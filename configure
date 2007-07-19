@@ -1,0 +1,36 @@
+#!/bin/bash
+CONFIG_QT=1
+CONFIG_KDE=1
+for parameter in "$@"; do
+   if echo $parameter | grep perfix > /dev/null; then
+      PREFIX="$(echo $parameter | cut -d"=" -f2-)"
+   elif echo $parameter | grep kde-dir > /dev/null; then
+      KDEDIR="$(echo $parameter | cut -d"=" -f2-)"
+   elif echo $parameter | grep qt-dir > /dev/null; then
+      QTDIR="$(echo $parameter | cut -d"=" -f2-)"
+#   elif [ $parameter = "without-qt-config" ]; then
+#      CONFIG_QT=0
+#   elif [ $parameter = "without-kde-config" ]; then
+#      CONFIG_KDE=0
+   else
+      echo -e "\e[0;34;47m\n!!! Unknown parameter \"$parameter\" !!!\n\nUsage:\n-------------\nconfigure [prefix=<Where apps get installed ($PREFIX)>] [qt-dir=<Path to Qt4>] [kde-dir=<Path to KDE4>]\e[m\n"
+#[without-qt-config]\n\nwithout-qt-config:\nDo NOT build the standalone configuration dialog\n\nwithout-kde-config:\nDo NOT build the kcontrol configuration plugin [auto turned off if KDE not found]\e[m\n"
+      exit 0
+   fi
+done
+
+qt4check="$($QTDIR/bin/qmake --version 2>&1 | grep -E "Qt *version *4")"
+if [ "$qt4check" = "" ]; then
+   echo -e "\e[0;31;47m$QTDIR does not seem to be a proper qt4 environment, try passing \"qt-dir=<Path to Qt4>\"\e[m"
+   exit 0
+fi
+
+kdecheck="$($KDEDIR/bin/kde4-config -v 2>&1 | grep -E "KDE *4")"
+if [ "$kdecheck" = "" ]; then
+   echo -e "\e[0;33;40m!!!$KDEDIR does not seem to be a proper KDE4 environment\nThe config plugin will NOT be build\n(Try passing \"kde-dir=<Path to KDE4>\")\e[m"
+   CONFIG_KDE=0
+fi
+
+if qmake qmake.pro; then
+   echo -e "\e[32;40mconfiguration done, now \"make && make install\"\e[m"
+fi
