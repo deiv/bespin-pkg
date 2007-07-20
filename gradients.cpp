@@ -200,8 +200,10 @@ progressGradient(const QColor &c, int size, Qt::Orientation o) {
    c.getHsv(&h,&s,&v);
    QColor dkC = c, ltC = c;
    int dv = 4*(v-80)/35; // v == 80 -> dv = 0, v = 255 -> dv = 20
-   dkC.setHsv(h+10, s, v - dv);
-   h -=20; if (h < 0) h = 400 + h;
+//    int th = h + 400;
+   int dh = qAbs((h % 120)-60)/6;
+   dkC.setHsv(h+dh, s, v - dv);
+   h -=dh; if (h < 0) h = 400 + h;
    dv = 20 - dv;
    ltC.setHsv(h-5,s, v + dv);
    
