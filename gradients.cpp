@@ -191,10 +191,24 @@ static inline QPixmap *
 progressGradient(const QColor &c, int size, Qt::Orientation o) {
 #define GLASS true
 #define GLOSS false
-   // in addition, glosses should have the last stop at 0.9
-   int dc = colorValue(c)/5; // how much darken/lighten we will
-   QColor dkC = c.dark(100+sqrt(2*dc));
-   QColor ltC = c.light(150-dc);
+// in addition, glosses should have the last stop at 0.9
+   
+   // some psychovisual stuff, we search a dark & bright surrounding and
+   // slightly shift hue as well (e.g. for green the dark color will slide to
+   // blue and the bright one to yellow - A LITTLE! ;)
+   int h,s,v;
+   c.getHsv(&h,&s,&v);
+   QColor dkC = c, ltC = c;
+   int dv = 4*(v-80)/35; // v == 80 -> dv = 0, v = 255 -> dv = 20
+   dkC.setHsv(h+10, s, v - dv);
+   h -=20; if (h < 0) h = 400 + h;
+   dv = 20 - dv;
+   ltC.setHsv(h-5,s, v + dv);
+   
+//    int dc = colorValue(c)/5; // how much darken/lighten we will
+//    QColor dkC = c.dark(100+sqrt(2*dc));
+//    QColor ltC = c.light(150-dc);
+   
    QPoint start, stop;
    QPixmap *dark = newPix(size, o, &start, &stop, 3*size);
    QGradient lg1, lg2;

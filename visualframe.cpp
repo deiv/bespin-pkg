@@ -169,6 +169,11 @@ void VisualFrame::wheelEvent ( QWheelEvent * event ) {
 
 void VisualFrame::correctPosition() {
    QRect rect = _frame->frameRect();
+   // TODO: this works around a Qt rtl (bug(?))!
+   if ((_frame->layoutDirection() == Qt::RightToLeft) &&
+       rect.right() != _frame->rect().right() &&
+       _frame->inherits("QAbstractScrollArea"))
+      rect.moveLeft(rect.x() + (_frame->rect().right() - rect.right()));
    rect.translate(_frame->mapTo(parentWidget(), QPoint(0,0)));
    int offs = _off[0]+_off[1];
    switch (_side) {

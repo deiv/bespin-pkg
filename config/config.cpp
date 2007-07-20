@@ -149,7 +149,8 @@ Config::Config(QWidget *parent) : BConfig(parent) {
    handleSettings(ui.fullButtonHover, "FullButtonHover", false);
    setContextHelp(ui.fullButtonHover, "<b>Fully filled hovered buttons</b><hr>\
                   This is especially a good idea if the contrast between the\
-                  button and Window color is low - but may be toggled whenever you want");
+                  button and Window color is low and also looks ok with Glass/Gloss\
+                  gradient settings - but may be toggled whenever you want");
    handleSettings(ui.sunkenButtons, "SunkenButtons", false);
    setContextHelp(ui.sunkenButtons, "<b>Sunken Buttons</b><hr>\
                   Somewhat experimental, at least i'm not happy with the look.\

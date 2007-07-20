@@ -340,26 +340,35 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             break;
          }
          
-         if (sunken) {
-//             int f1 = dpi.f1;
-            rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
-            const QPixmap &fill =
-                  Gradients::pix(CONF_COLOR(tab[1]), size, o, Gradients::Sunken);
-            masks.tab.render(rect, painter, fill);
-         }
-         else {
-            int d;
-            QColor c =
-                  midColor(CONF_COLOR(tab[0]), CONF_COLOR(tab[1]), 6-step, step);
-            if (o == Qt::Horizontal) {
-               d = (6-step)*rect.width()/14;
-               rect.adjust(d, 0, -d, 0);
+//          if (sunken) {
+// //             int f1 = dpi.f1;
+//             rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
+//             const QPixmap &fill =
+//                   Gradients::pix(CONF_COLOR(tab[1]), size, o, Gradients::Sunken);
+//             masks.tab.render(rect, painter, fill);
+//          }
+//          else
+         {
+            QColor c;
+            int d = 0;
+            if (sunken) {
+               rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
+               c = CONF_COLOR(tab[1]);
+               d = (o == Qt::Vertical) ? -dpi.f1 : f2;
             }
             else {
-               d = (6-step)*rect.height()/14;
-               rect.adjust(0, d, 0, -d);
+               c = midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1);
+               c = midColor(c, CONF_COLOR(tab[1]), 21, step);
             }
-            const QPoint off(d+f2, d+dpi.f4);
+//             if (o == Qt::Horizontal) {
+//                d = (6-step)*rect.width()/14;
+//                rect.adjust(d, 0, -d, 0);
+//             }
+//             else {
+//                d = (6-step)*rect.height()/14;
+//                rect.adjust(0, d, 0, -d);
+//             }
+            const QPoint off(d, d+dpi.f4);
             masks.tab.render(rect, painter, Gradients::brush(c, size, o,
                              config.gradTab), Tile::Full, false, off);
          }
@@ -416,10 +425,19 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          
          // color adjustment
-         QColor cF = CONF_COLOR(tab[1]), cB = CONF_COLOR(tab[0]);
-         if (hover || selected) {
+         QColor cF, cB;
+         if (selected || sunken) {
             cF = CONF_COLOR(tab[0]);
             cB = CONF_COLOR(tab[1]);
+         }
+         else if (hover) {
+            cF = CONF_COLOR(tab[1]);
+            cB = midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1);
+            cB = midColor(cB, cF);
+         }
+         else {
+            cB = midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1);
+            cF = midColor(cB, CONF_COLOR(tab[1]), 1,4);
          }
 
          // dark background, let's paint an emboss
@@ -897,8 +915,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          default:
                break;
          }
-         const QPixmap & ground = Gradients::pix(CONF_COLOR(tab[0]),
-               RECT.height(), Qt::Vertical, config.gradTab);
+         QColor c = midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1);
+         const QPixmap & ground =
+               Gradients::pix(c, RECT.height(), Qt::Vertical, config.gradTab);
          masks.tab.render(RECT, painter, ground, pf);
          
          if (sunken || option->state & State_Selected) {
@@ -910,9 +929,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          else if (hover) {
             QRect r = RECT.adjusted(dpi.f3, dpi.f4, -dpi.f3, -dpi.f4);
+            c = midColor(c, CONF_COLOR(tab[1]), 21, 6);
             const QPixmap & fill =
-                  Gradients::pix(CONF_COLOR(tab[1]), r.height(), Qt::Vertical,
-                                    config.gradTab);
+                  Gradients::pix(c, r.height(), Qt::Vertical, config.gradTab);
             masks.tab.render(r, painter, fill);
          }
       }

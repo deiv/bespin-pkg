@@ -1027,7 +1027,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          }
          
          masks.tab.render(rect, painter, Gradients::brush(
-                          midColor(COLOR(Window), CONF_COLOR(tab[0]), 1, 2),
+                          midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1),
          size, o, config.gradTab));
          rect.setBottom(rect.bottom()+dpi.f2);
          shadows.tabSunken.render(rect, painter);
