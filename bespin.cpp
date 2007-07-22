@@ -730,14 +730,14 @@ void BespinStyle::polish( QWidget * widget) {
       // WARNING: compmgrs like e.g. beryl deny to shadow shaped windows,
       // if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
       widget->installEventFilter(this); // for the round corners
-      widget->setAutoFillBackground (true);
+//       widget->setAutoFillBackground (true);
       widget->setBackgroundRole ( config.role_popup[0] );
       widget->setForegroundRole ( config.role_popup[1] );
-      if (qGray(widget->palette().color(QPalette::Active, widget->backgroundRole()).rgb()) < 100) {
-         QFont tmpFont = widget->font();
-         tmpFont.setBold(true);
-         widget->setFont(tmpFont);
-      }
+//       if (qGray(widget->palette().color(QPalette::Active, widget->backgroundRole()).rgb()) < 100) {
+//          QFont tmpFont = widget->font();
+//          tmpFont.setBold(true);
+//          widget->setFont(tmpFont);
+//       }
    }
    
    //========================

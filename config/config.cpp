@@ -4,6 +4,8 @@
 #include <QSettings>
 #include <QTimer>
 #include <QDialogButtonBox>
+#include <QInputDialog>
+#include <QMessageBox>
 
 /** This function declares the kstyle config plugin, you may need to adjust it
 for other plugins or won't need it at all, if you're not interested in a plugin */
@@ -26,13 +28,21 @@ enum GradientType {
 };
 
 /** The Constructor - your first job! */
-Config::Config(QWidget *parent) : BConfig(parent) {
+Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    
    /** Setup the UI and geometry */
    ui.setupUi(this);
    ui.info->setMinimumWidth( 160 ); /** min width for the info browser */
    ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
    resize(640,-1); /** sets dialog width to 640 and height to auto */
+   
+   /** Prepare the settings store, not of interest */
+   ui.store->hide(); // don't show by default
+   QSettings settings("Bespin", "Store");
+   ui.store->addItems( settings.childGroups() );
+   ui.store->sortItems();
+   connect (ui.store, SIGNAL( itemClicked(QListWidgetItem *) ),
+            this, SLOT( import2(QListWidgetItem *) ) );
    
    /** fill some comboboxes, not of interest */
    generateColorModes(ui.crProgressBar);
@@ -164,6 +174,124 @@ Config::Config(QWidget *parent) : BConfig(parent) {
    /** you can call loadSettings() whenever you want, but (obviously)
    only items that have been propagated with handleSettings(.) are handled !!*/
    loadSettings();
+}
+
+/** reimplementation of the import functionality
+1. we won't present a file dialog, but a listview
+2. we wanna im/export the current palette as well
+*/
+void Config::import() {
+   ui.info->hide();
+   ui.store->show();
+}
+
+static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
+   QStringList list;
+   for (int i = 0; i < QPalette::NColorRoles; i++)
+      list << pal.color(group, (QPalette::ColorRole) i).name();
+   return list;
+}
+
+void Config::import2(QListWidgetItem *item) {
+   setQSetting("Bespin", "Store", item->text());
+   loadSettings(0, false);
+   setQSetting("Bespin", "Style", "Style");
+   
+   /** import the color settings as well */
+   if (!loadedPal)
+      loadedPal = new QPalette;
+   else
+      emit changed(true); // we must update casue we loded probably different colors before
+   
+   QStringList list; int i;
+   const QPalette &pal = QApplication::palette();
+   QSettings settings("Bespin", "Store");
+   settings.beginGroup(item->text());
+   settings.beginGroup("QPalette");
+   
+   list = settings.value ( "active", colors(pal, QPalette::Active) ).toStringList();
+   for (i = 0; i < QPalette::NColorRoles; i++)
+      loadedPal->setColor ( QPalette::Active, (QPalette::ColorRole) i, QColor(list.at(i)) );
+   
+   list = settings.value ( "inactive", colors(pal, QPalette::Inactive) ).toStringList();
+   for (i = 0; i < QPalette::NColorRoles; i++)
+      loadedPal->setColor ( QPalette::Inactive, (QPalette::ColorRole) i, QColor(list.at(i)) );
+   
+   list = settings.value ( "disabled", colors(pal, QPalette::Inactive) ).toStringList();
+   for (i = 0; i < QPalette::NColorRoles; i++)
+      loadedPal->setColor ( QPalette::Disabled, (QPalette::ColorRole) i, QColor(list.at(i)) );
+
+   settings.endGroup();
+   settings.endGroup();
+   
+   ui.store->hide();
+   ui.info->show();
+}
+
+void Config::save() {
+   BConfig::save();
+   /** save the palette loaded from store to qt configuration */
+   if (loadedPal) {
+      QSettings settings("Trolltech");
+      settings.beginGroup("Qt");
+      settings.beginGroup("Palette");
+      
+      settings.setValue ( "active", colors(*loadedPal, QPalette::Active) );
+      settings.setValue ( "inactive", colors(*loadedPal, QPalette::Inactive) );
+      settings.setValue ( "disabled", colors(*loadedPal, QPalette::Disabled) );
+      
+      settings.endGroup();
+      settings.endGroup();
+   }
+}
+
+/** see above, we'll present a name input dialog here */
+void Config::saveAs() {
+   bool ok, addItem = true;
+   QString string =
+      QInputDialog::getText ( parentWidget(), tr("Enter a Name"),
+                              tr(""),
+                              QLineEdit::Normal, "", &ok);
+   if (!ok) return;
+   if (string.isEmpty()) {
+      QMessageBox::information ( parentWidget(), tr("Empty name"),
+                                 tr("You entered an empty name - nothing will be saved!") );
+      return;
+   }
+   QList<QListWidgetItem *> present =
+      ui.store->findItems ( string, Qt::MatchExactly );
+   if (!present.isEmpty()) {
+      QMessageBox::StandardButton btn =
+         QMessageBox::question ( parentWidget(), tr("Allready exists!"),
+                                 tr("The name you entered (%1) allready exists.<br>\
+                                    <b>Do you want to replace it?</b>").arg(string),
+                                 QMessageBox::Yes | QMessageBox::No, QMessageBox::No );
+      if (btn == QMessageBox::No) {
+         saveAs();
+         return;
+      }
+      addItem = false;
+   }
+   if (addItem) {
+      ui.store->addItem(string);
+      ui.store->sortItems();
+   }
+   setQSetting("Bespin", "Store", string);
+   save();
+   setQSetting("Bespin", "Style", "Style");
+   
+   /** Now let's save colors as well */
+   QSettings settings("Bespin", "Store");
+   settings.beginGroup(string);
+   settings.beginGroup("QPalette");
+   
+   const QPalette &pal = QApplication::palette();
+   settings.setValue ( "active", colors(pal, QPalette::Active) );
+   settings.setValue ( "inactive", colors(pal, QPalette::Inactive) );
+   settings.setValue ( "disabled", colors(pal, QPalette::Disabled) );
+   
+   settings.endGroup();
+   settings.endGroup();
 }
 
 /** The combobox filler you've read of several times before ;) */

@@ -726,8 +726,6 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       if (const QStyleOptionMenuItem *menuItem =
           qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
              
-         QPalette::ColorRole fgr = QPalette::WindowText;
-//          QPalette::ColorRole bgr = QPalette::Window;
          // separator
          if (menuItem->menuItemType == QStyleOptionMenuItem::Separator) {
             int dx = RECT.width()/6,
@@ -736,16 +734,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             if (!menuItem->text.isEmpty()) {
                painter->setFont(menuItem->font);
                drawItemText(painter, RECT, Qt::AlignCenter, PAL, isEnabled,
-                            menuItem->text, fgr);
+                            menuItem->text, config.role_popup[1]);
             }
             break;
          }
          
          bool selected = menuItem->state & State_Selected;
          
-         QColor bg = COLOR(Window);
-         QColor fg = isEnabled ? COLOR(WindowText) :
-                midColor(COLOR(Window), COLOR(WindowText), 2,1);
+         QColor bg = CONF_COLOR(popup[0]);
+         QColor fg = isEnabled ? CONF_COLOR(popup[1]) :
+                midColor(CONF_COLOR(popup[0]), CONF_COLOR(popup[1]), 2,1);
 
          painter->save();
          bool checkable =
@@ -753,8 +751,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          bool checked = checkable && menuItem->checked;
          
          if (selected && isEnabled) {
-            bg = midColor(COLOR(Window), COLOR(WindowText), 1, 2);
-            fg = COLOR(Window);
+            bg = midColor(CONF_COLOR(popup[0]), CONF_COLOR(popup[1]), 1, 2);
+            fg = CONF_COLOR(popup[0]);
             if (sunken) {
             const QPixmap &fill =
                   Gradients::pix(bg, RECT.height(), Qt::Vertical, Gradients::Sunken);
@@ -869,7 +867,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       }
       break;
    case CE_MenuScroller: { // Scrolling areas in a QMenu when the style supports scrolling
-      QPalette::ColorRole bg = widget ? widget->backgroundRole() : QPalette::Window;
+      QPalette::ColorRole bg = config.role_popup[0];
       if (option->state & State_DownArrow) {
          const QPixmap &gradient =
                Gradients::pix(PAL.color(QPalette::Active, bg),

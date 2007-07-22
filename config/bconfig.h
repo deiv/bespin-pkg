@@ -6,6 +6,7 @@
 #include <QVariant>
 class QComboBox;
 class QTextBrowser;
+class QSettings;
 
 typedef struct {
    QVariant defaultValue;
@@ -18,28 +19,31 @@ class BConfig : public QWidget
    Q_OBJECT
 public:
    BConfig(QWidget *parent = 0L);
-   void handleSettings(QWidget *w, const QString entry, QVariant defaultValue);
-   void setContextHelp(QWidget *w, QString help);
-   void setContextHelp(QComboBox *c, QStringList & strings);
-   void setInfoBrowser(QTextBrowser *browser);
-   void setQSetting(const QString organisation, const QString application, const QString group);
-   void setDefaultContextInfo(QString info);
+   virtual void handleSettings(QWidget *w, const QString entry, QVariant defaultValue);
+   virtual void setContextHelp(QWidget *w, QString help);
+   virtual void setContextHelp(QComboBox *c, QStringList & strings);
+   virtual void setInfoBrowser(QTextBrowser *browser);
+   virtual void setQSetting(const QString organisation, const QString application, const QString group);
+   virtual void setDefaultContextInfo(QString info);
 protected:
-   bool eventFilter ( QObject * watched, QEvent * event );
-   void loadSettings();
-private:
-   bool infoItemHovered;
+   virtual bool eventFilter ( QObject * watched, QEvent * event );
+   virtual void loadSettings(QSettings *settings = 0, bool updateInitValue = true);
+   virtual void _save(QSettings *settings = 0);
 signals:
    void changed(bool);
 public slots:
-   void save();
-   void defaults();
-   void reset();
-private slots:
+   virtual void save();
+   virtual void defaults();
+   virtual void reset();
+   virtual void import();
+   virtual void saveAs();
+protected slots:
    void checkDirty();
+private slots:
    void resetInfo();
    void setComboListInfo(int index);
 private:
+   bool infoItemHovered;
    QTextBrowser *_infoBrowser;
    QMap<QWidget*, SettingInfo> _settings;
    QMap<QWidget*, QString> _contextHelps;
