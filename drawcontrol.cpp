@@ -667,12 +667,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
    case CE_MenuBarItem: // A menu item in a QMenuBar
       if (const QStyleOptionMenuItem *mbi =
           qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
-         QPalette::ColorRole cr = QPalette::WindowText;
+         hover = option->state & State_Selected;
+         QPalette::ColorRole cr = hover ? QPalette::Window : QPalette::WindowText;
          IndexedFadeInfo *info = 0;
          QAction *action = 0, *activeAction = 0;
          int step = 0;
          if (sunken)
-            step = 12;
+            step = 6;
          else {
             if (widget)
             if (const QMenuBar* mbar = qobject_cast<const QMenuBar*>(widget)) {
@@ -685,13 +686,11 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                activeAction->menu()->isHidden()))
                step = info->step((long int)action);
          }
-         if (step || option->state & State_Selected) {
+         if (step || hover) {
             if (!step) step = 6;
-            QRect r = RECT.adjusted(0,dpi.f2,0,-dpi.f2);
-            const QPixmap &fill =
-                  Gradients::pix(midColor(COLOR(Window), COLOR(Highlight), 18,step),
-                                 r.height(), Qt::Vertical, sunken ?
-                                       Gradients::Sunken : Gradients::Button);
+            QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f2);
+            const QColor c =
+                  midColor(COLOR(Window), COLOR(WindowText), 9-step,step);
 
             int dy = 0;
             if (!sunken) {
@@ -700,8 +699,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                dy = step*r.height()/18;
                r.adjust(dx, dy, -dx, -dy);
             }
-            
-            masks.tab.render(r, painter, fill, Tile::Full, false, QPoint(0,dy));
+            if (sunken) {
+               const QPixmap &fill =
+                     Gradients::pix(c, r.height(), Qt::Vertical, Gradients::Sunken);
+               masks.tab.render(r, painter, fill, Tile::Full, false, QPoint(0,dy));
+            }
+            else
+               masks.tab.render(r, painter, c, Tile::Full);
          }
          QPixmap pix =
                 mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ?
@@ -749,17 +753,15 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          bool checked = checkable && menuItem->checked;
          
          if (selected && isEnabled) {
-//             QRect r = RECT.adjusted(0,0,0,-dpi.f2);
-            bg = midColor(COLOR(Window), COLOR(Highlight),3,sunken?2:1);
+            bg = midColor(COLOR(Window), COLOR(WindowText), 1, 2);
+            fg = COLOR(Window);
+            if (sunken) {
             const QPixmap &fill =
-                  Gradients::pix(bg, RECT.height(), Qt::Vertical, sunken ?
-                  Gradients::Sunken : Gradients::Button);
-            masks.tab.render(RECT, painter, fill);
-//             fillWithMask(painter, RECT, bg, &masks.tab);
-//             fillWithMask(painter, r,
-//                          Gradients::brush(bg, r.height(), Qt::Vertical,
-//                                         config.gradChoose), &masks.tab, Tile::Full);
-//             shadows.tabSunken.render(RECT, painter);
+                  Gradients::pix(bg, RECT.height(), Qt::Vertical, Gradients::Sunken);
+               masks.tab.render(RECT, painter, fill);
+            }
+            else
+               masks.tab.render(RECT, painter, bg);
          }
 
          // Text and icon, ripped from windows style
@@ -840,9 +842,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                painter->drawEllipse ( checkRect );
                if (checked || sunken) {
                   painter->setBrush ( fg );
-                  painter->drawEllipse ( checkRect.adjusted(checkRect.width()/4,
-                                         checkRect.height()/4, -checkRect.width()/4,
-                                         -checkRect.height()/4) );
+                  painter->drawEllipse ( checkRect.adjusted(3*checkRect.width()/8,
+                                         3*checkRect.height()/8, -3*checkRect.width()/8,
+                                         -3*checkRect.height()/8) );
 //                   painter->setBrush ( Qt::NoBrush );
                }
             }
