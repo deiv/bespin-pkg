@@ -345,18 +345,21 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (!isEnabled)
          break;
       bool isOn = option->state & State_On;
-      sunken = sunken | (!hover && isOn);
       int step = animator->hoverStep(widget);
-      if (hover || step || isOn) {
+      const QColor &c = bgcolor(PAL, widget);
+      if (isOn && (!hover || step < 6))
+         masks.tab.render(RECT, painter,
+                          Gradients::pix(c, RECT.height(), Qt::Vertical, Gradients::Sunken));
+      if (hover || step || sunken) {
          QRect r = RECT;
          if (!sunken && step) {
             step = 6 - step;
             int dx = step*r.width()/18; int dy = step*r.height()/18;
             r.adjust(dx, dy, -dx, -dy);
          }
-         masks.tab.render(r, painter, Gradients::pix(bgcolor(PAL, widget), r.height(),
-                                               Qt::Vertical, sunken ?
-                                               Gradients::Sunken : Gradients::Button));
+         masks.tab.render(r, painter,
+                          Gradients::pix(c, r.height(), Qt::Vertical, sunken ?
+                                Gradients::Sunken : Gradients::Button));
       }
       if (isOn)
          shadows.tabSunken.render(RECT, painter);
@@ -546,41 +549,53 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          isOn = true;
       int step = isOn ? 0 : animator->hoverStep(widget);
       
-      if (!sunken && hasFocus) {
-         painter->save();
-         painter->setBrush(midColor(COLOR(Window), COLOR(Highlight),
-                                    24-step, step));
-         painter->setPen(Qt::NoPen);
-         painter->setRenderHint(QPainter::Antialiasing);
-         painter->drawEllipse(RECT);
-         painter->restore();
-      }
       
-      // shadow
-      sunken = sunken || isOn;
-      painter->drawPixmap(sunken ? xy + QPoint(f1,f1) : xy,
-                          shadows.radio[sunken][true]);
-      
-      // plate
       QColor c = btnBgColor(PAL, isEnabled, hasFocus, step);
       if (config.fullButtonHover)
          c = midColor(c, COLOR(Button), 6-step, step);
       
-      xy += QPoint(f2,f1);
-      fillWithMask(painter, xy,
-                   Gradients::brush( c, dpi.ExclusiveIndicator, Qt::Vertical,
-                                     config.gradButton), masks.radio);
-      
-      if (isEnabled) {
-         sz = dpi.ExclusiveIndicator - dpi.f4;
-         painter->save();
-         painter->setBrush(Qt::NoBrush);
-         painter->setPen(Qt::white);
-         painter->setRenderHint(QPainter::Antialiasing);
-         painter->drawEllipse(xy.x(), xy.y(), sz, sz);
-         painter->restore();
+      if (config.sunkenButtons) {
+         QRect r = RECT.adjusted(dpi.f1,0,-dpi.f1,-dpi.f2);
+         masks.tab.render(r, painter,
+                          Gradients::brush( c, r.height(), Qt::Vertical,
+                                            sunken || isOn ? Gradients::Sunken : config.gradButton));
+         r.setBottom(RECT.bottom());
+         shadows.tabSunken.render(r, painter);
+         xy += QPoint(f1, 0);
       }
-      
+      else {
+         
+         if (!sunken && hasFocus) {
+            painter->save();
+            painter->setBrush(midColor(COLOR(Window), COLOR(Highlight),
+                                       24-step, step));
+            painter->setPen(Qt::NoPen);
+            painter->setRenderHint(QPainter::Antialiasing);
+            painter->drawEllipse(RECT);
+            painter->restore();
+         }
+         
+         // shadow
+         sunken = sunken || isOn;
+         painter->drawPixmap(sunken ? xy + QPoint(f1,f1) : xy,
+                           shadows.radio[sunken][true]);
+         
+         // plate
+         xy += QPoint(f2,f1);
+         fillWithMask(painter, xy,
+                     Gradients::brush( c, dpi.ExclusiveIndicator, Qt::Vertical,
+                                       config.gradButton), masks.radio);
+         
+         if (isEnabled) {
+            sz = dpi.ExclusiveIndicator - dpi.f4;
+            painter->save();
+            painter->setBrush(Qt::NoBrush);
+            painter->setPen(Qt::white);
+            painter->setRenderHint(QPainter::Antialiasing);
+            painter->drawEllipse(xy.x(), xy.y(), sz, sz);
+            painter->restore();
+         }
+      }
       // drop
       if (isOn) step = 6;
       if (step) {
@@ -1031,7 +1046,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          }
          
          masks.tab.render(rect, painter, Gradients::brush(
-                          midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1),
+                          midColor(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1),
          size, o, config.gradTab));
          rect.setBottom(rect.bottom()+dpi.f2);
          shadows.tabSunken.render(rect, painter);

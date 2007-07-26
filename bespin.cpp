@@ -285,9 +285,6 @@ void BespinStyle::readSettings()
    config.gradTab =
       (Gradients::Type) settings.value("GradTab", Gradients::Gloss).toInt();
 
-   config.hoverImpact = 166 - settings.value("HoverImpact", 0).toInt();
-   config.hoverImpact = CLAMP(config.hoverImpact, 6, 166);
-   
    config.showMenuIcons = settings.value("ShowMenuIcons", false).toBool();
    config.menuShadow = settings.value("MenuShadow", false).toBool();
    config.showScrollButtons = settings.value("ShowScrollButtons", true).toBool();
@@ -299,23 +296,15 @@ void BespinStyle::readSettings()
    invColorRole(config.role_progress[0], config.role_progress[1],
                  QPalette::Highlight, QPalette::HighlightedText);
    
-   config.role_tab[0] =
-      (QPalette::ColorRole) settings.value("role_tab", QPalette::Button).toInt();
-   invColorRole(config.role_tab[0], config.role_tab[1],
+   config.role_tab[0][0] =
+      (QPalette::ColorRole) settings.value("role_tab", QPalette::Window).toInt();
+   invColorRole(config.role_tab[0][0], config.role_tab[0][1],
+                QPalette::Window, QPalette::WindowText);
+   
+   config.role_tab[1][0] =
+      (QPalette::ColorRole) settings.value("role_tabActive", QPalette::Button).toInt();
+   invColorRole(config.role_tab[1][0], config.role_tab[1][1],
                 QPalette::Button, QPalette::ButtonText);
-   
-   config.role_btn[0] =
-      (QPalette::ColorRole) settings.value("role_button", QPalette::Window).toInt();
-   invColorRole(config.role_btn[0], config.role_btn[1],
-                 QPalette::Window, QPalette::WindowText);
-   
-   config.role_btnHover[0] =
-      (QPalette::ColorRole) settings.value("role_buttonHover", QPalette::Highlight).toInt();
-   if (config.hoverImpact < 13)
-      invColorRole(config.role_btnHover[0], config.role_btnHover[1],
-                   QPalette::Highlight, QPalette::HighlightedText);
-   else
-      config.role_btnHover[1] = config.role_btn[1];
    
    config.role_popup[0] =
       (QPalette::ColorRole) settings.value("role_popup", QPalette::Window).toInt();
@@ -347,7 +336,7 @@ void BespinStyle::initMetrics()
    dpi.SliderThickness = SCALE(24);
    dpi.SliderControl = SCALE(19);
    dpi.Indicator = config.sunkenButtons ? SCALE(16) : SCALE(20);
-   dpi.ExclusiveIndicator = SCALE(19);
+   dpi.ExclusiveIndicator = config.sunkenButtons ? SCALE(16) : SCALE(19);
 }
 
 #undef SCALE
@@ -549,11 +538,8 @@ void BespinStyle::polish( QWidget * widget) {
    if (qobject_cast<QAbstractButton*>(widget)) {
       if (widget->inherits("QToolBoxButton"))
          widget->setForegroundRole ( QPalette::WindowText );
-      else {
-         widget->setBackgroundRole ( config.role_btn[0] );
-         widget->setForegroundRole ( config.role_btn[1] );
+      else
          widget->installEventFilter(this);
-      }
    }
    if (qobject_cast<QComboBox *>(widget)) {
       widget->setBackgroundRole ( QPalette::Base );
@@ -596,8 +582,8 @@ void BespinStyle::polish( QWidget * widget) {
       widget->installEventFilter(this);
 
    if (qobject_cast<QTabBar *>(widget)) {
-      widget->setBackgroundRole ( config.role_tab[0] );
-      widget->setForegroundRole ( config.role_tab[1] );
+      widget->setBackgroundRole ( config.role_tab[0][0] );
+      widget->setForegroundRole ( config.role_tab[1][0] );
       widget->installEventFilter(this);
    }
    

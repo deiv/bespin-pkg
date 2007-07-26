@@ -697,8 +697,8 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
       // special handling for the tabbar scrollers ----------------------------------
       if (widget && widget->parentWidget() &&
           qobject_cast<QTabBar*>(widget->parent())) {
-         QColor c = widget->parentWidget()->palette().color(config.role_tab[0]);
-         QColor c2 = widget->parentWidget()->palette().color(config.role_tab[1]);
+         QColor c = widget->parentWidget()->palette().color(config.role_tab[0][0]);
+         QColor c2 = widget->parentWidget()->palette().color(config.role_tab[0][1]);
          if (sunken) {
             int dy = (RECT.height()-RECT.width())/2;
             QRect r = RECT.adjusted(dpi.f2,dy,-dpi.f2,-dy);

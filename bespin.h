@@ -67,13 +67,19 @@ typedef struct Config {
    int structure;
    TabAnimInfo::TabTransition tabTransition;
    int gradientIntensity;
-   bool showMenuIcons, showScrollButtons, menuShadow,
-      sunkenButtons, fullButtonHover, strongFocus;
+   bool
+      showMenuIcons,
+      showScrollButtons,
+      menuShadow,
+      sunkenButtons,
+      fullButtonHover,
+      strongFocus;
    double scale;
    int checkType;
-   QPalette::ColorRole role_progress[2], role_tab[2],
-      role_btn[2], role_btnHover[2], role_popup[2];
-   int hoverImpact;
+   QPalette::ColorRole
+      role_progress[2],
+      role_tab[2][2],
+      role_popup[2];
 } Config;
 
 class BespinStyle : public QCommonStyle {
@@ -200,7 +206,7 @@ private:
    typedef QHash<uint, Tile::Set> TileCache;
    struct {
       Tile::Mask button, tab;
-      QPixmap radio, radioIndicator, radioGroove, notch, slider[4];
+      QPixmap radio, radioIndicator, notch, slider[4];
       QPixmap winClose, winMin, winMax;
       QRegion corner[4];
    } masks;

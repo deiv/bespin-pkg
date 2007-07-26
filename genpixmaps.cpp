@@ -196,19 +196,13 @@ void BespinStyle::generatePixmaps()
    p.end();
    UPDATE_COLORS(masks.radio);
    
-   rw -= f4; rh -= f4;
-   masks.radioGroove = QPixmap(rw, rh);
-   masks.radioGroove.fill(Qt::transparent);
-   p.begin(&masks.radioGroove);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,255));
-   p.drawEllipse(0,0,rw,rh);
-   p.end();
-   UPDATE_COLORS(masks.radioGroove);
-   
    // mask fill
-   rw -= f4; rh -= f4;
+   if (config.sunkenButtons) {
+      rw -= dpi.f6; rh -= dpi.f6;
+   }
+   else {
+      rw -= dpi.f8; rh -= dpi.f8;
+   }
    masks.radioIndicator = QPixmap(rw, rh);
    masks.radioIndicator.fill(Qt::transparent);
    p.begin(&masks.radioIndicator);

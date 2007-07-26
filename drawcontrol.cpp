@@ -74,6 +74,24 @@ static void drawArrow(const QStyle *style, const QStyleOptionToolButton *toolbut
    style->drawPrimitive(pe, &arrowOpt, painter, widget);
 }
 
+static int contrast(const QColor &a, const QColor &b)
+{
+   int ar,ag,ab,br,bg,bb;
+   a.getRgb(&ar,&ag,&ab);
+   b.getRgb(&br,&bg,&bb);
+   
+   int diff = (299*(ar-br) + 587*(ag-bg) + 114*(ab-bb));
+   int perc = diff / 2550;
+   
+   diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
+      - (qMin(ar,br) + qMin(ag,bg) + qMin(ab,bb));
+   
+   perc *= diff;
+   perc /= 765;
+   
+   return perc;
+}
+
 void BespinStyle::drawControl ( ControlElement element, const QStyleOption * option, QPainter * painter, const QWidget * widget) const
 {
    Q_ASSERT(option);
@@ -340,38 +358,22 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             break;
          }
          
-//          if (sunken) {
-// //             int f1 = dpi.f1;
-//             rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
-//             const QPixmap &fill =
-//                   Gradients::pix(CONF_COLOR(tab[1]), size, o, Gradients::Sunken);
-//             masks.tab.render(rect, painter, fill);
-//          }
-//          else
-         {
-            QColor c;
-            int d = 0;
-            if (sunken) {
-               rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
-               c = CONF_COLOR(tab[1]);
-               d = (o == Qt::Vertical) ? -dpi.f1 : f2;
-            }
-            else {
-               c = midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1);
-               c = midColor(c, CONF_COLOR(tab[1]), 21, step);
-            }
-//             if (o == Qt::Horizontal) {
-//                d = (6-step)*rect.width()/14;
-//                rect.adjust(d, 0, -d, 0);
-//             }
-//             else {
-//                d = (6-step)*rect.height()/14;
-//                rect.adjust(0, d, 0, -d);
-//             }
-            const QPoint off(d, d+dpi.f4);
-            masks.tab.render(rect, painter, Gradients::brush(c, size, o,
-                             config.gradTab), Tile::Full, false, off);
+         QColor c;
+         int d = 0;
+         if (sunken) {
+            rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
+            c = CONF_COLOR(tab[1][0]);
+            d = (o == Qt::Vertical) ? -dpi.f1 : f2;
          }
+         else {
+            c = midColor(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
+            int quota = 6 + (int) (.16 * contrast(c, CONF_COLOR(tab[1][0])));
+            c = midColor(c, CONF_COLOR(tab[1][0]), quota, step);
+         }
+         const QPoint off(d, d+dpi.f4);
+         masks.tab.render(rect, painter, Gradients::brush(c, size, o,
+                           config.gradTab), Tile::Full, false, off);
+
       }
       break;
    case CE_TabBarTabLabel: // The label within a tab
@@ -427,17 +429,17 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          // color adjustment
          QColor cF, cB;
          if (selected || sunken) {
-            cF = CONF_COLOR(tab[0]);
-            cB = CONF_COLOR(tab[1]);
+            cF = CONF_COLOR(tab[1][1]);
+            cB = CONF_COLOR(tab[1][0]);
          }
          else if (hover) {
-            cF = CONF_COLOR(tab[1]);
-            cB = midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1);
-            cB = midColor(cB, cF);
+            cF = CONF_COLOR(tab[0][1]);
+            cB = midColor(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
+            cB = midColor(cB, CONF_COLOR(tab[1][0]));
          }
          else {
-            cB = midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1);
-            cF = midColor(cB, CONF_COLOR(tab[1]), 1,4);
+            cB = midColor(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
+            cF = midColor(cB, CONF_COLOR(tab[0][1]), 1,4);
          }
 
          // dark background, let's paint an emboss
@@ -915,7 +917,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          default:
                break;
          }
-         QColor c = midColor(CONF_COLOR(tab[0]), COLOR(Window), 2, 1);
+         QColor c = midColor(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
          const QPixmap & ground =
                Gradients::pix(c, RECT.height(), Qt::Vertical, config.gradTab);
          masks.tab.render(RECT, painter, ground, pf);
@@ -923,13 +925,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          if (sunken || option->state & State_Selected) {
             QRect r = RECT.adjusted(dpi.f2, dpi.f3, -dpi.f2, -dpi.f3);
             const QPixmap & fill =
-                  Gradients::pix(CONF_COLOR(tab[1]), r.height(), Qt::Vertical,
+                  Gradients::pix(CONF_COLOR(tab[1][0]), r.height(), Qt::Vertical,
                                     Gradients::Sunken);
             masks.tab.render(r, painter, fill);
          }
          else if (hover) {
             QRect r = RECT.adjusted(dpi.f3, dpi.f4, -dpi.f3, -dpi.f4);
-            c = midColor(c, CONF_COLOR(tab[1]), 21, 6);
+            c = midColor(c, CONF_COLOR(tab[1][0]), 21, 6);
             const QPixmap & fill =
                   Gradients::pix(c, r.height(), Qt::Vertical, config.gradTab);
             masks.tab.render(r, painter, fill);
@@ -940,12 +942,11 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       if (const QStyleOptionToolBox* tbt =
           qstyleoption_cast<const QStyleOptionToolBox*>(option)) {
          
-         QPalette::ColorRole bgRole = config.role_tab[0],
-         fgRole = config.role_tab[1];
-         if (option->state & (State_Selected | State_MouseOver)) {
-            fgRole = config.role_tab[0];
-            bgRole = config.role_tab[1];
-         }
+         bool active = option->state & (State_Selected | State_MouseOver);
+         
+         QPalette::ColorRole
+               bgRole = config.role_tab[active][0],
+               fgRole = config.role_tab[active][1];
          
          painter->save();
          
@@ -1219,21 +1220,21 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          
          // shadow
          if (sunken) {
-            r.adjust(f1, f1, -f1, -f2);
-            shadows.tab[true][true].render(r, painter);
             r.adjust(f1, f1, -f1, -f1);
+            shadows.tab[true][true].render(r, painter);
+            r.adjust(f1, f1, -f1, -f2);
          }
          else {
             shadows.tab[true][false].render(r, painter);
             r.adjust(f2, f2, -f2, -dpi.f3);
          }
          
-         Qt::Orientation o; int size; QPoint off;
+         Qt::Orientation o; int size;
          if (option->state & QStyle::State_Horizontal) {
-            o = Qt::Vertical; size = r.height(); off = QPoint(0,f2);
+            o = Qt::Vertical; size = r.height();
          }
          else {
-            o = Qt::Horizontal; size = r.width(); off = QPoint(f2,0);
+            o = Qt::Horizontal; size = r.width();
          }
          
          // the hover indicator color (inside area)
@@ -1265,7 +1266,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          const QPixmap &deco =
                Gradients::pix(c, size, o, Gradients::Progress);
          r.adjust(f2, f2, -f2, -f2);
-         masks.button.render(r, painter, deco, Tile::Full, false, off);
+         masks.button.render(r, painter, deco, Tile::Full, false, QPoint(f2,f2));
       }
       break;
 //    case CE_ScrollBarFirst: // Scroll bar first line indicator (i.e., home).

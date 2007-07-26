@@ -37,7 +37,7 @@ hoverWidgets.count() + complexHoverWidgets.count() + indexedHoverWidgets.count()
 
 #define startTimer if (!timer->isActive()) timer->start(50)
 
-static QHash<QWidget*, uint> progressbars;
+static QHash<QWidget*, int> progressbars;
 typedef QHash<QWidget*, HoverFadeInfo> HoverFades;
 static HoverFades hoverWidgets;
 typedef QHash<QWidget*, ComplexHoverFadeInfo> ComplexHoverFades;
@@ -339,7 +339,7 @@ void StyleAnimator::updateProgressbars() {
    if (progressbars.isEmpty())
       return;
    //Update the registered progressbars.
-   QHash<QWidget*, uint>::iterator iter;
+   QHash<QWidget*, int>::iterator iter;
    QProgressBar *pb;
    animationUpdate = true;
    for (iter = progressbars.begin(); iter != progressbars.end(); iter++) {
@@ -349,12 +349,15 @@ void StyleAnimator::updateProgressbars() {
       if (pb->paintingActive() || !pb->isVisible() ||
           !(pb->value() > pb->minimum()) || !(pb->value() < pb->maximum()))
          continue;
-      int mod = (pb->height()-/*dpi.f*/6)*3;
+      int swap = pb->orientation() == Qt::Horizontal ? pb->width() : pb->height();
+//       swap = swap*pb->value()/(pb->maximum()-pb->minimum()) - 1;
+      int mod = (swap-/*dpi.f*/6)*3;
       if (!mod)
          continue;
       ++iter.value();
-      if (mod)
-         iter.value() %= mod;
+      iter.value() %= mod;
+//       if (iter.value() > swap)
+//          iter.value() = -iter.value();
 //       if (iter.value() % 2) { // odd - fade out
 //          iter.value() -= 2;
 //          if (iter.value() < 4) // == 3
@@ -376,7 +379,7 @@ void StyleAnimator::updateProgressbars() {
 }
 
 int StyleAnimator::progressStep(const QWidget *w) const {
-   return progressbars.value(const_cast<QWidget*>(w),0);
+   return qAbs(progressbars.value(const_cast<QWidget*>(w),0));
 }
 
 void StyleAnimator::progressbarDestroyed(QObject* obj) {

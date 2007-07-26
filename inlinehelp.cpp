@@ -106,9 +106,8 @@ inline QColor btnFgColor(const QPalette &pal, bool isEnabled, int hover, int ste
       return midColor(TMP_COLOR(Window), TMP_COLOR(WindowText), 1, 3);
    if (hover && !step) step = 6;
    if (step)
-      return midColor(TMP_COLOR(WindowText), TMP_COLOR(ButtonText),
-                      step, config.hoverImpact - step);
-   return TMP_CONF_COLOR(role_btn[1]);
+      return midColor(TMP_COLOR(WindowText), TMP_COLOR(ButtonText), 6 - step, step);
+   return TMP_COLOR(WindowText);
 }
 
 #undef TMP_COLOR
