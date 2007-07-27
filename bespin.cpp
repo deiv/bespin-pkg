@@ -482,6 +482,8 @@ static Atom winType = XInternAtom(QX11Info::display(), "_NET_WM_WINDOW_TYPE", Fa
 #endif
 void BespinStyle::polish( QWidget * widget) {
    
+   if (!widget) return; // !
+   
    // installs dynamic brush to all widgets, taking care of a correct bg pixmap size
    //TODO maybe we can exclude some more widgets here... (currently only popup menus)
 //    if (_bgBrush && !(
