@@ -92,6 +92,19 @@ static int contrast(const QColor &a, const QColor &b)
    return perc;
 }
 
+static void calcChunkSize(int l, int t, int &cw1, int &cw2) {
+   int n = l/t;
+   if (!n%2) --n;
+   int d = qMin(l-n*t, (n+2)*t-l);
+   if (n*t + d == l) d = -d;
+   if (d < 0) {
+      cw1 = t+1; cw2 = t + (d/(n/2))-1;
+   }
+   else {
+      cw2 = t-1; cw1 = t + (d/(n/2+1))+1;
+   }
+}
+
 void BespinStyle::drawControl ( ControlElement element, const QStyleOption * option, QPainter * painter, const QWidget * widget) const
 {
    Q_ASSERT(option);
@@ -478,23 +491,40 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
    case CE_ProgressBarGroove:
       if (const QStyleOptionProgressBarV2 *pb =
             qstyleoption_cast<const QStyleOptionProgressBarV2*>(option)) {
-         
-         // shadow
-         shadows.button[isEnabled][false].render(RECT, painter, Tile::Ring);
-         
-         // geometry setup
-         QRect rect = RECT.adjusted(dpi.f2, dpi.f1, -dpi.f2, -dpi.f3);
+
+         const int f2 = dpi.f2;
+         QRect rect = RECT;
          int size = rect.height();
          Qt::Orientation o = Qt::Vertical;
          if (pb->orientation == Qt::Vertical) {
             size = rect.width(); o = Qt::Horizontal;
          }
-         // "groove"
-         const QPixmap &groove =
-               Gradients::pix(COLOR(Window), size, o, config.gradProgress );
-         fillWithMask(painter, rect, groove, &masks.button, Tile::Full);
-         masks.button.outline(rect, painter,
-                              midColor(COLOR(Window), Qt::white, 1,3), true);
+         masks.button.render(rect, painter,
+                             Gradients::pix(COLOR(Window), size, o, Gradients::Sunken ) );
+         rect.adjust(f2,f2,-f2,-f2); size -= dpi.f4;
+         const QPixmap &glass =
+               Gradients::pix(COLOR(Window).dark(110), size, o, Gradients::Glass );
+         const QPixmap &solid =
+               Gradients::pix(COLOR(Window), size, o, Gradients::Simple );
+         QPixmap renderPix; int cw1, cw2;
+         if (o == Qt::Vertical) {
+            calcChunkSize(rect.width(), size, cw1, cw2);
+            renderPix = QPixmap(cw1+cw2, size);
+            QPainter p(&renderPix);
+            p.drawTiledPixmap(0,0,cw1,size,solid);
+            p.drawTiledPixmap(cw1,0,cw2,size,glass);
+            p.end();
+         }
+         else {
+            calcChunkSize(rect.height(), size, cw1, cw2);
+            renderPix = QPixmap(size, cw1+cw2);
+            QPainter p(&renderPix);
+            p.drawTiledPixmap(0,0,size,cw1,solid);
+            p.drawTiledPixmap(0,cw1,size,cw2,glass);
+            p.end();
+         }
+         painter->drawTiledPixmap(rect, renderPix);
+
       }
       break;
    case CE_ProgressBarContents:
@@ -503,39 +533,55 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          double val = pb->progress; val /= (pb->maximum - pb->minimum);
          if (val == 0.0)
             break;
-         QRect rect = RECT, r = RECT.adjusted(dpi.f3,dpi.f2,-dpi.f3,-dpi.f4);
+
+         bool reverse = option->direction == Qt::RightToLeft;
+         if (pb->invertedAppearance) reverse = !reverse;
+         
+         const int f2 = dpi.f2;
+         int step = animator->progressStep(widget);
+         
+         QRect r = RECT.adjusted(f2, f2, -f2, -f2);
          int size = r.height();
          Qt::Orientation o = Qt::Vertical;
-         bool reverse = option->direction == Qt::RightToLeft;
-         if (pb->invertedAppearance)
-            reverse = !reverse;
-         int step = animator->progressStep(widget);
-         QPoint off(-step, 0);
          if (pb->orientation == Qt::Vertical) {
-            off = QPoint(0, step);
-            size = r.width();
-            o = Qt::Horizontal;
+            size = r.width(); o = Qt::Horizontal;
             r.setTop(r.bottom() - (int)(val*r.height())+1);
-            rect.setTop(r.top()-lights.button.height(Tile::TopMid));
          }
-         else if (reverse) {
-            off = QPoint(step, 0);
+         else if (reverse)
             r.setLeft(r.right() - (int)(val*r.width())+1);
-            rect.setLeft(r.left()-lights.button.width(Tile::MidLeft));
-         }
-         else {
+         else
             r.setRight(r.left() + (int)(val*r.width())-1);
-            rect.setRight(r.right()+lights.button.width(Tile::MidRight));
-         }
 
          if (!size)
             break;
+         
+//          lights.button.render(r.adjusted(-f2,-f2,0,f2), painter, CONF_COLOR(progress[0]));
                
-         lights.button.render(rect, painter, CONF_COLOR(progress[0]), Tile::Ring);
-         masks.button.render(r, painter, Gradients::pix(CONF_COLOR(progress[0]),
-            size, o, Gradients::Progress), Tile::Full, false, off);
-         masks.button.outline(r, painter, midColor(COLOR(Window),
-                              CONF_COLOR(progress[0])).light(120));
+         QColor c =
+               midColor(COLOR(Window), CONF_COLOR(progress[0]), 18 - step, 18);
+         const QPixmap &glass = Gradients::pix(c, size, o, Gradients::Glass );
+         c = midColor(COLOR(Window), CONF_COLOR(progress[0]), 2,1);
+         const QPixmap &solid = Gradients::pix(c, size, o, Gradients::Simple );
+         
+         QPixmap renderPix; int cw1, cw2;
+         if (o == Qt::Vertical) {
+            calcChunkSize(RECT.width()-dpi.f4, size, cw1, cw2);
+            renderPix = QPixmap(cw1+cw2, size);
+            QPainter p(&renderPix);
+            p.drawTiledPixmap(0,0,cw1,size,solid);
+            p.drawTiledPixmap(cw1,0,cw2,size,glass);
+            p.end();
+         }
+         else {
+            calcChunkSize(RECT.height()-dpi.f4, size, cw1, cw2);
+            renderPix = QPixmap(size, cw1+cw2);
+            QPainter p(&renderPix);
+            p.drawTiledPixmap(0,0,size,cw1,solid);
+            p.drawTiledPixmap(0,cw1,size,cw2,glass);
+            p.end();
+         }
+         painter->drawTiledPixmap(r, renderPix, r.topLeft()-QPoint(f2,f2));
+         
       }
       break;
    case CE_ProgressBarLabel:

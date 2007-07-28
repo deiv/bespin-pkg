@@ -349,31 +349,13 @@ void StyleAnimator::updateProgressbars() {
       if (pb->paintingActive() || !pb->isVisible() ||
           !(pb->value() > pb->minimum()) || !(pb->value() < pb->maximum()))
          continue;
-      int swap = pb->orientation() == Qt::Horizontal ? pb->width() : pb->height();
-//       swap = swap*pb->value()/(pb->maximum()-pb->minimum()) - 1;
-      int mod = (swap-/*dpi.f*/6)*3;
-      if (!mod)
-         continue;
+
       ++iter.value();
-      iter.value() %= mod;
-//       if (iter.value() > swap)
-//          iter.value() = -iter.value();
-//       if (iter.value() % 2) { // odd - fade out
-//          iter.value() -= 2;
-//          if (iter.value() < 4) // == 3
-//             ++iter.value(); // 4
-//          if ((iter.value()+1) % 4) // save some cycles...
-//             continue;
-//       }
-//       else { //fade in
-//          iter.value() += 2;
-//          if (iter.value() > 39) // == 40
-//             ++iter.value(); // 41
-//          if (iter.value() % 4) // save some cycles...
-//             continue;
-//       }
-      if (!(iter.value() % 2)) // animate only every 3rd step (to save cpu)
-         pb->repaint(pb->rect().adjusted(3,3,-3,-3));
+      
+      if (iter.value() > 18) iter.value() = -18;
+      
+      if (iter.value() % 2) // animate only every 2nd step (to save cpu)
+         pb->repaint(pb->rect().adjusted(2,2,-2,-2));
    }
    animationUpdate = false;
 }

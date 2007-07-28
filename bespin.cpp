@@ -540,12 +540,21 @@ void BespinStyle::polish( QWidget * widget) {
    if (qobject_cast<QAbstractButton*>(widget)) {
       if (widget->inherits("QToolBoxButton"))
          widget->setForegroundRole ( QPalette::WindowText );
-      else
+      else {
+         widget->setBackgroundRole ( QPalette::Window );
+         widget->setForegroundRole ( QPalette::WindowText );
          widget->installEventFilter(this);
+      }
    }
-   if (qobject_cast<QComboBox *>(widget)) {
-      widget->setBackgroundRole ( QPalette::Base );
-      widget->setForegroundRole ( QPalette::Text );
+   if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
+      if (box->isEditable()) {
+         widget->setBackgroundRole ( QPalette::Base );
+         widget->setForegroundRole ( QPalette::Text );
+      }
+      else {
+         widget->setBackgroundRole ( QPalette::Window );
+         widget->setForegroundRole ( QPalette::WindowText );
+      }
       widget->installEventFilter(this);
    }
    if (qobject_cast<QAbstractSlider *>(widget)) {
@@ -575,8 +584,8 @@ void BespinStyle::polish( QWidget * widget) {
    }
    
    if (qobject_cast<QProgressBar*>(widget)) {
-      widget->setBackgroundRole ( config.role_progress[0] );
-      widget->setForegroundRole ( config.role_progress[1] );
+//       widget->setBackgroundRole ( config.role_progress[0] );
+//       widget->setForegroundRole ( config.role_progress[1] );
       widget->installEventFilter(this);
    }
    
