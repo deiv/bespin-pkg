@@ -642,6 +642,12 @@ void BespinStyle::polish( QWidget * widget) {
           frame->frameShape() == QFrame::WinPanel)
          frame->setFrameShape(QFrame::StyledPanel);
       
+      // map a toolbox frame to it's elements
+      if (qobject_cast<QAbstractScrollArea*>(frame) &&
+          frame->parentWidget() && frame->parentWidget()->inherits("QToolBox")) {
+         frame->setFrameStyle( static_cast<QFrame*>(frame->parentWidget())->frameStyle() );
+      }
+      
       // overwrite ugly lines
       if (frame->frameShape() == QFrame::HLine ||
           frame->frameShape() == QFrame::VLine)
@@ -656,11 +662,8 @@ void BespinStyle::polish( QWidget * widget) {
             widget->layout()->setSpacing ( 0 );
          }
       }
-
-//        && !(
-//          widget->inherits("QComboBoxListView") ||
-//          widget->inherits("QComboBoxPrivateContainer"))
       else if (frame->frameShape() == QFrame::StyledPanel) {
+         
          if (widget->inherits("QTextEdit") && frame->lineWidth() == 1)
             frame->setLineWidth(dpi.f4);
          else {

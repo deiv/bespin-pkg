@@ -47,6 +47,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    /** fill some comboboxes, not of interest */
    generateColorModes(ui.crProgressBar);
    generateColorModes(ui.crTabBar);
+   generateColorModes(ui.crTabBarActive);
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
@@ -150,8 +151,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
                   Choose any mode you like - the other part is like the window");
    handleSettings(ui.crTabBar, "role_tab", QPalette::WindowText);
    setContextHelp(ui.crTabBar, "<b>Tabbar Role</b><hr>\
-                  The color of the tabbar (everything but the selected tab, \
-                  which is inversed)<br>\
+                  The color of the tabbar background<br>\
+                  The Text color is chosen automatically");
+   handleSettings(ui.crTabBarActive, "role_tabActive", QPalette::Button);
+   setContextHelp(ui.crTabBarActive, "<b>Tabbar Active Item Role</b><hr>\
+                  The color of the hovered or selected tab<br>\
                   The Text color is chosen automatically");
    handleSettings(ui.gradButton, "GradButton", GradNone);
    handleSettings(ui.gradChoose, "GradChoose", GradGlass);

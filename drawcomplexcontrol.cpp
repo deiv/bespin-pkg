@@ -545,23 +545,23 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          const int ground = 0;
          
          if ((slider->subControls & SC_SliderGroove) && groove.isValid()) {
-            QRect r;
-            const QColor c = hasFocus ?
-               midColor(COLOR(Window), COLOR(Highlight), 3,1) : COLOR(Window);
+            painter->save();
 
+            QRect r;
+            const QColor c = midColor(COLOR(Window), CONF_COLOR(progress[0]), 3,1);
             if ( slider->orientation == Qt::Horizontal ) {
                
-               groove.adjust(0,handle.height()/3,0,-handle.height()/3);
-               // basic groove
-               const QPixmap &fill = Gradients::pix(COLOR(Window),
-                  groove.height(), Qt::Vertical, Gradients::Sunken);
-               masks.button.render(groove, painter, fill);
+               int y = groove.center().y();
+               painter->setPen(COLOR(Window).dark(115));
+               painter->drawLine(groove.x(),y,groove.right(),y);
+               ++y;
+               painter->setPen(COLOR(Window).light(108));
+               painter->drawLine(groove.x(),y,groove.right(),y);
 
                // the "temperature"
                if (slider->sliderPosition != ground &&
                    slider->maximum > slider->minimum) {
-                      
-                  groove.adjust(0, dpi.f1, 0, -dpi.f1);
+                  --y;
                   
                   int groundX = groove.width() * (ground - slider->minimum) /
                         (slider->maximum - slider->minimum);
@@ -582,23 +582,27 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                      groove.setLeft(handle.center().x());
                      groove.setRight(groundX);
                   }
-                  const QPixmap &fill = Gradients::pix(c, groove.height(),
-                     Qt::Vertical, config.gradButton);
-                  masks.button.render(groove, painter, fill, Tile::Full, false);
+                  painter->setPen(c.dark(115));
+                  painter->drawLine(groove.x(), y, groove.right(), y);
+                  ++y;
+                  painter->setPen(c.light(108));
+                  painter->drawLine(groove.x(), y, groove.right(), y);
                }
             }
             else { // Vertical
 
-               groove.adjust(handle.width()/3,0,-handle.width()/3,0);
-               // basic groove
-               const QPixmap &fill = Gradients::pix(COLOR(Window),
-                  groove.width(), Qt::Horizontal, Gradients::Sunken);
-               masks.button.render(groove, painter, fill);
+               int x = groove.center().x();
+               painter->setPen(COLOR(Window).dark(115));
+               painter->drawLine(x, groove.y(), x, groove.bottom());
+               ++x;
+               painter->setPen(COLOR(Window).light(108));
+               painter->drawLine(x, groove.y(), x, groove.bottom());
 
                // the "temperature"
                if (slider->sliderPosition != ground &&
                    slider->maximum > slider->minimum) {
-                  groove.adjust(dpi.f1, 0, -dpi.f1, 0);
+                  --x;
+                  
                   int groundY = groove.height() * (ground - slider->minimum) /
                         (slider->maximum - slider->minimum);
                   bool upside = slider->sliderPosition > ground;
@@ -618,14 +622,19 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                      groove.setBottom(groundY);
                      groove.setTop(handle.center().y());
                   }
+                  
+                  painter->setPen(c.dark(115));
+                  painter->drawLine(x, groove.y(), x, groove.bottom());
+                  ++x;
+                  painter->setPen(c.light(108));
+                  painter->drawLine(x, groove.y(), x, groove.bottom());
 
-                  const QPixmap &fill = Gradients::pix(c, groove.width(),
-                     Qt::Horizontal, config.gradButton);
-                  masks.button.render(groove, painter, fill, Tile::Full, false);
                }
                // for later (cosmetic)
-               handle.translate(slider->upsideDown ? dpi.f1 : dpi.f6, 0);
+               if (!slider->upsideDown)
+                  handle.translate(dpi.f6, 0);
             }
+            painter->restore();
          }
          
          int direction = 0;
@@ -667,13 +676,13 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             // shadow
             QPoint xy = handle.topLeft();
             painter->drawPixmap(sunken ? xy + QPoint(dpi.f1,dpi.f1) : xy,
-                                shadows.radio[sunken][hover]);
+                                shadows.sliderRound[sunken][isEnabled]);
             // gradient
             xy += QPoint(dpi.f2, dpi.f1/*direction?dpi.f1:0*/);
             QColor c = midColor(COLOR(Window), COLOR(Button), 6-step, step);
             const int sz = dpi.SliderControl-dpi.f4;
-            const QBrush fill =
-               Gradients::brush(c, sz, Qt::Vertical, config.gradButton);
+            const QBrush fill = Gradients::brush(c, sz, Qt::Vertical,
+                  isEnabled ? config.gradButton : Gradients::None);
 //             fillWithMask(painter, xy, fill, masks.radio);
             painter->save();
             painter->setRenderHint(QPainter::Antialiasing);
@@ -681,8 +690,8 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             painter->setBrush(fill);
             painter->setBrushOrigin(xy);
             painter->drawEllipse(QRect(xy, QSize(sz,sz)));
-            c = midColor(COLOR(Window), COLOR(Button), step, 6-step);
-            painter->setPen(QPen(c, dpi.f4));
+            c = midColor(COLOR(WindowText), COLOR(ButtonText), 6-step, step);
+            painter->setPen(QPen(c, dpi.f4, Qt::SolidLine, Qt::RoundCap));
             painter->drawPoint(handle.center());
             painter->restore();
 //             painter->drawPixmap(xy, lights.slider[direction]);

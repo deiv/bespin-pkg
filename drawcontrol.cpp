@@ -93,16 +93,7 @@ static int contrast(const QColor &a, const QColor &b)
 }
 
 static void calcChunkSize(int l, int t, int &cw1, int &cw2) {
-   int n = l/t;
-   if (!n%2) --n;
-   int d = qMin(l-n*t, (n+2)*t-l);
-   if (n*t + d == l) d = -d;
-   if (d < 0) {
-      cw1 = t+1; cw2 = t + (d/(n/2))-1;
-   }
-   else {
-      cw2 = t-1; cw1 = t + (d/(n/2+1))+1;
-   }
+   cw1 = t; cw2 = t/2;
 }
 
 void BespinStyle::drawControl ( ControlElement element, const QStyleOption * option, QPainter * painter, const QWidget * widget) const
@@ -492,7 +483,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       if (const QStyleOptionProgressBarV2 *pb =
             qstyleoption_cast<const QStyleOptionProgressBarV2*>(option)) {
 
-         const int f2 = dpi.f2;
+         const int f4 = dpi.f4;
          QRect rect = RECT;
          int size = rect.height();
          Qt::Orientation o = Qt::Vertical;
@@ -501,7 +492,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          masks.button.render(rect, painter,
                              Gradients::pix(COLOR(Window), size, o, Gradients::Sunken ) );
-         rect.adjust(f2,f2,-f2,-f2); size -= dpi.f4;
+         rect.adjust(f4,f4,-f4,-f4); size -= dpi.f8;
          const QPixmap &glass =
                Gradients::pix(COLOR(Window).dark(110), size, o, Gradients::Glass );
          const QPixmap &solid =
@@ -537,10 +528,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          bool reverse = option->direction == Qt::RightToLeft;
          if (pb->invertedAppearance) reverse = !reverse;
          
-         const int f2 = dpi.f2;
+         const int f4 = dpi.f4;
          int step = animator->progressStep(widget);
          
-         QRect r = RECT.adjusted(f2, f2, -f2, -f2);
+         QRect r = RECT.adjusted(f4, f4, -f4, -f4);
          int size = r.height();
          Qt::Orientation o = Qt::Vertical;
          if (pb->orientation == Qt::Vertical) {
@@ -555,7 +546,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          if (!size)
             break;
          
-//          lights.button.render(r.adjusted(-f2,-f2,0,f2), painter, CONF_COLOR(progress[0]));
+//          lights.button.render(r.adjusted(-dpi.f3,-dpi.f3,0,dpi.f3), painter, CONF_COLOR(progress[0]));
                
          QColor c =
                midColor(COLOR(Window), CONF_COLOR(progress[0]), 18 - step, 18);
@@ -565,7 +556,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          
          QPixmap renderPix; int cw1, cw2;
          if (o == Qt::Vertical) {
-            calcChunkSize(RECT.width()-dpi.f4, size, cw1, cw2);
+            calcChunkSize(RECT.width()-dpi.f8, size, cw1, cw2);
             renderPix = QPixmap(cw1+cw2, size);
             QPainter p(&renderPix);
             p.drawTiledPixmap(0,0,cw1,size,solid);
@@ -573,14 +564,14 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             p.end();
          }
          else {
-            calcChunkSize(RECT.height()-dpi.f4, size, cw1, cw2);
+            calcChunkSize(RECT.height()-dpi.f8, size, cw1, cw2);
             renderPix = QPixmap(size, cw1+cw2);
             QPainter p(&renderPix);
             p.drawTiledPixmap(0,0,size,cw1,solid);
             p.drawTiledPixmap(0,cw1,size,cw2,glass);
             p.end();
          }
-         painter->drawTiledPixmap(r, renderPix, r.topLeft()-QPoint(f2,f2));
+         painter->drawTiledPixmap(r, renderPix, r.topLeft()-QPoint(f4,f4));
          
       }
       break;
@@ -952,36 +943,38 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       if (const QStyleOptionToolBoxV2* tbt =
          qstyleoption_cast<const QStyleOptionToolBoxV2*>(option)) {
          
-         Tile::PosFlags pf = Tile::Full;
-         switch (tbt->position) {
-         case QStyleOptionToolBoxV2::Beginning:
-            pf &= ~Tile::Bottom; break;
-         case QStyleOptionToolBoxV2::End:
-            pf &= ~Tile::Top; break;
-         case QStyleOptionToolBoxV2::Middle:
-            pf &= ~(Tile::Top | Tile::Bottom); break;
-         default:
-               break;
-         }
+//          Tile::PosFlags pf = Tile::Full;
+//          switch (tbt->position) {
+//          case QStyleOptionToolBoxV2::Beginning:
+//             pf &= ~Tile::Bottom; break;
+//          case QStyleOptionToolBoxV2::End:
+//             pf &= ~Tile::Top; break;
+//          case QStyleOptionToolBoxV2::Middle:
+//             pf &= ~(Tile::Top | Tile::Bottom); break;
+//          default:
+//                break;
+//          }
          QColor c = midColor(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
+         QRect r = RECT.adjusted(0, 0, 0, -dpi.f2);
          const QPixmap & ground =
-               Gradients::pix(c, RECT.height(), Qt::Vertical, config.gradTab);
-         masks.tab.render(RECT, painter, ground, pf);
+               Gradients::pix(c, r.height(), Qt::Vertical, config.gradTab);
+         masks.tab.render(r, painter, ground);
          
          if (sunken || option->state & State_Selected) {
-            QRect r = RECT.adjusted(dpi.f2, dpi.f3, -dpi.f2, -dpi.f3);
+            r.adjust(dpi.f2, dpi.f3, -dpi.f2, -dpi.f3);
             const QPixmap & fill =
                   Gradients::pix(CONF_COLOR(tab[1][0]), r.height(), Qt::Vertical,
-                                    Gradients::Sunken);
+                                    config.gradTab);
             masks.tab.render(r, painter, fill);
          }
          else if (hover) {
-            QRect r = RECT.adjusted(dpi.f3, dpi.f4, -dpi.f3, -dpi.f4);
+            r.adjust(dpi.f3, dpi.f4, -dpi.f3, -dpi.f4);
             c = midColor(c, CONF_COLOR(tab[1][0]), 21, 6);
             const QPixmap & fill =
                   Gradients::pix(c, r.height(), Qt::Vertical, config.gradTab);
             masks.tab.render(r, painter, fill);
          }
+         shadows.tabSunken.render(RECT, painter);
       }
       break;
    case CE_ToolBoxTabLabel:

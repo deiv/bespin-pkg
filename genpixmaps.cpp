@@ -163,9 +163,28 @@ void BespinStyle::generatePixmaps()
    
    // ================================================================
    
+   // SLIDERSHADOW =====================================
+   int rw = dpi.SliderControl, rh = dpi.SliderControl;
+   // shadow
+   for (int i = 0; i < 2; ++i) { // opaque?
+      for (int j = 0; j < 2; ++j) { // sunken?
+         shadows.sliderRound[j][i] = QPixmap(rw-f1*2*j, rh-f1*2*j);
+         shadows.sliderRound[j][i].fill(Qt::transparent);
+         p.begin(&shadows.sliderRound[j][i]);
+         p.setPen(Qt::NoPen);
+         p.setRenderHint(QPainter::Antialiasing);
+         p.setBrush(QColor(0,0,0,(1+i+2*j)*9));
+         p.drawEllipse(shadows.sliderRound[j][i].rect());
+         if (!j) {
+            p.setBrush(QColor(0,0,0,(i+1)*20));
+            p.drawEllipse(f2_2,f2_2,rw-f2,rh-f2);
+         }
+         p.end();
+      }
+   }
+   
    // RADIOUTTON =====================================
-   int rw = dpi.ExclusiveIndicator;
-   int rh = dpi.ExclusiveIndicator;
+   rw = rh = dpi.ExclusiveIndicator;
    // shadow
    for (int i = 0; i < 2; ++i) { // opaque?
       for (int j = 0; j < 2; ++j) { // sunken?

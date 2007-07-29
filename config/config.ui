@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>571</width>
-    <height>547</height>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -148,13 +148,43 @@
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Gradient</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QComboBox" name="gradTab" />
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Background</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="crTabBar" />
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Active Item</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QComboBox" name="crTabBarActive" />
+      </item>
+      <item row="3" column="0" >
        <widget class="QLabel" name="label_7" >
         <property name="text" >
          <string>Transition</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
+      <item row="3" column="1" >
        <widget class="QComboBox" name="tabTransition" >
         <item>
          <property name="text" >
@@ -212,26 +242,6 @@
          </property>
         </item>
        </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
-         <string>Color role</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="crTabBar" />
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>Gradient</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" >
-       <widget class="QComboBox" name="gradTab" />
       </item>
      </layout>
     </widget>

@@ -286,6 +286,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (config.fullButtonHover && (hover || step))
          c = midColor(c, COLOR(Button), 6-step, step);
       
+      Gradients::Type gt = isEnabled ? config.gradButton : Gradients::None;
+      
       // sunken variant
       if (config.sunkenButtons) {
          r.setBottom(r.bottom()-f2);
@@ -295,7 +297,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
             c = midColor(c, COLOR(Button), 6-step, step);
             masks.button.render(ir, painter, Gradients::brush(c, r.height(),
-                                Qt::Vertical, sunken ? Gradients::Sunken : config.gradButton),
+                                Qt::Vertical, sunken ? Gradients::Sunken : gt),
                                 Tile::Full, false, QPoint(0,f2));
          }
          if (hasFocus)
@@ -309,11 +311,11 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       // shadow
       if (sunken) {
          r.adjust(f1, f1, -f1, -f2);
-         shadows.button[true][true].render(r, painter);
+         shadows.button[true][isEnabled].render(r, painter);
          r.adjust(f1, f1, -f1, -f1);
       }
       else {
-         shadows.button[false][true].render(r, painter);
+         shadows.button[false][isEnabled].render(r, painter);
          r.adjust(f2, f2, -f2, -dpi.f3);
          if (hasFocus)
             lights.button.render(RECT, painter, COLOR(Highlight));
@@ -321,7 +323,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       // backlight & plate
       masks.button.render(r, painter, Gradients::brush(c, r.height(),
-         Qt::Vertical, config.gradButton));
+         Qt::Vertical, gt));
       
       // outline
       masks.button.outline(r, painter, midColor(c, Qt::white,1,2), true);
@@ -330,7 +332,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
          c = midColor(c, COLOR(Button), 6-step, step);
          masks.button.render(ir, painter,
-                             Gradients::brush(c, ir.height(), Qt::Vertical, config.gradButton),
+                             Gradients::brush(c, ir.height(), Qt::Vertical, gt),
                              Tile::Full, false, QPoint(0,f2));
       }
       
@@ -490,8 +492,11 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       break;
    }
    case PE_IndicatorCheckBox: { // On/off indicator, for example, a QCheckBox.
-      
+      bool _fullHover = config.fullButtonHover;
+      if (config.checkType == 2)
+         config.fullButtonHover = true;
       drawPrimitive(PE_PanelButtonBevel, option, painter, widget);
+      config.fullButtonHover = _fullHover;
       
       if (!(sunken || (option->state & State_Off))) {
          painter->save();
@@ -499,14 +504,28 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          const int d = config.sunkenButtons ? dpi.f4 : dpi.f6;
          QRect r = RECT.adjusted(d, d, -d, -d);
          const QColor fill = btnFgColor(PAL, isEnabled, hover);
-//          const QPixmap &fill = Gradients::pix(c, r.height(), Qt::Vertical, config.gradButton);
          switch (config.checkType) {
          case 0: {
             QPen pen(fill, r.width()/5, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
             painter->setPen(pen);
-            painter->drawLine(r.x(), r.bottom()+1, r.right()+1, r.y());
-            if (option->state & State_On)
-               painter->drawLine(r.x(), r.y(), r.right()+1, r.bottom()+1);
+            int d = r.height()/8, c = r.height()/2, s = r.width(),
+            x = r.x(), y = r.y();
+            if (option->state & State_On) {
+               const QPoint points[8] = {
+               QPoint(x+c,y+c-d), QPoint(x,y),
+               QPoint(x+c-d,y+c), QPoint(x,y+s),
+               QPoint(x+c,y+c+d), QPoint(x+s,y+s),
+               QPoint(x+c+d,y+c), QPoint(x+s,y)
+               };
+               painter->drawPolygon(points, 8);
+            }
+            else {
+               const QPoint points[5] = {
+               QPoint(x+c,y+c-d), QPoint(x,y), QPoint(x+c-d,y+c),
+               QPoint(x+s,y+s), QPoint(x+c+d,y+c),
+               };
+               painter->drawPolygon(points, 5);
+            }
             break;
          }
          default:
@@ -524,13 +543,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          }
          case 2:
             if (option->state & State_On)
-               painter->fillRect(r, fill);
-            else {
-               QRect r2 = r; r2.setBottom(r.top()+r.height()/3);
-               fillWithMask(painter, r2, fill, &masks.button);
-               r2 = r; r2.setTop(r.bottom()-r.height()/3);
-               fillWithMask(painter, r2, fill, &masks.button);
-            }
+               masks.button.render(r, painter, fill);
          }
          painter->restore();
       }
@@ -541,6 +554,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       const int f2 = dpi.f2, f1 = dpi.f1;
       int sz = dpi.ExclusiveIndicator;
       QPoint xy = RECT.topLeft();
+      
+      Gradients::Type gt = isEnabled ? config.gradButton : Gradients::None;
       
       if (isOn) {
          hover = hasFocus = false;
@@ -558,7 +573,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          QRect r = RECT.adjusted(dpi.f1,0,-dpi.f1,-dpi.f2);
          masks.tab.render(r, painter,
                           Gradients::brush( c, r.height(), Qt::Vertical,
-                                            sunken || isOn ? Gradients::Sunken : config.gradButton));
+                                            sunken || isOn ? Gradients::Sunken : gt));
          r.setBottom(RECT.bottom());
          shadows.tabSunken.render(r, painter);
          xy += QPoint(f1, 0);
@@ -578,13 +593,13 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          // shadow
          sunken = sunken || isOn;
          painter->drawPixmap(sunken ? xy + QPoint(f1,f1) : xy,
-                           shadows.radio[sunken][true]);
+                           shadows.radio[sunken][isEnabled]);
          
          // plate
          xy += QPoint(f2,f1);
          fillWithMask(painter, xy,
                      Gradients::brush( c, dpi.ExclusiveIndicator, Qt::Vertical,
-                                       config.gradButton), masks.radio);
+                                       gt), masks.radio);
          
          if (isEnabled) {
             sz = dpi.ExclusiveIndicator - dpi.f4;

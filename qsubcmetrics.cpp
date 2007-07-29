@@ -363,7 +363,10 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
    case SE_CheckBoxIndicator: { // Area for the state indicator (e.g., check mark)
       int h = dpi.Indicator;
       QRect r = option->rect;
-      r.setRect(r.x(), r.y() + ((r.height() - h) / 2), h, h);
+      if (config.sunkenButtons)
+         r.setRect(r.x()+dpi.f1, r.y() + ((r.height() - h) / 2), h-dpi.f2, h);
+      else
+         r.setRect(r.x(), r.y() + ((r.height() - h) / 2), h, h);
       if (element != SE_CheckBoxContents)
          return visualRect(option->direction, option->rect, r);
       int spacing = dpi.f5;
