@@ -80,7 +80,7 @@ static int contrast(const QColor &a, const QColor &b)
    a.getRgb(&ar,&ag,&ab);
    b.getRgb(&br,&bg,&bb);
    
-   int diff = (299*(ar-br) + 587*(ag-bg) + 114*(ab-bb));
+   int diff = qAbs(299*(ar-br) + 587*(ag-bg) + 114*(ab-bb));
    int perc = diff / 2550;
    
    diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
@@ -440,6 +440,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             cF = CONF_COLOR(tab[0][1]);
             cB = midColor(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
             cB = midColor(cB, CONF_COLOR(tab[1][0]));
+            if (contrast(CONF_COLOR(tab[1][1]), cB) > contrast(cF, cB))
+               cF = CONF_COLOR(tab[1][1]);
          }
          else {
             cB = midColor(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
@@ -981,11 +983,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       if (const QStyleOptionToolBox* tbt =
           qstyleoption_cast<const QStyleOptionToolBox*>(option)) {
          
-         bool active = option->state & (State_Selected | State_MouseOver);
+         bool active = option->state & (State_Selected);
          
-         QPalette::ColorRole
-               bgRole = config.role_tab[active][0],
-               fgRole = config.role_tab[active][1];
+         QColor cB = CONF_COLOR(tab[active][0]);
+         QColor cF = CONF_COLOR(tab[active][1]);
+               
+         if (hover) {
+            cB = midColor(cB, cF);
+            if (contrast(CONF_COLOR(tab[!active][1]), cB) > contrast(cF, cB))
+               cF = CONF_COLOR(tab[!active][1]);
+         }
          
          painter->save();
          
@@ -995,16 +1002,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          
          // on dark background, let's paint an emboss
-         if (qGray(PAL.color(bgRole).rgb()) < 128) {
+         if (qGray(cB.rgb()) < 128) {
             QRect tr = RECT;
-            painter->setPen(PAL.color(bgRole).dark(120));
+            painter->setPen(cB.dark(120));
             tr.moveTop(tr.top()-1);
             drawItemText(painter, tr, Qt::AlignCenter | Qt::TextShowMnemonic,
                          PAL, isEnabled, tbt->text);
             tr.moveTop(tr.top()+1);
          }
 
-         painter->setPen(PAL.color(fgRole));
+         painter->setPen(cF);
          drawItemText(painter, RECT, Qt::AlignCenter | Qt::TextShowMnemonic,
                       PAL, isEnabled, tbt->text);
          painter->restore();

@@ -493,7 +493,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
    }
    case PE_IndicatorCheckBox: { // On/off indicator, for example, a QCheckBox.
       bool _fullHover = config.fullButtonHover;
-      if (config.checkType == 2)
+//       if (config.checkType == 2)
          config.fullButtonHover = true;
       drawPrimitive(PE_PanelButtonBevel, option, painter, widget);
       config.fullButtonHover = _fullHover;
@@ -612,10 +612,10 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          }
       }
       // drop
-      if (isOn) step = 6;
+      if (isOn) step = 18;
       if (step) {
          c = midColor(c, (hover && config.fullButtonHover) ? COLOR(ButtonText) :
-               COLOR(WindowText), 6-step, step);
+               COLOR(WindowText), 18-step, step);
          xy += QPoint(dpi.f4, dpi.f4);
          fillWithMask(painter, xy, c, masks.radioIndicator);
       }
