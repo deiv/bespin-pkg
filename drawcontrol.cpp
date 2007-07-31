@@ -335,7 +335,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                hoveredIndex = hover ? index :
                      tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
                info = const_cast<IndexedFadeInfo *>
-                  (animator->indexedFadeInfo(widget, hoveredIndex));
+                  (animator->fadeInfo(widget, hoveredIndex));
             }
             if (info)
                step = info->step(index);
@@ -721,7 +721,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                action = mbar->actionAt(RECT.topLeft()); // is the action for this item!
                activeAction = mbar->activeAction();
                info = const_cast<IndexedFadeInfo *>
-                  (animator->indexedFadeInfo(widget, (long int)activeAction));
+                  (animator->fadeInfo(widget, (long int)activeAction));
             }
             if (info && (!activeAction || !activeAction->menu() ||
                activeAction->menu()->isHidden()))

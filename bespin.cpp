@@ -543,7 +543,7 @@ void BespinStyle::polish( QWidget * widget) {
       else {
          widget->setBackgroundRole ( QPalette::Window );
          widget->setForegroundRole ( QPalette::WindowText );
-         widget->installEventFilter(this);
+         widget->installEventFilter(animator);
       }
    }
    if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
@@ -555,8 +555,13 @@ void BespinStyle::polish( QWidget * widget) {
          widget->setBackgroundRole ( QPalette::Window );
          widget->setForegroundRole ( QPalette::WindowText );
       }
-      widget->installEventFilter(this);
+      widget->installEventFilter(animator);
    }
+   
+   if (qobject_cast<QAbstractScrollArea*>(widget) ||
+       qobject_cast<Q3ScrollView*>(widget))
+      widget->installEventFilter(animator);
+   
    if (qobject_cast<QAbstractSlider *>(widget)) {
       widget->installEventFilter(this);
       if (qobject_cast<QScrollBar *>(widget)) {
@@ -575,22 +580,19 @@ void BespinStyle::polish( QWidget * widget) {
                   area = widget->parentWidget();
             }
          }
-         if (area) {
-            area->installEventFilter(this);
-            if (!_scrollAreas.contains(area))
-               _scrollAreas.append(area);
-         }
+         if (area)
+            animator->addScrollArea(area);
       }
    }
    
    if (qobject_cast<QProgressBar*>(widget)) {
 //       widget->setBackgroundRole ( config.role_progress[0] );
 //       widget->setForegroundRole ( config.role_progress[1] );
-      widget->installEventFilter(this);
+      widget->installEventFilter(animator);
    }
    
    if (qobject_cast<QTabWidget*>(widget))
-      widget->installEventFilter(this);
+      widget->installEventFilter(animator);
 
    if (qobject_cast<QTabBar *>(widget)) {
       widget->setBackgroundRole ( config.role_tab[0][0] );
@@ -598,12 +600,8 @@ void BespinStyle::polish( QWidget * widget) {
       widget->installEventFilter(this);
    }
    
-   
-   if (qobject_cast<QAbstractScrollArea*>(widget) ||
-       qobject_cast<Q3ScrollView*>(widget) ||
-       widget->inherits("QMdiSubWindow"))
+   if (widget->inherits("QMdiSubWindow"))
       widget->installEventFilter(this);
-   
    if (widget->inherits("QWorkspace"))
       connect(this, SIGNAL(MDIPopup(QPoint)), widget, SLOT(_q_popupOperationMenu(QPoint)));
 
@@ -820,147 +818,6 @@ bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
       }
       return false;
    }
-   case QEvent::Show: {
-      if (QProgressBar *progress = qobject_cast<QProgressBar*>(object))
-      if (progress->isEnabled()) {
-         animator->addProgressBar(progress);
-         return false;
-      }
-      if (QTabWidget* tab = qobject_cast<QTabWidget*>(object)) {
-         animator->addTab(tab, tab->currentIndex());
-         return false;
-      }
-      return false;
-   }
-   case QEvent::Hide: {
-      if (QProgressBar *progress = qobject_cast<QProgressBar*>(object)) {
-         animator->removeProgressBar(progress);
-         return false;
-      }
-      if (QTabWidget* tab = qobject_cast<QTabWidget*>(object)) {
-         animator->removeTab(tab);
-         return false;
-      }
-      return false;
-   }
-#define HANDLE_SCROLL_AREA_EVENT \
-         if (area->horizontalScrollBar()->isVisible())\
-            animator->fadeIn(area->horizontalScrollBar());\
-         if (area->verticalScrollBar()->isVisible())\
-            animator->fadeIn(area->verticalScrollBar());
-   case QEvent::Enter:
-      if (qobject_cast<QAbstractButton*>(object) ||
-          qobject_cast<QComboBox*>(object)) {
-         QWidget *widget = (QWidget*)object;
-         if (!widget->isEnabled())
-            return false;
-         animator->fadeIn(widget);
-         return false;
-      }
-      else if (QAbstractScrollArea* area =
-          qobject_cast<QAbstractScrollArea*>(object)) {
-         if (!area->isEnabled()) return false;
-         HANDLE_SCROLL_AREA_EVENT
-         return false;
-      }
-      else if (Q3ScrollView* area =
-               qobject_cast<Q3ScrollView*>(object)) {
-         if (!area->isEnabled()) return false;
-         HANDLE_SCROLL_AREA_EVENT
-         return false;
-      }
-      else if (_scrollAreas.contains(object)) {
-         QObjectList kids = object->children();
-         QWidget *sb;
-         foreach (QObject *kid, kids) {
-            if (kid->parent() == object)
-            if (sb = qobject_cast<QScrollBar*>(kid))
-               animator->fadeIn(sb);
-         }
-         return false;
-      }
-      return false;
-
-#undef HANDLE_SCROLL_AREA_EVENT
-#define HANDLE_SCROLL_AREA_EVENT \
-         if (area->horizontalScrollBar()->isVisible())\
-            animator->fadeOut(area->horizontalScrollBar());\
-         if (area->verticalScrollBar()->isVisible())\
-            animator->fadeOut(area->verticalScrollBar());
-   case QEvent::Leave:
-      if (qobject_cast<QAbstractButton*>(object) || 
-          qobject_cast<QComboBox*>(object)) {
-         QWidget *widget = (QWidget*)object;
-         if (!widget->isEnabled())
-            return false;
-         animator->fadeOut(widget);
-         return false;
-      }
-      else if (QAbstractScrollArea* area =
-          qobject_cast<QAbstractScrollArea*>(object)) {
-         if (!area->isEnabled()) return false;
-         HANDLE_SCROLL_AREA_EVENT
-         return false;
-      }
-      else if (Q3ScrollView* area =
-               qobject_cast<Q3ScrollView*>(object)) {
-         HANDLE_SCROLL_AREA_EVENT
-         return false;
-      }
-      else if (_scrollAreas.contains(object)) {
-         QObjectList kids = object->children();
-         QWidget *sb;
-         foreach (QObject *kid, kids) {
-            if (kid->parent() == object)
-            if (sb = qobject_cast<QScrollBar*>(kid))
-               animator->fadeOut(sb);
-         }
-         return false;
-      }
-      return false;
-#undef HANDLE_SCROLL_AREA_EVENT
-#if 0
-   case QEvent::FocusIn:
-      if (qobject_cast<QAbstractButton*>(object) ||
-          qobject_cast<QComboBox*>(object)) {
-         QWidget *widget = (QWidget*)object;
-         if (!widget->isEnabled()) return false;
-         if (widget->testAttribute(Qt::WA_UnderMouse))
-            widget->repaint();
-         else
-            animator->fadeIn(widget);
-         return false;
-      }
-      return false;
-   case QEvent::FocusOut:
-      if (qobject_cast<QAbstractButton*>(object) || 
-          qobject_cast<QComboBox*>(object)) {
-         QWidget *widget = (QWidget*)object;
-         if (!widget->isEnabled()) return false;
-         if (widget->testAttribute(Qt::WA_UnderMouse))
-            widget->repaint();
-         else
-            animator->fadeOut((QWidget*)(object));
-         return false;
-      }
-      return false;
-#endif
-   case QEvent::EnabledChange:
-      if (QWidget* progress = qobject_cast<QProgressBar*>(object)) {
-         if (progress->isEnabled())
-            animator->addProgressBar(progress);
-         else
-            animator->removeProgressBar(progress);
-         return false;
-      }
-      if (QTabWidget* tab = qobject_cast<QTabWidget*>(object)) {
-         if (tab->isEnabled())
-            animator->addTab(tab, tab->currentIndex());
-         else
-            animator->removeTab(tab);
-         return false;
-      }
-      return false;
    default:
       return false;
    }
@@ -972,12 +829,11 @@ void BespinStyle::unPolish( QApplication */*app */)
 
 void BespinStyle::unPolish( QWidget *widget )
 {
-   if (qobject_cast<QProgressBar*>(widget)) {
-      widget->removeEventFilter(this);
-      animator->removeProgressBar(widget);
-   }
-   if (qobject_cast<QAbstractScrollArea*>(widget) || qobject_cast<Q3ScrollView*>(widget))
-      widget->removeEventFilter(this);
+   if (qobject_cast<QProgressBar*>(widget) ||
+       qobject_cast<QAbstractScrollArea*>(widget) ||
+       qobject_cast<Q3ScrollView*>(widget))
+      animator->remove(widget);
+
    if (qobject_cast<VisualFrame*>(widget))
       delete widget; widget = 0L;
 //    w->removeEventFilter(this);

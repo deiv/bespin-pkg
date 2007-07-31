@@ -36,18 +36,23 @@ public:
 class ComplexHoverFadeInfo {
 public:
    ComplexHoverFadeInfo() {
-      activeSubControls = fadingInControls = fadingOutControls = QStyle::SC_None;
+      activeSubControls = fadeIns = fadeOuts = QStyle::SC_None;
    }
-   QStyle::SubControls activeSubControls, fadingInControls, fadingOutControls;
+   QStyle::SubControls activeSubControls, fadeIns, fadeOuts;
+   inline int step(QStyle::SubControl sc) const {return steps.value(sc);}
+private:
+   friend class StyleAnimator;
    QHash<QStyle::SubControl, int> steps;
 };
 
 class IndexedFadeInfo {
 public:
    IndexedFadeInfo(long int index) { this->index = index; }
+   int step(long int index) const;
+private:
+   friend class StyleAnimator;
+   QHash<long int, int> fadeIns, fadeOuts;
    long int index;
-   QHash<long int, int> fadingInIndices, fadingOutIndices;
-   int step(long int index);
 };
 
 class TabAnimInfo : public QObject {
@@ -77,37 +82,40 @@ public:
    StyleAnimator(QObject *parent, TabAnimInfo::TabTransition tabTransition =
                  TabAnimInfo::CrossFade);
    ~StyleAnimator();
-   void fadeIn(QWidget *widget);
-   void fadeOut(QWidget *widget );
-   void addTab(QTabWidget* tab, int currentTab = -1);
-   void removeTab(QTabWidget* tab);
-   void addProgressBar(QWidget *progressBar);
-   void removeProgressBar(QWidget *progressBar);
+   
+   void addScrollArea(QWidget *area);
+   void remove(QWidget *w);
+   
    int hoverStep(const QWidget *widget) const;
-   const ComplexHoverFadeInfo *complexHoverFadeInfo(const QWidget *widget,
-      QStyle::SubControls activeSubControls) const;
-   const IndexedFadeInfo *indexedFadeInfo(const QWidget *widget, long int index) const;
    int progressStep(const QWidget *w) const;
+   
+   const ComplexHoverFadeInfo *
+      fadeInfo(const QWidget *widget, QStyle::SubControls activeSubControls) const;
+   const IndexedFadeInfo *
+      fadeInfo(const QWidget *widget, long int index) const;
+   
+   inline bool handlesArea(QWidget *widget) {return _scrollAreas.contains(widget);}
+   
 public slots:
    void tabChanged(int index);
+protected:
+   bool eventFilter( QObject *object, QEvent *event );
+private:
+   void addProgressBar(QWidget *progressBar);
+   void addTab(QTabWidget* tab, int currentTab = -1);
+   void fadeIn(QWidget *widget);
+   void fadeOut(QWidget *widget );
 private slots:
-   void progressbarDestroyed(QObject*);
+   void destroyed(QObject*);
    void updateProgressbars();
-   
    void updateTabAnimation();
-   void tabDestroyed(QObject* obj);
-   
    void updateFades();
-   void fadeDestroyed(QObject* obj);
-   
    void updateComplexFades();
-   void complexFadeDestroyed(QObject* obj);
-   
    void updateIndexedFades();
-   void indexedFadeDestroyed(QObject* obj);
 private:
    QTimer* timer;
    TabAnimInfo::TabTransition tabTransition;
+   QObjectList _scrollAreas;
 };
 
 #endif // STYLEANIMATOR_H

@@ -24,6 +24,9 @@
 #include <QPaintEvent>
 #include <QProgressBar>
 #include <QAbstractScrollArea>
+#include <QAbstractButton>
+#include <QComboBox>
+#include <Q3ScrollView>
 #include <QScrollBar>
 
 #include "styleanimator.h"
@@ -67,41 +70,9 @@ StyleAnimator::~StyleAnimator(){
 
 // ===================== TABS ================================
 
-void StyleAnimator::addTab(QTabWidget* tab, int currentIndex) {
-   if (tabwidgets.contains(tab)) return; // accidental double add
-   tabwidgets[tab] = new TabAnimInfo(tab, currentIndex);
-   connect(tab, SIGNAL(currentChanged(int)),
-           this, SLOT(tabChanged(int)));
-   connect(tab, SIGNAL(destroyed(QObject*)),
-           this, SLOT(tabDestroyed(QObject*)));
-   startTimer;
-}
 
-void StyleAnimator::removeTab(QTabWidget* tab) {
-   tabwidgets.remove(tab);
-   disconnect(tab, SIGNAL(currentChanged(int)),
-           this, SLOT(tabChanged(int)));
-   disconnect(tab, SIGNAL(destroyed(QObject*)),
-           this, SLOT(tabDestroyed(QObject*)));
-   if (!ANIMATIONS) timer->stop();
-}
 
-// ===================== PROGRESSBARS ================================
 
-void StyleAnimator::addProgressBar(QWidget* progress) {
-   if (progressbars.contains(progress)) return; // accidental double add
-   progressbars[progress] = 0;
-   connect(progress, SIGNAL(destroyed(QObject*)),
-           this, SLOT(progressbarDestroyed(QObject*)));
-   startTimer;
-}
-
-void StyleAnimator::removeProgressBar(QWidget* progress) {
-   progressbars.remove(progress);
-   disconnect(progress, SIGNAL(destroyed(QObject*)),
-              this, SLOT(progressbarDestroyed(QObject*)));
-   if (!ANIMATIONS) timer->stop();
-}
 
 // ===================== TABS ================================
 
@@ -197,6 +168,179 @@ void TabAnimInfo::updatePixmaps(TabTransition tabTransition) {
       break;
    }
    }
+}
+
+bool StyleAnimator::eventFilter( QObject* object, QEvent *e ) {
+   switch (e->type()) {
+   case QEvent::Show: {
+      if (QProgressBar *progress = qobject_cast<QProgressBar*>(object))
+      if (progress->isEnabled()) {
+         addProgressBar(progress);
+         return false;
+      }
+      if (QTabWidget* tab = qobject_cast<QTabWidget*>(object)) {
+         addTab(tab, tab->currentIndex());
+         return false;
+      }
+      return false;
+   }
+   case QEvent::Hide: {
+      if (qobject_cast<QProgressBar*>(object) ||
+          qobject_cast<QTabWidget*>(object)) {
+             remove(static_cast<QWidget*>(object));
+         return false;
+      }
+      return false;
+   }
+#define HANDLE_SCROLL_AREA_EVENT \
+         if (area->horizontalScrollBar()->isVisible())\
+            fadeIn(area->horizontalScrollBar());\
+         if (area->verticalScrollBar()->isVisible())\
+            fadeIn(area->verticalScrollBar());
+   case QEvent::Enter:
+      if (qobject_cast<QAbstractButton*>(object) ||
+          qobject_cast<QComboBox*>(object)) {
+         QWidget *widget = (QWidget*)object;
+         if (!widget->isEnabled())
+            return false;
+         fadeIn(widget);
+         return false;
+      }
+      else if (QAbstractScrollArea* area =
+          qobject_cast<QAbstractScrollArea*>(object)) {
+         if (!area->isEnabled()) return false;
+         HANDLE_SCROLL_AREA_EVENT
+         return false;
+      }
+      else if (Q3ScrollView* area =
+               qobject_cast<Q3ScrollView*>(object)) {
+         if (!area->isEnabled()) return false;
+         HANDLE_SCROLL_AREA_EVENT
+         return false;
+      }
+      else if (_scrollAreas.contains(object)) {
+         QObjectList kids = object->children();
+         QWidget *sb;
+         foreach (QObject *kid, kids) {
+            if (kid->parent() == object)
+            if (sb = qobject_cast<QScrollBar*>(kid))
+               fadeIn(sb);
+         }
+         return false;
+      }
+      return false;
+
+#undef HANDLE_SCROLL_AREA_EVENT
+#define HANDLE_SCROLL_AREA_EVENT \
+         if (area->horizontalScrollBar()->isVisible())\
+            fadeOut(area->horizontalScrollBar());\
+         if (area->verticalScrollBar()->isVisible())\
+            fadeOut(area->verticalScrollBar());
+   case QEvent::Leave:
+      if (qobject_cast<QAbstractButton*>(object) || 
+          qobject_cast<QComboBox*>(object)) {
+         QWidget *widget = (QWidget*)object;
+         if (!widget->isEnabled())
+            return false;
+         fadeOut(widget);
+         return false;
+      }
+      else if (QAbstractScrollArea* area =
+          qobject_cast<QAbstractScrollArea*>(object)) {
+         if (!area->isEnabled()) return false;
+         HANDLE_SCROLL_AREA_EVENT
+         return false;
+      }
+      else if (Q3ScrollView* area =
+               qobject_cast<Q3ScrollView*>(object)) {
+         HANDLE_SCROLL_AREA_EVENT
+         return false;
+      }
+      else if (_scrollAreas.contains(object)) {
+         QObjectList kids = object->children();
+         QWidget *sb;
+         foreach (QObject *kid, kids) {
+            if (kid->parent() == object)
+            if (sb = qobject_cast<QScrollBar*>(kid))
+               fadeOut(sb);
+         }
+         return false;
+      }
+      return false;
+#undef HANDLE_SCROLL_AREA_EVENT
+#if 0
+   case QEvent::FocusIn:
+      if (qobject_cast<QAbstractButton*>(object) ||
+          qobject_cast<QComboBox*>(object)) {
+         QWidget *widget = (QWidget*)object;
+         if (!widget->isEnabled()) return false;
+         if (widget->testAttribute(Qt::WA_UnderMouse))
+            widget->repaint();
+         else
+            animator->fadeIn(widget);
+         return false;
+      }
+      return false;
+   case QEvent::FocusOut:
+      if (qobject_cast<QAbstractButton*>(object) || 
+          qobject_cast<QComboBox*>(object)) {
+         QWidget *widget = (QWidget*)object;
+         if (!widget->isEnabled()) return false;
+         if (widget->testAttribute(Qt::WA_UnderMouse))
+            widget->repaint();
+         else
+            animator->fadeOut((QWidget*)(object));
+         return false;
+      }
+      return false;
+#endif
+   case QEvent::EnabledChange:
+   if (QWidget* progress = qobject_cast<QProgressBar*>(object)) {
+      if (progress->isEnabled())
+         addProgressBar(progress);
+      else
+         remove(progress);
+      return false;
+   }
+   if (QTabWidget* tab = qobject_cast<QTabWidget*>(object)) {
+      if (tab->isEnabled())
+         addTab(tab, tab->currentIndex());
+      else
+         remove(tab);
+      return false;
+   }
+   return false;
+   default:
+      return false;
+   }
+}
+
+void StyleAnimator::addTab(QTabWidget* tab, int currentIndex) {
+   if (tabwidgets.contains(tab)) return; // accidental double add
+   tabwidgets[tab] = new TabAnimInfo(tab, currentIndex);
+   connect(tab, SIGNAL(currentChanged(int)),
+           this, SLOT(tabChanged(int)));
+   connect(tab, SIGNAL(destroyed(QObject*)),
+           this, SLOT(destroyed(QObject*)));
+   startTimer;
+}
+
+void StyleAnimator::addProgressBar(QWidget* progress) {
+   if (progressbars.contains(progress)) return; // accidental double add
+   progressbars[progress] = 0;
+   connect(progress, SIGNAL(destroyed(QObject*)),
+           this, SLOT(destroyed(QObject*)));
+   startTimer;
+}
+
+void StyleAnimator::addScrollArea(QWidget *area) {
+   if (!area) return;
+   area->installEventFilter(this);
+   if (qobject_cast<QAbstractScrollArea*>(area))
+      return;
+   if (_scrollAreas.contains(area))
+      return;
+   _scrollAreas.append(area);
 }
 
 #include <QStyleOption>
@@ -335,6 +479,28 @@ static void grabWidget(QWidget * root, QPixmap *pix) {
    delete saPix;
 }
 
+void StyleAnimator::destroyed(QObject *obj) {
+   tabwidgets.remove(qobject_cast<QTabWidget*>(obj));
+   progressbars.remove(static_cast<QWidget*>(obj));
+   hoverWidgets.remove(static_cast<QWidget*>(obj));
+   complexHoverWidgets.remove(static_cast<QWidget*>(obj));
+   indexedHoverWidgets.remove(static_cast<QWidget*>(obj));
+   if (!ANIMATIONS) timer->stop();
+}
+
+void StyleAnimator::remove(QWidget *w) {
+   disconnect(w, SIGNAL(destroyed(QObject*)), this, SLOT(destroyed(QObject*)));
+   if (QTabWidget* tab = qobject_cast<QTabWidget*>(w)) {
+      tabwidgets.remove(tab);
+      disconnect(tab, SIGNAL(currentChanged(int)),
+                 this, SLOT(tabChanged(int)));
+   }
+   if (QProgressBar *progress = qobject_cast<QProgressBar*>(w))
+      progressbars.remove(progress);
+   w->removeEventFilter(this);
+   if (!ANIMATIONS) timer->stop();
+}
+
 void StyleAnimator::updateProgressbars() {
    if (progressbars.isEmpty())
       return;
@@ -362,11 +528,6 @@ void StyleAnimator::updateProgressbars() {
 
 int StyleAnimator::progressStep(const QWidget *w) const {
    return qAbs(progressbars.value(const_cast<QWidget*>(w),0));
-}
-
-void StyleAnimator::progressbarDestroyed(QObject* obj) {
-   progressbars.remove(static_cast<QWidget*>(obj));
-   if (!ANIMATIONS) timer->stop();
 }
 
 // --- TabWidgets --------------------
@@ -448,12 +609,6 @@ void StyleAnimator::updateTabAnimation() {
    if (!ANIMATIONS) timer->stop();
 }
 
-void StyleAnimator::tabDestroyed(QObject* obj) {
-   tabwidgets.remove(static_cast<QTabWidget*>(obj));
-//    delete tai;
-   if (!ANIMATIONS) timer->stop();
-}
-
 
 // -- Buttons etc. -------------------------------
 void StyleAnimator::updateFades() {
@@ -487,7 +642,7 @@ void StyleAnimator::fadeIn(QWidget *widget) {
       it = hoverWidgets.insert(widget, HoverFadeInfo(1, true));
    }
    it.value().fadeIn = true;
-   connect(widget, SIGNAL(destroyed(QObject*)), this, SLOT(fadeDestroyed(QObject*)));
+   connect(widget, SIGNAL(destroyed(QObject*)), this, SLOT(destroyed(QObject*)));
    startTimer;
 }
 
@@ -497,13 +652,8 @@ void StyleAnimator::fadeOut(QWidget *widget) {
       it = hoverWidgets.insert(widget, HoverFadeInfo(6, false));
    }
    it.value().fadeIn = false;
-   connect(widget, SIGNAL(destroyed(QObject*)), this, SLOT(fadeDestroyed(QObject*)));
+   connect(widget, SIGNAL(destroyed(QObject*)), this, SLOT(destroyed(QObject*)));
    startTimer;
-}
-
-void StyleAnimator::fadeDestroyed(QObject* obj) {
-   hoverWidgets.remove(static_cast<QWidget*>(obj));
-   if (!ANIMATIONS) timer->stop();
 }
 
 int StyleAnimator::hoverStep(const QWidget *widget) const {
@@ -530,24 +680,24 @@ void StyleAnimator::updateComplexFades() {
       for (QStyle::SubControl control = (QStyle::SubControl)0x01;
            control <= (QStyle::SubControl)0x80;
            control = (QStyle::SubControl)(control<<1)) {
-         if (info.fadingInControls & control) {
+         if (info.fadeIns & control) {
             update = true;
             info.steps[control] += 2;
             if (info.steps.value(control) > 4)
-               info.fadingInControls &= ~control;
+               info.fadeIns &= ~control;
          }
-         else if (info.fadingOutControls & control) {
+         else if (info.fadeOuts & control) {
             update = true;
             --info.steps[control];
             if (info.steps.value(control) < 1)
-               info.fadingOutControls &= ~control;
+               info.fadeOuts &= ~control;
          }
       }
       if (update)
          it.key()->update();
       if (info.activeSubControls == QStyle::SC_None && // needed to detect changes!
-          info.fadingOutControls == QStyle::SC_None &&
-          info.fadingInControls == QStyle::SC_None)
+          info.fadeOuts == QStyle::SC_None &&
+          info.fadeIns == QStyle::SC_None)
          it = complexHoverWidgets.erase(it);
       else
          ++it;
@@ -555,7 +705,7 @@ void StyleAnimator::updateComplexFades() {
    if (!ANIMATIONS) timer->stop();
 }
 
-const ComplexHoverFadeInfo *StyleAnimator::complexHoverFadeInfo(const QWidget *widget,
+const ComplexHoverFadeInfo *StyleAnimator::fadeInfo(const QWidget *widget,
    QStyle::SubControls activeSubControls) const {
       QWidget *w = const_cast<QWidget*>(widget);
    ComplexHoverFades::iterator it = complexHoverWidgets.find(w);
@@ -566,7 +716,7 @@ const ComplexHoverFadeInfo *StyleAnimator::complexHoverFadeInfo(const QWidget *w
       // ...but we'll need one
       it = complexHoverWidgets.insert(w, ComplexHoverFadeInfo());
       connect(widget, SIGNAL(destroyed(QObject*)),
-               this, SLOT(complexFadeDestroyed(QObject*)));
+               this, SLOT(destroyed(QObject*)));
       startTimer;
    }
    // we now have an entry - check for validity and update in case
@@ -575,10 +725,10 @@ const ComplexHoverFadeInfo *StyleAnimator::complexHoverFadeInfo(const QWidget *w
       QStyle::SubControls diff = info->activeSubControls ^ activeSubControls;
       QStyle::SubControls newActive = diff & activeSubControls;
       QStyle::SubControls newDead = diff & info->activeSubControls;
-      info->fadingInControls &= ~newDead;
-      info->fadingInControls |= newActive;
-      info->fadingOutControls &= ~newActive;
-      info->fadingOutControls |= newDead;
+      info->fadeIns &= ~newDead;
+      info->fadeIns |= newActive;
+      info->fadeOuts &= ~newActive;
+      info->fadeOuts |= newDead;
       info->activeSubControls = activeSubControls;
       for (QStyle::SubControl control = (QStyle::SubControl)0x01;
       control <= (QStyle::SubControl)0x80;
@@ -593,11 +743,6 @@ const ComplexHoverFadeInfo *StyleAnimator::complexHoverFadeInfo(const QWidget *w
    return info;
 }
 
-void StyleAnimator::complexFadeDestroyed(QObject* obj) {
-   complexHoverWidgets.remove(static_cast<QWidget*>(obj));
-   if (!ANIMATIONS) timer->stop();
-}
-
 // -- Indexed items like menus, tabs ---------------------
 void StyleAnimator::updateIndexedFades() {
    if (indexedHoverWidgets.isEmpty())
@@ -607,25 +752,25 @@ void StyleAnimator::updateIndexedFades() {
    it = indexedHoverWidgets.begin();
    while (it != indexedHoverWidgets.end()) {
       IndexedFadeInfo &info = it.value();
-      if (info.fadingInIndices.isEmpty() && info.fadingOutIndices.isEmpty()) {
+      if (info.fadeIns.isEmpty() && info.fadeOuts.isEmpty()) {
          ++it;
          continue;
       }
       
-      stepIt = info.fadingInIndices.begin();
-      while (stepIt != info.fadingInIndices.end()) {
+      stepIt = info.fadeIns.begin();
+      while (stepIt != info.fadeIns.end()) {
          stepIt.value() += 2;
          if (stepIt.value() > 4)
-            stepIt = info.fadingInIndices.erase(stepIt);
+            stepIt = info.fadeIns.erase(stepIt);
          else
             ++stepIt;
       }
       
-      stepIt = info.fadingOutIndices.begin();
-      while (stepIt != info.fadingOutIndices.end()) {
+      stepIt = info.fadeOuts.begin();
+      while (stepIt != info.fadeOuts.end()) {
          --stepIt.value();
          if (stepIt.value() < 1)
-            stepIt = info.fadingOutIndices.erase(stepIt);
+            stepIt = info.fadeOuts.erase(stepIt);
          else
             ++stepIt;
       }
@@ -633,8 +778,8 @@ void StyleAnimator::updateIndexedFades() {
       it.key()->update();
       
       if (info.index == 0L && // nothing actually hovered
-          info.fadingInIndices.isEmpty() && // no fade ins
-          info.fadingOutIndices.isEmpty()) // no fade outs
+          info.fadeIns.isEmpty() && // no fade ins
+          info.fadeOuts.isEmpty()) // no fade outs
          it = indexedHoverWidgets.erase(it);
       else
          ++it;
@@ -642,7 +787,7 @@ void StyleAnimator::updateIndexedFades() {
    if (!ANIMATIONS) timer->stop();
 }
 
-const IndexedFadeInfo *StyleAnimator::indexedFadeInfo(const QWidget *widget,
+const IndexedFadeInfo *StyleAnimator::fadeInfo(const QWidget *widget,
    long int index) const {
    QWidget *w = const_cast<QWidget*>(widget);
    IndexedFades::iterator it = indexedHoverWidgets.find(w);
@@ -653,33 +798,29 @@ const IndexedFadeInfo *StyleAnimator::indexedFadeInfo(const QWidget *widget,
       // ... but we'll need one
       it = indexedHoverWidgets.insert(w, IndexedFadeInfo(0L));
       connect(widget, SIGNAL(destroyed(QObject*)),
-               this, SLOT(indexedFadeDestroyed(QObject*)));
+               this, SLOT(destroyed(QObject*)));
       startTimer;
    }
    // we now have an entry - check for validity and update in case
    IndexedFadeInfo *info = &it.value();
    if (info->index != index) { // sth. changed
-      info->fadingInIndices[index] = 1;
+      info->fadeIns[index] = 1;
       if (info->index)
-         info->fadingOutIndices[info->index] = 6;
+         info->fadeOuts[info->index] = 6;
       info->index = index;
    }
    return info;
 }
 
-void StyleAnimator::indexedFadeDestroyed(QObject* obj) {
-   indexedHoverWidgets.remove(static_cast<QWidget*>(obj));
-   if (!ANIMATIONS) timer->stop();
-}
-
-int IndexedFadeInfo::step(long int index) {
+int IndexedFadeInfo::step(long int index) const {
    typedef QHash<long int, int> Index2Step;
-   Index2Step::iterator stepIt;
-   for (stepIt = fadingInIndices.begin(); stepIt != fadingInIndices.end(); stepIt++)
+   Index2Step::const_iterator stepIt;
+   for (stepIt = fadeIns.begin(); stepIt != fadeIns.end(); stepIt++)
       if (stepIt.key() == index)
          return stepIt.value();
-   for (stepIt = fadingOutIndices.begin(); stepIt != fadingOutIndices.end(); stepIt++)
+   for (stepIt = fadeOuts.begin(); stepIt != fadeOuts.end(); stepIt++)
       if (stepIt.key() == index)
          return stepIt.value();
    return 0;
 }
+
