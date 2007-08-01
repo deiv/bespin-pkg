@@ -76,6 +76,8 @@ public:
    QPixmap tabPix[3];
 };
 
+#define OUT false
+
 class StyleAnimator : public QObject {
    Q_OBJECT
 public:
@@ -103,8 +105,7 @@ protected:
 private:
    void addProgressBar(QWidget *progressBar);
    void addTab(QTabWidget* tab, int currentTab = -1);
-   void fadeIn(QWidget *widget);
-   void fadeOut(QWidget *widget );
+   void fade(QWidget *widget, bool in = true);
 private slots:
    void destroyed(QObject*);
    void updateProgressbars();

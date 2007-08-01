@@ -475,122 +475,102 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          drawControl(CE_ProgressBarContents, &subopt, painter, widget);
 
          // label?
-         if (pb->textVisible) {
+         if (hover && pb->textVisible) {
             subopt.rect = subElementRect(SE_ProgressBarLabel, pb, widget);
             drawControl(CE_ProgressBarLabel, &subopt, painter, widget);
          }
       }
       break;
    case CE_ProgressBarGroove:
-      if (const QStyleOptionProgressBarV2 *pb =
-            qstyleoption_cast<const QStyleOptionProgressBarV2*>(option)) {
-
-         const int f4 = dpi.f4;
-         QRect rect = RECT;
-         int size = rect.height();
-         Qt::Orientation o = Qt::Vertical;
-         if (pb->orientation == Qt::Vertical) {
-            size = rect.width(); o = Qt::Horizontal;
-         }
-         masks.button.render(rect, painter,
-                             Gradients::pix(COLOR(Window), size, o, Gradients::Sunken ) );
-         rect.adjust(f4,f4,-f4,-f4); size -= dpi.f8;
-         const QPixmap &glass =
-               Gradients::pix(COLOR(Window).dark(110), size, o, Gradients::Glass );
-         const QPixmap &solid =
-               Gradients::pix(COLOR(Window), size, o, Gradients::Simple );
-         QPixmap renderPix; int cw1, cw2;
-         if (o == Qt::Vertical) {
-            calcChunkSize(rect.width(), size, cw1, cw2);
-            renderPix = QPixmap(cw1+cw2, size);
-            QPainter p(&renderPix);
-            p.drawTiledPixmap(0,0,cw1,size,solid);
-            p.drawTiledPixmap(cw1,0,cw2,size,glass);
-            p.end();
-         }
-         else {
-            calcChunkSize(rect.height(), size, cw1, cw2);
-            renderPix = QPixmap(size, cw1+cw2);
-            QPainter p(&renderPix);
-            p.drawTiledPixmap(0,0,size,cw1,solid);
-            p.drawTiledPixmap(0,cw1,size,cw2,glass);
-            p.end();
-         }
-         painter->drawTiledPixmap(rect, renderPix);
-
-      }
-      break;
    case CE_ProgressBarContents:
       if (const QStyleOptionProgressBarV2 *pb =
             qstyleoption_cast<const QStyleOptionProgressBarV2*>(option)) {
-         double val = pb->progress; val /= (pb->maximum - pb->minimum);
-         if (val == 0.0)
-            break;
-
+         
+         double val;
+         if (element == CE_ProgressBarContents) {
+            val = pb->progress; val /= (pb->maximum - pb->minimum);
+            if (val == 0.0)
+               break;
+         }
+         
          bool reverse = option->direction == Qt::RightToLeft;
          if (pb->invertedAppearance) reverse = !reverse;
+         const bool vertical = pb->orientation == Qt::Vertical;
          
-         const int f4 = dpi.f4;
-         int step = animator->progressStep(widget);
-         
-         QRect r = RECT.adjusted(f4, f4, -f4, -f4);
-         int size = r.height();
-         Qt::Orientation o = Qt::Vertical;
-         if (pb->orientation == Qt::Vertical) {
-            size = r.width(); o = Qt::Horizontal;
-            r.setTop(r.bottom() - (int)(val*r.height())+1);
+         int x,y,l,t;
+         RECT.getRect(&x,&y,&l,&t);
+         if (vertical) {
+            int h = x; x = y; y = h;
+            l = RECT.height(); t = RECT.width();
          }
-         else if (reverse)
-            r.setLeft(r.right() - (int)(val*r.width())+1);
+         
+         int s = qMin(qMax(l / 10, dpi.f16), t /*16*t/10*/);
+         int ss = (10*s)/16;
+         
+         int n = l/s;
+         if (vertical || reverse) {
+            x = vertical ? RECT.bottom() : RECT.right();
+            x -= (l - n*s + s - ss)/2 - ss;
+            s = -s;
+         }
          else
-            r.setRight(r.left() + (int)(val*r.width())-1);
-
-         if (!size)
-            break;
+            x += (l - n*s + s - ss)/2;
+         y += (t-ss)/2;
          
-//          lights.button.render(r.adjusted(-dpi.f3,-dpi.f3,0,dpi.f3), painter, CONF_COLOR(progress[0]));
-               
-         QColor c =
-               midColor(COLOR(Window), CONF_COLOR(progress[0]), 18 - step, 18);
-         const QPixmap &glass = Gradients::pix(c, size, o, Gradients::Glass );
-         c = midColor(COLOR(Window), CONF_COLOR(progress[0]), 2,1);
-         const QPixmap &solid = Gradients::pix(c, size, o, Gradients::Simple );
-         
-         QPixmap renderPix; int cw1, cw2;
-         if (o == Qt::Vertical) {
-            calcChunkSize(RECT.width()-dpi.f8, size, cw1, cw2);
-            renderPix = QPixmap(cw1+cw2, size);
-            QPainter p(&renderPix);
-            p.drawTiledPixmap(0,0,cw1,size,solid);
-            p.drawTiledPixmap(cw1,0,cw2,size,glass);
-            p.end();
+         painter->save();
+         painter->setRenderHint(QPainter::Antialiasing);
+         int nn = n;
+         if (element == CE_ProgressBarContents) {
+            nn = n*val;
+            painter->setBrush(Gradients::pix(CONF_COLOR(progress[0]), ss, Qt::Vertical, Gradients::Glass ));
+            painter->setPen(CONF_COLOR(progress[0]).dark(120));
          }
          else {
-            calcChunkSize(RECT.height()-dpi.f8, size, cw1, cw2);
-            renderPix = QPixmap(size, cw1+cw2);
-            QPainter p(&renderPix);
-            p.drawTiledPixmap(0,0,size,cw1,solid);
-            p.drawTiledPixmap(0,cw1,size,cw2,glass);
-            p.end();
+            const QColor c = COLOR(Window).dark(110);
+            painter->setBrush(Gradients::pix(c, ss, Qt::Vertical, Gradients::Glass ));
+            painter->setPen(c.dark(120));
          }
-         painter->drawTiledPixmap(r, renderPix, r.topLeft()-QPoint(f4,f4));
          
+         if (vertical) {
+            for (int i = 0; i < nn; ++i) { // x is in fact y!
+               painter->setBrushOrigin(0, x);
+               painter->drawEllipse(y,x,ss,ss); //todo: painterpath
+               x+=s;
+            }
+         }
+         else {
+            painter->setBrushOrigin(0, y);
+            for (int i = 0; i < nn; ++i) {
+               painter->drawEllipse(x,y,ss,ss); //todo: painterpath
+               x+=s;
+            }
+         }
+//          if (element == CE_ProgressBarContents) - included in below check!
+         if (nn < n) {
+            int q = 10*n*val - 10*nn;
+            const QColor c =
+                  midColor(COLOR(Window).dark(110), CONF_COLOR(progress[0]), 10-q, q);
+            painter->setBrush(Gradients::pix(c, ss, Qt::Vertical, Gradients::Glass ));
+            painter->setPen(c.dark(120));
+            if (vertical) {
+               painter->setBrushOrigin(0, x);
+               painter->drawEllipse(y,x,ss,ss); //todo: painterpath
+            }
+            else
+               painter->drawEllipse(x,y,ss,ss); //todo: painterpath
+         }
+         painter->restore();
       }
       break;
    case CE_ProgressBarLabel:
       if (const QStyleOptionProgressBarV2 *progress =
           qstyleoption_cast<const QStyleOptionProgressBarV2*>(option)) {
          painter->save();
-         QFont fnt = painter->font();
-         fnt.setBold(true);
-         painter->setFont(fnt);
+
          QRect rect = RECT;
-         double val = progress->progress;
-         bool reverse = option->direction == Qt::RightToLeft;
-         if (progress->invertedAppearance) reverse = !reverse;
-         val = val / (progress->maximum - progress->minimum);
-         QMatrix m;
+
          if (progress->orientation == Qt::Vertical) {
+            QMatrix m;
             rect.setRect(RECT.x(), RECT.y(), RECT.height(), RECT.width());
             if (progress->bottomToTop) {
                m.translate(0.0, RECT.height()); m.rotate(-90);
@@ -598,48 +578,21 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             else {
                m.translate(RECT.width(), 0.0); m.rotate(90);
             }
-         }
-         if ( val > 0.0 ) {
-            int s;
-            QRect cr;
-            if (progress->orientation == Qt::Vertical) {
-               s = qMin( RECT.height(), ( int ) (val * RECT.height() ) );
-               if ( s > 1 )
-                  cr = QRect(RECT.x(), RECT.bottom()-s+1, RECT.width(), s);
-            }
-            else {
-               s = qMin( RECT.width(), ( int ) (val * RECT.width() ) );
-               if ( s > 1 ) {
-//                   QRect progressRect = RECT;
-                  cr = RECT;
-                  if (reverse) {
-                     cr.setLeft(RECT.right()-s+1);
-                     cr.setWidth(s);
-//                      int left = progressRect.x()-progressRect.height();
-//                      for (int i = 0; i < progressRect.height(); i++)
-//                         cr += QRect(left+i,progressRect.y()+i,progressRect.height(),1);
-                  }
-                  else
-//                   {
-                     cr.setWidth(s);
-/*                     int right = progressRect.x()+progressRect.width();
-                     for (int i = 0; i < progressRect.height(); i++)
-                        cr += QRect(right-i-1, progressRect.y()+i, progressRect.height(),1);
-                  }
-                  cr = QRegion(progressRect) - cr;*/
-               }
-            }
-//             painter->setClipRegion(cr);
-            painter->setClipRect(cr);
             painter->setMatrix(m);
-            drawItemText(painter, rect, Qt::AlignCenter | Qt::TextSingleLine, PAL, isEnabled,
-                         progress->text, config.role_progress[1]);
-            painter->resetMatrix();
-            painter->setClipRegion(QRegion(RECT).subtract(cr));
          }
-         painter->setMatrix(m);
-         drawItemText(painter, rect, Qt::AlignCenter | Qt::TextSingleLine, PAL, isEnabled,
-                      progress->text, QPalette::WindowText);
+         painter->setPen(COLOR(Window));
+         int flags = Qt::AlignCenter | Qt::TextSingleLine;
+         rect.translate(-1,-1);
+         painter->drawText(rect, flags, progress->text);
+         rect.translate(0,2);
+         painter->drawText(rect, flags, progress->text);
+         rect.translate(2,0);
+         painter->drawText(rect, flags, progress->text);
+         rect.translate(0,-2);
+         painter->drawText(rect, flags, progress->text);
+         rect.translate(-1,1);
+         painter->setPen(COLOR(WindowText));
+         painter->drawText(rect, flags, progress->text);
          painter->restore();
       }
       break;

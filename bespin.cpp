@@ -524,6 +524,7 @@ void BespinStyle::polish( QWidget * widget) {
 #ifndef QT_NO_TABBAR
        || qobject_cast<QTabBar *>(widget)
 #endif
+       || qobject_cast<QProgressBar*>(widget)
        || widget->inherits("QWorkspaceTitleBar")
        || widget->inherits("QToolButton")
        || widget->inherits("QDockWidget")
@@ -586,9 +587,12 @@ void BespinStyle::polish( QWidget * widget) {
    }
    
    if (qobject_cast<QProgressBar*>(widget)) {
+         QFont fnt = widget->font();
+         fnt.setBold(true);
+         widget->setFont(fnt);
 //       widget->setBackgroundRole ( config.role_progress[0] );
 //       widget->setForegroundRole ( config.role_progress[1] );
-      widget->installEventFilter(animator);
+//       widget->installEventFilter(animator);
    }
    
    if (qobject_cast<QTabWidget*>(widget))
@@ -744,6 +748,10 @@ void BespinStyle::polish( QWidget * widget) {
 
 bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
    switch (ev->type()) {
+   case QEvent::MouseMove:
+   case QEvent::Timer:
+   case QEvent::Move:
+      return false; // just for performance - they can occur really often
    case QEvent::Paint: {
       if (QFrame *frame = qobject_cast<QFrame*>(object)) {
          if (frame->frameShape() == QFrame::HLine ||

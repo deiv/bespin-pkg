@@ -97,7 +97,8 @@ int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const 
    case SH_ToolBox_SelectedPageTitleBold: // Boldness of the selected page title in a QToolBox.
       return true;
    case SH_LineEdit_PasswordCharacter: // The Unicode character to be used for passwords.
-      return 42;
+//       return 42;
+      return 8226; //42 9824
 //    case SH_Table_GridLineColor: //  
    case SH_UnderlineShortcut: // Whether shortcuts are underlined.
       return true;
