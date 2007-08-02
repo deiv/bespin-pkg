@@ -85,8 +85,10 @@ public:
                  TabAnimInfo::CrossFade);
    ~StyleAnimator();
    
+   void registrate(QWidget *w);
+   void unregistrate(QWidget *w);
+   
    void addScrollArea(QWidget *area);
-   void remove(QWidget *w);
    
    int hoverStep(const QWidget *widget) const;
    int progressStep(const QWidget *w) const;
@@ -106,6 +108,7 @@ private:
    void addProgressBar(QWidget *progressBar);
    void addTab(QTabWidget* tab, int currentTab = -1);
    void fade(QWidget *widget, bool in = true);
+   void remove(QWidget *w);
 private slots:
    void destroyed(QObject*);
    void updateProgressbars();

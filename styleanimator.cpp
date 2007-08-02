@@ -485,6 +485,12 @@ int StyleAnimator::progressStep(const QWidget *w) const {
    return qAbs(progressbars.value(const_cast<QWidget*>(w),0));
 }
 
+void StyleAnimator::registrate(QWidget *w) {
+   if (!w) return;
+   w->removeEventFilter(this); // just to be sure...
+   w->installEventFilter(this);
+}
+
 void StyleAnimator::remove(QWidget *w) {
    disconnect(w, SIGNAL(destroyed(QObject*)), this, SLOT(destroyed(QObject*)));
    if (QTabWidget* tab = qobject_cast<QTabWidget*>(w)) {
@@ -494,7 +500,6 @@ void StyleAnimator::remove(QWidget *w) {
    }
    if (QProgressBar *progress = qobject_cast<QProgressBar*>(w))
       progressbars.remove(progress);
-   w->removeEventFilter(this);
    if (!ANIMATIONS) timer->stop();
 }
 
@@ -535,6 +540,11 @@ void StyleAnimator::tabChanged(int index) {
    startTimer;
 }
 
+void StyleAnimator::unregistrate(QWidget *w) {
+   w->removeEventFilter(this);
+   remove(w);
+}
+
 void StyleAnimator::updateProgressbars() {
    if (progressbars.isEmpty())
       return;
@@ -546,16 +556,35 @@ void StyleAnimator::updateProgressbars() {
       if ( !qobject_cast<QProgressBar*>(iter.key()) )
          continue;
       pb = (QProgressBar*)(iter.key());
-      if (pb->paintingActive() || !pb->isVisible() ||
-          !(pb->value() > pb->minimum()) || !(pb->value() < pb->maximum()))
+      if (pb->maximum() != 0 || pb->minimum() != 0 ||
+          pb->paintingActive() || !pb->isVisible())
          continue;
 
       ++iter.value();
       
-      if (iter.value() > 18) iter.value() = -18;
+      if (iter.value() == 100) iter.value() = -92;
+      else if (iter.value() == -1) iter.value() = 7;
       
-      if (iter.value() % 2) // animate only every 2nd step (to save cpu)
-         pb->repaint(pb->rect().adjusted(2,2,-2,-2));
+      int x,y,l,t;
+      pb->rect().getRect(&x,&y,&l,&t);
+      if ( pb->orientation() == Qt::Vertical ) {
+         int h = x; x = y; y = h;
+         l = pb->height(); t = pb->width();
+      }
+      int s = qMin(qMax(l / 10, /*dpi.f*/16), t /*16*t/10*/);
+      int ss = (10*s)/16;
+      int n = l/s;
+      if ( pb->orientation() == Qt::Vertical) {
+         x = pb->rect().bottom(); x -= (l - n*s)/2 + ss;
+         s = -s;
+      }
+      else
+         x += (l - n*s)/2;
+      x += qAbs(iter.value())*n*s/100;
+      if ( pb->orientation() == Qt::Vertical )
+         pb->repaint(y,x-s,s,3*s);
+      else
+         pb->repaint(x-s,y,3*s,s);
    }
    animationUpdate = false;
 }

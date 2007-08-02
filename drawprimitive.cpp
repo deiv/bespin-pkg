@@ -369,13 +369,11 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
    }
    case PE_PanelLineEdit: { // Panel for a QLineEdit.
       // spinboxes and combos allready have a lineedit as global frame
-      if (widget && widget->parentWidget() &&
-          (widget->parentWidget()->inherits("QAbstractSpinBox") ||
-           widget->parentWidget()->inherits("QComboBox")))
-         break;
       if (qstyleoption_cast<const QStyleOptionFrame *>(option) &&
           static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1) {
-         painter->fillRect(RECT, COLOR(Base)); break;
+         if (!widget || widget->autoFillBackground())
+            painter->fillRect(RECT, COLOR(Base));
+         break;
       }
       QRect r = RECT;
       if (isEnabled) {

@@ -464,21 +464,19 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       case CE_ProgressBar: // CE_ProgressBarGroove, CE_ProgressBarContents, CE_ProgressBarLabel
       if (const QStyleOptionProgressBar *pb
           = qstyleoption_cast<const QStyleOptionProgressBar *>(option)) {
-
+         
          QStyleOptionProgressBarV2 subopt = *pb;
-         // groove
+         // groove + contents
          subopt.rect = subElementRect(SE_ProgressBarGroove, pb, widget);
          drawControl(CE_ProgressBarGroove, pb, painter, widget);
-
-         // contents
-//          subopt.rect = subElementRect(SE_ProgressBarContents, pb, widget);
+         // subopt.rect = subElementRect(SE_ProgressBarContents, pb, widget);
          drawControl(CE_ProgressBarContents, &subopt, painter, widget);
-
          // label?
          if (hover && pb->textVisible) {
             subopt.rect = subElementRect(SE_ProgressBarLabel, pb, widget);
             drawControl(CE_ProgressBarLabel, &subopt, painter, widget);
          }
+         
       }
       break;
    case CE_ProgressBarGroove:
@@ -486,9 +484,12 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       if (const QStyleOptionProgressBarV2 *pb =
             qstyleoption_cast<const QStyleOptionProgressBarV2*>(option)) {
          
-         double val;
+         double val = 0.0;
          if (element == CE_ProgressBarContents) {
-            val = pb->progress; val /= (pb->maximum - pb->minimum);
+            if (pb->maximum == 0 && pb->minimum == 0)
+               val = -animator->progressStep(widget)/100.0;
+            else
+               val = pb->progress / double(pb->maximum - pb->minimum);
             if (val == 0.0)
                break;
          }
@@ -510,7 +511,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          int n = l/s;
          if (vertical || reverse) {
             x = vertical ? RECT.bottom() : RECT.right();
-            x -= (l - n*s + s - ss)/2 - ss;
+            x -= ((l - n*s) + (s - ss))/2 + ss;
             s = -s;
          }
          else
@@ -521,9 +522,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          painter->setRenderHint(QPainter::Antialiasing);
          int nn = n;
          if (element == CE_ProgressBarContents) {
-            nn = n*val;
+            if (val < 0) nn = 0;
+            nn = int(n*val);
             painter->setBrush(Gradients::pix(CONF_COLOR(progress[0]), ss, Qt::Vertical, Gradients::Glass ));
-            painter->setPen(CONF_COLOR(progress[0]).dark(120));
+            painter->setPen(COLOR(Window).dark(132)); // (110*120) ...
          }
          else {
             const QColor c = COLOR(Window).dark(110);
@@ -545,19 +547,36 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                x+=s;
             }
          }
-//          if (element == CE_ProgressBarContents) - included in below check!
-         if (nn < n) {
-            int q = 10*n*val - 10*nn;
-            const QColor c =
-                  midColor(COLOR(Window).dark(110), CONF_COLOR(progress[0]), 10-q, q);
-            painter->setBrush(Gradients::pix(c, ss, Qt::Vertical, Gradients::Glass ));
-            painter->setPen(c.dark(120));
-            if (vertical) {
-               painter->setBrushOrigin(0, x);
-               painter->drawEllipse(y,x,ss,ss); //todo: painterpath
+         if (element == CE_ProgressBarContents) {
+            bool b = (nn < n);
+            if (val < 0.0) { // busy
+               b = true;
+               val = -val; nn = int(n*val); x += nn*s;
+               double o = n*val - nn;
+               if (o < .5)
+                  val += o/n;
+               else
+                  val += (1.0-2*o)/n;
             }
-            else
-               painter->drawEllipse(x,y,ss,ss); //todo: painterpath
+            if (b) {
+               int q = int((10*n)*val) - 10*nn;
+               if (q) {
+                  
+                  const QColor c = midColor(COLOR(Window).dark(110),
+                                          CONF_COLOR(progress[0]), 10-q, q);
+                  painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
+                                    Gradients::Glass ));
+                  painter->setPen(COLOR(Window).dark(132)); // (110*120) ...
+                  
+                  if (vertical) {
+                     painter->setBrushOrigin(0, x);
+                     painter->drawEllipse(y,x,ss,ss);
+                  }
+                  else
+                     painter->drawEllipse(x,y,ss,ss);
+               
+               }
+            }
          }
          painter->restore();
       }
@@ -1307,13 +1326,15 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          // text
          if (!cb->currentText.isEmpty() && !cb->editable) {
-            const QComboBox* combo = widget ?
-                  qobject_cast<const QComboBox*>(widget) : 0;
-            hover = hover || ( combo && combo->view() &&
-                  ((QWidget*)(combo->view()))->isVisible());
-            int f3 = dpi.f3;
-            editRect.adjust(f3,0, -f3, 0);
-            painter->setPen(hover ? COLOR(ButtonText) : COLOR(WindowText));
+            if (cb->frame) {
+               const QComboBox* combo = widget ?
+                     qobject_cast<const QComboBox*>(widget) : 0;
+               hover = hover || ( combo && combo->view() &&
+                     ((QWidget*)(combo->view()))->isVisible());
+               int f3 = dpi.f3;
+               editRect.adjust(f3,0, -f3, 0);
+               painter->setPen(hover ? COLOR(ButtonText) : COLOR(WindowText));
+            }
             painter->drawText(editRect, Qt::AlignCenter, cb->currentText);
          }
          painter->restore();

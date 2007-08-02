@@ -385,10 +385,9 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
 //    case SE_SliderFocusRect: // Area for the focus indicator
 //    case SE_Q3DockWindowHandleRect: // Area for the tear-off handle
    case SE_ProgressBarGroove: // Area for the groove
-      return option->rect;//.adjusted(0,0,0,0);
    case SE_ProgressBarContents: // Area for the progress indicator
    case SE_ProgressBarLabel: // Area for the text label
-      return option->rect.adjusted(dpi.f3,dpi.f2,-dpi.f3,-dpi.f4);
+      return option->rect;
 //    case SE_DialogButtonAccept: // Area for a dialog's accept button
 //    case SE_DialogButtonReject: // Area for a dialog's reject button
 //    case SE_DialogButtonApply: // Area for a dialog's apply button

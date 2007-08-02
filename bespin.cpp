@@ -483,20 +483,7 @@ static Atom winType = XInternAtom(QX11Info::display(), "_NET_WM_WINDOW_TYPE", Fa
 void BespinStyle::polish( QWidget * widget) {
    
    if (!widget) return; // !
-   
-   // installs dynamic brush to all widgets, taking care of a correct bg pixmap size
-   //TODO maybe we can exclude some more widgets here... (currently only popup menus)
-//    if (_bgBrush && !(
-//          qobject_cast<QMenu*>(widget) ||
-//          widget->inherits("QAlphaWidget") ||
-//          widget->inherits("QComboBoxListView") ||
-//          widget->inherits("QComboBoxPrivateContainer") ||
-//          // Kwin stuff ===========================
-//          widget->window()->objectName() == "decoration widget" ||
-//          widget->window()->inherits("QDesktopWidget") ||
-//          widget->window()->objectName() == "desktop_widget"
-//         ))
-//       widget->installEventFilter(_bgBrush);
+
    if (widget->isWindow() && config.bgMode > Scanlines) {
       widget->setAutoFillBackground(true);
       widget->setAttribute(Qt::WA_StyledBackground);
@@ -507,17 +494,10 @@ void BespinStyle::polish( QWidget * widget) {
 #endif
    
    if (false
-//         qobject_cast<QPushButton *>(widget)
-// #ifndef QT_NO_COMBOBOX
-//        || qobject_cast<QComboBox *>(widget)
-// #endif
 #ifndef QT_NO_SPINBOX
        || qobject_cast<QAbstractSpinBox *>(widget)
 #endif
-//        || qobject_cast<QCheckBox *>(widget)
-       || qobject_cast<QScrollBar *>(widget)
        || widget->inherits("QHeaderView")
-//        || qobject_cast<QRadioButton *>(widget)
 #ifndef QT_NO_SPLITTER
        || qobject_cast<QSplitterHandle *>(widget)
 #endif
@@ -525,14 +505,13 @@ void BespinStyle::polish( QWidget * widget) {
        || qobject_cast<QTabBar *>(widget)
 #endif
        || qobject_cast<QProgressBar*>(widget)
+       || qobject_cast<QAbstractSlider*>(widget)
        || widget->inherits("QWorkspaceTitleBar")
-       || widget->inherits("QToolButton")
        || widget->inherits("QDockWidget")
        || widget->inherits("QToolBar")
        || widget->inherits("QToolBarHandle")
        || widget->inherits("QDockSeparator")
        || widget->inherits("QToolBoxButton")
-       || widget->inherits("QAbstractSlider")
        || widget->inherits("QDockWidgetSeparator")
        || widget->inherits("Q3DockWindowResizeHandle")
       )
@@ -544,7 +523,7 @@ void BespinStyle::polish( QWidget * widget) {
       else {
          widget->setBackgroundRole ( QPalette::Window );
          widget->setForegroundRole ( QPalette::WindowText );
-         widget->installEventFilter(animator);
+         animator->registrate(widget);
       }
    }
    if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
@@ -556,12 +535,8 @@ void BespinStyle::polish( QWidget * widget) {
          widget->setBackgroundRole ( QPalette::Window );
          widget->setForegroundRole ( QPalette::WindowText );
       }
-      widget->installEventFilter(animator);
+      animator->registrate(widget);
    }
-   
-   if (qobject_cast<QAbstractScrollArea*>(widget) ||
-       qobject_cast<Q3ScrollView*>(widget))
-      widget->installEventFilter(animator);
    
    if (qobject_cast<QAbstractSlider *>(widget)) {
       widget->installEventFilter(this);
@@ -587,16 +562,16 @@ void BespinStyle::polish( QWidget * widget) {
    }
    
    if (qobject_cast<QProgressBar*>(widget)) {
-         QFont fnt = widget->font();
-         fnt.setBold(true);
-         widget->setFont(fnt);
+      QFont fnt = widget->font();
+      fnt.setBold(true);
+      widget->setFont(fnt);
 //       widget->setBackgroundRole ( config.role_progress[0] );
 //       widget->setForegroundRole ( config.role_progress[1] );
-//       widget->installEventFilter(animator);
+      animator->registrate(widget);
    }
    
    if (qobject_cast<QTabWidget*>(widget))
-      widget->installEventFilter(animator);
+      animator->registrate(widget);
 
    if (qobject_cast<QTabBar *>(widget)) {
       widget->setBackgroundRole ( config.role_tab[0][0] );
@@ -644,11 +619,14 @@ void BespinStyle::polish( QWidget * widget) {
           frame->frameShape() == QFrame::WinPanel)
          frame->setFrameShape(QFrame::StyledPanel);
       
+      if (qobject_cast<QAbstractScrollArea*>(frame) ||
+          qobject_cast<Q3ScrollView*>(frame))
+         animator->registrate(frame);
+      
       // map a toolbox frame to it's elements
       if (qobject_cast<QAbstractScrollArea*>(frame) &&
-          frame->parentWidget() && frame->parentWidget()->inherits("QToolBox")) {
+          frame->parentWidget() && frame->parentWidget()->inherits("QToolBox"))
          frame->setFrameStyle( static_cast<QFrame*>(frame->parentWidget())->frameStyle() );
-      }
       
       // overwrite ugly lines
       if (frame->frameShape() == QFrame::HLine ||
@@ -831,22 +809,20 @@ bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
    }
 }
 
-void BespinStyle::unPolish( QApplication */*app */)
+void BespinStyle::unPolish( QApplication *app )
 {
+   app->setPalette(QPalette());
 }
 
 void BespinStyle::unPolish( QWidget *widget )
 {
-   if (qobject_cast<QProgressBar*>(widget) ||
-       qobject_cast<QAbstractScrollArea*>(widget) ||
-       qobject_cast<Q3ScrollView*>(widget))
-      animator->remove(widget);
+   animator->unregistrate(widget);
 
    if (qobject_cast<VisualFrame*>(widget))
       delete widget; widget = 0L;
-//    w->removeEventFilter(this);
-//    if (w->isTopLevel() || qobject_cast<QGroupBox*>(w) || w->inherits("KActiveLabel"))
-//       w->setPalette(QPalette());
+   
+   widget->removeEventFilter(this);
+
 }
 
 QPalette BespinStyle::standardPalette () const

@@ -83,24 +83,40 @@ int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const 
       return false;
    case SH_ComboBox_PopupFrameStyle:
       return QFrame::NoFrame; //QFrame::StyledPanel | QFrame::Plain;
-//    case SH_Workspace_FillSpaceOnMaximize: // The workspace should maximize the client area.
-//    case SH_TitleBar_NoBorder: // The title bar has no border.
-   case SH_ScrollBar_StopMouseOverSlider: // Stops auto-repeat when the slider reaches the mouse position.
+      // The workspace should maximize the client area.
+//    case SH_Workspace_FillSpaceOnMaximize:
+   // The title bar has no border.
+//    case SH_TitleBar_NoBorder:
+   // Stops auto-repeat when the slider reaches the mouse position.
+   case SH_ScrollBar_StopMouseOverSlider:
       return false;
-   case SH_BlinkCursorWhenTextSelected: // Whether cursor should blink when text is selected.
+   // Whether cursor should blink when text is selected.
+   case SH_BlinkCursorWhenTextSelected:
       return false;
-//    case SH_RichText_FullWidthSelection: // Whether richtext selections should extend to the full width of the document.
-   case SH_GroupBox_TextLabelVerticalAlignment: // How to vertically align a groupbox's text label.
+      // Whether richtext selections should extend to the full width of the document.
+//    case SH_RichText_FullWidthSelection:
+   // How to vertically align a groupbox's text label.
+   case SH_GroupBox_TextLabelVerticalAlignment:
       return Qt::AlignTop;
-//    case SH_GroupBox_TextLabelColor: // How to paint a groupbox's text label.
-//    case SH_DialogButtons_DefaultButton: // Which button gets the default status in a dialog's button widget.
-   case SH_ToolBox_SelectedPageTitleBold: // Boldness of the selected page title in a QToolBox.
+      // How to paint a groupbox's text label.
+//    case SH_GroupBox_TextLabelColor:
+      // Which button gets the default status in a dialog's button widget.
+//    case SH_DialogButtons_DefaultButton:
+   // Boldness of the selected page title in a QToolBox.
+   case SH_ToolBox_SelectedPageTitleBold:
       return true;
-   case SH_LineEdit_PasswordCharacter: // The Unicode character to be used for passwords.
-//       return 42;
-      return 8226; //42 9824
+   // The Unicode character to be used for passwords.
+   case SH_LineEdit_PasswordCharacter: {
+        const QFontMetrics &fm =
+         option ? option->fontMetrics :
+         (widget ? widget->fontMetrics() : QFontMetrics(QFont()));
+        if (fm.inFont(QChar(0x2022)))
+            return 0x2022;
+         return '*';
+    }
 //    case SH_Table_GridLineColor: //  
-   case SH_UnderlineShortcut: // Whether shortcuts are underlined.
+   // Whether shortcuts are underlined.
+   case SH_UnderlineShortcut:
       return true;
    case SH_SpinBox_AnimateButton: // Animate a click when up or down is pressed in a spin box.
       return true;
