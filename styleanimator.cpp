@@ -247,8 +247,9 @@ bool StyleAnimator::eventFilter( QObject* object, QEvent *e ) {
    case QEvent::MouseMove:
    case QEvent::Timer:
    case QEvent::Move:
+   case QEvent::Paint:
       return false; // just for performance - they can occur really often
-   
+
    case QEvent::Show: {
       if (QProgressBar *progress = qobject_cast<QProgressBar*>(object))
       if (progress->isEnabled()) {
@@ -562,15 +563,15 @@ void StyleAnimator::updateProgressbars() {
 
       ++iter.value();
       
-      if (iter.value() == 100) iter.value() = -92;
-      else if (iter.value() == -1) iter.value() = 7;
-      
       int x,y,l,t;
       pb->rect().getRect(&x,&y,&l,&t);
       if ( pb->orientation() == Qt::Vertical ) {
          int h = x; x = y; y = h;
          l = pb->height(); t = pb->width();
       }
+      if (iter.value() > l/3) iter.value() = l/36-l/3;
+      else if (iter.value() == -1) iter.value() = l/36-1;
+      
       int s = qMin(qMax(l / 10, /*dpi.f*/16), t /*16*t/10*/);
       int ss = (10*s)/16;
       int n = l/s;
@@ -580,7 +581,9 @@ void StyleAnimator::updateProgressbars() {
       }
       else
          x += (l - n*s)/2;
-      x += qAbs(iter.value())*n*s/100;
+      s = qAbs(s);
+      
+      x += qMax(3*qAbs(iter.value())*n*s/l - s, 0);
       if ( pb->orientation() == Qt::Vertical )
          pb->repaint(y,x-s,s,3*s);
       else

@@ -484,16 +484,6 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       if (const QStyleOptionProgressBarV2 *pb =
             qstyleoption_cast<const QStyleOptionProgressBarV2*>(option)) {
          
-         double val = 0.0;
-         if (element == CE_ProgressBarContents) {
-            if (pb->maximum == 0 && pb->minimum == 0)
-               val = -animator->progressStep(widget)/100.0;
-            else
-               val = pb->progress / double(pb->maximum - pb->minimum);
-            if (val == 0.0)
-               break;
-         }
-         
          bool reverse = option->direction == Qt::RightToLeft;
          if (pb->invertedAppearance) reverse = !reverse;
          const bool vertical = pb->orientation == Qt::Vertical;
@@ -503,6 +493,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          if (vertical) {
             int h = x; x = y; y = h;
             l = RECT.height(); t = RECT.width();
+         }
+         
+         double val = 0.0;
+         if (element == CE_ProgressBarContents) {
+            if (pb->maximum == 0 && pb->minimum == 0)
+               val = -3.0*animator->progressStep(widget)/l;
+            else
+               val = pb->progress / double(pb->maximum - pb->minimum);
+            if (val == 0.0)
+               break;
          }
          
          int s = qMin(qMax(l / 10, dpi.f16), t /*16*t/10*/);
@@ -1273,16 +1273,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             c = COLOR(Window);
          
          // the allways shown base
-         const QPixmap &base = Gradients::pix(config.fullButtonHover ? c :
-               COLOR(Window), size, o, Gradients::Progress);
+         const QBrush base = Gradients::brush(config.fullButtonHover ? c :
+               COLOR(Window), size, o, config.gradButton);
          masks.tab.render(r, painter, base);
          masks.tab.outline(r, painter, midColor(COLOR(Window), Qt::white,1,2), true);
          
          if (config.fullButtonHover)
             break; // really - nothing to do anymore!
          
-         const QPixmap &deco =
-               Gradients::pix(c, size, o, Gradients::Progress);
+         const QBrush deco =
+               Gradients::brush(c, size, o, config.gradButton);
          r.adjust(f2, f2, -f2, -f2);
          masks.button.render(r, painter, deco, Tile::Full, false, QPoint(f2,f2));
       }
