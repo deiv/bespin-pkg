@@ -491,7 +491,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
    }
    case PE_IndicatorCheckBox: { // On/off indicator, for example, a QCheckBox.
       bool _fullHover = config.fullButtonHover;
-//       if (config.checkType == 2)
+      if (!(option->state & State_Off))
          config.fullButtonHover = true;
       drawPrimitive(PE_PanelButtonBevel, option, painter, widget);
       config.fullButtonHover = _fullHover;

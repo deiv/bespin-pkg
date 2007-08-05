@@ -245,9 +245,6 @@ void BespinStyle::readSettings()
    config.scale = settings.value("Scale", 1.0).toDouble();
    config.checkType = settings.value("CheckType", 1).toInt();
    
-   
-   config.gradientIntensity = settings.value("GradientIntensity",70).toInt();
-   
    config.tabTransition =
       (TabAnimInfo::TabTransition) settings.value("TabTransition",
          TabAnimInfo::ScanlineBlend).toInt();
@@ -284,6 +281,8 @@ void BespinStyle::readSettings()
       (Gradients::Type) settings.value("GradChoose", Gradients::Glass).toInt();
    config.gradTab =
       (Gradients::Type) settings.value("GradTab", Gradients::Gloss).toInt();
+   config.gradMenuItem =
+         (Gradients::Type) settings.value("GradMenuItem", Gradients::None).toInt();
 
    config.showMenuIcons = settings.value("ShowMenuIcons", false).toBool();
    config.menuShadow = settings.value("MenuShadow", false).toBool();
@@ -306,10 +305,15 @@ void BespinStyle::readSettings()
    invColorRole(config.role_tab[1][0], config.role_tab[1][1],
                 QPalette::Button, QPalette::ButtonText);
    
+   config.role_menuActive[0] =
+      (QPalette::ColorRole) settings.value("role_menuActive", QPalette::WindowText).toInt();
+   invColorRole(config.role_menuActive[0], config.role_menuActive[1],
+                QPalette::Window, QPalette::WindowText);
    config.role_popup[0] =
       (QPalette::ColorRole) settings.value("role_popup", QPalette::Window).toInt();
    invColorRole(config.role_popup[0], config.role_popup[1],
                 QPalette::Window, QPalette::WindowText);
+
 
    settings.endGroup();
 }

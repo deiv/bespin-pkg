@@ -62,11 +62,15 @@ typedef struct {
 } Dpi;
 
 typedef struct Config {
-   Gradients::Type gradButton, gradChoose, gradProgress, gradTab;
+   Gradients::Type
+      gradButton,
+      gradChoose,
+      gradProgress,
+      gradTab,
+      gradMenuItem;
    BGMode bgMode;
    int structure;
    TabAnimInfo::TabTransition tabTransition;
-   int gradientIntensity;
    bool
       showMenuIcons,
       showScrollButtons,
@@ -79,7 +83,8 @@ typedef struct Config {
    QPalette::ColorRole
       role_progress[2],
       role_tab[2][2],
-      role_popup[2];
+      role_popup[2],
+      role_menuActive[0];
 } Config;
 
 class BespinStyle : public QCommonStyle {

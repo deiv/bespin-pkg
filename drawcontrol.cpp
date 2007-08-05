@@ -681,7 +681,6 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       if (const QStyleOptionMenuItem *mbi =
           qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
          hover = option->state & State_Selected;
-         QPalette::ColorRole cr = hover ? QPalette::Window : QPalette::WindowText;
          IndexedFadeInfo *info = 0;
          QAction *action = 0, *activeAction = 0;
          int step = 0;
@@ -703,7 +702,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             if (!step) step = 6;
             QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f2);
             const QColor c =
-                  midColor(COLOR(Window), COLOR(WindowText), 9-step,step);
+                  midColor(COLOR(Window), CONF_COLOR(menuActive[0]), 9-step,step);
 
             int dy = 0;
             if (!sunken) {
@@ -712,13 +711,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                dy = step*r.height()/18;
                r.adjust(dx, dy, -dx, -dy);
             }
-            if (sunken) {
-               const QPixmap &fill =
-                     Gradients::pix(c, r.height(), Qt::Vertical, Gradients::Sunken);
-               masks.tab.render(r, painter, fill, Tile::Full, false, QPoint(0,dy));
-            }
-            else
-               masks.tab.render(r, painter, c, Tile::Full);
+            const QBrush fill =
+                  Gradients::brush(c, r.height(), Qt::Vertical, sunken ?
+                  Gradients::Sunken : config.gradMenuItem);
+            masks.tab.render(r, painter, fill, Tile::Full, false, QPoint(0,dy));
          }
          QPixmap pix =
                 mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ?
@@ -729,7 +725,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          if (!pix.isNull())
             drawItemPixmap(painter,mbi->rect, alignment, pix);
          else
-            drawItemText(painter, mbi->rect, alignment, mbi->palette, isEnabled, mbi->text, cr);
+            drawItemText(painter, mbi->rect, alignment, mbi->palette, isEnabled,
+                         mbi->text, hover ? config.role_menuActive[1] : QPalette::WindowText);
       }
       break;
    case CE_MenuBarEmptyArea: // The empty area of a QMenuBar
@@ -764,15 +761,18 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          bool checked = checkable && menuItem->checked;
          
          if (selected && isEnabled) {
-            bg = midColor(CONF_COLOR(popup[0]), CONF_COLOR(popup[1]), 1, 2);
-            fg = CONF_COLOR(popup[0]);
-            if (sunken) {
-            const QPixmap &fill =
-                  Gradients::pix(bg, RECT.height(), Qt::Vertical, Gradients::Sunken);
-               masks.tab.render(RECT, painter, fill);
+            if (config.role_popup[0] == QPalette::Window) {
+               bg = midColor(CONF_COLOR(popup[0]), PAL.color(config.role_menuActive[0]), 1, 2);
+               fg = CONF_COLOR(menuActive[1]);
             }
-            else
-               masks.tab.render(RECT, painter, bg);
+            else {
+               bg = midColor(CONF_COLOR(popup[0]), CONF_COLOR(popup[1]), 1, 2);
+               fg = CONF_COLOR(popup[0]);
+            }
+            const QBrush fill =
+                  Gradients::brush(bg, RECT.height(), Qt::Vertical, sunken ?
+                  Gradients::Sunken : config.gradMenuItem);
+            masks.tab.render(RECT, painter, fill);
          }
 
          // Text and icon, ripped from windows style
