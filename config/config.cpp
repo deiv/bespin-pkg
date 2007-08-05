@@ -34,7 +34,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    ui.setupUi(this);
    ui.info->setMinimumWidth( 160 ); /** min width for the info browser */
    ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
-   resize(640,-1); /** sets dialog width to 640 and height to auto */
    
    /** Prepare the settings store, not of interest */
    ui.store->hide(); // don't show by default
@@ -48,10 +47,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    generateColorModes(ui.crProgressBar);
    generateColorModes(ui.crTabBar);
    generateColorModes(ui.crTabBarActive);
+   generateColorModes(ui.crPopup);
+   generateColorModes(ui.crMenuActive);
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
    generateGradientTypes(ui.gradTab);
+   generateGradientTypes(ui.gradMenuItem);
    
    /** 1. name the info browser, you'll need it to show up context help
    Can be any QTextBrowser on your UI form */
@@ -149,6 +151,19 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    setContextHelp(ui.crProgressBar, "<b>ProgressBar Roles</b><hr>\
                   This is the \"done\" part of the Progressbar<br>\
                   Choose any mode you like - the other part is like the window");
+   handleSettings(ui.crPopup, "role_popup", QPalette::Window);
+   setContextHelp(ui.crPopup, "<b>Popup Menu Role</b><hr>\
+                  Choose anything you like (hint: saturated colors annoy me :)<br>\
+                  The Text color is chosen automatically<br>\
+                  Selected items are like selected menubar items if you choose \"Window\" here,\
+                  otherwise they appear inverted");
+   handleSettings(ui.crMenuActive, "role_menuActive", QPalette::WindowText);
+   setContextHelp(ui.crMenuActive, "<b>Selected Menubar Item Role</b><hr>\
+                  You may choose any role here<br>\
+                  Select \"WindowText\" if you want inversion.<br>\
+                  <b>Warning!</b><br>If you select \"Window\" here and \"None\" \
+                  below, the hovering is hardly indicated!");
+   handleSettings(ui.gradMenuItem, "GradMenuItem", GradNone);
    handleSettings(ui.crTabBar, "role_tab", QPalette::WindowText);
    setContextHelp(ui.crTabBar, "<b>Tabbar Role</b><hr>\
                   The color of the tabbar background<br>\
@@ -178,6 +193,15 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    /** you can call loadSettings() whenever you want, but (obviously)
    only items that have been propagated with handleSettings(.) are handled !!*/
    loadSettings();
+   
+   /** ===========================================
+   You're pretty much done here - simple eh? ;)
+    The following code reimplemets some BConfig functions
+   (mainly to manage Qt color setttings)
+   
+   if you want a standalone app you may want to check the main() funtion
+   at the end of this file as well - but there's nothing special about it...
+    =========================================== */
 }
 
 /** reimplementation of the import functionality
@@ -331,6 +355,8 @@ int main(int argc, char *argv[])
    Config *config = new Config;
    /** Next make a dialog from the widget */
    BConfigDialog *window = new BConfigDialog(config);
+   /** sets dialog width to 640 and height to auto */
+   window->resize(640,-1);
    /** Show up the dialog */
    window->show();
    /** run the application! */
