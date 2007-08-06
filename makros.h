@@ -1,6 +1,10 @@
 #ifndef OXYGEN_DEFS_H
 #define OXYGEN_DEFS_H
 
+#define CLAMP(x,l,u) (x) < (l) ? (l) :\
+(x) > (u) ? (u) :\
+(x)
+
 #define _IsNotHtmlWidget(w) ( w->objectName() != "__khtml" )
 #define _IsHtmlWidget(w) ( w->objectName() == "__khtml" )
 #define _IsViewportChild(w) w->parent() &&\

@@ -27,6 +27,35 @@ f & QStyle::Style_HasFocus ? "HasFocus, " : "",\
 f & QStyle::Style_Active ? "Active, " : "",\
 f & QStyle::Style_ButtonDefault ? "ButtonDefault" : "" )
 
+#ifndef _PRINTSTATE_
+#define _PRINTSTATE_ option ? qWarning("State Flags:\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",\
+option->state & State_Active ? "Active, " : "",\
+option->state & State_AutoRaise ? "AutoRaise, " : "",\
+option->state & State_Bottom ? "Bottom, " : "",\
+option->state & State_Children ? "Children, " : "",\
+option->state & State_None ? "None, " : "",\
+option->state & State_DownArrow ? "DownArrow, " : "",\
+option->state & State_Editing ? "Editing, " : "",\
+option->state & State_Enabled ? "Enabled, " : "",\
+option->state & State_FocusAtBorder ? "FocusAtBorder, " : "",\
+option->state & State_HasFocus ? "HasFocus, " : "",\
+option->state & State_Horizontal ? "Horizontal, " : "",\
+option->state & State_Item ? "Item, " : "",\
+option->state & State_MouseOver ? "MouseOver, " : "",\
+option->state & State_NoChange ? "NoChange, " : "",\
+option->state & State_Off ? "Off, " : "",\
+option->state & State_On ? "On, " : "",\
+option->state & State_Open ? "Open, " : "",\
+option->state & State_Raised ? "Raised, " : "",\
+option->state & State_Selected ? "Selected, " : "",\
+option->state & State_Sibling ? "Sibling, " : "",\
+option->state & State_Sunken ? "Sunken, " : "",\
+option->state & State_Top ? "Top, " : "",\
+option->state & State_UpArrow ? "UpArrow, " : "",\
+option->state & State_KeyboardFocusChange ? "KeyboardFocusChange, " : "",\
+option->state & State_ReadOnly ? "ReadOnly, " : "") : qWarning("MISSING OPTIONS")
+#endif
+
 #define PRINTEVENT(e) qWarning("Event: %s",\
 e->type() == QEvent::Timer                    ? " Timer " : \
 e->type() == QEvent::MouseButtonPress         ? " MouseButtonPress " : \

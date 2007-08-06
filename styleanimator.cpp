@@ -16,18 +16,19 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <QEvent>
-#include <QPainter>
-#include <QBitmap>
-#include <QApplication>
-#include <QResizeEvent>
-#include <QPaintEvent>
-#include <QProgressBar>
 #include <QAbstractScrollArea>
 #include <QAbstractButton>
+#include <QApplication>
+#include <QBitmap>
 #include <QComboBox>
-#include <Q3ScrollView>
+#include <QEvent>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QProgressBar>
+#include <QResizeEvent>
 #include <QScrollBar>
+#include <QTimer>
+#include <Q3ScrollView>
 
 #include "styleanimator.h"
 #ifndef QT_NO_XRENDER
@@ -158,7 +159,7 @@ static void grabWidget(QWidget * root, QPixmap *pix) {
          }
          
          // scrollarea workaround
-         if (scrollarea = qobject_cast<QAbstractScrollArea*>(w))
+         if ((scrollarea = qobject_cast<QAbstractScrollArea*>(w)))
             hasScrollAreas = true;
          if (hasScrollAreas && !qobject_cast<QScrollBar*>(w) &&
              (scrollarea = scrollAncestor(w, root))) {
@@ -250,7 +251,7 @@ bool StyleAnimator::eventFilter( QObject* object, QEvent *e ) {
    case QEvent::Paint:
       return false; // just for performance - they can occur really often
 
-   case QEvent::Show: {
+   case QEvent::Show:
       if (QProgressBar *progress = qobject_cast<QProgressBar*>(object))
       if (progress->isEnabled()) {
          addProgressBar(progress);
@@ -261,16 +262,14 @@ bool StyleAnimator::eventFilter( QObject* object, QEvent *e ) {
          return false;
       }
       return false;
-   }
    
-   case QEvent::Hide: {
+   case QEvent::Hide:
       if (qobject_cast<QProgressBar*>(object) ||
           qobject_cast<QTabWidget*>(object)) {
              remove(static_cast<QWidget*>(object));
          return false;
       }
       return false;
-   }
 
 #define HANDLE_SCROLL_AREA_EVENT \
          if (area->horizontalScrollBar()->isVisible())\
@@ -303,7 +302,7 @@ bool StyleAnimator::eventFilter( QObject* object, QEvent *e ) {
          QWidget *sb;
          foreach (QObject *kid, kids) {
             if (kid->parent() == object)
-            if (sb = qobject_cast<QScrollBar*>(kid))
+            if ((sb = qobject_cast<QScrollBar*>(kid)))
                fade(sb);
          }
          return false;
@@ -341,7 +340,7 @@ bool StyleAnimator::eventFilter( QObject* object, QEvent *e ) {
          QWidget *sb;
          foreach (QObject *kid, kids) {
             if (kid->parent() == object)
-            if (sb = qobject_cast<QScrollBar*>(kid))
+            if ((sb = qobject_cast<QScrollBar*>(kid)))
                fade(sb, false);
          }
          return false;
@@ -490,6 +489,10 @@ void StyleAnimator::registrate(QWidget *w) {
    if (!w) return;
    w->removeEventFilter(this); // just to be sure...
    w->installEventFilter(this);
+   if (w->isVisible()) {
+      QEvent ev(QEvent::Show);
+      eventFilter(w, &ev);
+   }
 }
 
 void StyleAnimator::remove(QWidget *w) {
@@ -624,11 +627,25 @@ void StyleAnimator::updateTabAnimation() {
          }
          ctw->repaint(); //asap
          tai->autofillingWidgets.clear();
+         tai->lastTabUpdate = QTime();
          continue;
       }
       ++activeTabs;
+      // in case the tab is huge or the system slow, the whole animation
+      // slows down as all timer signals are handled, thus we implement a frame
+      // drop mechanism here
+      if (tai->lastTabUpdate.isValid()) {
+         QTime actualTime = QTime::currentTime();
+         int msecs = tai->lastTabUpdate.msecsTo(actualTime);
+         // 50 is desired, we allow a little loss...
+         if (msecs > 55) {
+            tai->lastTabUpdate = actualTime;
+            continue;
+         }
+      }
+      tai->lastTabUpdate = QTime::currentTime();
       tai->updatePixmaps(tabTransition);
-      ctw->parentWidget()->update();
+      ctw->parentWidget()->repaint();
    }
    if (!ANIMATIONS) timer->stop();
 }

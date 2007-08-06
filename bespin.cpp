@@ -98,6 +98,7 @@
 
 /**============= Bespin includes ==========================*/
 #include "bespin.h"
+#include "colors.h"
 #include "makros.h"
 #ifndef QT_NO_XRENDER
 #include "oxrender.h"
@@ -133,37 +134,6 @@ Gradients ::Type _progressBase;
 /** Let's try if we can supply round frames that shape their content */
 
 /** Get some excluded code */
-#include "inlinehelp.cpp"
-
-
-static bool invColorRole(QPalette::ColorRole &from, QPalette::ColorRole &to,
-                         QPalette::ColorRole defFrom = QPalette::WindowText, QPalette::ColorRole defTo = QPalette::Window)
-{
-   switch (from)
-   {
-   case QPalette::WindowText: //0
-      to = QPalette::Window; break;
-   case QPalette::Window: //10
-      to = QPalette::WindowText; break;
-   case QPalette::Base: //9
-      to = QPalette::Text; break;
-   case QPalette::Text: //6
-      to = QPalette::Base; break;
-   case QPalette::Button: //1
-      to = QPalette::ButtonText; break;
-   case QPalette::ButtonText: //8
-      to = QPalette::Button; break;
-   case QPalette::Highlight: //12
-      to = QPalette::HighlightedText; break;
-   case QPalette::HighlightedText: //13
-      to = QPalette::Highlight; break;
-   default:
-      from = defFrom;
-      to = defTo;
-      return false;
-   }
-   return true;
-}
 
 void BespinStyle::makeStructure(int num, const QColor &c)
 {
@@ -292,27 +262,27 @@ void BespinStyle::readSettings()
    
    config.role_progress[0] =
       (QPalette::ColorRole) settings.value("role_progress", QPalette::WindowText).toInt();
-   invColorRole(config.role_progress[0], config.role_progress[1],
-                 QPalette::Highlight, QPalette::HighlightedText);
+   Colors::counterRole(config.role_progress[0], config.role_progress[1],
+                       QPalette::Highlight, QPalette::HighlightedText);
    
    config.role_tab[0][0] =
       (QPalette::ColorRole) settings.value("role_tab", QPalette::Window).toInt();
-   invColorRole(config.role_tab[0][0], config.role_tab[0][1],
-                QPalette::Window, QPalette::WindowText);
+   Colors::counterRole(config.role_tab[0][0], config.role_tab[0][1],
+                       QPalette::Window, QPalette::WindowText);
    
    config.role_tab[1][0] =
       (QPalette::ColorRole) settings.value("role_tabActive", QPalette::Button).toInt();
-   invColorRole(config.role_tab[1][0], config.role_tab[1][1],
-                QPalette::Button, QPalette::ButtonText);
+   Colors::counterRole(config.role_tab[1][0], config.role_tab[1][1],
+                       QPalette::Button, QPalette::ButtonText);
    
    config.role_menuActive[0] =
       (QPalette::ColorRole) settings.value("role_menuActive", QPalette::WindowText).toInt();
-   invColorRole(config.role_menuActive[0], config.role_menuActive[1],
-                QPalette::Window, QPalette::WindowText);
+   Colors::counterRole(config.role_menuActive[0], config.role_menuActive[1],
+                       QPalette::Window, QPalette::WindowText);
    config.role_popup[0] =
       (QPalette::ColorRole) settings.value("role_popup", QPalette::Window).toInt();
-   invColorRole(config.role_popup[0], config.role_popup[1],
-                QPalette::Window, QPalette::WindowText);
+   Colors::counterRole(config.role_popup[0], config.role_popup[1],
+                       QPalette::Window, QPalette::WindowText);
 
 
    settings.endGroup();
@@ -426,7 +396,7 @@ static bool thereIsContrastBetween(const QColor &a, const QColor &b)
    
    int diff = (299*(ar-br) + 587*(ag-bg) + 114*(ab-bb));
    
-   if (QABS(diff) < 91001)
+   if (qAbs(diff) < 91001)
       return false;
    
    diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
@@ -463,16 +433,16 @@ void BespinStyle::polish( QPalette &pal )
    
    //inactive palette
    pal.setColor(QPalette::Inactive, QPalette::WindowText,
-                midColor(pal.color(QPalette::Active, QPalette::Window),
+                Colors::mid(pal.color(QPalette::Active, QPalette::Window),
                          pal.color(QPalette::Active, QPalette::WindowText)));
    pal.setColor(QPalette::Inactive, QPalette::Text,
-                midColor(pal.color(QPalette::Active, QPalette::Base),
+                Colors::mid(pal.color(QPalette::Active, QPalette::Base),
                          pal.color(QPalette::Active, QPalette::Text),1,3));
    pal.setColor(QPalette::Inactive, QPalette::Highlight,
-                midColor(pal.color(QPalette::Active, QPalette::Highlight),
+                Colors::mid(pal.color(QPalette::Active, QPalette::Highlight),
                          pal.color(QPalette::Disabled, QPalette::Highlight),3,1));
    pal.setColor(QPalette::Inactive, QPalette::AlternateBase,
-                midColor(pal.color(QPalette::Active, QPalette::AlternateBase),
+                Colors::mid(pal.color(QPalette::Active, QPalette::AlternateBase),
                          pal.color(QPalette::Active, QPalette::Base),3,1));
    
    config.strongFocus =

@@ -23,8 +23,10 @@
 #include <QHash>
 #include <QList>
 #include <QPixmap>
-#include <QTimer>
+#include <QTime>
 #include <QTabWidget>
+
+class QTimer;
 
 class HoverFadeInfo {
 public:
@@ -74,6 +76,7 @@ public:
    QList < QWidget* > autofillingWidgets;
    int lastTab, animStep;
    QPixmap tabPix[3];
+   QTime lastTabUpdate;
 };
 
 #define OUT false

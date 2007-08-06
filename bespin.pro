@@ -1,6 +1,6 @@
-HEADERS = oxrender.h bespin.h tileset.h debug.h eventkiller.h \
+HEADERS = colors.h oxrender.h bespin.h tileset.h debug.h eventkiller.h \
           visualframe.h gradients.h styleanimator.h
-SOURCES = oxrender.cpp bespin.cpp tileset.cpp stylehint.cpp \
+SOURCES = colors.cpp oxrender.cpp bespin.cpp tileset.cpp stylehint.cpp \
           sizefromcontents.cpp qsubcmetrics.cpp \
           pixelmetric.cpp stdpix.cpp styleanimator.cpp \
           drawcomplexcontrol.cpp drawcontrol.cpp \

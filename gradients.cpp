@@ -22,11 +22,14 @@
 #include <QRadialGradient>
 #include <cmath>
 
+#include "colors.h"
 #include "gradients.h"
 
 #ifndef QT_NO_XRENDER
 #include "oxrender.h"
 #endif
+
+using namespace Bespin;
 
 static QPixmap nullPix;
 static Gradients::BgMode _mode;
@@ -34,13 +37,6 @@ static Gradients::BgMode _mode;
 // define e.g. "Gradients::Type _progressBase = Glass;" instead
 extern Gradients::Type _progressBase;
 
-static inline int
-colorValue(const QColor &c) {
-   int v = c.red();
-   if (c.green() > v) v = c.green();
-   if (c.blue() > v) v = c.blue();
-   return v;
-}
 
 /* ========= MAGIC NUMBERS ARE COOL ;) =================
 Ok, we want to cache the gradients, but unfortunately we have no idea about
@@ -207,7 +203,7 @@ progressGradient(const QColor &c, int size, Qt::Orientation o) {
    dv = 20 - dv;
    ltC.setHsv(h-5,s, v + dv);
    
-//    int dc = colorValue(c)/5; // how much darken/lighten we will
+//    int dc = Colors::value(c)/5; // how much darken/lighten we will
 //    QColor dkC = c.dark(100+sqrt(2*dc));
 //    QColor ltC = c.light(150-dc);
    
@@ -286,7 +282,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
    
    // very dark colors won't make nice buttons =)
    QColor iC = c;
-   int v = colorValue(c);
+   int v = Colors::value(c);
    if (v < 80) {
       int h,s;
       c.getHsv(&h,&s,&v);
