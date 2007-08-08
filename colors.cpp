@@ -37,7 +37,7 @@ QColor Colors::btnBg(const QPalette &pal, bool isEnabled, int hasFocus, int step
       return TMP_COLOR(Window).dark(104);
    QColor c = (hasFocus) ?
       mid(TMP_COLOR(Highlight),TMP_COLOR(Window),
-               1, contrast(TMP_COLOR(Highlight),TMP_COLOR(Window))/2) :
+               1, contrast(TMP_COLOR(Highlight),TMP_COLOR(Window))) :
       TMP_COLOR(Window);
    if (step)
       return mid(c, TMP_COLOR(Button), 36 - step, step);

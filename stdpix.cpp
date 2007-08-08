@@ -29,8 +29,6 @@ using namespace Bespin;
 extern Dpi dpi;
 extern Config config;
 
-#include "inlinehelp.cpp"
-
 QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyleOption * option, const QWidget * widget ) const
 {
 

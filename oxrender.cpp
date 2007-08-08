@@ -78,7 +78,7 @@ void OXRender::composite(const QPixmap &src, OXPicture mask, const QPixmap &dst,
 }
 
 bool OXRender::blend(const QPixmap &upper, QPixmap &lower, double opacity) {
-   XRenderColor c = {0,0,0, (ushort)(opacity * 0xffff) };
+   XRenderColor c = {0,0,0, ushort(opacity * 0xffff) };
    OXPicture alpha = createFill (dpy, &c);
    if (alpha == X::None)
       return false;

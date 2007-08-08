@@ -190,8 +190,9 @@ static void grabWidget(QWidget * root, QPixmap *pix) {
 }
 
 StyleAnimator::StyleAnimator(QObject *parent,
-                             TabAnimInfo::TabTransition tabTrans) :
-QObject(parent), tabTransition(tabTrans) {
+                             TabAnimInfo::TabTransition tabTrans,
+                             uint tabAnimSteps) :
+QObject(parent), tabTransition(tabTrans), _tabAnimSteps(tabAnimSteps) {
    animationUpdate = false;
    timer = new QTimer( this );
    connect(timer, SIGNAL(timeout()), this, SLOT(updateProgressbars()));
@@ -225,7 +226,7 @@ void StyleAnimator::addScrollArea(QWidget *area) {
 
 void StyleAnimator::addTab(QTabWidget* tab, int currentIndex) {
    if (tabwidgets.contains(tab)) return; // accidental double add
-   tabwidgets[tab] = new TabAnimInfo(tab, currentIndex);
+   tabwidgets[tab] = new TabAnimInfo(tab, currentIndex, _tabAnimSteps);
    connect(tab, SIGNAL(currentChanged(int)),
            this, SLOT(tabChanged(int)));
    connect(tab, SIGNAL(destroyed(QObject*)),
@@ -528,7 +529,7 @@ void StyleAnimator::tabChanged(int index) {
    ctw = tw->currentWidget();
    grabWidget(ctw, &tai->tabPix[1]);
    
-   tai->animStep = 6;
+   tai->animStep = tai->_numSteps;
    tai->updatePixmaps(tabTransition);
    ctw->parentWidget()->installEventFilter(tai);
    _BLOCKEVENTS_(ctw);
@@ -780,34 +781,34 @@ void TabAnimInfo::updatePixmaps(TabTransition tabTransition) {
    switch (tabTransition) {
 #ifndef QT_NO_XRENDER
    case CrossFade: // the quotient says "accelerate animation"!
-      OXRender::blend(tabPix[1], tabPix[2], 1.1666-0.1666*animStep);
+      OXRender::blend(tabPix[1], tabPix[2], _q*(_n-animStep));
       break;
 #endif
    case ScanlineBlend:
    default: {
       QPainter p(&tabPix[2]);
-      for (int i = animStep; i < tabPix[2].height(); i+=6)
+      for (int i = animStep; i < tabPix[2].height(); i+=_numSteps)
          p.drawPixmap(0, i, tabPix[1], 0, i, tabPix[1].width(), 1);
       break;
    }
    case SlideIn: {
       //TODO handle different bar positions (currently assumes top)
       QPainter p(&tabPix[2]);
-      p.drawPixmap(0, 0, tabPix[0], 0, animStep*tabPix[1].height()/7,
-                   tabPix[0].width(), (7-animStep)*tabPix[1].height()/7);
+      p.drawPixmap(0, 0, tabPix[0], 0, animStep*tabPix[1].height()/_n,
+                   tabPix[0].width(), (_n-animStep)*tabPix[1].height()/_n);
       break;
    }
    case SlideOut: {
       tabPix[2] = tabPix[1];
       //TODO handle different bar positions (currently assumes top)
       QPainter p(&tabPix[2]);
-      p.drawPixmap(0, 0, tabPix[0], 0, (7 - animStep) * tabPix[0].height()/7,
-                   tabPix[0].width(), animStep*tabPix[0].height()/7);
+      p.drawPixmap(0, 0, tabPix[0], 0, (_n - animStep) * tabPix[0].height()/_n,
+                   tabPix[0].width(), animStep*tabPix[0].height()/_n);
       break;
    }
    case RollIn: {
       QPainter p(&tabPix[2]);
-      int h = (7-animStep)*tabPix[1].height()/14;
+      int h = (_n-animStep)*tabPix[1].height()/(2*_n);
       p.drawPixmap(0, 0, tabPix[1], 0, 0, tabPix[1].width(), h);
       p.drawPixmap(0, tabPix[1].height()-h, tabPix[1],
                    0, tabPix[1].height()-h, tabPix[1].width(), h);
@@ -815,7 +816,7 @@ void TabAnimInfo::updatePixmaps(TabTransition tabTransition) {
    }
    case RollOut: {
       QPainter p(&tabPix[2]);
-      int h = (7-animStep)*tabPix[1].height()/7;
+      int h = (_n-animStep)*tabPix[1].height()/_n;
       int y = (tabPix[1].height()-h)/2;
       p.drawPixmap(0, y, tabPix[1], 0, y, tabPix[1].width(), h);
       break;
@@ -823,7 +824,7 @@ void TabAnimInfo::updatePixmaps(TabTransition tabTransition) {
    case OpenVertically: {
       tabPix[2] = tabPix[1];
       QPainter p(&tabPix[2]);
-      int h = animStep*tabPix[0].height()/14;
+      int h = animStep*tabPix[0].height()/(2*_n);
       p.drawPixmap(0,0,tabPix[0],0,tabPix[0].height()/2-h,
                   tabPix[0].width(),h);
       p.drawPixmap(0,tabPix[0].height()-h,tabPix[0],
@@ -832,7 +833,7 @@ void TabAnimInfo::updatePixmaps(TabTransition tabTransition) {
    }
    case CloseVertically: {
       QPainter p(&tabPix[2]);
-      int h = (7-animStep)*tabPix[1].height()/14;
+      int h = (_n-animStep)*tabPix[1].height()/(2*_n);
       p.drawPixmap(0, 0, tabPix[1],
                    0, tabPix[1].height()/2-h, tabPix[1].width(), h);
       p.drawPixmap(0, tabPix[1].height()-h, tabPix[1],
@@ -842,7 +843,7 @@ void TabAnimInfo::updatePixmaps(TabTransition tabTransition) {
    case OpenHorizontally: {
       tabPix[2] = tabPix[1];
       QPainter p(&tabPix[2]);
-      int w = animStep*tabPix[0].width()/14;
+      int w = animStep*tabPix[0].width()/(2*_n);
       p.drawPixmap(0,0,tabPix[0],tabPix[0].width()/2-w,0,
                   w,tabPix[0].height());
       p.drawPixmap(tabPix[0].width()-w,0,tabPix[0],
@@ -851,7 +852,7 @@ void TabAnimInfo::updatePixmaps(TabTransition tabTransition) {
    }
    case CloseHorizontally: {
       QPainter p(&tabPix[2]);
-      int w = (7-animStep)*tabPix[1].width()/14;
+      int w = (_n-animStep)*tabPix[1].width()/(2*_n);
       p.drawPixmap(0, 0, tabPix[1],
                    tabPix[1].width()/2-w, 0, w, tabPix[1].height());
       p.drawPixmap(tabPix[1].width()-w, 0, tabPix[1],

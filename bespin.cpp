@@ -183,13 +183,22 @@ void BespinStyle::makeStructure(int num, const QColor &c)
       }
       break;
    }
-   case 2: // bricks - sucks...
-      p.setPen(c.dark(105));
-      p.setBrush(c.light(102));
-      p.drawRect(0,0,32,16); p.drawRect(32,0,32,16);
-      p.drawRect(0,16,16,16); p.drawRect(16,16,32,16); p.drawRect(48,16,16,16);
-      p.drawRect(0,32,32,16); p.drawRect(32,32,32,16);
-      p.drawRect(0,48,16,16); p.drawRect(16,48,32,16); p.drawRect(48,48,16,16);
+   case 2: // fat scans
+      _scanlines[num]->fill( c.light(103).rgb() );
+      p.setPen(QPen((num == 1) ? c.light(101) : c, 3));
+      p.setBrush( c.dark(102) );
+      p.drawRect(-3,8,70,8);
+      p.drawRect(-3,24,70,8);
+      p.drawRect(-3,40,70,8);
+      p.drawRect(-3,56,70,8);
+      break;
+   case 3: // "blue"print
+      _scanlines[num]->fill( c.dark(101).rgb() );
+      p.setPen((num == 1) ? c.light(104) : c.light(102));
+      for ( int i = 0; i < 64; i += 16 )
+         p.drawLine( 0, i, 63, i );
+      for ( int i = 0; i < 64; i += 16 )
+         p.drawLine( i, 0, i, 63 );
       break;
    }
    p.end();
@@ -212,6 +221,9 @@ void BespinStyle::readSettings()
 #endif
    config.structure = settings.value("Structure", 0).toInt();
    
+   config.tabAnimSteps =
+         CLAMP(settings.value("TabAnimSteps", 6).toUInt(), 2, 18);
+   
    config.scale = settings.value("Scale", 1.0).toDouble();
    config.checkType = settings.value("CheckType", 1).toInt();
    
@@ -226,27 +238,18 @@ void BespinStyle::readSettings()
    config.gradButton =
       (Gradients::Type) settings.value("GradButton", Gradients::None).toInt();
    
+   if (config.sunkenButtons)
+      config.cushion = true;
+   else if (config.gradButton == Gradients::None ||
+            config.gradButton ==  Gradients::Sunken)
+      config.cushion = false;
+   else
+      config.cushion = settings.value("Cushion", false).toBool();
+   
    if (config.sunkenButtons && config.gradButton == Gradients::Sunken) // NO!
       config.gradButton = Gradients::None;
-   
-   _progressBase = config.gradButton;
-   switch (config.gradButton) {
-   case Gradients::None:
-   case Gradients::Sunken:
-      _progressBase = Gradients::Button;
-      config.gradProgress = Gradients::Button; break;
-   case Gradients::Button:
-      config.gradProgress = Gradients::Simple; break;
-   case Gradients::Simple:
-      config.gradProgress = Gradients::Glass; break;
-   case Gradients::Gloss:
-   case Gradients::Glass:
-      config.gradProgress = Gradients::Gloss; break;
-   default:
-      _progressBase = Gradients::Glass;
-      config.gradProgress = Gradients::Gloss; break;
-   }
-      
+   config.gradProgress =
+         (Gradients::Type) settings.value("GradProgress", Gradients::Gloss).toInt();
    config.gradChoose =
       (Gradients::Type) settings.value("GradChoose", Gradients::Glass).toInt();
    config.gradTab =
@@ -332,7 +335,7 @@ internalEvent_(false) {
    
 
    // start being animated
-   animator = new StyleAnimator(this, config.tabTransition);
+   animator = new StyleAnimator(this, config.tabTransition, config.tabAnimSteps);
 
 }
 
@@ -384,7 +387,7 @@ void BespinStyle::polish ( QApplication * app ) {
    QPalette pal = app->palette();
    polish(pal);
    app->setPalette(pal);
-   app->installEventFilter(this);
+//    app->installEventFilter(this);
 }
 
 /**Internal, checks if there's contrast between two colors*/
@@ -430,6 +433,9 @@ void BespinStyle::polish( QPalette &pal )
    int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
    pal.setColor(QPalette::Disabled, QPalette::Highlight,
                 QColor(highlightGray,highlightGray,highlightGray));
+   pal.setColor(QPalette::Active, QPalette::AlternateBase,
+                Colors::mid(pal.color(QPalette::Active, QPalette::Base),
+                         pal.color(QPalette::Active, QPalette::Text),15,1));
    
    //inactive palette
    pal.setColor(QPalette::Inactive, QPalette::WindowText,
@@ -729,6 +735,7 @@ bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
          opt.initFrom(tabBar);
          drawPrimitive ( PE_FrameTabBarBase, &opt, &p);
          p.end();
+         return false;
       }
       return false;
    }

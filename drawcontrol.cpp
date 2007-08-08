@@ -101,9 +101,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          else
             drawControl(CE_PushButtonBevel, &tmpBtn, painter, widget);
 //          tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
-         tmpBtn.rect = config.sunkenButtons ? 
-               btn->rect.adjusted(dpi.f4,dpi.f3,-dpi.f4,-dpi.f4):
-               btn->rect.adjusted(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4);
+         if (config.sunkenButtons)
+            tmpBtn.rect.adjust(dpi.f4,dpi.f3,-dpi.f4,-dpi.f2);
+         else
+            tmpBtn.rect.adjust(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4);
          drawControl(CE_PushButtonLabel, &tmpBtn, painter, widget);
          
          // toggle indicator
@@ -507,12 +508,14 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          if (element == CE_ProgressBarContents) {
             if (val < 0) nn = 0;
             nn = int(n*val);
-            painter->setBrush(Gradients::pix(CONF_COLOR(progress[0]), ss, Qt::Vertical, Gradients::Glass ));
+            painter->setBrush(Gradients::pix(CONF_COLOR(progress[0]), ss,
+                              Qt::Vertical, config.gradProgress ));
             painter->setPen(COLOR(Window).dark(132)); // (110*120) ...
          }
          else {
             const QColor c = COLOR(Window).dark(110);
-            painter->setBrush(Gradients::pix(c, ss, Qt::Vertical, Gradients::Glass ));
+            painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
+                              config.gradProgress ));
             painter->setPen(c.dark(120));
          }
          
@@ -548,7 +551,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                   const QColor c = Colors::mid(COLOR(Window).dark(110),
                                           CONF_COLOR(progress[0]), 10-q, q);
                   painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
-                                    Gradients::Glass ));
+                                    config.gradProgress ));
                   painter->setPen(COLOR(Window).dark(132)); // (110*120) ...
                   
                   if (vertical) {
@@ -942,11 +945,15 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          
          QColor cB = CONF_COLOR(tab[active][0]);
          QColor cF = CONF_COLOR(tab[active][1]);
+         
+         if (active || sunken) hover = false;
                
          if (hover) {
-            cB = Colors::mid(cB, cF);
-            if (Colors::contrast(CONF_COLOR(tab[!active][1]), cB) > Colors::contrast(cF, cB))
-               cF = CONF_COLOR(tab[!active][1]);
+            cB = Colors::mid(cB, CONF_COLOR(tab[1][0]));
+            if (Colors::contrast(CONF_COLOR(tab[1][1]), cB) >
+                Colors::contrast(cF, cB)) {
+               cF = CONF_COLOR(tab[1][1]);
+            }
          }
          
          painter->save();

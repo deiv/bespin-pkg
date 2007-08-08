@@ -76,7 +76,7 @@ void BespinStyle::generatePixmaps()
    p.drawRoundRect(0,0,f9,f9,60,60);
    p.end();
    UPDATE_COLORS(tmp);
-   masks.button = Tile::Mask(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2,0,0,0,0,60,60);
+   masks.button = Tile::Mask(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2,0,0,0,0,85,85);
    
    // -> sunken
    QLinearGradient lg; QGradientStops stops;
@@ -97,18 +97,19 @@ void BespinStyle::generatePixmaps()
       p.setBrush(QColor(0,0,0,160+add)); p.drawRoundRect(f1,f3,f7,f4,85,85);
       p.setBrush(QColor(0,0,0,180+add)); p.drawRoundRect(f2,f4,dpi.f5,f3,90,90);
       p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-      lg = QLinearGradient(0,0,0,f9);
-      stops << QGradientStop( 0, QColor(255,255,255, 90) )
-         << QGradientStop( 0.5, QColor(255,255,255, 170) )
-         << QGradientStop( 1, QColor(255,255,255, 90) );
+      lg = QLinearGradient(0,0,f9,0);
+      stops << QGradientStop( 0, QColor(255,255,255, 20) )
+         << QGradientStop( 0.5, QColor(255,255,255, 110) )
+         << QGradientStop( 1, QColor(255,255,255, 20) );
       lg.setStops(stops);
       p.fillRect(f3,f9-f2,f3,f1, lg);
       stops.clear();
-      stops << QGradientStop( 0, QColor(255,255,255, 30) )
-         << QGradientStop( 0.5, QColor(255,255,255, 100) )
-         << QGradientStop( 1, QColor(255,255,255, 30) );
+      lg = QLinearGradient(0,0,f9,0);
+      stops << QGradientStop( 0, QColor(255,255,255, 10) )
+         << QGradientStop( 0.5, QColor(255,255,255, 70) )
+         << QGradientStop( 1, QColor(255,255,255, 10) );
       lg.setStops(stops);
-      p.fillRect(f3,f9-f1,f3,f1, lg);
+      p.fillRect(0,f9-f2,f9,f1, lg);
       stops.clear();
       p.end();
    
@@ -360,17 +361,17 @@ void BespinStyle::generatePixmaps()
    p.setBrush(QColor(0,0,0,180)); p.drawRoundRect(f2,dpi.f4,dpi.f13,f11,90,90);
    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
    lg = QLinearGradient(dpi.f4,0,f17-dpi.f4,0);
-   stops << QGradientStop( 0, QColor(255,255,255, 60) )
-      << QGradientStop( 0.5, QColor(255,255,255, 160) )
-      << QGradientStop( 1, QColor(255,255,255, 60) );
+   stops << QGradientStop( 0, QColor(255,255,255, 20) )
+      << QGradientStop( 0.5, QColor(255,255,255, 110) )
+      << QGradientStop( 1, QColor(255,255,255, 20) );
    lg.setStops(stops);
-   p.fillRect(dpi.f4,f17-f2,dpi.f9,f1, lg);
+   p.fillRect(f2,f17-f2,f13,f1, lg);
    stops.clear();
-   stops << QGradientStop( 0, QColor(255,255,255, 30) )
-      << QGradientStop( 0.5, QColor(255,255,255, 90) )
-      << QGradientStop( 1, QColor(255,255,255, 30) );
+   stops << QGradientStop( 0, QColor(255,255,255, 10) )
+      << QGradientStop( 0.5, QColor(255,255,255, 70) )
+      << QGradientStop( 1, QColor(255,255,255, 10) );
    lg.setStops(stops);
-   p.fillRect(dpi.f4,f17-f1,dpi.f9,f1, lg);
+   p.fillRect(f2,f17-f1,f13,f1, lg);
    stops.clear();
    p.end();
    shadows.tabSunken = Tile::Set(QPixmap::fromImage(tmpImg),f17_2,f17_2,f17-2*f17_2,f17-2*f17_2);

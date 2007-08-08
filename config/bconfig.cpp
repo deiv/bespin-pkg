@@ -11,7 +11,8 @@
 #include <QComboBox>
 #include <QTextBrowser>
 
-BConfigDialog::BConfigDialog(BConfig *config, QWidget *parent) : QDialog(parent) {
+BConfigDialog::BConfigDialog(BConfig *config, QWidget *parent) :
+QDialog(parent, Qt::Window) {
    
    QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
    QWidget *btn;
@@ -60,7 +61,7 @@ void BConfig::saveAs() {
    QString filename = QFileDialog::getSaveFileName(parentWidget(),
       tr("Save Configuration"), QDir::home().path(), tr("Config Files (*.conf *.ini)"));
    QSettings settings(filename, QSettings::IniFormat);
-   _save(&settings);
+   _save(&settings, false);
 }
 
 void BConfig::import() {
@@ -70,10 +71,22 @@ void BConfig::import() {
    loadSettings(&settings, false);
 }
 
+QVariant BConfig::defaultValue(QWidget *w) const {
+   return _settings.value(w).defaultValue;
+}
+
+QVariant BConfig::initialValue(QWidget *w) const {
+   return _settings.value(w).initialValue;
+}
+
+QVariant BConfig::savedValue(QWidget *w) const {
+   return _settings.value(w).savedValue;
+}
+
 void BConfig::handleSettings(QWidget *w, QString entry, QVariant value) {
    SettingInfo info;
    info.defaultValue = value;
-   info.initialValue = QVariant();
+   info.initialValue = info.savedValue = QVariant();
    info.entry = entry;
    _settings[w] = info;
    if (qobject_cast<QAbstractButton*>(w))
@@ -105,7 +118,6 @@ void BConfig::setInfoBrowser(QTextBrowser *browser) {
    _infoBrowser = browser;
    _infoBrowser->installEventFilter(this);
 }
-#include <QtDebug>
 
 void BConfig::checkDirty()
 {
@@ -115,22 +127,10 @@ void BConfig::checkDirty()
    {
       if (!sender() || (sender() == i.key()))
       {
-        SettingInfo *info = &(i.value());
-         if (QComboBox *box = qobject_cast<QComboBox*>(i.key()))
-         {
-            if (box->itemData(box->currentIndex()).isValid())
-               dirty = dirty || (box->itemData(box->currentIndex()) != info->initialValue);
-            else
-               dirty = dirty || (box->currentIndex() != info->initialValue.toInt());
-         }
-         else if (QAbstractButton *btn = qobject_cast<QAbstractButton*>(i.key()))
-            dirty = dirty || (btn->isChecked() != info->initialValue.toBool());
-         else
-            qWarning("%s is not supported yet, feel free tro ask", i.key()->metaObject()->className());
-         if (!sender()) {
-            if (dirty) break;
-         }
-         else
+         SettingInfo *info = &(i.value());
+         dirty = dirty || variant(i.key()) != info->savedValue;
+         
+         if (sender() || dirty)
             break;
       }
    }
@@ -143,19 +143,7 @@ void BConfig::reset() {
    {
       if (sender() == i.key())
       {
-         SettingInfo *info = &(i.value());
-         if (QComboBox *box = qobject_cast<QComboBox*>(i.key()))
-         {
-            int idx = box->findData(info->initialValue);
-            if (idx == -1)
-               box->setCurrentIndex(info->initialValue.toInt());
-            else
-               box->setCurrentIndex(idx);
-         }
-         else if (QCheckBox *box = qobject_cast<QCheckBox*>(i.key()))
-            box->setChecked(info->initialValue.toBool());
-         else
-            qWarning("%s is not supported yet, feel free tro ask", i.key()->metaObject()->className());
+         setVariant(i.key(), (&(i.value()))->defaultValue);
          break;
       }
    }
@@ -167,19 +155,7 @@ void BConfig::defaults() {
    {
       if (sender() == i.key())
       {
-         SettingInfo *info = &(i.value());
-         if (QComboBox *box = qobject_cast<QComboBox*>(i.key()))
-         {
-            int idx = box->findData(info->defaultValue);
-            if (idx == -1)
-               box->setCurrentIndex(info->defaultValue.toInt());
-            else
-               box->setCurrentIndex(idx);
-         }
-         else if (QCheckBox *box = qobject_cast<QCheckBox*>(i.key()))
-            box->setChecked(info->defaultValue.toBool());
-         else
-            qWarning("%s is not supported yet, feel free tro ask", i.key()->metaObject()->className());
+         setVariant(i.key(), (&(i.value()))->defaultValue);
          break;
       }
    }
@@ -206,7 +182,7 @@ void BConfig::setQSetting(const QString organisation, const QString application,
    _qsetting[1] = application;
    _qsetting[2] = group;
 }
-
+#include <QtDebug>
 void BConfig::loadSettings(QSettings *settings, bool updateInit) {
    _infoBrowser->setHtml(_defaultContextInfo);
    bool delSettings = false;
@@ -224,19 +200,8 @@ void BConfig::loadSettings(QSettings *settings, bool updateInit) {
       info = &(i.value());
       value = settings->value( info->entry, info->defaultValue);
       if (updateInit)
-         info->initialValue = value;
-      if (QComboBox *box = qobject_cast<QComboBox*>(i.key()))
-      {
-         int idx = box->findData(value);
-         if (idx == -1)
-            box->setCurrentIndex(value.toInt());
-         else
-            box->setCurrentIndex(idx);
-      }
-      else if (QCheckBox *box = qobject_cast<QCheckBox*>(i.key()))
-         box->setChecked(value.toBool());
-      else
-         qWarning("%s is not supported yet, feel free tro ask", i.key()->metaObject()->className());
+         info->savedValue = info->initialValue = value;
+      setVariant(i.key(), value);
    }
    
    settings->endGroup();
@@ -249,7 +214,38 @@ void BConfig::save() {
    _save(&settings);
 }
 
-void BConfig::_save(QSettings *settings) {
+QVariant BConfig::variant(const QWidget *w) const {
+   if (const QComboBox *box = qobject_cast<const QComboBox*>(w)) {
+      if (box->itemData(box->currentIndex()).isValid())
+         return box->itemData(box->currentIndex());
+      return box->currentIndex();
+   }
+   else if (const QCheckBox *box = qobject_cast<const QCheckBox*>(w))
+      return box->isChecked();
+   
+   qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
+   return QVariant();
+}
+
+bool BConfig::setVariant(QWidget *w, const QVariant &v) const {
+   if (QComboBox *box = qobject_cast<QComboBox*>(w)) {
+      int idx = box->findData(v);
+      if (idx == -1)
+         box->setCurrentIndex(v.toInt());
+      else
+         box->setCurrentIndex(idx);
+   }
+   else if (QCheckBox *box = qobject_cast<QCheckBox*>(w))
+      box->setChecked(v.toBool());
+   else {
+      qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
+      return false;
+   }
+   return true;
+}
+
+void BConfig::_save(QSettings *settings, bool makeDirty) {
+   
    bool delSettings = false;
    if (!settings) {
       delSettings = true;
@@ -262,24 +258,21 @@ void BConfig::_save(QSettings *settings) {
    SettingInfo *info;
    for (i = _settings.begin(); i != _settings.end(); ++i)
    {
-      info = &(i.value());
-      info->initialValue = settings->value( info->entry, info->defaultValue);
-      if (QComboBox *box = qobject_cast<QComboBox*>(i.key()))
-      {
-         if (box->itemData(box->currentIndex()).isValid())
-            settings->setValue(info->entry, box->itemData(box->currentIndex()));
-         else
-            settings->setValue(info->entry, box->currentIndex());
+      QVariant value = variant(i.key());
+      if (value.isValid()) {
+         info = &(i.value());
+         settings->setValue(info->entry, value);
+         if (makeDirty)
+            info->savedValue = value;
       }
-      else if (QCheckBox *box = qobject_cast<QCheckBox*>(i.key()))
-         settings->setValue(info->entry, box->isChecked());
-      else
-         qWarning("%s is not supported yet, feel free tro ask", i.key()->metaObject()->className());
    }
    settings->endGroup();
    
    if (delSettings)
       delete settings;
+   
+   if (makeDirty)
+      emit changed(false);
 }
 
 bool BConfig::eventFilter ( QObject * o, QEvent * e) {

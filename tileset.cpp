@@ -213,8 +213,8 @@ Picture Set::render(int W, int H, PosFlags pf) const
 void Set::outline(const QRect &r, QPainter *p, QColor c, bool strong,
                   PosFlags pf, int size) const
 {
-//    int d = size/2;
-   QRect rect = r;//.adjusted(d,d,-d,-d);
+   int d = size/2;
+   QRect rect = r.adjusted(d,d,-d,-d);
    if (rect.isNull()) return;
    int rx = (int)ceil((float)rxf/rect.width()),
       ry = (int)ceil((float)ryf/rect.height());

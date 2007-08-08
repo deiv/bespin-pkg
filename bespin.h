@@ -77,14 +77,16 @@ typedef struct Config {
       menuShadow,
       sunkenButtons,
       fullButtonHover,
-      strongFocus;
+      strongFocus,
+      cushion;
    double scale;
    int checkType;
    QPalette::ColorRole
       role_progress[2],
       role_tab[2][2],
       role_popup[2],
-      role_menuActive[0];
+      role_menuActive[2];
+   uint tabAnimSteps;
 } Config;
 
 class BespinStyle : public QCommonStyle {

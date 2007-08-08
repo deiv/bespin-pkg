@@ -6,6 +6,7 @@
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QProcess>
 
 /** This function declares the kstyle config plugin, you may need to adjust it
 for other plugins or won't need it at all, if you're not interested in a plugin */
@@ -52,8 +53,9 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
-   generateGradientTypes(ui.gradTab);
    generateGradientTypes(ui.gradMenuItem);
+   generateGradientTypes(ui.gradProgress);
+   generateGradientTypes(ui.gradTab);
    
    /** 1. name the info browser, you'll need it to show up context help
    Can be any QTextBrowser on your UI form */
@@ -174,6 +176,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
                   The Text color is chosen automatically");
    handleSettings(ui.gradButton, "GradButton", GradNone);
    handleSettings(ui.gradChoose, "GradChoose", GradGlass);
+   handleSettings(ui.gradProgress, "GradProgress", GradGloss);
    handleSettings(ui.gradTab, "GradTab", GradGloss);
    handleSettings(ui.fullButtonHover, "FullButtonHover", false);
    setContextHelp(ui.fullButtonHover, "<b>Fully filled hovered buttons</b><hr>\
@@ -255,8 +258,21 @@ void Config::import2(QListWidgetItem *item) {
    ui.store->hide();
    ui.info->show();
 }
-
+#include <QtDebug>
 void Config::save() {
+   /** manage the daemon */
+   int former = savedValue(ui.bgMode).toInt();
+   int current = ui.bgMode->currentIndex();
+   if (current != former) {
+      QSettings settings("Bespin");
+      settings.beginGroup("Style");
+      if (former == 2) // was complex -> stop daemon
+         QProcess::startDetached ( settings.value("BgDaemon", "bespinPP").toString(),
+                                   QStringList() << "stop" );
+      else if (current == 2) // IS complex -> start daemon
+         QProcess::startDetached ( settings.value("BgDaemon", "bespinPP").toString() );
+      settings.endGroup();
+   }
    BConfig::save();
    /** save the palette loaded from store to qt configuration */
    if (loadedPal) {

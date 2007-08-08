@@ -284,30 +284,35 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (config.fullButtonHover && (hover || step))
          c = Colors::mid(c, COLOR(Button), 6-step, step);
       
-      Gradients::Type gt = isEnabled ? config.gradButton : Gradients::None;
-      
+      Gradients::Type gt = Gradients::None;
+      if (isEnabled) {
+         if (sunken && config.cushion)
+            gt = Gradients::Sunken;
+         else
+            gt = config.gradButton;
+      }
       // sunken variant
       if (config.sunkenButtons) {
          r.setBottom(r.bottom()-f2);
-         masks.button.render(r, painter, Gradients::brush(c, r.height(),
-            Qt::Vertical, sunken ? Gradients::Sunken : config.gradButton));
+         masks.button.render(r, painter, Gradients::brush(c, r.height(), Qt::Vertical, gt));
          if (!config.fullButtonHover && (hover || step)) {
             const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
             c = Colors::mid(c, COLOR(Button), 6-step, step);
             masks.button.render(ir, painter, Gradients::brush(c, r.height(),
-                                Qt::Vertical, sunken ? Gradients::Sunken : gt),
-                                Tile::Full, false, QPoint(0,f2));
+                                Qt::Vertical, gt), Tile::Full, false, QPoint(0,f2));
          }
-         if (hasFocus)
+         if (hasFocus) {
+            r.setBottom(r.bottom()+dpi.f1);
             masks.button.outline(r, painter, Colors::mid(c, COLOR(Highlight)),
                                  config.strongFocus);
+         }
          shadows.lineEdit[isEnabled].render(RECT, painter);
          break;
       }
       
       // normal buttons
       // shadow
-      if (sunken) {
+      if (sunken && !config.cushion) {
          r.adjust(f1, f1, -f1, -f2);
          shadows.button[true][isEnabled].render(r, painter);
          r.adjust(f1, f1, -f1, -f1);
@@ -324,18 +329,19 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          Qt::Vertical, gt));
       
       // outline
-      masks.button.outline(r, painter, Colors::mid(c, Qt::white,1,2), true);
+      masks.button.outline(r, painter, Colors::mid(c, Qt::white),
+                           gt == Gradients::Glass || gt == Gradients::Gloss);
       
       if (!config.fullButtonHover && (hover || step)) {
-         const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
          c = Colors::mid(c, COLOR(Button), 6-step, step);
+         const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
          masks.button.render(ir, painter,
                              Gradients::brush(c, ir.height(), Qt::Vertical, gt),
                              Tile::Full, false, QPoint(0,f2));
       }
       
       // ambient?
-      if (!sunken)
+      if (isEnabled && !sunken)
          painter->drawPixmap(QPoint(r.right()+1-16*r.height()/9, r.top()),
                              Gradients::ambient(r.height()));
 
@@ -378,8 +384,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          if (hasFocus) {
             r.adjust(0,0,0,-dpi.f2);
             masks.button.render(r, painter, COLOR(Base).light(112));
-//             r.setBottom(r.bottom()+dpi.f1);
-            QColor h = Colors::mid(COLOR(Base), COLOR(Highlight), 2, 1);
+            r.setBottom(r.bottom()+dpi.f1);
+            QColor h = Colors::mid(COLOR(Base), COLOR(Highlight), 3, 2);
             masks.button.outline(r, painter, h, config.strongFocus, Tile::Ring, dpi.f3);
          }
          else {
@@ -497,7 +503,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (!(sunken || (option->state & State_Off))) {
          painter->save();
          painter->setRenderHint(QPainter::Antialiasing);
-         const int d = config.sunkenButtons ? dpi.f4 : dpi.f6;
+         const int d = config.sunkenButtons ? dpi.f3 : dpi.f6;
          QRect r = RECT.adjusted(d, d, -d, -d);
          const QColor fill = Colors::btnFg(PAL, isEnabled, hover);
          switch (config.checkType) {
@@ -510,8 +516,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
                const QPoint points[8] = {
                QPoint(x+c,y+c-d), QPoint(x,y),
                QPoint(x+c-d,y+c), QPoint(x,y+s),
-               QPoint(x+c,y+c+d), QPoint(x+s,y+s),
-               QPoint(x+c+d,y+c), QPoint(x+s,y)
+               QPoint(x+c,y+s-c+d), QPoint(x+s,y+s),
+               QPoint(x+s-c+d,y+c), QPoint(x+s,y)
                };
                painter->drawPolygon(points, 8);
             }
@@ -562,8 +568,6 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       
       QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, step);
-      if (config.fullButtonHover)
-         c = Colors::mid(c, COLOR(Button), 6-step, step);
       
       if (config.sunkenButtons) {
          QRect r = RECT.adjusted(dpi.f1,0,-dpi.f1,-dpi.f2);
@@ -610,8 +614,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       // drop
       if (isOn) step = 18;
       if (step) {
-         c = Colors::mid(c, (hover && config.fullButtonHover) ? COLOR(ButtonText) :
-               COLOR(WindowText), 18-step, step);
+         c = Colors::mid(c, COLOR(WindowText), 18-step, step);
          xy += QPoint(dpi.f4, dpi.f4);
          fillWithMask(painter, xy, c, masks.radioIndicator);
       }
@@ -675,11 +678,11 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             if (hasFocus) {
                QColor h;
                if (fastFocus)
-                  h = Colors::mid(COLOR(Base), COLOR(Highlight), 2, 1);
+                  h = Colors::mid(COLOR(Base), COLOR(Highlight), 3, 2);
                else {
                   h = COLOR(Highlight); h.setAlpha(80);
                }
-               rect = RECT.adjusted(0,0,0,-dpi.f2);
+               rect = RECT.adjusted(0,0,0,-dpi.f1);
                mask->outline(rect, painter, h, config.strongFocus, Tile::Ring, dpi.f3);
             }
             if (shadow)

@@ -429,10 +429,10 @@ const QPixmap &Gradients::bg(const QColor &c, bool other) {
       pix = new QPixmap(32, 256);
       lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
       if (other) {
-         lg.setColorAt(0, c); lg.setColorAt(1, c.dark(110));
+         lg.setColorAt(0, c); lg.setColorAt(1, c.dark(106));
       }
       else {
-         lg.setColorAt(0, c.light(108)); lg.setColorAt(1, c);
+         lg.setColorAt(0, c.light(104)); lg.setColorAt(1, c);
       }
       break;
    }
@@ -440,21 +440,21 @@ const QPixmap &Gradients::bg(const QColor &c, bool other) {
       pix = new QPixmap(256, 32);
       lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
       if (other) {
-         lg.setColorAt(0, c); lg.setColorAt(1, c.dark(108));
+         lg.setColorAt(0, c); lg.setColorAt(1, c.dark(106));
       }
       else {
-         lg.setColorAt(0, c.dark(108)); lg.setColorAt(1, c);
+         lg.setColorAt(0, c.dark(106)); lg.setColorAt(1, c);
       }
       break;
    case LightV:
       pix = new QPixmap(32, 512);
       lg = QLinearGradient(QPoint(0,0), QPoint(0,512));
-      lg.setColorAt(0, c); lg.setColorAt(0.5, c.light(108)); lg.setColorAt(1, c);
+      lg.setColorAt(0, c); lg.setColorAt(0.5, c.light(106)); lg.setColorAt(1, c);
       break;
    case LightH:
       pix = new QPixmap(512, 32);
       lg = QLinearGradient(QPoint(0,0), QPoint(512,0));
-      lg.setColorAt(0, c); lg.setColorAt(0.5, c.light(108)); lg.setColorAt(1, c);
+      lg.setColorAt(0, c); lg.setColorAt(0.5, c.light(106)); lg.setColorAt(1, c);
       break;
    }
    QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();

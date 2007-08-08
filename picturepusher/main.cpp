@@ -133,8 +133,8 @@ void BespinPP::createPixmap()
    p.setPen(Qt::NoPen);
    
    QLinearGradient lg(QPoint(0,0), QPoint(0, h));
-   lg.setColorAt(0, c.light(104)); lg.setColorAt(0.5, c.dark(108));
-   lg.setColorAt(1, c.dark(115)); p.setBrush(lg);
+   lg.setColorAt(0, c.light(104)); lg.setColorAt(0.5, c.dark(104));
+   lg.setColorAt(1, c.dark(108)); p.setBrush(lg);
    p.drawRect( 0, 0, w-1, h-1);
    
    int h2 = h - h/6;

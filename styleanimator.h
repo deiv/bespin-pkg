@@ -67,12 +67,19 @@ public:
          , CrossFade
 #endif
    };
-   TabAnimInfo(QObject *parent = 0, int currentTab = -1) :
-      QObject(parent), lastTab(currentTab), animStep(0){}
+   TabAnimInfo(QObject *parent = 0, int currentTab = -1, uint numSteps = 6) :
+      QObject(parent), lastTab(currentTab), animStep(0) {
+         setNumSteps(numSteps);
+      }
    void updatePixmaps(TabTransition transition);
+   void setNumSteps(uint steps) {
+      _numSteps = steps; _q = 4.5/(steps*(steps+1)); _n = steps+1;
+   }
 protected:
    bool eventFilter( QObject* object, QEvent* event );
-public:
+private:
+   friend class StyleAnimator;
+   uint _numSteps, _n; float _q;
    QList < QWidget* > autofillingWidgets;
    int lastTab, animStep;
    QPixmap tabPix[3];
@@ -85,7 +92,7 @@ class StyleAnimator : public QObject {
    Q_OBJECT
 public:
    StyleAnimator(QObject *parent, TabAnimInfo::TabTransition tabTransition =
-                 TabAnimInfo::CrossFade);
+                 TabAnimInfo::CrossFade, uint tabAnimSteps = 6);
    ~StyleAnimator();
    
    void registrate(QWidget *w);
@@ -123,6 +130,7 @@ private:
    QTimer* timer;
    TabAnimInfo::TabTransition tabTransition;
    QObjectList _scrollAreas;
+   uint _tabAnimSteps;
 };
 
 #endif // STYLEANIMATOR_H
