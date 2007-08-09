@@ -13,14 +13,71 @@ class BConfig : public QWidget
    Q_OBJECT
 public:
    BConfig(QWidget *parent = 0L);
-   virtual QVariant defaultValue(QWidget *) const;
+   
+   /**
+   * Query the default value of a handled Widget (that you set initially)
+   *
+   * @param w The widget of interest
+   */
+   virtual QVariant defaultValue(QWidget *w) const;
+   
+   /**
+   * Handle the settings for a QWidget
+   *
+   * @param w The widget of interest
+   * @param entry The String that is used as key in the config file
+   * @param defaultValue The value the setting should have by default (i.e. if the user yet did not set one)
+   */
    virtual void handleSettings(QWidget *w, const QString entry, QVariant defaultValue);
-   virtual QVariant initialValue(QWidget *) const;
-   virtual QVariant savedValue(QWidget *) const;
+   
+   /**
+   * Query the initial value of a handled Widget (the value that was read from the config by loadSettings() or the default value if the entry wasn't set yet)
+   *
+   * @param w The widget of interest
+   */
+   virtual QVariant initialValue(QWidget *w) const;
+   
+   /**
+   * Query the currently saved value - same as initialValue() *unless* save() has been called
+   *
+   * @param w The widget of interest
+   */
+   virtual QVariant savedValue(QWidget *w) const;
+   
+   /**
+   * Set the (richtext) string that should be displayd as help when the config widget is hovered
+   *
+   * @param w The widget of interest
+   * @param help the help string
+   */
    virtual void setContextHelp(QWidget *w, QString help);
+   
+   /**
+   * Same as above, but allows to set a string for each entry of a combobox
+   *
+   * @param w The widget of interest
+   * @param strings the help strings
+   */
    virtual void setContextHelp(QComboBox *c, QStringList & strings);
+   
+   /**
+   * Define the QTextBrowser that shall be used as help viewer, i.e. where the help strings for config widgets are shown
+   *
+   * @param browser Pointer to a QTExtBrowser - if NULL, the online help is omitted (but the set help strings remain, so you can setInfoBrowser(NULL); setInfoBrowser(anotherBrowser);)
+   */
    virtual void setInfoBrowser(QTextBrowser *browser);
+   
+   /**
+   * Set which config parameters shall be used for managing the config entries - they're simply passesd to QSettings
+   * i.e. setQSetting("MyCompany", "MyProduct", "Product group");
+   */
    virtual void setQSetting(const QString organisation, const QString application, const QString group);
+   
+   /**
+   * Set the default contexthelp, i.e. what is displayed in the infoBrowser while no handled config widget is hovered
+   *
+   * @param info The default context help - good place for shameless selfpromotion! ;)
+   */
    virtual void setDefaultContextInfo(QString info);
 protected:
    typedef struct {

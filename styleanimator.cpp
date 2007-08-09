@@ -658,7 +658,7 @@ void StyleAnimator::updateFades() {
    while (it != hoverWidgets.end()) {
       if (it.value().fadeIn) {
          it.value().step += 2;
-         it.key()->update();
+         it.key()->repaint();
          if (it.value().step > 4)
             it = hoverWidgets.erase(it);
          else
@@ -666,7 +666,7 @@ void StyleAnimator::updateFades() {
       }
       else { // fade out
          --it.value().step;
-         it.key()->update();
+         it.key()->repaint();
          if (it.value().step < 1)
             it = hoverWidgets.erase(it);
          else

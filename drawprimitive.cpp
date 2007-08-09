@@ -306,7 +306,10 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             masks.button.outline(r, painter, Colors::mid(c, COLOR(Highlight)),
                                  config.strongFocus);
          }
-         shadows.lineEdit[isEnabled].render(RECT, painter);
+         if (sunken || config.sunkenButtons == 2)
+            shadows.lineEdit[isEnabled].render(RECT, painter);
+         else
+            masks.button.outline(r, painter, QColor(0,0,0,30), false, Tile::Ring, dpi.f2);
          break;
       }
       
@@ -503,7 +506,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (!(sunken || (option->state & State_Off))) {
          painter->save();
          painter->setRenderHint(QPainter::Antialiasing);
-         const int d = config.sunkenButtons ? dpi.f3 : dpi.f6;
+         const int d = config.sunkenButtons == 2 ? dpi.f3 : dpi.f6;
          QRect r = RECT.adjusted(d, d, -d, -d);
          const QColor fill = Colors::btnFg(PAL, isEnabled, hover);
          switch (config.checkType) {
@@ -574,9 +577,15 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          masks.tab.render(r, painter,
                           Gradients::brush( c, r.height(), Qt::Vertical,
                                             sunken || isOn ? Gradients::Sunken : gt));
-         r.setBottom(RECT.bottom());
-         shadows.tabSunken.render(r, painter);
-         xy += QPoint(f1, 0);
+         if (config.sunkenButtons == 2) {
+            r.setBottom(RECT.bottom());
+            shadows.tabSunken.render(r, painter);
+            xy += QPoint(f1, 0);
+         }
+         else {
+            masks.tab.outline(r, painter, QColor(0,0,0,30), false, Tile::Ring, dpi.f2);
+            xy += QPoint(f2,f1);
+         }
       }
       else {
          

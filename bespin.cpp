@@ -231,14 +231,14 @@ void BespinStyle::readSettings()
       (TabAnimInfo::TabTransition) settings.value("TabTransition",
          TabAnimInfo::ScanlineBlend).toInt();
    
-   config.sunkenButtons = settings.value("SunkenButtons", false).toBool();
+   config.sunkenButtons = CLAMP(settings.value("SunkenButtons", 0).toInt(), 0, 2);
    
    config.fullButtonHover = settings.value("FullButtonHover", false).toBool();
    
    config.gradButton =
       (Gradients::Type) settings.value("GradButton", Gradients::None).toInt();
    
-   if (config.sunkenButtons)
+   if (config.sunkenButtons == 2)
       config.cushion = true;
    else if (config.gradButton == Gradients::None ||
             config.gradButton ==  Gradients::Sunken)
@@ -312,8 +312,8 @@ void BespinStyle::initMetrics()
    dpi.ScrollBarSliderMin = SCALE(40);
    dpi.SliderThickness = SCALE(24);
    dpi.SliderControl = SCALE(19);
-   dpi.Indicator = config.sunkenButtons ? SCALE(16) : SCALE(20);
-   dpi.ExclusiveIndicator = config.sunkenButtons ? SCALE(16) : SCALE(19);
+   dpi.Indicator = config.sunkenButtons == 2 ? SCALE(16) : SCALE(20);
+   dpi.ExclusiveIndicator = config.sunkenButtons == 2 ? SCALE(16) : SCALE(19);
 }
 
 #undef SCALE

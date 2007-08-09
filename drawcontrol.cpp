@@ -98,10 +98,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             //TODO: handle focus indication here (or in the primitive...)!
             drawPrimitive(PE_PanelButtonTool, option, painter, widget);
          }
-         else
+         else {
+            if (sunken && config.sunkenButtons == 1)
+               tmpBtn.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,-dpi.f1);
             drawControl(CE_PushButtonBevel, &tmpBtn, painter, widget);
+         }
 //          tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
-         if (config.sunkenButtons)
+         if (config.sunkenButtons == 2)
             tmpBtn.rect.adjust(dpi.f4,dpi.f3,-dpi.f4,-dpi.f2);
          else
             tmpBtn.rect.adjust(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4);

@@ -69,13 +69,12 @@ typedef struct Config {
       gradTab,
       gradMenuItem;
    BGMode bgMode;
-   int structure;
+   int structure, sunkenButtons;
    TabAnimInfo::TabTransition tabTransition;
    bool
       showMenuIcons,
       showScrollButtons,
       menuShadow,
-      sunkenButtons,
       fullButtonHover,
       strongFocus,
       cushion;

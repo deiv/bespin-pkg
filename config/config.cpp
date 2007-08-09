@@ -205,11 +205,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
                   This is especially a good idea if the contrast between the\
                   button and Window color is low and also looks ok with Glass/Gloss\
                   gradient settings - but may be toggled whenever you want");
-   handleSettings(ui.sunkenButtons, "SunkenButtons", false);
-   setContextHelp(ui.sunkenButtons, "<b>Sunken Buttons</b><hr>\
-                  Somewhat experimental, at least i'm not happy with the look.\
-                  Should be avoided with dark (near black) window and/or button\
-                  color");
+   handleSettings(ui.sunkenButtons, "SunkenButtons", 0);
    
    /** setQSetting(.) tells BConfig to store values at
    "Company, Application, Group" - these strings are passed to QSettings */
