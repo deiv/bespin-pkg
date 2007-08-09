@@ -48,7 +48,7 @@ private slots:
 private:
    QVariant variant(const QWidget *w) const;
    bool setVariant(QWidget *w, const QVariant &v) const;
-   bool infoItemHovered;
+   bool infoItemHovered, infoDirty;
    QTextBrowser *_infoBrowser;
    QMap<QWidget*, SettingInfo> _settings;
    QMap<QWidget*, QString> _contextHelps;

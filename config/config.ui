@@ -16,7 +16,7 @@
    <item row="0" column="0" colspan="2" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
@@ -67,28 +67,35 @@
         </widget>
        </item>
        <item row="3" column="0" >
+        <widget class="QCheckBox" name="cushion" >
+         <property name="text" >
+          <string>Cushion</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" >
         <widget class="QCheckBox" name="sunkenButtons" >
          <property name="text" >
           <string>Sunken frame (exp)</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2" >
+       <item row="5" column="0" colspan="2" >
         <widget class="QCheckBox" name="showScrollButtons" >
          <property name="text" >
           <string>Show Scrollbar Buttons</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0" >
+       <item row="6" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" >
           <size>
-           <width>20</width>
-           <height>191</height>
+           <width>215</width>
+           <height>231</height>
           </size>
          </property>
         </spacer>
@@ -496,7 +503,7 @@
      </widget>
     </widget>
    </item>
-   <item rowspan="2" row="0" column="2" >
+   <item rowspan="3" row="0" column="2" >
     <widget class="QTextBrowser" name="info" />
    </item>
    <item row="1" column="0" >
@@ -515,7 +522,7 @@
      </item>
      <item>
       <property name="text" >
-       <string>Scanlines</string>
+       <string>Tiled Structure</string>
       </property>
      </item>
      <item>
@@ -541,6 +548,37 @@
      <item>
       <property name="text" >
        <string>Horizontal Center Gradient</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="labelStructure" >
+     <property name="text" >
+      <string>Structure</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QComboBox" name="structure" >
+     <item>
+      <property name="text" >
+       <string>Scanlines</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Checkboard</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Fat Scanlines</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>"Blue"print</string>
       </property>
      </item>
     </widget>

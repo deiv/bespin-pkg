@@ -44,6 +44,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    ui.store->sortItems();
    connect (ui.btnStore, SIGNAL(clicked()), this, SLOT(store()));
    connect (ui.btnRestore, SIGNAL(clicked()), this, SLOT(restore()));
+   connect (ui.store, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+            this, SLOT(restore()));
    connect (ui.btnImport, SIGNAL(clicked()), this, SLOT(import()));
    connect (ui.btnExport, SIGNAL(clicked()), this, SLOT(saveAs()));
    connect (ui.store, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)),
@@ -90,6 +92,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    "BackgroundMode" specifies the entry in the ini style config file and
    "3" is the default value for this entry*/
    handleSettings(ui.bgMode, "BackgroundMode", 3);
+   /** same for structure */
+   handleSettings(ui.structure, "Structure", 0);
+   
+   /** connection between the bgmode and the structure combo - not of interest*/
+   connect(ui.bgMode, SIGNAL(currentIndexChanged(int)), this, SLOT(handleBgMode(int)));
    
    QStringList strList;
    strList <<
@@ -150,6 +157,12 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
       This is CPU hungry - better have GPU Hardware acceleration.";
    setContextHelp(ui.tabTransition, strList);
    
+   handleSettings(ui.cushion, "Cushion", false);
+   setContextHelp(ui.cushion, "<b>Cushion Mode</b><hr>\
+                  By default, the buttons are kinda solid and will move towards\
+                  the background when pressed.<br>\
+                  If you check this, you'll get a more cushion kind look, i.e.\
+                  the Button will be \"pressed in\"");
    handleSettings(ui.checkMark, "CheckType", 1);
    handleSettings(ui.showMenuIcons, "ShowMenuIcons", false);
    handleSettings(ui.showScrollButtons, "ShowScrollButtons", false);
@@ -250,24 +263,29 @@ void Config::saveAs() {
 
 }
 
-/** reimplemented - i just want to merge the data into the store */
-void Config::import() {
+static QString sImport(const QString &filename) {
    
-   QString filename = QFileDialog::getOpenFileName(parentWidget(),
-      tr("Import Configuration"), QDir::home().path(), tr("Config Files (*.conf *.ini)"));
+   if (!QFile::exists(filename))
+      return QString();
    
    QSettings file(filename, QSettings::IniFormat);
+   
+   if (!file.childGroups().contains("BespinStyle"))
+      return QString();
+   
    file.beginGroup("BespinStyle");
    
    QString demandedName;
    QString storeName = demandedName = file.value("StoreName", "Imported").toString();
-   int i = 2;
-   while (!ui.store->findItems ( storeName, Qt::MatchExactly ).isEmpty())
-      storeName = demandedName + '#' + QString::number(i);
    
    QSettings store("Bespin", "Store");
-   store.beginGroup(storeName);
    
+   int i = 2;
+   QStringList entries = store.childGroups();
+   while (entries.contains(storeName))
+      storeName = demandedName + '#' + QString::number(i++);
+   
+   store.beginGroup(storeName);
    foreach (QString key, file.allKeys()) {
       if (key == "StoreName")
          continue;
@@ -277,10 +295,20 @@ void Config::import() {
    
    store.endGroup();
    file.endGroup();
-   
-   ui.store->addItem(storeName);
-   ui.store->sortItems();
+   return storeName;
+}
 
+/** reimplemented - i just want to merge the data into the store */
+void Config::import() {
+   
+   QString filename = QFileDialog::getOpenFileName(parentWidget(),
+      tr("Import Configuration"), QDir::home().path(), tr("Config Files (*.conf *.ini)"));
+   
+   QString storeName = sImport(filename);
+   if (storeName.isNull()) {
+      ui.store->addItem(storeName);
+      ui.store->sortItems();
+   }
 }
 
 /** addition to the import functionality
@@ -415,6 +443,11 @@ void Config::storedSettigSelected(QListWidgetItem *item) {
    ui.btnDelete->setEnabled(item);
 }
 
+void Config::handleBgMode(int idx) {
+   ui.structure->setVisible(idx == 1);
+   ui.labelStructure->setVisible(idx == 1);
+}
+
 /** The combobox filler you've read of several times before ;) */
 void Config::generateColorModes(QComboBox *box) {
    box->clear();
@@ -442,6 +475,12 @@ void Config::generateGradientTypes(QComboBox *box) {
 
 int main(int argc, char *argv[])
 {
+   /** ==========================================
+   This is just a command line tool for importing data - GUI part below*/
+   if (argc == 3 && !qstrcmp( argv[1], "import" ))
+      return sImport(argv[2]).isNull();
+   /** ================================================ */
+   
    /** First make an application */
    QApplication app(argc, argv);
    /** Next make a config widget (from the constructor above) */

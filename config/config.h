@@ -29,6 +29,7 @@ private:
 private slots:
    void storedSettigSelected(QListWidgetItem *);
    void remove();
+   void handleBgMode(int idx);
 };
 
 #endif

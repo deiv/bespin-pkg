@@ -68,7 +68,7 @@ QDialog(parent, Qt::Window) {
 
 
 BConfig::BConfig(QWidget *parent) : QWidget(parent) {
-   infoItemHovered = false;
+   infoItemHovered = infoDirty = false;
 }
 
 void BConfig::saveAs() {
@@ -187,8 +187,10 @@ void BConfig::setComboListInfo(int index) {
 }
 
 void BConfig::resetInfo() {
-   if (!infoItemHovered)
-      _infoBrowser->setHtml(_defaultContextInfo);
+   if (infoItemHovered || !infoDirty)
+      return;
+   _infoBrowser->setHtml(_defaultContextInfo);
+   infoDirty = false;
 }
 
 void BConfig::setQSetting(const QString organisation, const QString application, const QString group) {
@@ -302,6 +304,7 @@ bool BConfig::eventFilter ( QObject * o, QEvent * e) {
             if (o == i.key()) {
                infoItemHovered = true;
                _infoBrowser->setHtml(i.value().at(box->currentIndex()));
+               infoDirty = true;
                return false;
             }
       }
@@ -310,6 +313,7 @@ bool BConfig::eventFilter ( QObject * o, QEvent * e) {
          if (o == i.key()) {
             infoItemHovered = true;
             _infoBrowser->setHtml(i.value());
+            infoDirty = true;
             return false;
          }
       return false;
