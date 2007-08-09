@@ -1,6 +1,8 @@
 
 #include "config.h"
 #include <QApplication>
+#include <QFileDialog>
+#include <QDir>
 #include <QSettings>
 #include <QTimer>
 #include <QDialogButtonBox>
@@ -33,16 +35,23 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    
    /** Setup the UI and geometry */
    ui.setupUi(this);
-   ui.info->setMinimumWidth( 160 ); /** min width for the info browser */
+   ui.info->setMinimumWidth( 200 ); /** min width for the info browser */
    ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
    
    /** Prepare the settings store, not of interest */
-   ui.store->hide(); // don't show by default
    QSettings settings("Bespin", "Store");
    ui.store->addItems( settings.childGroups() );
    ui.store->sortItems();
-   connect (ui.store, SIGNAL( itemClicked(QListWidgetItem *) ),
-            this, SLOT( import2(QListWidgetItem *) ) );
+   connect (ui.btnStore, SIGNAL(clicked()), this, SLOT(store()));
+   connect (ui.btnRestore, SIGNAL(clicked()), this, SLOT(restore()));
+   connect (ui.btnImport, SIGNAL(clicked()), this, SLOT(import()));
+   connect (ui.btnExport, SIGNAL(clicked()), this, SLOT(saveAs()));
+   connect (ui.store, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)),
+            this, SLOT(storedSettigSelected(QListWidgetItem *)));
+   connect (ui.btnDelete, SIGNAL(clicked()), this, SLOT(remove()));
+   ui.btnRestore->setEnabled(false);
+   ui.btnExport->setEnabled(false);
+   ui.btnDelete->setEnabled(false);
    
    /** fill some comboboxes, not of interest */
    generateColorModes(ui.crProgressBar);
@@ -207,14 +216,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
     =========================================== */
 }
 
-/** reimplementation of the import functionality
-1. we won't present a file dialog, but a listview
-2. we wanna im/export the current palette as well
-*/
-void Config::import() {
-   ui.info->hide();
-   ui.store->show();
-}
 
 static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
    QStringList list;
@@ -223,7 +224,71 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
    return list;
 }
 
-void Config::import2(QListWidgetItem *item) {
+/** reimplemented - i just want to extract the data from the store */
+void Config::saveAs() {
+   
+   QListWidgetItem *item = ui.store->currentItem();
+   if (!item) return;
+   
+   QString filename = QFileDialog::getSaveFileName(parentWidget(),
+      tr("Save Configuration"), QDir::home().path(), tr("Config Files (*.conf *.ini)"));
+   
+   
+   QSettings store("Bespin", "Store");
+   store.beginGroup(item->text());
+   
+   QSettings file(filename, QSettings::IniFormat);
+   file.beginGroup("BespinStyle");
+   
+   file.setValue("StoreName", item->text());
+   
+   foreach (QString key, store.allKeys())
+      file.setValue(key, store.value(key));
+   
+   store.endGroup();
+   file.endGroup();
+
+}
+
+/** reimplemented - i just want to merge the data into the store */
+void Config::import() {
+   
+   QString filename = QFileDialog::getOpenFileName(parentWidget(),
+      tr("Import Configuration"), QDir::home().path(), tr("Config Files (*.conf *.ini)"));
+   
+   QSettings file(filename, QSettings::IniFormat);
+   file.beginGroup("BespinStyle");
+   
+   QString demandedName;
+   QString storeName = demandedName = file.value("StoreName", "Imported").toString();
+   int i = 2;
+   while (!ui.store->findItems ( storeName, Qt::MatchExactly ).isEmpty())
+      storeName = demandedName + '#' + QString::number(i);
+   
+   QSettings store("Bespin", "Store");
+   store.beginGroup(storeName);
+   
+   foreach (QString key, file.allKeys()) {
+      if (key == "StoreName")
+         continue;
+      else
+         store.setValue(key, file.value(key));
+   }
+   
+   store.endGroup();
+   file.endGroup();
+   
+   ui.store->addItem(storeName);
+   ui.store->sortItems();
+
+}
+
+/** addition to the import functionality
+1. we won't present a file dialog, but a listview
+2. we wanna im/export the current palette as well
+*/
+void Config::restore() {
+   QListWidgetItem *item = ui.store->currentItem();
    setQSetting("Bespin", "Store", item->text());
    loadSettings(0, false);
    setQSetting("Bespin", "Style", "Style");
@@ -254,9 +319,6 @@ void Config::import2(QListWidgetItem *item) {
 
    settings.endGroup();
    settings.endGroup();
-   
-   ui.store->hide();
-   ui.info->show();
 }
 #include <QtDebug>
 void Config::save() {
@@ -290,7 +352,7 @@ void Config::save() {
 }
 
 /** see above, we'll present a name input dialog here */
-void Config::saveAs() {
+void Config::store() {
    bool ok, addItem = true;
    QString string =
       QInputDialog::getText ( parentWidget(), tr("Enter a Name"),
@@ -302,9 +364,7 @@ void Config::saveAs() {
                                  tr("You entered an empty name - nothing will be saved!") );
       return;
    }
-   QList<QListWidgetItem *> present =
-      ui.store->findItems ( string, Qt::MatchExactly );
-   if (!present.isEmpty()) {
+   if (!ui.store->findItems ( string, Qt::MatchExactly ).isEmpty()) {
       QMessageBox::StandardButton btn =
          QMessageBox::question ( parentWidget(), tr("Allready exists!"),
                                  tr("The name you entered (%1) allready exists.<br>\
@@ -338,6 +398,23 @@ void Config::saveAs() {
    settings.endGroup();
 }
 
+void Config::remove() {
+   QListWidgetItem *item = ui.store->currentItem();
+   if (!item) return;
+   
+   QSettings store("Bespin", "Store");
+   store.beginGroup(item->text());
+   store.remove("");
+   store.endGroup();
+   delete item;
+}
+
+void Config::storedSettigSelected(QListWidgetItem *item) {
+   ui.btnRestore->setEnabled(item);
+   ui.btnExport->setEnabled(item);
+   ui.btnDelete->setEnabled(item);
+}
+
 /** The combobox filler you've read of several times before ;) */
 void Config::generateColorModes(QComboBox *box) {
    box->clear();
@@ -369,8 +446,10 @@ int main(int argc, char *argv[])
    QApplication app(argc, argv);
    /** Next make a config widget (from the constructor above) */
    Config *config = new Config;
-   /** Next make a dialog from the widget */
-   BConfigDialog *window = new BConfigDialog(config);
+   /** Next make a dialog from the widget - i wanna handle im and export in an extra tab*/
+   BConfigDialog *window =
+      new BConfigDialog(config, BConfigDialog::All &
+                        ~(BConfigDialog::Import | BConfigDialog::Export));
    /** sets dialog width to 640 and height to auto */
    window->resize(640,-1);
    /** Show up the dialog */

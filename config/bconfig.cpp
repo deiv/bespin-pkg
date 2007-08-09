@@ -11,39 +11,53 @@
 #include <QComboBox>
 #include <QTextBrowser>
 
-BConfigDialog::BConfigDialog(BConfig *config, QWidget *parent) :
+BConfigDialog::BConfigDialog(BConfig *config, uint btns, QWidget *parent) :
 QDialog(parent, Qt::Window) {
    
    QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
    QWidget *btn;
    
-   btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Ok );
-   connect(btn, SIGNAL(clicked(bool)), config, SLOT(save()));
-   connect(btn, SIGNAL(clicked(bool)), this, SLOT(accept()));
-   btn->setDisabled(true);
-   connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
+   if (btns & Ok) {
+      btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Ok );
+      connect(btn, SIGNAL(clicked(bool)), config, SLOT(save()));
+      connect(btn, SIGNAL(clicked(bool)), this, SLOT(accept()));
+      btn->setDisabled(true);
+      connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
+   }
    
-   btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Save );
-   connect(btn, SIGNAL(clicked(bool)), config, SLOT(save()));
-   btn->setDisabled(true);
-   connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
+   if (btns & Save) {
+      btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Save );
+      connect(btn, SIGNAL(clicked(bool)), config, SLOT(save()));
+      btn->setDisabled(true);
+      connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
+   }
    
-   btn = (QWidget*)buttonBox->addButton ( tr("Save As..."), QDialogButtonBox::ApplyRole );
-   connect(btn, SIGNAL(clicked(bool)), config, SLOT(saveAs()));
+   if (btns & Export) {
+      btn = (QWidget*)buttonBox->addButton ( tr("Export..."), QDialogButtonBox::ApplyRole );
+      connect(btn, SIGNAL(clicked(bool)), config, SLOT(saveAs()));
+   }
    
-   btn = (QWidget*)buttonBox->addButton ( tr("Load..."), QDialogButtonBox::ActionRole );
-   connect(btn, SIGNAL(clicked(bool)), config, SLOT(import()));
+   if (btns & Import) {
+      btn = (QWidget*)buttonBox->addButton ( tr("Import..."), QDialogButtonBox::ActionRole );
+      connect(btn, SIGNAL(clicked(bool)), config, SLOT(import()));
+   }
    
-   btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Reset );
-   connect(btn, SIGNAL(clicked(bool)), config, SLOT(reset()));
-   btn->setDisabled(true);
-   connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
+   if (btns & Reset) {
+      btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Reset );
+      connect(btn, SIGNAL(clicked(bool)), config, SLOT(reset()));
+      btn->setDisabled(true);
+      connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
+   }
    
-   btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::RestoreDefaults );
-   connect(btn, SIGNAL(clicked(bool)), config, SLOT(defaults()));
+   if (btns & Defaults) {
+      btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::RestoreDefaults );
+      connect(btn, SIGNAL(clicked(bool)), config, SLOT(defaults()));
+   }
    
-   btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Cancel );
-   connect(btn, SIGNAL(clicked(bool)), this, SLOT(reject()));
+   if (btns & Cancel) {
+      btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Cancel );
+      connect(btn, SIGNAL(clicked(bool)), this, SLOT(reject()));
+   }
 
    
    QVBoxLayout *vl = new QVBoxLayout;

@@ -8,13 +8,6 @@ class QComboBox;
 class QTextBrowser;
 class QSettings;
 
-typedef struct {
-   QVariant defaultValue;
-   QVariant initialValue;
-   QVariant savedValue;
-   QString entry;
-} SettingInfo;
-
 class BConfig : public QWidget
 {
    Q_OBJECT
@@ -30,6 +23,12 @@ public:
    virtual void setQSetting(const QString organisation, const QString application, const QString group);
    virtual void setDefaultContextInfo(QString info);
 protected:
+   typedef struct {
+      QVariant defaultValue;
+      QVariant initialValue;
+      QVariant savedValue;
+      QString entry;
+   } SettingInfo;
    virtual bool eventFilter ( QObject * watched, QEvent * event );
    virtual void loadSettings(QSettings *settings = 0, bool updateInitValue = true);
    virtual void _save(QSettings *settings = 0, bool makeDirty = true);
@@ -61,7 +60,11 @@ private:
 class BConfigDialog : public QDialog {
    Q_OBJECT
 public:
-   BConfigDialog(BConfig *config, QWidget *parent = 0L);
+   enum ButtonType {
+      Ok = 1, Cancel = 2, Save = 4, Reset = 8,
+         Defaults = 16, Import = 32, Export = 64, All = 127
+   };
+   BConfigDialog(BConfig *config, uint btns = All, QWidget *parent = 0L);
 };
 
 #endif

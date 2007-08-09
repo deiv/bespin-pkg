@@ -12,9 +12,11 @@ public:
    Config(QWidget *parent = 0L);
 public slots:
    /** We'll reimplement the im/export functions to handle color settings as well*/
+   void store();
+   void restore();
+   void save(); // to store colors to qt configuration - in case
    void import();
    void saveAs();
-   void save(); // to store colors to qt configuration - in case
 private:
    /** This is the UI created with Qt Designer and included by ui_config.h */
    Ui::Config ui;
@@ -24,10 +26,9 @@ private:
    void generateGradientTypes(QComboBox *box);
    
    QPalette *loadedPal;
-   
 private slots:
-   /** Does the import job for teh import reimplemetation */
-   void import2(QListWidgetItem *);
+   void storedSettigSelected(QListWidgetItem *);
+   void remove();
 };
 
 #endif

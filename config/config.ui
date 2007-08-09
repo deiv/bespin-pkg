@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>554</width>
-    <height>322</height>
+    <width>611</width>
+    <height>605</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -16,7 +16,7 @@
    <item row="0" column="0" colspan="2" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>3</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
@@ -334,22 +334,169 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="Seite_3" >
+      <attribute name="title" >
+       <string>Manage</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <item row="0" column="0" colspan="7" >
+        <widget class="QListWidget" name="store" >
+         <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior" >
+          <enum>QAbstractItemView::SelectItems</enum>
+         </property>
+         <property name="resizeMode" >
+          <enum>QListView::Adjust</enum>
+         </property>
+         <property name="uniformItemSizes" >
+          <bool>true</bool>
+         </property>
+         <property name="selectionRectVisible" >
+          <bool>true</bool>
+         </property>
+         <property name="sortingEnabled" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QPushButton" name="btnRestore" >
+         <property name="text" >
+          <string>Load</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QPushButton" name="btnStore" >
+         <property name="text" >
+          <string>Store...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QPushButton" name="btnDelete" >
+         <property name="palette" >
+          <palette>
+           <active>
+            <colorrole role="Button" >
+             <brush brushstyle="SolidPattern" >
+              <color alpha="255" >
+               <red>255</red>
+               <green>85</green>
+               <blue>0</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText" >
+             <brush brushstyle="SolidPattern" >
+              <color alpha="255" >
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Button" >
+             <brush brushstyle="SolidPattern" >
+              <color alpha="255" >
+               <red>255</red>
+               <green>85</green>
+               <blue>0</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText" >
+             <brush brushstyle="SolidPattern" >
+              <color alpha="255" >
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Button" >
+             <brush brushstyle="SolidPattern" >
+              <color alpha="255" >
+               <red>255</red>
+               <green>85</green>
+               <blue>0</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText" >
+             <brush brushstyle="SolidPattern" >
+              <color alpha="255" >
+               <red>128</red>
+               <green>128</green>
+               <blue>128</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="font" >
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text" >
+          <string>Delete</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="4" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="5" >
+        <widget class="QPushButton" name="btnImport" >
+         <property name="text" >
+          <string>Import...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="6" >
+        <widget class="QPushButton" name="btnExport" >
+         <property name="text" >
+          <string>Export...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item rowspan="2" row="0" column="2" >
-    <widget class="QListWidget" name="store" >
-     <property name="alternatingRowColors" >
-      <bool>true</bool>
-     </property>
-     <property name="selectionBehavior" >
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="sortingEnabled" >
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item rowspan="2" row="0" column="3" >
     <widget class="QTextBrowser" name="info" />
    </item>
    <item row="1" column="0" >
