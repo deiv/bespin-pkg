@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
-eval($$(CONFIG_QT) = 1) {
+if ( $$(CONFIG_QT) ) {
    SUBDIRS += bespin-config.pro
 }
-eval($$(CONFIG_KDE) = 1) {
+if ( $$(CONFIG_KDE) ) {
    SUBDIRS += kstyle-bespin-config.pro
 }

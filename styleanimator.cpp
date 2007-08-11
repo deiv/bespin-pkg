@@ -489,11 +489,11 @@ int StyleAnimator::progressStep(const QWidget *w) const {
 void StyleAnimator::registrate(QWidget *w) {
    if (!w) return;
    w->removeEventFilter(this); // just to be sure...
-   w->installEventFilter(this);
    if (w->isVisible()) {
       QEvent ev(QEvent::Show);
       eventFilter(w, &ev);
    }
+   w->installEventFilter(this);
 }
 
 void StyleAnimator::remove(QWidget *w) {

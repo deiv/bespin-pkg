@@ -1,4 +1,5 @@
 TEMPLATE = subdirs
-SUBDIRS += bespin.pro
-SUBDIRS += config
-SUBDIRS += picturepusher/bespinPP.pro
+SUBDIRS = bespin.pro config
+unix {
+   SUBDIRS += picturepusher/bespinPP.pro
+}

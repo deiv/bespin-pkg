@@ -10,6 +10,8 @@
 #include <QMessageBox>
 #include <QProcess>
 
+#if ! EXECUTABLE
+
 /** This function declares the kstyle config plugin, you may need to adjust it
 for other plugins or won't need it at all, if you're not interested in a plugin */
 extern "C"
@@ -23,6 +25,8 @@ extern "C"
    }
 }
 
+#endif
+
 /** Gradient enumeration for the comboboxes, so that i don't have to handle the
 integers - not of interest for you*/
 enum GradientType {
@@ -30,8 +34,46 @@ enum GradientType {
       GradGlass, GradButton
 };
 
+static const char* defInfo =
+"<div align=\"center\">\
+   <img src=\":/bespin.png\"/><br>\
+</div>\
+<b>Bespin Style</b><hr>\
+<p>\
+   &copy;&nbsp;2006/2007 by Thomas L&uuml;bking<br>\
+   Includes Design Ideas by\
+   <ul type=\"disc\">\
+      <li>Nuno Pinheiro</li>\
+      <li>David Vignoni</li>\
+      <li>Kenneth Wimer</li>\
+   </ul>\
+</p>\
+   <hr>\
+Visit <a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>";
+
+static const char* manageInfo =
+"<b>Settings management</b><hr>\
+<p>\
+   You can save your current settings (including colors from qconfig!) and\
+   restore them later here.\
+</p><p>\
+   It's also possible to im and export settings from external files and share\
+   them with others.\
+</p><p>\
+   You can also call the config dialog with the paramater \"demo\"\
+<pre>\
+   bespin-config demo [some style]\
+</pre>\
+   to test your settings on various widgets.\
+</p><p>\
+   If you want to test settings before importing them, call\
+<pre>\
+   bespin-config try &lt;some_settings.conf&gt;\
+</pre>\
+</p>";
+
 /** The Constructor - your first job! */
-Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
+Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(false) {
    
    /** Setup the UI and geometry */
    ui.setupUi(this);
@@ -51,6 +93,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    connect (ui.store, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)),
             this, SLOT(storedSettigSelected(QListWidgetItem *)));
    connect (ui.btnDelete, SIGNAL(clicked()), this, SLOT(remove()));
+   connect (ui.generalTab, SIGNAL(currentChanged(int)), this, SLOT(handleDefInfo(int)));
    ui.btnRestore->setEnabled(false);
    ui.btnExport->setEnabled(false);
    ui.btnDelete->setEnabled(false);
@@ -68,35 +111,48 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    generateGradientTypes(ui.gradProgress);
    generateGradientTypes(ui.gradTab);
    
+/** connection between the bgmode and the structure combo -
+   not of interest*/
+   connect(ui.bgMode, SIGNAL(currentIndexChanged(int)), this, SLOT(handleBgMode(int)));
+   
    /** 1. name the info browser, you'll need it to show up context help
    Can be any QTextBrowser on your UI form */
    setInfoBrowser(ui.info);
    /** 2. Define a context info that is displayed when no other context help is
    demanded */
-   setDefaultContextInfo("<div align=\"center\">\
-      <img src=\":/bespin.png\"/><br>\
-   </div>\
-   <b>Bespin Style</b><hr>\
-   &copy;&nbsp;2006/2007 by Thomas L&uuml;bking<br>\
-   Includes Design Ideas by\
-   <ul type=\"disc\">\
-      <li>Nuno Pinheiro</li>\
-      <li>David Vignoni</li>\
-      <li>Kenneth Wimer</li>\
-   </ul>\
-   <hr>\
-   Visit <a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>");
+   setDefaultContextInfo(defInfo);
    
    /** handleSettings(.) tells BConfig to take care (savwe load) of a widget
    In this case "ui.bgMode" is the widget on the form,
    "BackgroundMode" specifies the entry in the ini style config file and
    "3" is the default value for this entry*/
-   handleSettings(ui.bgMode, "BackgroundMode", 3);
-   /** same for structure */
-   handleSettings(ui.structure, "Structure", 0);
+   handleSettings(ui.bgMode, "Bg.Mode", 3);
+   handleSettings(ui.structure, "Bg.Structure", 0);
+
+   handleSettings(ui.sunkenButtons, "Btn.3dPos", 0);
+   handleSettings(ui.checkMark, "Btn.CheckType", 0);
+   handleSettings(ui.cushion, "Btn.Cushion", true);
+   handleSettings(ui.fullButtonHover, "Btn.FullHover", true);
+   handleSettings(ui.gradButton, "Btn.Gradient", GradButton);
    
-   /** connection between the bgmode and the structure combo - not of interest*/
-   connect(ui.bgMode, SIGNAL(currentIndexChanged(int)), this, SLOT(handleBgMode(int)));
+   handleSettings(ui.gradChoose, "Chooser.Gradient", GradSunken);
+   
+   handleSettings(ui.crMenuActive, "Menu.ActiveRole", QPalette::Highlight);
+   handleSettings(ui.gradMenuItem, "Menu.ItemGradient", GradNone);
+   handleSettings(ui.showMenuIcons, "Menu.ShowIcons", false);
+   handleSettings(ui.menuShadow, "Menu.Shadow", false); // i have a compmgr running :P
+   handleSettings(ui.crPopup, "Menu.Role", QPalette::Window);
+   
+   handleSettings(ui.gradProgress, "Progress.Gradient", GradGloss);
+   handleSettings(ui.crProgressBar, "Progress.Role", QPalette::Highlight);
+   
+   handleSettings(ui.showScrollButtons, "Scroll.ShowButtons", false);
+   
+   handleSettings(ui.crTabBarActive, "Tab.ActiveRole", QPalette::Highlight);
+   handleSettings(ui.tabAnimSteps, "Tab.AnimSteps", 4);
+   handleSettings(ui.gradTab, "Tab.Gradient", GradButton);
+   handleSettings(ui.crTabBar, "Tab.Role", QPalette::Window);
+   handleSettings(ui.tabTransition, "Tab.Transition", 1);
    
    QStringList strList;
    strList <<
@@ -125,7 +181,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
    setContextHelp(ui.bgMode, strList);
    strList.clear();
    
-   handleSettings(ui.tabTransition, "TabTransition", 1);
    strList <<
       "<b>Jump</b><hr>No transition at all - fastest but looks stupid" <<
       
@@ -157,55 +212,51 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0) {
       This is CPU hungry - better have GPU Hardware acceleration.";
    setContextHelp(ui.tabTransition, strList);
    
-   handleSettings(ui.cushion, "Cushion", false);
+   setContextHelp(ui.tabAnimSteps, "<b>Tab Transition Steps</b><hr>\
+                  How many steps the transition has.<br><b>Notice:</b> that this has\
+                  impact on the animation speed - more steps result in a slower animation!");
+   
+   
    setContextHelp(ui.cushion, "<b>Cushion Mode</b><hr>\
                   By default, the buttons are kinda solid and will move towards\
                   the background when pressed.<br>\
                   If you check this, you'll get a more cushion kind look, i.e.\
                   the Button will be \"pressed in\"");
-   handleSettings(ui.checkMark, "CheckType", 1);
-   handleSettings(ui.showMenuIcons, "ShowMenuIcons", false);
-   handleSettings(ui.showScrollButtons, "ShowScrollButtons", false);
+
    setContextHelp(ui.showScrollButtons, "<b>Show Scrollbar buttons</b><hr>\
                   Seriously, honestly: when do you ever use the buttons to move\
                   a scrollbar slider? (ok, notebooks don't have a mousewheel...)");
-   handleSettings(ui.menuShadow, "MenuShadow", false); // i have a compmgr running :P
-   handleSettings(ui.crProgressBar, "role_progress", QPalette::Button);
+
    /** setContextHelp(.) attaches a context help string to a widget on your form */
    setContextHelp(ui.crProgressBar, "<b>ProgressBar Roles</b><hr>\
                   This is the \"done\" part of the Progressbar<br>\
                   Choose any mode you like - the other part is like the window");
-   handleSettings(ui.crPopup, "role_popup", QPalette::Window);
+
    setContextHelp(ui.crPopup, "<b>Popup Menu Role</b><hr>\
                   Choose anything you like (hint: saturated colors annoy me :)<br>\
                   The Text color is chosen automatically<br>\
                   Selected items are like selected menubar items if you choose \"Window\" here,\
                   otherwise they appear inverted");
-   handleSettings(ui.crMenuActive, "role_menuActive", QPalette::WindowText);
+
    setContextHelp(ui.crMenuActive, "<b>Selected Menubar Item Role</b><hr>\
                   You may choose any role here<br>\
                   Select \"WindowText\" if you want inversion.<br>\
                   <b>Warning!</b><br>If you select \"Window\" here and \"None\" \
                   below, the hovering is hardly indicated!");
-   handleSettings(ui.gradMenuItem, "GradMenuItem", GradNone);
-   handleSettings(ui.crTabBar, "role_tab", QPalette::WindowText);
+
    setContextHelp(ui.crTabBar, "<b>Tabbar Role</b><hr>\
                   The color of the tabbar background<br>\
                   The Text color is chosen automatically");
-   handleSettings(ui.crTabBarActive, "role_tabActive", QPalette::Button);
+
    setContextHelp(ui.crTabBarActive, "<b>Tabbar Active Item Role</b><hr>\
                   The color of the hovered or selected tab<br>\
                   The Text color is chosen automatically");
-   handleSettings(ui.gradButton, "GradButton", GradNone);
-   handleSettings(ui.gradChoose, "GradChoose", GradGlass);
-   handleSettings(ui.gradProgress, "GradProgress", GradGloss);
-   handleSettings(ui.gradTab, "GradTab", GradGloss);
-   handleSettings(ui.fullButtonHover, "FullButtonHover", false);
+
    setContextHelp(ui.fullButtonHover, "<b>Fully filled hovered buttons</b><hr>\
                   This is especially a good idea if the contrast between the\
                   button and Window color is low and also looks ok with Glass/Gloss\
                   gradient settings - but may be toggled whenever you want");
-   handleSettings(ui.sunkenButtons, "SunkenButtons", 0);
+
    
    /** setQSetting(.) tells BConfig to store values at
    "Company, Application, Group" - these strings are passed to QSettings */
@@ -231,6 +282,11 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
    for (int i = 0; i < QPalette::NColorRoles; i++)
       list << pal.color(group, (QPalette::ColorRole) i).name();
    return list;
+}
+
+static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list) {
+      for (int i = 0; i < QPalette::NColorRoles; i++)
+         pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
 }
 
 /** reimplemented - i just want to extract the data from the store */
@@ -337,7 +393,7 @@ void Config::restore() {
    for (i = 0; i < QPalette::NColorRoles; i++)
       loadedPal->setColor ( QPalette::Inactive, (QPalette::ColorRole) i, QColor(list.at(i)) );
    
-   list = settings.value ( "disabled", colors(pal, QPalette::Inactive) ).toStringList();
+   list = settings.value ( "disabled", colors(pal, QPalette::Disabled) ).toStringList();
    for (i = 0; i < QPalette::NColorRoles; i++)
       loadedPal->setColor ( QPalette::Disabled, (QPalette::ColorRole) i, QColor(list.at(i)) );
 
@@ -444,6 +500,19 @@ void Config::handleBgMode(int idx) {
    ui.labelStructure->setVisible(idx == 1);
 }
 
+void Config::handleDefInfo(int idx) {
+   if (idx == 4) {
+      infoIsManage = true;
+      setDefaultContextInfo(manageInfo);
+      ui.info->setHtml(manageInfo);
+   }
+   else if (infoIsManage) {
+      setDefaultContextInfo(defInfo);
+      ui.info->setHtml(defInfo);
+      infoIsManage = false;
+   }
+}
+
 /** The combobox filler you've read of several times before ;) */
 void Config::generateColorModes(QComboBox *box) {
    box->clear();
@@ -469,12 +538,88 @@ void Config::generateGradientTypes(QComboBox *box) {
 
 /** The main function, you must provide this if you want an executable*/
 
+#if EXECUTABLE
+
+#include "ui_uiDemo.h"
+#include "dialog.h"
+
+class BStyle : public QStyle {
+public:
+   BStyle() : QStyle (){}
+   virtual void init(const QSettings *settings) = 0;
+};
+
+static int error(const QString & string) {
+   qWarning("Error: %s", string.toLatin1().data());
+   return 0;
+}
+
 int main(int argc, char *argv[])
 {
    /** ==========================================
    This is just a command line tool for importing data - GUI part below*/
-   if (argc == 3 && !qstrcmp( argv[1], "import" ))
-      return sImport(argv[2]).isNull();
+   if (argc > 1) {
+      
+      int mode = 0;
+      if (!qstrcmp( argv[1], "import" ))
+         mode = 1;
+      else if (!qstrcmp( argv[1], "demo" ))
+         mode = 2;
+      else if (!qstrcmp( argv[1], "try" ))
+         mode = 3;
+      
+      if (mode > 1) { // launch demo widget
+         QApplication app(argc, argv);
+         if (mode == 3) { // try external
+            
+            if (argc < 3)
+               error("Usage: bespin-config try <some_config.bespin.conf>");
+            
+            if (!QFile::exists(argv[2]))
+               error(QString("The file %1 does not exist").arg(argv[2]));
+            
+            QSettings file(argv[2], QSettings::IniFormat);
+            if (!file.childGroups().contains("BespinStyle"))
+               error(QString("%1 is not a valid Bespin configuration").arg(argv[2]));
+            
+            if (!app.setStyle("Bespin"))
+               error("Fatal: Bespin Style not found or loadable!");
+            
+            file.beginGroup("BespinStyle");
+            // palette update =============================
+            QPalette pal = app.palette();
+            file.beginGroup("QPalette");
+            QStringList list =
+               file.value ( "active", colors(pal, QPalette::Active) ).toStringList();
+            updatePalette(pal, QPalette::Active, list);
+            list =
+               file.value ( "active", colors(pal, QPalette::Inactive) ).toStringList();
+            updatePalette(pal, QPalette::Inactive, list);
+            list =
+               file.value ( "active", colors(pal, QPalette::Disabled) ).toStringList();
+            updatePalette(pal, QPalette::Disabled, list);
+            file.endGroup();
+            app.setPalette(pal);
+            // ================================================
+            static_cast<BStyle*>(app.style())->init(&file);
+            
+            file.endGroup();
+            
+         }
+         else if (argc > 2) // demo - allow setting another style, but don't load custom settings
+            app.setStyle(argv[2]);
+         
+         Ui::Demo ui;
+         Dialog *window = new Dialog;
+         ui.setupUi(window);
+         QObject::connect (ui.rtl, SIGNAL(toggled(bool)),
+                           window, SLOT(setLayoutDirection(bool)));
+         window->show();
+         return app.exec();
+      }
+      if (mode == 1 && argc == 3)
+         return sImport(argv[2]).isNull();
+   }
    /** ================================================ */
    
    /** First make an application */
@@ -492,3 +637,4 @@ int main(int argc, char *argv[])
    /** run the application! */
    return app.exec();
 }
+#endif

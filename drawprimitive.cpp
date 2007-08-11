@@ -91,7 +91,7 @@ static inline uint decoRightSize(uint decoDim) {
    return (decoDim >> 24) & 0xff;
 }
 
-static inline bool drawTiledBackground(const QRect &r, QPainter *p, const QPalette &pal, const QWidget * widget) {
+static inline bool drawTiledBackground(const QRect &r, QPainter *p, const QColor &c, const QWidget * widget) {
    Display *dpy = QX11Info::display();
    QWidget *desktop = QApplication::desktop();
    
@@ -113,7 +113,7 @@ static inline bool drawTiledBackground(const QRect &r, QPainter *p, const QPalet
       return false;
    
    // check color range for usability
-   bgYoffset = pal.color(widget->backgroundRole()).rgb();
+   bgYoffset = c.rgb();
    if (qRed(bgPicture) > qRed(bgYoffset) + 5) return false;
    if (qRed(bgPicture) < qRed(bgYoffset) - 5) return false;
    if (qGreen(bgPicture) > qGreen(bgYoffset) + 5) return false;
@@ -204,20 +204,20 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
    bool hasFocus = option->state & State_HasFocus;
    bool up = false;
    
-   
    switch ( pe ) {
    case PE_Widget: {
       
       if (!(widget && widget->isWindow())) break; // can't do anything here
+      
+      const QColor &c = PAL.color(widget->backgroundRole());
 
       switch (config.bgMode) {
 #ifndef QT_NO_XRENDER
       case ComplexLights:
-         if (drawTiledBackground(RECT, painter, PAL, widget))
+         if (drawTiledBackground(RECT, painter, c, widget))
             break;
 #endif
       case BevelV: { // also fallback for ComplexLights
-         const QColor &c = PAL.color(widget->backgroundRole());
          const QPixmap &upper = Gradients::bg(c);
          const QPixmap &lower = Gradients::bg(c, true);
          int s1 = upper.height();
@@ -231,7 +231,6 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          break;
       }
       case BevelH: {
-         const QColor &c = PAL.color(widget->backgroundRole());
          const QPixmap &left = Gradients::bg(c);
          const QPixmap &right = Gradients::bg(c, true);
          int s1 = left.width();
@@ -245,8 +244,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          break;
       }
       case LightV: {
-         const QPixmap &center =
-               Gradients::bg(PAL.color(widget->backgroundRole()));
+         const QPixmap &center = Gradients::bg(c);
          int s1 = qMin(center.height(), RECT.height());
          int s2 = (RECT.height() - center.height())/2;
          painter->drawTiledPixmap( RECT.x(), RECT.y() + qMax(s2,0),
@@ -254,8 +252,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          break;
       }
       case LightH: {
-         const QPixmap &center =
-               Gradients::bg(PAL.color(widget->backgroundRole()));
+         const QPixmap &center = Gradients::bg(c);
          int s1 = qMin(center.width(), RECT.width());
          int s2 = (RECT.width() - center.width())/2;
          painter->drawTiledPixmap( RECT.x() + qMax(s2,0), RECT.y(),

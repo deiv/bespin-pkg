@@ -127,6 +127,23 @@ QColor Colors::emphasize(const QColor &c, int value) {
    return ret;
 }
 
+bool Colors::haveContrast(const QColor &a, const QColor &b)
+{
+   int ar,ag,ab,br,bg,bb;
+   a.getRgb(&ar,&ag,&ab);
+   b.getRgb(&br,&bg,&bb);
+   
+   int diff = (299*(ar-br) + 587*(ag-bg) + 114*(ab-bb));
+   
+   if (qAbs(diff) < 91001)
+      return false;
+   
+   diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
+      - (qMin(ar,br) + qMin(ag,bg) + qMin(ab,bb));
+   
+   return (diff > 300);
+}
+
 QColor Colors::light(const QColor &c, int value)
 {
    int h,s,v;

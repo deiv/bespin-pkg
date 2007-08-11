@@ -7,3 +7,4 @@ RESOURCES   = config.qrc
 target.path += $$(KDEDIR)/lib/kde4
 target.prefix = ""
 INSTALLS += target
+DEFINES += EXECUTABLE=0

@@ -27,7 +27,7 @@ class QScrollBar;
 class QTabBar;
 class QPaintEvent;
 class QFrame;
-// class GradientCache;
+class QSettings;
 
 #include <QCache>
 #include <QHash>
@@ -177,6 +177,8 @@ public:
 signals:
    void MDIPopup(QPoint);
 
+protected:
+   virtual void init(const QSettings *settings = 0L);
 //private slots:
 //   void fakeMouse();
    
@@ -202,11 +204,11 @@ private:
    QColor mapFadeColor(const QColor &color, int index) const;
    QPixmap *tint(const QImage &img, const QColor& c) const;
    const Tile::Set &glow(const QColor & c, bool round = false) const;
-   void readSettings();
    void generatePixmaps();
    void initMetrics();
    void makeStructure(int num, const QColor &c);
    bool scrollAreaHovered(const QWidget* slider) const;
+   void readSettings(const QSettings *settings = 0L);
    
 private:
    typedef QHash<uint, Tile::Set> TileCache;

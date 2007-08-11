@@ -35,6 +35,7 @@ bool counterRole(QPalette::ColorRole &from, QPalette::ColorRole &to,
                  QPalette::ColorRole defFrom = QPalette::WindowText,
                  QPalette::ColorRole defTo = QPalette::Window);
 QColor emphasize(const QColor &c, int value = 10);
+bool haveContrast(const QColor &a, const QColor &b);
 QColor light(const QColor &c, int value);
 QColor mid(const QColor &oc1, const QColor &c2, int w1 = 1, int w2 = 1);
 int value(const QColor &c);

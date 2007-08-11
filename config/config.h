@@ -26,10 +26,12 @@ private:
    void generateGradientTypes(QComboBox *box);
    
    QPalette *loadedPal;
+   bool infoIsManage;
 private slots:
    void storedSettigSelected(QListWidgetItem *);
    void remove();
-   void handleBgMode(int idx);
+   void handleBgMode(int);
+   void handleDefInfo(int);
 };
 
 #endif

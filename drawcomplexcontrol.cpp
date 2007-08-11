@@ -92,15 +92,22 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
       if (const QStyleOptionSpinBox *sb =
           qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
          QStyleOptionSpinBox copy = *sb;
-         int uh = 0;
+         
+         if (widget)
+         if (const QAbstractSpinBox* box = qobject_cast<const QAbstractSpinBox*>(widget))
+         if (box->isReadOnly()) {
+            isEnabled = false;
+            copy.state &= ~State_Enabled;
+         }
          
          if (sb->frame && (sb->subControls & SC_SpinBoxFrame))
-            drawPrimitive ( PE_PanelLineEdit, sb, painter, widget );
+            drawPrimitive ( PE_PanelLineEdit, &copy, painter, widget );
          
          if (!isEnabled)
             break; // why bother the user with elements he can't use... ;)
          
          Tile::PosFlags pf;
+         int uh = 0;
          
          if (sb->subControls & SC_SpinBoxUp) {
             copy.subControls = SC_SpinBoxUp;

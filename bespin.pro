@@ -1,10 +1,14 @@
-HEADERS = colors.h oxrender.h bespin.h tileset.h debug.h eventkiller.h \
+HEADERS = colors.h bespin.h tileset.h debug.h eventkiller.h \
           visualframe.h gradients.h styleanimator.h
-SOURCES = colors.cpp oxrender.cpp bespin.cpp tileset.cpp stylehint.cpp \
+SOURCES = colors.cpp bespin.cpp tileset.cpp stylehint.cpp \
           sizefromcontents.cpp qsubcmetrics.cpp \
           pixelmetric.cpp stdpix.cpp styleanimator.cpp \
           drawcomplexcontrol.cpp drawcontrol.cpp \
           drawprimitive.cpp visualframe.cpp gradients.cpp
+unix {
+   HEADERS += oxrender.h
+   SOURCES += oxrender.cpp
+}
 TEMPLATE = lib
 PLUGIN = true
 CONFIG += qt x11 plugin

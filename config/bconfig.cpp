@@ -1,15 +1,17 @@
 
 #include "bconfig.h"
 #include <QApplication>
-#include <QSettings>
-#include <QTimer>
-#include <QDir>
-#include <QDialogButtonBox>
-#include <QFileDialog>
-#include <QVBoxLayout>
+#include <QAbstractSlider>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDialogButtonBox>
+#include <QDir>
+#include <QFileDialog>
+#include <QSettings>
+#include <QSpinBox>
 #include <QTextBrowser>
+#include <QTimer>
+#include <QVBoxLayout>
 
 BConfigDialog::BConfigDialog(BConfig *config, uint btns, QWidget *parent) :
 QDialog(parent, Qt::Window) {
@@ -107,7 +109,7 @@ void BConfig::handleSettings(QWidget *w, QString entry, QVariant value) {
       connect (w, SIGNAL(toggled(bool)), this, SLOT(checkDirty()));
    else if (qobject_cast<QComboBox*>(w))
       connect (w, SIGNAL(currentIndexChanged(int)), this, SLOT(checkDirty()));
-   else if (qobject_cast<QAbstractSlider*>(w))
+   else if (qobject_cast<QAbstractSlider*>(w) || qobject_cast<QSpinBox*>(w))
       connect (w, SIGNAL(valueChanged(int)), this, SLOT(checkDirty()));
 }
 
@@ -238,6 +240,10 @@ QVariant BConfig::variant(const QWidget *w) const {
    }
    else if (const QCheckBox *box = qobject_cast<const QCheckBox*>(w))
       return box->isChecked();
+   else if (const QAbstractSlider *slider = qobject_cast<const QAbstractSlider*>(w))
+      return slider->value();
+   else if (const QSpinBox *spin = qobject_cast<const QSpinBox*>(w))
+      return spin->value();
    
    qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
    return QVariant();
@@ -253,6 +259,10 @@ bool BConfig::setVariant(QWidget *w, const QVariant &v) const {
    }
    else if (QCheckBox *box = qobject_cast<QCheckBox*>(w))
       box->setChecked(v.toBool());
+   else if (QAbstractSlider *slider = qobject_cast<QAbstractSlider*>(w))
+      slider->setValue(v.toInt());
+   else if (QSpinBox *spin = qobject_cast<QSpinBox*>(w))
+      spin->setValue(v.toInt());
    else {
       qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
       return false;

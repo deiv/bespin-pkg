@@ -204,39 +204,45 @@ void BespinStyle::makeStructure(int num, const QColor &c)
    p.end();
 }
 
-void BespinStyle::readSettings()
+void BespinStyle::readSettings(const QSettings* settings)
 {
-   QSettings settings("Bespin", "Style");
-   settings.beginGroup("Style");
+   bool delSettings = false;
+   QSettings *iSettings = const_cast<QSettings*>(settings);
+   if (!iSettings) {
+      delSettings = true;
+      iSettings = new QSettings("Bespin", "Style");
+      iSettings->beginGroup("Style");
+   }
+   else
+      qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
    
-   config.bgMode = (BGMode) settings.value("BackgroundMode", BevelV).toInt();
+   
+   // Background ===========================
+   config.bgMode = (BGMode) iSettings->value("Bg.Mode", BevelV).toInt();
+
 #ifndef QT_NO_XRENDER
    if (config.bgMode > LightH)
       config.bgMode = BevelV;
    else if(config.bgMode == ComplexLights &&
            !QFile::exists(QDir::tempPath() + "bespinPP.lock"))
-      QProcess::startDetached ( settings.value("BgDaemon", "bespinPP").toString() );
+      QProcess::startDetached ( iSettings->value("Bg.Daemon", "bespinPP").toString() );
 #else
    if (config.bgMode == ComplexLights) config.bgMode = BevelV;
 #endif
-   config.structure = settings.value("Structure", 0).toInt();
    
-   config.tabAnimSteps =
-         CLAMP(settings.value("TabAnimSteps", 6).toUInt(), 2, 18);
+   if (config.bgMode == Scanlines)
+      config.structure = iSettings->value("Bg.Structure", 0).toInt();
    
-   config.scale = settings.value("Scale", 1.0).toDouble();
-   config.checkType = settings.value("CheckType", 1).toInt();
-   
-   config.tabTransition =
-      (TabAnimInfo::TabTransition) settings.value("TabTransition",
-         TabAnimInfo::ScanlineBlend).toInt();
-   
-   config.sunkenButtons = CLAMP(settings.value("SunkenButtons", 0).toInt(), 0, 2);
-   
-   config.fullButtonHover = settings.value("FullButtonHover", false).toBool();
+   // Buttons ===========================
+   config.sunkenButtons =
+         CLAMP(iSettings->value("Btn.3dPos", 0).toInt(), 0, 2);
+   config.checkType = iSettings->value("Btn.CheckType", 0).toInt();
    
    config.gradButton =
-      (Gradients::Type) settings.value("GradButton", Gradients::None).toInt();
+      (Gradients::Type) iSettings->value("Btn.Gradient", Gradients::Button).toInt();
+   if (config.sunkenButtons == 2 &&
+       config.gradButton == Gradients::Sunken) // NO!
+      config.gradButton = Gradients::None;
    
    if (config.sunkenButtons == 2)
       config.cushion = true;
@@ -244,51 +250,62 @@ void BespinStyle::readSettings()
             config.gradButton ==  Gradients::Sunken)
       config.cushion = false;
    else
-      config.cushion = settings.value("Cushion", false).toBool();
+      config.cushion = iSettings->value("Btn.Cushion", true).toBool();
+   config.fullButtonHover = iSettings->value("Btn.FullHover", true).toBool();
    
-   if (config.sunkenButtons && config.gradButton == Gradients::Sunken) // NO!
-      config.gradButton = Gradients::None;
-   config.gradProgress =
-         (Gradients::Type) settings.value("GradProgress", Gradients::Gloss).toInt();
+   // Choosers ===========================
    config.gradChoose =
-      (Gradients::Type) settings.value("GradChoose", Gradients::Glass).toInt();
-   config.gradTab =
-      (Gradients::Type) settings.value("GradTab", Gradients::Gloss).toInt();
+      (Gradients::Type) iSettings->value("Chooser.Gradient", Gradients::Sunken).toInt();
+   
+   // Menus ===========================
    config.gradMenuItem =
-         (Gradients::Type) settings.value("GradMenuItem", Gradients::None).toInt();
-
-   config.showMenuIcons = settings.value("ShowMenuIcons", false).toBool();
-   config.menuShadow = settings.value("MenuShadow", false).toBool();
-   config.showScrollButtons = settings.value("ShowScrollButtons", true).toBool();
+         (Gradients::Type) iSettings->value("Menu.ItemGradient", Gradients::None).toInt();
+   config.showMenuIcons = iSettings->value("Menu.ShowIcons", false).toBool();
+   config.menuShadow = iSettings->value("Menu.Shadow", false).toBool();
+   config.role_menuActive[0] =
+      (QPalette::ColorRole) iSettings->value("Menu.ActiveRole", QPalette::Highlight).toInt();
+   Colors::counterRole(config.role_menuActive[0], config.role_menuActive[1],
+                       QPalette::Highlight, QPalette::HighlightedText);
+   config.role_popup[0] =
+      (QPalette::ColorRole) iSettings->value("Menu.Role", QPalette::Window).toInt();
+   Colors::counterRole(config.role_popup[0], config.role_popup[1],
+                       QPalette::Window, QPalette::WindowText);
    
-   // color roles
-   
+   // Progress ===========================
+   config.gradProgress =
+         (Gradients::Type) iSettings->value("Progress.Gradient", Gradients::Gloss).toInt();
    config.role_progress[0] =
-      (QPalette::ColorRole) settings.value("role_progress", QPalette::WindowText).toInt();
+      (QPalette::ColorRole) iSettings->value("Progress.Role", QPalette::Highlight).toInt();
    Colors::counterRole(config.role_progress[0], config.role_progress[1],
                        QPalette::Highlight, QPalette::HighlightedText);
    
-   config.role_tab[0][0] =
-      (QPalette::ColorRole) settings.value("role_tab", QPalette::Window).toInt();
-   Colors::counterRole(config.role_tab[0][0], config.role_tab[0][1],
-                       QPalette::Window, QPalette::WindowText);
+   // ScrollStuff ===========================
+   config.showScrollButtons =
+         iSettings->value("Scroll.ShowButtons", false).toBool();
    
+   // Tabs ===========================
    config.role_tab[1][0] =
-      (QPalette::ColorRole) settings.value("role_tabActive", QPalette::Button).toInt();
+      (QPalette::ColorRole) iSettings->value("Tab.ActiveRole", QPalette::Highlight).toInt();
    Colors::counterRole(config.role_tab[1][0], config.role_tab[1][1],
                        QPalette::Button, QPalette::ButtonText);
+   config.tabAnimSteps =
+         CLAMP(iSettings->value("Tab.AnimSteps", 5).toUInt(), 2, 18);
+   config.gradTab =
+      (Gradients::Type) iSettings->value("Tab.Gradient", Gradients::Button).toInt();
+   config.role_tab[0][0] =
+      (QPalette::ColorRole) iSettings->value("Tab.Role", QPalette::Window).toInt();
+   Colors::counterRole(config.role_tab[0][0], config.role_tab[0][1],
+                       QPalette::Window, QPalette::WindowText);
+   config.tabTransition =
+      (TabAnimInfo::TabTransition) iSettings->value("Tab.Transition",
+         TabAnimInfo::ScanlineBlend).toInt();
    
-   config.role_menuActive[0] =
-      (QPalette::ColorRole) settings.value("role_menuActive", QPalette::WindowText).toInt();
-   Colors::counterRole(config.role_menuActive[0], config.role_menuActive[1],
-                       QPalette::Window, QPalette::WindowText);
-   config.role_popup[0] =
-      (QPalette::ColorRole) settings.value("role_popup", QPalette::Window).toInt();
-   Colors::counterRole(config.role_popup[0], config.role_popup[1],
-                       QPalette::Window, QPalette::WindowText);
+   // General ===========================
+   config.scale = iSettings->value("Scale", 1.0).toDouble();
 
-
-   settings.endGroup();
+   
+   if (delSettings)
+      delete iSettings;
 }
 
 #define SCALE(_N_) lround(_N_*config.scale)
@@ -318,15 +335,20 @@ void BespinStyle::initMetrics()
 
 #undef SCALE
 
-/**THE STYLE ITSELF*/
-BespinStyle::BespinStyle() : QCommonStyle(), mouseButtonPressed_(false),
-internalEvent_(false) {
-   _scanlines[0] = _scanlines[1] = 0L;
-   readSettings();
+void BespinStyle::init(const QSettings* settings) {
+   readSettings(settings);
    initMetrics();
    generatePixmaps();
    Gradients::init(config.bgMode > ComplexLights ?
                    (Gradients::BgMode)config.bgMode : Gradients::BevelV);
+}
+
+/**THE STYLE ITSELF*/
+BespinStyle::BespinStyle() : QCommonStyle(), mouseButtonPressed_(false),
+internalEvent_(false) {
+   _scanlines[0] = _scanlines[1] = 0L;
+   init();
+
    //====== TOOLTIP ======================
 //    tooltipPalette = qApp->palette();
 //    tooltipPalette.setBrush( QPalette::Background, QColor( 255, 255, 220 ) );
@@ -390,24 +412,6 @@ void BespinStyle::polish ( QApplication * app ) {
 //    app->installEventFilter(this);
 }
 
-/**Internal, checks if there's contrast between two colors*/
-static bool thereIsContrastBetween(const QColor &a, const QColor &b)
-{
-   int ar,ag,ab,br,bg,bb;
-   a.getRgb(&ar,&ag,&ab);
-   b.getRgb(&br,&bg,&bb);
-   
-   int diff = (299*(ar-br) + 587*(ag-bg) + 114*(ab-bb));
-   
-   if (qAbs(diff) < 91001)
-      return false;
-   
-   diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
-      - (qMin(ar,br) + qMin(ag,bg) + qMin(ab,bb));
-   
-   return (diff > 300);
-}
-
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
 #include <QtDebug>
 void BespinStyle::polish( QPalette &pal )
@@ -452,7 +456,7 @@ void BespinStyle::polish( QPalette &pal )
                          pal.color(QPalette::Active, QPalette::Base),3,1));
    
    config.strongFocus =
-         thereIsContrastBetween(pal.color(QPalette::Active, QPalette::Window),
+         Colors::haveContrast(pal.color(QPalette::Active, QPalette::Window),
                                 pal.color(QPalette::Active, QPalette::Highlight));
 }
 
@@ -808,13 +812,13 @@ void BespinStyle::unPolish( QWidget *widget )
 
 QPalette BespinStyle::standardPalette () const
 {
-   QPalette pal ( Qt::black, QColor(30,31,32), // windowText, button
+   QPalette pal ( Qt::black, Qt::white, // windowText, button
                      Qt::white, QColor(200,201,202), QColor(221,222,223), //light, dark, mid
                      Qt::black, Qt::white, //text, bright_text
-                     QColor(251,254,255), QColor(238,239,242) ); //base, window
-   pal.setColor(QPalette::ButtonText, QColor(234,236,238));
-   pal.setColor(QPalette::Highlight, QColor(0, 170, 255));
-   pal.setColor(QPalette::HighlightedText, QColor(255, 255, 127));
+                     Qt::white, QColor(226,227,231) ); //base, window
+   pal.setColor(QPalette::ButtonText, Qt::black);
+   pal.setColor(QPalette::Highlight, QColor(78, 156, 234));
+   pal.setColor(QPalette::HighlightedText, Qt::white);
    return pal;
 }
 

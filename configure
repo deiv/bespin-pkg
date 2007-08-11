@@ -8,13 +8,23 @@ for parameter in "$@"; do
       KDEDIR="$(echo $parameter | cut -d"=" -f2-)"
    elif echo $parameter | grep qt-dir > /dev/null; then
       QTDIR="$(echo $parameter | cut -d"=" -f2-)"
-#   elif [ $parameter = "without-qt-config" ]; then
-#      CONFIG_QT=0
-#   elif [ $parameter = "without-kde-config" ]; then
-#      CONFIG_KDE=0
+  elif [ $parameter = "without-qt-config" ]; then
+     CONFIG_QT=0
+  elif [ $parameter = "without-kde-config" ]; then
+     CONFIG_KDE=0
    else
-      echo -e "\e[0;34;47m\n!!! Unknown parameter \"$parameter\" !!!\n\nUsage:\n-------------\nconfigure [prefix=<Where apps get installed ($PREFIX)>] [qt-dir=<Path to Qt4>] [kde-dir=<Path to KDE4>]\e[m\n"
-#[without-qt-config]\n\nwithout-qt-config:\nDo NOT build the standalone configuration dialog\n\nwithout-kde-config:\nDo NOT build the kcontrol configuration plugin [auto turned off if KDE not found]\e[m\n"
+      echo -e "
+\e[0;34;47m\n!!! Unknown parameter \"$parameter\" !!!
+
+Usage:\n-------------\nconfigure [prefix=path] [qt-dir=<Path to Qt4>] [kde-dir=<Path to KDE4>] [without-qt-config] [without-kde-config]
+
+prefix: Where apps get installed ($PREFIX)
+
+without-qt-config:\nDo NOT build the standalone configuration dialog
+
+without-kde-config:\nDo NOT build the kcontrol configuration plugin (auto turned off if KDE not found)
+
+\e[m"
       exit 0
    fi
 done
@@ -31,6 +41,6 @@ if [ "$kdecheck" = "" ]; then
    CONFIG_KDE=0
 fi
 
-if qmake qmake.pro; then
+if $QTDIR/bin/qmake qmake.pro; then
    echo -e "\e[32;40mconfiguration done, now \"make && make install\"\e[m"
 fi

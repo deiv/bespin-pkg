@@ -14,7 +14,7 @@
   </property>
   <layout class="QGridLayout" >
    <item row="0" column="0" colspan="2" >
-    <widget class="QTabWidget" name="tabWidget" >
+    <widget class="QTabWidget" name="generalTab" >
      <property name="currentIndex" >
       <number>0</number>
      </property>
@@ -133,7 +133,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
+       <item row="0" column="1" colspan="2" >
         <widget class="QComboBox" name="gradTab" />
        </item>
        <item row="1" column="0" >
@@ -143,7 +143,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
+       <item row="1" column="1" colspan="2" >
         <widget class="QComboBox" name="crTabBar" />
        </item>
        <item row="2" column="0" >
@@ -153,7 +153,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1" >
+       <item row="2" column="1" colspan="2" >
         <widget class="QComboBox" name="crTabBarActive" />
        </item>
        <item row="3" column="0" >
@@ -163,7 +163,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1" >
+       <item row="3" column="1" colspan="2" >
         <widget class="QComboBox" name="tabTransition" >
          <item>
           <property name="text" >
@@ -223,14 +223,56 @@
         </widget>
        </item>
        <item row="4" column="0" >
+        <widget class="QLabel" name="label_15" >
+         <property name="text" >
+          <string>Steps</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" >
+        <widget class="QSlider" name="tabAnimSteps" >
+         <property name="minimum" >
+          <number>2</number>
+         </property>
+         <property name="maximum" >
+          <number>18</number>
+         </property>
+         <property name="pageStep" >
+          <number>2</number>
+         </property>
+         <property name="value" >
+          <number>6</number>
+         </property>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2" >
+        <widget class="QSpinBox" name="spinBox" >
+         <property name="readOnly" >
+          <bool>true</bool>
+         </property>
+         <property name="minimum" >
+          <number>2</number>
+         </property>
+         <property name="maximum" >
+          <number>18</number>
+         </property>
+         <property name="value" >
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" >
           <size>
-           <width>20</width>
-           <height>211</height>
+           <width>215</width>
+           <height>151</height>
           </size>
          </property>
         </spacer>
@@ -605,5 +647,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>tabAnimSteps</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>296</x>
+     <y>187</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>425</x>
+     <y>197</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
