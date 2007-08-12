@@ -73,12 +73,12 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
                          dpi.f6 : menuItem->fontMetrics.lineSpacing());
              
          bool checkable = menuItem->menuHasCheckableItems;
-         int maxpmw = config.showMenuIcons*menuItem->maxIconWidth;
+         int maxpmw = config.menu.showIcons*menuItem->maxIconWidth;
          int w = contentsSize.width();
          int h = qMax(contentsSize.height()+dpi.f2,
                       menuItem->fontMetrics.lineSpacing());
          
-         if (config.showMenuIcons && !menuItem->icon.isNull())
+         if (config.menu.showIcons && !menuItem->icon.isNull())
             h = qMax(h,
                      menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize),
                                              QIcon::Normal).height() + dpi.f4);
@@ -121,7 +121,7 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
             if (abn->isCheckable())
                w += contentsSize.height()/2+dpi.f10;
             if (w < dpi.f80) w = dpi.f80;
-            if (config.sunkenButtons == 2)
+            if (config.btn.layer == 2)
                return QSize(w, contentsSize.height() + dpi.f5);
             else
                return QSize(w, contentsSize.height() + dpi.f8);

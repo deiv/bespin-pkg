@@ -22,6 +22,7 @@
 #include "bespin.h"
 
 using namespace Bespin;
+extern Config config;
 
 int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const QWidget * widget, QStyleHintReturn * returnData ) const {
    switch (hint) {
@@ -107,12 +108,12 @@ int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const 
       return true;
    // The Unicode character to be used for passwords.
    case SH_LineEdit_PasswordCharacter: {
-        const QFontMetrics &fm =
-         option ? option->fontMetrics :
-         (widget ? widget->fontMetrics() : QFontMetrics(QFont()));
-        if (fm.inFont(QChar(0x2022)))
-            return 0x2022;
-         return '*';
+      const QFontMetrics &fm =
+      option ? option->fontMetrics :
+      (widget ? widget->fontMetrics() : QFontMetrics(QFont()));
+      if (fm.inFont(QChar(config.input.pwEchoChar)))
+         return config.input.pwEchoChar;
+      return '|';
     }
 //    case SH_Table_GridLineColor: //  
    // Whether shortcuts are underlined.

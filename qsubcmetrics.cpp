@@ -147,7 +147,7 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
       if (const QStyleOptionSlider *scrollbar =
           qstyleoption_cast<const QStyleOptionSlider *>(option)) {
          int sbextent = pixelMetric(PM_ScrollBarExtent, scrollbar, widget);
-         int buttonSpace = config.showScrollButtons * sbextent * 2;
+         int buttonSpace = config.scroll.showButtons * sbextent * 2;
          int maxlen = ((scrollbar->orientation == Qt::Horizontal) ?
                        scrollbar->rect.width() : scrollbar->rect.height()) - buttonSpace;
          
@@ -171,7 +171,7 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
             scrollbar->upsideDown);
          switch (subControl) {
          case SC_ScrollBarSubLine:            // top/left button
-            if (!config.showScrollButtons)
+            if (!config.scroll.showButtons)
                ret = QRect();
             else if (scrollbar->orientation == Qt::Horizontal) {
                int buttonWidth = qMin(scrollbar->rect.width() / 2, sbextent);
@@ -183,7 +183,7 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
             }
             break;
          case SC_ScrollBarAddLine:            // bottom/right button
-            if (!config.showScrollButtons)
+            if (!config.scroll.showButtons)
                ret = QRect();
             else if (scrollbar->orientation == Qt::Horizontal) {
                int buttonWidth = qMin(scrollbar->rect.width()/2, sbextent);
@@ -363,7 +363,7 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
    case SE_CheckBoxIndicator: { // Area for the state indicator (e.g., check mark)
       int h = dpi.Indicator;
       QRect r = option->rect;
-      if (config.sunkenButtons)
+      if (config.btn.layer)
          r.setRect(r.x()+dpi.f1, r.y() + ((r.height() - h) / 2), h-dpi.f2, h);
       else
          r.setRect(r.x(), r.y() + ((r.height() - h) / 2), h, h);

@@ -140,15 +140,14 @@ void BespinStyle::makeStructure(int num, const QColor &c)
    if (!_scanlines[num])
       _scanlines[num] = new QPixmap(64, 64);
    QPainter p(_scanlines[num]);
-   switch (config.structure)
+   switch (config.bg.structure)
    {
    default:
    case 0: { // scanlines
       _scanlines[num]->fill( c.light(110).rgb() );
       p.setPen( (num == 1) ? c.light(106) : c.light(103) );
       int i;
-      for ( i = 1; i < 64; i += 4 )
-      {
+      for ( i = 1; i < 64; i += 4 ) {
          p.drawLine( 0, i, 63, i );
          p.drawLine( 0, i+2, 63, i+2 );
       }
@@ -200,6 +199,17 @@ void BespinStyle::makeStructure(int num, const QColor &c)
       for ( int i = 0; i < 64; i += 16 )
          p.drawLine( i, 0, i, 63 );
       break;
+   case 4: // verticals
+      _scanlines[num]->fill( c.light(110).rgb() );
+      p.setPen( (num == 1) ? c.light(106) : c.light(103) );
+      for ( int i = 1; i < 64; i += 4 ) {
+         p.drawLine( i, 0, i, 63 );
+         p.drawLine( i+2, 0, i+2, 63 );
+      }
+      p.setPen( c );
+      for ( int i = 2; i < 63; i += 4 )
+         p.drawLine( i, 0, i, 63 );
+      break;
    }
    p.end();
 }
@@ -225,49 +235,54 @@ void BespinStyle::readSettings(const QSettings* settings)
    
    
    // Background ===========================
-   config.bgMode = (BGMode) iSettings->value("Bg.Mode", BevelV).toInt();
+   config.bg.mode = (BGMode) iSettings->value("Bg.Mode", BevelV).toInt();
 
 #ifndef QT_NO_XRENDER
-   if (config.bgMode > LightH)
-      config.bgMode = BevelV;
-   else if(config.bgMode == ComplexLights &&
+   if (config.bg.mode > LightH)
+      config.bg.mode = BevelV;
+   else if(config.bg.mode == ComplexLights &&
            !QFile::exists(QDir::tempPath() + "bespinPP.lock"))
       QProcess::startDetached ( iSettings->value("Bg.Daemon", "bespinPP").toString() );
 #else
-   if (config.bgMode == ComplexLights) config.bgMode = BevelV;
+   if (config.bg.mode == ComplexLights) config.bg.mode = BevelV;
 #endif
    
-   if (config.bgMode == Scanlines)
-      config.structure = iSettings->value("Bg.Structure", 0).toInt();
+   if (config.bg.mode == Scanlines)
+      config.bg.structure = iSettings->value("Bg.Structure", 0).toInt();
    
    // Buttons ===========================
-   config.sunkenButtons =
-         CLAMP(iSettings->value("Btn.3dPos", 0).toInt(), 0, 2);
-   config.checkType = iSettings->value("Btn.CheckType", 0).toInt();
+   config.btn.layer = CLAMP(iSettings->value("Btn.Layer", 0).toInt(), 0, 2);
+   config.btn.checkType = iSettings->value("Btn.CheckType", 0).toInt();
    
    CONF_GRAD(btn) = gradientType("Btn.Gradient", Button);
 
-   if (config.sunkenButtons == 2 && CONF_GRAD(btn) == Gradients::Sunken) // NO!
+   if (config.btn.layer == 2 && CONF_GRAD(btn) == Gradients::Sunken) // NO!
       CONF_GRAD(btn) = Gradients::None;
    
-   if (config.sunkenButtons == 2)
-      config.cushion = true;
+   if (config.btn.layer == 2)
+      config.btn.cushion = true;
    else if (CONF_GRAD(btn) == Gradients::None ||
             CONF_GRAD(btn) ==  Gradients::Sunken)
-      config.cushion = false;
+      config.btn.cushion = false;
    else
-      config.cushion = iSettings->value("Btn.Cushion", true).toBool();
-   config.fullButtonHover = iSettings->value("Btn.FullHover", true).toBool();
+      config.btn.cushion = iSettings->value("Btn.Cushion", true).toBool();
+   config.btn.fullHover = iSettings->value("Btn.FullHover", true).toBool();
    readRole("Btn.Role", btn.std, Window, WindowText);
    readRole("Btn.ActiveRole", btn.active, Button, ButtonText);
+   Colors::setButtonRoles(config.btn.std_role[0], config.btn.std_role[1],
+                       config.btn.active_role[0], config.btn.active_role[1]);
    
    // Choosers ===========================
    CONF_GRAD(chooser) = gradientType("Chooser.Gradient", Sunken);
    
+   // PW Echo Char ===========================
+   config.input.pwEchoChar =
+         ushort(iSettings->value("Input.PwEchoChar", 0x26AB).toUInt());
+   
    // Menus ===========================
    config.menu.itemGradient = gradientType("Menu.ItemGradient", None);
-   config.showMenuIcons = iSettings->value("Menu.ShowIcons", false).toBool();
-   config.menuShadow = iSettings->value("Menu.Shadow", false).toBool();
+   config.menu.showIcons = iSettings->value("Menu.ShowIcons", false).toBool();
+   config.menu.shadow = iSettings->value("Menu.Shadow", false).toBool();
    readRole("Menu.ActiveRole", menu.active, Highlight, HighlightedText);
    readRole("Menu.Role", menu.std, Window, WindowText);
    
@@ -276,16 +291,16 @@ void BespinStyle::readSettings(const QSettings* settings)
    readRole("Progress.Role", progress.std, Highlight, HighlightedText);
    
    // ScrollStuff ===========================
-   config.showScrollButtons =
+   config.scroll.showButtons =
          iSettings->value("Scroll.ShowButtons", false).toBool();
    
    // Tabs ===========================
    readRole("Tab.ActiveRole", tab.active, Highlight, HighlightedText);
-   config.tabAnimSteps =
+   config.tab.animSteps =
          CLAMP(iSettings->value("Tab.AnimSteps", 5).toUInt(), 2, 18);
    CONF_GRAD(tab) = gradientType("Tab.Gradient", Button);
    readRole("Tab.Role", tab.std, Window, WindowText);
-   config.tabTransition =
+   config.tab.transition =
       (TabAnimInfo::TabTransition) iSettings->value("Tab.Transition",
          TabAnimInfo::ScanlineBlend).toInt();
    
@@ -321,8 +336,8 @@ void BespinStyle::initMetrics()
    dpi.ScrollBarSliderMin = SCALE(40);
    dpi.SliderThickness = SCALE(24);
    dpi.SliderControl = SCALE(19);
-   dpi.Indicator = config.sunkenButtons == 2 ? SCALE(16) : SCALE(20);
-   dpi.ExclusiveIndicator = config.sunkenButtons == 2 ? SCALE(16) : SCALE(19);
+   dpi.Indicator = config.btn.layer == 2 ? SCALE(16) : SCALE(20);
+   dpi.ExclusiveIndicator = config.btn.layer == 2 ? SCALE(16) : SCALE(19);
 }
 
 #undef SCALE
@@ -331,8 +346,8 @@ void BespinStyle::init(const QSettings* settings) {
    readSettings(settings);
    initMetrics();
    generatePixmaps();
-   Gradients::init(config.bgMode > ComplexLights ?
-                   (Gradients::BgMode)config.bgMode : Gradients::BevelV);
+   Gradients::init(config.bg.mode > ComplexLights ?
+                   (Gradients::BgMode)config.bg.mode : Gradients::BevelV);
 }
 
 /**THE STYLE ITSELF*/
@@ -349,7 +364,7 @@ internalEvent_(false) {
    
 
    // start being animated
-   animator = new StyleAnimator(this, config.tabTransition, config.tabAnimSteps);
+   animator = new StyleAnimator(this, config.tab.transition, config.tab.animSteps);
 
 }
 
@@ -409,7 +424,7 @@ void BespinStyle::polish ( QApplication * app ) {
 void BespinStyle::polish( QPalette &pal )
 {
    QColor c = pal.color(QPalette::Active, QPalette::Background);
-   if (config.bgMode > Scanlines) {
+   if (config.bg.mode > Scanlines) {
       int h,s,v;
       c.getHsv(&h,&s,&v);
       if (v < 70) // very dark colors won't make nice backgrounds ;)
@@ -419,7 +434,7 @@ void BespinStyle::polish( QPalette &pal )
    if (_scanlines[0]) delete _scanlines[0]; _scanlines[0] = 0;
    if (_scanlines[1]) delete _scanlines[1]; _scanlines[1] = 0;
    QLinearGradient lg; QPainter p;
-   if (config.bgMode == Scanlines) {
+   if (config.bg.mode == Scanlines) {
       QColor c = pal.color(QPalette::Active, QPalette::Background);
       makeStructure(0, c);
       QBrush brush( c, *_scanlines[0] );
@@ -460,7 +475,7 @@ void BespinStyle::polish( QWidget * widget) {
    
    if (!widget) return; // !
 
-   if (widget->isWindow() && config.bgMode > Scanlines) {
+   if (widget->isWindow() && config.bg.mode > Scanlines) {
       widget->setAutoFillBackground(true);
       widget->setAttribute(Qt::WA_StyledBackground);
    }
@@ -574,7 +589,7 @@ void BespinStyle::polish( QWidget * widget) {
 #endif
       ) {
       widget->setBackgroundRole(QPalette::Window);
-      if (config.bgMode == Scanlines) {
+      if (config.bg.mode == Scanlines) {
          widget->setAutoFillBackground ( true );
          QPalette pal = widget->palette();
          QColor c = pal.color(QPalette::Active, QPalette::Window);

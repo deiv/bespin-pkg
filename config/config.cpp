@@ -9,6 +9,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QProcess>
+#include <QValidator>
 
 #if ! EXECUTABLE
 
@@ -72,6 +73,35 @@ static const char* manageInfo =
 </pre>\
 </p>";
 
+/** Intenal class for the PW Char entry - not of interest */
+
+static ushort unicode(const QString &string) {
+   if (string.length() == 1)
+      return string.at(0).unicode();
+   uint n = string.toUShort();
+   if (!n)
+      n = string.toUShort(0,16);
+   if (!n)
+      n = string.toUShort(0,8);
+   return n;
+}
+
+class UniCharValidator : public QValidator {
+public:
+   UniCharValidator( QObject * parent ) : QValidator(parent){}
+   virtual State validate ( QString & input, int & ) const {
+      if (input.length() == 0)
+         return Intermediate;
+      if (input.length() == 1)
+         return Acceptable;
+      if (input.length() == 2 && input.at(0) == '0' && input.at(1).toLower() == 'x')
+         return Intermediate;
+      if (unicode(input))
+         return Acceptable;
+      return Invalid;
+   }
+};
+
 /** The Constructor - your first job! */
 Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(false) {
    
@@ -104,12 +134,54 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateColorModes(ui.crTabBarActive);
    generateColorModes(ui.crPopup);
    generateColorModes(ui.crMenuActive);
+   generateColorModes(ui.btnRole);
+   generateColorModes(ui.btnActiveRole);
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
    generateGradientTypes(ui.gradMenuItem);
    generateGradientTypes(ui.gradProgress);
    generateGradientTypes(ui.gradTab);
+   
+   
+   QSettings csettings("Bespin", "Config");
+   QStringList strList =
+      csettings.value ( "UserPwChars", QStringList() ).toStringList();
+   ushort n;
+   foreach (QString str, strList) {
+      n = str.toUShort(0,16);
+      if (n)
+         ui.pwEchoChar->addItem(QChar(n), n);
+   }
+   strList.clear();
+   ui.pwEchoChar->addItem(QChar(0x26AB), 0x26AB);
+   ui.pwEchoChar->addItem(QChar(0x2022), 0x2022);
+   ui.pwEchoChar->addItem(QChar(0x2055), 0x2055);
+   ui.pwEchoChar->addItem(QChar(0x220E), 0x220E);
+   ui.pwEchoChar->addItem(QChar(0x224E), 0x224E);
+   ui.pwEchoChar->addItem(QChar(0x25AA), 0x25AA);
+   ui.pwEchoChar->addItem(QChar(0x25AC), 0x25AC);
+   ui.pwEchoChar->addItem(QChar(0x25AC), 0x25AC);
+   ui.pwEchoChar->addItem(QChar(0x25A0), 0x25A0);
+   ui.pwEchoChar->addItem(QChar(0x25CF), 0x25CF);
+   ui.pwEchoChar->addItem(QChar(0x2605), 0x2605);
+   ui.pwEchoChar->addItem(QChar(0x2613), 0x2613);
+   ui.pwEchoChar->addItem(QChar(0x26A1), 0x26A1);
+   ui.pwEchoChar->addItem(QChar(0x2717), 0x2717);
+   ui.pwEchoChar->addItem(QChar(0x2726), 0x2726);
+   ui.pwEchoChar->addItem(QChar(0x2756), 0x2756);
+   ui.pwEchoChar->addItem(QChar(0x2756), 0x2756);
+   ui.pwEchoChar->addItem(QChar(0x27A4), 0x27A4);
+   ui.pwEchoChar->addItem(QChar(0xa4), 0xa4);
+   ui.pwEchoChar->addItem("|", '|');
+   ui.pwEchoChar->addItem(":", ':');
+   ui.pwEchoChar->addItem("*", '*');
+   ui.pwEchoChar->lineEdit()->
+      setValidator(new UniCharValidator(ui.pwEchoChar->lineEdit()));
+   connect (ui.pwEchoChar->lineEdit(), SIGNAL(returnPressed()),
+            this, SLOT (learnPwChar()));
+   ui.pwEchoChar->setInsertPolicy(QComboBox::NoInsert);
+   
    
 /** connection between the bgmode and the structure combo -
    not of interest*/
@@ -129,13 +201,17 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.bgMode, "Bg.Mode", 3);
    handleSettings(ui.structure, "Bg.Structure", 0);
 
-   handleSettings(ui.sunkenButtons, "Btn.3dPos", 0);
+   handleSettings(ui.sunkenButtons, "Btn.Layer", 0);
    handleSettings(ui.checkMark, "Btn.CheckType", 0);
    handleSettings(ui.cushion, "Btn.Cushion", true);
    handleSettings(ui.fullButtonHover, "Btn.FullHover", true);
    handleSettings(ui.gradButton, "Btn.Gradient", GradButton);
+   handleSettings(ui.btnRole, "Btn.Role", QPalette::Window);
+   handleSettings(ui.btnActiveRole, "Btn.ActiveRole", QPalette::Button);
    
    handleSettings(ui.gradChoose, "Chooser.Gradient", GradSunken);
+   
+   handleSettings(ui.pwEchoChar, "Input.PwEchoChar", 0x26AB);
    
    handleSettings(ui.crMenuActive, "Menu.ActiveRole", QPalette::Highlight);
    handleSettings(ui.gradMenuItem, "Menu.ItemGradient", GradNone);
@@ -154,7 +230,12 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.crTabBar, "Tab.Role", QPalette::Window);
    handleSettings(ui.tabTransition, "Tab.Transition", 1);
    
-   QStringList strList;
+   /** setContextHelp(.) attaches a context help string to a widget on your form */
+   setContextHelp(ui.btnRoles, "<b>Button Colors</b><hr>\
+                  The default and the hovered color of a button.<br>\
+                  <b>Notice:</b> It's strongly suggested to select \"Button\" to\
+                  (at least and best excatly) one of the states!");
+   
    strList <<
       "<b>Plain (color)</b><hr>Select if you have a really lousy \
       machine or just hate structured backgrounds." <<
@@ -210,6 +291,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
       "<b>CrossFade</b><hr>What you would expect - one fades out while the \
       other fades in.<br>\
       This is CPU hungry - better have GPU Hardware acceleration.";
+   
+   setContextHelp(ui.pwEchoChar, "<b>Pasword Echo Character</b><hr>\
+                  The character that is displayed instead of the real text when\
+                  you enter e.g. a password.<br>\
+                  You can enter any char or unicode number here.\
+                  <b>Notice:</b> That not all fontsets may provide all unicode characters!");
+                  
    setContextHelp(ui.tabTransition, strList);
    
    setContextHelp(ui.tabAnimSteps, "<b>Tab Transition Steps</b><hr>\
@@ -227,7 +315,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                   Seriously, honestly: when do you ever use the buttons to move\
                   a scrollbar slider? (ok, notebooks don't have a mousewheel...)");
 
-   /** setContextHelp(.) attaches a context help string to a widget on your form */
    setContextHelp(ui.crProgressBar, "<b>ProgressBar Roles</b><hr>\
                   This is the \"done\" part of the Progressbar<br>\
                   Choose any mode you like - the other part is like the window");
@@ -290,13 +377,14 @@ static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStri
 }
 
 /** reimplemented - i just want to extract the data from the store */
+static QString lastPath = QDir::home().path();
 void Config::saveAs() {
    
    QListWidgetItem *item = ui.store->currentItem();
    if (!item) return;
    
    QString filename = QFileDialog::getSaveFileName(parentWidget(),
-      tr("Save Configuration"), QDir::home().path(), tr("Config Files (*.conf *.ini)"));
+      tr("Save Configuration"), lastPath, tr("Config Files (*.conf *.ini)"));
    
    
    QSettings store("Bespin", "Store");
@@ -354,7 +442,7 @@ static QString sImport(const QString &filename) {
 void Config::import() {
    
    QString filename = QFileDialog::getOpenFileName(parentWidget(),
-      tr("Import Configuration"), QDir::home().path(), tr("Config Files (*.conf *.ini)"));
+      tr("Import Configuration"), lastPath, tr("Config Files (*.conf *.ini)"));
    
    QString storeName = sImport(filename);
    if (storeName.isNull()) {
@@ -511,6 +599,17 @@ void Config::handleDefInfo(int idx) {
       ui.info->setHtml(defInfo);
       infoIsManage = false;
    }
+}
+
+void Config::learnPwChar() {
+   ushort n = unicode(ui.pwEchoChar->lineEdit()->text());
+   if (ui.pwEchoChar->findData(n) != -1)
+      return;
+   ui.pwEchoChar->insertItem(0, QChar(n), n);
+   QSettings settings("Bespin", "Config");
+   QStringList list = settings.value ( "UserPwChars", QStringList() ).toStringList();
+   list << QString::number( n, 16 );
+   settings.setValue("UserPwChars", list);
 }
 
 /** The combobox filler you've read of several times before ;) */

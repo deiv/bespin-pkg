@@ -32,6 +32,7 @@ private slots:
    void remove();
    void handleBgMode(int);
    void handleDefInfo(int);
+   void learnPwChar();
 };
 
 #endif

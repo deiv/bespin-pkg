@@ -40,6 +40,9 @@ QColor light(const QColor &c, int value);
 QColor mid(const QColor &oc1, const QColor &c2, int w1 = 1, int w2 = 1);
 int value(const QColor &c);
 
+void setButtonRoles(QPalette::ColorRole bg, QPalette::ColorRole fg,
+                    QPalette::ColorRole bgActive, QPalette::ColorRole fgActive);
+
 };
 };
 

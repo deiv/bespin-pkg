@@ -22,6 +22,11 @@
 
 using namespace Bespin;
 
+static QPalette::ColorRole btnRoles[2][2] = {
+   {QPalette::Window, QPalette::WindowText},
+   {QPalette::Button, QPalette::ButtonText}
+};
+
 const QColor &Colors::bg(const QPalette &pal, const QWidget *w) {
    if (w->parentWidget())
       return pal.color(w->parentWidget()->backgroundRole());
@@ -30,44 +35,47 @@ const QColor &Colors::bg(const QPalette &pal, const QWidget *w) {
    return pal.color(QPalette::Window);
 }
 
-#define TMP_COLOR(_ROLE_) pal.color(QPalette::_ROLE_)
+#undef PAL
+#define PAL pal
 
 QColor Colors::btnBg(const QPalette &pal, bool isEnabled, int hasFocus, int step) {
    if (!isEnabled)
-      return TMP_COLOR(Window).dark(104);
+      return FCOLOR(Window).dark(104);
    QColor c = (hasFocus) ?
-      mid(TMP_COLOR(Highlight),TMP_COLOR(Window),
-               1, contrast(TMP_COLOR(Highlight),TMP_COLOR(Window))) :
-      TMP_COLOR(Window);
+      mid(FCOLOR(Highlight), COLOR(btnRoles[0][0]),
+          1, contrast(FCOLOR(Highlight), COLOR(btnRoles[0][0]))) :
+         COLOR(btnRoles[0][0]);
    if (step)
-      return mid(c, TMP_COLOR(Button), 36 - step, step);
+      return mid(c, COLOR(btnRoles[1][0]), 36 - step, step);
    return c;
 }
 
 QColor Colors::btnFg(const QPalette &pal, bool isEnabled, int hover, int step) {
    if (!isEnabled)
-      return mid(TMP_COLOR(Window), TMP_COLOR(WindowText), 1, 3);
+      return mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
    if (hover && !step) step = 6;
    if (step)
-      return mid(TMP_COLOR(WindowText), TMP_COLOR(ButtonText), 6 - step, step);
-   return TMP_COLOR(WindowText);
+      return mid(COLOR(btnRoles[0][1]), COLOR(btnRoles[1][1]), 6 - step, step);
+   return COLOR(btnRoles[0][1]);
 }
 
-#undef TMP_COLOR
+#undef PAL
+#define PAL option->palette
 
 int Colors::contrast(const QColor &a, const QColor &b) {
    int ar,ag,ab,br,bg,bb;
    a.getRgb(&ar,&ag,&ab);
    b.getRgb(&br,&bg,&bb);
    
-   int diff = qAbs(299*(ar-br) + 587*(ag-bg) + 114*(ab-bb));
+   int diff = 299*(ar-br) + 587*(ag-bg) + 114*(ab-bb);
+   diff = (diff < 0) ? -diff : 90*diff/100;
    int perc = diff / 2550;
    
    diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
       - (qMin(ar,br) + qMin(ag,bg) + qMin(ab,bb));
    
-   perc *= diff;
-   perc /= 765;
+   perc += diff/765;
+   perc /= 2;
    
    return perc;
 }
@@ -177,6 +185,14 @@ QColor Colors::mid(const QColor &oc1, const QColor &c2, int w1, int w2) {
                  (w1*c1.green() + w2*c2.green())/sum,
                  (w1*c1.blue() + w2*c2.blue())/sum,
                  (w1*c1.alpha() + w2*c2.alpha())/sum);
+}
+
+void Colors::setButtonRoles(QPalette::ColorRole bg, QPalette::ColorRole fg,
+                    QPalette::ColorRole bgActive, QPalette::ColorRole fgActive) {
+   btnRoles[0][0] = bg;
+   btnRoles[0][1] = fg;
+   btnRoles[1][0] = bgActive;
+   btnRoles[1][1] = fgActive;
 }
 
 int Colors::value(const QColor &c) {

@@ -93,15 +93,11 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
           qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
          QStyleOptionSpinBox copy = *sb;
          
-         if (widget)
-         if (const QAbstractSpinBox* box = qobject_cast<const QAbstractSpinBox*>(widget))
-         if (box->isReadOnly()) {
-            isEnabled = false;
-            copy.state &= ~State_Enabled;
-         }
+         
+         isEnabled = isEnabled && !(option->state & State_ReadOnly);
          
          if (sb->frame && (sb->subControls & SC_SpinBoxFrame))
-            drawPrimitive ( PE_PanelLineEdit, &copy, painter, widget );
+            drawPrimitive ( PE_PanelLineEdit, sb, painter, widget );
          
          if (!isEnabled)
             break; // why bother the user with elements he can't use... ;)
@@ -122,14 +118,14 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
 //             shadows.button[1].render(copy.rect, painter, pf);
 //             copy.rect.adjust(2,2,-2,0);
 //             gt = (isEnabled && hover) ? (sunken ? Gradients::Sunken : Gradients::Gloss) : Gradients::Button;
-//             fillWithMask(painter, copy.rect, gradient(COLOR(Button), RECT.height(), Qt::Vertical, gt),
+//             fillWithMask(painter, copy.rect, gradient(FCOLOR(Button), RECT.height(), Qt::Vertical, gt),
 //                          &masks.button, pf | Tile::Center);
             
             int dx = copy.rect.width()/4, dy = copy.rect.height()/4;
             copy.rect.adjust(dx, 2*dy,-dx,-dpi.f1);
             
             if (!sunken) {
-               painter->setPen(COLOR(Base).dark(105));
+               painter->setPen(FCOLOR(Base).dark(105));
                copy.rect.translate(dpi.f2, dpi.f2);
                drawPrimitive(PE_IndicatorArrowUp, &copy, painter, widget);
                copy.rect.translate(-dpi.f2, -dpi.f2);
@@ -137,11 +133,11 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             
             QColor c;
             if (hover)
-               c = COLOR(Highlight);
+               c = FCOLOR(Highlight);
             else if (isEnabled)
-               c = Colors::mid(COLOR(Base), COLOR(Text));
+               c = Colors::mid(FCOLOR(Base), FCOLOR(Text));
             else
-               c = Colors::mid(COLOR(Base), PAL.color(QPalette::Disabled, QPalette::Text));
+               c = Colors::mid(FCOLOR(Base), PAL.color(QPalette::Disabled, QPalette::Text));
             
             painter->setPen(c);
             drawPrimitive(PE_IndicatorSpinUp, &copy, painter, widget);
@@ -160,14 +156,14 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
 //             copy.rect.adjust(2,0,-2,-2);
 //             gt = (isEnabled && hover) ? (sunken ? Gradients::Sunken : Gradients::Gloss) : Gradients::Button;
 
-//             fillWithMask(painter, copy.rect, Gradients::pix(COLOR(Button), RECT.height(), Qt::Vertical, gt), &masks.button,
+//             fillWithMask(painter, copy.rect, Gradients::pix(FCOLOR(Button), RECT.height(), Qt::Vertical, gt), &masks.button,
 //                          pf | Tile::Center, false, QPoint(0,-uh));
             
             int dx = copy.rect.width()/4, dy = copy.rect.height()/4;
             copy.rect.adjust(dx, dpi.f1,-dx,-2*dy);
             
             if (!sunken) {
-               painter->setPen(COLOR(Base).dark(105));
+               painter->setPen(FCOLOR(Base).dark(105));
                copy.rect.translate(dpi.f2, dpi.f2);
                drawPrimitive(PE_IndicatorArrowDown, &copy, painter, widget);
                copy.rect.translate(-dpi.f2, -dpi.f2);
@@ -175,11 +171,11 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             
             QColor c;
             if (hover)
-               c = COLOR(Highlight);
+               c = FCOLOR(Highlight);
             else if (isEnabled)
-               c = Colors::mid(COLOR(Base), COLOR(Text));
+               c = Colors::mid(FCOLOR(Base), FCOLOR(Text));
             else
-               c = Colors::mid(COLOR(Base), PAL.color(QPalette::Disabled, QPalette::Text));
+               c = Colors::mid(FCOLOR(Base), PAL.color(QPalette::Disabled, QPalette::Text));
             
             painter->setPen(c);
             drawPrimitive(PE_IndicatorSpinDown, &copy, painter, widget);
@@ -367,7 +363,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          const bool listShown = combo && combo->view() &&
                ((QWidget*)(combo->view()))->isVisible();
          const bool reverse = (option->direction == Qt::RightToLeft);
-         int step = 0; QColor c = COLOR(Window);
+         int step = 0; QColor c = CONF_COLOR(btn.std, 0);
          
          if (listShown) { // this messes up hover
             hover = hover || QRect(widget->mapToGlobal(RECT.topLeft()),
@@ -388,7 +384,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             }
             else {
                if (!isEnabled || ar.isNull()) {
-                  masks.tab.render(r, painter, Gradients::brush(COLOR(Window),
+                  masks.tab.render(r, painter, Gradients::brush(FCOLOR(Window),
                      r.height(), Qt::Vertical, CONF_GRAD(chooser)));
                }
                else {
@@ -396,19 +392,19 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                   step = animator->hoverStep(widget);
                   if (listShown) step = 6;
                   c = Colors::btnBg(PAL, isEnabled, hasFocus, 0);
-                  if (config.fullButtonHover)
-                     c = Colors::mid(c, COLOR(Button), 6-step, step);
+                  if (config.btn.fullHover)
+                     c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
                   masks.tab.render(r, painter, Gradients::brush(c, r.height(),
                         Qt::Vertical, CONF_GRAD(chooser)));
                   if (hasFocus)
-                     masks.tab.outline(r, painter, Colors::mid(COLOR(Window),
-                        COLOR(Highlight), 2, 1), config.strongFocus, Tile::Ring, f3);
+                     masks.tab.outline(r, painter, Colors::mid(CONF_COLOR(btn.std, 0),
+                        FCOLOR(Highlight), 2, 1), config.strongFocus, Tile::Ring, f3);
                   
                   // maybe hover indicator?
-                  if (!config.fullButtonHover && step) { // jupp ;)
+                  if (!config.btn.fullHover && step) { // jupp ;)
                      r.adjust(f3, f3, -f3, -f3);
                      masks.tab.render(r, painter, Gradients::brush(
-                        Colors::mid(c, COLOR(Button), 6-step, step), RECT.height()-f2,
+                        Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step), RECT.height()-f2,
                         Qt::Vertical, CONF_GRAD(chooser)), Tile::Full, false,
                                       QPoint(0,f3));
                   }
@@ -436,24 +432,24 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             if (cmb->editable) {
                hover = hover && (cmb->activeSubControls == SC_ComboBoxArrow);
                if (!sunken) {
-                  painter->setPen(COLOR(Base).dark(105));
+                  painter->setPen(FCOLOR(Base).dark(105));
                   tmpOpt.rect.translate(-f2, f2);
                   drawPrimitive(arrow, &tmpOpt, painter, widget);
                   tmpOpt.rect.translate(f2, -f2);
                }
                if (hover || listShown)
-                  painter->setPen(COLOR(Highlight));
+                  painter->setPen(FCOLOR(Highlight));
                else
-                  painter->setPen( Colors::mid(COLOR(Base), COLOR(Text)) );
+                  painter->setPen( Colors::mid(FCOLOR(Base), FCOLOR(Text)) );
             }
             else {
-               c = Colors::mid(c, COLOR(Button));
-               c = Colors::mid(c, COLOR(Button), 6-step, step);
+               c = Colors::mid(c, CONF_COLOR(btn.active, 0));
+               c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
                ar.adjust(f2, dpi.f4, -f2, -dpi.f4);
                masks.tab.render(ar, painter, Gradients::brush(c, RECT.height()-f2,
                   Qt::Vertical, CONF_GRAD(chooser)), Tile::Full, false,
                                 QPoint(0,dpi.f4));
-               painter->setPen(COLOR(ButtonText));
+               painter->setPen(CONF_COLOR(btn.active, 1));
             }
             drawPrimitive(arrow, &tmpOpt, painter, widget);
             painter->restore();
@@ -510,7 +506,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                drawControl(CE_ScrollBar##_E_, &newScrollbar, painter, widget);\
             }\
          }//
-         if (config.showScrollButtons) {
+         if (config.scroll.showButtons) {
             PAINT_ELEMENT(SubLine);
             PAINT_ELEMENT(AddLine);
          }
@@ -555,14 +551,14 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             painter->save();
 
             QRect r;
-            const QColor c = Colors::mid(COLOR(Window), CONF_COLOR(progress.std, 0), 3,1);
+            const QColor c = Colors::mid(FCOLOR(Window), CONF_COLOR(progress.std, 0), 3,1);
             if ( slider->orientation == Qt::Horizontal ) {
                
                int y = groove.center().y();
-               painter->setPen(COLOR(Window).dark(115));
+               painter->setPen(FCOLOR(Window).dark(115));
                painter->drawLine(groove.x(),y,groove.right(),y);
                ++y;
-               painter->setPen(COLOR(Window).light(108));
+               painter->setPen(FCOLOR(Window).light(108));
                painter->drawLine(groove.x(),y,groove.right(),y);
 
                // the "temperature"
@@ -599,10 +595,10 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             else { // Vertical
 
                int x = groove.center().x();
-               painter->setPen(COLOR(Window).dark(115));
+               painter->setPen(FCOLOR(Window).dark(115));
                painter->drawLine(x, groove.y(), x, groove.bottom());
                ++x;
-               painter->setPen(COLOR(Window).light(108));
+               painter->setPen(FCOLOR(Window).light(108));
                painter->drawLine(x, groove.y(), x, groove.bottom());
 
                // the "temperature"
@@ -685,18 +681,18 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                                 shadows.sliderRound[sunken][isEnabled]);
             // gradient
             xy += QPoint(dpi.f2, dpi.f1/*direction?dpi.f1:0*/);
-            QColor c = Colors::mid(COLOR(Window), COLOR(Button), 6-step, step);
+            QColor c = Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 6-step, step);
             const int sz = dpi.SliderControl-dpi.f4;
             const QBrush fill = Gradients::brush(c, sz, Qt::Vertical,
                   isEnabled ? CONF_GRAD(btn) : Gradients::None);
 //             fillWithMask(painter, xy, fill, masks.radio);
             painter->save();
             painter->setRenderHint(QPainter::Antialiasing);
-            painter->setPen(QPen(COLOR(Window), dpi.f2));
+            painter->setPen(QPen(CONF_COLOR(btn.std, 0), dpi.f2));
             painter->setBrush(fill);
             painter->setBrushOrigin(xy);
             painter->drawEllipse(QRect(xy, QSize(sz,sz)));
-            c = Colors::mid(COLOR(WindowText), COLOR(ButtonText), 6-step, step);
+            c = Colors::mid(CONF_COLOR(btn.std, 1), CONF_COLOR(btn.active, 1), 6-step, step);
             painter->setPen(QPen(c, dpi.f4, Qt::SolidLine, Qt::RoundCap));
             painter->drawPoint(handle.center());
             painter->restore();
@@ -756,11 +752,11 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          if (!(bflags & State_Sunken) &&
              (toolbutton->subControls & SC_ToolButtonMenu)) {
             if (toolbutton->activeSubControls & SC_ToolButtonMenu)
-               painter->drawTiledPixmap(menuarea, Gradients::pix(COLOR(Window),
+               painter->drawTiledPixmap(menuarea, Gradients::pix(FCOLOR(Window),
                                         menuarea.height(), Qt::Vertical,
                                         Gradients::Sunken));
             QPen oldPen = painter->pen();
-            painter->setPen(Colors::mid(COLOR(Window), COLOR(WindowText), 2, 1));
+            painter->setPen(Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 2, 1));
             tool.rect = menuarea; tool.state = mflags;
             drawPrimitive(PE_IndicatorButtonDropDown, &tool, painter, widget);
             painter->setPen(oldPen);
@@ -792,7 +788,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             // button grounds
             QRect gr = RECT;//.adjusted(0,dpi.f2, 0, -dpi.f2);
             gr.setRight(ir.left() - dpi.f4);
-            const QPixmap &groove = Gradients::pix(COLOR(Window), gr.height(),
+            const QPixmap &groove = Gradients::pix(FCOLOR(Window), gr.height(),
                   Qt::Vertical, Gradients::Sunken);
             masks.tab.render(gr, painter, groove, Tile::Full &~ Tile::Left);
             gr.setRight(RECT.right());
@@ -888,11 +884,11 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          
          // the huge ring
          r = d/2; rect.adjust(r,r,-r,-r);
-         painter->setPen(COLOR(Window).dark(115));
+         painter->setPen(FCOLOR(Window).dark(115));
          painter->setRenderHint( QPainter::Antialiasing );
          painter->drawEllipse(rect);
          rect.translate(0, 1);
-         painter->setPen(COLOR(Window).light(108));
+         painter->setPen(FCOLOR(Window).light(108));
          painter->drawEllipse(rect);
          // the value
          QFont fnt = painter->font();
@@ -909,10 +905,10 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          painter->setBrush(QColor(0,0,0,50));
          painter->drawEllipse(rect);
          rect.adjust(dpi.f2,dpi.f1,-dpi.f2,-dpi.f2);
-         painter->setPen(QPen(COLOR(Window), dpi.f2));
+         painter->setPen(QPen(CONF_COLOR(btn.std, 0), dpi.f2));
          painter->setBrushOrigin(rect.topLeft());
-         const QColor c = hover ? COLOR(Button) : hasFocus ?
-                COLOR(Highlight) : COLOR(Window);
+         const QColor c = hover ? CONF_COLOR(btn.active, 0) : hasFocus ?
+                FCOLOR(Highlight) : CONF_COLOR(btn.std, 0);
          const QPixmap &fill =
                 Gradients::pix(c, rect.height(), Qt::Vertical, CONF_GRAD(btn));
          painter->setBrush(fill);

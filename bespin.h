@@ -69,7 +69,7 @@ typedef struct Config {
    } bg;
    
    struct btn {
-      int _3dPos, checkType;
+      int layer, checkType;
       bool cushion, fullHover;
       Gradients::Type gradient;
       QPalette::ColorRole std_role[2], active_role[2];
@@ -78,6 +78,10 @@ typedef struct Config {
    struct chooser {
       Gradients::Type gradient;
    } chooser;
+   
+   struct input {
+      ushort pwEchoChar;
+   } input;
    
    struct menu {
       QPalette::ColorRole std_role[2], active_role[2];
@@ -90,29 +94,21 @@ typedef struct Config {
       QPalette::ColorRole std_role[2];
    } progress;
    
+   double scale;
+   
    struct scroll {
       bool showButtons;
    } scroll;
    
+   bool strongFocus;
+   
    struct tab {
       QPalette::ColorRole std_role[2], active_role[2];
       Gradients::Type gradient;
-      int animSteps, transition;
+      int animSteps;
+      TabAnimInfo::TabTransition transition;
    } tab;
 
-   BGMode bgMode;
-   int structure, sunkenButtons;
-   TabAnimInfo::TabTransition tabTransition;
-   bool
-      showMenuIcons,
-      showScrollButtons,
-      menuShadow,
-      fullButtonHover,
-      strongFocus,
-      cushion;
-   double scale;
-   int checkType;
-   uint tabAnimSteps;
 } Config;
 
 class BespinStyle : public QCommonStyle {

@@ -99,12 +99,12 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             drawPrimitive(PE_PanelButtonTool, option, painter, widget);
          }
          else {
-            if (sunken && config.sunkenButtons == 1)
+            if (sunken && config.btn.layer == 1)
                tmpBtn.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,-dpi.f1);
             drawControl(CE_PushButtonBevel, &tmpBtn, painter, widget);
          }
 //          tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
-         if (config.sunkenButtons == 2)
+         if (config.btn.layer == 2)
             tmpBtn.rect.adjust(dpi.f4,dpi.f3,-dpi.f4,-dpi.f2);
          else
             tmpBtn.rect.adjust(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4);
@@ -125,10 +125,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             painter->setRenderHint(QPainter::Antialiasing);
             const QPixmap &fill =
                   Gradients::pix((option->state & State_On) ?
-                  Colors::mid(COLOR(Highlight), COLOR(Window)) :
-                  COLOR(Window), r.height(), Qt::Vertical, CONF_GRAD(btn));
+                  Colors::mid(FCOLOR(Highlight), CONF_COLOR(btn.std, 0)) :
+                  CONF_COLOR(btn.std, 0), r.height(), Qt::Vertical, CONF_GRAD(btn));
             painter->setBrush(fill);
-            painter->setPen(COLOR(Window).dark(124));
+            painter->setPen(CONF_COLOR(btn.std, 0).dark(124));
             painter->setBrushOrigin(r.topLeft());
             painter->drawEllipse(r);
             painter->restore();
@@ -151,7 +151,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             newBtn.rect.setHeight(sz); newBtn.rect.setWidth(sz);
             painter->save();
             painter->setPen(Qt::NoPen);
-            painter->setBrush(Colors::mid(COLOR(Window),COLOR(WindowText)));
+            painter->setBrush(Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 1)));
             drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
             painter->restore();
          }
@@ -218,7 +218,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          painter->save();
          QColor fg = Colors::btnFg(PAL, isEnabled, hover);
          if (btn->features & QStyleOptionButton::DefaultButton) {
-            painter->setPen(Colors::mid(hover?COLOR(Button):COLOR(Window), fg, 3,1));
+            painter->setPen(Colors::mid(hover ? CONF_COLOR(btn.active, 0) :
+                  CONF_COLOR(btn.std, 0), fg, 3,1));
             ir.translate(0,1);
             drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
 //             ir.translate(2,2);
@@ -297,8 +298,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             painter->setClipRect(r);
          }
          // paint shape and label
-         drawControl(CE_TabBarTabShape, tab, painter, widget);
-         drawControl(CE_TabBarTabLabel, tab, painter, widget);
+         QStyleOptionTab copy = *tab;
+         copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
+         drawControl(CE_TabBarTabShape, &copy, painter, widget);
+         drawControl(CE_TabBarTabLabel, &copy, painter, widget);
          if (needRestore)
             painter->restore();
       }
@@ -334,7 +337,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             break;
 
          const int f2 = dpi.f2;
-         QRect rect = RECT.adjusted(dpi.f3, dpi.f5, -dpi.f4, -dpi.f7);
+         QRect rect = RECT.adjusted(dpi.f3, dpi.f5, -dpi.f4, -dpi.f5);
          int size = RECT.height()-f2;
          Qt::Orientation o = Qt::Vertical;
 
@@ -357,7 +360,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             d = (o == Qt::Vertical) ? -dpi.f1 : f2;
          }
          else {
-            c = Colors::mid(CONF_COLOR(tab.std, 0), COLOR(Window), 2, 1);
+            c = Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1);
             int quota = 6 + (int) (.16 * Colors::contrast(c, CONF_COLOR(tab.active, 0)));
             c = Colors::mid(c, CONF_COLOR(tab.active, 0), quota, step);
          }
@@ -425,13 +428,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          else if (hover) {
             cF = CONF_COLOR(tab.std, 1);
-            cB = Colors::mid(CONF_COLOR(tab.std ,0 ), COLOR(Window), 2, 1);
+            cB = Colors::mid(CONF_COLOR(tab.std ,0 ), FCOLOR(Window), 2, 1);
             cB = Colors::mid(cB, CONF_COLOR(tab.active, 0));
             if (Colors::contrast(CONF_COLOR(tab.active, 1), cB) > Colors::contrast(cF, cB))
                cF = CONF_COLOR(tab.active, 1);
          }
          else {
-            cB = Colors::mid(CONF_COLOR(tab.std, 0), COLOR(Window), 2, 1);
+            cB = Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1);
             cF = Colors::mid(cB, CONF_COLOR(tab.std, 1), 1,4);
          }
 
@@ -513,10 +516,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             nn = int(n*val);
             painter->setBrush(Gradients::pix(CONF_COLOR(progress.std, 0), ss,
                               Qt::Vertical, CONF_GRAD(progress) ));
-            painter->setPen(COLOR(Window).dark(132)); // (110*120) ...
+            painter->setPen(FCOLOR(Window).dark(132)); // (110*120) ...
          }
          else {
-            const QColor c = COLOR(Window).dark(110);
+            const QColor c = FCOLOR(Window).dark(110);
             painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
                               CONF_GRAD(progress) ));
             painter->setPen(c.dark(120));
@@ -551,11 +554,11 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                int q = int((10*n)*val) - 10*nn;
                if (q) {
                   
-                  const QColor c = Colors::mid(COLOR(Window).dark(110),
+                  const QColor c = Colors::mid(FCOLOR(Window).dark(110),
                                           CONF_COLOR(progress.std, 0), 10-q, q);
                   painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
                                     CONF_GRAD(progress) ));
-                  painter->setPen(COLOR(Window).dark(132)); // (110*120) ...
+                  painter->setPen(FCOLOR(Window).dark(132)); // (110*120) ...
                   
                   if (vertical) {
                      painter->setBrushOrigin(0, x);
@@ -588,7 +591,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             }
             painter->setMatrix(m);
          }
-         painter->setPen(COLOR(Window));
+         painter->setPen(FCOLOR(Window));
          int flags = Qt::AlignCenter | Qt::TextSingleLine;
          rect.translate(-1,-1);
          painter->drawText(rect, flags, progress->text);
@@ -599,7 +602,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          rect.translate(0,-2);
          painter->drawText(rect, flags, progress->text);
          rect.translate(-1,1);
-         painter->setPen(COLOR(WindowText));
+         painter->setPen(FCOLOR(WindowText));
          painter->drawText(rect, flags, progress->text);
          painter->restore();
       }
@@ -691,7 +694,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             if (!step) step = 6;
             QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f2);
             const QColor c =
-                  Colors::mid(COLOR(Window), CONF_COLOR(menu.active, 0), 9-step,step);
+                  Colors::mid(FCOLOR(Window), CONF_COLOR(menu.active, 0), 9-step,step);
 
             int dy = 0;
             if (!sunken) {
@@ -769,9 +772,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 
          // Text and icon, ripped from windows style
          const QStyleOptionMenuItem *menuitem = menuItem;
-         int iconCol = config.showMenuIcons*menuitem->maxIconWidth;
+         int iconCol = config.menu.showIcons*menuitem->maxIconWidth;
          
-         if (config.showMenuIcons && !menuItem->icon.isNull()) {
+         if (config.menu.showIcons && !menuItem->icon.isNull()) {
             QRect vCheckRect = visualRect(option->direction, RECT,
                                        QRect(RECT.x(), RECT.y(), iconCol, RECT.height()));
             QIcon::Mode mode = isEnabled ? (selected ? QIcon::Active :
@@ -904,10 +907,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
    }
    case CE_Q3DockWindowEmptyArea: // The empty area of a QDockWidget
       break;
-   case CE_ToolBoxTabShape:
+   case CE_ToolBoxTabShape: {
       if (!isEnabled) break;
-      if (const QStyleOptionToolBoxV2* tbt =
-         qstyleoption_cast<const QStyleOptionToolBoxV2*>(option)) {
+//       if (const QStyleOptionToolBoxV2* tbt =
+//          qstyleoption_cast<const QStyleOptionToolBoxV2*>(option)) {
          
 //          Tile::PosFlags pf = Tile::Full;
 //          switch (tbt->position) {
@@ -920,7 +923,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 //          default:
 //                break;
 //          }
-         QColor c = Colors::mid(CONF_COLOR(tab.std, 0), COLOR(Window), 2, 1);
+         QColor c = Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1);
          QRect r = RECT.adjusted(0, 0, 0, -dpi.f2);
          const QPixmap & ground =
                Gradients::pix(c, r.height(), Qt::Vertical, CONF_GRAD(tab));
@@ -941,16 +944,17 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             masks.tab.render(r, painter, fill);
          }
          shadows.tabSunken.render(RECT, painter);
-      }
+//       }
       break;
+   }
    case CE_ToolBoxTabLabel:
       if (const QStyleOptionToolBox* tbt =
           qstyleoption_cast<const QStyleOptionToolBox*>(option)) {
          
-         bool active = option->state & (State_Selected);
+         sunken = sunken || option->state & (State_Selected);
          
          QColor cB, cF;
-         if (active) {
+         if (sunken) {
             cB = CONF_COLOR(tab.active, 0);
             cF = CONF_COLOR(tab.active, 1);
          }
@@ -959,7 +963,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             cF = CONF_COLOR(tab.std, 1);
          }
          
-         if (active || sunken) hover = false;
+         if (sunken) hover = false;
                
          if (hover) {
             cB = Colors::mid(cB, CONF_COLOR(tab.active, 0));
@@ -993,14 +997,18 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       }
       break;
 
-   case CE_ToolBoxTab: { // The toolbox's tab area
-      if (widget && widget->parentWidget()) // color fix...
-         const_cast<QStyleOption*>(option)->palette =
-               widget->parentWidget()->palette();
-      drawControl(CE_ToolBoxTabShape, option, painter, widget);
-      drawControl(CE_ToolBoxTabLabel, option, painter, widget);
+   case CE_ToolBoxTab: // The toolbox's tab area
+      if (const QStyleOptionToolBox* tbt =
+          qstyleoption_cast<const QStyleOptionToolBox*>(option)) {
+         if (widget && widget->parentWidget()) // color fix...
+            const_cast<QStyleOption*>(option)->palette =
+                  widget->parentWidget()->palette();
+         QStyleOptionToolBox copy = *tbt;
+         copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
+         drawControl(CE_ToolBoxTabShape, &copy, painter, widget);
+         drawControl(CE_ToolBoxTabLabel, &copy, painter, widget);
+      }
       break;
-   }
    case CE_SizeGrip: {
       Qt::Corner corner;
       if (const QStyleOptionSizeGrip *sgOpt =
@@ -1023,8 +1031,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          angle = 0;
          rect.moveRight(RECT.right());
       case Qt::BottomRightCorner:
-         painter->setBrush(COLOR(Window).dark(120));
-         painter->setPen(COLOR(Window).dark(140));
+         painter->setBrush(FCOLOR(Window).dark(120));
+         painter->setPen(FCOLOR(Window).dark(140));
          break;
       case Qt::TopLeftCorner:
          angle += 90<<4;
@@ -1032,8 +1040,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       case Qt::TopRightCorner:
          angle += 90<<4;
          rect.moveBottom(RECT.bottom());
-         painter->setBrush(COLOR(Window).dark(110));
-         painter->setPen(COLOR(Window).dark(116));
+         painter->setBrush(FCOLOR(Window).dark(110));
+         painter->setPen(FCOLOR(Window).dark(116));
          painter->drawPie(RECT, -(90<<4), 90<<4);
          break;
       }
@@ -1068,7 +1076,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          subopt.rect = subElementRect(SE_HeaderArrow, option, widget);
          painter->save();
          painter->setPen(Qt::NoPen);
-         painter->setBrush(COLOR(Base));
+         painter->setBrush(FCOLOR(Base));
          drawPrimitive(PE_IndicatorHeaderArrow, &subopt, painter, widget);
          painter->restore();
       }
@@ -1079,20 +1087,20 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       const QStyleOptionHeader *header =
             qstyleoption_cast<const QStyleOptionHeader *>(option);
       const QPixmap &sunk =
-            Gradients::pix(COLOR(Text), RECT.height(), Qt::Vertical, Gradients::Sunken);
+            Gradients::pix(FCOLOR(Text), RECT.height(), Qt::Vertical, Gradients::Sunken);
       if (hover) sunken = false;
       if (sunken)
          painter->drawTiledPixmap(RECT, sunk);
       else if (header && header->orientation == Qt::Vertical) {
          painter->save();
-         painter->setPen(COLOR(Text));
-         painter->setBrush(Colors::mid(COLOR(Text), COLOR(Base), hover ? 7 : 10, 1));
+         painter->setPen(FCOLOR(Text));
+         painter->setBrush(Colors::mid(FCOLOR(Text), FCOLOR(Base), hover ? 7 : 10, 1));
          painter->drawRect(RECT.adjusted(0,0,-1,0));
          painter->restore();
       }
       else {
          const QPixmap &norm =
-               Gradients::pix(COLOR(Text), RECT.height(), Qt::Vertical,
+               Gradients::pix(FCOLOR(Text), RECT.height(), Qt::Vertical,
                               hover ? Gradients::Glass : Gradients::Button);
          QRect r = RECT; r.setWidth(RECT.width() - dpi.f1);
          painter->drawTiledPixmap(r, norm);
@@ -1128,7 +1136,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       QFont tmpFnt = painter->font(); tmpFnt.setBold(sunken);
       painter->setFont(tmpFnt);
 
-      QColor bg = COLOR(Text), fg = COLOR(Base);
+      QColor bg = FCOLOR(Text), fg = FCOLOR(Base);
       if (qGray(bg.rgb()) < 148) { // dark background, let's paint an emboss
          rect.moveTop(rect.top()-1);
          painter->setPen(bg.dark(120));
@@ -1141,11 +1149,11 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       break;
    }
    case CE_ScrollBarAddLine: // ======= scroll down
-      if (!config.showScrollButtons)
+      if (!config.scroll.showButtons)
          break;
       if (option->state & State_Item) { // combobox scroller
          painter->save();
-         painter->setPen(hover?COLOR(Text):Colors::mid(COLOR(Base),COLOR(Text)));
+         painter->setPen(hover?FCOLOR(Text):Colors::mid(FCOLOR(Base),FCOLOR(Text)));
          QStyleOption opt = *option;
          opt.rect = RECT.adjusted(RECT.width()/4, RECT.height()/4,
                                   -RECT.width()/4, -RECT.height()/4);
@@ -1157,11 +1165,11 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          break;
       }
    case CE_ScrollBarSubLine: // ======= scroll up
-      if (!config.showScrollButtons)
+      if (!config.scroll.showButtons)
          break;
       if (option->state & State_Item) { // combobox scroller
          painter->save();
-         painter->setPen(hover?COLOR(Text):Colors::mid(COLOR(Base),COLOR(Text)));
+         painter->setPen(hover?FCOLOR(Text):Colors::mid(FCOLOR(Base),FCOLOR(Text)));
          QStyleOption opt = *option;
          opt.rect = RECT.adjusted(RECT.width()/4, RECT.height()/4,
                                   -RECT.width()/4, -RECT.height()/4);
@@ -1182,15 +1190,15 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          QPoint xy = RECT.topLeft();
          const int sz = dpi.ExclusiveIndicator - dpi.f4;
          const int step = (hover && !complexStep) ? 6 : complexStep;
-         const QColor c = (!alive) ? COLOR(Window) :
-               Colors::mid(COLOR(Window), COLOR(Button), 18, step);
+         const QColor c = (!alive) ? FCOLOR(Window) :
+               Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 18, step);
          const QPixmap &fill =
                Gradients::pix(c, sz, Qt::Vertical, (sunken || !alive) ?
                Gradients::Sunken : Gradients::Button);
          fillWithMask(painter, xy, fill, masks.radio);
          if (alive) {
             painter->save();
-            painter->setPen(COLOR(Window).dark(120));
+            painter->setPen(CONF_COLOR(btn.std, 0).dark(120));
             painter->setBrush(Qt::NoBrush);
             painter->drawEllipse(QRect(xy, QSize(sz, sz)));
             painter->restore();
@@ -1204,17 +1212,17 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       
       // the groove TODO: might be Colors::mid(bg, fg) is better?!
       SAVE_PEN;
-      painter->setPen(COLOR(Window).dark(115));
+      painter->setPen(FCOLOR(Window).dark(115));
       if (option->state & QStyle::State_Horizontal) {
          int y = RECT.center().y()-dpi.f1;
          painter->drawLine(RECT.x(), y, RECT.right(), y);
-         ++y; painter->setPen(COLOR(Window).light(108));
+         ++y; painter->setPen(FCOLOR(Window).light(108));
          painter->drawLine(RECT.x(), y, RECT.right(), y);
       }
       else {
          int x = RECT.center().x();
          painter->drawLine(x, RECT.y(), x, RECT.bottom());
-         ++x; painter->setPen(COLOR(Window).light(108));
+         ++x; painter->setPen(FCOLOR(Window).light(108));
          painter->drawLine(x, RECT.y(), x, RECT.bottom());
       }
       RESTORE_PEN;
@@ -1223,8 +1231,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
    case CE_ScrollBarSlider: // Scroll bar slider.
       if (option->state & State_Item) {
          painter->fillRect(RECT.adjusted(dpi.f2, 0, -dpi.f2, 0),
-                           (hover || sunken) ? COLOR(Text) :
-                                 Colors::mid(COLOR(Base), COLOR(Text), 8, 1));
+                           (hover || sunken) ? FCOLOR(Text) :
+                                 Colors::mid(FCOLOR(Base), FCOLOR(Text), 8, 1));
          break;
       }
       if (/*const QStyleOptionSlider *opt =*/
@@ -1261,27 +1269,27 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          // the hover indicator color (inside area)
          QColor c;
          if (sunken)
-            c = COLOR(Button);
+            c = CONF_COLOR(btn.active, 0);
          else if (complexStep) {
-            c = Colors::mid(COLOR(Window), COLOR(Button), 2, 1);
-            c = Colors::mid(c, COLOR(Button), 6-complexStep, complexStep);
+            c = Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 2, 1);
+            c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-complexStep, complexStep);
          }
          else if (hover)
-            c = COLOR(Button);
+            c = CONF_COLOR(btn.active, 0);
          else if (widgetStep)
-            c = Colors::mid(COLOR(Window), COLOR(Button), 18-widgetStep, widgetStep);
+            c = Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 18-widgetStep, widgetStep);
          else if (scrollAreaHovered_)
-            c = Colors::mid(COLOR(Window), COLOR(Button), 2, 1);
+            c = Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 2, 1);
          else
-            c = COLOR(Window);
+            c = CONF_COLOR(btn.std, 0);
          
          // the allways shown base
-         const QBrush base = Gradients::brush(config.fullButtonHover ? c :
-               COLOR(Window), size, o, CONF_GRAD(btn));
+         const QBrush base = Gradients::brush(config.btn.fullHover ? c :
+               CONF_COLOR(btn.std, 0), size, o, CONF_GRAD(btn));
          masks.tab.render(r, painter, base);
-         masks.tab.outline(r, painter, Colors::mid(COLOR(Window), Qt::white,1,2), true);
+         masks.tab.outline(r, painter, Colors::mid(CONF_COLOR(btn.std, 0), Qt::white,1,2), true);
          
-         if (config.fullButtonHover)
+         if (config.btn.fullHover)
             break; // really - nothing to do anymore!
          
          const QBrush deco =
@@ -1294,7 +1302,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 //    case CE_ScrollBarLast: // Scroll bar last line indicator (i.e., end).
    case CE_RubberBand: {// Rubber band used in such things as iconview.
       painter->save();
-      QColor c = COLOR(Highlight);
+      QColor c = FCOLOR(Highlight);
       painter->setPen(c);
       c.setAlpha(100);
       painter->setBrush(c);
@@ -1336,7 +1344,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                      ((QWidget*)(combo->view()))->isVisible());
                int f3 = dpi.f3;
                editRect.adjust(f3,0, -f3, 0);
-               painter->setPen(hover ? COLOR(ButtonText) : COLOR(WindowText));
+               painter->setPen(hover ? CONF_COLOR(btn.active, 1) : CONF_COLOR(btn.std, 1));
             }
             painter->drawText(editRect, Qt::AlignCenter, cb->currentText);
          }

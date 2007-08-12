@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>611</width>
-    <height>605</height>
+    <width>585</width>
+    <height>427</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -23,24 +23,24 @@
        <string>Buttons</string>
       </attribute>
       <layout class="QGridLayout" >
-       <item row="0" column="0" >
+       <item row="0" column="0" colspan="2" >
         <widget class="QLabel" name="label_11" >
          <property name="text" >
           <string>Gradient</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
+       <item row="0" column="2" >
         <widget class="QComboBox" name="gradButton" />
        </item>
-       <item row="1" column="0" >
+       <item row="1" column="0" colspan="2" >
         <widget class="QLabel" name="label_14" >
          <property name="text" >
-          <string>3D Position</string>
+          <string>Layer</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
+       <item row="1" column="2" >
         <widget class="QComboBox" name="sunkenButtons" >
          <item>
           <property name="text" >
@@ -59,28 +59,60 @@
          </item>
         </widget>
        </item>
-       <item row="2" column="0" >
+       <item row="2" column="0" colspan="3" >
+        <widget class="QGroupBox" name="btnRoles" >
+         <property name="title" >
+          <string>Color Roles</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QComboBox" name="btnRole" />
+          </item>
+          <item row="0" column="1" >
+           <widget class="QLabel" name="label_16" >
+            <property name="text" >
+             <string>---></string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QComboBox" name="btnActiveRole" />
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0" >
         <widget class="QCheckBox" name="cushion" >
          <property name="text" >
           <string>Cushion</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2" >
+       <item row="4" column="0" colspan="3" >
         <widget class="QCheckBox" name="fullButtonHover" >
          <property name="text" >
           <string>Hover fill to border</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" >
+       <item row="5" column="0" colspan="3" >
+        <widget class="Line" name="line" >
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" >
         <widget class="QLabel" name="label_8" >
          <property name="text" >
           <string>Checkbox Appereance</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
+       <item row="6" column="1" colspan="2" >
         <widget class="QComboBox" name="checkMark" >
          <item>
           <property name="text" >
@@ -99,14 +131,14 @@
          </item>
         </widget>
        </item>
-       <item row="5" column="0" colspan="2" >
+       <item row="7" column="0" colspan="3" >
         <widget class="QCheckBox" name="showScrollButtons" >
          <property name="text" >
           <string>Show Scrollbar Buttons</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0" >
+       <item row="8" column="0" colspan="2" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -114,7 +146,7 @@
          <property name="sizeHint" >
           <size>
            <width>215</width>
-           <height>211</height>
+           <height>101</height>
           </size>
          </property>
         </spacer>
@@ -356,51 +388,101 @@
       <attribute name="title" >
        <string>Misc</string>
       </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_3" >
-         <property name="text" >
-          <string>Progress color role</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="crProgressBar" />
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_13" >
-         <property name="text" >
-          <string>Progress Gradient</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="gradProgress" />
-       </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_12" >
-         <property name="text" >
-          <string>Combo Gradient</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" >
-        <widget class="QComboBox" name="gradChoose" />
-       </item>
-       <item row="3" column="0" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>151</width>
-           <height>81</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
+      <widget class="QLabel" name="label_3" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>9</y>
+         <width>215</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text" >
+        <string>Progress color role</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="crProgressBar" >
+       <property name="geometry" >
+        <rect>
+         <x>230</x>
+         <y>9</y>
+         <width>215</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_13" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>40</y>
+         <width>215</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text" >
+        <string>Progress Gradient</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="gradProgress" >
+       <property name="geometry" >
+        <rect>
+         <x>230</x>
+         <y>40</y>
+         <width>215</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_12" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>71</y>
+         <width>215</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text" >
+        <string>Combo Gradient</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="gradChoose" >
+       <property name="geometry" >
+        <rect>
+         <x>230</x>
+         <y>71</y>
+         <width>215</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_17" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>102</y>
+         <width>215</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text" >
+        <string>Password Echo Chararcter</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="pwEchoChar" >
+       <property name="geometry" >
+        <rect>
+         <x>230</x>
+         <y>102</y>
+         <width>215</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="editable" >
+        <bool>true</bool>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="Seite_3" >
       <attribute name="title" >
@@ -640,6 +722,11 @@
      <item>
       <property name="text" >
        <string>"Blue"print</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Pinstripes</string>
       </property>
      </item>
     </widget>

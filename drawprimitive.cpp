@@ -211,7 +211,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       const QColor &c = PAL.color(widget->backgroundRole());
 
-      switch (config.bgMode) {
+      switch (config.bg.mode) {
 #ifndef QT_NO_XRENDER
       case ComplexLights:
          if (drawTiledBackground(RECT, painter, c, widget))
@@ -278,32 +278,29 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       QRect r = RECT;
       int step = sunken ? 6 : animator->hoverStep(widget);
       QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, step);
-      if (config.fullButtonHover && (hover || step))
-         c = Colors::mid(c, COLOR(Button), 6-step, step);
+      if (config.btn.fullHover && (hover || step))
+         c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
       
-      Gradients::Type gt = Gradients::None;
-      if (isEnabled) {
-         if (sunken && config.cushion)
-            gt = Gradients::Sunken;
-         else
-            gt = CONF_GRAD(btn);
-      }
+      Gradients::Type gt = !isEnabled ? Gradients::None : CONF_GRAD(btn);
+      
       // sunken variant
-      if (config.sunkenButtons) {
+      if (config.btn.layer) {
+         if (sunken && config.btn.layer == 2)
+            gt = Gradients::Sunken;
          r.setBottom(r.bottom()-f2);
          masks.button.render(r, painter, Gradients::brush(c, r.height(), Qt::Vertical, gt));
-         if (!config.fullButtonHover && (hover || step)) {
+         if (!config.btn.fullHover && (hover || step)) {
             const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
-            c = Colors::mid(c, COLOR(Button), 6-step, step);
+            c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
             masks.button.render(ir, painter, Gradients::brush(c, r.height(),
                                 Qt::Vertical, gt), Tile::Full, false, QPoint(0,f2));
          }
          if (hasFocus) {
             r.setBottom(r.bottom()+dpi.f1);
-            masks.button.outline(r, painter, Colors::mid(c, COLOR(Highlight)),
+            masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)),
                                  config.strongFocus);
          }
-         if (sunken || config.sunkenButtons == 2)
+         if (sunken || config.btn.layer == 2)
             shadows.lineEdit[isEnabled].render(RECT, painter);
          else
             masks.button.outline(r, painter, QColor(0,0,0,30), false, Tile::Ring, dpi.f2);
@@ -312,7 +309,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       // normal buttons
       // shadow
-      if (sunken && !config.cushion) {
+      if (sunken && !config.btn.cushion) {
          r.adjust(f1, f1, -f1, -f2);
          shadows.button[true][isEnabled].render(r, painter);
          r.adjust(f1, f1, -f1, -f1);
@@ -321,7 +318,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          shadows.button[false][isEnabled].render(r, painter);
          r.adjust(f2, f2, -f2, -dpi.f3);
          if (hasFocus)
-            lights.button.render(RECT, painter, COLOR(Highlight));
+            lights.button.render(RECT, painter, FCOLOR(Highlight));
       }
       
       // backlight & plate
@@ -332,11 +329,17 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       masks.button.outline(r, painter, Colors::mid(c, Qt::white),
                            gt == Gradients::Glass || gt == Gradients::Gloss);
       
-      if (!config.fullButtonHover && (hover || step)) {
-         c = Colors::mid(c, COLOR(Button), 6-step, step);
+      bool drawInner = !config.btn.fullHover && (hover || step);
+      if (config.btn.cushion &&
+          (sunken || (!hover && option->state & State_On))) {
+         gt = Gradients::Sunken;
+         drawInner = true;
+      }
+      if (drawInner) {
+         c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
          const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
          masks.button.render(ir, painter,
-                             Gradients::brush(c, ir.height(), Qt::Vertical, gt),
+                             Gradients::brush(c, r.height(), Qt::Vertical, gt),
                              Tile::Full, false, QPoint(0,f2));
       }
       
@@ -376,25 +379,26 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (qstyleoption_cast<const QStyleOptionFrame *>(option) &&
           static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1) {
          if (!widget || widget->autoFillBackground())
-            painter->fillRect(RECT, COLOR(Base));
+            painter->fillRect(RECT, FCOLOR(Base));
          break;
       }
+      isEnabled = isEnabled && !(option->state & State_ReadOnly);
       QRect r = RECT;
       if (isEnabled) {
          if (hasFocus) {
             r.adjust(0,0,0,-dpi.f2);
-            masks.button.render(r, painter, COLOR(Base).light(112));
+            masks.button.render(r, painter, FCOLOR(Base).light(112));
             r.setBottom(r.bottom()+dpi.f1);
-            QColor h = Colors::mid(COLOR(Base), COLOR(Highlight), 3, 2);
+            QColor h = Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
             masks.button.outline(r, painter, h, config.strongFocus, Tile::Ring, dpi.f3);
          }
          else {
             r.setBottom(r.y()+r.height()/2);
             const QPixmap &fill =
-               Gradients::pix(COLOR(Base), r.height(), Qt::Vertical, Gradients::Sunken);
+               Gradients::pix(FCOLOR(Base), r.height(), Qt::Vertical, Gradients::Sunken);
             masks.button.render(r, painter, fill, Tile::Full & ~Tile::Bottom);
             r.setTop(r.bottom()+1); r.setBottom(RECT.bottom()-dpi.f2);
-            masks.button.render(r, painter, COLOR(Base).light(112),
+            masks.button.render(r, painter, FCOLOR(Base).light(112),
                                 Tile::Full & ~Tile::Top);
          }
       }
@@ -404,7 +408,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
    case PE_FrameFocusRect: { // Generic focus indicator.
       painter->save();
       painter->setBrush(Qt::NoBrush);
-      painter->setPen(COLOR(Highlight));
+      painter->setPen(FCOLOR(Highlight));
       painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
       painter->restore();
       break;
@@ -494,19 +498,19 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       break;
    }
    case PE_IndicatorCheckBox: { // On/off indicator, for example, a QCheckBox.
-      bool _fullHover = config.fullButtonHover;
+      bool _fullHover = config.btn.fullHover;
       if (!(option->state & State_Off))
-         config.fullButtonHover = true;
+         config.btn.fullHover = true;
       drawPrimitive(PE_PanelButtonBevel, option, painter, widget);
-      config.fullButtonHover = _fullHover;
+      config.btn.fullHover = _fullHover;
       
       if (!(sunken || (option->state & State_Off))) {
          painter->save();
          painter->setRenderHint(QPainter::Antialiasing);
-         const int d = config.sunkenButtons == 2 ? dpi.f3 : dpi.f6;
+         const int d = config.btn.layer == 2 ? dpi.f3 : dpi.f6;
          QRect r = RECT.adjusted(d, d, -d, -d);
          const QColor fill = Colors::btnFg(PAL, isEnabled, hover);
-         switch (config.checkType) {
+         switch (config.btn.checkType) {
          case 0: {
             QPen pen(fill, r.width()/5, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
             painter->setPen(pen);
@@ -569,12 +573,12 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, step);
       
-      if (config.sunkenButtons) {
+      if (config.btn.layer) {
          QRect r = RECT.adjusted(dpi.f1,0,-dpi.f1,-dpi.f2);
          masks.tab.render(r, painter,
                           Gradients::brush( c, r.height(), Qt::Vertical,
                                             sunken || isOn ? Gradients::Sunken : gt));
-         if (config.sunkenButtons == 2) {
+         if (config.btn.layer == 2) {
             r.setBottom(RECT.bottom());
             shadows.tabSunken.render(r, painter);
             xy += QPoint(f1, 0);
@@ -588,7 +592,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          
          if (!sunken && hasFocus) {
             painter->save();
-            painter->setBrush(Colors::mid(COLOR(Window), COLOR(Highlight),
+            painter->setBrush(Colors::mid(FCOLOR(Window), FCOLOR(Highlight),
                                        24-step, step));
             painter->setPen(Qt::NoPen);
             painter->setRenderHint(QPainter::Antialiasing);
@@ -620,7 +624,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       // drop
       if (isOn) step = 18;
       if (step) {
-         c = Colors::mid(c, COLOR(WindowText), 18-step, step);
+         c = Colors::mid(c, CONF_COLOR(btn.std, 1), 18-step, step);
          xy += QPoint(dpi.f4, dpi.f4);
          fillWithMask(painter, xy, c, masks.radioIndicator);
       }
@@ -634,7 +638,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          // handle the
          if (widget->inherits("QComboBoxPrivateContainer")) {
             SAVE_PEN;
-            painter->setPen(COLOR(Base));
+            painter->setPen(FCOLOR(Base));
             painter->drawRect(RECT.adjusted(0,0,-1,-1));
             RESTORE_PEN;
             break;
@@ -684,9 +688,9 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             if (hasFocus) {
                QColor h;
                if (fastFocus)
-                  h = Colors::mid(COLOR(Base), COLOR(Highlight), 3, 2);
+                  h = Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
                else {
-                  h = COLOR(Highlight); h.setAlpha(80);
+                  h = FCOLOR(Highlight); h.setAlpha(80);
                }
                rect = RECT.adjusted(0,0,0,-dpi.f1);
                mask->outline(rect, painter, h, config.strongFocus, Tile::Ring, dpi.f3);
@@ -737,7 +741,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       painter->drawLine(RECT.right(), RECT.top(), RECT.right(), RECT.bottom());
       RESTORE_PEN;
 #endif
-      if (config.menuShadow) {
+      if (config.menu.shadow) {
          QRect rect = RECT.adjusted(0,0, // don't ask...
                                     shadows.line[true][Sunken].thickness()+1,
                                     shadows.line[false][Sunken].thickness()+1);
@@ -798,9 +802,9 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
 
          // the "frame"
          painter->save();
-         painter->setPen(COLOR(Window).dark(120));
+         painter->setPen(FCOLOR(Window).dark(120));
          painter->drawLine(line[0]);
-         painter->setPen(COLOR(Window).light(114));
+         painter->setPen(FCOLOR(Window).light(114));
          painter->drawLine(line[1]);
          painter->restore();
 
@@ -812,7 +816,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       QRect r = RECT.adjusted(0,0,0,-dpi.f2);
       shadows.lineEdit[isEnabled].render(r, painter);
       if (hasFocus) {
-         QColor h = COLOR(Highlight); h.setAlpha(80);
+         QColor h = FCOLOR(Highlight); h.setAlpha(80);
 //          r.setBottom(r.bottom()+dpi.f1);
          masks.button.outline(r, painter, h, config.strongFocus, Tile::Ring, dpi.f3);
       }
@@ -825,7 +829,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
                    Tile::Full&~Tile::Bottom);
       rect.setBottom(RECT.bottom()-dpi.f32);
       shadows.group.render(RECT, painter, Tile::Ring);
-      masks.button.outline(rect, painter, COLOR(Window).light(120), true,
+      masks.button.outline(rect, painter, FCOLOR(Window).light(120), true,
                            Tile::Full&~Tile::Bottom);
       break;
    }
@@ -866,10 +870,10 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             fg = selected ? PAL.color(widget->backgroundRole()) :
             PAL.color(widget->foregroundRole());
          else
-            fg = selected ? COLOR(Window) : COLOR(WindowText);
+            fg = selected ? FCOLOR(Window) : FCOLOR(WindowText);
       }
       else
-         fg = COLOR(Text);
+         fg = FCOLOR(Text);
       
       painter->setPen(fg);
       painter->drawRect(rect.adjusted(0, off, -off, 0));
@@ -877,7 +881,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (!(option->state & State_Off)) {
          painter->setRenderHint(QPainter::Antialiasing);
          if (pe != PE_IndicatorMenuCheckMark) {
-            fg = Colors::mid(COLOR(Highlight), COLOR(HighlightedText));
+            fg = Colors::mid(FCOLOR(Highlight), FCOLOR(HighlightedText));
             painter->setPen(fg);
          }
          painter->setBrush(fg);
@@ -982,13 +986,13 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       }
       if (num%2)
       {
-         fill = &Gradients::pix(Colors::mid(COLOR(Window), PAL.color(role), 3, imp), f6, Qt::Vertical, Gradients::Sunken);
+         fill = &Gradients::pix(Colors::mid(FCOLOR(Window), PAL.color(role), 3, imp), f6, Qt::Vertical, Gradients::Sunken);
          fillWithMask(painter, points[cnt], *fill, masks.notch);
       }
       --num;
       for (int i = 0; i < cnt; ++i)
       {
-         fill = &Gradients::pix(Colors::mid(COLOR(Window), PAL.color(role), 3+cnt-i, imp), f6, Qt::Vertical, Gradients::Sunken);
+         fill = &Gradients::pix(Colors::mid(FCOLOR(Window), PAL.color(role), 3+cnt-i, imp), f6, Qt::Vertical, Gradients::Sunken);
          fillWithMask(painter, points[i], *fill, masks.notch);
          fillWithMask(painter, points[num-i], *fill, masks.notch);
       }
@@ -1017,7 +1021,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             rect.setTop(rect.top()+(rect.height()-rect.width())/2);
             rect.setHeight(rect.width());
          }
-         QColor c = hover ? COLOR(Highlight) : COLOR(Window).dark(110);
+         QColor c = hover ? FCOLOR(Highlight) : FCOLOR(Window).dark(110);
          painter->setRenderHint(QPainter::Antialiasing);
          painter->setBrush(Gradients::pix(c, rect.height(), Qt::Vertical, Gradients::Sunken));
          painter->setPen(Qt::NoPen);
@@ -1065,7 +1069,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          }
          
          masks.tab.render(rect, painter, Gradients::brush(
-                          Colors::mid(CONF_COLOR(tab.std, 0), COLOR(Window), 2, 1),
+                          Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1),
          size, o, CONF_GRAD(tab)));
          rect.setBottom(rect.bottom()+dpi.f2);
          shadows.tabSunken.render(rect, painter);
