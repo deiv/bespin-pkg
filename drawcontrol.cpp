@@ -126,7 +126,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             const QPixmap &fill =
                   Gradients::pix((option->state & State_On) ?
                   Colors::mid(COLOR(Highlight), COLOR(Window)) :
-                  COLOR(Window), r.height(), Qt::Vertical, config.gradButton);
+                  COLOR(Window), r.height(), Qt::Vertical, CONF_GRAD(btn));
             painter->setBrush(fill);
             painter->setPen(COLOR(Window).dark(124));
             painter->setBrushOrigin(r.topLeft());
@@ -353,17 +353,17 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          int d = 0;
          if (sunken) {
             rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
-            c = CONF_COLOR(tab[1][0]);
+            c = CONF_COLOR(tab.active, 0);
             d = (o == Qt::Vertical) ? -dpi.f1 : f2;
          }
          else {
-            c = Colors::mid(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
-            int quota = 6 + (int) (.16 * Colors::contrast(c, CONF_COLOR(tab[1][0])));
-            c = Colors::mid(c, CONF_COLOR(tab[1][0]), quota, step);
+            c = Colors::mid(CONF_COLOR(tab.std, 0), COLOR(Window), 2, 1);
+            int quota = 6 + (int) (.16 * Colors::contrast(c, CONF_COLOR(tab.active, 0)));
+            c = Colors::mid(c, CONF_COLOR(tab.active, 0), quota, step);
          }
          const QPoint off(d, d+dpi.f4);
          masks.tab.render(rect, painter, Gradients::brush(c, size, o,
-                           config.gradTab), Tile::Full, false, off);
+                           CONF_GRAD(tab)), Tile::Full, false, off);
 
       }
       break;
@@ -420,19 +420,19 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          // color adjustment
          QColor cF, cB;
          if (selected || sunken) {
-            cF = CONF_COLOR(tab[1][1]);
-            cB = CONF_COLOR(tab[1][0]);
+            cF = CONF_COLOR(tab.active, 1);
+            cB = CONF_COLOR(tab.active, 0);
          }
          else if (hover) {
-            cF = CONF_COLOR(tab[0][1]);
-            cB = Colors::mid(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
-            cB = Colors::mid(cB, CONF_COLOR(tab[1][0]));
-            if (Colors::contrast(CONF_COLOR(tab[1][1]), cB) > Colors::contrast(cF, cB))
-               cF = CONF_COLOR(tab[1][1]);
+            cF = CONF_COLOR(tab.std, 1);
+            cB = Colors::mid(CONF_COLOR(tab.std ,0 ), COLOR(Window), 2, 1);
+            cB = Colors::mid(cB, CONF_COLOR(tab.active, 0));
+            if (Colors::contrast(CONF_COLOR(tab.active, 1), cB) > Colors::contrast(cF, cB))
+               cF = CONF_COLOR(tab.active, 1);
          }
          else {
-            cB = Colors::mid(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
-            cF = Colors::mid(cB, CONF_COLOR(tab[0][1]), 1,4);
+            cB = Colors::mid(CONF_COLOR(tab.std, 0), COLOR(Window), 2, 1);
+            cF = Colors::mid(cB, CONF_COLOR(tab.std, 1), 1,4);
          }
 
          // dark background, let's paint an emboss
@@ -511,14 +511,14 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          if (element == CE_ProgressBarContents) {
             if (val < 0) nn = 0;
             nn = int(n*val);
-            painter->setBrush(Gradients::pix(CONF_COLOR(progress[0]), ss,
-                              Qt::Vertical, config.gradProgress ));
+            painter->setBrush(Gradients::pix(CONF_COLOR(progress.std, 0), ss,
+                              Qt::Vertical, CONF_GRAD(progress) ));
             painter->setPen(COLOR(Window).dark(132)); // (110*120) ...
          }
          else {
             const QColor c = COLOR(Window).dark(110);
             painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
-                              config.gradProgress ));
+                              CONF_GRAD(progress) ));
             painter->setPen(c.dark(120));
          }
          
@@ -552,9 +552,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                if (q) {
                   
                   const QColor c = Colors::mid(COLOR(Window).dark(110),
-                                          CONF_COLOR(progress[0]), 10-q, q);
+                                          CONF_COLOR(progress.std, 0), 10-q, q);
                   painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
-                                    config.gradProgress ));
+                                    CONF_GRAD(progress) ));
                   painter->setPen(COLOR(Window).dark(132)); // (110*120) ...
                   
                   if (vertical) {
@@ -691,7 +691,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             if (!step) step = 6;
             QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f2);
             const QColor c =
-                  Colors::mid(COLOR(Window), CONF_COLOR(menuActive[0]), 9-step,step);
+                  Colors::mid(COLOR(Window), CONF_COLOR(menu.active, 0), 9-step,step);
 
             int dy = 0;
             if (!sunken) {
@@ -702,7 +702,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             }
             const QBrush fill =
                   Gradients::brush(c, r.height(), Qt::Vertical, sunken ?
-                  Gradients::Sunken : config.gradMenuItem);
+                  Gradients::Sunken : config.menu.itemGradient);
             masks.tab.render(r, painter, fill, Tile::Full, false, QPoint(0,dy));
          }
          QPixmap pix =
@@ -715,7 +715,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             drawItemPixmap(painter,mbi->rect, alignment, pix);
          else
             drawItemText(painter, mbi->rect, alignment, mbi->palette, isEnabled,
-                         mbi->text, hover ? config.role_menuActive[1] : QPalette::WindowText);
+                         mbi->text, hover ? config.menu.active_role[1] : QPalette::WindowText);
       }
       break;
    case CE_MenuBarEmptyArea: // The empty area of a QMenuBar
@@ -733,16 +733,17 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             if (!menuItem->text.isEmpty()) {
                painter->setFont(menuItem->font);
                drawItemText(painter, RECT, Qt::AlignCenter, PAL, isEnabled,
-                            menuItem->text, config.role_popup[1]);
+                            menuItem->text, config.menu.std_role[1]);
             }
             break;
          }
          
          bool selected = menuItem->state & State_Selected;
          
-         QColor bg = CONF_COLOR(popup[0]);
-         QColor fg = isEnabled ? CONF_COLOR(popup[1]) :
-                Colors::mid(CONF_COLOR(popup[0]), CONF_COLOR(popup[1]), 2,1);
+         QColor bg = CONF_COLOR(menu.std, 0);
+         QColor fg = isEnabled ? CONF_COLOR(menu.std, 1) :
+                Colors::mid(CONF_COLOR(menu.std, 0),
+                            CONF_COLOR(menu.std, 1), 2,1);
 
          painter->save();
          bool checkable =
@@ -750,17 +751,19 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          bool checked = checkable && menuItem->checked;
          
          if (selected && isEnabled) {
-            if (config.role_popup[0] == QPalette::Window) {
-               bg = Colors::mid(CONF_COLOR(popup[0]), PAL.color(config.role_menuActive[0]), 1, 2);
-               fg = CONF_COLOR(menuActive[1]);
+            if (config.menu.std_role[0] == QPalette::Window) {
+               bg = Colors::mid(CONF_COLOR(menu.std, 0),
+                                PAL.color(config.menu.active_role[0]), 1, 2);
+               fg = CONF_COLOR(menu.active, 1);
             }
             else {
-               bg = Colors::mid(CONF_COLOR(popup[0]), CONF_COLOR(popup[1]), 1, 2);
-               fg = CONF_COLOR(popup[0]);
+               bg = Colors::mid(CONF_COLOR(menu.std, 0),
+                                CONF_COLOR(menu.std, 1), 1, 2);
+               fg = CONF_COLOR(menu.std, 0);
             }
             const QBrush fill =
                   Gradients::brush(bg, RECT.height(), Qt::Vertical, sunken ?
-                  Gradients::Sunken : config.gradMenuItem);
+                  Gradients::Sunken : config.menu.itemGradient);
             masks.tab.render(RECT, painter, fill);
          }
 
@@ -869,7 +872,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       }
       break;
    case CE_MenuScroller: { // Scrolling areas in a QMenu when the style supports scrolling
-      QPalette::ColorRole bg = config.role_popup[0];
+      QPalette::ColorRole bg = config.menu.std_role[0];
       if (option->state & State_DownArrow) {
          const QPixmap &gradient =
                Gradients::pix(PAL.color(QPalette::Active, bg),
@@ -917,24 +920,24 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 //          default:
 //                break;
 //          }
-         QColor c = Colors::mid(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1);
+         QColor c = Colors::mid(CONF_COLOR(tab.std, 0), COLOR(Window), 2, 1);
          QRect r = RECT.adjusted(0, 0, 0, -dpi.f2);
          const QPixmap & ground =
-               Gradients::pix(c, r.height(), Qt::Vertical, config.gradTab);
+               Gradients::pix(c, r.height(), Qt::Vertical, CONF_GRAD(tab));
          masks.tab.render(r, painter, ground);
          
          if (sunken || option->state & State_Selected) {
             r.adjust(dpi.f2, dpi.f3, -dpi.f2, -dpi.f3);
             const QPixmap & fill =
-                  Gradients::pix(CONF_COLOR(tab[1][0]), r.height(), Qt::Vertical,
-                                    config.gradTab);
+                  Gradients::pix(CONF_COLOR(tab.active, 0), r.height(), Qt::Vertical,
+                                    CONF_GRAD(tab));
             masks.tab.render(r, painter, fill);
          }
          else if (hover) {
             r.adjust(dpi.f3, dpi.f4, -dpi.f3, -dpi.f4);
-            c = Colors::mid(c, CONF_COLOR(tab[1][0]), 21, 6);
+            c = Colors::mid(c, CONF_COLOR(tab.active, 0), 21, 6);
             const QPixmap & fill =
-                  Gradients::pix(c, r.height(), Qt::Vertical, config.gradTab);
+                  Gradients::pix(c, r.height(), Qt::Vertical, CONF_GRAD(tab));
             masks.tab.render(r, painter, fill);
          }
          shadows.tabSunken.render(RECT, painter);
@@ -946,16 +949,23 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          
          bool active = option->state & (State_Selected);
          
-         QColor cB = CONF_COLOR(tab[active][0]);
-         QColor cF = CONF_COLOR(tab[active][1]);
+         QColor cB, cF;
+         if (active) {
+            cB = CONF_COLOR(tab.active, 0);
+            cF = CONF_COLOR(tab.active, 1);
+         }
+         else {
+            cB = CONF_COLOR(tab.std, 0);
+            cF = CONF_COLOR(tab.std, 1);
+         }
          
          if (active || sunken) hover = false;
                
          if (hover) {
-            cB = Colors::mid(cB, CONF_COLOR(tab[1][0]));
-            if (Colors::contrast(CONF_COLOR(tab[1][1]), cB) >
+            cB = Colors::mid(cB, CONF_COLOR(tab.active, 0));
+            if (Colors::contrast(CONF_COLOR(tab.active, 1), cB) >
                 Colors::contrast(cF, cB)) {
-               cF = CONF_COLOR(tab[1][1]);
+               cF = CONF_COLOR(tab.active, 1);
             }
          }
          
@@ -1267,7 +1277,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          
          // the allways shown base
          const QBrush base = Gradients::brush(config.fullButtonHover ? c :
-               COLOR(Window), size, o, config.gradButton);
+               COLOR(Window), size, o, CONF_GRAD(btn));
          masks.tab.render(r, painter, base);
          masks.tab.outline(r, painter, Colors::mid(COLOR(Window), Qt::white,1,2), true);
          
@@ -1275,7 +1285,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             break; // really - nothing to do anymore!
          
          const QBrush deco =
-               Gradients::brush(c, size, o, config.gradButton);
+               Gradients::brush(c, size, o, CONF_GRAD(btn));
          r.adjust(f2, f2, -f2, -f2);
          masks.button.render(r, painter, deco, Tile::Full, false, QPoint(f2,f2));
       }

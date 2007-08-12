@@ -25,6 +25,7 @@
 #define RECT option->rect
 #define PAL option->palette
 #define COLOR(_TYPE_) option->palette.color(QPalette::_TYPE_)
-#define CONF_COLOR(_TYPE_) option->palette.color(config.role_##_TYPE_)
+#define CONF_COLOR(_TYPE_, _FG_) option->palette.color(config._TYPE_##_role[_FG_])
+#define CONF_GRAD(_TYPE_) config._TYPE_.gradient
 
 #endif //OXYGEN_DEFS_H

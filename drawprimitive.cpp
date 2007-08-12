@@ -35,7 +35,7 @@
 #include <QX11Info>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
-#include <fixx11h.h>
+#include "fixx11h.h"
 #endif
 
 #include <cmath>
@@ -286,7 +286,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          if (sunken && config.cushion)
             gt = Gradients::Sunken;
          else
-            gt = config.gradButton;
+            gt = CONF_GRAD(btn);
       }
       // sunken variant
       if (config.sunkenButtons) {
@@ -557,7 +557,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       int sz = dpi.ExclusiveIndicator;
       QPoint xy = RECT.topLeft();
       
-      Gradients::Type gt = isEnabled ? config.gradButton : Gradients::None;
+      Gradients::Type gt = isEnabled ? CONF_GRAD(btn) : Gradients::None;
       
       if (isOn) {
          hover = hasFocus = false;
@@ -1065,8 +1065,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          }
          
          masks.tab.render(rect, painter, Gradients::brush(
-                          Colors::mid(CONF_COLOR(tab[0][0]), COLOR(Window), 2, 1),
-         size, o, config.gradTab));
+                          Colors::mid(CONF_COLOR(tab.std, 0), COLOR(Window), 2, 1),
+         size, o, CONF_GRAD(tab)));
          rect.setBottom(rect.bottom()+dpi.f2);
          shadows.tabSunken.render(rect, painter);
       }

@@ -204,6 +204,13 @@ void BespinStyle::makeStructure(int num, const QColor &c)
    p.end();
 }
 
+#define readRole(_ENTRY_, _VAR_, _DEF1_, _DEF2_)\
+config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_ENTRY_, QPalette::_DEF1_).toInt();\
+Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1], QPalette::_DEF1_, QPalette::_DEF2_)
+
+#define gradientType(_ENTRY_, _DEF_)\
+(Gradients::Type) iSettings->value(_ENTRY_, Gradients::_DEF_).toInt();
+
 void BespinStyle::readSettings(const QSettings* settings)
 {
    bool delSettings = false;
@@ -238,64 +245,46 @@ void BespinStyle::readSettings(const QSettings* settings)
          CLAMP(iSettings->value("Btn.3dPos", 0).toInt(), 0, 2);
    config.checkType = iSettings->value("Btn.CheckType", 0).toInt();
    
-   config.gradButton =
-      (Gradients::Type) iSettings->value("Btn.Gradient", Gradients::Button).toInt();
-   if (config.sunkenButtons == 2 &&
-       config.gradButton == Gradients::Sunken) // NO!
-      config.gradButton = Gradients::None;
+   CONF_GRAD(btn) = gradientType("Btn.Gradient", Button);
+
+   if (config.sunkenButtons == 2 && CONF_GRAD(btn) == Gradients::Sunken) // NO!
+      CONF_GRAD(btn) = Gradients::None;
    
    if (config.sunkenButtons == 2)
       config.cushion = true;
-   else if (config.gradButton == Gradients::None ||
-            config.gradButton ==  Gradients::Sunken)
+   else if (CONF_GRAD(btn) == Gradients::None ||
+            CONF_GRAD(btn) ==  Gradients::Sunken)
       config.cushion = false;
    else
       config.cushion = iSettings->value("Btn.Cushion", true).toBool();
    config.fullButtonHover = iSettings->value("Btn.FullHover", true).toBool();
+   readRole("Btn.Role", btn.std, Window, WindowText);
+   readRole("Btn.ActiveRole", btn.active, Button, ButtonText);
    
    // Choosers ===========================
-   config.gradChoose =
-      (Gradients::Type) iSettings->value("Chooser.Gradient", Gradients::Sunken).toInt();
+   CONF_GRAD(chooser) = gradientType("Chooser.Gradient", Sunken);
    
    // Menus ===========================
-   config.gradMenuItem =
-         (Gradients::Type) iSettings->value("Menu.ItemGradient", Gradients::None).toInt();
+   config.menu.itemGradient = gradientType("Menu.ItemGradient", None);
    config.showMenuIcons = iSettings->value("Menu.ShowIcons", false).toBool();
    config.menuShadow = iSettings->value("Menu.Shadow", false).toBool();
-   config.role_menuActive[0] =
-      (QPalette::ColorRole) iSettings->value("Menu.ActiveRole", QPalette::Highlight).toInt();
-   Colors::counterRole(config.role_menuActive[0], config.role_menuActive[1],
-                       QPalette::Highlight, QPalette::HighlightedText);
-   config.role_popup[0] =
-      (QPalette::ColorRole) iSettings->value("Menu.Role", QPalette::Window).toInt();
-   Colors::counterRole(config.role_popup[0], config.role_popup[1],
-                       QPalette::Window, QPalette::WindowText);
+   readRole("Menu.ActiveRole", menu.active, Highlight, HighlightedText);
+   readRole("Menu.Role", menu.std, Window, WindowText);
    
    // Progress ===========================
-   config.gradProgress =
-         (Gradients::Type) iSettings->value("Progress.Gradient", Gradients::Gloss).toInt();
-   config.role_progress[0] =
-      (QPalette::ColorRole) iSettings->value("Progress.Role", QPalette::Highlight).toInt();
-   Colors::counterRole(config.role_progress[0], config.role_progress[1],
-                       QPalette::Highlight, QPalette::HighlightedText);
+   CONF_GRAD(progress) = gradientType("Progress.Gradient", Gloss);
+   readRole("Progress.Role", progress.std, Highlight, HighlightedText);
    
    // ScrollStuff ===========================
    config.showScrollButtons =
          iSettings->value("Scroll.ShowButtons", false).toBool();
    
    // Tabs ===========================
-   config.role_tab[1][0] =
-      (QPalette::ColorRole) iSettings->value("Tab.ActiveRole", QPalette::Highlight).toInt();
-   Colors::counterRole(config.role_tab[1][0], config.role_tab[1][1],
-                       QPalette::Button, QPalette::ButtonText);
+   readRole("Tab.ActiveRole", tab.active, Highlight, HighlightedText);
    config.tabAnimSteps =
          CLAMP(iSettings->value("Tab.AnimSteps", 5).toUInt(), 2, 18);
-   config.gradTab =
-      (Gradients::Type) iSettings->value("Tab.Gradient", Gradients::Button).toInt();
-   config.role_tab[0][0] =
-      (QPalette::ColorRole) iSettings->value("Tab.Role", QPalette::Window).toInt();
-   Colors::counterRole(config.role_tab[0][0], config.role_tab[0][1],
-                       QPalette::Window, QPalette::WindowText);
+   CONF_GRAD(tab) = gradientType("Tab.Gradient", Button);
+   readRole("Tab.Role", tab.std, Window, WindowText);
    config.tabTransition =
       (TabAnimInfo::TabTransition) iSettings->value("Tab.Transition",
          TabAnimInfo::ScanlineBlend).toInt();
@@ -307,6 +296,9 @@ void BespinStyle::readSettings(const QSettings* settings)
    if (delSettings)
       delete iSettings;
 }
+
+#undef readRole
+#undef gradientType
 
 #define SCALE(_N_) lround(_N_*config.scale)
 
@@ -549,8 +541,8 @@ void BespinStyle::polish( QWidget * widget) {
       QFont fnt = widget->font();
       fnt.setBold(true);
       widget->setFont(fnt);
-//       widget->setBackgroundRole ( config.role_progress[0] );
-//       widget->setForegroundRole ( config.role_progress[1] );
+//       widget->setBackgroundRole ( config.progress.role[0] );
+//       widget->setForegroundRole ( config.progress.role[1] );
       animator->registrate(widget);
    }
    
@@ -558,8 +550,8 @@ void BespinStyle::polish( QWidget * widget) {
       animator->registrate(widget);
 
    if (qobject_cast<QTabBar *>(widget)) {
-      widget->setBackgroundRole ( config.role_tab[0][0] );
-      widget->setForegroundRole ( config.role_tab[1][0] );
+      widget->setBackgroundRole ( config.tab.std_role[0] );
+      widget->setForegroundRole ( config.tab.std_role[1] );
       widget->installEventFilter(this);
    }
    
@@ -695,8 +687,8 @@ void BespinStyle::polish( QWidget * widget) {
       // if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
       widget->installEventFilter(this); // for the round corners
 //       widget->setAutoFillBackground (true);
-      widget->setBackgroundRole ( config.role_popup[0] );
-      widget->setForegroundRole ( config.role_popup[1] );
+      widget->setBackgroundRole ( config.menu.std_role[0] );
+      widget->setForegroundRole ( config.menu.std_role[1] );
 //       if (qGray(widget->palette().color(QPalette::Active, widget->backgroundRole()).rgb()) < 100) {
 //          QFont tmpFont = widget->font();
 //          tmpFont.setBold(true);

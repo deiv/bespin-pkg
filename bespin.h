@@ -61,13 +61,45 @@ typedef struct {
    int ExclusiveIndicator;
 } Dpi;
 
+
 typedef struct Config {
-   Gradients::Type
-      gradButton,
-      gradChoose,
-      gradProgress,
-      gradTab,
-      gradMenuItem;
+   struct bg {
+      BGMode mode;
+      int structure;
+   } bg;
+   
+   struct btn {
+      int _3dPos, checkType;
+      bool cushion, fullHover;
+      Gradients::Type gradient;
+      QPalette::ColorRole std_role[2], active_role[2];
+   } btn;
+   
+   struct chooser {
+      Gradients::Type gradient;
+   } chooser;
+   
+   struct menu {
+      QPalette::ColorRole std_role[2], active_role[2];
+      Gradients::Type itemGradient;
+      bool showIcons, shadow;
+   } menu;
+   
+   struct progress {
+      Gradients::Type gradient;
+      QPalette::ColorRole std_role[2];
+   } progress;
+   
+   struct scroll {
+      bool showButtons;
+   } scroll;
+   
+   struct tab {
+      QPalette::ColorRole std_role[2], active_role[2];
+      Gradients::Type gradient;
+      int animSteps, transition;
+   } tab;
+
    BGMode bgMode;
    int structure, sunkenButtons;
    TabAnimInfo::TabTransition tabTransition;
@@ -80,11 +112,6 @@ typedef struct Config {
       cushion;
    double scale;
    int checkType;
-   QPalette::ColorRole
-      role_progress[2],
-      role_tab[2][2],
-      role_popup[2],
-      role_menuActive[2];
    uint tabAnimSteps;
 } Config;
 

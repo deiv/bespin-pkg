@@ -25,7 +25,7 @@
 #include <QVector>
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrender.h>
-#include <fixx11h.h>
+#include "fixx11h.h"
 
 typedef QVector<double> PointArray;
 typedef QVector<QColor> ColorArray;

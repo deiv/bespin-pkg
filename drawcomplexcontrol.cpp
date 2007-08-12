@@ -389,7 +389,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             else {
                if (!isEnabled || ar.isNull()) {
                   masks.tab.render(r, painter, Gradients::brush(COLOR(Window),
-                     r.height(), Qt::Vertical, config.gradChoose));
+                     r.height(), Qt::Vertical, CONF_GRAD(chooser)));
                }
                else {
                   // ground
@@ -399,7 +399,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                   if (config.fullButtonHover)
                      c = Colors::mid(c, COLOR(Button), 6-step, step);
                   masks.tab.render(r, painter, Gradients::brush(c, r.height(),
-                        Qt::Vertical, config.gradChoose));
+                        Qt::Vertical, CONF_GRAD(chooser)));
                   if (hasFocus)
                      masks.tab.outline(r, painter, Colors::mid(COLOR(Window),
                         COLOR(Highlight), 2, 1), config.strongFocus, Tile::Ring, f3);
@@ -409,7 +409,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                      r.adjust(f3, f3, -f3, -f3);
                      masks.tab.render(r, painter, Gradients::brush(
                         Colors::mid(c, COLOR(Button), 6-step, step), RECT.height()-f2,
-                        Qt::Vertical, config.gradChoose), Tile::Full, false,
+                        Qt::Vertical, CONF_GRAD(chooser)), Tile::Full, false,
                                       QPoint(0,f3));
                   }
                }
@@ -451,7 +451,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                c = Colors::mid(c, COLOR(Button), 6-step, step);
                ar.adjust(f2, dpi.f4, -f2, -dpi.f4);
                masks.tab.render(ar, painter, Gradients::brush(c, RECT.height()-f2,
-                  Qt::Vertical, config.gradChoose), Tile::Full, false,
+                  Qt::Vertical, CONF_GRAD(chooser)), Tile::Full, false,
                                 QPoint(0,dpi.f4));
                painter->setPen(COLOR(ButtonText));
             }
@@ -555,7 +555,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             painter->save();
 
             QRect r;
-            const QColor c = Colors::mid(COLOR(Window), CONF_COLOR(progress[0]), 3,1);
+            const QColor c = Colors::mid(COLOR(Window), CONF_COLOR(progress.std, 0), 3,1);
             if ( slider->orientation == Qt::Horizontal ) {
                
                int y = groove.center().y();
@@ -688,7 +688,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             QColor c = Colors::mid(COLOR(Window), COLOR(Button), 6-step, step);
             const int sz = dpi.SliderControl-dpi.f4;
             const QBrush fill = Gradients::brush(c, sz, Qt::Vertical,
-                  isEnabled ? config.gradButton : Gradients::None);
+                  isEnabled ? CONF_GRAD(btn) : Gradients::None);
 //             fillWithMask(painter, xy, fill, masks.radio);
             painter->save();
             painter->setRenderHint(QPainter::Antialiasing);
@@ -712,8 +712,8 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
       // special handling for the tabbar scrollers ----------------------------------
       if (widget && widget->parentWidget() &&
           qobject_cast<QTabBar*>(widget->parent())) {
-         QColor c = widget->parentWidget()->palette().color(config.role_tab[0][0]);
-         QColor c2 = widget->parentWidget()->palette().color(config.role_tab[0][1]);
+         QColor c = widget->parentWidget()->palette().color(config.tab.std_role[0]);
+         QColor c2 = widget->parentWidget()->palette().color(config.tab.std_role[1]);
          if (sunken) {
             int dy = (RECT.height()-RECT.width())/2;
             QRect r = RECT.adjusted(dpi.f2,dy,-dpi.f2,-dy);
@@ -914,7 +914,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          const QColor c = hover ? COLOR(Button) : hasFocus ?
                 COLOR(Highlight) : COLOR(Window);
          const QPixmap &fill =
-                Gradients::pix(c, rect.height(), Qt::Vertical, config.gradButton);
+                Gradients::pix(c, rect.height(), Qt::Vertical, CONF_GRAD(btn));
          painter->setBrush(fill);
          painter->drawEllipse(rect);
          painter->restore();
