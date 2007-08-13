@@ -19,6 +19,7 @@
 #include "colors.h"
 #include "makros.h"
 #include <QWidget>
+#include <QApplication>
 
 using namespace Bespin;
 
@@ -28,11 +29,16 @@ static QPalette::ColorRole btnRoles[2][2] = {
 };
 
 const QColor &Colors::bg(const QPalette &pal, const QWidget *w) {
+   QPalette::ColorRole role;
    if (w->parentWidget())
-      return pal.color(w->parentWidget()->backgroundRole());
-   if (w)
-      return pal.color(w->backgroundRole());
-   return pal.color(QPalette::Window);
+      role = w->parentWidget()->backgroundRole();
+   else if (w)
+      role = w->backgroundRole();
+   else
+      role = QPalette::Window;
+   if (pal.brush(role).style() > 1)
+      return pal.color(role);
+   return QApplication::palette().color(role);
 }
 
 #undef PAL

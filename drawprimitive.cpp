@@ -207,7 +207,10 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
    switch ( pe ) {
    case PE_Widget: {
       
-      if (!(widget && widget->isWindow())) break; // can't do anything here
+      if (!(widget && widget->isWindow()))
+         break; // can't do anything here
+      if (PAL.brush(widget->backgroundRole()).style() > 1)
+         break; // we'd cover a gradient/pixmap/whatever
       
       const QColor &c = PAL.color(widget->backgroundRole());
 
