@@ -43,7 +43,7 @@ QColor Colors::btnBg(const QPalette &pal, bool isEnabled, int hasFocus, int step
       return FCOLOR(Window).dark(104);
    QColor c = (hasFocus) ?
       mid(FCOLOR(Highlight), COLOR(btnRoles[0][0]),
-          1, contrast(FCOLOR(Highlight), COLOR(btnRoles[0][0]))) :
+          1, 10+contrast(FCOLOR(Highlight), COLOR(btnRoles[0][0]))) :
          COLOR(btnRoles[0][0]);
    if (step)
       return mid(c, COLOR(btnRoles[1][0]), 36 - step, step);
