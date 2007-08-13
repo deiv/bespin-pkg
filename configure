@@ -28,9 +28,11 @@ without-kde-config:\nDo NOT build the kcontrol configuration plugin (auto turned
       exit 0
    fi
 done
-qt4check="$(qmake --version 2>&1 | grep -E "Qt *version *4")"
+QMAKE=qmake
+qt4check="$($QMAKE --version 2>&1 | grep -E "Qt *version *4")"
 if [ "$qt4check" = "" ]; then
-   qt4check="$($QTDIR/bin/qmake --version 2>&1 | grep -E "Qt *version *4")"
+   QMAKE=$QTDIR/bin/qmake
+   qt4check="$($QMAKE --version 2>&1 | grep -E "Qt *version *4")"
 fi
 if [ "$qt4check" = "" ]; then
    echo -e "\e[0;31;47m$QTDIR does not seem to be a proper qt4 environment, try passing \"qt-dir=<Path to Qt4>\"\e[m"
@@ -46,6 +48,6 @@ if [ "$kdecheck" = "" ]; then
    CONFIG_KDE=0
 fi
 
-if $QTDIR/bin/qmake qmake.pro; then
+if $QMAKE qmake.pro; then
    echo -e "\e[32;40mconfiguration done, now \"make && make install\"\e[m"
 fi

@@ -114,7 +114,8 @@ typedef struct Config {
 class BespinStyle : public QCommonStyle {
    Q_OBJECT
 public:
-   enum WidgetState{Basic = 0, Hovered, Focused, Active};
+//    enum WidgetState{Basic = 0, Hovered, Focused, Active};
+   enum WidgetState{Bg = 0, Fg = 1};
    
    BespinStyle();
    ~BespinStyle();

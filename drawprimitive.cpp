@@ -867,18 +867,9 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       painter->save();
       painter->setBrush(Qt::NoBrush);
       QColor fg;
-      if (pe == PE_IndicatorMenuCheckMark) {
-         selected = option->state & State_Selected && isEnabled;
-         if (widget)
-            fg = selected ? PAL.color(widget->backgroundRole()) :
-            PAL.color(widget->foregroundRole());
-         else
-            fg = selected ? FCOLOR(Window) : FCOLOR(WindowText);
-      }
-      else
-         fg = FCOLOR(Text);
+      if (pe != PE_IndicatorMenuCheckMark)
+         painter->setPen(FCOLOR(Text));
       
-      painter->setPen(fg);
       painter->drawRect(rect.adjusted(0, off, -off, 0));
       
       if (!(option->state & State_Off)) {

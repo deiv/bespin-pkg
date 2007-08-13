@@ -672,6 +672,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
    case CE_MenuBarItem: // A menu item in a QMenuBar
       if (const QStyleOptionMenuItem *mbi =
           qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
+         ROLES(menu.active);
          hover = option->state & State_Selected;
          IndexedFadeInfo *info = 0;
          QAction *action = 0, *activeAction = 0;
@@ -694,7 +695,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             if (!step) step = 6;
             QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f2);
             const QColor c =
-                  Colors::mid(FCOLOR(Window), CONF_COLOR(menu.active, 0), 9-step,step);
+                  Colors::mid(FCOLOR(Window), COLOR(ROLE[Bg]), 9-step,step);
 
             int dy = 0;
             if (!sunken) {
@@ -718,7 +719,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             drawItemPixmap(painter,mbi->rect, alignment, pix);
          else
             drawItemText(painter, mbi->rect, alignment, mbi->palette, isEnabled,
-                         mbi->text, hover ? config.menu.active_role[1] : QPalette::WindowText);
+                         mbi->text, hover ? ROLE[Fg] : QPalette::WindowText);
       }
       break;
    case CE_MenuBarEmptyArea: // The empty area of a QMenuBar
@@ -727,7 +728,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
         // Draws one item in a popup menu.
       if (const QStyleOptionMenuItem *menuItem =
           qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
-             
+         ROLES(menu.std);
+         
          // separator
          if (menuItem->menuItemType == QStyleOptionMenuItem::Separator) {
             int dx = RECT.width()/6,
@@ -736,17 +738,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             if (!menuItem->text.isEmpty()) {
                painter->setFont(menuItem->font);
                drawItemText(painter, RECT, Qt::AlignCenter, PAL, isEnabled,
-                            menuItem->text, config.menu.std_role[1]);
+                            menuItem->text, ROLE[Fg]);
             }
             break;
          }
          
          bool selected = menuItem->state & State_Selected;
          
-         QColor bg = CONF_COLOR(menu.std, 0);
-         QColor fg = isEnabled ? CONF_COLOR(menu.std, 1) :
-                Colors::mid(CONF_COLOR(menu.std, 0),
-                            CONF_COLOR(menu.std, 1), 2,1);
+         QColor bg = COLOR(ROLE[Bg]);
+         QColor fg = isEnabled ? COLOR(ROLE[Fg]) :
+               Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 2,1);
 
          painter->save();
          bool checkable =
@@ -754,15 +755,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          bool checked = checkable && menuItem->checked;
          
          if (selected && isEnabled) {
-            if (config.menu.std_role[0] == QPalette::Window) {
-               bg = Colors::mid(CONF_COLOR(menu.std, 0),
-                                PAL.color(config.menu.active_role[0]), 1, 2);
-               fg = CONF_COLOR(menu.active, 1);
+            if (ROLE[Bg] == QPalette::Window) {
+               bg = Colors::mid(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg), 1, 2);
+               fg = CCOLOR(menu.active, Fg);
             }
             else {
-               bg = Colors::mid(CONF_COLOR(menu.std, 0),
-                                CONF_COLOR(menu.std, 1), 1, 2);
-               fg = CONF_COLOR(menu.std, 0);
+               bg = Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 1, 2);
+               fg = COLOR(ROLE[Bg]);
             }
             const QBrush fill =
                   Gradients::brush(bg, RECT.height(), Qt::Vertical, sunken ?
@@ -840,9 +839,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          else if (checkable) { // Checkmark
             xpos = RECT.right() - dpi.f7 - cDim;
-            QRect checkRect(xpos, RECT.y() + (RECT.height() - cDim)/2, cDim, cDim);
-            checkRect = visualRect(menuItem->direction, menuItem->rect, checkRect);
             if (menuItem->checkType & QStyleOptionMenuItem::Exclusive) {
+               QRect checkRect(xpos, RECT.y() + (RECT.height() - cDim)/2, cDim, cDim);
+               checkRect = visualRect(menuItem->direction, menuItem->rect, checkRect);
                // Radio button
                painter->setRenderHint ( QPainter::Antialiasing );
                painter->drawEllipse ( checkRect );
@@ -856,6 +855,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             }
             else {
                // Check box
+               QRect checkRect(xpos, RECT.y()+dpi.f3, RECT.height()-dpi.f6, RECT.height()-dpi.f6);
+               checkRect = visualRect(menuItem->direction, menuItem->rect, checkRect);
 //                painter->setBrush ( Qt::NoBrush );
                QStyleOptionMenuItem tmpOpt = *menuItem;
                tmpOpt.rect = checkRect;
