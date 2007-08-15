@@ -110,6 +110,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    QSettings settings("Bespin", "Store");
    ui.store->addItems( settings.childGroups() );
    ui.store->sortItems();
+   ui.btnStore->setAutoDefault ( false );
+   ui.btnRestore->setAutoDefault ( false );
+   ui.btnImport->setAutoDefault ( false );
+   ui.btnExport->setAutoDefault ( false );
+   ui.btnDelete->setAutoDefault ( false );
    connect (ui.btnStore, SIGNAL(clicked()), this, SLOT(store()));
    connect (ui.btnRestore, SIGNAL(clicked()), this, SLOT(restore()));
    connect (ui.store, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
@@ -123,6 +128,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    ui.btnRestore->setEnabled(false);
    ui.btnExport->setEnabled(false);
    ui.btnDelete->setEnabled(false);
+   ui.storeLine->hide();
    
    /** fill some comboboxes, not of interest */
    generateColorModes(ui.crProgressBar);
@@ -436,7 +442,6 @@ QString Config::sImport(const QString &filename) {
 
 /** reimplemented - i just want to merge the data into the store */
 void Config::import() {
-   
    QString filename = QFileDialog::getOpenFileName(parentWidget(),
       tr("Import Configuration"), lastPath, tr("Config Files (*.conf *.ini)"));
    
@@ -517,29 +522,47 @@ void Config::save() {
 
 /** see above, we'll present a name input dialog here */
 void Config::store() {
-   bool ok, addItem = true;
-   QString string =
-      QInputDialog::getText ( parentWidget(), tr("Enter a Name"),
-                              tr(""),
-                              QLineEdit::Normal, "", &ok);
-   if (!ok) return;
+   ui.storeLine->setText("Enter a name or select an item above");
+   ui.storeLine->selectAll();
+   ui.storeLine->show();
+   ui.storeLine->setFocus();
+   connect (ui.storeLine, SIGNAL(returnPressed()),
+            this, SLOT(store2a()));
+   connect (ui.store, SIGNAL(itemClicked(QListWidgetItem*)),
+            this, SLOT(store2b(QListWidgetItem *)));
+}
+
+void Config::store2a() {
+   if (sender() != ui.storeLine)
+      return;
+   const QString &string = ui.storeLine->text();
    if (string.isEmpty()) {
-      QMessageBox::information ( parentWidget(), tr("Empty name"),
-                                 tr("You entered an empty name - nothing will be saved!") );
+      ui.storeLine->setText("Valid names have some chars...");
       return;
    }
    if (!ui.store->findItems ( string, Qt::MatchExactly ).isEmpty()) {
-      QMessageBox::StandardButton btn =
-         QMessageBox::question ( parentWidget(), tr("Allready exists!"),
-                                 tr("The name you entered (%1) allready exists.<br>\
-                                    <b>Do you want to replace it?</b>").arg(string),
-                                 QMessageBox::Yes | QMessageBox::No, QMessageBox::No );
-      if (btn == QMessageBox::No) {
-         saveAs();
-         return;
-      }
-      addItem = false;
+      ui.storeLine->setText("Item allready exists, please click it to replace it!");
+      return;
    }
+   disconnect (ui.storeLine, SIGNAL(returnPressed()),
+            this, SLOT(store2a()));
+   disconnect (ui.store, SIGNAL(itemClicked(QListWidgetItem*)),
+            this, SLOT(store2b(QListWidgetItem *)));
+   ui.storeLine->hide();
+   store3( string, true );
+}
+
+void Config::store2b(QListWidgetItem* item) {
+   disconnect (ui.storeLine, SIGNAL(returnPressed()),
+            this, SLOT(store2a()));
+   disconnect (ui.store, SIGNAL(itemClicked(QListWidgetItem*)),
+            this, SLOT(store2b(QListWidgetItem *)));
+   ui.storeLine->hide();
+   store3( item->text(), false );
+}
+/** real action */
+void Config::store3( const QString &string, bool addItem ) {
+
    if (addItem) {
       ui.store->addItem(string);
       ui.store->sortItems();
@@ -561,6 +584,7 @@ void Config::store() {
    settings.endGroup();
    settings.endGroup();
 }
+
 
 void Config::remove() {
    QListWidgetItem *item = ui.store->currentItem();

@@ -284,7 +284,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (config.btn.fullHover && (hover || step))
          c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
       
-      Gradients::Type gt = !isEnabled ? Gradients::None : CONF_GRAD(btn);
+      Gradients::Type gt = !isEnabled ? Gradients::None : GRAD(btn);
       
       // sunken variant
       if (config.btn.layer) {
@@ -564,7 +564,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       int sz = dpi.ExclusiveIndicator;
       QPoint xy = RECT.topLeft();
       
-      Gradients::Type gt = isEnabled ? CONF_GRAD(btn) : Gradients::None;
+      Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
       
       if (isOn) {
          hover = hasFocus = false;
@@ -1064,7 +1064,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          
          masks.tab.render(rect, painter, Gradients::brush(
                           Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1),
-         size, o, CONF_GRAD(tab)));
+         size, o, GRAD(tab)));
          rect.setBottom(rect.bottom()+dpi.f2);
          shadows.tabSunken.render(rect, painter);
       }

@@ -254,15 +254,15 @@ void BespinStyle::readSettings(const QSettings* settings)
    config.btn.layer = CLAMP(iSettings->value("Btn.Layer", 0).toInt(), 0, 2);
    config.btn.checkType = iSettings->value("Btn.CheckType", 0).toInt();
    
-   CONF_GRAD(btn) = gradientType("Btn.Gradient", Button);
+   GRAD(btn) = gradientType("Btn.Gradient", Button);
 
-   if (config.btn.layer == 2 && CONF_GRAD(btn) == Gradients::Sunken) // NO!
-      CONF_GRAD(btn) = Gradients::None;
+   if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
+      GRAD(btn) = Gradients::None;
    
    if (config.btn.layer == 2)
       config.btn.cushion = true;
-   else if (CONF_GRAD(btn) == Gradients::None ||
-            CONF_GRAD(btn) ==  Gradients::Sunken)
+   else if (GRAD(btn) == Gradients::None ||
+            GRAD(btn) ==  Gradients::Sunken)
       config.btn.cushion = false;
    else
       config.btn.cushion = iSettings->value("Btn.Cushion", true).toBool();
@@ -273,7 +273,7 @@ void BespinStyle::readSettings(const QSettings* settings)
                        config.btn.active_role[0], config.btn.active_role[1]);
    
    // Choosers ===========================
-   CONF_GRAD(chooser) = gradientType("Chooser.Gradient", Sunken);
+   GRAD(chooser) = gradientType("Chooser.Gradient", Sunken);
    
    // PW Echo Char ===========================
    config.input.pwEchoChar =
@@ -287,7 +287,7 @@ void BespinStyle::readSettings(const QSettings* settings)
    readRole("Menu.Role", menu.std, Window, WindowText);
    
    // Progress ===========================
-   CONF_GRAD(progress) = gradientType("Progress.Gradient", Gloss);
+   GRAD(progress) = gradientType("Progress.Gradient", Gloss);
    readRole("Progress.Role", progress.std, Highlight, HighlightedText);
    
    // ScrollStuff ===========================
@@ -298,7 +298,7 @@ void BespinStyle::readSettings(const QSettings* settings)
    readRole("Tab.ActiveRole", tab.active, Highlight, HighlightedText);
    config.tab.animSteps =
          CLAMP(iSettings->value("Tab.AnimSteps", 5).toUInt(), 2, 18);
-   CONF_GRAD(tab) = gradientType("Tab.Gradient", Button);
+   GRAD(tab) = gradientType("Tab.Gradient", Button);
    readRole("Tab.Role", tab.std, Window, WindowText);
    config.tab.transition =
       (TabAnimInfo::TabTransition) iSettings->value("Tab.Transition",

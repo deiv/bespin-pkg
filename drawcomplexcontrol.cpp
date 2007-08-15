@@ -385,7 +385,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             else {
                if (!isEnabled || ar.isNull()) {
                   masks.tab.render(r, painter, Gradients::brush(FCOLOR(Window),
-                     r.height(), Qt::Vertical, CONF_GRAD(chooser)));
+                     r.height(), Qt::Vertical, GRAD(chooser)));
                }
                else {
                   // ground
@@ -395,7 +395,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                   if (config.btn.fullHover)
                      c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
                   masks.tab.render(r, painter, Gradients::brush(c, r.height(),
-                        Qt::Vertical, CONF_GRAD(chooser)));
+                        Qt::Vertical, GRAD(chooser)));
                   if (hasFocus)
                      masks.tab.outline(r, painter, Colors::mid(CONF_COLOR(btn.std, 0),
                         FCOLOR(Highlight), 2, 1), config.strongFocus, Tile::Ring, f3);
@@ -405,7 +405,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                      r.adjust(f3, f3, -f3, -f3);
                      masks.tab.render(r, painter, Gradients::brush(
                         Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step), RECT.height()-f2,
-                        Qt::Vertical, CONF_GRAD(chooser)), Tile::Full, false,
+                        Qt::Vertical, GRAD(chooser)), Tile::Full, false,
                                       QPoint(0,f3));
                   }
                }
@@ -447,7 +447,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
                ar.adjust(f2, dpi.f4, -f2, -dpi.f4);
                masks.tab.render(ar, painter, Gradients::brush(c, RECT.height()-f2,
-                  Qt::Vertical, CONF_GRAD(chooser)), Tile::Full, false,
+                  Qt::Vertical, GRAD(chooser)), Tile::Full, false,
                                 QPoint(0,dpi.f4));
                painter->setPen(CONF_COLOR(btn.active, 1));
             }
@@ -684,7 +684,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             QColor c = Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 6-step, step);
             const int sz = dpi.SliderControl-dpi.f4;
             const QBrush fill = Gradients::brush(c, sz, Qt::Vertical,
-                  isEnabled ? CONF_GRAD(btn) : Gradients::None);
+                  isEnabled ? GRAD(btn) : Gradients::None);
 //             fillWithMask(painter, xy, fill, masks.radio);
             painter->save();
             painter->setRenderHint(QPainter::Antialiasing);
@@ -910,7 +910,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          const QColor c = hover ? CONF_COLOR(btn.active, 0) : hasFocus ?
                 FCOLOR(Highlight) : CONF_COLOR(btn.std, 0);
          const QPixmap &fill =
-                Gradients::pix(c, rect.height(), Qt::Vertical, CONF_GRAD(btn));
+                Gradients::pix(c, rect.height(), Qt::Vertical, GRAD(btn));
          painter->setBrush(fill);
          painter->drawEllipse(rect);
          painter->restore();

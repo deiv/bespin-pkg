@@ -48,8 +48,11 @@ private:
    
    QPalette *loadedPal;
    bool infoIsManage;
+   void store3(const QString &, bool);
 private slots:
    void storedSettigSelected(QListWidgetItem *);
+   void store2a();
+   void store2b(QListWidgetItem *);
    void remove();
    void handleBgMode(int);
    void handleDefInfo(int);

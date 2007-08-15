@@ -21,6 +21,7 @@
 #include <QPainter>
 #include <QPen>
 #include "bespin.h"
+#include "colors.h"
 
 #define COLOR(_TYPE_) pal.color(QPalette::_TYPE_)
 
@@ -71,32 +72,19 @@ QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyl
       points[6] = QPoint(c+d,c); points[7] = QPoint(s,d2);
    }
    case SP_TitleBarMinButton:
-      if (!numPoints) {
-         numPoints = 3;
-         points = new QPoint[3];
-         int d = rect.height()/8, y = rect.height()/2, r = rect.width();
-         points[0] = QPoint(d,y);
-         points[1] = QPoint(r-2*d,y-d);
-         points[2] = QPoint(r-3*d,y+d);
-      }
-   case SP_TitleBarNormalButton:
+   case SP_TitleBarMaxButton:
       if (!numPoints) {
          numPoints = 4;
          points = new QPoint[4];
-         int d = rect.height()/3, s = rect.width()-d;
-         points[0] = QPoint(d,d); points[1] = QPoint(s,d);
-         points[2] = QPoint(s,s); points[3] = QPoint(d,s);
+         int dx = rect.height()/6, c = rect.width()/2;
+         int y = rect.center().y();
+         int dy = (standardPixmap == SP_TitleBarMaxButton) ? - dx : dx;
+         points[0] = QPoint(rect.x()+dx, y - dy);
+         points[1] = QPoint(rect.x()+c, y + dy);
+         points[2] = QPoint(rect.right()-dx, y - dy);
+         points[3] = QPoint(rect.x()+c, y);
       }
-   case SP_TitleBarMaxButton: {
-      if (!numPoints) {
-         numPoints = 8;
-         points = new QPoint[8];
-         int d = rect.height()/8, c = rect.height()/2, s = rect.width()-d;
-         points[0] = QPoint(c,d); points[1] = QPoint(c-d,c-d);
-         points[2] = QPoint(d,c); points[3] = QPoint(c-d,c+d);
-         points[4] = QPoint(c,s); points[5] = QPoint(c+d,c+d);
-         points[6] = QPoint(s,c); points[7] = QPoint(c+d,c-d);
-      }
+   case SP_TitleBarNormalButton: {
       painter.setRenderHint ( QPainter::Antialiasing );
       painter.setPen(Qt::NoPen);
       Gradients::Type type = Gradients::Button;
@@ -107,13 +95,23 @@ QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyl
          painter.drawEllipse(rect);
          type = Gradients::Sunken;
       }
-      const QPixmap &fill = Gradients::pix(COLOR(WindowText), rect.height(),
-                                           Qt::Vertical, type);
-      painter.setBrush(fill);
-      painter.drawPolygon(points, numPoints);
-      delete [] points;
+      if (!numPoints) { // SP_TitleBarNormalButton
+         painter.setPen(QPen(Colors::mid(COLOR(Window), COLOR(WindowText),1,2), rect.width()/8));
+         painter.setBrush(Qt::NoBrush);
+         int d = rect.width()/3;
+         rect.adjust(d,d,-d,-d);
+         painter.drawRoundRect(rect);
+      }
+      else {
+         const QPixmap &fill = Gradients::pix(COLOR(WindowText), rect.height(),
+                                             Qt::Vertical, type);
+         painter.setBrush(fill);
+         painter.drawPolygon(points, numPoints);
+         delete [] points;
+      }
       break;
    }
+      
    case SP_TitleBarMenuButton: { //  0  Menu button on a title bar
       QFont fnt = painter.font();
       fnt.setPixelSize ( rect.height() );

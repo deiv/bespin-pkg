@@ -126,7 +126,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             const QPixmap &fill =
                   Gradients::pix((option->state & State_On) ?
                   Colors::mid(FCOLOR(Highlight), CONF_COLOR(btn.std, 0)) :
-                  CONF_COLOR(btn.std, 0), r.height(), Qt::Vertical, CONF_GRAD(btn));
+                  CONF_COLOR(btn.std, 0), r.height(), Qt::Vertical, GRAD(btn));
             painter->setBrush(fill);
             painter->setPen(CONF_COLOR(btn.std, 0).dark(124));
             painter->setBrushOrigin(r.topLeft());
@@ -366,7 +366,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          const QPoint off(d, d+dpi.f4);
          masks.tab.render(rect, painter, Gradients::brush(c, size, o,
-                           CONF_GRAD(tab)), Tile::Full, false, off);
+                           GRAD(tab)), Tile::Full, false, off);
 
       }
       break;
@@ -477,6 +477,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          bool reverse = option->direction == Qt::RightToLeft;
          if (pb->invertedAppearance) reverse = !reverse;
          const bool vertical = pb->orientation == Qt::Vertical;
+         const bool busy = pb->maximum == 0 && pb->minimum == 0;
          
          int x,y,l,t;
          RECT.getRect(&x,&y,&l,&t);
@@ -486,14 +487,17 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          
          double val = 0.0;
+         if (busy)
+            val = -3.0*animator->progressStep(widget)/l;
+         else
+            val = pb->progress / double(pb->maximum - pb->minimum);
          if (element == CE_ProgressBarContents) {
-            if (pb->maximum == 0 && pb->minimum == 0)
-               val = -3.0*animator->progressStep(widget)/l;
-            else
-               val = pb->progress / double(pb->maximum - pb->minimum);
             if (val == 0.0)
                break;
          }
+         else if (val == 1.0)
+            break;
+            
          
          int s = qMin(qMax(l / 10, dpi.f16), t /*16*t/10*/);
          int ss = (10*s)/16;
@@ -508,40 +512,54 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             x += (l - n*s + s - ss)/2;
          y += (t-ss)/2;
          
-         painter->save();
-         painter->setRenderHint(QPainter::Antialiasing);
-         int nn = n;
+         --x; --y;
+         
+         QPixmap renderPix(ss+2,ss+2);
+         renderPix.fill(Qt::transparent);
+         QPainter p(&renderPix);
+         p.setRenderHint(QPainter::Antialiasing);
+         
+         int nn = (val < 0) ? 0 : int(n*val);
          if (element == CE_ProgressBarContents) {
-            if (val < 0) nn = 0;
-            nn = int(n*val);
-            painter->setBrush(Gradients::pix(CONF_COLOR(progress.std, 0), ss,
-                              Qt::Vertical, CONF_GRAD(progress) ));
-            painter->setPen(FCOLOR(Window).dark(132)); // (110*120) ...
+            p.setBrush(Gradients::pix(CONF_COLOR(progress.std, 0), ss,
+                              Qt::Vertical, GRAD(progress) ));
          }
          else {
+            if (busy)
+               nn = n;
+            else {
+               x += nn*s; nn = n - nn;
+            }
             const QColor c = FCOLOR(Window).dark(110);
-            painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
-                              CONF_GRAD(progress) ));
-            painter->setPen(c.dark(120));
+            p.setBrush(Gradients::pix(c, ss, Qt::Vertical,
+                              GRAD(progress) ));
          }
-         
+         p.setPen(Qt::NoPen);
+         p.setBrushOrigin(-1,-1);
+         p.drawEllipse(1,1,ss,ss);
+         p.setBrush(Qt::NoBrush);
+         p.setPen(QColor(0,0,0,70));
+         p.drawEllipse(1,1,ss,ss);
+         p.setPen(QColor(255,255,255,70));
+         p.drawEllipse(1,2,ss,ss);
+         p.end();
+
          if (vertical) {
             for (int i = 0; i < nn; ++i) { // x is in fact y!
-               painter->setBrushOrigin(0, x);
-               painter->drawEllipse(y,x,ss,ss); //todo: painterpath
+               painter->drawPixmap(y,x, renderPix);
                x+=s;
             }
          }
          else {
-            painter->setBrushOrigin(0, y);
             for (int i = 0; i < nn; ++i) {
-               painter->drawEllipse(x,y,ss,ss); //todo: painterpath
+               painter->drawPixmap(x,y, renderPix);
                x+=s;
             }
          }
          if (element == CE_ProgressBarContents) {
             bool b = (nn < n);
-            if (val < 0.0) { // busy
+            x+=2; y+=2; ss-=2;
+            if (busy) { // busy
                b = true;
                val = -val; nn = int(n*val); x += nn*s;
                double o = n*val - nn;
@@ -553,24 +571,27 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             if (b) {
                int q = int((10*n)*val) - 10*nn;
                if (q) {
+                  painter->save();
+                  painter->setRenderHint(QPainter::Antialiasing);
                   
                   const QColor c = Colors::mid(FCOLOR(Window).dark(110),
                                           CONF_COLOR(progress.std, 0), 10-q, q);
                   painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
-                                    CONF_GRAD(progress) ));
-                  painter->setPen(FCOLOR(Window).dark(132)); // (110*120) ...
+                                    GRAD(progress) ));
+                  painter->setPen(Qt::NoPen);
                   
                   if (vertical) {
                      painter->setBrushOrigin(0, x);
                      painter->drawEllipse(y,x,ss,ss);
                   }
-                  else
+                  else {
+                     painter->setBrushOrigin(0, y);
                      painter->drawEllipse(x,y,ss,ss);
-               
+                  }
+               painter->restore();
                }
             }
          }
-         painter->restore();
       }
       break;
    case CE_ProgressBarLabel:
@@ -927,21 +948,21 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          QColor c = Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1);
          QRect r = RECT.adjusted(0, 0, 0, -dpi.f2);
          const QPixmap & ground =
-               Gradients::pix(c, r.height(), Qt::Vertical, CONF_GRAD(tab));
+               Gradients::pix(c, r.height(), Qt::Vertical, GRAD(tab));
          masks.tab.render(r, painter, ground);
          
          if (sunken || option->state & State_Selected) {
             r.adjust(dpi.f2, dpi.f3, -dpi.f2, -dpi.f3);
             const QPixmap & fill =
                   Gradients::pix(CONF_COLOR(tab.active, 0), r.height(), Qt::Vertical,
-                                    CONF_GRAD(tab));
+                                    GRAD(tab));
             masks.tab.render(r, painter, fill);
          }
          else if (hover) {
             r.adjust(dpi.f3, dpi.f4, -dpi.f3, -dpi.f4);
             c = Colors::mid(c, CONF_COLOR(tab.active, 0), 21, 6);
             const QPixmap & fill =
-                  Gradients::pix(c, r.height(), Qt::Vertical, CONF_GRAD(tab));
+                  Gradients::pix(c, r.height(), Qt::Vertical, GRAD(tab));
             masks.tab.render(r, painter, fill);
          }
          shadows.tabSunken.render(RECT, painter);
@@ -1004,9 +1025,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          if (widget && widget->parentWidget()) // color fix...
             const_cast<QStyleOption*>(option)->palette =
                   widget->parentWidget()->palette();
+         drawControl(CE_ToolBoxTabShape, tbt, painter, widget);
          QStyleOptionToolBox copy = *tbt;
          copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
-         drawControl(CE_ToolBoxTabShape, &copy, painter, widget);
          drawControl(CE_ToolBoxTabLabel, &copy, painter, widget);
       }
       break;
@@ -1087,26 +1108,34 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
    case CE_HeaderSection: { // A header section
       const QStyleOptionHeader *header =
             qstyleoption_cast<const QStyleOptionHeader *>(option);
-      const QPixmap &sunk =
-            Gradients::pix(FCOLOR(Text), RECT.height(), Qt::Vertical, Gradients::Sunken);
-      if (hover) sunken = false;
-      if (sunken)
-         painter->drawTiledPixmap(RECT, sunk);
-      else if (header && header->orientation == Qt::Vertical) {
-         painter->save();
-         painter->setPen(FCOLOR(Text));
-         painter->setBrush(Colors::mid(FCOLOR(Text), FCOLOR(Base), hover ? 7 : 10, 1));
-         painter->drawRect(RECT.adjusted(0,0,-1,0));
-         painter->restore();
+      Qt::Orientation o = Qt::Vertical; int s = RECT.height();
+      if (header && header->orientation == Qt::Vertical) {
+         o = Qt::Horizontal;
+         s = RECT.width();
       }
+      if (hover) sunken = false;
+      if (sunken) {
+         const QPixmap &sunk = Gradients::pix(FCOLOR(Text), s, o, Gradients::Sunken);
+         painter->drawTiledPixmap(RECT, sunk);
+      }
+//       else if (header && header->orientation == Qt::Vertical) {
+//          painter->save();
+//          painter->setPen(FCOLOR(Text));
+//          painter->setBrush(Colors::mid(FCOLOR(Text), FCOLOR(Base), hover ? 7 : 10, 1));
+//          painter->drawRect(RECT.adjusted(0,0,-1,0));
+//          painter->restore();
+//       }
       else {
          const QPixmap &norm =
-               Gradients::pix(FCOLOR(Text), RECT.height(), Qt::Vertical,
-                              hover ? Gradients::Glass : Gradients::Button);
-         QRect r = RECT; r.setWidth(RECT.width() - dpi.f1);
-         painter->drawTiledPixmap(r, norm);
-         r = RECT; r.setLeft(r.right() - dpi.f1);
-         painter->drawTiledPixmap(r, sunk);
+               Gradients::pix(FCOLOR(Text), s, o, hover ? Gradients::Glass : Gradients::Button);
+         painter->drawTiledPixmap(RECT, norm);
+         if (o == Qt::Vertical) {
+            QRect r = RECT;
+            r.setWidth(RECT.width() - dpi.f1);
+            r = RECT; r.setLeft(r.right() - dpi.f1);
+            const QPixmap &sunk = Gradients::pix(FCOLOR(Text), s, o, Gradients::Sunken);
+            painter->drawTiledPixmap(r, sunk);
+         }
       }
       break;
    }
@@ -1286,7 +1315,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          
          // the allways shown base
          const QBrush base = Gradients::brush(config.btn.fullHover ? c :
-               CONF_COLOR(btn.std, 0), size, o, CONF_GRAD(btn));
+               CONF_COLOR(btn.std, 0), size, o, GRAD(btn));
          masks.tab.render(r, painter, base);
          masks.tab.outline(r, painter, Colors::mid(CONF_COLOR(btn.std, 0), Qt::white,1,2), true);
          
@@ -1294,7 +1323,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             break; // really - nothing to do anymore!
          
          const QBrush deco =
-               Gradients::brush(c, size, o, CONF_GRAD(btn));
+               Gradients::brush(c, size, o, GRAD(btn));
          r.adjust(f2, f2, -f2, -f2);
          masks.button.render(r, painter, deco, Tile::Full, false, QPoint(f2,f2));
       }
