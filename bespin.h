@@ -211,15 +211,6 @@ private:
    BespinStyle& operator=( const BespinStyle & );
    
    void fillWithMask(QPainter *painter,
-                     const QRect &rect,
-                     const QBrush &brush,
-                     const Tile::Mask *mask,
-                     Tile::PosFlags pf = Tile::Full,
-                     bool justClip = false,
-                     QPoint offset = QPoint(),
-                     bool inverse = false,
-                     const QRect *outerRect = 0L) const;
-   void fillWithMask(QPainter *painter,
                      const QPoint &xy,
                      const QBrush &brush,
                      const QPixmap &mask,

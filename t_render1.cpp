@@ -38,14 +38,14 @@
       yOff += tlh;
       h -= tlh;
       if (pf & Left) // upper left
-         DRAW_PIXMAP(r.x(),r.y(),PIXMAP(TopLeft), 0, 0, tlw, tlh);
+         DRAW_PIXMAP(r.x(),r.y(),pixmap[TopLeft], 0, 0, tlw, tlh);
       if (pf & Right) // upper right
-         DRAW_PIXMAP(rOff, r.y(), PIXMAP(TopRight), width(TopRight)-trw, 0,
+         DRAW_PIXMAP(rOff, r.y(), pixmap[TopRight], width(TopRight)-trw, 0,
                      trw, trh);
       
       // upper line
       if (w > 0 && !pixmap[TopMid].isNull())
-         DRAW_TILED_PIXMAP(xOff, r.y(), w, tlh/*height(TopMid)*/, PIXMAP(TopMid));
+         DRAW_TILED_PIXMAP(xOff, r.y(), w, tlh/*height(TopMid)*/, pixmap[TopMid]);
    }
    if (pf & Bottom)
    {
@@ -58,15 +58,15 @@
       int bOff = r.bottom()-blh+1;
       h -= blh;
       if (pf & Left) // lower left
-         DRAW_PIXMAP(r.x(), bOff, PIXMAP(BtmLeft), 0, height(BtmLeft)-blh,
+         DRAW_PIXMAP(r.x(), bOff, pixmap[BtmLeft], 0, height(BtmLeft)-blh,
                      blw, blh);
       if (pf & Right) // lower right
-         DRAW_PIXMAP(rOff, bOff, PIXMAP(BtmRight), width(BtmRight)-brw,
+         DRAW_PIXMAP(rOff, bOff, pixmap[BtmRight], width(BtmRight)-brw,
                      height(BtmRight)-brh, brw, brh);
       
       // lower line
       if (w > 0 && !pixmap[BtmMid].isNull())
-         DRAW_TILED_PIXMAP(xOff, bOff, w, height(BtmMid), PIXMAP(BtmMid));
+         DRAW_TILED_PIXMAP(xOff, bOff, w, height(BtmMid), pixmap[BtmMid]);
    }
    
    if (h > 0)
@@ -74,8 +74,8 @@
       if ((pf & Center) && (w > 0)) // center part
          DRAW_TILED_PIXMAP(xOff, yOff, w, h, pixmap[MidMid]);
       if (pf & Left && !pixmap[MidLeft].isNull()) // left line
-         DRAW_TILED_PIXMAP(r.x(), yOff, width(MidLeft), h, PIXMAP(MidLeft));
+         DRAW_TILED_PIXMAP(r.x(), yOff, width(MidLeft), h, pixmap[MidLeft]);
       rOff = r.right()-width(MidRight)+1;
       if (pf & Right && !pixmap[MidRight].isNull()) // right line
-         DRAW_TILED_PIXMAP(rOff, yOff, width(MidRight), h, PIXMAP(MidRight));
+         DRAW_TILED_PIXMAP(rOff, yOff, width(MidRight), h, pixmap[MidRight]);
    }

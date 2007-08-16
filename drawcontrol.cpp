@@ -100,7 +100,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          else {
             if (sunken && config.btn.layer == 1)
-               tmpBtn.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,-dpi.f1);
+               tmpBtn.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
             drawControl(CE_PushButtonBevel, &tmpBtn, painter, widget);
          }
 //          tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
@@ -125,10 +125,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             painter->setRenderHint(QPainter::Antialiasing);
             const QPixmap &fill =
                   Gradients::pix((option->state & State_On) ?
-                  Colors::mid(FCOLOR(Highlight), CONF_COLOR(btn.std, 0)) :
-                  CONF_COLOR(btn.std, 0), r.height(), Qt::Vertical, GRAD(btn));
+                  Colors::mid(FCOLOR(Highlight), CCOLOR(btn.std, 0)) :
+                  CCOLOR(btn.std, 0), r.height(), Qt::Vertical, GRAD(btn));
             painter->setBrush(fill);
-            painter->setPen(CONF_COLOR(btn.std, 0).dark(124));
+            painter->setPen(CCOLOR(btn.std, 0).dark(124));
             painter->setBrushOrigin(r.topLeft());
             painter->drawEllipse(r);
             painter->restore();
@@ -151,7 +151,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             newBtn.rect.setHeight(sz); newBtn.rect.setWidth(sz);
             painter->save();
             painter->setPen(Qt::NoPen);
-            painter->setBrush(Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 1)));
+            painter->setBrush(Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 1)));
             drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
             painter->restore();
          }
@@ -218,8 +218,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          painter->save();
          QColor fg = Colors::btnFg(PAL, isEnabled, hover);
          if (btn->features & QStyleOptionButton::DefaultButton) {
-            painter->setPen(Colors::mid(hover ? CONF_COLOR(btn.active, 0) :
-                  CONF_COLOR(btn.std, 0), fg, 3,1));
+            painter->setPen(Colors::mid(hover ? CCOLOR(btn.active, 0) :
+                  CCOLOR(btn.std, 0), fg, 3,1));
             ir.translate(0,1);
             drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
 //             ir.translate(2,2);
@@ -356,17 +356,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          int d = 0;
          if (sunken) {
             rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
-            c = CONF_COLOR(tab.active, 0);
+            c = CCOLOR(tab.active, 0);
             d = (o == Qt::Vertical) ? -dpi.f1 : f2;
          }
          else {
-            c = Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1);
-            int quota = 6 + (int) (.16 * Colors::contrast(c, CONF_COLOR(tab.active, 0)));
-            c = Colors::mid(c, CONF_COLOR(tab.active, 0), quota, step);
+            c = Colors::mid(CCOLOR(tab.std, 0), FCOLOR(Window), 2, 1);
+            int quota = 6 + (int) (.16 * Colors::contrast(c, CCOLOR(tab.active, 0)));
+            c = Colors::mid(c, CCOLOR(tab.active, 0), quota, step);
          }
          const QPoint off(d, d+dpi.f4);
-         masks.tab.render(rect, painter, Gradients::brush(c, size, o,
-                           GRAD(tab)), Tile::Full, false, off);
+         masks.tab.render(rect, painter, GRAD(tab), o, c, size, off);
 
       }
       break;
@@ -415,27 +414,27 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             }
             QPixmap tabIcon = tabV2.icon.pixmap(iconSize, (isEnabled) ?
                   QIcon::Normal : QIcon::Disabled);
-            painter->drawPixmap(tr.left() + 6,
+            painter->drawPixmap(tr.left() + dpi.f6,
                                 tr.center().y() - tabIcon.height() / 2, tabIcon);
-            tr.setLeft(tr.left() + iconSize.width() + 4);
+            tr.setLeft(tr.left() + iconSize.width() + dpi.f4);
          }
          
          // color adjustment
          QColor cF, cB;
          if (selected || sunken) {
-            cF = CONF_COLOR(tab.active, 1);
-            cB = CONF_COLOR(tab.active, 0);
+            cF = CCOLOR(tab.active, 1);
+            cB = CCOLOR(tab.active, 0);
          }
          else if (hover) {
-            cF = CONF_COLOR(tab.std, 1);
-            cB = Colors::mid(CONF_COLOR(tab.std ,0 ), FCOLOR(Window), 2, 1);
-            cB = Colors::mid(cB, CONF_COLOR(tab.active, 0));
-            if (Colors::contrast(CONF_COLOR(tab.active, 1), cB) > Colors::contrast(cF, cB))
-               cF = CONF_COLOR(tab.active, 1);
+            cF = CCOLOR(tab.std, 1);
+            cB = Colors::mid(CCOLOR(tab.std ,0 ), FCOLOR(Window), 2, 1);
+            cB = Colors::mid(cB, CCOLOR(tab.active, 0));
+            if (Colors::contrast(CCOLOR(tab.active, 1), cB) > Colors::contrast(cF, cB))
+               cF = CCOLOR(tab.active, 1);
          }
          else {
-            cB = Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1);
-            cF = Colors::mid(cB, CONF_COLOR(tab.std, 1), 1,4);
+            cB = Colors::mid(CCOLOR(tab.std, 0), FCOLOR(Window), 2, 1);
+            cF = Colors::mid(cB, CCOLOR(tab.std, 1), 1,4);
          }
 
          // dark background, let's paint an emboss
@@ -521,7 +520,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          
          int nn = (val < 0) ? 0 : int(n*val);
          if (element == CE_ProgressBarContents) {
-            p.setBrush(Gradients::pix(CONF_COLOR(progress.std, 0), ss,
+            p.setBrush(Gradients::pix(CCOLOR(progress.std, 0), ss,
                               Qt::Vertical, GRAD(progress) ));
          }
          else {
@@ -575,7 +574,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                   painter->setRenderHint(QPainter::Antialiasing);
                   
                   const QColor c = Colors::mid(FCOLOR(Window).dark(110),
-                                          CONF_COLOR(progress.std, 0), 10-q, q);
+                                          CCOLOR(progress.std, 0), 10-q, q);
                   painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
                                     GRAD(progress) ));
                   painter->setPen(Qt::NoPen);
@@ -725,10 +724,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                dy = step*r.height()/18;
                r.adjust(dx, dy, -dx, -dy);
             }
-            const QBrush fill =
-                  Gradients::brush(c, r.height(), Qt::Vertical, sunken ?
-                  Gradients::Sunken : config.menu.itemGradient);
-            masks.tab.render(r, painter, fill, Tile::Full, false, QPoint(0,dy));
+            const Gradients::Type gt =
+                  sunken ? Gradients::Sunken : config.menu.itemGradient;
+            masks.tab.render(r, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,dy));
          }
          QPixmap pix =
                 mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ?
@@ -784,10 +782,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                bg = Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 1, 2);
                fg = COLOR(ROLE[Bg]);
             }
-            const QBrush fill =
-                  Gradients::brush(bg, RECT.height(), Qt::Vertical, sunken ?
-                  Gradients::Sunken : config.menu.itemGradient);
-            masks.tab.render(RECT, painter, fill);
+            masks.tab.render(RECT, painter, sunken ?
+                  Gradients::Sunken : config.menu.itemGradient, Qt::Vertical, bg);
          }
 
          // Text and icon, ripped from windows style
@@ -945,25 +941,18 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 //          default:
 //                break;
 //          }
-         QColor c = Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1);
+         QColor c = Colors::mid(CCOLOR(tab.std, 0), FCOLOR(Window), 2, 1);
          QRect r = RECT.adjusted(0, 0, 0, -dpi.f2);
-         const QPixmap & ground =
-               Gradients::pix(c, r.height(), Qt::Vertical, GRAD(tab));
-         masks.tab.render(r, painter, ground);
+         masks.tab.render(r, painter, GRAD(tab), Qt::Vertical, c);
          
          if (sunken || option->state & State_Selected) {
             r.adjust(dpi.f2, dpi.f3, -dpi.f2, -dpi.f3);
-            const QPixmap & fill =
-                  Gradients::pix(CONF_COLOR(tab.active, 0), r.height(), Qt::Vertical,
-                                    GRAD(tab));
-            masks.tab.render(r, painter, fill);
+            masks.tab.render(r, painter, GRAD(tab), Qt::Vertical, CCOLOR(tab.active, 0));
          }
          else if (hover) {
             r.adjust(dpi.f3, dpi.f4, -dpi.f3, -dpi.f4);
-            c = Colors::mid(c, CONF_COLOR(tab.active, 0), 21, 6);
-            const QPixmap & fill =
-                  Gradients::pix(c, r.height(), Qt::Vertical, GRAD(tab));
-            masks.tab.render(r, painter, fill);
+            c = Colors::mid(c, CCOLOR(tab.active, 0), 21, 6);
+            masks.tab.render(r, painter, GRAD(tab), Qt::Vertical, c);
          }
          shadows.tabSunken.render(RECT, painter);
 //       }
@@ -977,21 +966,21 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          
          QColor cB, cF;
          if (sunken) {
-            cB = CONF_COLOR(tab.active, 0);
-            cF = CONF_COLOR(tab.active, 1);
+            cB = CCOLOR(tab.active, 0);
+            cF = CCOLOR(tab.active, 1);
          }
          else {
-            cB = CONF_COLOR(tab.std, 0);
-            cF = CONF_COLOR(tab.std, 1);
+            cB = CCOLOR(tab.std, 0);
+            cF = CCOLOR(tab.std, 1);
          }
          
          if (sunken) hover = false;
                
          if (hover) {
-            cB = Colors::mid(cB, CONF_COLOR(tab.active, 0));
-            if (Colors::contrast(CONF_COLOR(tab.active, 1), cB) >
+            cB = Colors::mid(cB, CCOLOR(tab.active, 0));
+            if (Colors::contrast(CCOLOR(tab.active, 1), cB) >
                 Colors::contrast(cF, cB)) {
-               cF = CONF_COLOR(tab.active, 1);
+               cF = CCOLOR(tab.active, 1);
             }
          }
          
@@ -1221,14 +1210,14 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          const int sz = dpi.ExclusiveIndicator - dpi.f4;
          const int step = (hover && !complexStep) ? 6 : complexStep;
          const QColor c = (!alive) ? FCOLOR(Window) :
-               Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 18, step);
+               Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 18, step);
          const QPixmap &fill =
                Gradients::pix(c, sz, Qt::Vertical, (sunken || !alive) ?
                Gradients::Sunken : Gradients::Button);
          fillWithMask(painter, xy, fill, masks.radio);
          if (alive) {
             painter->save();
-            painter->setPen(CONF_COLOR(btn.std, 0).dark(120));
+            painter->setPen(CCOLOR(btn.std, 0).dark(120));
             painter->setBrush(Qt::NoBrush);
             painter->drawEllipse(QRect(xy, QSize(sz, sz)));
             painter->restore();
@@ -1299,33 +1288,30 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          // the hover indicator color (inside area)
          QColor c;
          if (sunken)
-            c = CONF_COLOR(btn.active, 0);
+            c = CCOLOR(btn.active, 0);
          else if (complexStep) {
-            c = Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 2, 1);
-            c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-complexStep, complexStep);
+            c = Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 2, 1);
+            c = Colors::mid(c, CCOLOR(btn.active, 0), 6-complexStep, complexStep);
          }
          else if (hover)
-            c = CONF_COLOR(btn.active, 0);
+            c = CCOLOR(btn.active, 0);
          else if (widgetStep)
-            c = Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 18-widgetStep, widgetStep);
+            c = Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 18-widgetStep, widgetStep);
          else if (scrollAreaHovered_)
-            c = Colors::mid(CONF_COLOR(btn.std, 0), CONF_COLOR(btn.active, 0), 2, 1);
+            c = Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 2, 1);
          else
-            c = CONF_COLOR(btn.std, 0);
+            c = CCOLOR(btn.std, 0);
          
          // the allways shown base
-         const QBrush base = Gradients::brush(config.btn.fullHover ? c :
-               CONF_COLOR(btn.std, 0), size, o, GRAD(btn));
-         masks.tab.render(r, painter, base);
-         masks.tab.outline(r, painter, Colors::mid(CONF_COLOR(btn.std, 0), Qt::white,1,2), true);
+         masks.tab.render(r, painter, GRAD(btn), o,
+                          config.btn.fullHover ? c : CCOLOR(btn.std, 0), size);
+         masks.tab.outline(r, painter, Colors::mid(CCOLOR(btn.std, 0), Qt::white,1,2), true);
          
          if (config.btn.fullHover)
             break; // really - nothing to do anymore!
-         
-         const QBrush deco =
-               Gradients::brush(c, size, o, GRAD(btn));
+
          r.adjust(f2, f2, -f2, -f2);
-         masks.button.render(r, painter, deco, Tile::Full, false, QPoint(f2,f2));
+         masks.button.render(r, painter, GRAD(btn), o, c, size, QPoint(f2,f2));
       }
       break;
 //    case CE_ScrollBarFirst: // Scroll bar first line indicator (i.e., home).
@@ -1374,7 +1360,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                      ((QWidget*)(combo->view()))->isVisible());
                int f3 = dpi.f3;
                editRect.adjust(f3,0, -f3, 0);
-               painter->setPen(hover ? CONF_COLOR(btn.active, 1) : CONF_COLOR(btn.std, 1));
+               painter->setPen(hover ? CCOLOR(btn.active, 1) : CCOLOR(btn.std, 1));
             }
             painter->drawText(editRect, Qt::AlignCenter, cb->currentText);
          }

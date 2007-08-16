@@ -115,12 +115,6 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             hover = isEnabled && (sb->activeSubControls == SC_SpinBoxUp);
             sunken = sunken && (sb->activeSubControls == SC_SpinBoxUp);
             
-//             shadows.button[1].render(copy.rect, painter, pf);
-//             copy.rect.adjust(2,2,-2,0);
-//             gt = (isEnabled && hover) ? (sunken ? Gradients::Sunken : Gradients::Gloss) : Gradients::Button;
-//             fillWithMask(painter, copy.rect, gradient(FCOLOR(Button), RECT.height(), Qt::Vertical, gt),
-//                          &masks.button, pf | Tile::Center);
-            
             int dx = copy.rect.width()/4, dy = copy.rect.height()/4;
             copy.rect.adjust(dx, 2*dy,-dx,-dpi.f1);
             
@@ -151,13 +145,6 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             isEnabled = sb->stepEnabled & QAbstractSpinBox::StepDownEnabled;
             hover = isEnabled && (sb->activeSubControls == SC_SpinBoxDown);
             sunken = sunken && (sb->activeSubControls == SC_SpinBoxDown);
-            
-//             shadows.button[1].render(copy.rect, painter, pf);
-//             copy.rect.adjust(2,0,-2,-2);
-//             gt = (isEnabled && hover) ? (sunken ? Gradients::Sunken : Gradients::Gloss) : Gradients::Button;
-
-//             fillWithMask(painter, copy.rect, Gradients::pix(FCOLOR(Button), RECT.height(), Qt::Vertical, gt), &masks.button,
-//                          pf | Tile::Center, false, QPoint(0,-uh));
             
             int dx = copy.rect.width()/4, dy = copy.rect.height()/4;
             copy.rect.adjust(dx, dpi.f1,-dx,-2*dy);
@@ -383,30 +370,33 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                drawPrimitive(PE_PanelLineEdit, option, painter, widget);
             }
             else {
-               if (!isEnabled || ar.isNull()) {
-                  masks.tab.render(r, painter, Gradients::brush(FCOLOR(Window),
-                     r.height(), Qt::Vertical, GRAD(chooser)));
-               }
+               if (!isEnabled || ar.isNull())
+                  masks.tab.render(r, painter, GRAD(chooser),
+                                   Qt::Vertical, FCOLOR(Window));
                else {
                   // ground
                   step = animator->hoverStep(widget);
                   if (listShown) step = 6;
+                  
                   c = Colors::btnBg(PAL, isEnabled, hasFocus, 0);
                   if (config.btn.fullHover)
                      c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
-                  masks.tab.render(r, painter, Gradients::brush(c, r.height(),
-                        Qt::Vertical, GRAD(chooser)));
-                  if (hasFocus)
-                     masks.tab.outline(r, painter, Colors::mid(CONF_COLOR(btn.std, 0),
-                        FCOLOR(Highlight), 2, 1), config.strongFocus, Tile::Ring, f3);
+                  
+                  masks.tab.render(r, painter, GRAD(chooser), Qt::Vertical, c);
+                  
+                  if (hasFocus) {
+                     const QColor hlc =
+                           Colors::mid(CONF_COLOR(btn.std, 0), FCOLOR(Highlight), 2, 1);
+                     masks.tab.outline(r, painter, hlc, config.strongFocus, f3);
+                  }
                   
                   // maybe hover indicator?
                   if (!config.btn.fullHover && step) { // jupp ;)
                      r.adjust(f3, f3, -f3, -f3);
-                     masks.tab.render(r, painter, Gradients::brush(
-                        Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step), RECT.height()-f2,
-                        Qt::Vertical, GRAD(chooser)), Tile::Full, false,
-                                      QPoint(0,f3));
+                     const QColor c2 =
+                           Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
+                     masks.tab.render(r, painter, GRAD(chooser), Qt::Vertical,
+                                      c2, RECT.height()-f2, QPoint(0,f3));
                   }
                }
                shadows.tabSunken.render(RECT, painter);
@@ -446,9 +436,8 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                c = Colors::mid(c, CONF_COLOR(btn.active, 0));
                c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
                ar.adjust(f2, dpi.f4, -f2, -dpi.f4);
-               masks.tab.render(ar, painter, Gradients::brush(c, RECT.height()-f2,
-                  Qt::Vertical, GRAD(chooser)), Tile::Full, false,
-                                QPoint(0,dpi.f4));
+               masks.tab.render(ar, painter, GRAD(chooser), Qt::Vertical, c,
+                                RECT.height()-f2, QPoint(0,dpi.f4));
                painter->setPen(CONF_COLOR(btn.active, 1));
             }
             drawPrimitive(arrow, &tmpOpt, painter, widget);
@@ -790,10 +779,13 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             gr.setRight(ir.left() - dpi.f4);
             const QPixmap &groove = Gradients::pix(FCOLOR(Window), gr.height(),
                   Qt::Vertical, Gradients::Sunken);
-            masks.tab.render(gr, painter, groove, Tile::Full &~ Tile::Left);
+            masks.tab.setShape(Tile::Full &~ Tile::Left);
+            masks.tab.render(gr, painter, groove);
             gr.setRight(RECT.right());
             gr.setLeft(ir.right() + dpi.f4);
-            masks.tab.render(gr, painter, groove, Tile::Full &~ Tile::Right);
+            masks.tab.setShape(Tile::Full &~ Tile::Right);
+            masks.tab.render(gr, painter, groove);
+            masks.tab.reset();
          }
          
 #define PAINT_WINDOW_BUTTON(_btn_) {\

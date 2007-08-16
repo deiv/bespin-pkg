@@ -142,13 +142,17 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
    case CT_TabBarTab: // A tab on a tab bar, like QTabBar
       if (const QStyleOptionTab *tab =
           qstyleoption_cast<const QStyleOptionTab *>(option)) {
+         int add = dpi.f8;
+         if (!tab->icon.isNull()) {
+            add += dpi.f12;
+         }
          switch (tab->shape) {
          case QTabBar::RoundedNorth: case QTabBar::TriangularNorth:
          case QTabBar::RoundedSouth: case QTabBar::TriangularSouth:
-            return contentsSize + QSize(dpi.f8, 0);
+            return contentsSize + QSize(add, 0);
          case QTabBar::RoundedEast: case QTabBar::TriangularEast:
          case QTabBar::RoundedWest: case QTabBar::TriangularWest:
-            return contentsSize + QSize(0, dpi.f8);
+            return contentsSize + QSize(0, add);
          }
       }
       return contentsSize + QSize(dpi.f6, dpi.f6);

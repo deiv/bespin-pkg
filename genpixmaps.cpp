@@ -63,8 +63,9 @@ void BespinStyle::generatePixmaps()
    p.setBrush(QColor(0,0,0,64));
    p.drawRoundRect(f3,f3,f9-2*f3,f9-2*f3,60,60);
    p.end();
-   lights.button =
-      Tile::Mask(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2, f3,f3,-f3,-f3, 75,75);
+   lights.button = Tile::Mask(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2, 75,75);
+   lights.button.setClipOffsets(f3, f3, f3, f3);
+   lights.button.setDefaultShape(Tile::Ring);
    
    // mask
    tmp = QPixmap(f9,f9);
@@ -76,7 +77,8 @@ void BespinStyle::generatePixmaps()
    p.drawRoundRect(0,0,f9,f9,60,60);
    p.end();
    UPDATE_COLORS(tmp);
-   masks.button = Tile::Mask(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2,0,0,0,0,85,85);
+   masks.button = Tile::Mask(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2,85,85);
+   masks.button.setClipOffsets(0,0,0,0);
    
    // -> sunken
    QLinearGradient lg; QGradientStops stops;
@@ -109,7 +111,7 @@ void BespinStyle::generatePixmaps()
          << QGradientStop( 0.5, QColor(255,255,255, 70) )
          << QGradientStop( 1, QColor(255,255,255, 10) );
       lg.setStops(stops);
-      p.fillRect(0,f9-f2,f9,f1, lg);
+      p.fillRect(0,f9-f1,f9,f1, lg);
       stops.clear();
       p.end();
    
@@ -123,12 +125,12 @@ void BespinStyle::generatePixmaps()
    QPen pen = p.pen(); pen.setWidth(f1); p.setPen(pen);
    p.setRenderHint(QPainter::Antialiasing);
    p.setBrush(Qt::NoBrush);
-   p.setPen(QColor(255,255,255,40));
-   p.drawRoundRect(0,0,f9-f2,f9-f2,60,60);
-   p.setPen(QColor(255,255,255,60));
-   p.drawRoundRect(f2,f2,f9-f2,f9-f2,60,60);
-   p.setPen(QColor(0,0,0,50));
-   p.drawRoundRect(f1,f1,f9-dpi.f3,f9-dpi.f3,60,60);
+   p.setPen(QColor(0,0,0,70));
+   p.drawRoundRect(0,0,f9,f9-f2,95,95);
+//    p.setPen(QColor(255,255,255,60));
+//    p.drawRoundRect(f2,f2,f9-f2,f9-f2,60,60);
+   p.setPen(QColor(255,255,255,110));
+   p.drawRoundRect(0,f1,f9,f9-f1,85,85);
    p.end();
    shadows.relief = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
 
@@ -296,7 +298,8 @@ void BespinStyle::generatePixmaps()
    p.end();
    int f13_2 = (f13-1)/2;
    UPDATE_COLORS(tmp);
-   masks.tab = Tile::Mask(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2,0,0,0,0,99,99);
+   masks.tab = Tile::Mask(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2,99,99);
+   masks.tab.setClipOffsets(0,0,0,0);
    
    // light
    tmp.fill(Qt::transparent);
@@ -312,8 +315,9 @@ void BespinStyle::generatePixmaps()
    p.setBrush(QColor(0,0,0,64));
    p.drawRoundRect(f3,f3,f13-2*f3,f13-2*f3,91,91);
    p.end();
-   lights.tab =
-      Tile::Mask(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2, f3,f3,-f3,-f3, 91,91);
+   lights.tab = Tile::Mask(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2, 91,91);
+   lights.tab.setClipOffsets(f3,f3,f3,f3);
+   lights.tab.setDefaultShape(Tile::Ring);
    
    // shadow
    int f17 = SCALE(17), f17_2 = (f17-1)/2;

@@ -370,7 +370,6 @@ internalEvent_(false) {
 
 BespinStyle::~BespinStyle() {
    Gradients::wipe();
-//    bfi.clear();
 }
 
 void BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy, const QBrush &brush, const QPixmap &mask, QPoint offset) const
@@ -392,19 +391,6 @@ void BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy, const QBrush
    painter->drawPixmap(xy, qPix);
 }
 
-void BespinStyle::fillWithMask(QPainter *painter, const QRect &rect, const QBrush &brush, const Tile::Mask *mask, Tile::PosFlags pf, bool justClip, QPoint offset, bool inverse, const QRect *outerRect) const
-{
-   // TODO: get rid of this?! - masks now render themselves!
-   bool pixmode = !brush.texture().isNull();
-   if (!mask) {
-      if (pixmode)
-         painter->drawTiledPixmap(rect, brush.texture(), offset);
-      else
-         painter->fillRect(rect, brush.color());
-      return;
-   }
-   mask->render(rect, painter, brush, pf, justClip, offset, inverse, outerRect);
-}
 
 /**======================================*/
 
