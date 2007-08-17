@@ -784,6 +784,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             }
             masks.tab.render(RECT, painter, sunken ?
                   Gradients::Sunken : config.menu.itemGradient, Qt::Vertical, bg);
+//             masks.tab.outline(RECT, painter, QColor(0,0,0,45), true);
          }
 
          // Text and icon, ripped from windows style
@@ -1245,6 +1246,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          painter->drawLine(x, RECT.y(), x, RECT.bottom());
       }
       RESTORE_PEN;
+
       break;
    }
    case CE_ScrollBarSlider: // Scroll bar slider.
@@ -1258,33 +1260,15 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
           qstyleoption_cast<const QStyleOptionSlider *>(option)) {
   
          if (!isEnabled) {
-            drawControl(CE_ScrollBarSubPage, option, painter, widget);
+            if (config.scroll.sunken)
+               shadows.tabSunken.render(RECT, painter);
+            else
+               drawControl(CE_ScrollBarSubPage, option, painter, widget);
             break;
          }
-         
-         // we need to paint a slider
-         const int f1 = dpi.f1, f2 = dpi.f2;
-         QRect r = RECT;
-         
-         // shadow
-         if (sunken) {
-            r.adjust(f1, f1, -f1, -f1);
-            shadows.tab[true][true].render(r, painter);
-            r.adjust(f1, f1, -f1, -f2);
-         }
-         else {
-            shadows.tab[true][false].render(r, painter);
-            r.adjust(f2, f2, -f2, -dpi.f3);
-         }
-         
-         Qt::Orientation o; int size;
-         if (option->state & QStyle::State_Horizontal) {
-            o = Qt::Vertical; size = r.height();
-         }
-         else {
-            o = Qt::Horizontal; size = r.width();
-         }
-         
+
+         // --> we need to paint a slider
+
          // the hover indicator color (inside area)
          QColor c;
          if (sunken)
@@ -1301,17 +1285,42 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             c = Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 2, 1);
          else
             c = CCOLOR(btn.std, 0);
-         
+
+         QRect r = RECT;
+         const int f1 = dpi.f1, f2 = dpi.f2;
+
+         // shadow
+         if (sunken) {
+            r.adjust(f1, f1, -f1, -f1);
+            shadows.tab[true][true].render(r, painter);
+            r.adjust(f1, f1, -f1, -f2);
+         }
+         else {
+            shadows.tab[true][false].render(r, painter);
+            r.adjust(f2, f2, -f2, -dpi.f3);
+         }
+
+         // gradient setup
+         Qt::Orientation o; int size; Tile::PosFlags pf;
+         if (option->state & QStyle::State_Horizontal) {
+            o = Qt::Vertical; size = r.height();
+            pf = Tile::Top | Tile::Bottom;
+         }
+         else {
+            o = Qt::Horizontal; size = r.width();
+            pf = Tile::Left | Tile::Right;
+         }
+
          // the allways shown base
-         masks.tab.render(r, painter, GRAD(btn), o,
+         masks.tab.render(r, painter, GRAD(scroll), o,
                           config.btn.fullHover ? c : CCOLOR(btn.std, 0), size);
          masks.tab.outline(r, painter, Colors::mid(CCOLOR(btn.std, 0), Qt::white,1,2), true);
-         
+
          if (config.btn.fullHover)
             break; // really - nothing to do anymore!
 
          r.adjust(f2, f2, -f2, -f2);
-         masks.button.render(r, painter, GRAD(btn), o, c, size, QPoint(f2,f2));
+         masks.button.render(r, painter, Gradients::Progress/*GRAD(btn)*/, o, c, size, QPoint(f2,f2));
       }
       break;
 //    case CE_ScrollBarFirst: // Scroll bar first line indicator (i.e., home).

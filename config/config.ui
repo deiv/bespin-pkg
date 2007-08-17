@@ -16,7 +16,7 @@
    <item row="0" column="0" colspan="2" >
     <widget class="QTabWidget" name="generalTab" >
      <property name="currentIndex" >
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
@@ -129,13 +129,6 @@
            <string>O</string>
           </property>
          </item>
-        </widget>
-       </item>
-       <item row="7" column="0" colspan="3" >
-        <widget class="QCheckBox" name="showScrollButtons" >
-         <property name="text" >
-          <string>Show Scrollbar Buttons</string>
-         </property>
         </widget>
        </item>
        <item row="8" column="0" colspan="2" >
@@ -388,101 +381,120 @@
       <attribute name="title" >
        <string>Misc</string>
       </attribute>
-      <widget class="QLabel" name="label_3" >
-       <property name="geometry" >
-        <rect>
-         <x>9</x>
-         <y>9</y>
-         <width>215</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text" >
-        <string>Progress color role</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="crProgressBar" >
-       <property name="geometry" >
-        <rect>
-         <x>230</x>
-         <y>9</y>
-         <width>215</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_13" >
-       <property name="geometry" >
-        <rect>
-         <x>9</x>
-         <y>40</y>
-         <width>215</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text" >
-        <string>Progress Gradient</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="gradProgress" >
-       <property name="geometry" >
-        <rect>
-         <x>230</x>
-         <y>40</y>
-         <width>215</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_12" >
-       <property name="geometry" >
-        <rect>
-         <x>9</x>
-         <y>71</y>
-         <width>215</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text" >
-        <string>Combo Gradient</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="gradChoose" >
-       <property name="geometry" >
-        <rect>
-         <x>230</x>
-         <y>71</y>
-         <width>215</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_17" >
-       <property name="geometry" >
-        <rect>
-         <x>9</x>
-         <y>102</y>
-         <width>215</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text" >
-        <string>Password Echo Chararcter</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="pwEchoChar" >
-       <property name="geometry" >
-        <rect>
-         <x>230</x>
-         <y>102</y>
-         <width>215</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="editable" >
-        <bool>true</bool>
-       </property>
-      </widget>
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QLabel" name="label_12" >
+         <property name="text" >
+          <string>Combo Gradient</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QLabel" name="label_17" >
+         <property name="text" >
+          <string>Password Echo Chararcter</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QComboBox" name="gradChoose" />
+       </item>
+       <item row="1" column="1" >
+        <widget class="QComboBox" name="pwEchoChar" >
+         <property name="editable" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QGroupBox" name="groupBox" >
+         <property name="title" >
+          <string>Scrollbars</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_18" >
+            <property name="text" >
+             <string>Gradient</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QComboBox" name="gradScroll" />
+          </item>
+          <item row="1" column="0" colspan="2" >
+           <widget class="QCheckBox" name="scrollSunken" >
+            <property name="text" >
+             <string>Sunken</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2" >
+           <widget class="QCheckBox" name="showScrollButtons" >
+            <property name="text" >
+             <string>Show Buttons</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QGroupBox" name="groupBox_3" >
+         <property name="title" >
+          <string>Progressbars</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_3" >
+            <property name="text" >
+             <string>Color role</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QComboBox" name="crProgressBar" />
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_13" >
+            <property name="text" >
+             <string>Gradient</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QComboBox" name="gradProgress" />
+          </item>
+          <item row="2" column="0" colspan="2" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="Seite_3" >
       <attribute name="title" >

@@ -209,25 +209,26 @@ progressGradient(const QColor &c, int size, Qt::Orientation o) {
    
    QPoint start, stop;
    QPixmap *dark = newPix(size, o, &start, &stop, 3*size);
-   QGradient lg1, lg2;
-   switch (_progressBase) {
-   case Gradients::Button:
-      lg1 = buttonGradient(dkC, start, stop);
-      lg2 = buttonGradient(ltC, start, stop); break;
-   case Gradients::Glass:
-   default:
-      lg1 = gl_ssGradient(dkC, start, stop, true);
-      lg2 = gl_ssGradient(ltC, start, stop, true); break;
-   case Gradients::Simple:
-      lg1 = simpleGradient(dkC, start, stop);
-      lg2 = simpleGradient(ltC, start, stop); break;
-   case Gradients::Sunken:
-      lg1 = sunkenGradient(dkC, start, stop);
-      lg2 = sunkenGradient(ltC, start, stop); break;
-   case Gradients::Gloss:
-      lg1 = gl_ssGradient(dkC, start, stop);
-      lg2 = gl_ssGradient(ltC, start, stop); break;
-   }
+   QGradient lg1 = simpleGradient(ltC, start, stop),
+      lg2 = gl_ssGradient(dkC, start, stop, true);
+//    switch (_progressBase) {
+//    case Gradients::Button:
+//       lg1 = buttonGradient(dkC, start, stop);
+//       lg2 = buttonGradient(ltC, start, stop); break;
+//    case Gradients::Glass:
+//    default:
+//       lg1 = gl_ssGradient(dkC, start, stop, true);
+//       lg2 = gl_ssGradient(ltC, start, stop, true); break;
+//    case Gradients::Simple:
+//       lg1 = simpleGradient(dkC, start, stop);
+//       lg2 = simpleGradient(ltC, start, stop); break;
+//    case Gradients::Sunken:
+//       lg1 = sunkenGradient(dkC, start, stop);
+//       lg2 = sunkenGradient(ltC, start, stop); break;
+//    case Gradients::Gloss:
+//       lg1 = gl_ssGradient(dkC, start, stop);
+//       lg2 = gl_ssGradient(ltC, start, stop); break;
+//    }
    QPainter p(dark); p.fillRect(dark->rect(), lg1); p.end();
    
    QPixmap alpha = QPixmap(dark->size());

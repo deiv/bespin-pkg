@@ -28,7 +28,7 @@ namespace Bespin {
 namespace Gradients {
 
 enum Type {
-   None = 0, Simple, Sunken, Gloss, Glass, Button, RadialGloss, Progress,
+   None = 0, Simple, Sunken, Gloss, Glass, Button, Progress, RadialGloss,
    TypeAmount
 };
 

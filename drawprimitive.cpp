@@ -608,7 +608,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             r.translate(0,1);
             painter->setPen(QColor(255,255,255,90)); painter->drawEllipse(r);
             painter->restore();
-            xy += QPoint(f2,f1);
+            xy += QPoint(config.btn.layer*f1,f1);
       }
       else {
          

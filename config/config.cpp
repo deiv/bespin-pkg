@@ -28,7 +28,7 @@ extern "C"
 integers - not of interest for you*/
 enum GradientType {
    GradNone = 0, GradSimple, GradSunken, GradGloss,
-      GradGlass, GradButton
+      GradGlass, GradButton, GradCloud
 };
 
 static const char* defInfo =
@@ -144,6 +144,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateGradientTypes(ui.gradMenuItem);
    generateGradientTypes(ui.gradProgress);
    generateGradientTypes(ui.gradTab);
+   generateGradientTypes(ui.gradScroll);
    
    
    QSettings csettings("Bespin", "Config");
@@ -225,6 +226,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.crProgressBar, "Progress.Role", QPalette::Highlight);
    
    handleSettings(ui.showScrollButtons, "Scroll.ShowButtons", false);
+   handleSettings(ui.scrollSunken, "Scroll.Sunken", false);
+   handleSettings(ui.gradScroll, "Scroll.Gradient", GradButton);
    
    handleSettings(ui.crTabBarActive, "Tab.ActiveRole", QPalette::Highlight);
    handleSettings(ui.tabAnimSteps, "Tab.AnimSteps", 4);
@@ -653,4 +656,5 @@ void Config::generateGradientTypes(QComboBox *box) {
    box->addItem("Gloss");
    box->addItem("Glass");
    box->addItem("Button (Flat)");
+   box->addItem("Cloudy");
 }

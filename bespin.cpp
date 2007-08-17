@@ -255,6 +255,7 @@ void BespinStyle::readSettings(const QSettings* settings)
    config.btn.checkType = iSettings->value("Btn.CheckType", 0).toInt();
    
    GRAD(btn) = gradientType("Btn.Gradient", Button);
+   _progressBase = GRAD(btn);
 
    if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
       GRAD(btn) = Gradients::None;
@@ -290,8 +291,12 @@ void BespinStyle::readSettings(const QSettings* settings)
    readRole("Progress.Role", progress.std, Highlight, HighlightedText);
    
    // ScrollStuff ===========================
+   GRAD(scroll) =
+         (Gradients::Type) iSettings->value("Scroll.Gradient", GRAD(btn)).toInt();
    config.scroll.showButtons =
          iSettings->value("Scroll.ShowButtons", false).toBool();
+   config.scroll.sunken =
+         iSettings->value("Scroll.Sunken", false).toBool();
    
    // Tabs ===========================
    readRole("Tab.ActiveRole", tab.active, Highlight, HighlightedText);

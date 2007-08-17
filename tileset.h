@@ -65,8 +65,9 @@ public:
       that->_shape = pf;
    }
    inline PosFlags shape() const { return _shape; }
-   inline void reset() {
-      _shape = _defShape;
+   inline void reset() const {
+      Set *that = const_cast<Set*>(this);
+      that->_shape = _defShape;
    }
 protected:
    QPixmap pixmap[9];

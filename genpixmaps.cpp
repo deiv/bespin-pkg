@@ -207,7 +207,7 @@ void BespinStyle::generatePixmaps()
    UPDATE_COLORS(masks.radio);
    
    // mask fill
-   if (config.btn.layer == 2) {
+   if (config.btn.layer) {
       rw -= dpi.f6; rh -= dpi.f6;
    }
    else {

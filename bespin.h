@@ -97,7 +97,9 @@ typedef struct Config {
    double scale;
    
    struct scroll {
+      Gradients::Type gradient;
       bool showButtons;
+      bool sunken;
    } scroll;
    
    bool strongFocus;

@@ -507,8 +507,10 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             PAINT_ELEMENT(SubLine);
             PAINT_ELEMENT(AddLine);
          }
-         PAINT_ELEMENT(SubPage);
-         PAINT_ELEMENT(AddPage);
+         if (!config.scroll.sunken) {
+            PAINT_ELEMENT(SubPage);
+            PAINT_ELEMENT(AddPage);
+         }
 //          PAINT_ELEMENT(SC_ScrollBarFirst, CE_ScrollBarFirst);
 //          PAINT_ELEMENT(SC_ScrollBarLast, CE_ScrollBarLast);
          
@@ -517,6 +519,8 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             newScrollbar.state = saveFlags;
             newScrollbar.rect = subControlRect(control, &newScrollbar,
                                                SC_ScrollBarSlider, widget);
+            if (config.scroll.sunken)
+               newScrollbar.rect.adjust(-1,-1,1,1);
             if (newScrollbar.rect.isValid()) {
                if (!(scrollbar->activeSubControls & SC_ScrollBarSlider))
                   newScrollbar.state &= ~(State_Sunken | State_MouseOver);
@@ -530,6 +534,8 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                drawControl(CE_ScrollBarSlider, &newScrollbar, painter, widget);
             }
          }
+         if (config.scroll.sunken)
+            shadows.tabSunken.render(RECT, painter);
       }
       break;
    case CC_Slider: // A slider, like QSlider
