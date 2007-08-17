@@ -297,6 +297,8 @@ void BespinStyle::readSettings(const QSettings* settings)
          iSettings->value("Scroll.ShowButtons", false).toBool();
    config.scroll.sunken =
          iSettings->value("Scroll.Sunken", false).toBool();
+   config.scroll.groove = (!config.scroll.sunken) ? false :
+         iSettings->value("Scroll.Groove", false).toBool();
    
    // Tabs ===========================
    readRole("Tab.ActiveRole", tab.active, Highlight, HighlightedText);

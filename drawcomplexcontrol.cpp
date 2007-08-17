@@ -513,6 +513,10 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          }
 //          PAINT_ELEMENT(SC_ScrollBarFirst, CE_ScrollBarFirst);
 //          PAINT_ELEMENT(SC_ScrollBarLast, CE_ScrollBarLast);
+         if (config.scroll.groove)
+            masks.tab.render(RECT, painter, Gradients::Sunken,
+                               option->state & QStyle::State_Horizontal ?
+                                     Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
          
          if (scrollbar->subControls & SC_ScrollBarSlider) {
             newScrollbar.rect = scrollbar->rect;

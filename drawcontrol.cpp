@@ -751,9 +751,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          
          // separator
          if (menuItem->menuItemType == QStyleOptionMenuItem::Separator) {
-            int dx = RECT.width()/6,
+            int dx = RECT.width()/10,
             dy = (RECT.height()-shadows.line[0][Sunken].thickness())/2;
+            painter->save();
+            const QRegion rgn =
+                  QRegion(RECT).subtract( painter->
+                  boundingRect( RECT, Qt::AlignCenter, menuItem->text).
+                  adjusted(-dpi.f4,0,dpi.f4,0));
+            painter->setClipRegion(rgn, Qt::IntersectClip);
             shadows.line[0][Sunken].render(RECT.adjusted(dx,dy,-dx,-dy), painter);
+            painter->restore();
             if (!menuItem->text.isEmpty()) {
                painter->setFont(menuItem->font);
                drawItemText(painter, RECT, Qt::AlignCenter, PAL, isEnabled,
@@ -761,7 +768,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             }
             break;
          }
-         
+
+         QRect r = RECT.adjusted(0,0,-1,-1);
          bool selected = menuItem->state & State_Selected;
          
          QColor bg = COLOR(ROLE[Bg]);
@@ -782,9 +790,19 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                bg = Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 1, 2);
                fg = COLOR(ROLE[Bg]);
             }
-            masks.tab.render(RECT, painter, sunken ?
+#if 0
+            painter->save();
+            painter->setBrush(Gradients::brush(bg, r.height(), Qt::Vertical,
+                              sunken ? Gradients::Sunken : config.menu.itemGradient));
+            painter->setBrushOrigin(r.topLeft());
+            painter->setPen(CCOLOR(menu.active, Bg));
+            painter->drawRect(r);
+            painter->restore();
+#else
+            masks.tab.render(r, painter, sunken ?
                   Gradients::Sunken : config.menu.itemGradient, Qt::Vertical, bg);
-//             masks.tab.outline(RECT, painter, QColor(0,0,0,45), true);
+//             masks.tab.outline(r, painter, QColor(0,0,0,45), true);
+#endif
          }
 
          // Text and icon, ripped from windows style
@@ -792,8 +810,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          int iconCol = config.menu.showIcons*menuitem->maxIconWidth;
          
          if (config.menu.showIcons && !menuItem->icon.isNull()) {
-            QRect vCheckRect = visualRect(option->direction, RECT,
-                                       QRect(RECT.x(), RECT.y(), iconCol, RECT.height()));
+            QRect vCheckRect = visualRect(option->direction, r,
+                                       QRect(r.x(), r.y(), iconCol, r.height()));
             QIcon::Mode mode = isEnabled ? (selected ? QIcon::Active :
                   QIcon::Normal) : QIcon::Disabled;
             QPixmap pixmap = menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize),
@@ -809,16 +827,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          painter->setBrush ( Qt::NoBrush );
          
          int x, y, w, h;
-         RECT.getRect(&x, &y, &w, &h);
+         r.getRect(&x, &y, &w, &h);
          int tab = menuitem->tabWidth;
-         int cDim = 2*(RECT.height() - dpi.f4)/3;
+         int cDim = 2*(r.height() - dpi.f4)/3;
          int xm = windowsItemFrame + iconCol + windowsItemHMargin;
-         int xpos = RECT.x() + xm;
+         int xpos = r.x() + xm;
          QRect textRect(xpos, y + windowsItemVMargin,
                         w - xm - menuItem->menuHasCheckableItems*(cDim+dpi.f7) -
                               windowsRightBorder - tab + 1,
                         h - 2 * windowsItemVMargin);
-         QRect vTextRect = visualRect(option->direction, RECT, textRect);
+         QRect vTextRect = visualRect(option->direction, r, textRect);
          QString s = menuitem->text;
          if (!s.isEmpty()) {
             // draw text
@@ -826,7 +844,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             const int text_flags = Qt::AlignVCenter | Qt::TextShowMnemonic |
                   Qt::TextDontClip | Qt::TextSingleLine;
             if (t >= 0) {
-               QRect vShortcutRect = visualRect(option->direction, RECT,
+               QRect vShortcutRect = visualRect(option->direction, r,
                      QRect(textRect.topRight(),
                            QPoint(textRect.right()+tab, textRect.bottom())));
                painter->drawText(vShortcutRect, text_flags | Qt::AlignLeft, s.mid(t + 1));
@@ -845,20 +863,20 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             PrimitiveElement arrow = (option->direction == Qt::RightToLeft) ?
                   PE_IndicatorArrowLeft : PE_IndicatorArrowRight;
             
-            int dim = RECT.height()/3;
-            xpos = RECT.x() + RECT.width() - dpi.f7 - dim;
+            int dim = r.height()/3;
+            xpos = r.x() + r.width() - dpi.f7 - dim;
             
             QStyleOptionMenuItem tmpOpt = *menuItem;
-            tmpOpt.rect = visualRect(option->direction, RECT,
-                                     QRect(xpos, RECT.y() +
-                                           (RECT.height() - dim)/2, dim, dim));
+            tmpOpt.rect = visualRect(option->direction, r,
+                                     QRect(xpos, r.y() +
+                                           (r.height() - dim)/2, dim, dim));
             painter->setPen(Colors::mid(bg, fg, 1, 3));
             drawPrimitive(arrow, &tmpOpt, painter, widget);
          }
          else if (checkable) { // Checkmark
-            xpos = RECT.right() - dpi.f7 - cDim;
+            xpos = r.right() - dpi.f7 - cDim;
             if (menuItem->checkType & QStyleOptionMenuItem::Exclusive) {
-               QRect checkRect(xpos, RECT.y() + (RECT.height() - cDim)/2, cDim, cDim);
+               QRect checkRect(xpos, r.y() + (r.height() - cDim)/2, cDim, cDim);
                checkRect = visualRect(menuItem->direction, menuItem->rect, checkRect);
                // Radio button
                painter->setRenderHint ( QPainter::Antialiasing );
@@ -873,7 +891,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             }
             else {
                // Check box
-               QRect checkRect(xpos, RECT.y()+dpi.f3, RECT.height()-dpi.f6, RECT.height()-dpi.f6);
+               QRect checkRect(xpos, r.y()+dpi.f3, r.height()-dpi.f6, r.height()-dpi.f6);
                checkRect = visualRect(menuItem->direction, menuItem->rect, checkRect);
 //                painter->setBrush ( Qt::NoBrush );
                QStyleOptionMenuItem tmpOpt = *menuItem;
@@ -1288,16 +1306,22 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 
          QRect r = RECT;
          const int f1 = dpi.f1, f2 = dpi.f2;
+         int d = f2;
 
          // shadow
+         if (config.scroll.sunken &&
+             option->state & QStyle::State_Horizontal) {
+            r.setBottom(r.bottom()-dpi.f2);
+            d = 0;
+         }
          if (sunken) {
             r.adjust(f1, f1, -f1, -f1);
             shadows.tab[true][true].render(r, painter);
-            r.adjust(f1, f1, -f1, -f2);
+            r.adjust(f1, f1, -f1, -d);
          }
          else {
             shadows.tab[true][false].render(r, painter);
-            r.adjust(f2, f2, -f2, -dpi.f3);
+            r.adjust(f2, f2, -f2, -(d+f1));
          }
 
          // gradient setup

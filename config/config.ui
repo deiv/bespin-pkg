@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>591</width>
-    <height>428</height>
+    <height>420</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -382,31 +382,7 @@
        <string>Misc</string>
       </attribute>
       <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_12" >
-         <property name="text" >
-          <string>Combo Gradient</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QLabel" name="label_17" >
-         <property name="text" >
-          <string>Password Echo Chararcter</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QComboBox" name="gradChoose" />
-       </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="pwEchoChar" >
-         <property name="editable" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" >
+       <item row="0" column="0" colspan="5" >
         <widget class="QGroupBox" name="groupBox" >
          <property name="title" >
           <string>Scrollbars</string>
@@ -422,10 +398,20 @@
           <item row="0" column="1" >
            <widget class="QComboBox" name="gradScroll" />
           </item>
-          <item row="1" column="0" colspan="2" >
+          <item row="1" column="0" >
            <widget class="QCheckBox" name="scrollSunken" >
             <property name="text" >
              <string>Sunken</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QCheckBox" name="scrollGroove" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
+            <property name="text" >
+             <string>... and Groove</string>
             </property>
            </widget>
           </item>
@@ -436,23 +422,10 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="2" >
-           <spacer>
-            <property name="orientation" >
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" >
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
         </widget>
        </item>
-       <item row="2" column="1" >
+       <item row="1" column="0" colspan="5" >
         <widget class="QGroupBox" name="groupBox_3" >
          <property name="title" >
           <string>Progressbars</string>
@@ -478,20 +451,44 @@
           <item row="1" column="1" >
            <widget class="QComboBox" name="gradProgress" />
           </item>
-          <item row="2" column="0" colspan="2" >
-           <spacer>
-            <property name="orientation" >
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" >
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QLabel" name="label_12" >
+         <property name="text" >
+          <string>Combo Gradient</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QComboBox" name="gradChoose" />
+       </item>
+       <item row="2" column="2" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="3" >
+        <widget class="QLabel" name="label_17" >
+         <property name="text" >
+          <string>Secret Echo</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4" >
+        <widget class="QComboBox" name="pwEchoChar" >
+         <property name="editable" >
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -770,12 +767,28 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>296</x>
-     <y>187</y>
+     <x>112</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>425</x>
-     <y>197</y>
+     <x>112</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scrollSunken</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>scrollGroove</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>95</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>341</x>
+     <y>128</y>
     </hint>
    </hints>
   </connection>

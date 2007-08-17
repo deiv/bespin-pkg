@@ -161,9 +161,9 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
    case PM_MenuPanelWidth: // Border width (applied on all sides) for a QMenu
       return 1; // cosmetic, qt hates 0 sized popupframes
    case PM_MenuHMargin: // Additional border (used on left and right) for a QMenu
-      return dpi.f2;
-   case PM_MenuVMargin: // Additional border (used for bottom and top) for a QMenu
       return dpi.f1;
+   case PM_MenuVMargin: // Additional border (used for bottom and top) for a QMenu
+      return 0;
 //    case PM_MenuScrollerHeight: // Height of the scroller area in a QMenu
 //    case PM_MenuTearoffHeight: // Height of a tear off area in a QMenu
 //    case PM_MenuDesktopFrameWidth: //  

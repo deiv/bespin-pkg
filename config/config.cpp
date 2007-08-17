@@ -228,6 +228,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.showScrollButtons, "Scroll.ShowButtons", false);
    handleSettings(ui.scrollSunken, "Scroll.Sunken", false);
    handleSettings(ui.gradScroll, "Scroll.Gradient", GradButton);
+   handleSettings(ui.scrollGroove, "Scroll.Groove", false);
    
    handleSettings(ui.crTabBarActive, "Tab.ActiveRole", QPalette::Highlight);
    handleSettings(ui.tabAnimSteps, "Tab.AnimSteps", 4);

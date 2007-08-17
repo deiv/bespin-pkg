@@ -98,8 +98,7 @@ typedef struct Config {
    
    struct scroll {
       Gradients::Type gradient;
-      bool showButtons;
-      bool sunken;
+      bool groove, showButtons, sunken;
    } scroll;
    
    bool strongFocus;
