@@ -289,16 +289,18 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       // sunken variant
       if (config.btn.layer) {
          int d = 0, d2 = 0;
-         if (sunken) {
-            if (config.btn.layer == 2) gt = Gradients::Sunken;
-            else d2 = f2;
+         if (config.btn.layer == 1) {
+            d = f1; d2 = d2;
          }
-         else {
-            if (config.btn.layer == 1) d = f1;
-         }
-         r.adjust(d,2*d,-d,-f2);
+         r.adjust(d,2*d,-d,-f2+d);
          masks.button.render(r, painter, gt, Qt::Vertical, c);
-         if (!config.btn.fullHover && (hover || step)) {
+         bool drawInner = !config.btn.fullHover && (hover || step);
+         if (config.btn.cushion &&
+            (sunken || (!hover && option->state & State_On))) {
+            gt = Gradients::Sunken;
+            drawInner = true;
+         }
+         if (drawInner) {
             const QRect ir = r.adjusted(dpi.f3, f2+d2-d, -dpi.f3, -f2 );
             c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
             masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,f2+d2+2*d));
@@ -311,8 +313,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)),
                                  config.strongFocus);
          }
-         if (sunken || config.btn.layer == 2)
-            shadows.lineEdit[false].render(RECT, painter);
+         if ((sunken && !config.btn.cushion) || config.btn.layer == 2)
+            shadows.lineEdit[isEnabled].render(RECT, painter);
          else
             shadows.relief.render(RECT, painter);
          break;
@@ -581,19 +583,32 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, step);
       
-      if (config.btn.layer) {
+      if (config.btn.layer == 2) {
          QRect r = RECT.adjusted(dpi.f1,0,-dpi.f1,-dpi.f2);
          masks.tab.render(r, painter, sunken || isOn ? Gradients::Sunken : gt,
                           Qt::Vertical, c);
-         if (config.btn.layer == 2) {
-            r.setBottom(RECT.bottom());
-            shadows.tabSunken.render(r, painter);
-            xy += QPoint(f1, 0);
-         }
-         else {
-            masks.tab.outline(r, painter, QColor(0,0,0,30), false, dpi.f2);
+         r.setBottom(RECT.bottom());
+         shadows.tabSunken.render(r, painter);
+         xy += QPoint(f1, 0);
+      }
+      else if (config.btn.layer) {
+            QRect r = RECT.adjusted(2,2,-2,-2);
+            painter->save();
+            painter->setRenderHint(QPainter::Antialiasing);
+            painter->setBrushOrigin(r.topLeft());
+            painter->setBrush(Gradients::brush( c, r.height(), Qt::Vertical, gt));
+            if (!sunken && hasFocus)
+               painter->setPen(Colors::mid(FCOLOR(Window), FCOLOR(Highlight),
+                                       24-step, step));
+            else
+               painter->setPen(Qt::NoPen);
+            painter->drawEllipse(r);
+            painter->setBrush(Qt::NoBrush); r.adjust(-1,-1,1,1);
+            painter->setPen(QColor(0,0,0,70)); painter->drawEllipse(r);
+            r.translate(0,1);
+            painter->setPen(QColor(255,255,255,90)); painter->drawEllipse(r);
+            painter->restore();
             xy += QPoint(f2,f1);
-         }
       }
       else {
          
@@ -832,10 +847,10 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
    case PE_FrameGroupBox: { // Panel frame around group boxes.
       QRect rect = RECT.adjusted(dpi.f4,dpi.f2,-dpi.f4,0);
       rect.setHeight(qMin(2*dpi.f32, RECT.height()));
-      masks.button.setShape(Tile::Full&~Tile::Bottom);
+      masks.button.setShape(Tile::Full & ~Tile::Bottom);
       masks.button.render(rect, painter, Gradients::light(rect.height()));
       rect.setBottom(RECT.bottom()-dpi.f32);
-      shadows.group.render(RECT, painter, Tile::Ring);
+      shadows.group.render(RECT, painter);
       masks.button.outline(rect, painter, FCOLOR(Window).light(120), true);
       masks.button.reset();
       break;

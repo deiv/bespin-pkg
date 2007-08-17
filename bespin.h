@@ -239,17 +239,14 @@ private:
          group, lineEdit[2],
          sunken, raised, relief;
       QPixmap radio[2][2];
-      QPixmap winClose[2], winMin[2], winMax[2];
       Tile::Line line[2][3];
-      QPixmap slider[4][2][2];
+//       QPixmap slider[4][2][2];
       QPixmap sliderRound[2][2];
    } shadows;
-   struct {
-      Tile::Set rect[3], round[3], button[2];
-   } frames;
+   
    struct {
       Tile::Line top;
-      QPixmap slider[4];
+//       QPixmap slider[4];
       Tile::Mask button, tab;
    } lights;
    

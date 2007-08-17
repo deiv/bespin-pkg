@@ -157,10 +157,11 @@ QRect Set::rect(const QRect &rect, PosFlags pf) const
    return ret;
 }
 
-void Set::render(const QRect &r, QPainter *p, PosFlags pf) const
+void Set::render(const QRect &r, QPainter *p) const
 {
 #define DRAW_PIXMAP p->drawPixmap
 #define DRAW_TILED_PIXMAP p->drawTiledPixmap
+   PosFlags pf = _shape;
 
 #include "t_render1.cpp"
 #undef PIXMAP
@@ -170,12 +171,12 @@ void Set::render(const QRect &r, QPainter *p, PosFlags pf) const
 
 static Window root = RootWindow (QX11Info::display(), DefaultScreen (QX11Info::display()));
 
-Picture Set::render(const QSize &s, PosFlags pf) const
+Picture Set::render(const QSize &s) const
 {
-   return render(s.width(), s.height(), pf);
+   return render(s.width(), s.height());
 }
 
-Picture Set::render(int W, int H, PosFlags pf) const
+Picture Set::render(int W, int H) const
 {
    Display *dpy = QX11Info::display();
    QRect r(0,0,W,H);
@@ -201,6 +202,8 @@ Picture Set::render(int W, int H, PosFlags pf) const
                              pict, 0, 0, 0, 0, x+_DX_, y+_DY_,\
                              MIN(_PIX_.width(), _W_-x),\
                              MIN(_PIX_.height(), _H_-y));
+      
+   PosFlags pf = _shape;
 
 #include "t_render1.cpp"
    XFreePixmap (dpy, xpix);
@@ -252,7 +255,7 @@ Set(pix, xOff, yOff, width, height, rx, ry) {
       _clipOffset[1] = _clipOffset[3] = 0;
    _texPix = 0L; _texColor = 0L; _offset = 0L;
    setDefaultShape(Full);
-//    pixmap[MidMid] = QPixmap();
+   pixmap[MidMid] = QPixmap();
    _hasCorners = !pix.isNull();
    _justClip = false;
 }
@@ -263,10 +266,10 @@ void Tile::Mask::setClipOffsets(uint left, uint top, uint right, uint bottom) {
    _clipOffset[1] = top;
    _clipOffset[3] = -bottom;
    
-//    if (!left) pixmap[MidLeft] = QPixmap();
-//    if (!right) pixmap[MidRight] = QPixmap();
-//    if (!top) pixmap[TopMid] = QPixmap();
-//    if (!bottom) pixmap[BtmMid] = QPixmap();
+   if (!left) pixmap[MidLeft] = QPixmap();
+   if (!right) pixmap[MidRight] = QPixmap();
+   if (!top) pixmap[TopMid] = QPixmap();
+   if (!bottom) pixmap[BtmMid] = QPixmap();
 }
 
 QRect Tile::Mask::bounds(const QRect &rect, PosFlags pf) const

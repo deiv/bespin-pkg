@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>585</width>
+    <width>591</width>
     <height>428</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
    <item row="0" column="0" colspan="2" >
     <widget class="QTabWidget" name="generalTab" >
      <property name="currentIndex" >
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
@@ -489,7 +489,7 @@
        <string>Manage</string>
       </attribute>
       <layout class="QGridLayout" >
-       <item row="0" column="0" colspan="7" >
+       <item row="0" column="0" colspan="8" >
         <widget class="QListWidget" name="store" >
          <property name="alternatingRowColors" >
           <bool>true</bool>
@@ -511,7 +511,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="7" >
+       <item row="1" column="0" colspan="8" >
         <widget class="QLineEdit" name="storeLine" />
        </item>
        <item row="2" column="0" >
@@ -522,9 +522,9 @@
         </widget>
        </item>
        <item row="2" column="1" >
-        <widget class="QPushButton" name="btnStore" >
+        <widget class="QPushButton" name="btnImport" >
          <property name="text" >
-          <string>Store...</string>
+          <string>Import...</string>
          </property>
         </widget>
        </item>
@@ -542,6 +542,26 @@
         </spacer>
        </item>
        <item row="2" column="3" >
+        <widget class="QPushButton" name="btnExport" >
+         <property name="text" >
+          <string>Export...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>31</width>
+           <height>27</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="5" >
         <widget class="QPushButton" name="btnDelete" >
          <property name="palette" >
           <palette>
@@ -618,30 +638,23 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="4" >
+       <item row="2" column="6" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" >
           <size>
-           <width>16</width>
+           <width>31</width>
            <height>27</height>
           </size>
          </property>
         </spacer>
        </item>
-       <item row="2" column="5" >
-        <widget class="QPushButton" name="btnImport" >
+       <item row="2" column="7" >
+        <widget class="QPushButton" name="btnStore" >
          <property name="text" >
-          <string>Import...</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="6" >
-        <widget class="QPushButton" name="btnExport" >
-         <property name="text" >
-          <string>Export...</string>
+          <string>Store...</string>
          </property>
         </widget>
        </item>

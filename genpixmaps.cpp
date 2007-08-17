@@ -46,6 +46,7 @@ void BespinStyle::generatePixmaps()
          }
          p.end();
          shadows.button[j][i] = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
+         shadows.button[j][i].setDefaultShape(Tile::Ring);
       }
    }
    
@@ -116,6 +117,7 @@ void BespinStyle::generatePixmaps()
       p.end();
    
       shadows.lineEdit[i] = Tile::Set(QPixmap::fromImage(tmpImg),f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
+      shadows.lineEdit[i].setDefaultShape(Tile::Ring);
    }
    
    // relief
@@ -129,26 +131,11 @@ void BespinStyle::generatePixmaps()
    p.drawRoundRect(0,0,f9,f9-f2,95,95);
 //    p.setPen(QColor(255,255,255,60));
 //    p.drawRoundRect(f2,f2,f9-f2,f9-f2,60,60);
-   p.setPen(QColor(255,255,255,110));
+   p.setPen(QColor(255,255,255,95));
    p.drawRoundRect(0,f1,f9,f9-f1,85,85);
    p.end();
    shadows.relief = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-
-   
-   // outlines
-   tmp = QPixmap(f9,f9);
-   for (int i = 0; i < 2; ++i) {
-      tmp.fill(Qt::transparent);
-      p.begin(&tmp);
-      p.setRenderHint(QPainter::Antialiasing);
-      p.setPen(QColor(255,255,255,100+i*60));
-      p.setBrush(Qt::NoBrush);
-      p.drawRoundRect(0,0,f9,2*f9,75,38);
-      p.end();
-      frames.button[i] = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-   }
-//    frames.button[0] = Tile::Nuno(100);
-//    frames.button[1] = Tile::Nuno(160);
+   shadows.relief.setDefaultShape(Tile::Ring);
    
    // toplight
    int f49 = SCALE(49);
@@ -177,10 +164,10 @@ void BespinStyle::generatePixmaps()
          p.begin(&shadows.sliderRound[j][i]);
          p.setPen(Qt::NoPen);
          p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,(1+i+2*j)*9));
+         p.setBrush(QColor(0,0,0,(1+i+2*j)*14));
          p.drawEllipse(shadows.sliderRound[j][i].rect());
          if (!j) {
-            p.setBrush(QColor(0,0,0,(i+1)*20));
+            p.setBrush(QColor(0,0,0,(i+1)*30));
             p.drawEllipse(f2_2,f2_2,rw-f2,rh-f2);
          }
          p.end();
@@ -197,10 +184,10 @@ void BespinStyle::generatePixmaps()
          p.begin(&shadows.radio[j][i]);
          p.setPen(Qt::NoPen);
          p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,(1+i+2*j)*9));
+         p.setBrush(QColor(0,0,0,(1+i+2*j)*13));
          p.drawEllipse(shadows.radio[j][i].rect());
          if (!j) {
-            p.setBrush(QColor(0,0,0,(i+1)*20));
+            p.setBrush(QColor(0,0,0,(i+1)*28));
             p.drawEllipse(f2_2,f2_2,rw-f2,rh-f2);
          }
          p.end();
@@ -281,7 +268,7 @@ void BespinStyle::generatePixmaps()
    
    p.end();
    shadows.sunken = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-   
+   shadows.sunken.setDefaultShape(Tile::Ring);
    // ================================================================
    
    // TABBAR =====================================
@@ -347,6 +334,7 @@ void BespinStyle::generatePixmaps()
          p.end();
          shadows.tab[i][j] =
                   Tile::Set(QPixmap::fromImage(tmpImg),f17_2,f17_2,f17-2*f17_2,f17-2*f17_2);
+         shadows.tab[i][j].setDefaultShape(Tile::Ring);
       }
    }
    
@@ -366,19 +354,20 @@ void BespinStyle::generatePixmaps()
    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
    lg = QLinearGradient(dpi.f4,0,f17-dpi.f4,0);
    stops << QGradientStop( 0, QColor(255,255,255, 20) )
-      << QGradientStop( 0.5, QColor(255,255,255, 110) )
+      << QGradientStop( 0.5, QColor(255,255,255, 90) )
       << QGradientStop( 1, QColor(255,255,255, 20) );
    lg.setStops(stops);
    p.fillRect(f2,f17-f2,f13,f1, lg);
    stops.clear();
    stops << QGradientStop( 0, QColor(255,255,255, 10) )
-      << QGradientStop( 0.5, QColor(255,255,255, 70) )
+      << QGradientStop( 0.5, QColor(255,255,255, 55) )
       << QGradientStop( 1, QColor(255,255,255, 10) );
    lg.setStops(stops);
    p.fillRect(f2,f17-f1,f13,f1, lg);
    stops.clear();
    p.end();
    shadows.tabSunken = Tile::Set(QPixmap::fromImage(tmpImg),f17_2,f17_2,f17-2*f17_2,f17-2*f17_2);
+   shadows.tabSunken.setDefaultShape(Tile::Ring);
    
    // GROUPBOX =====================================
    
@@ -407,6 +396,7 @@ void BespinStyle::generatePixmaps()
    p.end();
    int f12 = dpi.f12;
    shadows.group = Tile::Set(QPixmap::fromImage(tmpImg),f12,f12,f49-2*f12,f1);
+   shadows.group.setDefaultShape(Tile::Ring);
    
    // mask --> uses buttons
 //    int f25 = SCALE(25);
@@ -464,7 +454,7 @@ void BespinStyle::generatePixmaps()
             Tile::Line(tmp, i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);
       }
    }
-   
+#if 0
    // slider handles =================================================
    QPoint triangle[3] = { QPoint(0, 100), QPoint(-100, -100), QPoint(100, -100) };
    int size;
@@ -514,6 +504,7 @@ void BespinStyle::generatePixmaps()
       p.end();
       UPDATE_COLORS(masks.slider[i]);
    }
+#endif
    // ================================================================
    // ================================================================
    // Popup corners - not really pxmaps, though ;) ===================
@@ -529,57 +520,6 @@ void BespinStyle::generatePixmaps()
 //    circle.translate(f9, 0);
 //    masks.corner[2] = rect - (circle & rect);
    // ================================================================
-#define _INITPIX_(_PIX_,_W_,_H_)\
-   _PIX_ = QPixmap(_W_, _H_);\
-   _PIX_.fill(Qt::transparent);\
-   p.begin(&_PIX_);\
-   p.setPen(Qt::NoPen);\
-   p.setRenderHint(QPainter::Antialiasing)
-      
-#define _CLOSE_ARROW_(_PIX_, _OFF_)\
-   triangle[0] = QPoint(_OFF_, _PIX_.rect().center().y()+_OFF_);\
-   triangle[1] = _PIX_.rect().topRight()+QPoint(-_OFF_,_OFF_);\
-   triangle[2] = _PIX_.rect().bottomRight()-QPoint(_OFF_,_OFF_);\
-   p.drawPolygon(triangle, 3)
-      
-#define _MIN_ARROW_(_PIX_, _OFF_)\
-   triangle[0] = _PIX_.rect().bottomLeft()+QPoint(_OFF_,-_OFF_);\
-   triangle[1] = _PIX_.rect().topLeft()+QPoint(_OFF_,_OFF_);\
-   triangle[2] = _PIX_.rect().bottomRight()-QPoint(_OFF_,_OFF_);\
-   p.drawPolygon(triangle, 3)
-      
-#define _MAX_ARROW_(_PIX_, _OFF_)\
-   triangle[0] = _PIX_.rect().topLeft()+QPoint(_OFF_,_OFF_);\
-   triangle[1] = _PIX_.rect().topRight()+QPoint(-_OFF_,_OFF_);\
-   triangle[2] = _PIX_.rect().bottomRight()-QPoint(_OFF_,_OFF_);\
-   p.drawPolygon(triangle, 3)
-   
-   // Window Buttons ===================================
-//    QPoint triangle[3];
-   int f14 = SCALE(14);// f15 = SCALE(15), f16 = dpi.f16;
-   _INITPIX_(masks.winClose, f14,f14);
-   p.setBrush(Qt::black);
-   _CLOSE_ARROW_(masks.winClose, 0);
-   p.end();
-   UPDATE_COLORS(masks.winClose);
-   _INITPIX_(masks.winMin,f14,f14);
-   p.setBrush(Qt::black);
-   _MIN_ARROW_(masks.winMin, 0);
-   p.end();
-   UPDATE_COLORS(masks.winMin);
-   _INITPIX_(masks.winMax,f14,f14);
-   p.setBrush(Qt::black);
-   _MAX_ARROW_(masks.winMax, 0);
-   p.end();
-   UPDATE_COLORS(masks.winMax);
-   /*
-   shadows.winClose[0] = QPixmap(f16, f16);
-   shadows.winMin[0] = QPixmap(f16, f16);
-   shadows.winMax[0] = QPixmap(f16, f16);
-   shadows.winClose[0] = QPixmap(f15, f15);
-   shadows.winMin[0] = QPixmap(f15, f15);
-   shadows.winMax[0] = QPixmap(f15, f15);
-   */
-   // ================================================================
+
 }
 #undef fillRect

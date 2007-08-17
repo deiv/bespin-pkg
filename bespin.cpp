@@ -261,8 +261,7 @@ void BespinStyle::readSettings(const QSettings* settings)
    
    if (config.btn.layer == 2)
       config.btn.cushion = true;
-   else if (GRAD(btn) == Gradients::None ||
-            GRAD(btn) ==  Gradients::Sunken)
+   else if (GRAD(btn) ==  Gradients::Sunken)
       config.btn.cushion = false;
    else
       config.btn.cushion = iSettings->value("Btn.Cushion", true).toBool();
@@ -337,7 +336,7 @@ void BespinStyle::initMetrics()
    dpi.SliderThickness = SCALE(24);
    dpi.SliderControl = SCALE(19);
    dpi.Indicator = config.btn.layer == 2 ? SCALE(16) : SCALE(20);
-   dpi.ExclusiveIndicator = config.btn.layer == 2 ? SCALE(16) : SCALE(19);
+   dpi.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
 }
 
 #undef SCALE

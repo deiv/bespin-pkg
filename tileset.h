@@ -51,10 +51,10 @@ class Set
 public:
    Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int rx = 0, int ry = 0);
    Set(){setDefaultShape(Ring);}
-   void render(const QRect &rect, QPainter *p, PosFlags pf = Ring) const;
+   void render(const QRect &rect, QPainter *p) const;
    void outline(const QRect &rect, QPainter *p, QColor c, bool strong = false, int size = 1) const;
-   Picture render(int width, int height, PosFlags pf = Ring) const;
-   Picture render(const QSize &size, PosFlags pf = Ring) const;
+   Picture render(int width, int height) const;
+   Picture render(const QSize &size) const;
    QRect rect(const QRect &rect, PosFlags pf) const;
    inline int width(Section sect) const {return pixmap[sect].width();}
    inline int height(Section sect) const {return pixmap[sect].height();}

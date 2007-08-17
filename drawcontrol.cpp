@@ -99,7 +99,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             drawPrimitive(PE_PanelButtonTool, option, painter, widget);
          }
          else {
-            if (sunken && config.btn.layer == 1)
+            if (sunken && config.btn.layer == 1 && !config.btn.cushion)
                tmpBtn.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
             drawControl(CE_PushButtonBevel, &tmpBtn, painter, widget);
          }

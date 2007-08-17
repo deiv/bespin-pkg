@@ -18,6 +18,7 @@
 
 #include <Q3ScrollView>
 #include <QAbstractScrollArea>
+#include <QAbstractSpinBox>
 #include <QApplication>
 #include <QComboBox>
 #include <QPainter>
@@ -93,11 +94,18 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
           qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
          QStyleOptionSpinBox copy = *sb;
          
-         
-         isEnabled = isEnabled && !(option->state & State_ReadOnly);
+         // this doesn't work (for the moment, i assume...)
+//          isEnabled = isEnabled && !(option->state & State_ReadOnly);
+         if (isEnabled)
+         if (widget)
+         if (const QAbstractSpinBox *box = qobject_cast<const QAbstractSpinBox*>(widget)) {
+            isEnabled = isEnabled && !box->isReadOnly();
+            if (!isEnabled)
+            copy.state &= ~State_Enabled;
+         }
          
          if (sb->frame && (sb->subControls & SC_SpinBoxFrame))
-            drawPrimitive ( PE_PanelLineEdit, sb, painter, widget );
+            drawPrimitive ( PE_PanelLineEdit, &copy, painter, widget );
          
          if (!isEnabled)
             break; // why bother the user with elements he can't use... ;)

@@ -148,7 +148,21 @@ void VisualFrame::passDownEvent(QEvent *ev, const QPoint &gMousePos) {
       }
    }
    if (!match) match = _frame;
-   QCoreApplication::sendEvent( match, ev );
+   QEvent *nev = 0;
+   if (ev->type() == QEvent::Wheel) {
+      QWheelEvent *wev = static_cast<QWheelEvent *>(ev);
+      QWheelEvent wev2( match->mapFromGlobal(gMousePos), gMousePos,
+                        wev->delta(), wev->buttons(), wev->modifiers(),
+                        wev->orientation() );
+      nev = &wev2;
+   }
+   else {
+      QMouseEvent *mev = static_cast<QMouseEvent *>(ev);
+      QMouseEvent mev2( mev->type(), match->mapFromGlobal(gMousePos), gMousePos,
+                        mev->button(), mev->buttons(), mev->modifiers() );
+      nev = &mev2;
+   }
+   QCoreApplication::sendEvent( match, nev );
 }
 
 #define HANDLE_EVENT(_EV_) \
