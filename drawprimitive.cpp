@@ -54,10 +54,10 @@ extern Dpi dpi;
 
 #include "makros.h"
 
-static int radius(const QRect &r) {
-   const QPoint &c = r.center();
-   return sqrt(pow(c.x()-r.x(),2)+pow(c.y()-r.y(),2));
-}
+// static int radius(const QRect &r) {
+//    const QPoint &c = r.center();
+//    return int(sqrt(pow(c.x()-r.x(),2)+pow(c.y()-r.y(),2)));
+// }
 
 #ifndef QT_NO_XRENDER
 static const Atom bespin_decoDim =
@@ -89,6 +89,55 @@ static inline uint decoLeftSize(uint decoDim) {
 
 static inline uint decoRightSize(uint decoDim) {
    return (decoDim >> 24) & 0xff;
+}
+
+static void drawCheckMark(QStyleOption *option, QPainter *painter, int type = 1) {
+   // the checkmark (using brush)
+   painter->setPen(Qt::NoPen);
+   painter->setRenderHint(QPainter::Antialiasing);
+   bool isOn = option->state & QStyle::State_On;
+   switch (type) {
+      case 0: {
+         const int d = RECT.height()/8, c = RECT.height()/2, s = RECT.width(),
+         x = RECT.x(), y = RECT.y();
+         if (isOn) {
+            const QPoint points[8] = {
+               QPoint(x+c,y+c-d), QPoint(x,y),
+               QPoint(x+c-d,y+c), QPoint(x,y+s),
+               QPoint(x+c,y+c+d), QPoint(x+s,y+s),
+               QPoint(x+c+d,y+c), QPoint(x+s,y)
+            };
+            painter->drawPolygon(points, 8);
+         }
+         else { // tristate
+            const QPoint points[5] = {
+               QPoint(x+c,y+c-d), QPoint(x,y), QPoint(x+c-d,y+c),
+               QPoint(x+s,y+s), QPoint(x+c+d,y+c),
+            };
+            painter->drawPolygon(points, 5);
+         }
+         break;
+      }
+      default:
+      case 1: {
+         QRect r = RECT.adjusted(dpi.f3, 0, 0, -dpi.f3);
+         const QPoint points[4] = {
+            QPoint(r.right(), r.top()),
+            QPoint(r.x()+r.width()/4, r.bottom()),
+            QPoint(r.x(), r.bottom()-r.height()/2),
+            QPoint(r.x()+r.width()/4, r.bottom()-r.height()/4)
+         };
+         painter->drawPolygon(points, isOn ? 4 : 2);
+         break;
+      }
+      case 2: {
+         const int d = RECT.height()/8;
+         QRect r = RECT.adjusted(d,d,-d,-d);
+         if (!isOn)
+            r.adjust(0,r.height()/4,0,-r.height()/4);
+         painter->drawRoundRect(r,70,70);
+      }
+   }
 }
 
 static inline bool drawTiledBackground(const QRect &r, QPainter *p, const QColor &c, const QWidget * widget) {
@@ -274,8 +323,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       break;
    case PE_PanelButtonCommand: // Button used to initiate an action, for example, a QPushButton.
    case PE_PanelButtonBevel: { // Generic panel with a button bevel.
-      const QStyleOptionButton* opt =
-         qstyleoption_cast<const QStyleOptionButton*>(option);
+//       const QStyleOptionButton* opt =
+//          qstyleoption_cast<const QStyleOptionButton*>(option);
       
       const int f1 = dpi.f1, f2 = dpi.f2;
       QRect r = RECT;
@@ -338,8 +387,14 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       masks.button.render(r, painter, gt, Qt::Vertical, c);
       
       // outline
-      const bool strong = gt == Gradients::Glass || gt == Gradients::Gloss;
-      masks.button.outline(r, painter, Colors::mid(c, Qt::white), strong);
+      if (isEnabled) {
+#if 0
+         shadows.relief.render(r.adjusted(-f1,-f1,f1,f2), painter);
+#else
+         const bool strong = gt == Gradients::Glass || gt == Gradients::Gloss;
+         masks.button.outline(r, painter, Colors::mid(c, Qt::white), strong);
+#endif
+      }
       
       bool drawInner = !config.btn.fullHover && (hover || step);
       if (config.btn.cushion &&
@@ -516,51 +571,14 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       if (!(sunken || (option->state & State_Off))) {
          painter->save();
-         painter->setRenderHint(QPainter::Antialiasing);
-         const int d = dpi.f6 - config.btn.layer * dpi.f1;// == 2 ? dpi.f3 : dpi.f6;
-         QRect r = RECT.adjusted(d, d, -d, -d);
-         const QColor fill = Colors::btnFg(PAL, isEnabled, hover);
-         switch (config.btn.checkType) {
-         case 0: {
-            QPen pen(fill, r.width()/5, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
-            painter->setPen(pen);
-            int d = r.height()/8, c = r.height()/2, s = r.width(),
-            x = r.x(), y = r.y();
-            if (option->state & State_On) {
-               const QPoint points[8] = {
-               QPoint(x+c,y+c-d), QPoint(x,y),
-               QPoint(x+c-d,y+c), QPoint(x,y+s),
-               QPoint(x+c,y+s-c+d), QPoint(x+s,y+s),
-               QPoint(x+s-c+d,y+c), QPoint(x+s,y)
-               };
-               painter->drawPolygon(points, 8);
-            }
-            else {
-               const QPoint points[5] = {
-               QPoint(x+c,y+c-d), QPoint(x,y), QPoint(x+c-d,y+c),
-               QPoint(x+s,y+s), QPoint(x+c+d,y+c),
-               };
-               painter->drawPolygon(points, 5);
-            }
-            break;
-         }
-         default:
-         case 1: {
-            QPen pen(fill, r.width()/5, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
-            painter->setPen(pen);
-            const QPoint points[4] = {
-            QPoint(r.right(), r.top()),
-            QPoint(r.x()+r.width()/3, r.bottom()),
-            QPoint(r.x(), r.bottom()-r.height()/3),
-            QPoint(r.x()+r.width()/3, r.bottom()-r.height()/5)
-            };
-            painter->drawPolygon(points, (option->state & State_On)?4:2);
-            break;
-         }
-         case 2:
-            if (option->state & State_On)
-               masks.button.render(r, painter, fill);
-         }
+         painter->setBrush(Colors::btnFg(PAL, isEnabled, hover));
+         QStyleOption copy = *option;
+         const int d = dpi.f5 - config.btn.layer * dpi.f1;
+         if (config.btn.checkType == 1)
+            copy.rect.adjust(dpi.f2, d, -d, -dpi.f2);
+         else
+            copy.rect.adjust(d, d, -d, config.btn.layer ? -d : -dpi.f6);
+         drawCheckMark(&copy, painter, config.btn.checkType);
          painter->restore();
       }
       break;
@@ -874,38 +892,56 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
    case PE_IndicatorMenuCheckMark: { // Check mark used in a menu.
 //       if (option->state & State_NoChange)
 //          break;
-      
-//       bool selected = false;
-      QRect rect = RECT.adjusted(dpi.f2, dpi.f2, -dpi.f2, -dpi.f2);
-      if (rect.width() > rect.height())
-         rect.setWidth(rect.height());
-      else
-         rect.setHeight(rect.width());
-      int off = rect.width()/4;
-      
+      QStyleOption copy = *option;
+
+      const int f2 = dpi.f2;
+      // storage
       painter->save();
+      QBrush oldBrush = painter->brush();
+      painter->setRenderHint(QPainter::Antialiasing);
+
+      // rect -> square
+      QRect r = RECT;
+      if (r.width() > r.height())
+         r.setWidth(r.height());
+      else
+         r.setHeight(r.width());
+
+      // box (requires set pen for PE_IndicatorMenuCheckMark)
       painter->setBrush(Qt::NoBrush);
-      QColor fg;
-      if (pe != PE_IndicatorMenuCheckMark)
-         painter->setPen(FCOLOR(Text));
-      
-      painter->drawRect(rect.adjusted(0, off, -off, 0));
-      
-      if (!(option->state & State_Off)) {
-         painter->setRenderHint(QPainter::Antialiasing);
-         if (pe != PE_IndicatorMenuCheckMark) {
-            fg = Colors::mid(FCOLOR(Highlight), FCOLOR(HighlightedText));
-            painter->setPen(fg);
+      QPalette::ColorRole fg, bg;
+      if (pe != PE_IndicatorMenuCheckMark) { // itemViewCheck
+         r.adjust(f2, f2, -f2, -f2);
+         if (!(option->state & State_Off))
+            copy.state |= State_On;
+         if (option->state & State_Selected) {
+            fg = QPalette::HighlightedText; bg = QPalette::Highlight;
          }
-         painter->setBrush(fg);
-         const QPoint points[4] = {
-            QPoint(rect.right(), rect.top()),
-            QPoint(rect.x()+rect.width()/3, rect.bottom()),
-            QPoint(rect.x(), rect.bottom()-rect.height()/3),
-               QPoint(rect.x()+rect.width()/3, rect.bottom()-rect.height()/5)
-         };
-         painter->drawPolygon(points, 4);
+         else {
+            fg = QPalette::Text; bg = QPalette::Base;
+         }
+         painter->setPen(Colors::mid(COLOR(bg), COLOR(fg)));
       }
+
+      if (painter->pen() != Qt::NoPen) {
+         r.adjust(f2, f2, -f2, -f2);
+         painter->drawRoundRect(r);
+      }
+
+      // get out if not checked
+      if (option->state & State_Off) {
+         painter->restore();
+         break;
+      }
+
+      // checkmark
+      if (pe != PE_IndicatorMenuCheckMark)
+         painter->setBrush(COLOR(fg));
+      else {
+         painter->setBrush(oldBrush);
+         painter->setBrushOrigin(r.topLeft());
+      }
+      drawCheckMark(&copy, painter, 1);
       painter->restore();
       break;
    }
@@ -947,7 +983,9 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
                        option->direction == Qt::RightToLeft ? PE_IndicatorArrowLeft :
                        PE_IndicatorArrowRight, &tmpOpt, painter, widget);
       }
-      if (RECT.x() ==  -1) { // this is for the first col and i don't see why we'd need a line here
+
+      // no line on the first column!
+      if (RECT.x() ==  -1) {
          RESTORE_PEN;
          break;
       }

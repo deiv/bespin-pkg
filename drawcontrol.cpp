@@ -893,7 +893,6 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                // Check box
                QRect checkRect(xpos, r.y()+dpi.f3, r.height()-dpi.f6, r.height()-dpi.f6);
                checkRect = visualRect(menuItem->direction, menuItem->rect, checkRect);
-//                painter->setBrush ( Qt::NoBrush );
                QStyleOptionMenuItem tmpOpt = *menuItem;
                tmpOpt.rect = checkRect;
                tmpOpt.state &= ~State_Selected; // cause of color, not about checkmark!
@@ -905,6 +904,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                   tmpOpt.state |= State_Off;
                   tmpOpt.state &= ~State_On;
                }
+               painter->setPen(Colors::mid(bg, fg));
+               painter->setBrush(fg);
                drawPrimitive(PE_IndicatorMenuCheckMark, &tmpOpt, painter, widget);
             }
          }

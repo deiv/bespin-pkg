@@ -29,6 +29,13 @@ using namespace Bespin;
 extern Dpi dpi;
 extern Config config;
 
+inline static bool verticalTabs(QTabBar::Shape shape) {
+   return shape == QTabBar::RoundedEast ||
+         shape == QTabBar::TriangularEast ||
+         shape == QTabBar::RoundedWest ||
+         shape == QTabBar::TriangularWest;
+}
+
 QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionComplex * option, SubControl subControl, const QWidget * widget) const
 {
    QRect ret;
@@ -412,7 +419,23 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
 //    case SE_HeaderLabel: //  
 //    case SE_TabWidgetLeftCorner: //  
 //    case SE_TabWidgetRightCorner: //  
-//    case SE_TabWidgetTabBar: //  
+   case SE_TabWidgetTabBar: { //
+      if (const QStyleOptionTabWidgetFrame *twf =
+          qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option)) {
+         QRect r = QCommonStyle::subElementRect ( element, option, widget);
+         if (verticalTabs(twf->shape)) {
+            r.translate(0,dpi.f4);
+         if (r.bottom() > option->rect.bottom())
+            r.setBottom(option->rect.bottom());
+         }
+         else {
+            r.translate(dpi.f4,0);
+         if (r.right() > option->rect.right())
+            r.setRight(option->rect.right());
+         }
+         return r;
+      }
+   }
    case SE_TabWidgetTabContents: //  
       if (const QStyleOptionTabWidgetFrame *twf =
           qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option)) {
