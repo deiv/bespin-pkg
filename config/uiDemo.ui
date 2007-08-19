@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>547</width>
-    <height>466</height>
+    <height>506</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -19,8 +19,268 @@
    <item row="0" column="0" colspan="4" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>6</number>
+      <number>0</number>
      </property>
+     <widget class="QWidget" name="demo" >
+      <attribute name="title" >
+       <string>Demo</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <item row="0" column="0" colspan="2" >
+        <widget class="QMenuBar" name="menuBar" >
+         <widget class="QMenu" name="menuUiDemo" >
+          <property name="title" >
+           <string>UiDemo</string>
+          </property>
+          <addaction name="actionDon_t_open" />
+          <addaction name="actionDon_t_save" />
+          <addaction name="actionDon_t_exit" />
+         </widget>
+         <widget class="QMenu" name="menuEdit" >
+          <property name="title" >
+           <string>Edit</string>
+          </property>
+          <addaction name="actionDon_t" />
+          <addaction name="actionJust_don_t" />
+          <addaction name="actionDo_anything" />
+          <addaction name="actionHere" />
+         </widget>
+         <widget class="QMenu" name="menuAppereance" >
+          <property name="title" >
+           <string>Appereance</string>
+          </property>
+          <addaction name="actionIs_fixed" />
+          <addaction name="actionSo_you_can_t_do_anything" />
+          <addaction name="action_at_least_not_here" />
+          <addaction name="action" />
+          <addaction name="action_no_really" />
+          <addaction name="actionNOOOO" />
+         </widget>
+         <widget class="QMenu" name="menu" >
+          <property name="title" >
+           <string>:-)</string>
+          </property>
+          <addaction name="action_2" />
+          <addaction name="action_P" />
+          <addaction name="action_3" />
+          <addaction name="action_4" />
+          <addaction name="action8" />
+         </widget>
+         <addaction name="menuUiDemo" />
+         <addaction name="menuEdit" />
+         <addaction name="menuAppereance" />
+         <addaction name="menu" />
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLineEdit" name="lineEdit_2" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QPushButton" name="pushButton_3" >
+         <property name="text" >
+          <string>PushButton</string>
+         </property>
+        </widget>
+       </item>
+       <item rowspan="3" row="2" column="0" >
+        <widget class="QTextBrowser" name="textBrowser_2" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="html" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Luxi Sans'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">--&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QComboBox" name="comboBox_3" >
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QGroupBox" name="groupBox_6" >
+         <property name="title" >
+          <string>GroupBox</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QRadioButton" name="radioButton_3" >
+            <property name="text" >
+             <string>RadioButton</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QCheckBox" name="checkBox_5" >
+            <property name="text" >
+             <string>CheckBox</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="1" >
+        <widget class="QTreeWidget" name="treeWidget_2" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Expanding" hsizetype="Ignored" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <column>
+          <property name="text" >
+           <string>1</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>2</string>
+          </property>
+         </column>
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Neues Element</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <item>
+           <property name="text" >
+            <string>Neues untergeordnetes Element</string>
+           </property>
+           <property name="text" >
+            <string/>
+           </property>
+           <item>
+            <property name="text" >
+             <string>Neues untergeordnetes Element</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Neues Element</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Neues Element</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Neues Element</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Neues Element</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+           </item>
+          </item>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
        <string>Buttons</string>
@@ -1158,220 +1418,6 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="Seite_5" >
-      <attribute name="title" >
-       <string>Demo</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLineEdit" name="lineEdit_2" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QPushButton" name="pushButton_3" >
-         <property name="text" >
-          <string>PushButton</string>
-         </property>
-        </widget>
-       </item>
-       <item rowspan="3" row="1" column="0" >
-        <widget class="QTextBrowser" name="textBrowser_2" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="html" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Luxi Sans'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">--&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.&lt;/p>&lt;/body>&lt;/html></string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="comboBox_3" >
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="2" column="1" >
-        <widget class="QGroupBox" name="groupBox_6" >
-         <property name="title" >
-          <string>GroupBox</string>
-         </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="QRadioButton" name="radioButton_3" >
-            <property name="text" >
-             <string>RadioButton</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" >
-           <widget class="QCheckBox" name="checkBox_5" >
-            <property name="text" >
-             <string>CheckBox</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" >
-           <spacer>
-            <property name="orientation" >
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" >
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="3" column="1" >
-        <widget class="QTreeWidget" name="treeWidget_2" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Expanding" hsizetype="Ignored" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <column>
-          <property name="text" >
-           <string>1</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>2</string>
-          </property>
-         </column>
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-          <property name="text" >
-           <string/>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-          <property name="text" >
-           <string/>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Neues Element</string>
-          </property>
-          <property name="text" >
-           <string/>
-          </property>
-          <item>
-           <property name="text" >
-            <string>Neues untergeordnetes Element</string>
-           </property>
-           <property name="text" >
-            <string/>
-           </property>
-           <item>
-            <property name="text" >
-             <string>Neues untergeordnetes Element</string>
-            </property>
-            <property name="text" >
-             <string/>
-            </property>
-           </item>
-           <item>
-            <property name="text" >
-             <string>Neues Element</string>
-            </property>
-            <property name="text" >
-             <string/>
-            </property>
-           </item>
-           <item>
-            <property name="text" >
-             <string>Neues Element</string>
-            </property>
-            <property name="text" >
-             <string/>
-            </property>
-           </item>
-           <item>
-            <property name="text" >
-             <string>Neues Element</string>
-            </property>
-            <property name="text" >
-             <string/>
-            </property>
-           </item>
-           <item>
-            <property name="text" >
-             <string>Neues Element</string>
-            </property>
-            <property name="text" >
-             <string/>
-            </property>
-           </item>
-          </item>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
    <item row="1" column="0" >
@@ -1415,6 +1461,96 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
   </layout>
+  <action name="actionDon_t_open" >
+   <property name="text" >
+    <string>Don't open</string>
+   </property>
+  </action>
+  <action name="actionDon_t_save" >
+   <property name="text" >
+    <string>Don't save</string>
+   </property>
+  </action>
+  <action name="actionDon_t_exit" >
+   <property name="text" >
+    <string>Don't exit</string>
+   </property>
+  </action>
+  <action name="actionDon_t" >
+   <property name="text" >
+    <string>Don't</string>
+   </property>
+  </action>
+  <action name="actionJust_don_t" >
+   <property name="text" >
+    <string>Just don't</string>
+   </property>
+  </action>
+  <action name="actionDo_anything" >
+   <property name="text" >
+    <string>Do anything</string>
+   </property>
+  </action>
+  <action name="actionHere" >
+   <property name="text" >
+    <string>Here!</string>
+   </property>
+  </action>
+  <action name="actionIs_fixed" >
+   <property name="text" >
+    <string>Is fixed!</string>
+   </property>
+  </action>
+  <action name="actionSo_you_can_t_do_anything" >
+   <property name="text" >
+    <string>So you can't do anything</string>
+   </property>
+  </action>
+  <action name="action_at_least_not_here" >
+   <property name="text" >
+    <string>...at least not here.</string>
+   </property>
+  </action>
+  <action name="action" >
+   <property name="text" >
+    <string>...</string>
+   </property>
+  </action>
+  <action name="action_no_really" >
+   <property name="text" >
+    <string>... no really ...</string>
+   </property>
+  </action>
+  <action name="actionNOOOO" >
+   <property name="text" >
+    <string>NOOOO!</string>
+   </property>
+  </action>
+  <action name="action_2" >
+   <property name="text" >
+    <string>=)</string>
+   </property>
+  </action>
+  <action name="action_P" >
+   <property name="text" >
+    <string>;-P</string>
+   </property>
+  </action>
+  <action name="action_3" >
+   <property name="text" >
+    <string>;-)</string>
+   </property>
+  </action>
+  <action name="action_4" >
+   <property name="text" >
+    <string>:-(</string>
+   </property>
+  </action>
+  <action name="action8" >
+   <property name="text" >
+    <string>8-)</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>

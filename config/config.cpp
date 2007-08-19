@@ -59,13 +59,13 @@ static const char* manageInfo =
 </p><p>\
    You can also call the config dialog with the paramater \"demo\"\
 <pre>\
-   bespin-config demo [some style]\
+   bespin demo [some style]\
 </pre>\
    to test your settings on various widgets.\
 </p><p>\
    If you want to test settings before importing them, call\
 <pre>\
-   bespin-config try &lt;some_settings.conf&gt;\
+   bespin try &lt;some_settings.conf&gt;\
 </pre>\
 </p>";
 
@@ -138,6 +138,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateColorModes(ui.crMenuActive);
    generateColorModes(ui.btnRole);
    generateColorModes(ui.btnActiveRole);
+   generateColorModes(ui.headerRole);
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
@@ -235,6 +236,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.gradTab, "Tab.Gradient", GradButton);
    handleSettings(ui.crTabBar, "Tab.Role", QPalette::Window);
    handleSettings(ui.tabTransition, "Tab.Transition", 1);
+
+   handleSettings(ui.headerRole, "View.HeaderRole", QPalette::Text);
    
    /** setContextHelp(.) attaches a context help string to a widget on your form */
    setContextHelp(ui.btnRoles, "<b>Button Colors</b><hr>\
@@ -367,6 +370,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    if you want a standalone app you may want to check the main() funtion
    at the end of this file as well - but there's nothing special about it...
     =========================================== */
+
+   ui.generalTab->setCurrentIndex(0);
 }
 
 
@@ -502,10 +507,9 @@ void Config::save() {
       QSettings settings("Bespin");
       settings.beginGroup("Style");
       if (former == 2) // was complex -> stop daemon
-         QProcess::startDetached ( settings.value("BgDaemon", "bespinPP").toString(),
-                                   QStringList() << "stop" );
+         QProcess::startDetached ( settings.value("BgDaemon", "bespin pusher").toString().append(" stop") );
       else if (current == 2) // IS complex -> start daemon
-         QProcess::startDetached ( settings.value("BgDaemon", "bespinPP").toString() );
+         QProcess::startDetached ( settings.value("BgDaemon", "bespin pusher").toString() );
       settings.endGroup();
    }
    BConfig::save();
@@ -613,7 +617,7 @@ void Config::handleBgMode(int idx) {
 }
 
 void Config::handleDefInfo(int idx) {
-   if (idx == 4) {
+   if (idx == 0) {
       infoIsManage = true;
       setDefaultContextInfo(manageInfo);
       ui.info->setHtml(manageInfo);

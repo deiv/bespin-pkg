@@ -3,5 +3,5 @@ if ( $$(CONFIG_KDE) ) {
    SUBDIRS += kstyle-bespin-config.pro
 }
 if ( $$(CONFIG_QT) ) {
-   SUBDIRS += bespin-config.pro
+   SUBDIRS += bespin.pro
 }
