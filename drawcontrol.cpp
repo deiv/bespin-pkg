@@ -1221,27 +1221,27 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       }
       if (const QStyleOptionSlider *opt =
             qstyleoption_cast<const QStyleOptionSlider *>(option)) {
+         QRect r = RECT.adjusted(dpi.f2,dpi.f2,-dpi.f2,-dpi.f2);
          bool alive = isEnabled && ((element == CE_ScrollBarAddLine &&
                                      opt->sliderValue < opt->maximum) ||
                                     (element == CE_ScrollBarSubLine &&
                                      opt->sliderValue > opt->minimum));
          hover = hover && alive;
-         QPoint xy = RECT.topLeft();
-         const int sz = dpi.ExclusiveIndicator - dpi.f4;
          const int step = (hover && !complexStep) ? 6 : complexStep;
-         const QColor c = (!alive) ? FCOLOR(Window) :
-               Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 18, step);
-         const QPixmap &fill =
-               Gradients::pix(c, sz, Qt::Vertical, (sunken || !alive) ?
-               Gradients::Sunken : Gradients::Button);
-         fillWithMask(painter, xy, fill, masks.radio);
-         if (alive) {
-            painter->save();
+         const QColor c =
+               alive ? Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0),
+                                   6-step, step) : FCOLOR(Window);
+         painter->save();
+         painter->setRenderHint(QPainter::Antialiasing);
+         if (alive)
             painter->setPen(CCOLOR(btn.std, 0).dark(120));
-            painter->setBrush(Qt::NoBrush);
-            painter->drawEllipse(QRect(xy, QSize(sz, sz)));
-            painter->restore();
-         }
+         else
+            painter->setPen(Qt::NoPen);
+         painter->setBrush(Gradients::pix(c, r.height(), Qt::Vertical,
+                           (sunken || !alive) ? Gradients::Sunken : Gradients::Button));
+         painter->setBrushOrigin(r.topLeft());
+         painter->drawEllipse(r);
+         painter->restore();
          break;
       }
    case CE_ScrollBarSubPage: // Scroll bar page decrease indicator (i.e., page up).
@@ -1310,8 +1310,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          int d = f2;
 
          // shadow
-         if (config.scroll.sunken &&
-             option->state & QStyle::State_Horizontal) {
+         if (config.scroll.sunken) {
             r.setBottom(r.bottom()-dpi.f2);
             d = 0;
          }

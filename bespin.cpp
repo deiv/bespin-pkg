@@ -684,15 +684,14 @@ void BespinStyle::polish( QWidget * widget) {
    }
    
    // swap qmenu colors
-   if (qobject_cast<QMenu *>(widget)) {
+   if (QMenu * menu = qobject_cast<QMenu *>(widget)) {
 #ifdef Q_WS_X11
       // this should tell beryl et. al this is a popup - doesn't work... yet
       XChangeProperty(QX11Info::display(), widget->winId(), winType,
                       XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&winTypePopup, 1L);
 #endif
-      // WARNING: compmgrs like e.g. beryl deny to shadow shaped windows,
+      // WARNING: compmgrs like e.g. beryl/emerald deny to shadow shaped windows,
       // if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
-      widget->installEventFilter(this); // for the round corners
 //       widget->setAutoFillBackground (true);
       widget->setBackgroundRole ( config.menu.std_role[0] );
       widget->setForegroundRole ( config.menu.std_role[1] );
@@ -701,6 +700,15 @@ void BespinStyle::polish( QWidget * widget) {
 //          tmpFont.setBold(true);
 //          widget->setFont(tmpFont);
 //       }
+      // hmmmm... =)
+#if 0
+//       if (qobject_cast<QMenuBar*>(menu->menuAction()->parent())) {
+         QAction *action = new QAction( menu->menuAction()->iconText(), menu );
+         connect (action, SIGNAL(triggered(bool)), menu, SLOT(hide()));
+         menu->insertAction(menu->actions().at(0), action);
+         menu->installEventFilter(this); // for the round corners
+//       }
+#endif
    }
    
    //========================
@@ -788,6 +796,15 @@ bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
       }
       return false;
    }
+#if 0
+   case QEvent::Show:
+      if (QMenu * menu = qobject_cast<QMenu*>(object)) {
+         if (menu->parentWidget())
+            menu->move(menu->parentWidget()->mapToGlobal(QPoint(0,0)));
+         return false;
+      }
+      return false;
+#endif
    default:
       return false;
    }

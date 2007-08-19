@@ -141,14 +141,14 @@ void BConfig::checkDirty()
    QMap<QWidget*, SettingInfo>::iterator i;
    for (i = _settings.begin(); i != _settings.end(); ++i)
    {
-      if (!sender() || (sender() == i.key()))
-      {
+//       if (!sender() || (sender() == i.key()))
+//       {
          SettingInfo *info = &(i.value());
          dirty = dirty || variant(i.key()) != info->savedValue;
          
-         if (sender() || dirty)
+         if (/*sender() ||*/ dirty)
             break;
-      }
+//       }
    }
    emit changed(dirty);
 }

@@ -263,6 +263,8 @@ private:
    QPoint cursorPos_;
    bool mouseButtonPressed_;
    bool internalEvent_;
+private slots:
+   void reposMenu();
 };
 
 } // namespace Bespin

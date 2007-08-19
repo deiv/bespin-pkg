@@ -503,10 +503,14 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                drawControl(CE_ScrollBar##_E_, &newScrollbar, painter, widget);\
             }\
          }//
+         QRect groove = RECT;
          if (config.scroll.showButtons) {
             PAINT_ELEMENT(SubLine);
             PAINT_ELEMENT(AddLine);
+            if (config.scroll.sunken)
+               groove = subControlRect(control, option, SC_ScrollBarGroove, widget);
          }
+
          if (!config.scroll.sunken) {
             PAINT_ELEMENT(SubPage);
             PAINT_ELEMENT(AddPage);
@@ -514,9 +518,9 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
 //          PAINT_ELEMENT(SC_ScrollBarFirst, CE_ScrollBarFirst);
 //          PAINT_ELEMENT(SC_ScrollBarLast, CE_ScrollBarLast);
          if (config.scroll.groove)
-            masks.tab.render(RECT, painter, Gradients::Sunken,
-                               option->state & QStyle::State_Horizontal ?
-                                     Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
+            masks.tab.render(groove, painter, Gradients::Sunken,
+                             option->state & QStyle::State_Horizontal ?
+                                   Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
          
          if (scrollbar->subControls & SC_ScrollBarSlider) {
             newScrollbar.rect = scrollbar->rect;
@@ -539,7 +543,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             }
          }
          if (config.scroll.sunken)
-            shadows.tabSunken.render(RECT, painter);
+            shadows.tabSunken.render(groove, painter);
       }
       break;
    case CC_Slider: // A slider, like QSlider

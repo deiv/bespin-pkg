@@ -392,7 +392,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          shadows.relief.render(r.adjusted(-f1,-f1,f1,f2), painter);
 #else
          const bool strong = gt == Gradients::Glass || gt == Gradients::Gloss;
-         masks.button.outline(r, painter, Colors::mid(c, Qt::white), strong);
+         masks.button.outline(r, painter, Colors::mid(hasFocus ?
+               FCOLOR(Highlight) : c, Qt::white), strong);
 #endif
       }
       
@@ -578,6 +579,10 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             copy.rect.adjust(dpi.f2, d, -d, -dpi.f2);
          else
             copy.rect.adjust(d, d, -d, config.btn.layer ? -d : -dpi.f6);
+         if (copy.rect.width() > copy.rect.height())
+            copy.rect.setWidth(copy.rect.height());
+         else
+            copy.rect.setHeight(copy.rect.width());
          drawCheckMark(&copy, painter, config.btn.checkType);
          painter->restore();
       }
@@ -596,10 +601,11 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       }
       else if (hover && sunken)
          isOn = true;
+
       int step = isOn ? 0 : animator->hoverStep(widget);
-      
-      
       QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, step);
+//       if (config.btn.fullHover && step)
+//          c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
       
       if (config.btn.layer == 2) {
          QRect r = RECT.adjusted(dpi.f1,0,-dpi.f1,-dpi.f2);
