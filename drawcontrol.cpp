@@ -104,10 +104,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             drawControl(CE_PushButtonBevel, &tmpBtn, painter, widget);
          }
 //          tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
-         if (config.btn.layer == 2)
-            tmpBtn.rect.adjust(dpi.f4,dpi.f3,-dpi.f4,-dpi.f2);
-         else
-            tmpBtn.rect.adjust(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4);
+         tmpBtn.rect.adjust(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4);
          drawControl(CE_PushButtonLabel, &tmpBtn, painter, widget);
          
          // toggle indicator
@@ -1124,7 +1121,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       }
       if (hover) sunken = false;
       if (sunken) {
-         const QPixmap &sunk = Gradients::pix(FCOLOR(Text), s, o, Gradients::Sunken);
+         const QPixmap &sunk = Gradients::pix(COLOR(config.view.header_role[Bg]),
+                                              s, o, Gradients::Sunken);
          painter->drawTiledPixmap(RECT, sunk);
       }
 //       else if (header && header->orientation == Qt::Vertical) {
@@ -1136,14 +1134,21 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 //       }
       else {
          const QPixmap &norm =
-               Gradients::pix(FCOLOR(Text), s, o, hover ? Gradients::Glass : Gradients::Button);
-         painter->drawTiledPixmap(RECT, norm);
+               Gradients::pix(COLOR(config.view.header_role[Bg]), s, o,
+                              hover ? Gradients::Glass : Gradients::Button);
+         QRect r = RECT;
+         if (o == Qt::Vertical)
+            r.setBottom(r.bottom()-1);
+         painter->drawTiledPixmap(r, norm);
          if (o == Qt::Vertical) {
-            QRect r = RECT;
-            r.setWidth(RECT.width() - dpi.f1);
-            r = RECT; r.setLeft(r.right() - dpi.f1);
-            const QPixmap &sunk = Gradients::pix(FCOLOR(Text), s, o, Gradients::Sunken);
+            r.setLeft(r.right() - dpi.f1);
+            const QPixmap &sunk = Gradients::pix(COLOR(config.view.header_role[Bg]),
+                  s, o, Gradients::Sunken);
             painter->drawTiledPixmap(r, sunk);
+            painter->save();
+            painter->setPen(QColor(0,0,0, 50));
+            painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
+            painter->restore();
          }
       }
       break;
@@ -1175,7 +1180,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       QFont tmpFnt = painter->font(); tmpFnt.setBold(sunken);
       painter->setFont(tmpFnt);
 
-      QColor bg = FCOLOR(Text), fg = FCOLOR(Base);
+      QColor bg = CCOLOR(view.header, Bg), fg = CCOLOR(view.header, Fg);
       if (qGray(bg.rgb()) < 148) { // dark background, let's paint an emboss
          rect.moveTop(rect.top()-1);
          painter->setPen(bg.dark(120));

@@ -18,3 +18,4 @@ target.path += $$[QT_INSTALL_PLUGINS]/styles
 DATA.files = bespin.themerc
 DATA.path += $$(KDEDIR)/share/apps/kstyle/themes/
 INSTALLS += target DATA
+DEFINES += SHAPE_POPUP=0

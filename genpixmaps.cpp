@@ -505,21 +505,29 @@ void BespinStyle::generatePixmaps()
       UPDATE_COLORS(masks.slider[i]);
    }
 #endif
+#if SHAPE_POPUP
    // ================================================================
    // ================================================================
    // Popup corners - not really pxmaps, though ;) ===================
    // they at least break beryl's popup shadows...
    // see bespin.cpp#BespinStyle::eventfilter as well
-//    QRegion circle = QRegion(0,0,2*f9,2*f9, QRegion::Ellipse);
-//    QRegion rect = QRegion(0,0,f9,f9);
-//    masks.corner[0] = rect - (circle & rect);
-//    circle.translate(-f9, 0);
-//    masks.corner[1] = rect - (circle & rect);
-//    circle.translate(0, -f9);
-//    masks.corner[3] = rect - (circle & rect);
-//    circle.translate(f9, 0);
-//    masks.corner[2] = rect - (circle & rect);
+   int f5 = 4;
+   QBitmap bm(2*f5, 2*f5);
+   bm.fill(Qt::black);
+   p.begin(&bm);
+   p.setPen(Qt::NoPen);
+   p.setBrush(Qt::white);
+   p.drawEllipse(0,0,2*f5,2*f5);
+   p.end();
+   QRegion circle(bm);
+   masks.corner[0] = circle & QRegion(0,0,f5,f5); // tl
+   masks.corner[1] = circle & QRegion(f5,0,f5,f5); // tr
+   masks.corner[1].translate(-masks.corner[1].boundingRect().left(), 0);
+   masks.corner[2] = circle & QRegion(0,f5,f5,f5); // bl
+   masks.corner[2].translate(0, -masks.corner[2].boundingRect().top());
+   masks.corner[3] = circle & QRegion(f5,f5,f5,f5); // br
+   masks.corner[3].translate(-masks.corner[3].boundingRect().topLeft());
    // ================================================================
-
+#endif
 }
 #undef fillRect

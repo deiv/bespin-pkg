@@ -258,6 +258,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       if (!(widget && widget->isWindow()))
          break; // can't do anything here
+      if (!widget->isActiveWindow())
+         break; // experiment - plain inactives...
       if (PAL.brush(widget->backgroundRole()).style() > 1)
          break; // we'd cover a gradient/pixmap/whatever
       
@@ -341,28 +343,30 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          if (config.btn.layer == 1) {
             d = f1; d2 = d2;
          }
-         r.adjust(d,2*d,-d,-f2+d);
-         masks.button.render(r, painter, gt, Qt::Vertical, c);
-         bool drawInner = !config.btn.fullHover && (hover || step);
-         if (config.btn.cushion &&
-            (sunken || (!hover && option->state & State_On))) {
-            gt = Gradients::Sunken;
-            drawInner = true;
+         if (isEnabled) {
+            r.adjust(d,2*d,-d,-f2+d);
+            masks.button.render(r, painter, gt, Qt::Vertical, c);
+            bool drawInner = !config.btn.fullHover && (hover || step);
+            if (config.btn.cushion &&
+               (sunken || (!hover && option->state & State_On))) {
+               gt = Gradients::Sunken;
+               drawInner = true;
+            }
+            if (drawInner) {
+               const QRect ir = r.adjusted(dpi.f3, f2+d2-d, -dpi.f3, -f2 );
+               c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
+               masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,f2+d2+2*d));
+            }
+            if (hasFocus) {
+               if (config.btn.layer == 1)
+                  r = RECT.adjusted(0,f1, 0, -f1);
+               else
+                  r.setBottom(r.bottom()+dpi.f1);
+               masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)),
+                                    config.strongFocus);
+            }
          }
-         if (drawInner) {
-            const QRect ir = r.adjusted(dpi.f3, f2+d2-d, -dpi.f3, -f2 );
-            c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
-            masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,f2+d2+2*d));
-         }
-         if (hasFocus) {
-            if (config.btn.layer == 1)
-               r = RECT.adjusted(0,f1, 0, -f1);
-            else
-               r.setBottom(r.bottom()+dpi.f1);
-            masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)),
-                                 config.strongFocus);
-         }
-         if ((sunken && !config.btn.cushion) || config.btn.layer == 2)
+         if (!isEnabled || (sunken && !config.btn.cushion) || config.btn.layer == 2)
             shadows.lineEdit[isEnabled].render(RECT, painter);
          else
             shadows.relief.render(RECT, painter);

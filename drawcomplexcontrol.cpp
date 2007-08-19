@@ -366,7 +366,9 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          }
          
          // do we have an arrow?
-         if ((cmb->subControls & SC_ComboBoxArrow) && (!combo || combo->count() > 0)) {
+         if (isEnabled &&
+             (cmb->subControls & SC_ComboBoxArrow) &&
+             (!combo || combo->count() > 0)) {
             ar = subControlRect(CC_ComboBox, cmb, SC_ComboBoxArrow, widget);
             ar.setBottom(ar.bottom()-f2);
          }
@@ -378,10 +380,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                drawPrimitive(PE_PanelLineEdit, option, painter, widget);
             }
             else {
-               if (!isEnabled || ar.isNull())
-                  masks.tab.render(r, painter, GRAD(chooser),
-                                   Qt::Vertical, FCOLOR(Window));
-               else {
+               if (!ar.isNull()) {
                   // ground
                   step = animator->hoverStep(widget);
                   if (listShown) step = 6;
@@ -522,7 +521,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                              option->state & QStyle::State_Horizontal ?
                                    Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
          
-         if (scrollbar->subControls & SC_ScrollBarSlider) {
+         if (isEnabled && scrollbar->subControls & SC_ScrollBarSlider) {
             newScrollbar.rect = scrollbar->rect;
             newScrollbar.state = saveFlags;
             newScrollbar.rect = subControlRect(control, &newScrollbar,

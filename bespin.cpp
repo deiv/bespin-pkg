@@ -242,7 +242,7 @@ void BespinStyle::readSettings(const QSettings* settings)
       config.bg.mode = BevelV;
    else if(config.bg.mode == ComplexLights &&
            !QFile::exists(QDir::tempPath() + "bespinPP.lock"))
-      QProcess::startDetached ( iSettings->value("Bg.Daemon", "bespinPP").toString() );
+      QProcess::startDetached ( iSettings->value("Bg.Daemon", "bespin pusher").toString() );
 #else
    if (config.bg.mode == ComplexLights) config.bg.mode = BevelV;
 #endif
@@ -309,6 +309,9 @@ void BespinStyle::readSettings(const QSettings* settings)
    config.tab.transition =
       (TabAnimInfo::TabTransition) iSettings->value("Tab.Transition",
          TabAnimInfo::ScanlineBlend).toInt();
+
+   // Views ===========================
+   readRole("View.HeaderRole", view.header, Text, Base);
    
    // General ===========================
    config.scale = iSettings->value("Scale", 1.0).toDouble();
@@ -458,6 +461,19 @@ void BespinStyle::polish( QPalette &pal )
          Colors::haveContrast(pal.color(QPalette::Active, QPalette::Window),
                                 pal.color(QPalette::Active, QPalette::Highlight));
 }
+
+#if SHAPE_POPUP
+static QMenuBar *bar4popup(QMenu *menu) {
+   if (!menu->menuAction())
+      return 0;
+   if (menu->menuAction()->associatedWidgets().isEmpty())
+      return 0;
+   foreach (QWidget *w, menu->menuAction()->associatedWidgets())
+      if (qobject_cast<QMenuBar*>(w))
+         return static_cast<QMenuBar *>(w);
+   return 0;
+}
+#endif
 
 #ifdef Q_WS_X11
 static Atom winTypePopup = XInternAtom(QX11Info::display(), "_NET_WM_WINDOW_TYPE_POPUP_MENU", False);
@@ -701,13 +717,13 @@ void BespinStyle::polish( QWidget * widget) {
 //          widget->setFont(tmpFont);
 //       }
       // hmmmm... =)
-#if 0
-//       if (qobject_cast<QMenuBar*>(menu->menuAction()->parent())) {
+#if SHAPE_POPUP
+      if (bar4popup(menu)) {
          QAction *action = new QAction( menu->menuAction()->iconText(), menu );
          connect (action, SIGNAL(triggered(bool)), menu, SLOT(hide()));
          menu->insertAction(menu->actions().at(0), action);
-         menu->installEventFilter(this); // for the round corners
-//       }
+         menu->installEventFilter(this); // reposition/round corners
+      }
 #endif
    }
    
@@ -750,23 +766,31 @@ bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
       }
       return false;
    }
-//    case QEvent::Resize: {
-//       if (QMenu *menu = qobject_cast<QMenu*>(object)) {
-//                   QResizeEvent *rev = (QResizeEvent*)ev;
-//          int w = ((QResizeEvent*)ev)->size().width(),
-//             h = ((QResizeEvent*)ev)->size().height();
-//          QRegion mask(0,0,w,h);
-//          mask -= masks.popupCorner[0]; // tl
-//          QRect br = masks.popupCorner[1].boundingRect();
-//          mask -= masks.popupCorner[1].translated(w-br.width(), 0); // tr
-//          br = masks.popupCorner[2].boundingRect();
-//          mask -= masks.popupCorner[2].translated(0, h-br.height()); // bl
-//          br = masks.popupCorner[3].boundingRect();
-//          mask -= masks.popupCorner[3].translated(w-br.width(), h-br.height()); // br
-//          menu->setMask(mask);
-//       }
-//       return false;
-//    }
+#if SHAPE_POPUP
+   case QEvent::Resize: {
+      if (QMenu *menu = qobject_cast<QMenu*>(object)) {
+         QAction *head = menu->actions().at(0);
+         QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
+         Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | Qt::TextShowMnemonic,
+         head->iconText());
+         r.adjust(-dpi.f5, -dpi.f2, dpi.f5, dpi.f2);
+         QResizeEvent *rev = (QResizeEvent*)ev;
+         QRegion mask(menu->rect());
+         mask -= QRect(0,0,menu->width(),r.bottom());
+         mask += r;
+         mask -= masks.corner[0]; // tl
+         QRect br = masks.corner[1].boundingRect();
+         mask -= masks.corner[1].translated(r.right()-br.width(), 0); // tr
+         br = masks.corner[2].boundingRect();
+         mask -= masks.corner[2].translated(0, menu->height()-br.height()); // bl
+         br = masks.corner[3].boundingRect();
+         mask -= masks.corner[3].translated(menu->width()-br.width(),
+                                            menu->height()-br.height()); // br
+         menu->setMask(mask);
+      }
+      return false;
+   }
+#endif
    case QEvent::MouseButtonPress: {
       QMouseEvent *mev = (QMouseEvent*)ev;
 #ifdef MOUSEDEBUG
@@ -796,11 +820,16 @@ bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
       }
       return false;
    }
-#if 0
+#if SHAPE_POPUP
    case QEvent::Show:
       if (QMenu * menu = qobject_cast<QMenu*>(object)) {
-         if (menu->parentWidget())
-            menu->move(menu->parentWidget()->mapToGlobal(QPoint(0,0)));
+         QMenuBar *bar = bar4popup(menu);
+         if (bar) {
+            QPoint pos(dpi.f3, dpi.f1);
+            pos += bar->actionGeometry(menu->menuAction()).topLeft();
+            menu->move(bar->mapToGlobal(pos));
+            menu->setActiveAction(menu->actions().at(0));
+         }
          return false;
       }
       return false;

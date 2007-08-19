@@ -110,6 +110,10 @@ typedef struct Config {
       TabAnimInfo::TabTransition transition;
    } tab;
 
+   struct view {
+      QPalette::ColorRole header_role[2];
+   } view;
+
 } Config;
 
 class BespinStyle : public QCommonStyle {
@@ -232,7 +236,9 @@ private:
       Tile::Mask button, tab;
       QPixmap radio, radioIndicator, notch, slider[4];
       QPixmap winClose, winMin, winMax;
+#if SHAPE_POPUP
       QRegion corner[4];
+#endif
    } masks;
    struct {
       Tile::Set button[2][2],
