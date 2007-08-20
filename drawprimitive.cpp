@@ -410,7 +410,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (drawInner) {
          c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
          const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
-         masks.button.render(ir, painter, gt, Qt::Vertical, c,
+         masks.tab.render(ir, painter, gt, Qt::Vertical, c,
                              r.height(), QPoint(0,f2));
       }
       

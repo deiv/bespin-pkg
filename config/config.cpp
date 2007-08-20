@@ -48,26 +48,6 @@ static const char* defInfo =
    <hr>\
 Visit <a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>";
 
-static const char* manageInfo =
-"<b>Settings management</b><hr>\
-<p>\
-   You can save your current settings (including colors from qconfig!) and\
-   restore them later here.\
-</p><p>\
-   It's also possible to im and export settings from external files and share\
-   them with others.\
-</p><p>\
-   You can also call the config dialog with the paramater \"demo\"\
-<pre>\
-   bespin demo [some style]\
-</pre>\
-   to test your settings on various widgets.\
-</p><p>\
-   If you want to test settings before importing them, call\
-<pre>\
-   bespin try &lt;some_settings.conf&gt;\
-</pre>\
-</p>";
 
 /** Intenal class for the PW Char entry - not of interest */
 
@@ -124,7 +104,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    connect (ui.store, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)),
             this, SLOT(storedSettigSelected(QListWidgetItem *)));
    connect (ui.btnDelete, SIGNAL(clicked()), this, SLOT(remove()));
-   connect (ui.generalTab, SIGNAL(currentChanged(int)), this, SLOT(handleDefInfo(int)));
    ui.btnRestore->setEnabled(false);
    ui.btnExport->setEnabled(false);
    ui.btnDelete->setEnabled(false);
@@ -300,14 +279,34 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
       "<b>CrossFade</b><hr>What you would expect - one fades out while the \
       other fades in.<br>\
       This is CPU hungry - better have GPU Hardware acceleration.";
+                  
+   setContextHelp(ui.tabTransition, strList);
+
+   setContextHelp(ui.store, "<b>Settings management</b><hr>\
+                  <p>\
+                  You can save your current settings (including colors from qconfig!) and\
+                  restore them later here.\
+                  </p><p>\
+                  It's also possible to im and export settings from external files and share\
+                  them with others.\
+                  </p><p>\
+                  You can also call the config dialog with the paramater \"demo\"\
+                  <pre>\
+                  bespin demo [some style]\
+                  </pre>\
+                  to test your settings on various widgets.\
+                  </p><p>\
+                  If you want to test settings before importing them, call\
+                  <pre>\
+                  bespin try &lt;some_settings.conf&gt;\
+                  </pre>\
+                  </p>");
    
    setContextHelp(ui.pwEchoChar, "<b>Pasword Echo Character</b><hr>\
                   The character that is displayed instead of the real text when\
                   you enter e.g. a password.<br>\
                   You can enter any char or unicode number here.\
                   <b>Notice:</b> That not all fontsets may provide all unicode characters!");
-                  
-   setContextHelp(ui.tabTransition, strList);
    
    setContextHelp(ui.tabAnimSteps, "<b>Tab Transition Steps</b><hr>\
                   How many steps the transition has.<br><b>Notice:</b> that this has\
@@ -614,19 +613,6 @@ void Config::storedSettigSelected(QListWidgetItem *item) {
 void Config::handleBgMode(int idx) {
    ui.structure->setVisible(idx == 1);
    ui.labelStructure->setVisible(idx == 1);
-}
-
-void Config::handleDefInfo(int idx) {
-   if (idx == 0) {
-      infoIsManage = true;
-      setDefaultContextInfo(manageInfo);
-      ui.info->setHtml(manageInfo);
-   }
-   else if (infoIsManage) {
-      setDefaultContextInfo(defInfo);
-      ui.info->setHtml(defInfo);
-      infoIsManage = false;
-   }
 }
 
 void Config::learnPwChar() {
