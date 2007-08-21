@@ -208,7 +208,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex" >
-          <number>4</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page_2" >
           <property name="geometry" >
@@ -305,8 +305,8 @@
              </property>
              <property name="sizeHint" >
               <size>
-               <width>20</width>
-               <height>40</height>
+               <width>21</width>
+               <height>118</height>
               </size>
              </property>
             </spacer>
@@ -318,8 +318,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>341</width>
-            <height>131</height>
+            <width>517</width>
+            <height>281</height>
            </rect>
           </property>
           <attribute name="label" >
@@ -581,7 +581,7 @@
             <x>0</x>
             <y>0</y>
             <width>517</width>
-            <height>157</height>
+            <height>281</height>
            </rect>
           </property>
           <attribute name="label" >
@@ -692,8 +692,8 @@
              </property>
              <property name="sizeHint" >
               <size>
-               <width>499</width>
-               <height>41</height>
+               <width>21</width>
+               <height>124</height>
               </size>
              </property>
             </spacer>
@@ -767,8 +767,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>183</width>
-            <height>74</height>
+            <width>517</width>
+            <height>281</height>
            </rect>
           </property>
           <attribute name="label" >
@@ -835,8 +835,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>374</width>
-            <height>102</height>
+            <width>517</width>
+            <height>281</height>
            </rect>
           </property>
           <attribute name="label" >
