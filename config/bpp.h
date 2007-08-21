@@ -25,7 +25,7 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/render.h>
 #include <X11/Xatom.h>
-#include "fixx11h.h"
+#include "../fixx11h.h"
 
 class BespinPP : public QApplication
 {

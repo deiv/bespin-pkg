@@ -33,6 +33,8 @@
 #include "colors.h"
 #include "makros.h"
 
+#include <QtDebug>
+
 using namespace Bespin;
 
 extern Config config;
@@ -1082,11 +1084,12 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
        qstyleoption_cast<const QStyleOptionHeader *>(option)) {
       
       // init
-      const QRegion clipRegion = painter->clipRegion();
-      painter->setClipRect(RECT, Qt::IntersectClip);
+//       const QRegion clipRegion = painter->clipRegion();
+//       painter->setClipRect(RECT/*, Qt::IntersectClip*/);
 
       // base
       drawControl(CE_HeaderSection, header, painter, widget);
+
       // label
       QStyleOptionHeader subopt = *header;
       subopt.rect = subElementRect(SE_HeaderLabel, header, widget);
@@ -1102,7 +1105,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          drawPrimitive(PE_IndicatorHeaderArrow, &subopt, painter, widget);
          painter->restore();
       }
-      painter->setClipRegion(clipRegion);
+
+//       painter->setClipRegion(clipRegion);
       break;
    }
    case CE_HeaderSection: { // A header section
@@ -1116,8 +1120,6 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       const QColor &c = (header->sortIndicator != QStyleOptionHeader::None) ?
             COLOR(config.view.sortingHeader_role[Bg]) :
             COLOR(config.view.header_role[Bg]);
-      
-//       if (hover) sunken = false;
       if (sunken) {
          const QPixmap &sunk = Gradients::pix(c, s, o, Gradients::Sunken);
          painter->drawTiledPixmap(RECT, sunk);
@@ -1131,15 +1133,26 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 //       }
       else {
          const Gradients::Type gt =
-               (hover || (header->sortIndicator != QStyleOptionHeader::None)) ?
+               (header->sortIndicator != QStyleOptionHeader::None) ?
                config.view.sortingHeaderGradient : config.view.headerGradient;
          QRect r = RECT;
          if (o == Qt::Vertical)
             r.setBottom(r.bottom()-1);
-         painter->drawTiledPixmap(r, Gradients::pix(c, s, o, gt));
+         if (hover) {
+            const bool sort =
+                  (header->sortIndicator != QStyleOptionHeader::None);
+            QColor bg =
+                  Colors::mid(c,  sort ?
+                              COLOR(config.view.sortingHeader_role[Fg]) :
+                              COLOR(config.view.header_role[Fg]),10,1);
+            painter->drawTiledPixmap(r, Gradients::pix(bg, s, o, gt));
+         }
+         else
+            painter->drawTiledPixmap(r, Gradients::pix(c, s, o, gt));
          if (o == Qt::Vertical) {
             r.setLeft(r.right() - dpi.f1);
-            painter->drawTiledPixmap(r, Gradients::pix(c, s, o, Gradients::Sunken));
+            painter->drawTiledPixmap(r, Gradients::pix(c, s, o,
+                                     Gradients::Sunken));
             painter->save();
             painter->setPen(QColor(0,0,0, 50));
             painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
@@ -1173,19 +1186,25 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       // this works around a possible Qt bug?!?
       QFont tmpFnt = painter->font(); tmpFnt.setBold(sunken);
       painter->setFont(tmpFnt);
-      const bool sort = (header->sortIndicator != QStyleOptionHeader::None);
-      const QColor &bg =
-            sort ? CCOLOR(view.header, Bg) : CCOLOR(view.sortingHeader, Bg);
-      const QColor &fg =
-            sort ? CCOLOR(view.header, Fg) : CCOLOR(view.sortingHeader, Fg);
-      if (qGray(bg.rgb()) < 148) { // dark background, let's paint an emboss
+      const QColor *bg, *fg;
+      if (header->sortIndicator != QStyleOptionHeader::None) {
+         bg = &CCOLOR(view.sortingHeader, Bg);
+         fg = &CCOLOR(view.sortingHeader, Fg);
+      }
+      else {
+         bg = &CCOLOR(view.header, Bg);
+         fg = &CCOLOR(view.header, Fg);
+      }
+      if (qGray(bg->rgb()) < 148) { // dark background, let's paint an emboss
          rect.moveTop(rect.top()-1);
-         painter->setPen(bg.dark(120));
-         drawItemText ( painter, rect, Qt::AlignCenter, PAL, isEnabled, header->text);
+         painter->setPen(bg->dark(120));
+         drawItemText ( painter, rect, Qt::AlignCenter,
+                        PAL, isEnabled, header->text);
          rect.moveTop(rect.top()+1);
       }
-      painter->setPen(fg);
-      drawItemText ( painter, rect, Qt::AlignCenter, PAL, isEnabled, header->text);
+      painter->setPen(*fg);
+      drawItemText ( painter, rect, Qt::AlignCenter,
+                     PAL, isEnabled, header->text);
       painter->restore();
       break;
    }
@@ -1194,7 +1213,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          break;
       if (option->state & State_Item) { // combobox scroller
          painter->save();
-         painter->setPen(hover?FCOLOR(Text):Colors::mid(FCOLOR(Base),FCOLOR(Text)));
+         painter->setPen(hover ? FCOLOR(Text) :
+               Colors::mid(FCOLOR(Base), FCOLOR(Text)));
          QStyleOption opt = *option;
          opt.rect = RECT.adjusted(RECT.width()/4, RECT.height()/4,
                                   -RECT.width()/4, -RECT.height()/4);
