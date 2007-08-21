@@ -531,13 +531,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                               GRAD(progress) ));
          }
          p.setPen(Qt::NoPen);
-         p.setBrushOrigin(-1,-1);
-         p.drawEllipse(1,1,ss,ss);
+         p.setBrushOrigin(0,1);
+         p.drawEllipse(1,1,ss,ss-1);
          p.setBrush(Qt::NoBrush);
          p.setPen(QColor(0,0,0,70));
-         p.drawEllipse(1,1,ss,ss);
+         p.drawEllipse(1,1,ss,ss-1);
          p.setPen(QColor(255,255,255,70));
-         p.drawEllipse(1,2,ss,ss);
+         p.drawEllipse(1,2,ss,ss-1);
          p.end();
 
          if (vertical) {
@@ -578,11 +578,11 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                   
                   if (vertical) {
                      painter->setBrushOrigin(0, x);
-                     painter->drawEllipse(y,x,ss,ss);
+                     painter->drawEllipse(y,x,ss,ss-1);
                   }
                   else {
                      painter->setBrushOrigin(0, y);
-                     painter->drawEllipse(x,y,ss,ss);
+                     painter->drawEllipse(x,y,ss,ss-1);
                   }
                painter->restore();
                }
@@ -1084,20 +1084,14 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       // init
       const QRegion clipRegion = painter->clipRegion();
       painter->setClipRect(RECT, Qt::IntersectClip);
-      QStyleOptionHeader subopt = *header;
-      
-      // extend the sunken state on sorting headers
-      sunken = sunken || (subopt.sortIndicator != QStyleOptionHeader::None);
-      if (sunken)
-         subopt.state |= State_Sunken;
-      
+
       // base
-      drawControl(CE_HeaderSection, &subopt, painter, widget);
-          
+      drawControl(CE_HeaderSection, header, painter, widget);
       // label
+      QStyleOptionHeader subopt = *header;
       subopt.rect = subElementRect(SE_HeaderLabel, header, widget);
       if (subopt.rect.isValid())
-         drawControl(CE_HeaderLabel, &subopt, painter, widget);
+         drawControl(CE_HeaderLabel, header, painter, widget);
           
       // sort Indicator on sorting or (inverted) on hovered headers
       if (subopt.sortIndicator != QStyleOptionHeader::None) {
@@ -1119,10 +1113,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          o = Qt::Horizontal;
          s = RECT.width();
       }
-      if (hover) sunken = false;
+      const QColor &c = (header->sortIndicator != QStyleOptionHeader::None) ?
+            COLOR(config.view.sortingHeader_role[Bg]) :
+            COLOR(config.view.header_role[Bg]);
+      
+//       if (hover) sunken = false;
       if (sunken) {
-         const QPixmap &sunk = Gradients::pix(COLOR(config.view.header_role[Bg]),
-                                              s, o, Gradients::Sunken);
+         const QPixmap &sunk = Gradients::pix(c, s, o, Gradients::Sunken);
          painter->drawTiledPixmap(RECT, sunk);
       }
 //       else if (header && header->orientation == Qt::Vertical) {
@@ -1133,18 +1130,16 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 //          painter->restore();
 //       }
       else {
-         const QPixmap &norm =
-               Gradients::pix(COLOR(config.view.header_role[Bg]), s, o,
-                              hover ? Gradients::Glass : Gradients::Button);
+         const Gradients::Type gt =
+               (hover || (header->sortIndicator != QStyleOptionHeader::None)) ?
+               config.view.sortingHeaderGradient : config.view.headerGradient;
          QRect r = RECT;
          if (o == Qt::Vertical)
             r.setBottom(r.bottom()-1);
-         painter->drawTiledPixmap(r, norm);
+         painter->drawTiledPixmap(r, Gradients::pix(c, s, o, gt));
          if (o == Qt::Vertical) {
             r.setLeft(r.right() - dpi.f1);
-            const QPixmap &sunk = Gradients::pix(COLOR(config.view.header_role[Bg]),
-                  s, o, Gradients::Sunken);
-            painter->drawTiledPixmap(r, sunk);
+            painter->drawTiledPixmap(r, Gradients::pix(c, s, o, Gradients::Sunken));
             painter->save();
             painter->setPen(QColor(0,0,0, 50));
             painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
@@ -1154,24 +1149,23 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       break;
    }
    case CE_HeaderLabel: { // The header's label
-      const QStyleOptionHeader* hopt =
+      const QStyleOptionHeader* header =
             qstyleoption_cast<const QStyleOptionHeader*>(option);
       QRect rect = RECT;
       
       // iconos
-      if ( !hopt->icon.isNull() ) {
+      if ( !header->icon.isNull() ) {
          QPixmap pixmap =
-               hopt->icon.pixmap( 22,22, isEnabled ? QIcon::Normal : QIcon::Disabled );
+               header->icon.pixmap( 22,22, isEnabled ? QIcon::Normal : QIcon::Disabled );
          int pixw = pixmap.width();
          int pixh = pixmap.height();
-         
-         rect.setY( rect.center().y() - (pixh - 1) / 2 );
          // "pixh - 1" because of tricky integer division
+         rect.setY( rect.center().y() - (pixh - 1) / 2 );
          drawItemPixmap ( painter, rect, Qt::AlignCenter, pixmap );
          rect = RECT; rect.setLeft( rect.left() + pixw + 2 );
       }
       
-      if (hopt->text.isEmpty())
+      if (header->text.isEmpty())
          break;
       // textos ;)
       painter->save();
@@ -1179,16 +1173,19 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       // this works around a possible Qt bug?!?
       QFont tmpFnt = painter->font(); tmpFnt.setBold(sunken);
       painter->setFont(tmpFnt);
-
-      QColor bg = CCOLOR(view.header, Bg), fg = CCOLOR(view.header, Fg);
+      const bool sort = (header->sortIndicator != QStyleOptionHeader::None);
+      const QColor &bg =
+            sort ? CCOLOR(view.header, Bg) : CCOLOR(view.sortingHeader, Bg);
+      const QColor &fg =
+            sort ? CCOLOR(view.header, Fg) : CCOLOR(view.sortingHeader, Fg);
       if (qGray(bg.rgb()) < 148) { // dark background, let's paint an emboss
          rect.moveTop(rect.top()-1);
          painter->setPen(bg.dark(120));
-         drawItemText ( painter, rect, Qt::AlignCenter, PAL, isEnabled, hopt->text);
+         drawItemText ( painter, rect, Qt::AlignCenter, PAL, isEnabled, header->text);
          rect.moveTop(rect.top()+1);
       }
       painter->setPen(fg);
-      drawItemText ( painter, rect, Qt::AlignCenter, PAL, isEnabled, hopt->text);
+      drawItemText ( painter, rect, Qt::AlignCenter, PAL, isEnabled, header->text);
       painter->restore();
       break;
    }
@@ -1349,7 +1346,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             break; // really - nothing to do anymore!
 
          r.adjust(f2, f2, -f2, -f2);
-         masks.button.render(r, painter, Gradients::Progress/*GRAD(btn)*/, o, c, size, QPoint(f2,f2));
+         masks.button.render(r, painter, GRAD(scroll), o, c, size, QPoint(f2,f2));
       }
       break;
 //    case CE_ScrollBarFirst: // Scroll bar first line indicator (i.e., home).

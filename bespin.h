@@ -111,7 +111,8 @@ typedef struct Config {
    } tab;
 
    struct view {
-      QPalette::ColorRole header_role[2];
+      QPalette::ColorRole header_role[2], sortingHeader_role[2];
+      Gradients::Type headerGradient, sortingHeaderGradient;
    } view;
 
 } Config;

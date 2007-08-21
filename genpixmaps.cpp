@@ -102,17 +102,17 @@ void BespinStyle::generatePixmaps()
       p.setCompositionMode( QPainter::CompositionMode_SourceOver );
       lg = QLinearGradient(0,0,f9,0);
       stops << QGradientStop( 0, QColor(255,255,255, 20) )
-         << QGradientStop( 0.5, QColor(255,255,255, 110) )
+         << QGradientStop( 0.5, QColor(255,255,255, 90) )
          << QGradientStop( 1, QColor(255,255,255, 20) );
       lg.setStops(stops);
       p.fillRect(f3,f9-f2,f3,f1, lg);
       stops.clear();
       lg = QLinearGradient(0,0,f9,0);
       stops << QGradientStop( 0, QColor(255,255,255, 10) )
-         << QGradientStop( 0.5, QColor(255,255,255, 70) )
+         << QGradientStop( 0.5, QColor(255,255,255, 55) )
          << QGradientStop( 1, QColor(255,255,255, 10) );
       lg.setStops(stops);
-      p.fillRect(0,f9-f1,f9,f1, lg);
+      p.fillRect(f2,f9-f1,f9-f4,f1, lg);
       stops.clear();
       p.end();
    
@@ -128,7 +128,7 @@ void BespinStyle::generatePixmaps()
    p.setRenderHint(QPainter::Antialiasing);
    p.setBrush(Qt::NoBrush);
    p.setPen(QColor(0,0,0,70));
-   p.drawRoundRect(0,0,f9,f9-f2,95,95);
+   p.drawRoundRect(0,0,f9,f9-f2,90,90);
 //    p.setPen(QColor(255,255,255,60));
 //    p.drawRoundRect(f2,f2,f9-f2,f9-f2,60,60);
    p.setPen(QColor(255,255,255,95));
@@ -357,7 +357,7 @@ void BespinStyle::generatePixmaps()
       << QGradientStop( 0.5, QColor(255,255,255, 90) )
       << QGradientStop( 1, QColor(255,255,255, 20) );
    lg.setStops(stops);
-   p.fillRect(f2,f17-f2,f13,f1, lg);
+   p.fillRect(f4,f17-f2,f9,f1, lg);
    stops.clear();
    stops << QGradientStop( 0, QColor(255,255,255, 10) )
       << QGradientStop( 0.5, QColor(255,255,255, 55) )

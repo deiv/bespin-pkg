@@ -5,20 +5,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>591</width>
-    <height>462</height>
+    <width>825</width>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Bespin Configuration</string>
   </property>
   <layout class="QGridLayout" >
-   <item row="0" column="0" colspan="2" >
+   <item row="0" column="0" >
     <widget class="QTabWidget" name="generalTab" >
      <property name="currentIndex" >
-      <number>4</number>
+      <number>1</number>
      </property>
-     <widget class="QWidget" name="Seite_3" >
+     <widget class="QWidget" name="tab" >
       <attribute name="title" >
        <string>Manage</string>
       </attribute>
@@ -89,7 +89,7 @@
          </property>
          <property name="sizeHint" >
           <size>
-           <width>31</width>
+           <width>16</width>
            <height>27</height>
           </size>
          </property>
@@ -179,7 +179,7 @@
          </property>
          <property name="sizeHint" >
           <size>
-           <width>31</width>
+           <width>16</width>
            <height>27</height>
           </size>
          </property>
@@ -194,598 +194,841 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab" >
-      <attribute name="title" >
-       <string>Buttons</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" colspan="2" >
-        <widget class="QLabel" name="label_11" >
-         <property name="text" >
-          <string>Gradient</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2" >
-        <widget class="QComboBox" name="gradButton" />
-       </item>
-       <item row="1" column="0" colspan="2" >
-        <widget class="QLabel" name="label_14" >
-         <property name="text" >
-          <string>Layer</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2" >
-        <widget class="QComboBox" name="sunkenButtons" >
-         <item>
-          <property name="text" >
-           <string>Raised</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Embedded</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Sunken</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="3" >
-        <widget class="QGroupBox" name="btnRoles" >
-         <property name="title" >
-          <string>Color Roles</string>
-         </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="QComboBox" name="btnRole" />
-          </item>
-          <item row="0" column="1" >
-           <widget class="QLabel" name="label_16" >
-            <property name="text" >
-             <string>---></string>
-            </property>
-            <property name="alignment" >
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2" >
-           <widget class="QComboBox" name="btnActiveRole" />
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="3" column="0" >
-        <widget class="QCheckBox" name="cushion" >
-         <property name="text" >
-          <string>Cushion</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="3" >
-        <widget class="QCheckBox" name="fullButtonHover" >
-         <property name="text" >
-          <string>Hover fill to border</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="3" >
-        <widget class="Line" name="line" >
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" >
-        <widget class="QLabel" name="label_8" >
-         <property name="text" >
-          <string>Checkbox Appereance</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1" colspan="2" >
-        <widget class="QComboBox" name="checkMark" >
-         <item>
-          <property name="text" >
-           <string>X</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>V</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>O</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="8" column="0" colspan="2" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>215</width>
-           <height>101</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="tab_2" >
       <attribute name="title" >
-       <string>Tabbars</string>
+       <string>Configure</string>
       </attribute>
       <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_2" >
-         <property name="text" >
-          <string>Gradient</string>
+       <item row="0" column="0" colspan="4" >
+        <widget class="QToolBox" name="config" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Minimum" hsizetype="Expanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
+         <property name="currentIndex" >
+          <number>4</number>
+         </property>
+         <widget class="QWidget" name="page_2" >
+          <property name="geometry" >
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>517</width>
+            <height>281</height>
+           </rect>
+          </property>
+          <attribute name="label" >
+           <string>Buttons</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <item row="0" column="0" >
+            <widget class="QLabel" name="label_11" >
+             <property name="text" >
+              <string>Gradient</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" >
+            <widget class="QComboBox" name="gradButton" />
+           </item>
+           <item row="0" column="2" >
+            <widget class="QCheckBox" name="cushion" >
+             <property name="text" >
+              <string>Cushion</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" >
+            <widget class="QLabel" name="label_14" >
+             <property name="text" >
+              <string>Layer</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" >
+            <widget class="QComboBox" name="sunkenButtons" >
+             <item>
+              <property name="text" >
+               <string>Raised</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Embedded</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Sunken</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="2" >
+            <widget class="QCheckBox" name="fullButtonHover" >
+             <property name="text" >
+              <string>Hover fill to border</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="3" >
+            <widget class="QGroupBox" name="btnRoles" >
+             <property name="title" >
+              <string>Color Roles</string>
+             </property>
+             <layout class="QGridLayout" >
+              <item row="0" column="0" >
+               <widget class="QComboBox" name="btnRole" />
+              </item>
+              <item row="0" column="1" >
+               <widget class="QLabel" name="label_16" >
+                <property name="text" >
+                 <string>---></string>
+                </property>
+                <property name="alignment" >
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2" >
+               <widget class="QComboBox" name="btnActiveRole" />
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="3" column="1" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="Seite_4" >
+          <property name="geometry" >
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>341</width>
+            <height>131</height>
+           </rect>
+          </property>
+          <attribute name="label" >
+           <string>Tabbars</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <item row="0" column="0" colspan="4" >
+            <layout class="QHBoxLayout" >
+             <item>
+              <layout class="QVBoxLayout" >
+               <item>
+                <widget class="QLabel" name="label_2" >
+                 <property name="text" >
+                  <string>Gradient</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="gradTab" />
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" >
+               <item>
+                <widget class="QLabel" name="label_5" >
+                 <property name="text" >
+                  <string>Background</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="crTabBar" />
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" >
+               <item>
+                <widget class="QLabel" name="label_4" >
+                 <property name="text" >
+                  <string>Active Item</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="crTabBarActive" />
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0" >
+            <widget class="QLabel" name="label_7" >
+             <property name="text" >
+              <string>Transition</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" >
+            <widget class="QComboBox" name="tabTransition" >
+             <item>
+              <property name="text" >
+               <string>None</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Scanline blend</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Slide in</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Slide out</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Roll in</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Roll out</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Open vertically</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Close vertically</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Open horizontally</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Close horizontally</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Crossfade</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="2" >
+            <widget class="QSpinBox" name="tabAnimSteps" >
+             <property name="readOnly" >
+              <bool>false</bool>
+             </property>
+             <property name="suffix" >
+              <string>  Steps</string>
+             </property>
+             <property name="minimum" >
+              <number>2</number>
+             </property>
+             <property name="maximum" >
+              <number>18</number>
+             </property>
+             <property name="value" >
+              <number>6</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="2" column="1" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="Seite_5" >
+          <property name="geometry" >
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>517</width>
+            <height>281</height>
+           </rect>
+          </property>
+          <attribute name="label" >
+           <string>Menus</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <item row="0" column="0" >
+            <widget class="QGroupBox" name="groupBox_2" >
+             <property name="title" >
+              <string>Popups</string>
+             </property>
+             <layout class="QGridLayout" >
+              <item row="0" column="0" >
+               <widget class="QLabel" name="label_6" >
+                <property name="text" >
+                 <string>Color</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" colspan="2" >
+               <widget class="QComboBox" name="crPopup" />
+              </item>
+              <item row="1" column="0" colspan="2" >
+               <widget class="QCheckBox" name="showMenuIcons" >
+                <property name="text" >
+                 <string>Show icons</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2" >
+               <widget class="QCheckBox" name="menuShadow" >
+                <property name="text" >
+                 <string>"Shadow" outline</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="0" column="1" >
+            <widget class="QGroupBox" name="groupBox" >
+             <property name="title" >
+              <string>Selected</string>
+             </property>
+             <layout class="QGridLayout" >
+              <item row="0" column="0" >
+               <widget class="QLabel" name="label_9" >
+                <property name="text" >
+                 <string>Color</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" >
+               <widget class="QComboBox" name="crMenuActive" />
+              </item>
+              <item row="1" column="0" >
+               <widget class="QLabel" name="label_10" >
+                <property name="text" >
+                 <string>Gradient</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" >
+               <widget class="QComboBox" name="gradMenuItem" />
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="0" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="Seite_6" >
+          <property name="geometry" >
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>517</width>
+            <height>157</height>
+           </rect>
+          </property>
+          <attribute name="label" >
+           <string>Itemviews</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <item row="0" column="0" >
+            <widget class="QGroupBox" name="groupBox_3" >
+             <property name="title" >
+              <string>Header</string>
+             </property>
+             <layout class="QGridLayout" >
+              <item row="0" column="0" colspan="2" >
+               <widget class="QLabel" name="label_19" >
+                <property name="font" >
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text" >
+                 <string>Standard</string>
+                </property>
+                <property name="alignment" >
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item rowspan="3" row="0" column="2" >
+               <widget class="Line" name="line" >
+                <property name="orientation" >
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3" >
+               <widget class="QLabel" name="label_15" >
+                <property name="font" >
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text" >
+                 <string>Sorting</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" >
+               <widget class="QLabel" name="label_20" >
+                <property name="sizePolicy" >
+                 <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text" >
+                 <string>Color</string>
+                </property>
+                <property name="alignment" >
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" >
+               <widget class="QComboBox" name="headerRole" >
+                <property name="sizePolicy" >
+                 <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                  <horstretch>1</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3" >
+               <widget class="QComboBox" name="headerSortingRole" >
+                <property name="sizePolicy" >
+                 <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                  <horstretch>1</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" >
+               <widget class="QLabel" name="label_21" >
+                <property name="text" >
+                 <string>Gradient</string>
+                </property>
+                <property name="alignment" >
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1" >
+               <widget class="QComboBox" name="headerGradient" />
+              </item>
+              <item row="2" column="3" >
+               <widget class="QComboBox" name="headerSortingGradient" />
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="0" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>499</width>
+               <height>41</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="Seite_7" >
+          <property name="geometry" >
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>517</width>
+            <height>281</height>
+           </rect>
+          </property>
+          <attribute name="label" >
+           <string>Scrollbars</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <item row="0" column="0" >
+            <widget class="QLabel" name="label_18" >
+             <property name="text" >
+              <string>Gradient</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" colspan="3" >
+            <widget class="QComboBox" name="gradScroll" />
+           </item>
+           <item row="1" column="0" colspan="2" >
+            <widget class="QCheckBox" name="scrollSunken" >
+             <property name="text" >
+              <string>Sunken</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2" colspan="2" >
+            <widget class="QCheckBox" name="scrollGroove" >
+             <property name="enabled" >
+              <bool>false</bool>
+             </property>
+             <property name="text" >
+              <string>... and Groove</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="3" >
+            <widget class="QCheckBox" name="showScrollButtons" >
+             <property name="text" >
+              <string>Show Buttons</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="3" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="Seite_8" >
+          <property name="geometry" >
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>183</width>
+            <height>74</height>
+           </rect>
+          </property>
+          <attribute name="label" >
+           <string>Progressbars</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <item row="0" column="0" >
+            <widget class="QLabel" name="label_3" >
+             <property name="text" >
+              <string>Color</string>
+             </property>
+            </widget>
+           </item>
+           <item rowspan="3" row="0" column="1" >
+            <widget class="Line" name="line_2" >
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2" >
+            <widget class="QLabel" name="label_13" >
+             <property name="text" >
+              <string>Gradient</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" >
+            <widget class="QComboBox" name="crProgressBar" />
+           </item>
+           <item row="1" column="2" >
+            <widget class="QComboBox" name="gradProgress" />
+           </item>
+           <item row="2" column="0" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="2" column="2" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="Seite_9" >
+          <property name="geometry" >
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>374</width>
+            <height>102</height>
+           </rect>
+          </property>
+          <attribute name="label" >
+           <string>Misc</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <item row="0" column="0" colspan="2" >
+            <widget class="QLabel" name="label_12" >
+             <property name="text" >
+              <string>Combobox Gradient</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2" colspan="2" >
+            <widget class="QComboBox" name="gradChoose" />
+           </item>
+           <item row="0" column="4" colspan="2" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>211</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="1" column="0" >
+            <widget class="QLabel" name="label_17" >
+             <property name="text" >
+              <string>Secret Echo</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2" >
+            <widget class="QComboBox" name="pwEchoChar" >
+             <property name="editable" >
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3" >
+            <widget class="QLabel" name="label_8" >
+             <property name="text" >
+              <string>Checkbox Indicator</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="4" >
+            <widget class="QComboBox" name="checkMark" >
+             <item>
+              <property name="text" >
+               <string>X</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>V</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>O</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="5" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="2" column="3" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
         </widget>
-       </item>
-       <item row="0" column="1" colspan="2" >
-        <widget class="QComboBox" name="gradTab" />
        </item>
        <item row="1" column="0" >
-        <widget class="QLabel" name="label_5" >
+        <widget class="QLabel" name="label" >
          <property name="text" >
-          <string>Background</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" colspan="2" >
-        <widget class="QComboBox" name="crTabBar" />
-       </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_4" >
-         <property name="text" >
-          <string>Active Item</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" colspan="2" >
-        <widget class="QComboBox" name="crTabBarActive" />
-       </item>
-       <item row="3" column="0" >
-        <widget class="QLabel" name="label_7" >
-         <property name="text" >
-          <string>Transition</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1" colspan="2" >
-        <widget class="QComboBox" name="tabTransition" >
-         <item>
-          <property name="text" >
-           <string>None</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Scanline blend</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Slide in</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Slide out</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Roll in</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Roll out</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Open vertically</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Close vertically</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Open horizontally</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Close horizontally</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Crossfade</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="4" column="0" >
-        <widget class="QLabel" name="label_15" >
-         <property name="text" >
-          <string>Steps</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1" >
-        <widget class="QSlider" name="tabAnimSteps" >
-         <property name="minimum" >
-          <number>2</number>
-         </property>
-         <property name="maximum" >
-          <number>18</number>
-         </property>
-         <property name="pageStep" >
-          <number>2</number>
-         </property>
-         <property name="value" >
-          <number>6</number>
-         </property>
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2" >
-        <widget class="QSpinBox" name="spinBox" >
-         <property name="readOnly" >
-          <bool>true</bool>
-         </property>
-         <property name="minimum" >
-          <number>2</number>
-         </property>
-         <property name="maximum" >
-          <number>18</number>
-         </property>
-         <property name="value" >
-          <number>6</number>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>215</width>
-           <height>151</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="Seite" >
-      <attribute name="title" >
-       <string>Menus</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_9" >
-         <property name="text" >
-          <string>Selected Color</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="crMenuActive" />
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_10" >
-         <property name="text" >
-          <string>Gradient</string>
+          <string>Background Mode</string>
          </property>
         </widget>
        </item>
        <item row="1" column="1" >
-        <widget class="QComboBox" name="gradMenuItem" />
-       </item>
-       <item row="2" column="0" colspan="2" >
-        <widget class="QGroupBox" name="groupBox_2" >
-         <property name="title" >
-          <string>Popups</string>
-         </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_6" >
-            <property name="text" >
-             <string>Color</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" >
-           <widget class="QComboBox" name="crPopup" />
-          </item>
-          <item row="1" column="0" >
-           <widget class="QCheckBox" name="showMenuIcons" >
-            <property name="text" >
-             <string>Show icons</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="2" >
-           <widget class="QCheckBox" name="menuShadow" >
-            <property name="text" >
-             <string>"Shadow" outline</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <widget class="QComboBox" name="bgMode" >
+         <item>
+          <property name="text" >
+           <string>Plain</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Tiled Structure</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Complex</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Vertical Top/Bottom Gradient</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Horizontal Left/Right Gradient</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Vertical Center Gradient</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Horizontal Center Gradient</string>
+          </property>
+         </item>
         </widget>
        </item>
-       <item row="3" column="0" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>151</width>
-           <height>21</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="Seite_2" >
-      <attribute name="title" >
-       <string>Misc</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" colspan="5" >
-        <widget class="QGroupBox" name="groupBox" >
-         <property name="title" >
-          <string>Scrollbars</string>
-         </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_18" >
-            <property name="text" >
-             <string>Gradient</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" >
-           <widget class="QComboBox" name="gradScroll" />
-          </item>
-          <item row="1" column="0" >
-           <widget class="QCheckBox" name="scrollSunken" >
-            <property name="text" >
-             <string>Sunken</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" >
-           <widget class="QCheckBox" name="scrollGroove" >
-            <property name="enabled" >
-             <bool>false</bool>
-            </property>
-            <property name="text" >
-             <string>... and Groove</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="2" >
-           <widget class="QCheckBox" name="showScrollButtons" >
-            <property name="text" >
-             <string>Show Buttons</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="5" >
-        <widget class="QGroupBox" name="groupBox_3" >
-         <property name="title" >
-          <string>Progressbars</string>
-         </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_3" >
-            <property name="text" >
-             <string>Color role</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" >
-           <widget class="QComboBox" name="crProgressBar" />
-          </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_13" >
-            <property name="text" >
-             <string>Gradient</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" >
-           <widget class="QComboBox" name="gradProgress" />
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_12" >
+       <item row="1" column="2" >
+        <widget class="QLabel" name="labelStructure" >
          <property name="text" >
-          <string>Combo Gradient</string>
+          <string>Structure</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1" >
-        <widget class="QComboBox" name="gradChoose" />
-       </item>
-       <item row="2" column="2" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="3" >
-        <widget class="QLabel" name="label_17" >
-         <property name="text" >
-          <string>Secret Echo</string>
-         </property>
+       <item row="1" column="3" >
+        <widget class="QComboBox" name="structure" >
+         <item>
+          <property name="text" >
+           <string>Scanlines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Checkboard</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Fat Scanlines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>"Blue"print</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Pinstripes</string>
+          </property>
+         </item>
         </widget>
-       </item>
-       <item row="2" column="4" >
-        <widget class="QComboBox" name="pwEchoChar" >
-         <property name="editable" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2" >
-        <widget class="QLabel" name="label_19" >
-         <property name="text" >
-          <string>Itemview Header color role</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2" colspan="3" >
-        <widget class="QComboBox" name="headerRole" />
        </item>
       </layout>
      </widget>
     </widget>
    </item>
-   <item rowspan="3" row="0" column="2" >
+   <item row="0" column="1" >
     <widget class="QTextBrowser" name="info" />
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Background Mode</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" >
-    <widget class="QComboBox" name="bgMode" >
-     <item>
-      <property name="text" >
-       <string>Plain</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Tiled Structure</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Complex</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Vertical Top/Bottom Gradient</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Horizontal Left/Right Gradient</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Vertical Center Gradient</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Horizontal Center Gradient</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="2" column="0" >
-    <widget class="QLabel" name="labelStructure" >
-     <property name="text" >
-      <string>Structure</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" >
-    <widget class="QComboBox" name="structure" >
-     <item>
-      <property name="text" >
-       <string>Scanlines</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Checkboard</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Fat Scanlines</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>"Blue"print</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Pinstripes</string>
-      </property>
-     </item>
-    </widget>
    </item>
   </layout>
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>tabAnimSteps</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>112</x>
-     <y>70</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>112</x>
-     <y>70</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>scrollSunken</sender>
    <signal>toggled(bool)</signal>
@@ -793,12 +1036,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>95</x>
-     <y>120</y>
+     <x>73</x>
+     <y>234</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>341</x>
-     <y>128</y>
+     <x>340</x>
+     <y>235</y>
     </hint>
    </hints>
   </connection>

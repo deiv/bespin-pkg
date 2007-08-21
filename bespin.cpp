@@ -312,6 +312,9 @@ void BespinStyle::readSettings(const QSettings* settings)
 
    // Views ===========================
    readRole("View.HeaderRole", view.header, Text, Base);
+   readRole("View.SortingHeaderRole", view.sortingHeader, Text, Base);
+   config.view.headerGradient = gradientType("View.HeaderGradient", Button);
+   config.view.sortingHeaderGradient = gradientType("View.SortingHeaderGradient", Sunken);
    
    // General ===========================
    config.scale = iSettings->value("Scale", 1.0).toDouble();

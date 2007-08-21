@@ -118,6 +118,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateColorModes(ui.btnRole);
    generateColorModes(ui.btnActiveRole);
    generateColorModes(ui.headerRole);
+   generateColorModes(ui.headerSortingRole);
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
@@ -125,6 +126,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateGradientTypes(ui.gradProgress);
    generateGradientTypes(ui.gradTab);
    generateGradientTypes(ui.gradScroll);
+   generateGradientTypes(ui.headerGradient);
+   generateGradientTypes(ui.headerSortingGradient);
    
    
    QSettings csettings("Bespin", "Config");
@@ -217,6 +220,9 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.tabTransition, "Tab.Transition", 1);
 
    handleSettings(ui.headerRole, "View.HeaderRole", QPalette::Text);
+   handleSettings(ui.headerSortingRole, "View.SortingHeaderRole", QPalette::Text);
+   handleSettings(ui.headerGradient, "View.HeaderGradient", GradButton);
+   handleSettings(ui.headerSortingGradient, "View.SortingHeaderGradient", GradSunken);
    
    /** setContextHelp(.) attaches a context help string to a widget on your form */
    setContextHelp(ui.btnRoles, "<b>Button Colors</b><hr>\
@@ -371,6 +377,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     =========================================== */
 
    ui.generalTab->setCurrentIndex(0);
+   ui.config->setCurrentIndex(0);
 }
 
 
