@@ -221,14 +221,55 @@ Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1], QPalette::_D
 #define gradientType(_ENTRY_, _DEF_)\
 (Gradients::Type) iSettings->value(_ENTRY_, Gradients::_DEF_).toInt();
 
+static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list) {
+   for (int i = 0; i < QPalette::NColorRoles; i++)
+      pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
+}
+
+static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
+   QStringList list;
+   for (int i = 0; i < QPalette::NColorRoles; i++)
+      list << pal.color(group, (QPalette::ColorRole) i).name();
+   return list;
+}
+
 void BespinStyle::readSettings(const QSettings* settings)
 {
    bool delSettings = false;
    QSettings *iSettings = const_cast<QSettings*>(settings);
    if (!iSettings) {
       delSettings = true;
-      iSettings = new QSettings("Bespin", "Style");
-      iSettings->beginGroup("Style");
+      char *preset = getenv("BESPIN_PRESET");
+      if (preset) {
+         iSettings = new QSettings("Bespin", "Store");
+         if (iSettings->childGroups().contains(preset)) {
+            iSettings->beginGroup(preset);
+            // set custom palette!
+            QPalette pal;
+            iSettings->beginGroup("QPalette");
+            QStringList list =
+                  iSettings->value ( "active", colors(pal,
+                                     QPalette::Active) ).toStringList();
+            updatePalette(pal, QPalette::Active, list);
+            list = iSettings->value ( "inactive", colors(pal,
+                                      QPalette::Inactive) ).toStringList();
+            updatePalette(pal, QPalette::Inactive, list);
+            list = iSettings->value ( "disabled", colors(pal,
+                                      QPalette::Disabled) ).toStringList();
+            updatePalette(pal, QPalette::Disabled, list);
+            polish(pal);
+            qApp->setPalette(pal);
+            iSettings->endGroup();
+         }
+         else {
+            delete iSettings; iSettings = 0L;
+         }
+         free(preset);
+      }
+      if (!iSettings) {
+         iSettings = new QSettings("Bespin", "Style");
+         iSettings->beginGroup("Style");
+      }
    }
    else
       qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");

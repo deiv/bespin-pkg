@@ -117,10 +117,10 @@ int main(int argc, char *argv[])
          file.value ( "active", Config::colors(pal, QPalette::Active) ).toStringList();
       Config::updatePalette(pal, QPalette::Active, list);
       list =
-         file.value ( "active", Config::colors(pal, QPalette::Inactive) ).toStringList();
+         file.value ( "inactive", Config::colors(pal, QPalette::Inactive) ).toStringList();
       Config::updatePalette(pal, QPalette::Inactive, list);
       list =
-         file.value ( "active", Config::colors(pal, QPalette::Disabled) ).toStringList();
+         file.value ( "disabled", Config::colors(pal, QPalette::Disabled) ).toStringList();
       Config::updatePalette(pal, QPalette::Disabled, list);
       file.endGroup();
       app.setPalette(pal);
