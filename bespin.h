@@ -110,6 +110,11 @@ typedef struct Config {
       TabAnimInfo::TabTransition transition;
    } tab;
 
+   struct toolbox {
+      QPalette::ColorRole active_role[2];
+      Gradients::Type gradient;
+   } toolbox;
+
    struct view {
       QPalette::ColorRole header_role[2], sortingHeader_role[2];
       Gradients::Type headerGradient, sortingHeaderGradient;

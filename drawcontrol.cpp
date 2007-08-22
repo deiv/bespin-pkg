@@ -945,36 +945,24 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
    case CE_Q3DockWindowEmptyArea: // The empty area of a QDockWidget
       break;
    case CE_ToolBoxTabShape: {
-      if (!isEnabled) break;
-//       if (const QStyleOptionToolBoxV2* tbt =
-//          qstyleoption_cast<const QStyleOptionToolBoxV2*>(option)) {
-         
-//          Tile::PosFlags pf = Tile::Full;
-//          switch (tbt->position) {
-//          case QStyleOptionToolBoxV2::Beginning:
-//             pf &= ~Tile::Bottom; break;
-//          case QStyleOptionToolBoxV2::End:
-//             pf &= ~Tile::Top; break;
-//          case QStyleOptionToolBoxV2::Middle:
-//             pf &= ~(Tile::Top | Tile::Bottom); break;
-//          default:
-//                break;
-//          }
-         QColor c = Colors::mid(CCOLOR(tab.std, 0), FCOLOR(Window), 2, 1);
-         QRect r = RECT.adjusted(0, 0, 0, -dpi.f2);
-         masks.tab.render(r, painter, GRAD(tab), Qt::Vertical, c);
-         
-         if (sunken || option->state & State_Selected) {
-            r.adjust(dpi.f2, dpi.f3, -dpi.f2, -dpi.f3);
-            masks.tab.render(r, painter, GRAD(tab), Qt::Vertical, CCOLOR(tab.active, 0));
-         }
-         else if (hover) {
-            r.adjust(dpi.f3, dpi.f4, -dpi.f3, -dpi.f4);
-            c = Colors::mid(c, CCOLOR(tab.active, 0), 21, 6);
-            masks.tab.render(r, painter, GRAD(tab), Qt::Vertical, c);
-         }
-         shadows.tabSunken.render(RECT, painter);
-//       }
+      if (!isEnabled)
+         break;
+
+      Gradients::Type gt = Gradients::Button;
+      QColor c;
+      sunken = sunken || option->state & State_Selected;
+
+      if (sunken) {
+         c = Colors::mid(CCOLOR(toolbox.active, Bg), FCOLOR(Window), 2, 1);
+         gt = GRAD(toolbox);
+      }
+      else if (hover)
+         c = Colors::mid(CCOLOR(toolbox.active, Bg), FCOLOR(Window));
+      else
+         c = FCOLOR(Window);
+      masks.tab.render(RECT.adjusted(0, 0, 0, -dpi.f2), painter, gt, Qt::Vertical, c);
+      shadows.tabSunken.render(RECT, painter);
+
       break;
    }
    case CE_ToolBoxTabLabel:
@@ -982,25 +970,22 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
           qstyleoption_cast<const QStyleOptionToolBox*>(option)) {
          
          sunken = sunken || option->state & (State_Selected);
+         if (sunken) hover = false;
          
          QColor cB, cF;
          if (sunken) {
-            cB = CCOLOR(tab.active, 0);
-            cF = CCOLOR(tab.active, 1);
+            cB = CCOLOR(toolbox.active, Bg);
+            cF = CCOLOR(toolbox.active, Fg);
+         }
+         else if (hover) {
+            cB = Colors::mid(FCOLOR(Window), CCOLOR(toolbox.active, Bg));
+            const QColor &std = FCOLOR(WindowText);
+            const QColor &act = CCOLOR(toolbox.active, Fg);
+            cF = (Colors::contrast(act, cB) > Colors::contrast(std, cB)) ? act : std;
          }
          else {
-            cB = CCOLOR(tab.std, 0);
-            cF = CCOLOR(tab.std, 1);
-         }
-         
-         if (sunken) hover = false;
-               
-         if (hover) {
-            cB = Colors::mid(cB, CCOLOR(tab.active, 0));
-            if (Colors::contrast(CCOLOR(tab.active, 1), cB) >
-                Colors::contrast(cF, cB)) {
-               cF = CCOLOR(tab.active, 1);
-            }
+            cB = FCOLOR(Window);
+            cF = FCOLOR(WindowText);
          }
          
          painter->save();

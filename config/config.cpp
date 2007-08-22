@@ -119,6 +119,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateColorModes(ui.btnActiveRole);
    generateColorModes(ui.headerRole);
    generateColorModes(ui.headerSortingRole);
+   generateColorModes(ui.crTool);
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
@@ -128,6 +129,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateGradientTypes(ui.gradScroll);
    generateGradientTypes(ui.headerGradient);
    generateGradientTypes(ui.headerSortingGradient);
+   generateGradientTypes(ui.gradTool);
    
    
    QSettings csettings("Bespin", "Config");
@@ -218,6 +220,9 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.gradTab, "Tab.Gradient", GradButton);
    handleSettings(ui.crTabBar, "Tab.Role", QPalette::Window);
    handleSettings(ui.tabTransition, "Tab.Transition", 1);
+
+   handleSettings(ui.crTool, "ToolBox.ActiveRole", QPalette::Highlight);
+   handleSettings(ui.gradTool, "Tab.ActiveGradient", GradGlass);
 
    handleSettings(ui.headerRole, "View.HeaderRole", QPalette::Text);
    handleSettings(ui.headerSortingRole, "View.SortingHeaderRole", QPalette::Text);

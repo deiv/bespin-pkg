@@ -351,6 +351,14 @@ void BespinStyle::readSettings(const QSettings* settings)
       (TabAnimInfo::TabTransition) iSettings->value("Tab.Transition",
          TabAnimInfo::ScanlineBlend).toInt();
 
+   // ToolBoxes
+   config.toolbox.active_role[0] = (QPalette::ColorRole)
+         iSettings->value("ToolBox.ActiveRole", config.tab.std_role[Bg]).toInt();
+   Colors::counterRole(config.toolbox.active_role[Bg],
+                       config.toolbox.active_role[Fg],
+                       config.tab.std_role[Bg], config.tab.std_role[Fg]);
+   GRAD(toolbox) = (Gradients::Type) iSettings->value("Tab.ActiveGradient", GRAD(tab)).toInt();
+
    // Views ===========================
    readRole("View.HeaderRole", view.header, Text, Base);
    readRole("View.SortingHeaderRole", view.sortingHeader, Text, Base);
@@ -561,15 +569,12 @@ void BespinStyle::polish( QWidget * widget) {
          widget->setAttribute(Qt::WA_Hover);
    
    if (qobject_cast<QAbstractButton*>(widget)) {
-      if (widget->inherits("QToolBoxButton"))
-         widget->setForegroundRole ( QPalette::WindowText );
-      else {
          widget->setBackgroundRole ( QPalette::Window );
          widget->setForegroundRole ( QPalette::WindowText );
-         animator->registrate(widget);
-      }
+         if (!widget->inherits("QToolBoxButton"))
+            animator->registrate(widget);
    }
-   if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
+   else if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
       if (box->isEditable()) {
          widget->setBackgroundRole ( QPalette::Base );
          widget->setForegroundRole ( QPalette::Text );
@@ -581,7 +586,7 @@ void BespinStyle::polish( QWidget * widget) {
       animator->registrate(widget);
    }
    
-   if (qobject_cast<QAbstractSlider *>(widget)) {
+   else if (qobject_cast<QAbstractSlider *>(widget)) {
       widget->installEventFilter(this);
       if (qobject_cast<QScrollBar *>(widget)) {
          widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
@@ -604,7 +609,7 @@ void BespinStyle::polish( QWidget * widget) {
       }
    }
    
-   if (qobject_cast<QProgressBar*>(widget)) {
+   else if (qobject_cast<QProgressBar*>(widget)) {
       QFont fnt = widget->font();
       fnt.setBold(true);
       widget->setFont(fnt);
@@ -613,18 +618,18 @@ void BespinStyle::polish( QWidget * widget) {
       animator->registrate(widget);
    }
    
-   if (qobject_cast<QTabWidget*>(widget))
+   else if (qobject_cast<QTabWidget*>(widget))
       animator->registrate(widget);
 
-   if (qobject_cast<QTabBar *>(widget)) {
+   else if (qobject_cast<QTabBar *>(widget)) {
       widget->setBackgroundRole ( config.tab.std_role[0] );
       widget->setForegroundRole ( config.tab.std_role[1] );
       widget->installEventFilter(this);
    }
    
-   if (widget->inherits("QMdiSubWindow"))
+   else if (widget->inherits("QMdiSubWindow"))
       widget->installEventFilter(this);
-   if (widget->inherits("QWorkspace"))
+   else if (widget->inherits("QWorkspace"))
       connect(this, SIGNAL(MDIPopup(QPoint)), widget, SLOT(_q_popupOperationMenu(QPoint)));
 
    
