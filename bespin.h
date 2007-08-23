@@ -82,6 +82,8 @@ typedef struct Config {
    struct input {
       ushort pwEchoChar;
    } input;
+
+   Qt::LayoutDirection leftHanded;
    
    struct menu {
       QPalette::ColorRole std_role[2], active_role[2];
@@ -239,7 +241,7 @@ private:
 private:
    typedef QHash<uint, Tile::Set> TileCache;
    struct {
-      Tile::Mask button, tab;
+      Tile::Set button, tab;
       QPixmap radio, radioIndicator, notch, slider[4];
       QPixmap winClose, winMin, winMax;
 #if SHAPE_POPUP
@@ -260,7 +262,7 @@ private:
    struct {
       Tile::Line top;
 //       QPixmap slider[4];
-      Tile::Mask button, tab;
+      Tile::Set button, tab;
    } lights;
    
    // pixmaps

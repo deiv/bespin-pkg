@@ -357,7 +357,6 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                 qobject_cast<const QComboBox*>(widget) : 0;
          const bool listShown = combo && combo->view() &&
                ((QWidget*)(combo->view()))->isVisible();
-         const bool reverse = (option->direction == Qt::RightToLeft);
          int step = 0; QColor c = CONF_COLOR(btn.std, 0);
          
          if (listShown) { // this messes up hover
@@ -419,7 +418,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             
             if (!listShown)
                arrow = PE_IndicatorArrowDown;
-            else if (reverse)
+            else if (config.leftHanded)
                arrow = PE_IndicatorArrowRight;
             else
                arrow = PE_IndicatorArrowLeft;
@@ -800,13 +799,13 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             gr.setRight(ir.left() - dpi.f4);
             const QPixmap &groove = Gradients::pix(FCOLOR(Window), gr.height(),
                   Qt::Vertical, Gradients::Sunken);
-            masks.tab.setShape(Tile::Full &~ Tile::Left);
+            Tile::setShape(Tile::Full &~ Tile::Left);
             masks.tab.render(gr, painter, groove);
             gr.setRight(RECT.right());
             gr.setLeft(ir.right() + dpi.f4);
-            masks.tab.setShape(Tile::Full &~ Tile::Right);
+            Tile::setShape(Tile::Full &~ Tile::Right);
             masks.tab.render(gr, painter, groove);
-            masks.tab.reset();
+            Tile::reset();
          }
          
 #define PAINT_WINDOW_BUTTON(_btn_) {\

@@ -319,6 +319,11 @@ void BespinStyle::readSettings(const QSettings* settings)
    // PW Echo Char ===========================
    config.input.pwEchoChar =
          ushort(iSettings->value("Input.PwEchoChar", 0x26AB).toUInt());
+
+   // flanders
+   config.leftHanded = Qt::LeftToRight;
+   if (iSettings->value("LeftHanded", false).toBool())
+         config.leftHanded = Qt::RightToLeft;
    
    // Menus ===========================
    config.menu.itemGradient = gradientType("Menu.ItemGradient", None);

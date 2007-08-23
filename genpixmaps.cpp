@@ -64,7 +64,7 @@ void BespinStyle::generatePixmaps()
    p.setBrush(QColor(0,0,0,64));
    p.drawRoundRect(f3,f3,f9-2*f3,f9-2*f3,60,60);
    p.end();
-   lights.button = Tile::Mask(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2, 75,75);
+   lights.button = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2, 75,75);
    lights.button.setClipOffsets(f3, f3, f3, f3);
    lights.button.setDefaultShape(Tile::Ring);
    
@@ -78,7 +78,7 @@ void BespinStyle::generatePixmaps()
    p.drawRoundRect(0,0,f9,f9,60,60);
    p.end();
    UPDATE_COLORS(tmp);
-   masks.button = Tile::Mask(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2,85,85);
+   masks.button = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2,85,85);
    masks.button.setClipOffsets(0,0,0,0);
    
    // -> sunken
@@ -285,7 +285,7 @@ void BespinStyle::generatePixmaps()
    p.end();
    int f13_2 = (f13-1)/2;
    UPDATE_COLORS(tmp);
-   masks.tab = Tile::Mask(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2,99,99);
+   masks.tab = Tile::Set(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2,99,99);
    masks.tab.setClipOffsets(0,0,0,0);
    
    // light
@@ -302,7 +302,7 @@ void BespinStyle::generatePixmaps()
    p.setBrush(QColor(0,0,0,64));
    p.drawRoundRect(f3,f3,f13-2*f3,f13-2*f3,91,91);
    p.end();
-   lights.tab = Tile::Mask(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2, 91,91);
+   lights.tab = Tile::Set(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2, 91,91);
    lights.tab.setClipOffsets(f3,f3,f3,f3);
    lights.tab.setDefaultShape(Tile::Ring);
    

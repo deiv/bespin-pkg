@@ -463,13 +463,13 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          }
          else {
             r.setBottom(r.y()+r.height()/2);
-            masks.button.setShape(Tile::Full & ~Tile::Bottom);
+            Tile::setShape(Tile::Full & ~Tile::Bottom);
             masks.button.render(r, painter, Gradients::Sunken,
                                 Qt::Vertical, FCOLOR(Base));
             r.setTop(r.bottom()+1); r.setBottom(RECT.bottom()-dpi.f2);
-            masks.button.setShape(Tile::Full & ~Tile::Top);
+            Tile::setShape(Tile::Full & ~Tile::Top);
             masks.button.render(r, painter, FCOLOR(Base).light(112));
-            masks.button.reset();
+            Tile::reset();
          }
       }
       shadows.lineEdit[isEnabled].render(RECT, painter);
@@ -703,7 +703,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          else
             rect.adjust(dpi.f2,dpi.f2,-dpi.f2,-dpi.f2);
          
-         const Tile::Mask *mask = 0L; const Tile::Set *shadow = 0L;
+         const Tile::Set *mask = 0L; const Tile::Set *shadow = 0L;
          if (sunken) {
             shadow = &shadows.lineEdit[isEnabled];
             mask = &masks.button;
@@ -875,12 +875,14 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
    case PE_FrameGroupBox: { // Panel frame around group boxes.
       QRect rect = RECT.adjusted(dpi.f4,dpi.f2,-dpi.f4,0);
       rect.setHeight(qMin(2*dpi.f32, RECT.height()));
-      masks.button.setShape(Tile::Full & ~Tile::Bottom);
+      Tile::setShape(Tile::Full & ~Tile::Bottom);
       masks.button.render(rect, painter, Gradients::light(rect.height()));
       rect.setBottom(RECT.bottom()-dpi.f32);
+      Tile::setShape(Tile::Full);
       shadows.group.render(RECT, painter);
-      masks.button.outline(rect, painter, FCOLOR(Window).light(120), true);
-      masks.button.reset();
+//       Tile::setShape(Tile::Full & ~Tile::Bottom);
+//       masks.button.outline(rect, painter, FCOLOR(Window).light(120), true);
+      Tile::reset();
       break;
    }
 //    case PE_FrameButtonBevel: // Panel frame for a button bevel
@@ -1128,9 +1130,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             o = Qt::Horizontal; size = RECT.width();
             break;
          }
-         const QColor c =
-               Colors::mid(CONF_COLOR(tab.std, 0), FCOLOR(Window), 2, 1);
-         masks.tab.render(rect, painter, GRAD(tab), o, c, size);
+         masks.tab.render(rect, painter, GRAD(tab), o, CCOLOR(tab.std, Bg), size);
          rect.setBottom(rect.bottom()+dpi.f2);
          shadows.tabSunken.render(rect, painter);
       }

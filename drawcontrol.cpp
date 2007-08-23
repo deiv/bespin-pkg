@@ -359,7 +359,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             d = (o == Qt::Vertical) ? -dpi.f1 : f2;
          }
          else {
-            c = Colors::mid(CCOLOR(tab.std, 0), FCOLOR(Window), 2, 1);
+            c = CCOLOR(tab.std, Bg);
             int quota = 6 + (int) (.16 * Colors::contrast(c, CCOLOR(tab.active, 0)));
             c = Colors::mid(c, CCOLOR(tab.active, 0), quota, step);
          }
@@ -949,17 +949,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          break;
 
       Gradients::Type gt = Gradients::Button;
-      QColor c;
+      QColor c = CCOLOR(toolbox.active, Bg);
       sunken = sunken || option->state & State_Selected;
 
-      if (sunken) {
-         c = Colors::mid(CCOLOR(toolbox.active, Bg), FCOLOR(Window), 2, 1);
+      if (sunken)
          gt = GRAD(toolbox);
-      }
-      else if (hover)
-         c = Colors::mid(CCOLOR(toolbox.active, Bg), FCOLOR(Window));
-      else
-         c = FCOLOR(Window);
+      else if (!hover)
+         c = FCOLOR(Window).dark(110);
       masks.tab.render(RECT.adjusted(0, 0, 0, -dpi.f2), painter, gt, Qt::Vertical, c);
       shadows.tabSunken.render(RECT, painter);
 
@@ -972,22 +968,12 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          sunken = sunken || option->state & (State_Selected);
          if (sunken) hover = false;
          
-         QColor cB, cF;
-         if (sunken) {
+         QColor cB = FCOLOR(Window), cF = FCOLOR(WindowText);
+         if (sunken || hover) {
             cB = CCOLOR(toolbox.active, Bg);
             cF = CCOLOR(toolbox.active, Fg);
          }
-         else if (hover) {
-            cB = Colors::mid(FCOLOR(Window), CCOLOR(toolbox.active, Bg));
-            const QColor &std = FCOLOR(WindowText);
-            const QColor &act = CCOLOR(toolbox.active, Fg);
-            cF = (Colors::contrast(act, cB) > Colors::contrast(std, cB)) ? act : std;
-         }
-         else {
-            cB = FCOLOR(Window);
-            cF = FCOLOR(WindowText);
-         }
-         
+
          painter->save();
          
          if ((option->state & State_Selected)) {

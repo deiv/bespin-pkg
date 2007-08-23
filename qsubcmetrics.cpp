@@ -69,7 +69,7 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
          default:
             break;
          }
-         ret = visualRect(spinbox->direction, spinbox->rect, ret);
+         ret = visualRect(config.leftHanded, spinbox->rect, ret);
       }
    case CC_ComboBox: // A combobox, like QComboBox
       if (const QStyleOptionComboBox *cb =
@@ -102,7 +102,7 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
          default:
             break;
          }
-         ret = visualRect(cb->direction, cb->rect, ret);
+         ret = visualRect(config.leftHanded, cb->rect, ret);
       }
       break;
    case CC_GroupBox:
