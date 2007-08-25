@@ -68,7 +68,7 @@ public:
 
    inline bool isQBitmap() const {return _isBitmap;}
 
-   void outline(const QRect &rect, QPainter *p, QColor c, bool strong = false, int size = 1) const;
+   void outline(const QRect &rect, QPainter *p, QColor c, int size = 1) const;
    
    QRect rect(const QRect &rect, PosFlags pf) const;
    

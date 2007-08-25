@@ -800,7 +800,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
 #else
             masks.tab.render(r, painter, sunken ?
                   Gradients::Sunken : config.menu.itemGradient, Qt::Vertical, bg);
-//             masks.tab.outline(r, painter, QColor(0,0,0,45), true);
+//             masks.tab.outline(r, painter, QColor(0,0,0,45));
 #endif
          }
 
@@ -945,38 +945,61 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
    case CE_Q3DockWindowEmptyArea: // The empty area of a QDockWidget
       break;
    case CE_ToolBoxTabShape: {
-      if (!isEnabled)
-         break;
-
-      Gradients::Type gt = Gradients::Button;
-      QColor c = CCOLOR(toolbox.active, Bg);
-      sunken = sunken || option->state & State_Selected;
-
-      if (sunken)
-         gt = GRAD(toolbox);
-      else if (!hover)
-         c = FCOLOR(Window).dark(110);
-      masks.tab.render(RECT.adjusted(0, 0, 0, -dpi.f2), painter, gt, Qt::Vertical, c);
+      QRect r = RECT; Tile::PosFlags pf = Tile::Full;
+      if (const QStyleOptionToolBoxV2* tbt =
+          qstyleoption_cast<const QStyleOptionToolBoxV2*>(option)) {
+         switch (tbt->position) {
+         case QStyleOptionToolBoxV2::Beginning:
+            pf &= ~Tile::Bottom;
+            break;
+         case QStyleOptionToolBoxV2::Middle:
+            pf &= ~(Tile::Top | Tile::Bottom);
+            break;
+         case QStyleOptionToolBoxV2::End:
+            pf &= ~Tile::Top;
+         default:
+            r.setBottom(r.bottom()-dpi.f2);
+         }
+         if (option->state & State_Selected) {
+            pf |= Tile::Bottom;
+            r.setBottom(RECT.bottom()-dpi.f2);
+         }
+         else if (tbt->selectedPosition == // means we touch the displayed box bottom
+                  QStyleOptionToolBoxV2::PreviousIsSelected)
+            pf |= Tile::Top;
+      }
+      Tile::setShape(pf);
+      const bool selected = option->state & State_Selected;
+      if (selected || hover || sunken) {
+         const QColor &c = (selected || sunken) ?
+               CCOLOR(toolbox.active, Bg) : FCOLOR(Window);
+         Gradients::Type gt = selected ? GRAD(toolbox) :
+               (sunken ? Gradients::Sunken : Gradients::Button);
+         masks.tab.render(r, painter, gt, Qt::Vertical, c);
+      }
+      else
+         masks.tab.render(r, painter, FCOLOR(Window).dark(108));
+      Tile::setShape(pf & ~Tile::Center);
       shadows.tabSunken.render(RECT, painter);
-
+      Tile::reset();
       break;
    }
    case CE_ToolBoxTabLabel:
       if (const QStyleOptionToolBox* tbt =
           qstyleoption_cast<const QStyleOptionToolBox*>(option)) {
-         
-         sunken = sunken || option->state & (State_Selected);
-         if (sunken) hover = false;
-         
+
+         const bool selected = option->state & (State_Selected);
+
          QColor cB = FCOLOR(Window), cF = FCOLOR(WindowText);
-         if (sunken || hover) {
+         if (sunken || selected) {
+            hover = false;
             cB = CCOLOR(toolbox.active, Bg);
             cF = CCOLOR(toolbox.active, Fg);
          }
 
          painter->save();
          
-         if ((option->state & State_Selected)) {
+         if (selected) {
             QFont tmpFnt = painter->font(); tmpFnt.setBold(true);
             painter->setFont(tmpFnt);
          }
@@ -1331,7 +1354,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          // the allways shown base
          masks.tab.render(r, painter, GRAD(scroll), o,
                           config.btn.fullHover ? c : CCOLOR(btn.std, 0), size);
-         masks.tab.outline(r, painter, Colors::mid(CCOLOR(btn.std, 0), Qt::white,1,2), true);
+         masks.tab.outline(r, painter, Colors::mid(CCOLOR(btn.std, 0), Qt::white,1,2));
 
          if (config.btn.fullHover)
             break; // really - nothing to do anymore!

@@ -333,7 +333,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       int step = sunken ? 6 : animator->hoverStep(widget);
       QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, step);
       if (config.btn.fullHover && (hover || step))
-         c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
+         c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-step, step);
       
       Gradients::Type gt = !isEnabled ? Gradients::None : GRAD(btn);
       
@@ -362,8 +362,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
                   r = RECT.adjusted(0,f1, 0, -f1);
                else
                   r.setBottom(r.bottom()+dpi.f1);
-               masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)),
-                                    config.strongFocus);
+               masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)));
             }
          }
          if (!isEnabled || (sunken && !config.btn.cushion) || config.btn.layer == 2)
@@ -392,13 +391,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       // outline
       if (isEnabled) {
-#if 0
-         shadows.relief.render(r.adjusted(-f1,-f1,f1,f2), painter);
-#else
-         const bool strong = gt == Gradients::Glass || gt == Gradients::Gloss;
          masks.button.outline(r, painter, Colors::mid(hasFocus ?
-               FCOLOR(Highlight) : c, Qt::white), strong);
-#endif
+               FCOLOR(Highlight) : c, Qt::white));
       }
       
       bool drawInner = !config.btn.fullHover && (hover || step);
@@ -459,7 +453,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             masks.button.render(r, painter, FCOLOR(Base).light(112));
             r.setBottom(r.bottom()+dpi.f1);
             QColor h = Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
-            masks.button.outline(r, painter, h, config.strongFocus, dpi.f3);
+            masks.button.outline(r, painter, h, dpi.f3);
          }
          else {
             r.setBottom(r.y()+r.height()/2);
@@ -743,7 +737,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
                   h = FCOLOR(Highlight); h.setAlpha(80);
                }
                rect = RECT.adjusted(0,0,0,-dpi.f1);
-               mask->outline(rect, painter, h, config.strongFocus, dpi.f3);
+               mask->outline(rect, painter, h, dpi.f3);
             }
             if (shadow)
                shadow->render(RECT, painter);
@@ -868,7 +862,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (hasFocus) {
          QColor h = FCOLOR(Highlight); h.setAlpha(80);
 //          r.setBottom(r.bottom()+dpi.f1);
-         masks.button.outline(r, painter, h, config.strongFocus, dpi.f3);
+         masks.button.outline(r, painter, h, dpi.f3);
       }
       break;
    }
@@ -881,7 +875,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       Tile::setShape(Tile::Full);
       shadows.group.render(RECT, painter);
 //       Tile::setShape(Tile::Full & ~Tile::Bottom);
-//       masks.button.outline(rect, painter, FCOLOR(Window).light(120), true);
+//       masks.button.outline(rect, painter, FCOLOR(Window).light(120));
       Tile::reset();
       break;
    }

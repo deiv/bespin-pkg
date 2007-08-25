@@ -513,10 +513,6 @@ void BespinStyle::polish( QPalette &pal )
    pal.setColor(QPalette::Inactive, QPalette::AlternateBase,
                 Colors::mid(pal.color(QPalette::Active, QPalette::AlternateBase),
                          pal.color(QPalette::Active, QPalette::Base),3,1));
-   
-   config.strongFocus =
-         Colors::haveContrast(pal.color(QPalette::Active, QPalette::Window),
-                                pal.color(QPalette::Active, QPalette::Highlight));
 }
 
 #if SHAPE_POPUP

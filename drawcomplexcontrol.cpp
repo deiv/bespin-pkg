@@ -393,7 +393,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                   if (hasFocus) {
                      const QColor hlc =
                            Colors::mid(CONF_COLOR(btn.std, 0), FCOLOR(Highlight), 2, 1);
-                     masks.tab.outline(r, painter, hlc, config.strongFocus, f3);
+                     masks.tab.outline(r, painter, hlc, f3);
                   }
                   
                   // maybe hover indicator?

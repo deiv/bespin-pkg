@@ -103,8 +103,6 @@ typedef struct Config {
       bool groove, showButtons, sunken;
    } scroll;
    
-   bool strongFocus;
-   
    struct tab {
       QPalette::ColorRole std_role[2], active_role[2];
       Gradients::Type gradient;

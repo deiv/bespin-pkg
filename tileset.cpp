@@ -354,41 +354,89 @@ void Set::render(const QRect &r, QPainter *p) const
 static Window root = RootWindow (QX11Info::display(), DefaultScreen (QX11Info::display()));
 
 
-void Set::outline(const QRect &r, QPainter *p, QColor c, bool strong, int size) const
+void Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
 {
-   int d = size/2;
-   QRect rect = r.adjusted(d,d,-d,-d);
-   if (rect.isNull()) return;
-   int rx = (int)ceil((float)rxf/rect.width()),
-      ry = (int)ceil((float)ryf/rect.height());
+
    PosFlags pf = _shape ? _shape : _defShape;
    
+   int d = size/2;
+   QRect rect = r.adjusted(d,d,-d,-d);
+   if (rect.isNull())
+      return;
+
+   QList<QPainterPath> paths;
+   paths << QPainterPath();
+   QRect tRect;
+   QPoint end = rect.topLeft();
+
+   if (pf & Top) {
+      paths.last().moveTo(rect.topRight());
+      if (pf & Right) {
+         tRect = pixmap[TopRight].rect();
+         tRect.setSize(2*tRect.size());
+         tRect.moveTopRight(rect.topRight());
+         paths.last().arcTo(tRect, 0, 90);
+      }
+      if (pf & Left) {
+         tRect = pixmap[TopLeft].rect();
+         tRect.setSize(2*tRect.size());
+         tRect.moveTopLeft(rect.topLeft());
+         paths.last().arcTo(tRect, 90, 90);
+      }
+      else
+         paths.last().lineTo(rect.topLeft());
+   }
+   else
+      paths.last().moveTo(rect.topLeft());
+
+   if (pf & Left) {
+      if (pf & Bottom) {
+         tRect = pixmap[BtmLeft].rect();
+         tRect.setSize(2*tRect.size());
+         tRect.moveBottomLeft(rect.bottomLeft());
+         paths.last().arcTo(tRect, 180, 90);
+      }
+      else
+         paths.last().lineTo(rect.bottomLeft());
+   }
+   else {
+      if (!paths.last().isEmpty())
+         paths << QPainterPath();
+      paths.last().moveTo(rect.bottomLeft());
+   }
+
+   if (pf & Bottom) {
+      if (pf & Right) {
+         tRect = pixmap[BtmRight].rect();
+         tRect.setSize(2*tRect.size());
+         tRect.moveBottomRight(rect.bottomRight());
+         paths.last().arcTo(tRect, 270, 90);
+      }
+      else
+         paths.last().lineTo(rect.bottomRight());
+   }
+   else {
+      if (!paths.last().isEmpty())
+         paths << QPainterPath();
+      paths.last().moveTo(rect.bottomRight());
+   }
+
+   if (pf & Right) {
+      if (pf & Top)
+         paths.last().connectPath(paths.first());
+      else
+         paths.last().lineTo(rect.topRight());
+   }
+
    p->save();
-   p->setRenderHint(QPainter::Antialiasing, false);
+   p->setRenderHint(QPainter::Antialiasing);
    QPen pen = p->pen();
    pen.setColor(c); pen.setWidth(size);
-   p->setPen(pen);
-   p->setBrush(Qt::NoBrush);
-   if (! (pf & Top))
-      rect.setTop(rect.top()-100);
-   else if (strong)
-      p->drawLine(r.left()+width(TopLeft), r.top(), r.right()-width(TopRight), r.top());
-   if (! (pf & Left))
-      rect.setLeft(rect.left()-100);
-   else if (strong)
-      p->drawLine(r.left(), r.top()+height(TopRight), r.left(), r.bottom()-height(BtmRight));
-   if (! (pf & Bottom))
-      rect.setBottom(rect.bottom()+100);
-   else if (strong)
-      p->drawLine(r.left()+width(BtmLeft), r.bottom(), r.right()-width(BtmRight), r.bottom());
-   if (! (pf & Right))
-      rect.setRight(rect.right()+100);
-   else if (strong)
-      p->drawLine(r.right(), r.top()+height(TopRight), r.right(), r.bottom()-height(BtmRight));
-   p->setClipRect(r, Qt::IntersectClip);
-   p->setRenderHint(QPainter::Antialiasing);
-   p->drawRoundRect(rect, rx, ry);
+   p->setPen(pen); p->setBrush(Qt::NoBrush);
+   for (int i = 0; i < paths.count(); ++i)
+      p->drawPath(paths.at(i));
    p->restore();
+
 }
 
 void Set::setClipOffsets(uint left, uint top, uint right, uint bottom) {
