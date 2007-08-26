@@ -87,21 +87,21 @@ static QPixmap invertAlpha(const QPixmap & pix)
    return ret;
 }
 
-Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int rx, int ry)
+Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round)
 {
    if (pix.isNull()) {
       _isBitmap = false;
       return;
    }
    _isBitmap = pix.isQBitmap();
-   rxf = pix.width()*rx;
-   ryf = pix.height()*ry;
-   
+
+   int i = xOff*200/round;
+   rndRect = QRect(i, i, i, i);
+
    int rOff = pix.width() - xOff - width;
    int bOff = pix.height() - yOff - height;
    int amount = 32/width+1;
    int amount2 = 32/height+1;
-   int i;
    
    QPainter p;
    
@@ -366,22 +366,20 @@ void Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
 
    QList<QPainterPath> paths;
    paths << QPainterPath();
-   QRect tRect;
    QPoint end = rect.topLeft();
+   Set *that = const_cast<Set*>(this);
 
    if (pf & Top) {
-      paths.last().moveTo(rect.topRight());
       if (pf & Right) {
-         tRect = pixmap[TopRight].rect();
-         tRect.setSize(2*tRect.size());
-         tRect.moveTopRight(rect.topRight());
-         paths.last().arcTo(tRect, 0, 90);
+         that->rndRect.moveTopRight(rect.topRight());
+         paths.last().arcMoveTo(rndRect, 0);
+         paths.last().arcTo(rndRect, 0, 90);
       }
+      else
+         paths.last().moveTo(rect.topRight());
       if (pf & Left) {
-         tRect = pixmap[TopLeft].rect();
-         tRect.setSize(2*tRect.size());
-         tRect.moveTopLeft(rect.topLeft());
-         paths.last().arcTo(tRect, 90, 90);
+         that->rndRect.moveTopLeft(rect.topLeft());
+         paths.last().arcTo(rndRect, 90, 90);
       }
       else
          paths.last().lineTo(rect.topLeft());
@@ -391,10 +389,8 @@ void Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
 
    if (pf & Left) {
       if (pf & Bottom) {
-         tRect = pixmap[BtmLeft].rect();
-         tRect.setSize(2*tRect.size());
-         tRect.moveBottomLeft(rect.bottomLeft());
-         paths.last().arcTo(tRect, 180, 90);
+         that->rndRect.moveBottomLeft(rect.bottomLeft());
+         paths.last().arcTo(rndRect, 180, 90);
       }
       else
          paths.last().lineTo(rect.bottomLeft());
@@ -407,10 +403,8 @@ void Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
 
    if (pf & Bottom) {
       if (pf & Right) {
-         tRect = pixmap[BtmRight].rect();
-         tRect.setSize(2*tRect.size());
-         tRect.moveBottomRight(rect.bottomRight());
-         paths.last().arcTo(tRect, 270, 90);
+         that->rndRect.moveBottomRight(rect.bottomRight());
+         paths.last().arcTo(rndRect, 270, 90);
       }
       else
          paths.last().lineTo(rect.bottomRight());

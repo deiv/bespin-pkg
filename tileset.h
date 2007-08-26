@@ -49,7 +49,7 @@ inline static bool matches(PosFlags This, PosFlags That){return (This & That) ==
 class Set
 {
 public:
-   Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int rx = 0, int ry = 0);
+   Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round = 99);
    Set(){
       setDefaultShape(Ring);
       _clipOffset[0] = _clipOffset[1] = _clipOffset[2] = _clipOffset[3] = 0;
@@ -112,9 +112,9 @@ protected:
    QPixmap pixmap[9];
    PosFlags _defShape;
 private:
-   int rxf, ryf;
    int _clipOffset[4];
    bool _isBitmap, _hasCorners;
+   QRect rndRect;
 };
 
 PosFlags shape();

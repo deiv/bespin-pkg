@@ -339,12 +339,12 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       // sunken variant
       if (config.btn.layer) {
-         int d = 0, d2 = 0;
+         int d = 0;
          if (config.btn.layer == 1) {
-            d = f1; d2 = d2;
+            d = f1;
          }
          if (isEnabled) {
-            r.adjust(d,2*d,-d,-f2+d);
+            r.adjust(d,d,-d,-f2+d);
             masks.button.render(r, painter, gt, Qt::Vertical, c);
             bool drawInner = !config.btn.fullHover && (hover || step);
             if (config.btn.cushion &&
@@ -353,9 +353,9 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
                drawInner = true;
             }
             if (drawInner) {
-               const QRect ir = r.adjusted(dpi.f3, f2+d2-d, -dpi.f3, -f2 );
+               const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -(f2+d) );
                c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
-               masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,f2+d2+2*d));
+               masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,f2+d));
             }
             if (hasFocus) {
                if (config.btn.layer == 1)
@@ -391,10 +391,10 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       // outline
       if (isEnabled) {
-         masks.button.outline(r, painter, Colors::mid(hasFocus ?
-               FCOLOR(Highlight) : c, Qt::white));
+         masks.button.outline(r, painter, (gt == Gradients::Glass ||
+               gt == Gradients::Gloss) ? Qt::white : Colors::mid(c, Qt::white));
       }
-      
+
       bool drawInner = !config.btn.fullHover && (hover || step);
       if (config.btn.cushion &&
           (sunken || (!hover && option->state & State_On))) {
@@ -402,7 +402,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          drawInner = true;
       }
       if (drawInner) {
-         c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
+         c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-step, step);
          const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
          masks.tab.render(ir, painter, gt, Qt::Vertical, c,
                              r.height(), QPoint(0,f2));

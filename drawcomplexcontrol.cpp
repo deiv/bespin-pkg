@@ -456,7 +456,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          qstyleoption_cast<const QStyleOptionSlider *>(option)) {
          // Make a copy here and reset it for each primitive.
          QStyleOptionSlider newScrollbar = *scrollbar;
-         BespinStyle *ptr = const_cast<BespinStyle*>( this );
+         BespinStyle *that = const_cast<BespinStyle*>( this );
          
          // TODO: this is a stupid hack, move the whole special scrollbar painting here!
          if (widget && widget->parentWidget() &&
@@ -471,12 +471,12 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                saveFlags &= ~State_Enabled;
          
          if (scrollbar->activeSubControls & SC_ScrollBarSlider) {
-            ptr->widgetStep = 0;
-            ptr->scrollAreaHovered_ = true;
+            that->widgetStep = 0;
+            that->scrollAreaHovered_ = true;
          }
          else {
-            ptr->widgetStep = animator->hoverStep(widget);
-            ptr->scrollAreaHovered_ = scrollAreaHovered(widget);
+            that->widgetStep = animator->hoverStep(widget);
+            that->scrollAreaHovered_ = scrollAreaHovered(widget);
          }
          
          SubControls hoverControls = scrollbar->activeSubControls &
@@ -495,9 +495,9 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                   newScrollbar.state &= ~(State_Sunken | State_MouseOver);\
                if (info && (info->fadeIns & SC_ScrollBar##_E_ ||\
                   info->fadeOuts & SC_ScrollBar##_E_))\
-                  ptr->complexStep = info->step(SC_ScrollBar##_E_);\
+                  that->complexStep = info->step(SC_ScrollBar##_E_);\
                else \
-                  ptr->complexStep = 0; \
+                  that->complexStep = 0; \
                drawControl(CE_ScrollBar##_E_, &newScrollbar, painter, widget);\
             }\
          }//
@@ -534,9 +534,9 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                   newScrollbar.state |= (State_Sunken | State_MouseOver);
                if (info && (info->fadeIns & SC_ScrollBarSlider ||
                    info->fadeOuts & SC_ScrollBarSlider))
-                  ptr->complexStep = info->step(SC_ScrollBarSlider);
+                  that->complexStep = info->step(SC_ScrollBarSlider);
                else
-                  ptr->complexStep = 0;
+                  that->complexStep = 0;
                drawControl(CE_ScrollBarSlider, &newScrollbar, painter, widget);
             }
          }

@@ -216,15 +216,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          painter->save();
          QColor fg = Colors::btnFg(PAL, isEnabled, hover);
-         if (btn->features & QStyleOptionButton::DefaultButton) {
-            painter->setPen(Colors::mid(hover ? CCOLOR(btn.active, 0) :
-                  CCOLOR(btn.std, 0), fg, 3,1));
-            ir.translate(0,1);
-            drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
-//             ir.translate(2,2);
-//             drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
+         const QColor &bg = hover ? CCOLOR(btn.active, 0) : CCOLOR(btn.std, 0);
+//          if (qGray(bg.rgb()) < 148) {
+            painter->setPen(bg.dark(120));
             ir.translate(0,-1);
-         }
+            drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
+            ir.translate(0,1);
+//          }
          painter->setPen(fg);
          drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
          painter->restore();
@@ -437,12 +435,12 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
 
          // dark background, let's paint an emboss
-         if (qGray(cB.rgb()) < 148) {
+//          if (qGray(cB.rgb()) < 148) {
             painter->setPen(cB.dark(120));
             tr.moveTop(tr.top()-1);
             drawItemText(painter, tr, alignment, PAL, isEnabled, tab->text);
             tr.moveTop(tr.top()+1);
-         }
+//          }
          painter->setPen(cF);
          drawItemText(painter, tr, alignment, PAL, isEnabled, tab->text);
          
@@ -1005,14 +1003,14 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          
          // on dark background, let's paint an emboss
-         if (qGray(cB.rgb()) < 128) {
+//          if (qGray(cB.rgb()) < 128) {
             QRect tr = RECT;
             painter->setPen(cB.dark(120));
             tr.moveTop(tr.top()-1);
             drawItemText(painter, tr, Qt::AlignCenter | Qt::TextShowMnemonic,
                          PAL, isEnabled, tbt->text);
             tr.moveTop(tr.top()+1);
-         }
+//          }
 
          painter->setPen(cF);
          drawItemText(painter, RECT, Qt::AlignCenter | Qt::TextShowMnemonic,
@@ -1095,7 +1093,8 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          subopt.rect = subElementRect(SE_HeaderArrow, option, widget);
          painter->save();
          painter->setPen(Qt::NoPen);
-         painter->setBrush(FCOLOR(Base));
+         painter->setBrush(Colors::mid(CCOLOR(view.sortingHeader, Bg),
+                           CCOLOR(view.sortingHeader, Fg)));
          drawPrimitive(PE_IndicatorHeaderArrow, &subopt, painter, widget);
          painter->restore();
       }
@@ -1136,9 +1135,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             const bool sort =
                   (header->sortIndicator != QStyleOptionHeader::None);
             QColor bg =
-                  Colors::mid(c,  sort ?
-                              COLOR(config.view.sortingHeader_role[Fg]) :
-                              COLOR(config.view.header_role[Fg]),10,1);
+                  Colors::mid(c, sort ?
+                              CCOLOR(view.sortingHeader, Fg) :
+                              CCOLOR(view.header, Fg),10,1);
             painter->drawTiledPixmap(r, Gradients::pix(bg, s, o, gt));
          }
          else
@@ -1189,13 +1188,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          bg = &CCOLOR(view.header, Bg);
          fg = &CCOLOR(view.header, Fg);
       }
-      if (qGray(bg->rgb()) < 148) { // dark background, let's paint an emboss
+//       if (qGray(bg->rgb()) < 148) { // dark background, let's paint an emboss
          rect.moveTop(rect.top()-1);
          painter->setPen(bg->dark(120));
          drawItemText ( painter, rect, Qt::AlignCenter,
                         PAL, isEnabled, header->text);
          rect.moveTop(rect.top()+1);
-      }
+//       }
       painter->setPen(*fg);
       drawItemText ( painter, rect, Qt::AlignCenter,
                      PAL, isEnabled, header->text);
