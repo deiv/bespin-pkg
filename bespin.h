@@ -70,7 +70,7 @@ typedef struct Config {
    
    struct btn {
       int layer, checkType;
-      bool cushion, fullHover;
+      bool cushion, fullHover, swapFocusHover;
       Gradients::Type gradient;
       QPalette::ColorRole std_role[2], active_role[2];
    } btn;

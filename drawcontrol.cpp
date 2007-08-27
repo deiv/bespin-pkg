@@ -215,8 +215,10 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             break;
          }
          painter->save();
+         if (config.btn.swapFocusHover)
+            hover = hover xor hasFocus;
          QColor fg = Colors::btnFg(PAL, isEnabled, hover);
-         const QColor &bg = hover ? CCOLOR(btn.active, 0) : CCOLOR(btn.std, 0);
+         const QColor &bg = hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg);
 //          if (qGray(bg.rgb()) < 148) {
             painter->setPen(bg.dark(120));
             ir.translate(0,-1);

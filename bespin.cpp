@@ -312,6 +312,7 @@ void BespinStyle::readSettings(const QSettings* settings)
    readRole("Btn.ActiveRole", btn.active, Button, ButtonText);
    Colors::setButtonRoles(config.btn.std_role[0], config.btn.std_role[1],
                        config.btn.active_role[0], config.btn.active_role[1]);
+   config.btn.swapFocusHover = iSettings->value("Btn.SwapFocusHover", false).toBool();
    
    // Choosers ===========================
    GRAD(chooser) = gradientType("Chooser.Gradient", Sunken);

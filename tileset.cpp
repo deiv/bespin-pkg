@@ -95,7 +95,7 @@ Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int roun
    }
    _isBitmap = pix.isQBitmap();
 
-   int i = xOff*200/round;
+   int i = xOff*2*round/100;
    rndRect = QRect(i, i, i, i);
 
    int rOff = pix.width() - xOff - width;

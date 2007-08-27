@@ -36,13 +36,13 @@ void BespinStyle::generatePixmaps()
          p.begin(&tmp);
          p.setPen(Qt::NoPen);
          p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,((j?5:1)+i)*6));
+         p.setBrush(QColor(0,0,0,((j?5:1)+i)*5));
          p.drawRoundRect(0,0,f9,f9,99,99);
          if (!j) {
-            p.setBrush(QColor(0,0,0,(1+i)*10));
-            p.drawRoundRect(f1,f1,f9-2*f1,f9-2*f1,99,99);
+            p.setBrush(QColor(0,0,0,(1+i)*9));
+            p.drawRoundRect(f1,f2,f9-f2,f9-f3,99,99);
             p.setBrush(QColor(0,0,0,(1+i)*14));
-            p.drawRoundRect(f2,f2,f9-2*f2,f9-2*f2,99,99);
+            p.drawRoundRect(f2,f2,f9-f4,f9-f4,99,99);
          }
          p.end();
          shadows.button[j][i] = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
