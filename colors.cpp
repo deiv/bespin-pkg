@@ -86,6 +86,29 @@ int Colors::contrast(const QColor &a, const QColor &b) {
    return perc;
 }
 
+QPalette::ColorRole counterRole(QPalette::ColorRole role) {
+   switch (role) {
+   case QPalette::ButtonText: //8
+      return QPalette::Button;
+   case QPalette::WindowText: //0
+      return QPalette::Window;
+   case QPalette::HighlightedText: //13
+      return QPalette::Highlight;
+   case QPalette::Window: //10
+      return QPalette::WindowText;
+   case QPalette::Base: //9
+      return QPalette::Text;
+   case QPalette::Text: //6
+      return QPalette::Base;
+   case QPalette::Highlight: //12
+      return QPalette::HighlightedText;
+   case QPalette::Button: //1
+      return QPalette::ButtonText;
+   default:
+      return QPalette::Window;
+   }
+}
+
 bool Colors::counterRole(QPalette::ColorRole &from, QPalette::ColorRole &to,
                          QPalette::ColorRole defFrom, QPalette::ColorRole defTo) {
    switch (from) {

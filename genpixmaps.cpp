@@ -121,20 +121,21 @@ void BespinStyle::generatePixmaps()
    }
    
    // relief
-   tmp = QPixmap(f9,f9);
+   int f11 = SCALE(11), f11_2 = f11/2;
+   tmp = QPixmap(f11,f11);
    tmp.fill(Qt::transparent);
    p.begin(&tmp);
    QPen pen = p.pen(); pen.setWidth(f1); p.setPen(pen);
    p.setRenderHint(QPainter::Antialiasing);
    p.setBrush(Qt::NoBrush);
+   p.setPen(QColor(255,255,255,95));
+   p.drawRoundRect(0,f1,f11,f9,80,80);
    p.setPen(QColor(0,0,0,70));
-   p.drawRoundRect(0,0,f9,f9-f2,99,99);
+   p.drawRoundRect(f1,0,f9,f9,80,80);
 //    p.setPen(QColor(255,255,255,60));
 //    p.drawRoundRect(f2,f2,f9-f2,f9-f2,60,60);
-   p.setPen(QColor(255,255,255,95));
-   p.drawRoundRect(0,f1,f9,f9-f1,99,99);
    p.end();
-   shadows.relief = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
+   shadows.relief = Tile::Set(tmp,f11_2,f11_2,f11-2*f11_2,f11-2*f11_2);
    shadows.relief.setDefaultShape(Tile::Ring);
    
    // toplight
@@ -340,7 +341,7 @@ void BespinStyle::generatePixmaps()
    
    
    // sunken
-   int f15 = SCALE(15), f11 = SCALE(11);
+   int f15 = SCALE(15);
    tmpImg.fill(Qt::transparent);
    p.begin(&tmpImg);
    p.setPen(Qt::NoPen);

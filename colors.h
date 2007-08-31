@@ -31,7 +31,8 @@ const QColor &bg(const QPalette &pal, const QWidget *w);
 QColor btnBg(const QPalette &pal, bool isEnabled, int hasFocus = false, int step = 0);
 QColor btnFg(const QPalette &pal, bool isEnabled, int hover, int step = 0);
 int contrast(const QColor &a, const QColor &b);
-bool counterRole(QPalette::ColorRole &from, QPalette::ColorRole &to, 
+QPalette::ColorRole counterRole(QPalette::ColorRole role);
+bool counterRole(QPalette::ColorRole &from, QPalette::ColorRole &to,
                  QPalette::ColorRole defFrom = QPalette::WindowText,
                  QPalette::ColorRole defTo = QPalette::Window);
 QColor emphasize(const QColor &c, int value = 10);

@@ -208,23 +208,39 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
              qobject_cast<const QAbstractButton*>(widget))
          if (btn->isCheckable())
             ir.setRight(ir.right() - ir.height()/2 - dpi.f10);
-         
-         if (btn->features & QStyleOptionButton::Flat) {
-            drawItemText(painter, ir, tf, PAL, isEnabled, btn->text,
-                         QPalette::WindowText);
-            break;
-         }
+
          painter->save();
-         if (config.btn.swapFocusHover)
-            hover = hover xor hasFocus;
-         QColor fg = Colors::btnFg(PAL, isEnabled, hover);
-         const QColor &bg = hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg);
-//          if (qGray(bg.rgb()) < 148) {
+         if (hasFocus) {
+            ir.translate(0,-1);
+            QFont tmpFnt = painter->font();
+            tmpFnt.setBold(true);
+            QFontMetrics fm(tmpFnt);
+            QRect tr = fm.boundingRect ( btn->text );
+            if (tr.width() > ir.width()) {
+               if (tmpFnt.pointSize() > -1)
+                  tmpFnt.setPointSize(tmpFnt.pointSize()*ir.width()/tr.width());
+               else
+                  tmpFnt.setPixelSize(tmpFnt.pixelSize()*ir.width()/tr.width());
+            }
+            painter->setFont(tmpFnt);
+         }
+
+         const bool flat = btn->features & QStyleOptionButton::Flat;
+         QColor fg;
+         if (flat)
+            fg = FCOLOR(WindowText);
+         else
+            fg = Colors::btnFg(PAL, isEnabled, hover);
+         const QColor &bg = flat ? FCOLOR(Window) :
+               (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
+
+         if (isEnabled) {
             painter->setPen(bg.dark(120));
             ir.translate(0,-1);
             drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
             ir.translate(0,1);
-//          }
+         }
+         
          painter->setPen(fg);
          drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
          painter->restore();
@@ -437,12 +453,12 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
 
          // dark background, let's paint an emboss
-//          if (qGray(cB.rgb()) < 148) {
+         if (isEnabled) {
             painter->setPen(cB.dark(120));
             tr.moveTop(tr.top()-1);
             drawItemText(painter, tr, alignment, PAL, isEnabled, tab->text);
             tr.moveTop(tr.top()+1);
-//          }
+         }
          painter->setPen(cF);
          drawItemText(painter, tr, alignment, PAL, isEnabled, tab->text);
          
@@ -1005,14 +1021,14 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          }
          
          // on dark background, let's paint an emboss
-//          if (qGray(cB.rgb()) < 128) {
+         if (isEnabled) {
             QRect tr = RECT;
             painter->setPen(cB.dark(120));
             tr.moveTop(tr.top()-1);
             drawItemText(painter, tr, Qt::AlignCenter | Qt::TextShowMnemonic,
                          PAL, isEnabled, tbt->text);
             tr.moveTop(tr.top()+1);
-//          }
+         }
 
          painter->setPen(cF);
          drawItemText(painter, RECT, Qt::AlignCenter | Qt::TextShowMnemonic,
@@ -1180,9 +1196,9 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       
       // this works around a possible Qt bug?!?
       QFont tmpFnt = painter->font(); tmpFnt.setBold(sunken);
-      painter->setFont(tmpFnt);
       const QColor *bg, *fg;
       if (header->sortIndicator != QStyleOptionHeader::None) {
+         tmpFnt.setBold(true);
          bg = &CCOLOR(view.sortingHeader, Bg);
          fg = &CCOLOR(view.sortingHeader, Fg);
       }
@@ -1190,13 +1206,14 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
          bg = &CCOLOR(view.header, Bg);
          fg = &CCOLOR(view.header, Fg);
       }
-//       if (qGray(bg->rgb()) < 148) { // dark background, let's paint an emboss
+      painter->setFont(tmpFnt);
+      if (isEnabled) { // dark background, let's paint an emboss
          rect.moveTop(rect.top()-1);
          painter->setPen(bg->dark(120));
          drawItemText ( painter, rect, Qt::AlignCenter,
                         PAL, isEnabled, header->text);
          rect.moveTop(rect.top()+1);
-//       }
+      }
       painter->setPen(*fg);
       drawItemText ( painter, rect, Qt::AlignCenter,
                      PAL, isEnabled, header->text);

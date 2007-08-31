@@ -121,7 +121,7 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
             if (abn->isCheckable())
                w += contentsSize.height()/2+dpi.f10;
             if (w < dpi.f80) w = dpi.f80;
-            if (config.btn.layer == 2)
+            if (config.btn.layer)
                return QSize(w, contentsSize.height() + dpi.f5);
             else
                return QSize(w, contentsSize.height() + dpi.f8);

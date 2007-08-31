@@ -330,21 +330,19 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       
       const int f1 = dpi.f1, f2 = dpi.f2;
       QRect r = RECT;
-      const bool swap = config.btn.swapFocusHover && hasFocus;
       int step = sunken ? 6 : animator->hoverStep(widget);
-      int iStep = 6-step;
-      if (swap) {
-         int h = step; step = iStep; iStep = h;
-      }
       QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, step);
-      if (config.btn.fullHover) {
-         if (hover || step)
-            c = Colors::mid(c, CCOLOR(btn.active, Bg), iStep, step);
-         else if (swap)
-            c = CCOLOR(btn.active, Bg);
-      }
+
+      if (config.btn.fullHover && (hover || step))
+         c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-step, step);
       
       Gradients::Type gt = !isEnabled ? Gradients::None : GRAD(btn);
+      bool drawInner = !config.btn.fullHover && (hover || step);
+      if (config.btn.cushion &&
+          (sunken || (!hover && option->state & State_On))) {
+         gt = Gradients::Sunken;
+         drawInner = true;
+      }
       
       // sunken variant
       if (config.btn.layer) {
@@ -355,20 +353,14 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          if (isEnabled) {
             r.adjust(d,d,-d,-f2+d);
             masks.button.render(r, painter, gt, Qt::Vertical, c);
-            bool drawInner = !config.btn.fullHover && (hover || step);
-            if (config.btn.cushion &&
-               (sunken || (!hover && option->state & State_On))) {
-               gt = Gradients::Sunken;
-               drawInner = true;
-            }
             if (drawInner) {
                const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -(f2+d) );
-               c = Colors::mid(c, CCOLOR(btn.active, Bg), iStep, step);
+               c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-step, step);
                masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,f2+d));
             }
             if (hasFocus) {
                if (config.btn.layer == 1)
-                  r = RECT.adjusted(0,f1, 0, -f1);
+                  r = RECT;
                else
                   r.setBottom(r.bottom()+dpi.f1);
                masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)), f2);
@@ -399,24 +391,17 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       masks.button.render(r, painter, gt, Qt::Vertical, c);
       
       // outline?
-      if (gt == Gradients::Glass || gt == Gradients::Gloss) {
-         painter->save();
-         painter->setClipRegion(r);
-         masks.button.outline(r, painter, Qt::white);
-         painter->restore();
-      }
+      painter->save();
+      painter->setClipRegion(r);
+      masks.button.outline(r, painter, (gt == Gradients::Glass ||
+            gt == Gradients::Gloss) ? Qt::white : Colors::mid(c, Qt::white));
+      painter->restore();
 
-      bool drawInner = !config.btn.fullHover && (hover || step);
-      if (config.btn.cushion &&
-          (sunken || (!hover && option->state & State_On))) {
-         gt = Gradients::Sunken;
-         drawInner = true;
-      }
       if (drawInner) {
          c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-step, step);
          const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
-         masks.tab.render(ir, painter, gt, Qt::Vertical, c,
-                             r.height(), QPoint(0,f2));
+         masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(),
+                          QPoint(0,f2));
       }
       
       // ambient?
@@ -573,11 +558,11 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       break;
    }
    case PE_IndicatorCheckBox: { // On/off indicator, for example, a QCheckBox.
-      bool _fullHover = config.btn.fullHover;
-      if (!(option->state & State_Off))
-         config.btn.fullHover = true;
+//       bool _fullHover = config.btn.fullHover;
+//       if (!(option->state & State_Off))
+//          config.btn.fullHover = true;
       drawPrimitive(PE_PanelButtonBevel, option, painter, widget);
-      config.btn.fullHover = _fullHover;
+//       config.btn.fullHover = _fullHover;
       
       if (!(sunken || (option->state & State_Off))) {
          painter->save();
