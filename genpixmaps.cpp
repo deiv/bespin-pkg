@@ -185,10 +185,10 @@ void BespinStyle::generatePixmaps()
          p.begin(&shadows.radio[j][i]);
          p.setPen(Qt::NoPen);
          p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,(1+i+2*j)*13));
+         p.setBrush(QColor(0,0,0,(1+i+2*j)*8));
          p.drawEllipse(shadows.radio[j][i].rect());
          if (!j) {
-            p.setBrush(QColor(0,0,0,(i+1)*28));
+            p.setBrush(QColor(0,0,0,(i+1)*14));
             p.drawEllipse(f2_2,f2_2,rw-f2,rh-f2);
          }
          p.end();

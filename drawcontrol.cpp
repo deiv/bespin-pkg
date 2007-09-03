@@ -106,7 +106,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             drawControl(CE_PushButtonBevel, &tmpBtn, painter, widget);
          }
 //          tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
-         tmpBtn.rect.adjust(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4);
+         tmpBtn.rect.adjust(dpi.f6,dpi.f4,-dpi.f6,-dpi.f4);
          drawControl(CE_PushButtonLabel, &tmpBtn, painter, widget);
          
          // toggle indicator

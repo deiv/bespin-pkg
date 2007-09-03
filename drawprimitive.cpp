@@ -652,12 +652,12 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
                                        gt), masks.radio);
          
          if (isEnabled) {
-            sz = dpi.ExclusiveIndicator - dpi.f4;
+            sz = dpi.ExclusiveIndicator - dpi.f6;
             painter->save();
             painter->setBrush(Qt::NoBrush);
             painter->setPen(Qt::white);
             painter->setRenderHint(QPainter::Antialiasing);
-            painter->drawEllipse(xy.x(), xy.y(), sz, sz);
+            painter->drawEllipse(xy.x()+f1, xy.y()+f1, sz, sz);
             painter->restore();
          }
       }
