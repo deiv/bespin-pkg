@@ -403,7 +403,7 @@ void BespinStyle::initMetrics()
    dpi.ScrollBarSliderMin = SCALE(40);
    dpi.SliderThickness = SCALE(24);
    dpi.SliderControl = SCALE(19);
-   dpi.Indicator = config.btn.layer == 2 ? SCALE(16) : SCALE(20);
+   dpi.Indicator = SCALE(20 - 2*config.btn.layer);
    dpi.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
 }
 

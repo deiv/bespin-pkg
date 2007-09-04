@@ -122,9 +122,9 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
                w += contentsSize.height()/2+dpi.f10;
             if (w < dpi.f80) w = dpi.f80;
             if (config.btn.layer)
-               return QSize(w, contentsSize.height() + dpi.f5);
+               return QSize(w, contentsSize.height() + dpi.f4);
             else
-               return QSize(w, contentsSize.height() + dpi.f8);
+               return QSize(w, contentsSize.height() + dpi.f6);
          }
       }
 //    case CT_RadioButton: // A radio button, like QRadioButton

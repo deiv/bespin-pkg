@@ -217,6 +217,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             QFontMetrics fm(tmpFnt);
             QRect tr = fm.boundingRect ( btn->text );
             if (tr.width() > ir.width()) {
+               ir.translate(0,1);
                if (tmpFnt.pointSize() > -1)
                   tmpFnt.setPointSize(tmpFnt.pointSize()*ir.width()/tr.width());
                else

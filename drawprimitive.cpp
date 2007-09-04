@@ -355,8 +355,10 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
             masks.button.render(r, painter, gt, Qt::Vertical, c);
             if (drawInner) {
                const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -(f2+d) );
-               c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-step, step);
-               masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,f2+d));
+               masks.button.render(ir, painter, gt, Qt::Vertical,
+                                   Colors::mid(c, CCOLOR(btn.active, Bg),
+                                               6-step, step),
+                                   r.height(), QPoint(0,f2+d));
             }
             if (hasFocus) {
                if (config.btn.layer == 1)
@@ -558,25 +560,31 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       break;
    }
    case PE_IndicatorCheckBox: { // On/off indicator, for example, a QCheckBox.
+      QStyleOption copy = *option;
+      copy.state &= ~State_On; // don't want toggle cushion here
+      if (config.btn.layer == 1)
+         copy.rect.adjust(0,dpi.f1,0,-dpi.f1); // get rect appereance again
+      else if (config.btn.layer == 0)
+         copy.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0); // get rect appereance again
 //       bool _fullHover = config.btn.fullHover;
 //       if (!(option->state & State_Off))
 //          config.btn.fullHover = true;
-      drawPrimitive(PE_PanelButtonBevel, option, painter, widget);
+      drawPrimitive(PE_PanelButtonBevel, &copy, painter, widget);
 //       config.btn.fullHover = _fullHover;
+      if (option->state & State_On)
+         copy.state |= State_On; // reset
       
       if (!(sunken || (option->state & State_Off))) {
          painter->save();
+         const QPoint center = copy.rect.center() - QPoint(0,dpi.f1);
          painter->setBrush(Colors::btnFg(PAL, isEnabled, hover));
-         QStyleOption copy = *option;
          const int d = dpi.f5 - config.btn.layer * dpi.f1;
-         if (config.btn.checkType == 1)
-            copy.rect.adjust(dpi.f2, d, -d, -dpi.f2);
-         else
-            copy.rect.adjust(d, d, -d, config.btn.layer ? -d : -dpi.f6);
+         copy.rect.adjust(d, d, -d, -d);
          if (copy.rect.width() > copy.rect.height())
             copy.rect.setWidth(copy.rect.height());
          else
             copy.rect.setHeight(copy.rect.width());
+         copy.rect.moveCenter(center);
          drawCheckMark(&copy, painter, config.btn.checkType);
          painter->restore();
       }
