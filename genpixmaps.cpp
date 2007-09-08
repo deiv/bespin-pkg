@@ -37,12 +37,12 @@ void BespinStyle::generatePixmaps()
          p.setPen(Qt::NoPen);
          p.setRenderHint(QPainter::Antialiasing);
          p.setBrush(QColor(0,0,0,((j?5:1)+i)*5));
-         p.drawRoundRect(0,0,f9,f9,99,99);
+         p.drawRoundRect(0,0,f9,f9,90,90);
          if (!j) {
             p.setBrush(QColor(0,0,0,(1+i)*9));
-            p.drawRoundRect(f1,f2,f9-f2,f9-f3,99,99);
+            p.drawRoundRect(f1,f2,f9-f2,f9-f3,85,85);
             p.setBrush(QColor(0,0,0,(1+i)*14));
-            p.drawRoundRect(f2,f2,f9-f4,f9-f4,99,99);
+            p.drawRoundRect(f2,f2,f9-f4,f9-f4,70,70);
          }
          p.end();
          shadows.button[j][i] = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
@@ -176,7 +176,8 @@ void BespinStyle::generatePixmaps()
    }
    
    // RADIOUTTON =====================================
-   rw = rh = dpi.ExclusiveIndicator;
+   rw = dpi.ExclusiveIndicator;
+   rh = rw - f1;
    // shadow
    for (int i = 0; i < 2; ++i) { // opaque?
       for (int j = 0; j < 2; ++j) { // sunken?
@@ -185,7 +186,7 @@ void BespinStyle::generatePixmaps()
          p.begin(&shadows.radio[j][i]);
          p.setPen(Qt::NoPen);
          p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,(1+i+2*j)*8));
+         p.setBrush(QColor(0,0,0,(1+i+2*j)*11));
          p.drawEllipse(shadows.radio[j][i].rect());
          if (!j) {
             p.setBrush(QColor(0,0,0,(i+1)*14));
@@ -196,7 +197,7 @@ void BespinStyle::generatePixmaps()
    }
    
    // mask
-   rw -= f4; rh -= f4;
+   rw -= f4; rh -= f3;
    masks.radio = QPixmap(rw, rh);
    masks.radio.fill(Qt::transparent);
    p.begin(&masks.radio);

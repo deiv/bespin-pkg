@@ -36,7 +36,7 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
    case CT_ComboBox: // A combo box, like QComboBox
       if (const QStyleOptionComboBox *cb =
           qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-         int margin = cb->frame ? dpi.f3 : 0;
+         int margin = cb->frame ? (config.btn.fullHover ? dpi.f1 : dpi.f2) : 0;
          int hgt = contentsSize.height() + 2*margin;
          return QSize(contentsSize.width()+dpi.f10+(int)(hgt/1.1), hgt);
       }

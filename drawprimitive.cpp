@@ -120,14 +120,13 @@ static void drawCheckMark(QStyleOption *option, QPainter *painter, int type = 1)
       }
       default:
       case 1: {
-         QRect r = RECT.adjusted(dpi.f3, 0, 0, -dpi.f3);
          const QPoint points[4] = {
-            QPoint(r.right(), r.top()),
-            QPoint(r.x()+r.width()/4, r.bottom()),
-            QPoint(r.x(), r.bottom()-r.height()/2),
-            QPoint(r.x()+r.width()/4, r.bottom()-r.height()/4)
+            QPoint(RECT.right(), RECT.top()),
+            QPoint(RECT.x()+RECT.width()/4, RECT.bottom()),
+            QPoint(RECT.x(), RECT.bottom()-RECT.height()/2),
+            QPoint(RECT.x()+RECT.width()/4, RECT.bottom()-RECT.height()/4)
          };
-         painter->drawPolygon(points, isOn ? 4 : 2);
+         painter->drawPolygon(points, 4);
          break;
       }
       case 2: {
@@ -388,15 +387,14 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          if (hasFocus)
             lights.button.render(RECT, painter, FCOLOR(Highlight));
       }
-      
+
       // backlight & plate
       masks.button.render(r, painter, gt, Qt::Vertical, c);
       
       // outline?
       painter->save();
       painter->setClipRegion(r);
-      masks.button.outline(r, painter, (gt == Gradients::Glass ||
-            gt == Gradients::Gloss) ? Qt::white : Colors::mid(c, Qt::white));
+      masks.button.outline(r, painter, Colors::mid(c, Qt::white,1,3));
       painter->restore();
 
       if (drawInner) {
@@ -566,11 +564,11 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          copy.rect.adjust(0,dpi.f1,0,-dpi.f1); // get rect appereance again
       else if (config.btn.layer == 0)
          copy.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0); // get rect appereance again
-//       bool _fullHover = config.btn.fullHover;
+      bool _fullHover = config.btn.fullHover;
 //       if (!(option->state & State_Off))
-//          config.btn.fullHover = true;
+         config.btn.fullHover = true;
       drawPrimitive(PE_PanelButtonBevel, &copy, painter, widget);
-//       config.btn.fullHover = _fullHover;
+      config.btn.fullHover = _fullHover;
       if (option->state & State_On)
          copy.state |= State_On; // reset
       
@@ -578,7 +576,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          painter->save();
          const QPoint center = copy.rect.center() - QPoint(0,dpi.f1);
          painter->setBrush(Colors::btnFg(PAL, isEnabled, hover));
-         const int d = dpi.f5 - config.btn.layer * dpi.f1;
+         const int d = dpi.f5 - (config.btn.checkType + config.btn.layer) * dpi.f1;
          copy.rect.adjust(d, d, -d, -d);
          if (copy.rect.width() > copy.rect.height())
             copy.rect.setWidth(copy.rect.height());
@@ -601,8 +599,8 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       if (isOn) {
          hover = hasFocus = false;
       }
-      else if (hover && sunken)
-         isOn = true;
+//       else if (hover && sunken)
+//          isOn = true;
 
       int step = isOn ? 0 : animator->hoverStep(widget);
       QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, step);
@@ -640,8 +638,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          
          if (!sunken && hasFocus) {
             painter->save();
-            painter->setBrush(Colors::mid(FCOLOR(Window), FCOLOR(Highlight),
-                                       24-step, step));
+            painter->setBrush(Colors::mid(FCOLOR(Window), FCOLOR(Highlight), 3, 1));
             painter->setPen(Qt::NoPen);
             painter->setRenderHint(QPainter::Antialiasing);
             painter->drawEllipse(RECT);
@@ -662,7 +659,10 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          if (isEnabled) {
             sz = dpi.ExclusiveIndicator - dpi.f6;
             painter->save();
-            painter->setBrush(Qt::NoBrush);
+            if (hover)
+               painter->setBrush(Colors::mid(c, CCOLOR(btn.active, Bg), 6-step, step));
+            else
+               painter->setBrush(Qt::NoBrush);
             painter->setPen(Qt::white);
             painter->setRenderHint(QPainter::Antialiasing);
             painter->drawEllipse(xy.x()+f1, xy.y()+f1, sz, sz);
@@ -670,11 +670,9 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          }
       }
       // drop
-      if (isOn) step = 18;
-      if (step) {
-         c = Colors::mid(c, CONF_COLOR(btn.std, 1), 18-step, step);
+      if (isOn) {
          xy += QPoint(dpi.f4, dpi.f4);
-         fillWithMask(painter, xy, c, masks.radioIndicator);
+         fillWithMask(painter, xy, FCOLOR(WindowText), masks.radioIndicator);
       }
       
       break;
@@ -951,6 +949,7 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
          painter->setBrush(oldBrush);
          painter->setBrushOrigin(r.topLeft());
       }
+      copy.rect.adjust(dpi.f3,0,0,-dpi.f3);
       drawCheckMark(&copy, painter, 1);
       painter->restore();
       break;

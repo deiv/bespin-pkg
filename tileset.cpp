@@ -353,16 +353,22 @@ void Set::render(const QRect &r, QPainter *p) const
 
 static Window root = RootWindow (QX11Info::display(), DefaultScreen (QX11Info::display()));
 
-
 void Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
 {
 
    PosFlags pf = _shape ? _shape : _defShape;
    
-   int d = size/2;
+   const int d = (size+1)/2;
+//    const int o = size%2;
    QRect rect = r.adjusted(d,d,-d,-d);
    if (rect.isNull())
       return;
+
+   p->save();
+   p->setRenderHint(QPainter::Antialiasing);
+   QPen pen = p->pen();
+   pen.setColor(c); pen.setWidth(size);
+   p->setPen(pen); p->setBrush(Qt::NoBrush);
 
    QList<QPainterPath> paths;
    paths << QPainterPath();
@@ -422,11 +428,6 @@ void Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
          paths.last().lineTo(rect.topRight());
    }
 
-   p->save();
-   p->setRenderHint(QPainter::Antialiasing);
-   QPen pen = p->pen();
-   pen.setColor(c); pen.setWidth(size);
-   p->setPen(pen); p->setBrush(Qt::NoBrush);
    for (int i = 0; i < paths.count(); ++i)
       p->drawPath(paths.at(i));
    p->restore();

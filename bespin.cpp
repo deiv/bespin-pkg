@@ -493,13 +493,23 @@ void BespinStyle::polish( QPalette &pal )
       QBrush brush( c, *_scanlines[0] );
       pal.setBrush( QPalette::Background, brush );
    }
-   
+
+   // disabled palette
    int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
    pal.setColor(QPalette::Disabled, QPalette::Highlight,
                 QColor(highlightGray,highlightGray,highlightGray));
    pal.setColor(QPalette::Active, QPalette::AlternateBase,
                 Colors::mid(pal.color(QPalette::Active, QPalette::Base),
                          pal.color(QPalette::Active, QPalette::Text),15,1));
+   pal.setColor(QPalette::Inactive, QPalette::WindowText,
+                Colors::mid(pal.color(QPalette::Active, QPalette::Window),
+                            pal.color(QPalette::Active, QPalette::WindowText),2,1));
+   pal.setColor(QPalette::Inactive, QPalette::Base,
+                Colors::mid(pal.color(QPalette::Active, QPalette::Window),
+                            pal.color(QPalette::Active, QPalette::Base),1,2));
+   pal.setColor(QPalette::Inactive, QPalette::Text,
+                Colors::mid(pal.color(QPalette::Active, QPalette::Base),
+                            pal.color(QPalette::Active, QPalette::Text)));
    
    //inactive palette
    pal.setColor(QPalette::Inactive, QPalette::WindowText,
