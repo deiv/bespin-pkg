@@ -2,7 +2,7 @@
 CONFIG_QT=1
 CONFIG_KDE=1
 for parameter in "$@"; do
-   if echo $parameter | grep perfix > /dev/null; then
+   if echo $parameter | grep prefix > /dev/null; then
       PREFIX="$(echo $parameter | cut -d"=" -f2-)"
    elif echo $parameter | grep kde-dir > /dev/null; then
       KDEDIR="$(echo $parameter | cut -d"=" -f2-)"
