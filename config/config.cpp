@@ -28,7 +28,7 @@ extern "C"
 integers - not of interest for you*/
 enum GradientType {
    GradNone = 0, GradSimple, GradSunken, GradGloss,
-      GradGlass, GradButton, GradCloud
+      GradGlass, GradButton, GradMetal, GradCloud
 };
 
 static const char* defInfo =
@@ -659,5 +659,6 @@ void Config::generateGradientTypes(QComboBox *box) {
    box->addItem("Gloss");
    box->addItem("Glass");
    box->addItem("Button (Flat)");
+   box->addItem("Metal");
    box->addItem("Cloudy");
 }

@@ -210,6 +210,18 @@ void BespinStyle::makeStructure(int num, const QColor &c)
       for ( int i = 2; i < 63; i += 4 )
          p.drawLine( i, 0, i, 63 );
       break;
+   case 5: { // diagonals
+      _scanlines[num]->fill( c.light(102).rgb() );
+      QPen pen(c.dark(102-num), 11);
+      p.setPen(pen);
+      p.setRenderHint(QPainter::Antialiasing);
+      p.drawLine(-64,64,64,-64);
+      p.drawLine(0,64,64,0);
+      p.drawLine(0,128,128,0);
+      p.drawLine(32,64,64,32);
+      p.drawLine(0,32,32,0);
+      break;
+   }
    }
    p.end();
 }

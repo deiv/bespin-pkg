@@ -105,6 +105,16 @@ simpleGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
 }
 
 static inline QLinearGradient
+metalGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
+   QLinearGradient lg(start, stop);
+   QColor iC = c.light(104);
+   lg.setColorAt(0, iC); lg.setColorAt(0.5, iC);
+   iC = c.dark(104);
+   lg.setColorAt(0.5, iC); lg.setColorAt(1, iC);
+   return lg;
+}
+
+static inline QLinearGradient
 sunkenGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
    QLinearGradient lg(start, stop);
    lg.setColorAt(0, c.dark(110));
@@ -327,6 +337,9 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
          break;
       case Gradients::Gloss:
          grad = gl_ssGradient(iC, start, stop);
+         break;
+      case Gradients::Metal:
+         grad = metalGradient(iC, start, stop);
          break;
       }
       QPainter p(pix); p.fillRect(pix->rect(), grad); p.end();
