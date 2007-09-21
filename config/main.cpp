@@ -65,6 +65,7 @@ enum Mode {Invalid = 0,  Configure, Import, Demo, Try, Pusher };
 int main(int argc, char *argv[])
 {
    Mode mode = Configure;
+   QApplication *app = 0;
    if (argc > 1) {
       mode = Invalid;
       if (!qstrcmp( argv[1], "config" )) mode = Configure;
@@ -78,14 +79,14 @@ int main(int argc, char *argv[])
 
    switch (mode) {
    case Configure: {
-      QApplication app(argc, argv);
+      app = new QApplication(argc, argv);
       Config *config = new Config;
       BConfigDialog *window =
          new BConfigDialog(config, BConfigDialog::All &
                            ~(BConfigDialog::Import | BConfigDialog::Export));
       window->resize(640,-1);
       window->show();
-      return app.exec();
+      return app->exec();
    }
    case Import: {
       if (argc < 3)
@@ -95,7 +96,7 @@ int main(int argc, char *argv[])
       return Config::sImport(argv[2]).isNull();
    }
    case Try: {
-      QApplication app(argc, argv);
+      app = new QApplication(argc, argv);
       if (argc < 3)
          return error("you lack <some_config.bespin.conf>");
       
@@ -106,12 +107,12 @@ int main(int argc, char *argv[])
       if (!file.childGroups().contains("BespinStyle"))
          return error(QString("%1 is not a valid Bespin configuration").arg(argv[2]));
       
-      if (!app.setStyle("Bespin"))
+      if (!app->setStyle("Bespin"))
          return error("Fatal: Bespin Style not found or loadable!");
       
       file.beginGroup("BespinStyle");
             // palette update =============================
-      QPalette pal = app.palette();
+      QPalette pal = app->palette();
       file.beginGroup("QPalette");
       QStringList list =
          file.value ( "active", Config::colors(pal, QPalette::Active) ).toStringList();
@@ -123,16 +124,17 @@ int main(int argc, char *argv[])
          file.value ( "disabled", Config::colors(pal, QPalette::Disabled) ).toStringList();
       Config::updatePalette(pal, QPalette::Disabled, list);
       file.endGroup();
-      app.setPalette(pal);
+      app->setPalette(pal);
             // ================================================
-      static_cast<BStyle*>(app.style())->init(&file);
+      static_cast<BStyle*>(app->style())->init(&file);
       
       file.endGroup();
    }
    case Demo: {
-      QApplication app(argc, argv);
+      if (!app)
+         app = new QApplication(argc, argv);
       if (mode == Demo && argc > 2) // allow setting another style
-         app.setStyle(argv[2]);
+         app->setStyle(argv[2]);
       Ui::Demo ui;
       Dialog *window = new Dialog;
       ui.setupUi(window);
@@ -140,7 +142,7 @@ int main(int argc, char *argv[])
       QObject::connect (ui.rtl, SIGNAL(toggled(bool)),
                         window, SLOT(setLayoutDirection(bool)));
       window->show();
-      return app.exec();
+      return app->exec();
    }
 #if PUSHER
    case Pusher: {
