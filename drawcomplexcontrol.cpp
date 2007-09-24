@@ -109,28 +109,30 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          
          if (!isEnabled)
             break; // why bother the user with elements he can't use... ;)
+
+         const int f1 = dpi.f1, f2 = dpi.f2;
          
          Tile::PosFlags pf;
-         int uh = 0;
+         int arrowHeight = -1;
          
          if (sb->subControls & SC_SpinBoxUp) {
             copy.subControls = SC_SpinBoxUp;
             copy.rect = subControlRect(CC_SpinBox, sb, SC_SpinBoxUp, widget);
-            uh = copy.rect.height();
             
             pf = Tile::Top | Tile::Left | Tile::Right;
             isEnabled = sb->stepEnabled & QAbstractSpinBox::StepUpEnabled;
             hover = isEnabled && (sb->activeSubControls == SC_SpinBoxUp);
             sunken = sunken && (sb->activeSubControls == SC_SpinBoxUp);
-            
-            int dx = copy.rect.width()/4, dy = copy.rect.height()/4;
-            copy.rect.adjust(dx, 2*dy,-dx,-dpi.f1);
+
+            arrowHeight = copy.rect.height()/3;
+            copy.rect.translate(0,-f1);
+            copy.rect.setTop(copy.rect.bottom()-arrowHeight);
             
             if (!sunken) {
                painter->setPen(FCOLOR(Base).dark(105));
-               copy.rect.translate(dpi.f2, dpi.f2);
+               copy.rect.translate(0, f2);
                drawPrimitive(PE_IndicatorArrowUp, &copy, painter, widget);
-               copy.rect.translate(-dpi.f2, -dpi.f2);
+               copy.rect.translate(0, -f2);
             }
             
             QColor c;
@@ -153,15 +155,17 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
             isEnabled = sb->stepEnabled & QAbstractSpinBox::StepDownEnabled;
             hover = isEnabled && (sb->activeSubControls == SC_SpinBoxDown);
             sunken = sunken && (sb->activeSubControls == SC_SpinBoxDown);
-            
-            int dx = copy.rect.width()/4, dy = copy.rect.height()/4;
-            copy.rect.adjust(dx, dpi.f1,-dx,-2*dy);
-            
+
+            if (arrowHeight < 0)
+               arrowHeight = copy.rect.height()/3;
+            copy.rect.translate(0,f1);
+            copy.rect.setBottom(copy.rect.top()+arrowHeight);
+
             if (!sunken) {
                painter->setPen(FCOLOR(Base).dark(105));
-               copy.rect.translate(dpi.f2, dpi.f2);
+               copy.rect.translate(0, f2);
                drawPrimitive(PE_IndicatorArrowDown, &copy, painter, widget);
-               copy.rect.translate(-dpi.f2, -dpi.f2);
+               copy.rect.translate(0, -f2);
             }
             
             QColor c;
@@ -412,7 +416,7 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
          // the arrow
          if (!ar.isNull()) {
             QStyleOptionComboBox tmpOpt = *cmb;
-            const int dx = ar.width()/3, dy = ar.height()/3;
+            const int dx = 7*ar.width()/24, dy = ar.height()/3;
             tmpOpt.rect = ar.adjusted(dx, dy, -dx, -dy);
             PrimitiveElement arrow;
             
@@ -429,9 +433,9 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                hover = hover && (cmb->activeSubControls == SC_ComboBoxArrow);
                if (!sunken) {
                   painter->setPen(FCOLOR(Base).dark(105));
-                  tmpOpt.rect.translate(-f2, f2);
+                  tmpOpt.rect.translate(0, f2);
                   drawPrimitive(arrow, &tmpOpt, painter, widget);
-                  tmpOpt.rect.translate(f2, -f2);
+                  tmpOpt.rect.translate(0, -f2);
                }
                if (hover || listShown)
                   painter->setPen(FCOLOR(Highlight));
@@ -439,12 +443,12 @@ void BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptio
                   painter->setPen( Colors::mid(FCOLOR(Base), FCOLOR(Text)) );
             }
             else {
-               c = Colors::mid(c, CONF_COLOR(btn.active, 0));
-               c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-step, step);
+               c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
+               c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-step, step);
                ar.adjust(f2, dpi.f4, -f2, -dpi.f4);
                masks.tab.render(ar, painter, GRAD(chooser), Qt::Vertical, c,
                                 RECT.height()-f2, QPoint(0,dpi.f4));
-               painter->setPen(CONF_COLOR(btn.active, 1));
+               painter->setPen(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
             }
             drawPrimitive(arrow, &tmpOpt, painter, widget);
             painter->restore();

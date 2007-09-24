@@ -36,7 +36,9 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
    case CT_ComboBox: // A combo box, like QComboBox
       if (const QStyleOptionComboBox *cb =
           qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-         int margin = cb->frame ? (config.btn.fullHover ? dpi.f1 : dpi.f2) : 0;
+         int margin = 0;
+         if ( cb->frame )
+            margin = (cb->editable || !config.btn.fullHover) ? dpi.f2 : dpi.f1;
          int hgt = contentsSize.height() + 2*margin;
          return QSize(contentsSize.width()+dpi.f10+(int)(hgt/1.1), hgt);
       }
@@ -137,7 +139,7 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
    case CT_Slider: // A slider, like QSlider
    case CT_ScrollBar: // A scroll bar, like QScrollBar
    case CT_SpinBox: // A spin box, like QSpinBox
-      return contentsSize;
+      return contentsSize - QSize(0, dpi.f2);
 //    case CT_Splitter: // A splitter, like QSplitter
    case CT_TabBarTab: // A tab on a tab bar, like QTabBar
       if (const QStyleOptionTab *tab =
