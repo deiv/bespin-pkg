@@ -120,6 +120,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateColorModes(ui.headerRole);
    generateColorModes(ui.headerSortingRole);
    generateColorModes(ui.crTool);
+   generateColorModes(ui.crMenu);
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
@@ -164,6 +165,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    ui.pwEchoChar->addItem("|", '|');
    ui.pwEchoChar->addItem(":", ':');
    ui.pwEchoChar->addItem("*", '*');
+   ui.pwEchoChar->addItem("#", '#');
    ui.pwEchoChar->lineEdit()->
       setValidator(new UniCharValidator(ui.pwEchoChar->lineEdit()));
    connect (ui.pwEchoChar->lineEdit(), SIGNAL(returnPressed()),
@@ -206,6 +208,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.showMenuIcons, "Menu.ShowIcons", false);
    handleSettings(ui.menuShadow, "Menu.Shadow", false); // i have a compmgr running :P
    handleSettings(ui.crPopup, "Menu.Role", QPalette::Window);
+   handleSettings(ui.crMenu, "Menu.BarRole", QPalette::Window);
+   handleSettings(ui.barSunken, "Menu.BarSunken", false);
    
    handleSettings(ui.gradProgress, "Progress.Gradient", GradGloss);
    handleSettings(ui.crProgressBar, "Progress.Role", QPalette::Highlight);

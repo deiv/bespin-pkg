@@ -86,9 +86,9 @@ typedef struct Config {
    Qt::LayoutDirection leftHanded;
    
    struct menu {
-      QPalette::ColorRole std_role[2], active_role[2];
+      QPalette::ColorRole std_role[2], active_role[2], bar_role[2];
       Gradients::Type itemGradient;
-      bool showIcons, shadow;
+      bool showIcons, shadow, barSunken;
    } menu;
    
    struct progress {

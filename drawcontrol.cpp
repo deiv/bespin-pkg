@@ -706,6 +706,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
       }
       break;
    case CE_MenuBarItem: // A menu item in a QMenuBar
+      drawPrimitive(PE_PanelMenuBar, option, painter, widget);
       if (const QStyleOptionMenuItem *mbi =
           qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
          ROLES(menu.active);
@@ -727,11 +728,13 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                activeAction->menu()->isHidden()))
                step = info->step((long int)action);
          }
+         QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f4);
          if (step || hover) {
             if (!step) step = 6;
-            QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f2);
-            const QColor c =
-                  Colors::mid(FCOLOR(Window), COLOR(ROLE[Bg]), 9-step,step);
+            QColor c = (config.menu.bar_role[Bg] == QPalette::Window) ?
+                  FCOLOR(Window) :
+                  Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,2);
+            c = Colors::mid(c, COLOR(ROLE[Bg]), 9-step,step);
 
             int dy = 0;
             if (!sunken) {
@@ -751,13 +754,14 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                 Qt::AlignCenter | Qt::TextShowMnemonic |
                 Qt::TextDontClip | Qt::TextSingleLine;
          if (!pix.isNull())
-            drawItemPixmap(painter,mbi->rect, alignment, pix);
+            drawItemPixmap(painter,r, alignment, pix);
          else
-            drawItemText(painter, mbi->rect, alignment, mbi->palette, isEnabled,
-                         mbi->text, hover ? ROLE[Fg] : QPalette::WindowText);
+            drawItemText(painter, r, alignment, mbi->palette, isEnabled,
+                         mbi->text, hover ? ROLE[Fg] : config.menu.bar_role[Fg]);
       }
       break;
    case CE_MenuBarEmptyArea: // The empty area of a QMenuBar
+      drawPrimitive(PE_PanelMenuBar, option, painter, widget);
       break;
    case CE_MenuItem: // A menu item in a QMenu
         // Draws one item in a popup menu.

@@ -344,6 +344,8 @@ void BespinStyle::readSettings(const QSettings* settings)
    config.menu.shadow = iSettings->value("Menu.Shadow", false).toBool();
    readRole("Menu.ActiveRole", menu.active, Highlight, HighlightedText);
    readRole("Menu.Role", menu.std, Window, WindowText);
+   readRole("Menu.BarRole", menu.bar, Window, WindowText);
+   config.menu.barSunken = iSettings->value("Menu.BarSunken", false).toBool();
    
    // Progress ===========================
    GRAD(progress) = gradientType("Progress.Gradient", Gloss);

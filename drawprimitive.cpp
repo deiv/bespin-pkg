@@ -800,8 +800,17 @@ void BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * opti
       }
       break;
    }
-   case PE_PanelMenuBar: // Panel for menu bars.
    case PE_FrameDockWidget: // Panel frame for dock windows and toolbars.
+      break;
+   case PE_PanelMenuBar: // Panel for menu bars.
+      if (config.menu.bar_role[Bg] != QPalette::Window)
+         painter->fillRect(RECT.adjusted(0,0,0,-dpi.f2),
+                           Colors::mid(FCOLOR(Window),CCOLOR(menu.bar, Bg),1,2));
+      if (config.menu.barSunken) {
+         Tile::setShape(Tile::Top | Tile::Bottom);
+         shadows.lineEdit[false].render(RECT, painter);
+         Tile::reset();
+      }
       break;
    case PE_FrameTabWidget: // Frame for tab widgets.
       if (const QStyleOptionTabWidgetFrame *twf =

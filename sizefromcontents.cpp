@@ -138,6 +138,7 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
    case CT_ProgressBar: // A progress bar, like QProgressBar
    case CT_Slider: // A slider, like QSlider
    case CT_ScrollBar: // A scroll bar, like QScrollBar
+      return contentsSize;
    case CT_SpinBox: // A spin box, like QSpinBox
       return contentsSize - QSize(0, dpi.f2);
 //    case CT_Splitter: // A splitter, like QSplitter
