@@ -742,6 +742,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
                int dx = step*r.width()/18;
                dy = step*r.height()/18;
                r.adjust(dx, dy, -dx, -dy);
+               step = 6-step;
             }
             const Gradients::Type gt =
                   sunken ? Gradients::Sunken : config.menu.itemGradient;
@@ -757,7 +758,7 @@ void BespinStyle::drawControl ( ControlElement element, const QStyleOption * opt
             drawItemPixmap(painter,r, alignment, pix);
          else
             drawItemText(painter, r, alignment, mbi->palette, isEnabled,
-                         mbi->text, hover ? ROLE[Fg] : config.menu.bar_role[Fg]);
+                         mbi->text, step > 2 ? ROLE[Fg] : config.menu.bar_role[Fg]);
       }
       break;
    case CE_MenuBarEmptyArea: // The empty area of a QMenuBar
