@@ -32,4 +32,15 @@
 #define ROLES(_TYPE_) QPalette::ColorRole (*role)[2] = &config._TYPE_##_role
 #define ROLE (*role)
 
+#define ASSURE_OPTION(_VAR_, _TYPE_) \
+const QStyleOption##_TYPE_ *_VAR_ =\
+qstyleoption_cast<const QStyleOption##_TYPE_ *>(option);\
+if (!_VAR_) return
+
+#define ASSURE_WIDGET(_VAR_, _TYPE_)\
+const _TYPE_ *_VAR_ = qobject_cast<const _TYPE_*>(widget);\
+if (!_VAR_) return
+
+#define ASSURE(_VAR_) if (!_VAR_) return
+
 #endif //OXYGEN_DEFS_H

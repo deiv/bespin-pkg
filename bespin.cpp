@@ -17,93 +17,50 @@
  */
 
 /**================== Qt4 includes ======================*/
-#include <QDir>
-#include <QFile>
-#include <QTextStream>
-#include <QSettings>
+
 #include <QEvent>
-#include <QList>
-#include <QResizeEvent>
-#include <QApplication>
-#include <QWidget>
 #include <QPainter>
-#include <QGroupBox>
-#include <QPixmap>
-#include <QImage>
-#include <QDesktopWidget>
-#include <QX11Info>
 #include <QStylePlugin>
-#include <QProgressBar>
 #include <QMenu>
-#include <QMenuBar>
-#include <QStyleOptionProgressBarV2>
-#include <QLayout>
-#include <QListWidget>
-#include <QAbstractButton>
-#include <QPushButton>
-#include <QScrollBar>
-#include <QTabBar>
-#include <QTabWidget>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QSplitterHandle>
-#include <QToolBar>
+#include <QMouseEvent>
 #include <QFrame>
-#include <QLabel>
-#include <QLineEdit>
-#include <QAbstractScrollArea>
-#include <QProcess>
-/**============= Qt3 support includes ======================*/
-#include <Q3ScrollView>
-/**========================================================*/
 
 /**============= System includes ==========================*/
-
 #ifdef Q_WS_X11
 // #include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <X11/keysym.h>
-#include <X11/extensions/XTest.h>
+// #include <X11/keysym.h>
+// #include <X11/extensions/XTest.h>
 // #include <fixx11h.h>
 #endif
-#ifndef QT_NO_XRENDER
-#include <X11/extensions/Xrender.h>
-#endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <cmath>
 /**========================================================*/
 
 /**============= DEBUG includes ==========================*/
-#undef DEBUG
-#ifdef DEBUG
-#define MOUSEDEBUG 1
-#include <QtDebug>
-#include "debug.h"
-#define oDEBUG qDebug()
-#include <QTime>
-#include <QTimer>
-#define _PROFILESTART_ QTime timer; int time; timer.start();
-#define _PROFILERESTART_ timer.restart();
-#define _PROFILESTOP_(_STRING_) time = timer.elapsed(); qDebug("%s: %d",_STRING_,time);
-#else
-#define oDEBUG //
-#undef MOUSEDEBUG
-#endif
+// #undef DEBUG
+// #ifdef DEBUG
+// #define MOUSEDEBUG 1
+// #include <QtDebug>
+// #include "debug.h"
+// #define oDEBUG qDebug()
+// #include <QTime>
+// #include <QTimer>
+// #define _PROFILESTART_ QTime timer; int time; timer.start();
+// #define _PROFILERESTART_ timer.restart();
+// #define _PROFILESTOP_(_STRING_) time = timer.elapsed(); qDebug("%s: %d",_STRING_,time);
+// #else
+// #define oDEBUG //
+// #undef MOUSEDEBUG
+// #endif
 
 /**========================================================*/
 
 /**============= Bespin includes ==========================*/
-#include "bespin.h"
-#include "colors.h"
-#include "makros.h"
+
 #ifndef QT_NO_XRENDER
 #include "oxrender.h"
 #endif
-#include "visualframe.h"
+
+#include "bespin.h"
+
 /**=========================================================*/
 
 
@@ -124,6 +81,7 @@ public:
 
 Q_EXPORT_PLUGIN2(BespinStyle, BespinStylePlugin)
 /**=========================================================*/
+
 using namespace Bespin;
 
 /** static config object */
@@ -131,309 +89,137 @@ Config config;
 Dpi dpi;
 Gradients ::Type _progressBase;
 
-/** Let's try if we can supply round frames that shape their content */
+#define N_PE 50
+#define N_CE 50
+#define N_CC 10
+static void
+(BespinStyle::*primitiveRoutine[N_PE])(const QStyleOption*, QPainter*, const QWidget*) const;
+static void
+(BespinStyle::*controlRoutine[N_CE])(const QStyleOption*, QPainter*, const QWidget*) const;
+static void
+(BespinStyle::*complexRoutine[N_CC])(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
 
-/** Get some excluded code */
+#define registerPE(_FUNC_, _ELEM_) primitiveRoutine[QStyle::_ELEM_] = &BespinStyle::_FUNC_
+#define registerCE(_FUNC_, _ELEM_) controlRoutine[QStyle::_ELEM_] = &BespinStyle::_FUNC_
+#define registerCC(_FUNC_, _ELEM_) complexRoutine[QStyle::_ELEM_] = &BespinStyle::_FUNC_
 
-void BespinStyle::makeStructure(int num, const QColor &c)
+void
+BespinStyle::registerRoutines()
 {
-   if (!_scanlines[num])
-      _scanlines[num] = new QPixmap(64, 64);
-   QPainter p(_scanlines[num]);
-   switch (config.bg.structure)
-   {
-   default:
-   case 0: { // scanlines
-      _scanlines[num]->fill( c.light(110).rgb() );
-      p.setPen( (num == 1) ? c.light(106) : c.light(103) );
-      int i;
-      for ( i = 1; i < 64; i += 4 ) {
-         p.drawLine( 0, i, 63, i );
-         p.drawLine( 0, i+2, 63, i+2 );
-      }
-      p.setPen( c );
-      for ( i = 2; i < 63; i += 4 )
-         p.drawLine( 0, i, 63, i );
-      break;
-   }
-   case 1: { //checkboard
-      p.setPen(Qt::NoPen);
-      p.setBrush(c.light(102));
-      if (num == 1) {
-         p.drawRect(0,0,16,16); p.drawRect(32,0,16,16);
-         p.drawRect(16,16,16,16); p.drawRect(48,16,16,16);
-         p.drawRect(0,32,16,16); p.drawRect(32,32,16,16);
-         p.drawRect(16,48,16,16); p.drawRect(48,48,16,16);
-      }
-      else {
-         p.drawRect(0,0,32,32);
-         p.drawRect(32,32,32,32);
-      }
-      p.setBrush(c.dark(102));
-      if (num == 1) {
-         p.drawRect(16,0,16,16); p.drawRect(48,0,16,16);
-         p.drawRect(0,16,16,16); p.drawRect(32,16,16,16);
-         p.drawRect(16,32,16,16); p.drawRect(48,32,16,16);
-         p.drawRect(0,48,16,16); p.drawRect(32,48,16,16);
-      }
-      else {
-         p.drawRect(32,0,32,32);
-         p.drawRect(0,32,32,32);
-      }
-      break;
-   }
-   case 2: // fat scans
-      _scanlines[num]->fill( c.light(103).rgb() );
-      p.setPen(QPen((num == 1) ? c.light(101) : c, 3));
-      p.setBrush( c.dark(102) );
-      p.drawRect(-3,8,70,8);
-      p.drawRect(-3,24,70,8);
-      p.drawRect(-3,40,70,8);
-      p.drawRect(-3,56,70,8);
-      break;
-   case 3: // "blue"print
-      _scanlines[num]->fill( c.dark(101).rgb() );
-      p.setPen((num == 1) ? c.light(104) : c.light(102));
-      for ( int i = 0; i < 64; i += 16 )
-         p.drawLine( 0, i, 63, i );
-      for ( int i = 0; i < 64; i += 16 )
-         p.drawLine( i, 0, i, 63 );
-      break;
-   case 4: // verticals
-      _scanlines[num]->fill( c.light(110).rgb() );
-      p.setPen( (num == 1) ? c.light(106) : c.light(103) );
-      for ( int i = 1; i < 64; i += 4 ) {
-         p.drawLine( i, 0, i, 63 );
-         p.drawLine( i+2, 0, i+2, 63 );
-      }
-      p.setPen( c );
-      for ( int i = 2; i < 63; i += 4 )
-         p.drawLine( i, 0, i, 63 );
-      break;
-   case 5: { // diagonals
-      _scanlines[num]->fill( c.light(102).rgb() );
-      QPen pen(c.dark(102-num), 11);
-      p.setPen(pen);
-      p.setRenderHint(QPainter::Antialiasing);
-      p.drawLine(-64,64,64,-64);
-      p.drawLine(0,64,64,0);
-      p.drawLine(0,128,128,0);
-      p.drawLine(32,64,64,32);
-      p.drawLine(0,32,32,0);
-      break;
-   }
-   }
-   p.end();
-}
-
-#define readRole(_ENTRY_, _VAR_, _DEF1_, _DEF2_)\
-config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_ENTRY_, QPalette::_DEF1_).toInt();\
-Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1], QPalette::_DEF1_, QPalette::_DEF2_)
-
-#define gradientType(_ENTRY_, _DEF_)\
-(Gradients::Type) iSettings->value(_ENTRY_, Gradients::_DEF_).toInt();
-
-static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list) {
-   for (int i = 0; i < QPalette::NColorRoles; i++)
-      pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
-}
-
-static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
-   QStringList list;
-   for (int i = 0; i < QPalette::NColorRoles; i++)
-      list << pal.color(group, (QPalette::ColorRole) i).name();
-   return list;
-}
-
-void BespinStyle::readSettings(const QSettings* settings)
-{
-   bool delSettings = false;
-   QSettings *iSettings = const_cast<QSettings*>(settings);
-   if (!iSettings) {
-      delSettings = true;
-      char *preset = getenv("BESPIN_PRESET");
-      if (preset) {
-         iSettings = new QSettings("Bespin", "Store");
-         if (iSettings->childGroups().contains(preset)) {
-            iSettings->beginGroup(preset);
-            // set custom palette!
-            QPalette pal;
-            iSettings->beginGroup("QPalette");
-            QStringList list =
-                  iSettings->value ( "active", colors(pal,
-                                     QPalette::Active) ).toStringList();
-            updatePalette(pal, QPalette::Active, list);
-            list = iSettings->value ( "inactive", colors(pal,
-                                      QPalette::Inactive) ).toStringList();
-            updatePalette(pal, QPalette::Inactive, list);
-            list = iSettings->value ( "disabled", colors(pal,
-                                      QPalette::Disabled) ).toStringList();
-            updatePalette(pal, QPalette::Disabled, list);
-            polish(pal);
-            qApp->setPalette(pal);
-            iSettings->endGroup();
-         }
-         else {
-            delete iSettings; iSettings = 0L;
-         }
-         free(preset);
-      }
-      if (!iSettings) {
-         iSettings = new QSettings("Bespin", "Style");
-         iSettings->beginGroup("Style");
-      }
-   }
-   else
-      qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
+   for (int i = 0; i < N_PE; ++i)
+      primitiveRoutine[i] = 0;
+   for (int i = 0; i < N_CE; ++i)
+      controlRoutine[i] = 0;
+   for (int i = 0; i < N_CC; ++i)
+      complexRoutine[i] = 0;
    
-   
-   // Background ===========================
-   config.bg.mode = (BGMode) iSettings->value("Bg.Mode", BevelV).toInt();
-
-#ifndef QT_NO_XRENDER
-   if (config.bg.mode > LightH)
-      config.bg.mode = BevelV;
-   else if(config.bg.mode == ComplexLights &&
-           !QFile::exists(QDir::tempPath() + "bespinPP.lock"))
-      QProcess::startDetached ( iSettings->value("Bg.Daemon", "bespin pusher").toString() );
-#else
-   if (config.bg.mode == ComplexLights) config.bg.mode = BevelV;
-#endif
-   
-   if (config.bg.mode == Scanlines)
-      config.bg.structure = iSettings->value("Bg.Structure", 0).toInt();
-   
-   // Buttons ===========================
-   config.btn.layer = CLAMP(iSettings->value("Btn.Layer", 0).toInt(), 0, 2);
-   config.btn.checkType = iSettings->value("Btn.CheckType", 0).toInt();
-   
-   GRAD(btn) = gradientType("Btn.Gradient", Button);
-   _progressBase = GRAD(btn);
-
-   if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
-      GRAD(btn) = Gradients::None;
-   
-   if (config.btn.layer == 2)
-      config.btn.cushion = true;
-   else if (GRAD(btn) ==  Gradients::Sunken)
-      config.btn.cushion = false;
-   else
-      config.btn.cushion = iSettings->value("Btn.Cushion", true).toBool();
-   config.btn.fullHover = iSettings->value("Btn.FullHover", true).toBool();
-   readRole("Btn.Role", btn.std, Window, WindowText);
-   readRole("Btn.ActiveRole", btn.active, Button, ButtonText);
-   Colors::setButtonRoles(config.btn.std_role[0], config.btn.std_role[1],
-                       config.btn.active_role[0], config.btn.active_role[1]);
-   config.btn.swapFocusHover = iSettings->value("Btn.SwapFocusHover", false).toBool();
-   
-   // Choosers ===========================
-   GRAD(chooser) = gradientType("Chooser.Gradient", Sunken);
-   
-   // PW Echo Char ===========================
-   config.input.pwEchoChar =
-         ushort(iSettings->value("Input.PwEchoChar", 0x26AB).toUInt());
-
-   // flanders
-   config.leftHanded = Qt::LeftToRight;
-   if (iSettings->value("LeftHanded", false).toBool())
-         config.leftHanded = Qt::RightToLeft;
-   
-   // Menus ===========================
-   config.menu.itemGradient = gradientType("Menu.ItemGradient", None);
-   config.menu.showIcons = iSettings->value("Menu.ShowIcons", false).toBool();
-   config.menu.shadow = iSettings->value("Menu.Shadow", false).toBool();
-   readRole("Menu.ActiveRole", menu.active, Highlight, HighlightedText);
-   readRole("Menu.Role", menu.std, Window, WindowText);
-   readRole("Menu.BarRole", menu.bar, Window, WindowText);
-   config.menu.barSunken = iSettings->value("Menu.BarSunken", false).toBool();
-   
-   // Progress ===========================
-   GRAD(progress) = gradientType("Progress.Gradient", Gloss);
-   readRole("Progress.Role", progress.std, Highlight, HighlightedText);
-   
-   // ScrollStuff ===========================
-   GRAD(scroll) =
-         (Gradients::Type) iSettings->value("Scroll.Gradient", GRAD(btn)).toInt();
-   config.scroll.showButtons =
-         iSettings->value("Scroll.ShowButtons", false).toBool();
-   config.scroll.sunken =
-         iSettings->value("Scroll.Sunken", false).toBool();
-   config.scroll.groove = (!config.scroll.sunken) ? false :
-         iSettings->value("Scroll.Groove", false).toBool();
-   
-   // Tabs ===========================
-   readRole("Tab.ActiveRole", tab.active, Highlight, HighlightedText);
-   config.tab.animSteps =
-         CLAMP(iSettings->value("Tab.AnimSteps", 5).toUInt(), 2, 18);
-   GRAD(tab) = gradientType("Tab.Gradient", Button);
-   readRole("Tab.Role", tab.std, Window, WindowText);
-   config.tab.transition =
-      (TabAnimInfo::TabTransition) iSettings->value("Tab.Transition",
-         TabAnimInfo::ScanlineBlend).toInt();
-
-   // ToolBoxes
-   config.toolbox.active_role[0] = (QPalette::ColorRole)
-         iSettings->value("ToolBox.ActiveRole", config.tab.std_role[Bg]).toInt();
-   Colors::counterRole(config.toolbox.active_role[Bg],
-                       config.toolbox.active_role[Fg],
-                       config.tab.std_role[Bg], config.tab.std_role[Fg]);
-   GRAD(toolbox) = (Gradients::Type) iSettings->value("Tab.ActiveGradient", GRAD(tab)).toInt();
-
-   // Views ===========================
-   readRole("View.HeaderRole", view.header, Text, Base);
-   readRole("View.SortingHeaderRole", view.sortingHeader, Text, Base);
-   config.view.headerGradient = gradientType("View.HeaderGradient", Button);
-   config.view.sortingHeaderGradient = gradientType("View.SortingHeaderGradient", Sunken);
-   
-   // General ===========================
-   config.scale = iSettings->value("Scale", 1.0).toDouble();
-
-   
-   if (delSettings)
-      delete iSettings;
-}
-
-#undef readRole
-#undef gradientType
-
-#define SCALE(_N_) lround(_N_*config.scale)
-
-#include "genpixmaps.cpp"
-
-void BespinStyle::initMetrics()
-{
-   dpi.f1 = SCALE(1); dpi.f2 = SCALE(2);
-   dpi.f3 = SCALE(3); dpi.f4 = SCALE(4);
-   dpi.f5 = SCALE(5); dpi.f6 = SCALE(6);
-   dpi.f7 = SCALE(7); dpi.f8 = SCALE(8);
-   dpi.f9 = SCALE(9); dpi.f10 =SCALE(10);
-   
-   dpi.f12 = SCALE(12); dpi.f13 = SCALE(13);
-   dpi.f16 = SCALE(16); dpi.f18 = SCALE(18);
-   dpi.f20 = SCALE(20); dpi.f32 = SCALE(32);
-   dpi.f80 = SCALE(80);
-   
-   dpi.ScrollBarExtent = SCALE(17);
-   dpi.ScrollBarSliderMin = SCALE(40);
-   dpi.SliderThickness = SCALE(24);
-   dpi.SliderControl = SCALE(19);
-   dpi.Indicator = SCALE(20 - 2*config.btn.layer);
-   dpi.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
-}
-
-#undef SCALE
-
-void BespinStyle::init(const QSettings* settings) {
-   readSettings(settings);
-   initMetrics();
-   generatePixmaps();
-   Gradients::init(config.bg.mode > ComplexLights ?
-                   (Gradients::BgMode)config.bg.mode : Gradients::BevelV);
+   // buttons.cpp
+   registerPE(drawButtonFrame, PE_PanelButtonCommand);
+   registerPE(drawButtonFrame, PE_PanelButtonBevel);
+   registerPE(skip, PE_FrameDefaultButton);
+   registerCE(drawPushButton, CE_PushButton);
+   registerCE(drawPushButtonBevel, CE_PushButtonBevel);
+   registerCE(drawPushButtonLabel, CE_PushButtonLabel);
+   registerPE(drawCheckBox, PE_IndicatorCheckBox);
+   registerPE(drawRadio, PE_IndicatorRadioButton);
+   // docks.cpp
+   registerPE(skip, PE_Q3DockWindowSeparator);
+   registerPE(skip, PE_FrameDockWidget);
+   registerCE(skip, CE_Q3DockWindowEmptyArea);
+   registerCE(drawDockTitle, CE_DockWidgetTitle);
+   registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
+   // frames.cpp
+   registerCE(skip, CE_FocusFrame);
+   registerPE(skip, PE_FrameStatusBar);
+   registerPE(drawFocusFrame, PE_FrameFocusRect);
+   registerPE(drawFrame, PE_Frame);
+   registerCC(drawGroupBox, CC_GroupBox);
+   registerPE(drawGroupBoxFrame, PE_FrameGroupBox);
+   // input.cpp
+   registerPE(drawLineEditFrame, PE_FrameLineEdit);
+   registerPE(drawLineEdit, PE_PanelLineEdit);
+   registerCC(drawSpinBox, CC_SpinBox);
+   registerCC(drawComboBox, CC_ComboBox);
+   registerCE(drawComboBoxLabel, CE_ComboBoxLabel);
+   // menus.cpp
+   registerPE(drawMenuBarBg, PE_PanelMenuBar);
+   registerCE(drawMenuBarBg, CE_MenuBarEmptyArea);
+   registerCE(drawMenuBarItem, CE_MenuBarItem);
+   registerPE(drawMenuFrame, PE_FrameMenu);
+   registerCE(drawMenuItem, CE_MenuItem);
+   registerCE(drawMenuScroller, CE_MenuScroller);
+   registerCE(skip, CE_MenuEmptyArea);
+   registerCE(skip, CE_MenuHMargin);
+   registerCE(skip, CE_MenuVMargin);
+   // progress.cpp
+   registerCE(drawProgressBar, CE_ProgressBar);
+   registerCE(drawProgressBarGroove, CE_ProgressBarGroove);
+   registerCE(drawProgressBarContents, CE_ProgressBarContents);
+   registerCE(drawProgressBarLabel, CE_ProgressBarLabel);
+   // scrollareas.cpp
+   registerCC(drawScrollBar, CC_ScrollBar);
+   registerCE(drawScrollBarAddLine, CE_ScrollBarAddLine);
+   registerCE(drawScrollBarSubLine, CE_ScrollBarSubLine);
+   registerCE(drawScrollBarGroove, CE_ScrollBarSubPage);
+   registerCE(drawScrollBarGroove, CE_ScrollBarAddPage);
+   registerCE(drawScrollBarSlider, CE_ScrollBarSlider);
+   // shapes.cpp
+   registerPE(drawItemCheck, PE_IndicatorViewItemCheck);
+   registerPE(drawItemCheck, PE_Q3CheckListIndicator);
+   registerPE(drawMenuCheck, PE_IndicatorMenuCheckMark);
+   registerPE(drawExclusiveCheck, PE_Q3CheckListExclusiveIndicator);
+   registerPE(drawSolidArrowUp, PE_IndicatorArrowUp);
+   registerPE(drawSolidArrowUp, PE_IndicatorSpinUp);
+   registerPE(drawSolidArrowUp, PE_IndicatorSpinPlus);
+   registerPE(drawSolidArrowDown, PE_IndicatorArrowDown);
+   registerPE(drawSolidArrowDown, PE_IndicatorSpinDown);
+   registerPE(drawSolidArrowDown, PE_IndicatorSpinMinus);
+   registerPE(drawSolidArrowDown, PE_IndicatorButtonDropDown);
+   registerPE(drawSolidArrowEast, PE_IndicatorArrowRight);
+   registerPE(drawSolidArrowWest, PE_IndicatorArrowLeft);
+   // slider.cpp
+   registerCC(drawSlider, CC_Slider);
+   registerCC(drawDial, CC_Dial);
+   // tabbing.cpp
+   registerPE(drawTabWidget, PE_FrameTabWidget);
+   registerPE(drawTabBar, PE_FrameTabBarBase);
+   registerCE(drawTab, CE_TabBarTab);
+   registerCE(drawTabShape, CE_TabBarTabShape);
+   registerCE(drawTabLabel, CE_TabBarTabLabel);
+   registerPE(skip, PE_IndicatorTabTear);
+   registerCE(drawToolboxTab, CE_ToolBoxTab);
+   registerCE(drawToolboxTabShape, CE_ToolBoxTabShape);
+   registerCE(drawToolboxTabLabel, CE_ToolBoxTabLabel);
+   // toolbars.cpp
+   registerCC(drawToolButton, CC_ToolButton);
+   registerPE(drawToolButtonShape, PE_PanelButtonTool);
+   registerPE(skip, PE_IndicatorToolBarSeparator);
+   registerPE(skip, PE_PanelToolBar);
+   registerCE(drawToolButtonLabel, CE_ToolButtonLabel);
+   registerCE(skip, CE_ToolBar);
+   registerPE(skip, PE_FrameButtonTool);
+   registerPE(skip, PE_Q3Separator);
+   registerPE(drawToolBarHandle, PE_IndicatorToolBarHandle);
+   // views.cpp
+   registerCE(drawHeader, CE_Header);
+   registerCE(drawHeaderSection, CE_HeaderSection);
+   registerCE(drawHeaderLabel, CE_HeaderLabel);
+   registerPE(drawBranch, PE_IndicatorBranch);
+   registerCC(drawTree, CC_Q3ListView);
+   registerCE(drawRubberBand, CE_RubberBand);
+   registerPE(drawHeaderArrow, PE_IndicatorHeaderArrow);
+   // window.cpp
+   registerPE(drawWindowFrame, PE_FrameWindow);
+   registerPE(drawWindowBg, PE_Widget);
+   registerCC(drawTitleBar, CC_TitleBar);
+   registerCE(drawDockHandle, CE_Splitter);
+   registerCE(drawSizeGrip, CE_SizeGrip);
 }
 
 /**THE STYLE ITSELF*/
 BespinStyle::BespinStyle() : QCommonStyle(), mouseButtonPressed_(false),
 internalEvent_(false) {
+   registerRoutines();
    _scanlines[0] = _scanlines[1] = 0L;
    init();
 
@@ -453,7 +239,48 @@ BespinStyle::~BespinStyle() {
    Gradients::wipe();
 }
 
-void BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy, const QBrush &brush, const QPixmap &mask, QPoint offset) const
+void
+BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
+                             QPainter * painter, const QWidget * widget) const
+{
+   Q_ASSERT(option);
+   Q_ASSERT(painter);
+   if (primitiveRoutine[pe])
+      (this->*primitiveRoutine[pe])(option, painter, widget);
+   else
+      QCommonStyle::drawPrimitive( pe, option, painter, widget );
+}
+
+void
+BespinStyle::drawControl ( ControlElement element, const QStyleOption * option,
+                           QPainter * painter, const QWidget * widget) const
+{
+   Q_ASSERT(option);
+   Q_ASSERT(painter);
+   if (controlRoutine[element])
+      (this->*controlRoutine[element])(option, painter, widget);
+   else
+      QCommonStyle::drawControl( element, option, painter, widget );
+}
+
+void
+BespinStyle::drawComplexControl ( ComplexControl control,
+                                  const QStyleOptionComplex * option,
+                                  QPainter * painter,
+                                  const QWidget * widget) const
+{
+   Q_ASSERT(option);
+   Q_ASSERT(painter);
+   if (complexRoutine[control])
+      (this->*complexRoutine[control])(option, painter, widget);
+   else
+      QCommonStyle::drawComplexControl( control, option, painter, widget );
+}
+
+void
+BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy,
+                          const QBrush &brush, const QPixmap &mask,
+                          QPoint offset) const
 {
    QPixmap qPix(mask.size());
    if (brush.texture().isNull())
@@ -473,340 +300,9 @@ void BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy, const QBrush
 }
 
 
-/**======================================*/
-
-/**QStyle reimplementation ========================================= */
-
-void BespinStyle::polish ( QApplication * app ) {
-//    if (timer && !timer->isActive())
-//       timer->start(50);
-   QPalette pal = app->palette();
-   polish(pal);
-   app->setPalette(pal);
-//    app->installEventFilter(this);
-}
-
-#define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
-#include <QtDebug>
-void BespinStyle::polish( QPalette &pal )
+bool
+BespinStyle::eventFilter( QObject *object, QEvent *ev )
 {
-   QColor c = pal.color(QPalette::Active, QPalette::Background);
-   if (config.bg.mode > Scanlines) {
-      int h,s,v;
-      c.getHsv(&h,&s,&v);
-      if (v < 70) // very dark colors won't make nice backgrounds ;)
-         c.setHsv(h,s,70);
-      pal.setColor( QPalette::Window, c );
-   }
-   if (_scanlines[0]) delete _scanlines[0]; _scanlines[0] = 0;
-   if (_scanlines[1]) delete _scanlines[1]; _scanlines[1] = 0;
-   QLinearGradient lg; QPainter p;
-   if (config.bg.mode == Scanlines) {
-      QColor c = pal.color(QPalette::Active, QPalette::Background);
-      makeStructure(0, c);
-      QBrush brush( c, *_scanlines[0] );
-      pal.setBrush( QPalette::Background, brush );
-   }
-
-   // disabled palette
-   int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
-   pal.setColor(QPalette::Disabled, QPalette::Highlight,
-                QColor(highlightGray,highlightGray,highlightGray));
-   pal.setColor(QPalette::Active, QPalette::AlternateBase,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Base),
-                         pal.color(QPalette::Active, QPalette::Text),15,1));
-   pal.setColor(QPalette::Inactive, QPalette::WindowText,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Window),
-                            pal.color(QPalette::Active, QPalette::WindowText),2,1));
-   pal.setColor(QPalette::Inactive, QPalette::Base,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Window),
-                            pal.color(QPalette::Active, QPalette::Base),1,2));
-   pal.setColor(QPalette::Inactive, QPalette::Text,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Base),
-                            pal.color(QPalette::Active, QPalette::Text)));
-   
-   //inactive palette
-   pal.setColor(QPalette::Inactive, QPalette::WindowText,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Window),
-                         pal.color(QPalette::Active, QPalette::WindowText)));
-   pal.setColor(QPalette::Inactive, QPalette::Text,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Base),
-                         pal.color(QPalette::Active, QPalette::Text),1,3));
-   pal.setColor(QPalette::Inactive, QPalette::Highlight,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Highlight),
-                         pal.color(QPalette::Disabled, QPalette::Highlight),3,1));
-   pal.setColor(QPalette::Inactive, QPalette::AlternateBase,
-                Colors::mid(pal.color(QPalette::Active, QPalette::AlternateBase),
-                         pal.color(QPalette::Active, QPalette::Base),3,1));
-}
-
-#if SHAPE_POPUP
-static QMenuBar *bar4popup(QMenu *menu) {
-   if (!menu->menuAction())
-      return 0;
-   if (menu->menuAction()->associatedWidgets().isEmpty())
-      return 0;
-   foreach (QWidget *w, menu->menuAction()->associatedWidgets())
-      if (qobject_cast<QMenuBar*>(w))
-         return static_cast<QMenuBar *>(w);
-   return 0;
-}
-#endif
-
-#ifdef Q_WS_X11
-static Atom winTypePopup = XInternAtom(QX11Info::display(), "_NET_WM_WINDOW_TYPE_POPUP_MENU", False);
-static Atom winType = XInternAtom(QX11Info::display(), "_NET_WM_WINDOW_TYPE", False);
-#endif
-void BespinStyle::polish( QWidget * widget) {
-   
-   if (!widget) return; // !
-
-   if (widget->isWindow() && config.bg.mode > Scanlines) {
-      widget->setAutoFillBackground(true);
-      widget->setAttribute(Qt::WA_StyledBackground);
-   }
-
-#ifdef MOUSEDEBUG
-   widget->installEventFilter(this);
-#endif
-   
-   if (false
-#ifndef QT_NO_SPINBOX
-       || qobject_cast<QAbstractSpinBox *>(widget)
-#endif
-       || widget->inherits("QHeaderView")
-#ifndef QT_NO_SPLITTER
-       || qobject_cast<QSplitterHandle *>(widget)
-#endif
-#ifndef QT_NO_TABBAR
-       || qobject_cast<QTabBar *>(widget)
-#endif
-       || qobject_cast<QProgressBar*>(widget)
-       || qobject_cast<QAbstractSlider*>(widget)
-       || widget->inherits("QWorkspaceTitleBar")
-       || widget->inherits("QDockWidget")
-       || widget->inherits("QToolBar")
-       || widget->inherits("QToolBarHandle")
-       || widget->inherits("QDockSeparator")
-       || widget->inherits("QToolBoxButton")
-       || widget->inherits("QDockWidgetSeparator")
-       || widget->inherits("Q3DockWindowResizeHandle")
-      )
-         widget->setAttribute(Qt::WA_Hover);
-   
-   if (qobject_cast<QAbstractButton*>(widget)) {
-         widget->setBackgroundRole ( QPalette::Window );
-         widget->setForegroundRole ( QPalette::WindowText );
-         if (!widget->inherits("QToolBoxButton"))
-            animator->registrate(widget);
-   }
-   else if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
-      if (box->isEditable()) {
-         widget->setBackgroundRole ( QPalette::Base );
-         widget->setForegroundRole ( QPalette::Text );
-      }
-      else {
-         widget->setBackgroundRole ( QPalette::Window );
-         widget->setForegroundRole ( QPalette::WindowText );
-      }
-      animator->registrate(widget);
-   }
-   
-   else if (qobject_cast<QAbstractSlider *>(widget)) {
-      widget->installEventFilter(this);
-      if (qobject_cast<QScrollBar *>(widget)) {
-         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
-         QWidget *area = 0;
-         if (widget->parentWidget()) {
-            area = widget->parentWidget();
-            if (area->parentWidget()) {
-               area = area->parentWidget();
-               if (qobject_cast<QAbstractScrollArea*>(area)) {
-                  if (area->inherits("QComboBoxListView"))
-                     widget->setAttribute(Qt::WA_OpaquePaintEvent, true);
-                  area = 0;
-               }
-               else // konsole, kate, etc.
-                  area = widget->parentWidget();
-            }
-         }
-         if (area)
-            animator->addScrollArea(area);
-      }
-   }
-   
-   else if (qobject_cast<QProgressBar*>(widget)) {
-      QFont fnt = widget->font();
-      fnt.setBold(true);
-      widget->setFont(fnt);
-//       widget->setBackgroundRole ( config.progress.role[0] );
-//       widget->setForegroundRole ( config.progress.role[1] );
-      animator->registrate(widget);
-   }
-   
-   else if (qobject_cast<QTabWidget*>(widget))
-      animator->registrate(widget);
-
-   else if (qobject_cast<QTabBar *>(widget)) {
-      widget->setBackgroundRole ( config.tab.std_role[0] );
-      widget->setForegroundRole ( config.tab.std_role[1] );
-      widget->installEventFilter(this);
-   }
-   
-   else if (widget->inherits("QMdiSubWindow"))
-      widget->installEventFilter(this);
-   else if (widget->inherits("QWorkspace"))
-      connect(this, SIGNAL(MDIPopup(QPoint)), widget, SLOT(_q_popupOperationMenu(QPoint)));
-
-   
-   if (false // to simplify the #ifdefs
-#ifndef QT_NO_MENUBAR
-       || qobject_cast<QMenuBar *>(widget)
-#endif
-#ifdef QT3_SUPPORT
-       || widget->inherits("Q3ToolBar")
-#endif
-#ifndef QT_NO_TOOLBAR
-       || qobject_cast<QToolBar *>(widget)
-       || (widget && qobject_cast<QToolBar *>(widget->parent()))
-#endif
-      ) {
-      widget->setBackgroundRole(QPalette::Window);
-      if (config.bg.mode == Scanlines) {
-         widget->setAutoFillBackground ( true );
-         QPalette pal = widget->palette();
-         QColor c = pal.color(QPalette::Active, QPalette::Window);
-         
-         if (!_scanlines[1])
-            makeStructure(1, c);
-         QBrush brush( c, *_scanlines[1] );
-         pal.setBrush( QPalette::Window, brush );
-         widget->setPalette(pal);
-      }
-   }
-   
-   if (!widget->isWindow())
-   if (QFrame *frame = qobject_cast<QFrame *>(widget)) {
-      // kill ugly winblows frames...
-      if (frame->frameShape() == QFrame::Box ||
-          frame->frameShape() == QFrame::Panel ||
-          frame->frameShape() == QFrame::WinPanel)
-         frame->setFrameShape(QFrame::StyledPanel);
-      
-      if (qobject_cast<QAbstractScrollArea*>(frame) ||
-          qobject_cast<Q3ScrollView*>(frame))
-         animator->registrate(frame);
-      
-      // map a toolbox frame to it's elements
-      if (qobject_cast<QAbstractScrollArea*>(frame) &&
-          frame->parentWidget() && frame->parentWidget()->inherits("QToolBox"))
-         frame->setFrameStyle( static_cast<QFrame*>(frame->parentWidget())->frameStyle() );
-      
-      // overwrite ugly lines
-      if (frame->frameShape() == QFrame::HLine ||
-          frame->frameShape() == QFrame::VLine)
-         widget->installEventFilter(this);
-      
-      // toolbox handling - a shame they look that crap by default!
-      else if (widget->inherits("QToolBox")) {
-         widget->setBackgroundRole(QPalette::Window);
-         widget->setForegroundRole(QPalette::WindowText);
-         if (widget->layout()) {
-            widget->layout()->setMargin ( 0 );
-            widget->layout()->setSpacing ( 0 );
-         }
-      }
-      else if (frame->frameShape() == QFrame::StyledPanel) {
-         
-         if (widget->inherits("QTextEdit") && frame->lineWidth() == 1)
-            frame->setLineWidth(dpi.f4);
-         else {
-            QWidget *grampa = frame;
-            while (grampa->parentWidget() &&
-                   !(grampa->isWindow() || grampa->inherits("QMdiSubWindow")))
-               grampa = grampa->parentWidget();
-               
-//             if (!grampa) grampa = frame;
-            QList<VisualFrame*> vfs = grampa->findChildren<VisualFrame*>();
-            bool addVF = true;
-            foreach (VisualFrame* vf, vfs)
-               if (vf->frame() == frame) { addVF = false; break; }
-            if (addVF) {
-               int f2 = dpi.f2, f3 = dpi.f3, f4 = dpi.f4, f6 = dpi.f6;
-               int s[4]; uint t[4]; // t/b/l/r
-               if (frame->frameShadow() == QFrame::Sunken) {
-                  s[0] = s[2] = s[3] = 0; s[1] = f3;
-                  t[0] = t[1] = t[2] = t[3] = f4;
-               }
-               else if (frame->frameShadow() == QFrame::Raised) {
-                  s[0] = f2; s[1] = f4; s[2] = s[3] = f2;
-                  t[0] = t[2] = t[3] = f4; t[1] = f6;
-               }
-               else { // plain
-                  s[0] = s[1] = s[2] = s[3] = f2;
-                  t[0] = t[1] = t[2] = t[3] = f2;
-               }
-               new VisualFrame(grampa, frame, VisualFrame::North,
-                               t[0], s[0], s[2], s[3]);
-               new VisualFrame(grampa, frame, VisualFrame::South,
-                               t[1], s[1], s[2], s[3]);
-               new VisualFrame(grampa, frame, VisualFrame::West,
-                               t[2], s[2], t[0]-s[0], t[1]-s[1], t[0], t[1]);
-               new VisualFrame(grampa, frame, VisualFrame::East,
-                               t[3], s[3], t[0]-s[0], t[1]-s[1], t[0], t[1]);
-            }
-         }
-      }
-   }
-   
-   if (widget->autoFillBackground() &&
-       // dad
-       widget->parentWidget() &&
-       ( widget->parentWidget()->objectName() == "qt_scrollarea_viewport" ) &&
-       //grampa
-       widget->parentWidget()->parentWidget() &&
-       qobject_cast<QAbstractScrollArea*>(widget->parentWidget()->parentWidget()) &&
-       // grangrampa
-       widget->parentWidget()->parentWidget()->parentWidget() &&
-       widget->parentWidget()->parentWidget()->parentWidget()->inherits("QToolBox")
-      ) {
-      widget->parentWidget()->setAutoFillBackground(false);
-      widget->setAutoFillBackground(false);
-   }
-   
-   // swap qmenu colors
-   if (QMenu * menu = qobject_cast<QMenu *>(widget)) {
-#ifdef Q_WS_X11
-      // this should tell beryl et. al this is a popup - doesn't work... yet
-      XChangeProperty(QX11Info::display(), widget->winId(), winType,
-                      XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&winTypePopup, 1L);
-#endif
-      // WARNING: compmgrs like e.g. beryl/emerald deny to shadow shaped windows,
-      // if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
-//       widget->setAutoFillBackground (true);
-      widget->setBackgroundRole ( config.menu.std_role[0] );
-      widget->setForegroundRole ( config.menu.std_role[1] );
-//       if (qGray(widget->palette().color(QPalette::Active, widget->backgroundRole()).rgb()) < 100) {
-//          QFont tmpFont = widget->font();
-//          tmpFont.setBold(true);
-//          widget->setFont(tmpFont);
-//       }
-      // hmmmm... =)
-#if SHAPE_POPUP
-      if (bar4popup(menu)) {
-         QAction *action = new QAction( menu->menuAction()->iconText(), menu );
-         connect (action, SIGNAL(triggered(bool)), menu, SLOT(hide()));
-         menu->insertAction(menu->actions().at(0), action);
-         menu->installEventFilter(this); // reposition/round corners
-      }
-#endif
-   }
-   
-   //========================
-
-}
-
-bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
    switch (ev->type()) {
    case QEvent::MouseMove:
    case QEvent::Timer:
@@ -835,7 +331,7 @@ bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
          QPainter p(tabBar);
          QStyleOptionTabBarBase opt;
          opt.initFrom(tabBar);
-         drawPrimitive ( PE_FrameTabBarBase, &opt, &p);
+         drawTabBar(&opt, &p, 0L);
          p.end();
          return false;
       }
@@ -914,23 +410,9 @@ bool BespinStyle::eventFilter( QObject *object, QEvent *ev ) {
    }
 }
 
-void BespinStyle::unPolish( QApplication *app )
-{
-   app->setPalette(QPalette());
-}
 
-void BespinStyle::unPolish( QWidget *widget )
-{
-   animator->unregistrate(widget);
-
-   if (qobject_cast<VisualFrame*>(widget))
-      delete widget; widget = 0L;
-   
-   widget->removeEventFilter(this);
-
-}
-
-QPalette BespinStyle::standardPalette () const
+QPalette
+BespinStyle::standardPalette () const
 {
    QPalette pal ( Qt::black, Qt::white, // windowText, button
                      Qt::white, QColor(200,201,202), QColor(221,222,223), //light, dark, mid

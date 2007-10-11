@@ -1,10 +1,12 @@
 HEADERS = colors.h bespin.h tileset.h debug.h eventkiller.h \
-          visualframe.h gradients.h styleanimator.h
+          visualframe.h gradients.h styleanimator.h draw.h
 SOURCES = colors.cpp bespin.cpp tileset.cpp stylehint.cpp \
           sizefromcontents.cpp qsubcmetrics.cpp \
           pixelmetric.cpp stdpix.cpp styleanimator.cpp \
-          drawcomplexcontrol.cpp drawcontrol.cpp \
-          drawprimitive.cpp visualframe.cpp gradients.cpp
+          visualframe.cpp gradients.cpp init.cpp polish.cpp \
+          buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp \
+          scrollareas.cpp shapes.cpp slider.cpp tabbing.cpp toolbars.cpp \
+          views.cpp window.cpp
 unix {
    HEADERS += oxrender.h
    SOURCES += oxrender.cpp

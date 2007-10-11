@@ -1,4 +1,7 @@
 
+#include <cmath>
+#include <QPainter>
+
 #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 
 // simply sets the pixmaps alpha value to all rgb (i.e. grey) channels

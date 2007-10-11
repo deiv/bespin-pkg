@@ -43,27 +43,26 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
    case CC_SpinBox: // A spinbox, like QSpinBox
       if (const QStyleOptionSpinBox *spinbox =
           qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
-         QSize bs = spinbox->rect.size();
-         bs.setHeight(bs.height()/2);
-            // 1.6 -approximate golden mean
-         bs.setWidth(qMax(dpi.f18, qMin(bs.height(), bs.width() / 4)));
+         int w = spinbox->rect.width(), h = spinbox->rect.height();
+         h /= 2;
+         // 1.6 -approximate golden mean
+         w = qMax(dpi.f18, qMin(h, w / 4));
 //          bs = bs.expandedTo(QApplication::globalStrut());
-         int x = spinbox->rect.width() - bs.width();
+         int x = spinbox->rect.width() - w;
          switch (subControl) {
          case SC_SpinBoxUp:
-            ret = QRect(x, 0, bs.width(), bs.height());
+            ret = QRect(x, 0, w, h);
             break;
          case SC_SpinBoxDown:
-            ret = QRect(x, bs.height(), bs.width(), spinbox->rect.height()-bs.height());
+            ret = QRect(x, spinbox->rect.bottom()-h, w, h);
             break;
-         case SC_SpinBoxEditField: {
-            int hfw = 0, vfw = 0;
+         case SC_SpinBoxEditField:
+            w = h = 0; // becomes framesizes
             if (spinbox->frame) {
-               hfw = dpi.f4; vfw = dpi.f1;
+               w = dpi.f4; h = dpi.f1;
             }
-            ret = QRect(hfw, vfw, x-dpi.f1, spinbox->rect.height() - 2*vfw);
+            ret = QRect(w, h, x-dpi.f1, spinbox->rect.height() - 2*h);
             break;
-         }
          case SC_SpinBoxFrame:
             ret = spinbox->rect;
          default:
