@@ -174,41 +174,52 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
    int bef_v = mid_v;
    int aft_h = mid_h;
    int aft_v = mid_v;
-   
-   if (widget)
-      painter->setPen(Colors::mid( PAL.color(widget->backgroundRole()),
-                                   PAL.color(widget->foregroundRole())));
-   else
-      painter->setPen(Colors::mid( PAL.color(QPalette::Base),
-                                   PAL.color(QPalette::Text)) );
 
+   QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
+   if (widget) {
+      bg = widget->backgroundRole();
+      fg = widget->foregroundRole();
+   }
+
+   const bool firstCol = (RECT.x() ==  -1);
+   
    static const int decoration_size = 9;
    if (option->state & State_Children) {
+      SAVE_BRUSH
       int delta = decoration_size / 2 + 2;
       bef_h -= delta;
       bef_v -= delta;
       aft_h += delta;
       aft_v += delta;
+      painter->setPen(Qt::NoPen);
       QRect rect = QRect(bef_h+2, bef_v+2, decoration_size, decoration_size);
-      if (option->direction == Qt::RightToLeft) {
-         if (option->state & State_Open)
+      if (firstCol)
+         rect.moveRight(RECT.right()+decoration_size/6);
+      if (option->state & State_Open) {
+         painter->setBrush(Colors::mid( COLOR(bg), COLOR(fg)));
+         rect.translate(0,-decoration_size/6);
+         if (option->direction == Qt::RightToLeft)
             drawSolidArrow(Navi::SW, rect, painter);
          else
-            drawArrow(Navi::W, rect, painter);
+            drawSolidArrow(Navi::SE, rect, painter);
       }
       else {
-         if (option->state & State_Open)
-            drawSolidArrow(Navi::SE, rect, painter);
+         painter->setBrush(Colors::mid( COLOR(bg), COLOR(fg), 8, 1));
+         if (option->direction == Qt::RightToLeft)
+            drawArrow(Navi::W, rect, painter);
          else
             drawArrow(Navi::E, rect, painter);
       }
+      RESTORE_BRUSH
    }
    
-      // no line on the first column!
-   if (RECT.x() ==  -1) {
+   // no line on the first column!
+   if (firstCol) {
       RESTORE_PEN;
       return;
    }
+
+   painter->setPen(Colors::mid( COLOR(bg), COLOR(fg), 40, 1));
    
    if (option->state & (State_Item | State_Sibling))
       painter->drawLine(mid_h, RECT.y(), mid_h, bef_v);

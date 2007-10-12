@@ -216,11 +216,12 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
             break;
          case SC_ScrollBarGroove:
             if (scrollbar->orientation == Qt::Horizontal)
-               ret.setRect(0, 0, scrollbar->rect.width() - buttonSpace,
+               ret.setRect(dpi.f2, 0,
+                           scrollbar->rect.width() - buttonSpace -dpi.f4,
                            scrollbar->rect.height());
             else
-               ret.setRect(0, 0, scrollbar->rect.width(),
-                           scrollbar->rect.height() - buttonSpace);
+               ret.setRect(0, dpi.f2, scrollbar->rect.width(),
+                           scrollbar->rect.height() - buttonSpace - dpi.f4);
             break;
          case SC_ScrollBarSlider:
             if (scrollbar->orientation == Qt::Horizontal)

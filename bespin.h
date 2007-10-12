@@ -85,7 +85,7 @@ typedef struct Config {
    struct menu {
       QPalette::ColorRole std_role[2], active_role[2], bar_role[2];
       Gradients::Type itemGradient;
-      bool showIcons, shadow, barSunken, boldText;
+      bool showIcons, shadow, barSunken, boldText, activeItemSunken;
    } menu;
    
    struct progress {
@@ -104,6 +104,7 @@ typedef struct Config {
       QPalette::ColorRole std_role[2], active_role[2];
       Gradients::Type gradient;
       int animSteps;
+      bool activeTabSunken;
       TabAnimInfo::TabTransition transition;
    } tab;
 

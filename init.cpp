@@ -154,6 +154,7 @@ BespinStyle::readSettings(const QSettings* settings)
    readRole("Menu.BarRole", menu.bar, Window, WindowText);
    config.menu.barSunken = iSettings->value("Menu.BarSunken", false).toBool();
    config.menu.boldText = iSettings->value("Menu.BoldText", false).toBool();
+   config.menu.activeItemSunken = iSettings->value("Menu.ActiveItemSunken", false).toBool();
    
    // Progress ===========================
    GRAD(progress) = gradientType("Progress.Gradient", Gloss);
@@ -178,6 +179,7 @@ BespinStyle::readSettings(const QSettings* settings)
    config.tab.transition =
       (TabAnimInfo::TabTransition) iSettings->value("Tab.Transition",
          TabAnimInfo::ScanlineBlend).toInt();
+   config.tab.activeTabSunken = iSettings->value("Tab.ActiveTabSunken", false).toBool();
    
    // ToolBoxes
    config.toolbox.active_role[0] = (QPalette::ColorRole)

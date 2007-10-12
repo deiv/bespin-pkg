@@ -210,6 +210,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.crPopup, "Menu.Role", QPalette::Window);
    handleSettings(ui.crMenu, "Menu.BarRole", QPalette::Window);
    handleSettings(ui.barSunken, "Menu.BarSunken", false);
+   handleSettings(ui.menuBoldText, "Menu.BoldText", false);
+   handleSettings(ui.menuActiveItemSunken, "Menu.ActiveItemSunken", false);
    
    handleSettings(ui.gradProgress, "Progress.Gradient", GradGloss);
    handleSettings(ui.crProgressBar, "Progress.Role", QPalette::Highlight);
@@ -224,6 +226,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.gradTab, "Tab.Gradient", GradButton);
    handleSettings(ui.crTabBar, "Tab.Role", QPalette::Window);
    handleSettings(ui.tabTransition, "Tab.Transition", 1);
+   handleSettings(ui.activeTabSunken, "Tab.ActiveTabSunken", false);
 
    handleSettings(ui.crTool, "ToolBox.ActiveRole", QPalette::Highlight);
    handleSettings(ui.gradTool, "Tab.ActiveGradient", GradGlass);
@@ -353,6 +356,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                   Select \"WindowText\" if you want inversion.<br>\
                   <b>Warning!</b><br>If you select \"Window\" here and \"None\" \
                   below, the hovering is hardly indicated!");
+
+   setContextHelp(ui.menuBoldText, "<b>Bold Menu Text</b><hr>\
+                  Depending on your font this can be a good choice especially \
+                  for bright text on dark backgrounds.");
 
    setContextHelp(ui.crTabBar, "<b>Tabbar Role</b><hr>\
                   The color of the tabbar background<br>\

@@ -108,14 +108,14 @@ void BespinStyle::generatePixmaps()
          << QGradientStop( 0.5, QColor(255,255,255, 90) )
          << QGradientStop( 1, QColor(255,255,255, 20) );
       lg.setStops(stops);
-      p.fillRect(f3,f9-f2,f3,f1, lg);
+      p.fillRect(f2,f9-f2,f9-f4,f1, lg);
       stops.clear();
       lg = QLinearGradient(0,0,f9,0);
       stops << QGradientStop( 0, QColor(255,255,255, 10) )
          << QGradientStop( 0.5, QColor(255,255,255, 55) )
          << QGradientStop( 1, QColor(255,255,255, 10) );
       lg.setStops(stops);
-      p.fillRect(f2,f9-f1,f9-f4,f1, lg);
+      p.fillRect(f3,f9-f1,f3,f1, lg);
       stops.clear();
       p.end();
    
@@ -362,13 +362,13 @@ void BespinStyle::generatePixmaps()
       << QGradientStop( 0.5, QColor(255,255,255, 90) )
       << QGradientStop( 1, QColor(255,255,255, 20) );
    lg.setStops(stops);
-   p.fillRect(f4,f17-f2,f9,f1, lg);
+   p.fillRect(f2,f17-f2,f13,f1, lg);
    stops.clear();
    stops << QGradientStop( 0, QColor(255,255,255, 10) )
       << QGradientStop( 0.5, QColor(255,255,255, 55) )
       << QGradientStop( 1, QColor(255,255,255, 10) );
    lg.setStops(stops);
-   p.fillRect(f2,f17-f1,f13,f1, lg);
+   p.fillRect(f4,f17-f1,f9,f1, lg);
    stops.clear();
    p.end();
    shadows.tabSunken = Tile::Set(QPixmap::fromImage(tmpImg),f17_2,f17_2,f17-2*f17_2,f17-2*f17_2);

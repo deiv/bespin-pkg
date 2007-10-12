@@ -84,6 +84,11 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       const Gradients::Type gt =
          sunken ? Gradients::Sunken : config.menu.itemGradient;
       masks.tab.render(r, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,dy));
+      if (config.menu.activeItemSunken && sunken) {
+         r.setBottom(r.bottom()+dpi.f2);
+         shadows.tabSunken.render(r, painter);
+         r.adjust(0,dpi.f1,0,-dpi.f1); // -> text repositioning
+      }
    }
    QPixmap pix =
       mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ?

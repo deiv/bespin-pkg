@@ -185,7 +185,10 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
    }
    const QPoint off(d, d+dpi.f4);
    masks.tab.render(rect, painter, GRAD(tab), o, c, size, off);
-
+   if (config.tab.activeTabSunken && sunken) {
+      rect.setBottom(rect.bottom()+f2);
+      shadows.tabSunken.render(rect, painter);
+   }
 }
 
 void
@@ -198,10 +201,14 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
    painter->save();
    QStyleOptionTabV2 tabV2(*tab);
    QRect tr = tabV2.rect;
+   
    bool verticalTabs = false;
    bool east = false;
    bool selected = tabV2.state & State_Selected;
    if (selected) hover = false;
+   if (config.tab.activeTabSunken && (selected || sunken))
+      tr.translate(0,dpi.f1);
+   
    int alignment = Qt::AlignCenter | Qt::TextShowMnemonic;
 
    switch(tab->shape) {

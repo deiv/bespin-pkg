@@ -38,7 +38,7 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
           qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
          int margin = 0;
          if ( cb->frame )
-            margin = (cb->editable || !config.btn.fullHover) ? dpi.f2 : dpi.f1;
+            margin = (cb->editable || config.btn.fullHover) ? dpi.f1 : dpi.f2;
          int hgt = contentsSize.height() + 2*margin;
          return QSize(contentsSize.width()+dpi.f10+(int)(hgt/1.1), hgt);
       }

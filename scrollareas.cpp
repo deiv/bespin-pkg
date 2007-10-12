@@ -119,16 +119,17 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
             that->complexStep = 0; \
          drawScrollBar##_E_(&newScrollbar, painter, widget);\
       }\
-      }//
+   }//
 
-      QRect groove = RECT;
-      if (config.scroll.showButtons) {
-         PAINT_ELEMENT(SubLine);
-         PAINT_ELEMENT(AddLine);
-         if (config.scroll.sunken)
-            groove = subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget);
-      }
+   QRect groove = RECT;
+   if (config.scroll.showButtons) {
+      PAINT_ELEMENT(SubLine);
+      PAINT_ELEMENT(AddLine);
+      if (config.scroll.sunken)
+         groove = subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget);
+   }
 
+   if (!isComboDropDownSlider) {
       if (!config.scroll.sunken) {
          PAINT_ELEMENT(Groove);
          PAINT_ELEMENT(Groove);
@@ -137,31 +138,32 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
 //          PAINT_ELEMENT(SC_ScrollBarLast, CE_ScrollBarLast);
       if (config.scroll.groove)
          masks.tab.render(groove, painter, Gradients::Sunken,
-                          option->state & QStyle::State_Horizontal ?
-                          Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
+                        option->state & QStyle::State_Horizontal ?
+                        Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
+   }
        
-      if (isEnabled && scrollbar->subControls & SC_ScrollBarSlider) {
-         newScrollbar.rect = scrollbar->rect;
-         newScrollbar.state = saveFlags;
-         newScrollbar.rect = subControlRect(CC_ScrollBar, &newScrollbar,
-                                          SC_ScrollBarSlider, widget);
-         if (config.scroll.sunken)
-            newScrollbar.rect.adjust(-1,-1,1,1);
-         if (newScrollbar.rect.isValid()) {
-            if (!(scrollbar->activeSubControls & SC_ScrollBarSlider))
-               newScrollbar.state &= ~(State_Sunken | State_MouseOver);
-            if (scrollbar->state & State_HasFocus)
-               newScrollbar.state |= (State_Sunken | State_MouseOver);
-            if (info && (info->fadeIns & SC_ScrollBarSlider ||
-                        info->fadeOuts & SC_ScrollBarSlider))
-               that->complexStep = info->step(SC_ScrollBarSlider);
-            else
-               that->complexStep = 0;
-            drawScrollBarSlider(&newScrollbar, painter, widget);
-         }
-      }
+   if (isEnabled && scrollbar->subControls & SC_ScrollBarSlider) {
+      newScrollbar.rect = scrollbar->rect;
+      newScrollbar.state = saveFlags;
+      newScrollbar.rect = subControlRect(CC_ScrollBar, &newScrollbar,
+                                       SC_ScrollBarSlider, widget);
       if (config.scroll.sunken)
-         shadows.tabSunken.render(groove, painter);
+         newScrollbar.rect.adjust(-1,-1,1,1);
+      if (newScrollbar.rect.isValid()) {
+         if (!(scrollbar->activeSubControls & SC_ScrollBarSlider))
+            newScrollbar.state &= ~(State_Sunken | State_MouseOver);
+         if (scrollbar->state & State_HasFocus)
+            newScrollbar.state |= (State_Sunken | State_MouseOver);
+         if (info && (info->fadeIns & SC_ScrollBarSlider ||
+                     info->fadeOuts & SC_ScrollBarSlider))
+            that->complexStep = info->step(SC_ScrollBarSlider);
+         else
+            that->complexStep = 0;
+         drawScrollBarSlider(&newScrollbar, painter, widget);
+      }
+   }
+   if (!isComboDropDownSlider && config.scroll.sunken)
+      shadows.tabSunken.render(groove, painter);
 }
 
 void
@@ -286,21 +288,21 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
 
    QRect r = RECT;
    const int f1 = dpi.f1, f2 = dpi.f2;
-   int d = f2;
 
    // shadow
    if (config.scroll.sunken) {
-      r.setBottom(r.bottom()-dpi.f2);
-      d = 0;
-   }
-   if (sunken) {
-      r.adjust(f1, f1, -f1, -f1);
-      shadows.tab[true][true].render(r, painter);
-      r.adjust(f1, f1, -f1, -d);
+      r.adjust(f2, f2, -f2, -f2);
    }
    else {
-      shadows.tab[true][false].render(r, painter);
-      r.adjust(f2, f2, -f2, -(d+f1));
+      if (sunken) {
+         r.adjust(f1, f1, -f1, -f1);
+         shadows.tab[true][true].render(r, painter);
+         r.adjust(f1, f1, -f1, -f2);
+      }
+      else {
+         shadows.tab[true][false].render(r, painter);
+         r.adjust(f2, f1, -f2, -dpi.f3);
+      }
    }
 
    // gradient setup
@@ -316,8 +318,8 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
 
 // the allways shown base
    masks.tab.render(r, painter, GRAD(scroll), o, config.btn.fullHover ?
-                     c : CCOLOR(btn.std, 0), size);
-   masks.tab.outline(r, painter, Colors::mid(CCOLOR(btn.std, 0), Qt::white,1,2));
+                     c : CCOLOR(btn.std, Bg), size);
+   masks.tab.outline(r, painter, Colors::mid(CCOLOR(btn.std, Bg), Qt::white,1,2));
 
    if (config.btn.fullHover) return;
 
