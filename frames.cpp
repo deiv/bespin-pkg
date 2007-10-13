@@ -68,9 +68,9 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
          return; // painted on visual frame
       }
    }
-   else if (qobject_cast<const VisualFrame*>(widget)) {
-      if (widget->parentWidget() && widget->parentWidget()->parentWidget())
-         brush = &PAL.brush(widget->parentWidget()->parentWidget()->backgroundRole());
+   else if (qobject_cast<const VisualFramePart*>(widget)) {
+//       if (widget->parentWidget() && widget->parentWidget()->parentWidget())
+//          brush = &PAL.brush(widget->parentWidget()->parentWidget()->backgroundRole());
       zero = widget->mapTo(widget->window(), QPoint(0,0));
    }
    else if (widget->inherits("QComboBoxPrivateContainer")) {

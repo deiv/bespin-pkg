@@ -27,17 +27,19 @@ class QPaintEvent;
 #include <QWidget>
 #include <QPoint>
 
-class VisualFrame : public QWidget {
+namespace VFrame
+{
+enum Side { North, South, West, East };
+}
+
+class VisualFramePart : public QWidget {
    Q_OBJECT
 public:
-   enum Side { North, South, East, West };
-   VisualFrame(QWidget *parent, QFrame *frame, Side side,
-               uint thickness = 0, int ext = 0,
-               uint off1 = 0, uint off2 = 0,
-               uint off3 = 0, uint off4 = 0);
-   bool eventFilter ( QObject * o, QEvent * ev );
+   VisualFramePart(QFrame *parent, VFrame::Side side,
+                   uint thickness = 0, int ext = 0,
+                   uint off1 = 0, uint off2 = 0, uint off3 = 0, uint off4 = 0);
+   VisualFramePart(){};
    void paintEvent ( QPaintEvent * event );
-   inline QFrame *frame() { return _frame; }
 protected:
 //    void enterEvent ( QEvent * event ) { passDownEvent(event, event->globalPos()); }
 //    void leaveEvent ( QEvent * event ) { passDownEvent(event, event->globalPos()); }
@@ -47,13 +49,30 @@ protected:
    void mouseReleaseEvent ( QMouseEvent * event );
    void wheelEvent ( QWheelEvent * event );
 private:
+   QFrame *_frame; // parent, to avoid nasty casting
    void passDownEvent(QEvent *ev, const QPoint &gMousePos);
-   void rise();
+//    void rise();
    int _thickness;
    int _off[4];
    int _ext;
-   Side _side;
-   QFrame *_frame;
+   VFrame::Side _side;
+};
+
+class VisualFrame : public QObject {
+   Q_OBJECT
+public:
+   VisualFrame( QFrame *parent, uint (&sizes)[4], int (&exts)[4] );
+   bool eventFilter ( QObject * o, QEvent * ev );
+public slots:
+   void show();
+   void hide();
+   void raise();
+   void update();
+private:
+   QFrame *_frame; // parent, to avoid nasty casting
+   VisualFramePart *top, *bottom, *left, *right;
+   uint _s[4];
+   int _e[4];
 private slots:
    void correctPosition();
 };

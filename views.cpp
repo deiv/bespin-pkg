@@ -194,7 +194,7 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
       painter->setPen(Qt::NoPen);
       QRect rect = QRect(bef_h+2, bef_v+2, decoration_size, decoration_size);
       if (firstCol)
-         rect.moveRight(RECT.right()+decoration_size/6);
+         rect.moveRight(RECT.right()-dpi.f1);
       if (option->state & State_Open) {
          painter->setBrush(Colors::mid( COLOR(bg), COLOR(fg)));
          rect.translate(0,-decoration_size/6);

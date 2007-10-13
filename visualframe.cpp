@@ -30,69 +30,44 @@
 
 #include <QtDebug>
 
+using namespace VFrame;
+
 static QRegion corner[4];
 
-VisualFrame::VisualFrame(QWidget *parent, QFrame *frame, Side side, uint t,
-                         int e, uint o1, uint o2, uint o3, uint o4) :
-QWidget(parent) {
-   if (!(frame && t)) {
-      deleteLater(); return;
-   }
-   _frame = frame;
+VisualFramePart::VisualFramePart(QFrame *parent, Side side, uint t, int e,
+                                 uint o1, uint o2, uint o3, uint o4) :
+QWidget(parent)
+{
+   _frame = parent;
    _side = side;
    _ext = e;
-   if (corner[0].isEmpty()) {
-      int f5 = 4;
-      QBitmap bm(2*f5, 2*f5);
-      bm.fill(Qt::black);
-      QPainter p(&bm);
-      p.setPen(Qt::NoPen);
-      p.setBrush(Qt::white);
-      p.drawEllipse(0,0,2*f5,2*f5);
-      p.end();
-      QRegion circle(bm);
-      corner[0] = circle & QRegion(0,0,f5,f5); // tl
-      corner[1] = circle & QRegion(f5,0,f5,f5); // tr
-      corner[1].translate(-corner[1].boundingRect().left(), 0);
-      corner[2] = circle & QRegion(0,f5,f5,f5); // bl
-      corner[2].translate(0, -corner[2].boundingRect().top());
-      corner[3] = circle & QRegion(f5,f5,f5,f5); // br
-      corner[3].translate(-corner[3].boundingRect().topLeft());
-   }
    _thickness = t;
    _off[0] = o1; _off[1] = o2; _off[2] = o3; _off[3] = o4;
-   connect(frame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
-   connect(frame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
-
-   this->installEventFilter(this);
-   QWidget *w = frame;
-   while (w && (w != parent)) {
-      w->installEventFilter(this);
-      w = w->parentWidget();
-   }
-   if (frame->isVisible()) show(); else hide();
-   QTimer::singleShot(0, this, SLOT(correctPosition()));
+   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
+   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
 //    setMouseTracking ( true );
 //    setAcceptDrops(true);
 }
 
-void VisualFrame::rise() {
-   QWidgetList widgets = parentWidget()->findChildren<QWidget*>();
-   QWidget *up = 0; int cnt = widgets.size()-1;
-   for (int i = 0; i < cnt; ++i)
-      if (widgets.at(i) == _frame) {
-         up = widgets.at(i+1);
-         break;
-      }
-   if (up)
-      stackUnder(up);
-   else
-      raise();
-}
+// void VisualFrame::rise() {
+//    QWidgetList widgets = parentWidget()->findChildren<QWidget*>();
+//    QWidget *up = 0; int cnt = widgets.size()-1;
+//    for (int i = 0; i < cnt; ++i)
+//       if (widgets.at(i) == _frame) {
+//          up = widgets.at(i+1);
+//          break;
+//       }
+//    if (up)
+//       stackUnder(up);
+//    else
+//       raise();
+// }
 
 #include <QtDebug>
 
-void VisualFrame::paintEvent ( QPaintEvent * event ) {
+void
+VisualFramePart::paintEvent ( QPaintEvent * event )
+{
    QPainter p(this);
    p.setClipRegion(event->region(), Qt::IntersectClip);
    QStyleOption opt;
@@ -131,7 +106,9 @@ void VisualFrame::paintEvent ( QPaintEvent * event ) {
    p.end();
 }
 
-void VisualFrame::passDownEvent(QEvent *ev, const QPoint &gMousePos) {
+void
+VisualFramePart::passDownEvent(QEvent *ev, const QPoint &gMousePos)
+{
    // the raised frames don't look like you could click in, we'll see if this should be changed...
    if (_frame->frameShadow() == QFrame::Raised)
       return;
@@ -166,7 +143,7 @@ void VisualFrame::passDownEvent(QEvent *ev, const QPoint &gMousePos) {
 }
 
 #define HANDLE_EVENT(_EV_) \
-void VisualFrame::_EV_ ( QMouseEvent * event ) {\
+void VisualFramePart::_EV_ ( QMouseEvent * event ) {\
    passDownEvent((QEvent *)event, event->globalPos());\
 }
 
@@ -175,68 +152,175 @@ HANDLE_EVENT(mouseMoveEvent)
 HANDLE_EVENT(mousePressEvent)
 HANDLE_EVENT(mouseReleaseEvent)
 
-void VisualFrame::wheelEvent ( QWheelEvent * event ) {
+void
+VisualFramePart::wheelEvent ( QWheelEvent * event ) {
    passDownEvent((QEvent *)event, event->globalPos());
 }
 
 #undef HANDLE_EVENT
 
-void VisualFrame::correctPosition() {
+class StdChildAdd : public QObject
+{
+public:
+   bool eventFilter( QObject *, QEvent *ev) {
+      return (ev->type() == QEvent::ChildAdded);
+   }
+};
+
+static StdChildAdd *stdChildAdd = 0L;
+
+VisualFrame::VisualFrame(QFrame *parent, uint (&sizes)[4], int (&exts)[4]) :
+QObject(parent)
+{
+   if (!(parent &&
+         (sizes[0] || sizes[1] ||
+          sizes[2] || sizes[3]))) {
+      deleteLater();
+      return;
+   }
+   // generate corner regions
+
+   if (corner[North].isEmpty()) {
+      int f5 = 4;
+      QBitmap bm(2*f5, 2*f5);
+      bm.fill(Qt::black);
+      QPainter p(&bm);
+      p.setPen(Qt::NoPen);
+      p.setBrush(Qt::white);
+      p.drawEllipse(0,0,2*f5,2*f5);
+      p.end();
+      QRegion circle(bm);
+      corner[North] = circle & QRegion(0,0,f5,f5); // tl
+      corner[South] = circle & QRegion(f5,0,f5,f5); // tr
+      corner[South].translate(-corner[South].boundingRect().left(), 0);
+      corner[West] = circle & QRegion(0,f5,f5,f5); // bl
+      corner[West].translate(0, -corner[West].boundingRect().top());
+      corner[East] = circle & QRegion(f5,f5,f5,f5); // br
+      corner[East].translate(-corner[East].boundingRect().topLeft());
+   }
+
+   // create frame elements
+   _frame = parent;
+   parent->installEventFilter(stdChildAdd);
+   for (int i = 0; i < 4; ++i) {
+      _s[i] = sizes[i]; _e[i] = exts[i];
+   }
+   top = new VisualFramePart(parent, North, _s[North], _e[North],
+                             _e[West], _e[East]);
+   bottom = new VisualFramePart(parent, South, _s[South], _e[South],
+                                _e[West], _e[East]);
+   left = new VisualFramePart(parent, West, _s[West], _e[West],
+                              _s[North]-_e[North], _s[South]-_e[South],
+                              _s[North], _s[South]);
+   right = new VisualFramePart(parent, East, _s[East], _e[East],
+                               _s[North]-_e[North], _s[South]-_e[South],
+                               _s[North], _s[South]);
+   parent->removeEventFilter(stdChildAdd);
+
+   // manage events
+   top->installEventFilter(this);
+   _frame->installEventFilter(this);
+   if (_frame->isVisible())
+      show();
+   else
+      hide();
+   QTimer::singleShot(0, this, SLOT(correctPosition()));
+}
+
+void
+VisualFrame::correctPosition()
+{
    QRect rect = _frame->frameRect();
    // TODO: this works around a Qt rtl (bug(?))!
    if ((_frame->layoutDirection() == Qt::RightToLeft) &&
        rect.right() != _frame->rect().right() &&
        _frame->inherits("QAbstractScrollArea"))
       rect.moveLeft(rect.x() + (_frame->rect().right() - rect.right()));
-   rect.translate(_frame->mapTo(parentWidget(), QPoint(0,0)));
-   int offs = _off[0]+_off[1];
-   switch (_side) {
-   case North: {
-      
-      const int x = _frame->frameRect().x();
-      const int y = _frame->frameRect().y();
-      const int w = _frame->frameRect().right()+1;
-      const int h = _frame->frameRect().bottom()+1;
-      QRegion mask(_frame->rect());
-      mask -= corner[0].translated(x, y); // tl
-      QRect br = corner[1].boundingRect();
-      mask -= corner[1].translated(w-br.width(), y); // tr
-      br = corner[2].boundingRect();
-      mask -= corner[2].translated(x, h-br.height()); // bl
-      br = corner[3].boundingRect();
-      mask -= corner[3].translated(w-br.width(), h-br.height()); // br
-      _frame->setMask(mask);
-      
-      resize(rect.width()+offs, _thickness);
-      move(rect.x()-_off[0], rect.y()-_ext);
-      break;
-   }
-   case South:
-      resize(rect.width()+offs, _thickness);
-      move(rect.x()-_off[0], rect.bottom()+1+_ext-_thickness);
-      break;
-   case West:
-      resize(_thickness, rect.height()-offs);
-      move(rect.x()-_ext, rect.y()+_off[0]);
-      break;
-   case East:
-      resize(_thickness, rect.height()-offs);
-      move(rect.right()+1-_thickness+_ext, rect.y()+_off[0]);
-      break;
-   }
+//    rect.translate(_frame->mapTo(parentWidget(), QPoint(0,0)));
+//    int offs = _off[0]+_off[1];
+
+   // mask
+   int x,y,r,b;
+   _frame->frameRect().getRect(&x, &y, &r, &b);
+   r += x; b += y;
+   QRegion mask(_frame->rect());
+   mask -= corner[North].translated(x, y); // tl
+   QRect br = corner[South].boundingRect();
+   mask -= corner[South].translated(r-br.width(), y); // tr
+   br = corner[West].boundingRect();
+   mask -= corner[West].translated(x, b-br.height()); // bl
+   br = corner[East].boundingRect();
+   mask -= corner[East].translated(r-br.width(), b-br.height()); // br
+   _frame->setMask(mask);
+
+   int offs = _e[West] + _e[East];
+   // north element
+   top->resize(rect.width()+offs, _s[North]);
+   top->move(rect.x()-_e[West], rect.y()-_e[North]);
+
+   // South element
+   bottom->resize(rect.width()+offs, _s[South]);
+   bottom->move(rect.x()-_e[West], rect.bottom()+1 + _e[South]-_s[South]);
+
+   offs = (_s[North] + _s[South]) - (_e[North] + _e[South]);
+   // West element
+   left->resize(_s[West], rect.height()-offs);
+   left->move(rect.x()-_e[West], rect.y()+_s[North]-_e[North]);
+
+   // East element
+   right->resize(_s[East], rect.height()-offs);
+   right->move(rect.right()+1-_s[East]+_e[East], rect.y()+_s[North]-_e[North]);
 }
 
-bool VisualFrame::eventFilter ( QObject * o, QEvent * ev ) {
-   if (o == this) {
+void
+VisualFrame::show()
+{
+   top->show();
+   left->show();
+   right->show();
+   bottom->show();
+}
+
+void
+VisualFrame::hide()
+{
+   top->hide();
+   left->hide();
+   right->hide();
+   bottom->hide();
+}
+
+void
+VisualFrame::raise()
+{
+   top->raise();
+   left->raise();
+   right->raise();
+   bottom->raise();
+}
+
+void
+VisualFrame::update()
+{
+   top->update();
+   left->update();
+   right->update();
+   bottom->update();
+}
+
+bool
+VisualFrame::eventFilter ( QObject * o, QEvent * ev )
+{
+   if (o == top) {
       if (ev->type() == QEvent::ZOrderChange)
-         rise();
+         raise();
       return false;
    }
    
-   if (ev->type() == QEvent::Move) { // for everyone between frame and parent...
-      correctPosition();
-      return false;
-   }
+//    if (ev->type() == QEvent::Move) { // for everyone between frame and parent...
+//       correctPosition();
+//       return false;
+//    }
    
    if (o != _frame) { // now we're only interested in frame events
       o->removeEventFilter(this);
@@ -261,10 +345,10 @@ bool VisualFrame::eventFilter ( QObject * o, QEvent * ev ) {
       return false;
    }
    
-   if (ev->type() == QEvent::ZOrderChange) { // might be necessary for all widgets from frame to parent?
-      rise();
-      return false;
-   }
+//    if (ev->type() == QEvent::ZOrderChange) { // might be necessary for all widgets from frame to parent?
+//       rise();
+//       return false;
+//    }
    
    if (ev->type() == QEvent::Hide) {
       hide();
@@ -279,5 +363,5 @@ bool VisualFrame::eventFilter ( QObject * o, QEvent * ev ) {
 //          setParent(_frame );
 //       rise();
 //    }
-   return false;
+//    return false;
 }

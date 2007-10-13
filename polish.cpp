@@ -346,80 +346,62 @@ void BespinStyle::polish( QWidget * widget) {
       }
    
    if (!widget->isWindow())
-      if (QFrame *frame = qobject_cast<QFrame *>(widget)) {
-      // kill ugly winblows frames...
-         if (frame->frameShape() == QFrame::Box ||
-             frame->frameShape() == QFrame::Panel ||
-             frame->frameShape() == QFrame::WinPanel)
-            frame->setFrameShape(QFrame::StyledPanel);
-         
-         if (qobject_cast<QAbstractScrollArea*>(frame) ||
-             qobject_cast<Q3ScrollView*>(frame))
-            animator->registrate(frame);
-         
-      // map a toolbox frame to it's elements
-         if (qobject_cast<QAbstractScrollArea*>(frame) &&
-             frame->parentWidget() && frame->parentWidget()->inherits("QToolBox"))
-            frame->setFrameStyle( static_cast<QFrame*>(frame->parentWidget())->frameStyle() );
-         
-      // overwrite ugly lines
-         if (frame->frameShape() == QFrame::HLine ||
-             frame->frameShape() == QFrame::VLine)
-            widget->installEventFilter(this);
-         
-      // toolbox handling - a shame they look that crap by default!
-         else if (widget->inherits("QToolBox")) {
-            widget->setBackgroundRole(QPalette::Window);
-            widget->setForegroundRole(QPalette::WindowText);
-            if (widget->layout()) {
-               widget->layout()->setMargin ( 0 );
-               widget->layout()->setSpacing ( 0 );
-            }
+   if (QFrame *frame = qobject_cast<QFrame *>(widget)) {
+   // kill ugly winblows frames...
+      if (frame->frameShape() == QFrame::Box ||
+            frame->frameShape() == QFrame::Panel ||
+            frame->frameShape() == QFrame::WinPanel)
+         frame->setFrameShape(QFrame::StyledPanel);
+
+      if (qobject_cast<QAbstractScrollArea*>(frame) ||
+            qobject_cast<Q3ScrollView*>(frame))
+         animator->registrate(frame);
+
+   // map a toolbox frame to it's elements
+      if (qobject_cast<QAbstractScrollArea*>(frame) &&
+            frame->parentWidget() && frame->parentWidget()->inherits("QToolBox"))
+         frame->setFrameStyle( static_cast<QFrame*>(frame->parentWidget())->frameStyle() );
+
+   // overwrite ugly lines
+      if (frame->frameShape() == QFrame::HLine ||
+            frame->frameShape() == QFrame::VLine)
+         widget->installEventFilter(this);
+
+   // toolbox handling - a shame they look that crap by default!
+      else if (widget->inherits("QToolBox")) {
+         widget->setBackgroundRole(QPalette::Window);
+         widget->setForegroundRole(QPalette::WindowText);
+         if (widget->layout()) {
+            widget->layout()->setMargin ( 0 );
+            widget->layout()->setSpacing ( 0 );
          }
-         else if (frame->frameShape() == QFrame::StyledPanel) {
-            
-            if (widget->inherits("QTextEdit") && frame->lineWidth() == 1)
-               frame->setLineWidth(dpi.f4);
-            else {
-               QWidget *grampa = frame;
-               while (grampa->parentWidget() &&
-                      !(grampa->isWindow() || grampa->inherits("QMdiSubWindow")))
-                  grampa = grampa->parentWidget();
-               
-//             if (!grampa) grampa = frame;
-               QList<VisualFrame*> vfs = grampa->findChildren<VisualFrame*>();
-               bool addVF = true;
-               foreach (VisualFrame* vf, vfs)
-                  if (vf->frame() == frame) { addVF = false; break; }
-               if (addVF) {
-                  int f2 = dpi.f2, f3 = dpi.f3, f4 = dpi.f4, f6 = dpi.f6;
-                  int s[4]; uint t[4]; // t/b/l/r
-                  if (frame->frameShadow() == QFrame::Sunken) {
-                     s[0] = s[2] = s[3] = 0; s[1] = f3;
-                     t[0] = t[1] = t[2] = t[3] = f4;
-                  }
-                  else if (frame->frameShadow() == QFrame::Raised) {
-                     s[0] = f2; s[1] = f4; s[2] = s[3] = f2;
-                     t[0] = t[2] = t[3] = f4; t[1] = f6;
-                  }
-                  else { // plain
-                     s[0] = s[1] = s[2] = s[3] = f2;
-                     t[0] = t[1] = t[2] = t[3] = f2;
-                  }
-                  _BLOCKEVENTS_(grampa);
-                  new VisualFrame(grampa, frame, VisualFrame::North,
-                                  t[0], s[0], s[2], s[3]);
-                  new VisualFrame(grampa, frame, VisualFrame::South,
-                                  t[1], s[1], s[2], s[3]);
-                  new VisualFrame(grampa, frame, VisualFrame::West,
-                                  t[2], s[2], t[0]-s[0], t[1]-s[1], t[0], t[1]);
-                  new VisualFrame(grampa, frame, VisualFrame::East,
-                                  t[3], s[3], t[0]-s[0], t[1]-s[1], t[0], t[1]);
-                  _UNBLOCKEVENTS_(grampa);
+      }
+      else if (frame->frameShape() == QFrame::StyledPanel) {
+
+         if (widget->inherits("QTextEdit") && frame->lineWidth() == 1)
+            frame->setLineWidth(dpi.f4);
+         else {
+            QList<VisualFrame*> vfs = frame->findChildren<VisualFrame*>();
+            if (vfs.isEmpty()) { // avoid double adds
+               int exts[4]; uint sizes[4]; // t/b/l/r
+               const int f2 = dpi.f2, f3 = dpi.f3, f4 = dpi.f4, f6 = dpi.f6;
+               if (frame->frameShadow() == QFrame::Sunken) {
+                  exts[0] = exts[2] = exts[3] = 0; exts[1] = f3;
+                  sizes[0] = sizes[1] = sizes[2] = sizes[3] = f4;
                }
+               else if (frame->frameShadow() == QFrame::Raised) {
+                  exts[0] = f2; exts[1] = f4; exts[2] = exts[3] = f2;
+                  sizes[0] = sizes[2] = sizes[3] = f4; sizes[1] = f6;
+               }
+               else { // plain
+                  exts[0] = exts[1] = exts[2] = exts[3] = f2;
+                  sizes[0] = sizes[1] = sizes[2] = sizes[3] = f2;
+               }
+               new VisualFrame(frame, sizes, exts);
             }
          }
       }
+   }
    
    if (widget->autoFillBackground() &&
        // dad
