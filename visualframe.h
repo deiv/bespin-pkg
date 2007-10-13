@@ -35,7 +35,7 @@ enum Side { North, South, West, East };
 class VisualFramePart : public QWidget {
    Q_OBJECT
 public:
-   VisualFramePart(QFrame *parent, VFrame::Side side,
+   VisualFramePart(QWidget *window, QFrame *parent, VFrame::Side side,
                    uint thickness = 0, int ext = 0,
                    uint off1 = 0, uint off2 = 0, uint off3 = 0, uint off4 = 0);
    VisualFramePart(){};
@@ -51,7 +51,6 @@ protected:
 private:
    QFrame *_frame; // parent, to avoid nasty casting
    void passDownEvent(QEvent *ev, const QPoint &gMousePos);
-//    void rise();
    int _thickness;
    int _off[4];
    int _ext;
@@ -70,6 +69,7 @@ public slots:
    void update();
 private:
    QFrame *_frame; // parent, to avoid nasty casting
+   QWidget *_window;
    VisualFramePart *top, *bottom, *left, *right;
    uint _s[4];
    int _e[4];

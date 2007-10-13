@@ -107,9 +107,11 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
       if (fastFocus)
          h = Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
       else {
-         h = FCOLOR(Highlight); h.setAlpha(80);
+         h = FCOLOR(Highlight); h.setAlpha(102);
       }
-      rect = RECT.adjusted(0,0,0,-dpi.f1);
+      const int f1 = dpi.f1;
+//       rect = RECT.adjusted(0,0,0,-dpi.f1);
+      rect = RECT.adjusted(-f1,-f1,f1,-f1);
       mask->outline(rect, painter, h, dpi.f3);
    }
    if (shadow)

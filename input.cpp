@@ -29,8 +29,11 @@ BespinStyle::drawLineEditFrame(const QStyleOption * option, QPainter * painter,
    QRect r = RECT.adjusted(0,0,0,-dpi.f2);
    if (hasFocus) {
       QColor h = FCOLOR(Highlight); h.setAlpha(80);
+      const int f1 = dpi.f1;
+      r.adjust(-f1, -f1, f1, f1);
 //          r.setBottom(r.bottom()+dpi.f1);
       masks.button.outline(r, painter, h, dpi.f3);
+      r.adjust(f1, f1, -f1, -f1);
    }
    shadows.lineEdit[isEnabled].render(r, painter);
 }
@@ -53,11 +56,14 @@ BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
    QRect r = RECT;
    if (isEnabled) {
       if (hasFocus) {
+         const int f1 = dpi.f1;
          r.adjust(0,0,0,-dpi.f2);
          masks.button.render(r, painter, FCOLOR(Base).light(112));
          r.setBottom(r.bottom()+dpi.f1);
          QColor h = Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
+         r.adjust(-f1, -f1, f1, f1);
          masks.button.outline(r, painter, h, dpi.f3);
+         r.adjust(f1, f1, -f1, -f1);
       }
       else {
          r.setBottom(r.y()+r.height()/2);
