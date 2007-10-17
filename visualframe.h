@@ -67,6 +67,7 @@ public slots:
    void hide();
    void raise();
    void update();
+   void repaint();
 private:
    QFrame *_frame; // parent, to avoid nasty casting
    QWidget *_window;

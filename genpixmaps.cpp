@@ -1,9 +1,19 @@
 
 #include <cmath>
 #include <QPainter>
+#include <QPixmap>
+
+#include "bespin.h"
+#include "makros.h"
+
+using namespace Bespin;
+
+extern Dpi dpi;
+extern Config config;
 
 #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 
+#ifdef QT_NO_XRENDER
 // simply sets the pixmaps alpha value to all rgb (i.e. grey) channels
 // TODO: maybe adjust rgb to psychovisual values? (qGrey() inversion)
 static QPixmap rgbFromAlpha(const QPixmap &pix) {
@@ -16,146 +26,188 @@ static QPixmap rgbFromAlpha(const QPixmap &pix) {
    }
    return QPixmap::fromImage(img);
 }
-
-#ifdef QT_NO_XRENDER
 #define UPDATE_COLORS(_PIX_) _PIX_ = rgbFromAlpha(_PIX_);
 #else
 #define UPDATE_COLORS(_PIX_) //
 #endif
 
-void BespinStyle::generatePixmaps()
+#define SCALE(_N_) lround(_N_*config.scale)
+
+#define NEW_EMPTY_PIX(_W_, _H_) \
+QPixmap *pix = new QPixmap(_W_, _H_);\
+pix->fill(Qt::transparent);\
+QPainter p(pix);\
+p.setRenderHint(QPainter::Antialiasing);\
+p.setPen(Qt::NoPen)
+
+#define SET_ALPHA(_A_) black.setAlpha(_A_); p.setBrush(black)
+
+static int f1, f2, f3, f4, f7, f9, f11, f2_2, f9_2, f11_2;
+
+static QColor black = Qt::black;
+
+static void
+renderButtonLight(Tile::Set &set)
 {
-   QPixmap tmp; QPainter p;
-   
-   // PUSHBUTTON =====================================
-   // shadow
-   int f1 = dpi.f1, f2 = dpi.f2, f2_2 = lround(f2/2.0);
-   int f9 = dpi.f9, f9_2 = (f9-1)/2;
-   int f7 = dpi.f7, f3 = dpi.f3, f4 = dpi.f4;
-   tmp = QPixmap(f9,f9);
-   for (int i = 0; i < 2; ++i) { // opaque?
-      for (int j = 0; j < 2; ++j) { // sunken?
-         tmp.fill(Qt::transparent);
-         p.begin(&tmp);
-         p.setPen(Qt::NoPen);
-         p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,((j?5:1)+i)*5));
-         p.drawRoundRect(0,0,f9,f9,90,90);
-         if (!j) {
-            p.setBrush(QColor(0,0,0,(1+i)*9));
-            p.drawRoundRect(f1,f2,f9-f2,f9-f3,85,85);
-            p.setBrush(QColor(0,0,0,(1+i)*14));
-            p.drawRoundRect(f2,f2,f9-f4,f9-f4,70,70);
-         }
-         p.end();
-         shadows.button[j][i] = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-         shadows.button[j][i].setDefaultShape(Tile::Ring);
-      }
-   }
-   
-   // light
-   tmp.fill(Qt::transparent);
-   p.begin(&tmp);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,30));
+   NEW_EMPTY_PIX(f9, f9);
+   SET_ALPHA(30);
    p.drawRoundRect(0,0,f9,f9,90,90);
-   p.setBrush(QColor(0,0,0,54));
+   SET_ALPHA(54);
    p.drawRoundRect(f1,f1,f9-2*f1,f9-2*f1,80,80);
-   p.setBrush(QColor(0,0,0,64));
+   SET_ALPHA(64);
    p.drawRoundRect(f2,f2,f9-2*f2,f9-2*f2,70,70);
-   p.setBrush(QColor(0,0,0,74));
+   SET_ALPHA(74);
    p.drawRoundRect(f3,f3,f9-2*f3,f9-2*f3,60,60);
    p.end();
-   lights.button = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-   lights.button.setClipOffsets(f3, f3, f3, f3);
-   lights.button.setDefaultShape(Tile::Ring);
-   
-   // mask
-   tmp = QPixmap(f9,f9);
-   tmp.fill(Qt::transparent);
-   p.begin(&tmp);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,255));
+   set = Tile::Set(*pix,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
+   set.setClipOffsets(f3, f3, f3, f3);
+   set.setDefaultShape(Tile::Ring);
+   delete pix;
+}
+
+static void
+renderButtonMask(Tile::Set &set)
+{
+   NEW_EMPTY_PIX(f9, f9);
+   SET_ALPHA(255);
    p.drawRoundRect(0,0,f9,f9,70,70);
    p.end();
-   UPDATE_COLORS(tmp);
-   masks.button = Tile::Set(tmp,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2, 70);
-   masks.button.setClipOffsets(0,0,0,0);
-   
-   // -> sunken
-   QLinearGradient lg; QGradientStops stops;
-   QImage tmpImg(f9,f9, QImage::Format_ARGB32);
-   
-   for (int i = 0; i < 2; ++i) {
-      int add = i*30;
-      tmpImg.fill(Qt::transparent);
-   
-      p.begin(&tmpImg);
-      p.setPen(Qt::NoPen);
-      p.setRenderHint(QPainter::Antialiasing);
-      p.setBrush(QColor(0,0,0,55+add)); p.drawRoundRect(0,0,f9,f7,80,80);
-      p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
-      add = 30 - add;
-      p.setBrush(QColor(0,0,0,120+add)); p.drawRoundRect(0,f1,f9,dpi.f6,75,75);
-      p.setBrush(QColor(0,0,0,140+add)); p.drawRoundRect(0,f2,f9,dpi.f5,80,80);
-      p.setBrush(QColor(0,0,0,160+add)); p.drawRoundRect(f1,f3,f7,f4,85,85);
-      p.setBrush(QColor(0,0,0,180+add)); p.drawRoundRect(f2,f4,dpi.f5,f3,90,90);
-      p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-      lg = QLinearGradient(0,0,f9,0);
-      stops << QGradientStop( 0, QColor(255,255,255, 20) )
-         << QGradientStop( 0.5, QColor(255,255,255, 90) )
-         << QGradientStop( 1, QColor(255,255,255, 20) );
-      lg.setStops(stops);
-      p.fillRect(f2,f9-f2,f9-f4,f1, lg);
-      stops.clear();
-      lg = QLinearGradient(0,0,f9,0);
-      stops << QGradientStop( 0, QColor(255,255,255, 10) )
-         << QGradientStop( 0.5, QColor(255,255,255, 55) )
-         << QGradientStop( 1, QColor(255,255,255, 10) );
-      lg.setStops(stops);
-      p.fillRect(f3,f9-f1,f3,f1, lg);
-      stops.clear();
-      p.end();
-   
-      shadows.lineEdit[i] = Tile::Set(QPixmap::fromImage(tmpImg),f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-      shadows.lineEdit[i].setDefaultShape(Tile::Ring);
+   UPDATE_COLORS(*pix);
+   set = Tile::Set(*pix,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2, 70);
+   set.setClipOffsets(0,0,0,0);
+   delete pix;
+}
+
+static void
+renderButtonShadow(Tile::Set &set, bool opaque, bool sunken)
+{
+   NEW_EMPTY_PIX(f9, f9);
+   SET_ALPHA(((sunken?5:1)+opaque)*5);
+   p.drawRoundRect(0,0,f9,f9,90,90);
+   if (!sunken) {
+      SET_ALPHA((1+opaque)*11);
+      p.drawRoundRect(dpi.f1,f2,f9-f2,f9-dpi.f3,90,90);
+      SET_ALPHA((1+opaque)*10);
+      p.drawRoundRect(f2,f2,f9-f4,f9-f4,80,80);
    }
-   
-   // relief
-   int f11 = SCALE(11), f11_2 = f11/2;
-   tmp = QPixmap(f11,f11);
-   tmp.fill(Qt::transparent);
-   p.begin(&tmp);
-   QPen pen = p.pen(); pen.setWidth(f1); p.setPen(pen);
+   p.end();
+   set = Tile::Set(*pix,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
+   set.setDefaultShape(Tile::Ring);
+   delete pix;
+}
+
+#define WHITE(_A_) QColor(255,255,255, _A_)
+
+static void
+renderLineEditShadow(Tile::Set &set, bool enabled)
+{
+   QImage *tmpImg = new QImage(f9,f9, QImage::Format_ARGB32);
+   tmpImg->fill(Qt::transparent);
+   QPainter p(tmpImg);
    p.setRenderHint(QPainter::Antialiasing);
+   p.setPen(Qt::NoPen);
+   
+   int add = enabled*30;
+   SET_ALPHA(55+add);
+   p.drawRoundRect(0,0,f9,f7,80,80);
+
+   p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
+   add = 30 - add;
+   SET_ALPHA(120+add); p.drawRoundRect(0,f1,f9,dpi.f6,75,75);
+   SET_ALPHA(140+add); p.drawRoundRect(0,f2,f9,dpi.f5,80,80);
+   SET_ALPHA(160+add); p.drawRoundRect(f1,f3,f7,f4,85,85);
+   SET_ALPHA(180+add); p.drawRoundRect(f2,f4,dpi.f5,f3,90,90);
+
+   p.setCompositionMode( QPainter::CompositionMode_SourceOver );
+   QLinearGradient lg(0,0,f9,0);
+   QGradientStops stops;
+   stops << QGradientStop( 0, WHITE(20) ) << QGradientStop( 0.5, WHITE(90) ) <<
+      QGradientStop( 1, WHITE(20) );
+   lg.setStops(stops);
+   p.fillRect(f2,f9-f2,f9-f4,f1, lg);
+   stops.clear();
+
+   lg = QLinearGradient(0,0,f9,0);
+   stops << QGradientStop( 0, WHITE(10) ) << QGradientStop( 0.5, WHITE(55) ) <<
+      QGradientStop( 1, WHITE(10) );
+   lg.setStops(stops);
+   p.fillRect(f3,f9-f1,f3,f1, lg);
+   stops.clear();
+
+   p.end();
+
+   set = Tile::Set(QPixmap::fromImage(*tmpImg),f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
+   set.setDefaultShape(Tile::Ring);
+   delete tmpImg;
+}
+
+static void
+renderRelief(Tile::Set &set)
+{
+   NEW_EMPTY_PIX(f11, f11);
+   QPen pen = p.pen(); pen.setWidth(f1); p.setPen(pen);
    p.setBrush(Qt::NoBrush);
-   p.setPen(QColor(255,255,255,95));
+   p.setPen(WHITE(95));
    p.drawRoundRect(0,f1,f11,f9,80,80);
-   p.setPen(QColor(0,0,0,70));
+   black.setAlpha(70); p.setPen(black);
    p.drawRoundRect(f1,0,f9,f9,80,80);
-//    p.setPen(QColor(255,255,255,60));
+//    p.setPen(WHITE(60));
 //    p.drawRoundRect(f2,f2,f9-f2,f9-f2,60,60);
    p.end();
-   shadows.relief = Tile::Set(tmp,f11_2,f11_2,f11-2*f11_2,f11-2*f11_2);
-   shadows.relief.setDefaultShape(Tile::Ring);
-   
-   // toplight
+   set = Tile::Set(*pix,f11_2,f11_2,f11-2*f11_2,f11-2*f11_2);
+   set.setDefaultShape(Tile::Ring);
+   delete pix;
+}
+
+static void
+renderLightLine(Tile::Line &line)
+{
    int f49 = SCALE(49);
    int f49_2 = (f49-1)/2;
-   tmp = QPixmap(f49,f49);
-   tmp.fill(Qt::transparent);
-   QRadialGradient rg( tmp.rect().center(), f49_2 );
-   rg.setColorAt ( 0, QColor(255,255,255,160) );
-   rg.setColorAt ( 1, QColor(255,255,255,0) );
-   p.begin(&tmp);
+   NEW_EMPTY_PIX(f49,f49);
+   QRadialGradient rg( pix->rect().center(), f49_2 );
+   rg.setColorAt ( 0, WHITE(160) ); rg.setColorAt ( 1, WHITE(0) );
    p.fillRect(0,0,f49,f49,rg);
    p.end();
-   tmp = tmp.scaled( f49, dpi.f5, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
+   QPixmap tmp = pix->scaled( f49, dpi.f5, Qt::IgnoreAspectRatio,
+                              Qt::SmoothTransformation );
    tmp = tmp.copy(0,f2,f49,dpi.f3);
-   lights.top = Tile::Line(tmp,Qt::Horizontal,f49_2,-f49_2);
+   line = Tile::Line(tmp,Qt::Horizontal,f49_2,-f49_2);
+   delete pix;
+}
+
+void BespinStyle::generatePixmaps()
+{
+
+   f1 = dpi.f1; f2 = dpi.f2; f3 = dpi.f3;
+   f4 = dpi.f4; f7 = dpi.f7; f9 = dpi.f9;
+   f11 = SCALE(11);
+
+   f2_2 = lround(f2/2.0); f9_2 = (f9-1)/2; f11_2 = f11/2;
+
+   // Pushbutton mask
+   renderButtonMask(masks.button);
    
+   // Pushbutton shadows
+   for (int i = 0; i < 2; ++i) // opaque?
+      for (int j = 0; j < 2; ++j) // sunken?
+         renderButtonShadow(shadows.button[j][i], i, j);
+   
+   // Pushbutton light
+   renderButtonLight(lights.button);
+
+   renderLineEditShadow(shadows.lineEdit[false], false);
+   renderLineEditShadow(shadows.lineEdit[true], true);
+
+   // relief
+   renderRelief(shadows.relief);
+
+   // toplight -- UNUSED!
+//    renderLightLine(lights.top);
+
+   QPixmap tmp = QPixmap(f9,f9); QPainter p;
+   int f49 = SCALE(49);
+   int f49_2 = (f49-1)/2;
    // ================================================================
    
    // SLIDERSHADOW =====================================
@@ -171,13 +223,24 @@ void BespinStyle::generatePixmaps()
          p.setBrush(QColor(0,0,0,(1+i+2*j)*14));
          p.drawEllipse(shadows.sliderRound[j][i].rect());
          if (!j) {
-            p.setBrush(QColor(0,0,0,(i+1)*30));
+            p.setBrush(QColor(0,0,0,(i+1)*14));
             p.drawEllipse(f2_2,f2_2,rw-f2,rh-f2);
          }
          p.end();
       }
    }
-   
+
+   rw -= f4; rh -= f4;
+   masks.slider = QPixmap(rw, rh);
+   masks.slider.fill(Qt::transparent);
+   p.begin(&masks.slider);
+   p.setPen(Qt::NoPen);
+   p.setRenderHint(QPainter::Antialiasing);
+   p.setBrush(QColor(0,0,0,255));
+   p.drawEllipse(0,0,rw,rh);
+   p.end();
+   UPDATE_COLORS(masks.slider);
+
    // RADIOUTTON =====================================
    rw = dpi.ExclusiveIndicator;
    rh = rw - f1;
@@ -189,10 +252,10 @@ void BespinStyle::generatePixmaps()
          p.begin(&shadows.radio[j][i]);
          p.setPen(Qt::NoPen);
          p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,(1+i+2*j)*11));
+         p.setBrush(QColor(0,0,0,(1+i+2*j)*14));
          p.drawEllipse(shadows.radio[j][i].rect());
          if (!j) {
-            p.setBrush(QColor(0,0,0,(i+1)*14));
+            p.setBrush(QColor(0,0,0,(i+1)*11));
             p.drawEllipse(f2_2,f2_2,rw-f2,rh-f2);
          }
          p.end();
@@ -313,7 +376,7 @@ void BespinStyle::generatePixmaps()
    
    // shadow
    int f17 = SCALE(17), f17_2 = (f17-1)/2;
-   tmpImg = QImage(f17,f17, QImage::Format_ARGB32);
+   QImage tmpImg = QImage(f17,f17, QImage::Format_ARGB32);
    for (int i = 0; i < 2; ++i) { // opaque?
       for (int j = 0; j < 2; ++j) { // sunken?
          int add = 5*(i+2*j);
@@ -357,7 +420,8 @@ void BespinStyle::generatePixmaps()
    p.setBrush(QColor(0,0,0,160)); p.drawRoundRect(f1,f3,f15,dpi.f12,85,85);
    p.setBrush(QColor(0,0,0,180)); p.drawRoundRect(f2,dpi.f4,dpi.f13,f11,90,90);
    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-   lg = QLinearGradient(dpi.f4,0,f17-dpi.f4,0);
+   QLinearGradient lg(dpi.f4,0,f17-dpi.f4,0);
+   QGradientStops stops;
    stops << QGradientStop( 0, QColor(255,255,255, 20) )
       << QGradientStop( 0.5, QColor(255,255,255, 90) )
       << QGradientStop( 1, QColor(255,255,255, 20) );

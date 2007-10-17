@@ -56,8 +56,9 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
          sz.setHeight(qMax(iconSize, txt.height()) + dpi.f4);
          sz.setWidth((iconSize?margin+iconSize:0) +
                      (hdr->text.isNull()?0:margin+txt.width()) +
-                     ((hdr->sortIndicator == QStyleOptionHeader::None) ? 0 :
-                      margin+8*option->rect.height()/5) + margin);
+//                      ((hdr->sortIndicator == QStyleOptionHeader::None) ? 0 :
+//                       margin+8*option->rect.height()/5) +
+                     margin);
          return sz;
       }
    case CT_LineEdit: // A line edit, like QLineEdit
@@ -165,14 +166,16 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
       const QStyleOptionToolButton *toolbutton
          = qstyleoption_cast<const QStyleOptionToolButton *>(option);
       // get ~goldem mean ratio
-      int extraH = dpi.f8;
+      int w, h;
       if (toolbutton &&
           toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon)
-         extraH = dpi.f10;
-      int w = qMax(contentsSize.width()+dpi.f6, (contentsSize.height()+extraH)*7/5);
+         h = contentsSize.height() + dpi.f4;
+      else
+         h = contentsSize.height() + dpi.f2;
+      w = qMax(contentsSize.width()+dpi.f4, h*8/5);
       if (toolbutton && (toolbutton->subControls & SC_ToolButtonMenu))
-         w += pixelMetric(PM_MenuButtonIndicator, option, widget) + dpi.f8;
-      return QSize(w, contentsSize.height()+extraH);
+         w += pixelMetric(PM_MenuButtonIndicator, option, widget) + dpi.f4;
+      return QSize(w, h);
    }
    default: ;
    } // switch

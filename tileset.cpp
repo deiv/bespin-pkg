@@ -365,7 +365,8 @@ void Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
       return;
 
    p->save();
-   p->setRenderHint(QPainter::Antialiasing);
+   p->setRenderHint(QPainter::Antialiasing, true);
+//    p->setClipRect(r);
    QPen pen = p->pen();
    pen.setColor(c); pen.setWidth(size);
    p->setPen(pen); p->setBrush(Qt::NoBrush);

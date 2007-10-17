@@ -22,6 +22,8 @@
 #include <QProcess>
 #include <QApplication>
 
+#include <cmath>
+
 #include "colors.h"
 #include "bespin.h"
 #include "makros.h"
@@ -207,8 +209,6 @@ BespinStyle::readSettings(const QSettings* settings)
 #undef gradientType
 
 #define SCALE(_N_) lround(_N_*config.scale)
-
-#include "genpixmaps.cpp"
 
 void BespinStyle::initMetrics()
 {

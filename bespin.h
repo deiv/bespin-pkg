@@ -346,8 +346,6 @@ private:
    const Tile::Set &glow(const QColor & c, bool round = false) const;
    void generatePixmaps();
    void initMetrics();
-   void makeStructure(int num, const QColor &c);
-   bool scrollAreaHovered(const QWidget* slider) const;
    void readSettings(const QSettings *settings = 0L);
    void registerRoutines();
    
@@ -355,7 +353,7 @@ private:
    typedef QHash<uint, Tile::Set> TileCache;
    struct {
       Tile::Set button, tab;
-      QPixmap radio, radioIndicator, notch, slider[4];
+      QPixmap radio, radioIndicator, notch, slider;
       QPixmap winClose, winMin, winMax;
 #if SHAPE_POPUP
       QRegion corner[4];

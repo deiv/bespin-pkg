@@ -22,6 +22,7 @@
 #include "draw.h"
 
 static int animStep = -1;
+static bool isCheckbox = false;
 
 void
 BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
@@ -105,16 +106,17 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    B_STATES
       
    const int f1 = dpi.f1, f2 = dpi.f2;
+   const bool fullHover = config.btn.fullHover || isCheckbox;
    QRect r = RECT;
    if (animStep < 0)
       animStep = sunken ? 6 : animator->hoverStep(widget);
    QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, animStep);
    
-   if (config.btn.fullHover && (hover || animStep))
+   if (fullHover && (hover || animStep))
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
    
    Gradients::Type gt = !isEnabled ? Gradients::None : GRAD(btn);
-   bool drawInner = !config.btn.fullHover && (hover || animStep);
+   bool drawInner = !fullHover && (hover || animStep);
    if (config.btn.cushion &&
        (sunken || (!hover && option->state & State_On))) {
           gt = Gradients::Sunken;
@@ -142,7 +144,8 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
                r = RECT;
             else
                r.setBottom(r.bottom()+dpi.f1);
-            masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)), f2);
+            masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)),
+                                 dpi.f3);
          }
       }
       if (!isEnabled || (sunken && !config.btn.cushion) || config.btn.layer == 2)
@@ -157,23 +160,23 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    if (sunken && !config.btn.cushion) {
       r.adjust(f1, f1, -f1, -f2);
       shadows.button[true][isEnabled].render(r, painter);
-      r.adjust(f1, 0, -f1, -f1);
+      r.adjust(f1, f1, -f1, -f1);
    }
    else {
+      r.adjust(0, f1, 0, 0);
       shadows.button[false][isEnabled].render(r, painter);
-      r.adjust(f2, f2, -f2, -dpi.f3);
       if (hasFocus)
          lights.tab.render(RECT, painter, FCOLOR(Highlight));
+      r.adjust(f2, f1, -f2, -dpi.f3);
    }
    
    // backlight & plate
+   r.adjust(f1,f1,-f1,-f1);
    masks.button.render(r, painter, gt, Qt::Vertical, c);
-   
+   r.adjust(-f1,-f1,f1,f1);
    // outline?
-   painter->save();
-   painter->setClipRegion(r);
-   masks.button.outline(r, painter, Colors::mid(c, Qt::white,1,3));
-   painter->restore();
+   if (isEnabled)
+      masks.button.outline(r, painter, Colors::mid(c, Qt::white), f2);
    
    if (drawInner) {
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
@@ -182,8 +185,8 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
                           QPoint(0,f2));
    }
    
-      // ambient?
-   if (isEnabled && !sunken)
+   // ambient?
+   if (isEnabled && !(sunken || isCheckbox))
       painter->drawPixmap(QPoint(r.right()+1-16*r.height()/9, r.top()),
                           Gradients::ambient(r.height()));
 }
@@ -237,6 +240,9 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
    else
       tf |= Qt::AlignHCenter;
 
+   if (btn->text.isEmpty())
+      return;
+
    if (btn->features & QStyleOptionButton::HasMenu) {
       ir.setRight(ir.right() - ir.height()/2 - dpi.f10);
    }
@@ -248,13 +254,17 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
 
    painter->save();
    if (hasFocus) {
-      ir.translate(0,-1);
+//       ir.translate(0,-1);
       QFont tmpFnt = painter->font();
       tmpFnt.setBold(true);
       QFontMetrics fm(tmpFnt);
       QRect tr = fm.boundingRect ( btn->text );
+      if (!tr.isValid()) {
+         painter->restore();
+         return;
+      }
       if (tr.width() > ir.width()) {
-         ir.translate(0,1);
+//          ir.translate(0,1);
          if (tmpFnt.pointSize() > -1)
             tmpFnt.setPointSize(tmpFnt.pointSize()*ir.width()/tr.width());
          else
@@ -297,11 +307,10 @@ BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
       copy.rect.adjust(0,dpi.f1,0,-dpi.f1); // get rect appereance again
    else if (config.btn.layer == 0)
       copy.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0); // get rect appereance again
-   bool _fullHover = config.btn.fullHover;
 //       if (!(option->state & State_Off))
-   config.btn.fullHover = true;
+   isCheckbox = true;
    drawButtonFrame(&copy, painter, widget);
-   config.btn.fullHover = _fullHover;
+   isCheckbox = false;
    if (option->state & State_On)
       copy.state |= State_On; // reset
    
@@ -387,7 +396,7 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
                           shadows.radio[sunken][isEnabled]);
       
       // plate
-      xy += QPoint(f2,f1);
+      xy += QPoint(dpi.f2,f1);
       fillWithMask(painter, xy, Gradients::brush(c, dpi.ExclusiveIndicator,
                                                  Qt::Vertical, gt), masks.radio);
       
@@ -395,9 +404,9 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
          sz = dpi.ExclusiveIndicator - dpi.f6;
          painter->save();
          painter->setBrush(Qt::NoBrush);
-         painter->setPen(Qt::white);
+         painter->setPen(QPen(Colors::mid(c,Qt::white,2,1), f2));
          painter->setRenderHint(QPainter::Antialiasing);
-         painter->drawEllipse(xy.x()+f1, xy.y()+f1, sz, sz);
+         painter->drawEllipse(xy.x(), xy.y(), sz+f1, sz+f1);
          painter->restore();
       }
    }

@@ -209,7 +209,7 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
    int x, y, w, h;
    r.getRect(&x, &y, &w, &h);
    int tab = menuitem->tabWidth;
-   int cDim = (r.height() - dpi.f4);
+   int cDim = (r.height() - dpi.f6);
    int xm = windowsItemFrame + iconCol + windowsItemHMargin;
    int xpos = r.x() + xm;
    QRect textRect(xpos, y + windowsItemVMargin,
@@ -227,7 +227,9 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
          QRect vShortcutRect = visualRect(option->direction, r,
                                           QRect(textRect.topRight(),
                                              QPoint(textRect.right()+tab, textRect.bottom())));
-         painter->drawText(vShortcutRect, text_flags | Qt::AlignLeft, s.mid(t + 1));
+         painter->setPen(Colors::mid(bg, fg));
+         painter->drawText(vShortcutRect, text_flags | Qt::AlignRight, s.mid(t + 1));
+         painter->setPen(fg);
          s = s.left(t);
       }
       if (menuitem->menuItemType == QStyleOptionMenuItem::DefaultItem) {
@@ -243,17 +245,18 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
       // draw sub menu arrow
       Navi::Direction dir = (option->direction == Qt::RightToLeft) ?
          Navi::W : Navi::E;
-      int dim = r.height()/3;
-      xpos = r.x() + r.width() - dpi.f7 - dim;
+      int dim = 5*r.height()/12;
+      xpos = r.right() - dpi.f4 - dim;
       QStyleOptionMenuItem tmpOpt = *menuItem;
       tmpOpt.rect = visualRect(option->direction, r,
                               QRect(xpos, r.y() +
                                     (r.height() - dim)/2, dim, dim));
-      painter->setPen(Colors::mid(bg, fg, 1, 3));
+      painter->setBrush(Colors::mid(bg, fg, 1, 2));
+      painter->setPen(painter->brush());
       drawArrow(dir, tmpOpt.rect, painter);
    }
    else if (checkable) { // Checkmark
-      xpos = r.right() - dpi.f7 - cDim;
+      xpos = r.right() - dpi.f4 - cDim;
       QStyleOptionMenuItem tmpOpt = *menuItem;
       tmpOpt.rect = QRect(xpos, r.y() + (r.height() - cDim)/2, cDim, cDim);
       tmpOpt.rect = visualRect(menuItem->direction, menuItem->rect, tmpOpt.rect);
@@ -269,7 +272,7 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
       painter->setPen(Colors::mid(bg, fg));
       painter->setBrush(fg);
       if (menuItem->checkType & QStyleOptionMenuItem::Exclusive) {
-         const int d = cDim/6;
+         const int d = cDim/7;
          tmpOpt.rect.adjust(d,d,-d,-d);
          drawExclusiveCheck(&tmpOpt, painter, widget); // Radio button
       }

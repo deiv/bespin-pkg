@@ -45,18 +45,19 @@ using namespace Bespin;
 extern Config config;
 extern Dpi dpi;
 
-void
-BespinStyle::makeStructure(int num, const QColor &c)
+static void
+makeStructure(QPixmap **pixp, const QColor &c, bool light)
 {
-   if (!_scanlines[num])
-      _scanlines[num] = new QPixmap(64, 64);
-   QPainter p(_scanlines[num]);
+   if (!(*pixp))
+      (*pixp) = new QPixmap(64, 64);
+   QPixmap *pix = (*pixp);
+   QPainter p(pix);
    switch (config.bg.structure)
    {
    default:
    case 0: { // scanlines
-      _scanlines[num]->fill( c.light(110).rgb() );
-      p.setPen( (num == 1) ? c.light(106) : c.light(103) );
+      pix->fill( c.light(110).rgb() );
+      p.setPen( light ? c.light(106) : c.light(103) );
       int i;
       for ( i = 1; i < 64; i += 4 ) {
          p.drawLine( 0, i, 63, i );
@@ -70,7 +71,7 @@ BespinStyle::makeStructure(int num, const QColor &c)
    case 1: { //checkboard
       p.setPen(Qt::NoPen);
       p.setBrush(c.light(102));
-      if (num == 1) {
+      if (light) {
          p.drawRect(0,0,16,16); p.drawRect(32,0,16,16);
          p.drawRect(16,16,16,16); p.drawRect(48,16,16,16);
          p.drawRect(0,32,16,16); p.drawRect(32,32,16,16);
@@ -81,7 +82,7 @@ BespinStyle::makeStructure(int num, const QColor &c)
          p.drawRect(32,32,32,32);
       }
       p.setBrush(c.dark(102));
-      if (num == 1) {
+      if (light) {
          p.drawRect(16,0,16,16); p.drawRect(48,0,16,16);
          p.drawRect(0,16,16,16); p.drawRect(32,16,16,16);
          p.drawRect(16,32,16,16); p.drawRect(48,32,16,16);
@@ -94,8 +95,8 @@ BespinStyle::makeStructure(int num, const QColor &c)
       break;
    }
    case 2: // fat scans
-      _scanlines[num]->fill( c.light(103).rgb() );
-      p.setPen(QPen((num == 1) ? c.light(101) : c, 3));
+      pix->fill( c.light(103).rgb() );
+      p.setPen(QPen(light ? c.light(101) : c, 3));
       p.setBrush( c.dark(102) );
       p.drawRect(-3,8,70,8);
       p.drawRect(-3,24,70,8);
@@ -103,16 +104,16 @@ BespinStyle::makeStructure(int num, const QColor &c)
       p.drawRect(-3,56,70,8);
       break;
    case 3: // "blue"print
-      _scanlines[num]->fill( c.dark(101).rgb() );
-      p.setPen((num == 1) ? c.light(104) : c.light(102));
+      pix->fill( c.dark(101).rgb() );
+      p.setPen(light ? c.light(104) : c.light(102));
       for ( int i = 0; i < 64; i += 16 )
          p.drawLine( 0, i, 63, i );
       for ( int i = 0; i < 64; i += 16 )
          p.drawLine( i, 0, i, 63 );
       break;
    case 4: // verticals
-      _scanlines[num]->fill( c.light(110).rgb() );
-      p.setPen( (num == 1) ? c.light(106) : c.light(103) );
+      pix->fill( c.light(110).rgb() );
+      p.setPen( light ? c.light(106) : c.light(103) );
       for ( int i = 1; i < 64; i += 4 ) {
          p.drawLine( i, 0, i, 63 );
          p.drawLine( i+2, 0, i+2, 63 );
@@ -122,8 +123,8 @@ BespinStyle::makeStructure(int num, const QColor &c)
          p.drawLine( i, 0, i, 63 );
       break;
    case 5: { // diagonals
-      _scanlines[num]->fill( c.light(102).rgb() );
-      QPen pen(c.dark(102-num), 11);
+      pix->fill( c.light(102).rgb() );
+      QPen pen(c.dark(102-light), 11);
       p.setPen(pen);
       p.setRenderHint(QPainter::Antialiasing);
       p.drawLine(-64,64,64,-64);
@@ -163,7 +164,7 @@ void BespinStyle::polish( QPalette &pal )
    QLinearGradient lg; QPainter p;
    if (config.bg.mode == Scanlines) {
       QColor c = pal.color(QPalette::Active, QPalette::Background);
-      makeStructure(0, c);
+      makeStructure(&_scanlines[0], c, false);
       QBrush brush( c, *_scanlines[0] );
       pal.setBrush( QPalette::Background, brush );
    }
@@ -338,7 +339,7 @@ void BespinStyle::polish( QWidget * widget) {
             QColor c = pal.color(QPalette::Active, QPalette::Window);
             
             if (!_scanlines[1])
-               makeStructure(1, c);
+               makeStructure(&_scanlines[1], c, true);
             QBrush brush( c, *_scanlines[1] );
             pal.setBrush( QPalette::Window, brush );
             widget->setPalette(pal);

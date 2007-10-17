@@ -308,6 +308,14 @@ VisualFrame::raise()
 }
 
 void
+VisualFrame::repaint() {
+   top->repaint();
+   left->repaint();
+   right->repaint();
+   bottom->repaint();
+}
+
+void
 VisualFrame::update()
 {
    top->update();
@@ -331,10 +339,10 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
    }
    
    if (o != _frame) { // now we're only interested in frame events
-      o->removeEventFilter(this);
+//       o->removeEventFilter(this);
       return false;
    }
-   
+
    if (ev->type() == QEvent::Show) {
       correctPosition();
       show();

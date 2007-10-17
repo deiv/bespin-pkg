@@ -409,11 +409,19 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
       option->rect.getRect(&x,&y,&w,&h);
       int margin = dpi.f2;// ;) pixelMetric(QStyle::PM_HeaderMargin, opt, widget);
       QRect r;
-      if (option->state & State_Horizontal)
-         r.setRect(x + w - 2*margin - (h / 2), y + h/4 + margin, h / 2, h/2);
-      else
+      if (option->state & State_Horizontal) {
+         bool up = false;
+         if (const QStyleOptionHeader *hdr =
+               qstyleoption_cast<const QStyleOptionHeader *>(option))
+            up = hdr->sortIndicator == QStyleOptionHeader::SortUp;
+         const int h_3 = h / 3;
+         r.setRect(x + (w - h_3)/2, up ? y+h-h_3 : y, h_3, h_3);
+//          r.setRect(x + w - 2*margin - (h / 2), y + h/4 + margin, h / 2, h/2);
+      }
+      else {
          r.setRect(x + dpi.f5, y, h / 2, h / 2 - margin * 2);
-      r = visualRect(option->direction, option->rect, r);
+         r = visualRect(option->direction, option->rect, r);
+      }
       return r;
    }
 //    case SE_HeaderLabel: //  

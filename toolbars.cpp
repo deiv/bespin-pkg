@@ -115,8 +115,9 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
          int dx = step*r.width()/18; int dy = step*r.height()/18;
          r.adjust(dx, dy, -dx, -dy);
       }
-      masks.tab.render(r, painter, sunken ? Gradients::Sunken : Gradients::Button,
-                       Qt::Vertical, c);
+      const Gradients::Type gt = sunken ? Gradients::Sunken :
+         (Colors::value(c) < 108 ? Gradients::Simple : Gradients::Button);
+      masks.tab.render(r, painter, gt, Qt::Vertical, c);
    }
    if (isOn)
       shadows.tabSunken.render(RECT, painter);

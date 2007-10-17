@@ -327,10 +327,10 @@ BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter,
          pf |= Tile::Top;
    }
 
-   Tile::setShape(pf);
    const bool selected = option->state & State_Selected;
+   Tile::setShape(pf);
    if (selected || hover || sunken) {
-      const QColor &c = (selected || sunken) ?
+      const QColor &c = selected ?
          CCOLOR(toolbox.active, Bg) : FCOLOR(Window);
       Gradients::Type gt = selected ? GRAD(toolbox) :
          (sunken ? Gradients::Sunken : Gradients::Button);
@@ -352,17 +352,14 @@ BespinStyle::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter,
    const bool selected = option->state & (State_Selected);
 
    QColor cB = FCOLOR(Window), cF = FCOLOR(WindowText);
-   if (sunken || selected) {
-      hover = false;
-      cB = CCOLOR(toolbox.active, Bg);
-      cF = CCOLOR(toolbox.active, Fg);
-   }
-
    painter->save();
    if (selected) {
+      cB = CCOLOR(toolbox.active, Bg);
+      cF = CCOLOR(toolbox.active, Fg);
       QFont tmpFnt = painter->font(); tmpFnt.setBold(true);
       painter->setFont(tmpFnt);
    }
+
    // on dark background, let's paint an emboss
    if (isEnabled) {
       QRect tr = RECT;

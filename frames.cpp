@@ -31,6 +31,8 @@ BespinStyle::drawFocusFrame(const QStyleOption * option, QPainter * painter,
    painter->restore();
 }
 
+#include <QtDebug>
+
 void
 BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
                        const QWidget * widget) const
@@ -54,7 +56,7 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
       return;
    }
 
-   QPoint zero; bool fastFocus = false;
+   bool fastFocus = false;
    const QBrush *brush = &PAL.brush(widget->backgroundRole());
    if (qobject_cast<const QFrame*>(widget)) { // frame, can be killed unless...
       if (widget->inherits("QTextEdit")) { // ...it's a TextEdit!
@@ -67,11 +69,6 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
                const_cast<QLabel*>(label)->setMargin(dpi.f3);
          return; // painted on visual frame
       }
-   }
-   else if (qobject_cast<const VisualFramePart*>(widget)) {
-//       if (widget->parentWidget() && widget->parentWidget()->parentWidget())
-//          brush = &PAL.brush(widget->parentWidget()->parentWidget()->backgroundRole());
-      zero = widget->mapTo(widget->window(), QPoint(0,0));
    }
    else if (widget->inherits("QComboBoxPrivateContainer")) {
       // comob dropdowns
@@ -101,7 +98,7 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
    }
    
    if (fastFocus)
-      mask->render(rect, painter, *brush, zero);
+      mask->render(rect, painter, *brush);
    if (hasFocus) {
       QColor h;
       if (fastFocus)

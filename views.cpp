@@ -36,13 +36,14 @@ BespinStyle::drawHeader(const QStyleOption * option, QPainter * painter,
    drawHeaderSection(header, painter, widget);
 
    // label
-   QStyleOptionHeader subopt = *header;
-   subopt.rect = subElementRect(SE_HeaderLabel, header, widget);
-   if (subopt.rect.isValid())
-      drawHeaderLabel(header, painter, widget);
+//    QStyleOptionHeader subopt = *header;
+//    subopt.rect = subElementRect(SE_HeaderLabel, header, widget);
+//    if (subopt.rect.isValid())
+   drawHeaderLabel(header, painter, widget);
        
    // sort Indicator on sorting or (inverted) on hovered headers
-   if (subopt.sortIndicator != QStyleOptionHeader::None) {
+   if (header->sortIndicator != QStyleOptionHeader::None) {
+      QStyleOptionHeader subopt = *header;
       subopt.rect = subElementRect(SE_HeaderArrow, option, widget);
       painter->save();
       painter->setPen(Qt::NoPen);
@@ -164,6 +165,21 @@ BespinStyle::drawHeaderLabel(const QStyleOption * option, QPainter * painter,
 }
 
 void
+BespinStyle::drawHeaderArrow(const QStyleOption * option, QPainter * painter,
+                             const QWidget *) const
+{
+   Navi::Direction dir = Navi::S;
+   if (const QStyleOptionHeader* hopt =
+       qstyleoption_cast<const QStyleOptionHeader*>(option)) {
+          if (hopt->sortIndicator == QStyleOptionHeader::None)
+             return;
+          if (hopt->sortIndicator == QStyleOptionHeader::SortUp)
+             dir = Navi::N;
+       }
+   drawArrow(dir, option->rect, painter);
+}
+
+void
 BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
                         const QWidget * widget) const
 {
@@ -175,11 +191,11 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
    int aft_h = mid_h;
    int aft_v = mid_v;
 
-   QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
-   if (widget) {
-      bg = widget->backgroundRole();
-      fg = widget->foregroundRole();
-   }
+//    const QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
+//    if (widget) {
+//       bg = widget->backgroundRole();
+//       fg = widget->foregroundRole();
+//    }
 
    const bool firstCol = (RECT.x() ==  -1);
    
@@ -196,7 +212,7 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
       if (firstCol)
          rect.moveRight(RECT.right()-dpi.f1);
       if (option->state & State_Open) {
-         painter->setBrush(Colors::mid( COLOR(bg), COLOR(fg)));
+         painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text)));
          rect.translate(0,-decoration_size/6);
          if (option->direction == Qt::RightToLeft)
             drawSolidArrow(Navi::SW, rect, painter);
@@ -204,7 +220,7 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
             drawSolidArrow(Navi::SE, rect, painter);
       }
       else {
-         painter->setBrush(Colors::mid( COLOR(bg), COLOR(fg), 8, 1));
+         painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text), 6, 1));
          if (option->direction == Qt::RightToLeft)
             drawArrow(Navi::W, rect, painter);
          else
@@ -219,7 +235,7 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
       return;
    }
 
-   painter->setPen(Colors::mid( COLOR(bg), COLOR(fg), 40, 1));
+   painter->setPen(Colors::mid( FCOLOR(Base), FCOLOR(Text), 40, 1));
    
    if (option->state & (State_Item | State_Sibling))
       painter->drawLine(mid_h, RECT.y(), mid_h, bef_v);
@@ -385,17 +401,3 @@ BespinStyle::drawRubberBand(const QStyleOption * option, QPainter * painter,
    painter->restore();
 }
 
-void
-BespinStyle::drawHeaderArrow(const QStyleOption * option, QPainter * painter,
-                             const QWidget *) const
-{
-   Navi::Direction dir = Navi::S;
-   if (const QStyleOptionHeader* hopt =
-       qstyleoption_cast<const QStyleOptionHeader*>(option)) {
-          if (hopt->sortIndicator == QStyleOptionHeader::None)
-             return;
-          if (hopt->sortIndicator == QStyleOptionHeader::SortUp)
-             dir = Navi::N;
-       }
-   drawSolidArrow(dir, option->rect, painter);
-}

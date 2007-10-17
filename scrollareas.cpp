@@ -20,8 +20,9 @@
 #include <QAbstractScrollArea>
 #include "draw.h"
 
-bool
-BespinStyle::scrollAreaHovered(const QWidget* slider) const {
+inline static bool
+scrollAreaHovered(const QWidget* slider, StyleAnimator *animator)
+{
 //    bool scrollerActive = false;
    QWidget *scrollWidget = const_cast<QWidget*>(slider);
    if (!scrollWidget->isEnabled())
@@ -95,7 +96,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
    }
    else {
       that->widgetStep = animator->hoverStep(widget);
-      that->scrollAreaHovered_ = scrollAreaHovered(widget);
+      that->scrollAreaHovered_ = scrollAreaHovered(widget, animator);
    }
 
    SubControls hoverControls = scrollbar->activeSubControls &
@@ -297,7 +298,7 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
       if (sunken) {
          r.adjust(f1, f1, -f1, -f1);
          shadows.tab[true][true].render(r, painter);
-         r.adjust(f1, f1, -f1, -f2);
+         r.adjust(f1, 0, -f1, -f2);
       }
       else {
          shadows.tab[true][false].render(r, painter);
@@ -317,9 +318,9 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    }
 
 // the allways shown base
-   masks.tab.render(r, painter, GRAD(scroll), o, config.btn.fullHover ?
-                     c : CCOLOR(btn.std, Bg), size);
-   masks.tab.outline(r, painter, Colors::mid(CCOLOR(btn.std, Bg), Qt::white,1,2));
+   const QColor &bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
+   masks.tab.render(r, painter, GRAD(scroll), o, bc, size);
+   masks.tab.outline(r, painter, Colors::mid(bc, Qt::white,2,1));
 
    if (config.btn.fullHover) return;
 
