@@ -148,8 +148,10 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
       newScrollbar.state = saveFlags;
       newScrollbar.rect = subControlRect(CC_ScrollBar, &newScrollbar,
                                        SC_ScrollBarSlider, widget);
-      if (config.scroll.sunken)
-         newScrollbar.rect.adjust(-1,-1,1,1);
+      if (config.scroll.sunken) {
+         const int f1 = dpi.f1;
+         newScrollbar.rect.adjust(-f1,-f1,f1,0);
+      }
       if (newScrollbar.rect.isValid()) {
          if (!(scrollbar->activeSubControls & SC_ScrollBarSlider))
             newScrollbar.state &= ~(State_Sunken | State_MouseOver);

@@ -221,6 +221,8 @@ protected:
    void drawPushButtonLabel(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawCheckBox(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawRadio(const QStyleOption*, QPainter*, const QWidget*) const;
+   void drawCheckBoxItem(const QStyleOption*, QPainter*, const QWidget*) const;
+   void drawRadioItem(const QStyleOption*, QPainter*, const QWidget*) const;
    // docks.cpp
    void drawDockTitle(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawDockHandle(const QStyleOption*, QPainter*, const QWidget*) const;

@@ -125,10 +125,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    
    // sunken variant
    if (config.btn.layer) {
-      int d = 0;
-      if (config.btn.layer == 1) {
-         d = f1;
-      }
+      const int d = (config.btn.layer == 1) ? f1 : 0;
       if (isEnabled) {
          r.adjust(d,d,-d,-f2+d);
          masks.button.render(r, painter, gt, Qt::Vertical, c);
@@ -140,10 +137,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
                                 r.height(), QPoint(0,f2+d));
          }
          if (hasFocus) {
-            if (config.btn.layer == 1)
-               r = RECT;
-            else
-               r.setBottom(r.bottom()+dpi.f1);
+            r = RECT; r.setBottom(r.bottom()-f1);
             masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)),
                                  dpi.f3);
          }
@@ -171,12 +165,11 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    }
    
    // backlight & plate
-   r.adjust(f1,f1,-f1,-f1);
    masks.button.render(r, painter, gt, Qt::Vertical, c);
-   r.adjust(-f1,-f1,f1,f1);
    // outline?
-   if (isEnabled)
-      masks.button.outline(r, painter, Colors::mid(c, Qt::white), f2);
+//    if (isEnabled)
+   masks.button.outline(r.adjusted(f1,f1,-f1,-f1), painter,
+                        Colors::mid(c, Qt::white), f2);
    
    if (drawInner) {
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
@@ -333,7 +326,7 @@ BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
 
 void
 BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
-                       const QWidget * widget) const
+                             const QWidget * widget) const
 {
    B_STATES
 
@@ -422,24 +415,29 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
 
 //    case PE_FrameButtonBevel: // Panel frame for a button bevel
 
-// case CE_RadioButton: // A QRadioButton, draws a PE_ExclusiveRadioButton, a case CE_RadioButtonLabel
-// case CE_CheckBox: // A QCheckBox, draws a PE_IndicatorCheckBox, a case CE_CheckBoxLabel
-// if (const QStyleOptionButton *btn =
-//     qstyleoption_cast<const QStyleOptionButton *>(option)) {
-//        QStyleOptionButton subopt = *btn;
-//        if (element == CE_RadioButton) {
-//           subopt.rect = subElementRect(SE_RadioButtonIndicator, btn, widget);
-//           drawPrimitive(PE_IndicatorRadioButton, &subopt, painter, widget);
-//           subopt.rect = subElementRect(SE_RadioButtonContents, btn, widget);
-//           drawControl(CE_RadioButtonLabel, &subopt, painter, widget);
-//        }
-//        else {
-//           subopt.rect = subElementRect(SE_CheckBoxIndicator, btn, widget);
-//           drawPrimitive(PE_IndicatorCheckBox, &subopt, painter, widget);
-//           subopt.rect = subElementRect(SE_CheckBoxContents, btn, widget);
-//           drawControl(CE_CheckBoxLabel, &subopt, painter, widget);
-//        }
-//     }
-// break;
+void
+BespinStyle::drawRadioItem(const QStyleOption * option, QPainter * painter,
+                           const QWidget * widget) const
+{
+   ASSURE_OPTION(btn, Button);
+   QStyleOptionButton subopt = *btn;
+   subopt.rect = subElementRect(SE_RadioButtonIndicator, btn, widget);
+   drawRadio(&subopt, painter, widget);
+   subopt.rect = subElementRect(SE_RadioButtonContents, btn, widget);
+   drawControl(CE_RadioButtonLabel, &subopt, painter, widget);
+}
+
+void
+BespinStyle::drawCheckBoxItem(const QStyleOption * option, QPainter * painter,
+                              const QWidget * widget) const
+{
+   ASSURE_OPTION(btn, Button);
+   QStyleOptionButton subopt = *btn;
+   subopt.rect = subElementRect(SE_CheckBoxIndicator, btn, widget);
+   drawCheckBox(&subopt, painter, widget);
+   subopt.rect = subElementRect(SE_CheckBoxContents, btn, widget);
+   drawControl(CE_CheckBoxLabel, &subopt, painter, widget);
+}
+
 //    case CE_CheckBoxLabel: // The label (text or pixmap) of a QCheckBox
 //    case CE_RadioButtonLabel: // The label (text or pixmap) of a QRadioButton

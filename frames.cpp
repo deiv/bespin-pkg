@@ -57,7 +57,7 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
    }
 
    bool fastFocus = false;
-   const QBrush *brush = &PAL.brush(widget->backgroundRole());
+   const QBrush *brush = 0;
    if (qobject_cast<const QFrame*>(widget)) { // frame, can be killed unless...
       if (widget->inherits("QTextEdit")) { // ...it's a TextEdit!
          fastFocus = true;
@@ -97,18 +97,15 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
       mask = &masks.tab;
    }
    
-   if (fastFocus)
+   if (brush)
       mask->render(rect, painter, *brush);
    if (hasFocus) {
       QColor h;
-      if (fastFocus)
-         h = Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
-      else {
+//       if (fastFocus)
+//          h = Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
+//       else {
          h = FCOLOR(Highlight); h.setAlpha(102);
-      }
-      const int f1 = dpi.f1;
-//       rect = RECT.adjusted(0,0,0,-dpi.f1);
-      rect = RECT.adjusted(-f1,-f1,f1,-f1);
+//       }
       mask->outline(rect, painter, h, dpi.f3);
    }
    if (shadow)

@@ -129,7 +129,7 @@ buttonGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
    
    // calc difference
    inc = 15; dec = 6;
-   if (v+15 > 255) {
+   if (v+inc > 255) {
       inc = 255-v; dec += (15-inc);
    }
    QLinearGradient lg(start, stop);

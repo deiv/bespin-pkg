@@ -358,7 +358,7 @@ void Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
 
    PosFlags pf = _shape ? _shape : _defShape;
    
-   const int d = (size+1)/2;
+   const int d = (size+1)/2-1;
 //    const int o = size%2;
    QRect rect = r.adjusted(d,d,-d,-d);
    if (rect.isNull())

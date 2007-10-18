@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
    if (argc > 1) {
       mode = Invalid;
       if (!qstrcmp( argv[1], "config" )) mode = Configure;
-      if (!qstrcmp( argv[1], "import" )) mode = Import;
+      else if (!qstrcmp( argv[1], "import" )) mode = Import;
       else if (!qstrcmp( argv[1], "demo" )) mode = Demo;
       else if (!qstrcmp( argv[1], "try" )) mode = Try;
 #if PUSHER
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
       BConfigDialog *window =
          new BConfigDialog(config, BConfigDialog::All &
                            ~(BConfigDialog::Import | BConfigDialog::Export));
-      window->resize(640,-1);
+      window->resize(640,480);
       window->show();
       return app->exec();
    }

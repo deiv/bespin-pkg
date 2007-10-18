@@ -46,7 +46,7 @@ const QColor &Colors::bg(const QPalette &pal, const QWidget *w) {
 
 QColor Colors::btnBg(const QPalette &pal, bool isEnabled, int hasFocus, int step) {
    if (!isEnabled)
-      return FCOLOR(Window).dark(104);
+      return FCOLOR(Window);//.dark(102);
    QColor c = (hasFocus) ?
       mid(FCOLOR(Highlight), COLOR(btnRoles[0][0]),
           1, 10+contrast(FCOLOR(Highlight), COLOR(btnRoles[0][0]))) :

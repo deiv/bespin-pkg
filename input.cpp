@@ -28,12 +28,8 @@ BespinStyle::drawLineEditFrame(const QStyleOption * option, QPainter * painter,
       
    QRect r = RECT.adjusted(0,0,0,-dpi.f2);
    if (hasFocus) {
-      QColor h = FCOLOR(Highlight); h.setAlpha(80);
-      const int f1 = dpi.f1;
-      r.adjust(-f1, -f1, f1, f1);
-//          r.setBottom(r.bottom()+dpi.f1);
+      QColor h = FCOLOR(Highlight); h.setAlpha(102);
       masks.button.outline(r, painter, h, dpi.f3);
-      r.adjust(f1, f1, -f1, -f1);
    }
    shadows.lineEdit[isEnabled].render(r, painter);
 }
@@ -56,14 +52,12 @@ BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
    QRect r = RECT;
    if (isEnabled) {
       if (hasFocus) {
-         const int f1 = dpi.f1;
          r.adjust(0,0,0,-dpi.f2);
          masks.button.render(r, painter, FCOLOR(Base).light(112));
          r.setBottom(r.bottom()+dpi.f1);
-         QColor h = Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
-         r.adjust(-f1, -f1, f1, f1);
+         QColor h = FCOLOR(Highlight); h.setAlpha(102);
+//          Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
          masks.button.outline(r, painter, h, dpi.f3);
-         r.adjust(f1, f1, -f1, -f1);
       }
       else {
          r.setBottom(r.y()+r.height()/2);
@@ -186,7 +180,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
       qobject_cast<const QComboBox*>(widget) : 0;
    const bool listShown = combo && combo->view() &&
       ((QWidget*)(combo->view()))->isVisible();
-   QColor c = CONF_COLOR(btn.std, 0);
+   QColor c = CONF_COLOR(btn.std, Bg);
 
    if (listShown) { // this messes up hover
       hover = hover || QRect(widget->mapToGlobal(RECT.topLeft()),
@@ -213,13 +207,13 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
 
          c = Colors::btnBg(PAL, isEnabled, hasFocus, 0);
          if (config.btn.fullHover)
-            c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-animStep, animStep);
+            c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
 
          masks.tab.render(r, painter, GRAD(chooser), Qt::Vertical, c);
 
          if (hasFocus) {
             const QColor hlc =
-               Colors::mid(CONF_COLOR(btn.std, 0), FCOLOR(Highlight), 2, 1);
+               Colors::mid(CONF_COLOR(btn.std, Bg), FCOLOR(Highlight), 2, 1);
             masks.tab.outline(r, painter, hlc, f3);
          }
 
@@ -227,9 +221,9 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
          if (!config.btn.fullHover && animStep) { // jupp ;)
             r.adjust(f3, f3, -f3, -f3);
             const QColor c2 =
-               Colors::mid(c, CONF_COLOR(btn.active, 0), 6-animStep, animStep);
+               Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
             masks.tab.render(r, painter, GRAD(chooser), Qt::Vertical,
-                              c2, RECT.height()-f2, QPoint(0,f3));
+                                c2, RECT.height()-f2, QPoint(0,f3));
          }
       }
       shadows.tabSunken.render(RECT, painter);

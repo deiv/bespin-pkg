@@ -122,6 +122,8 @@ BespinStyle::registerRoutines()
    registerCE(drawPushButtonLabel, CE_PushButtonLabel);
    registerPE(drawCheckBox, PE_IndicatorCheckBox);
    registerPE(drawRadio, PE_IndicatorRadioButton);
+   registerCE(drawCheckBoxItem, CE_CheckBox);
+   registerCE(drawRadioItem, CE_RadioButton);
    // docks.cpp
    registerPE(skip, PE_Q3DockWindowSeparator);
    registerPE(skip, PE_FrameDockWidget);

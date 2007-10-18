@@ -345,7 +345,7 @@ BespinStyle::drawSizeGrip(const QStyleOption * option, QPainter * painter,
       corner = Qt::BottomLeftCorner;
    else
       corner = Qt::BottomRightCorner;
-   
+
    QRect rect = RECT;
    rect.setWidth(7*RECT.width()/4);
    rect.setHeight(7*RECT.height()/4);
