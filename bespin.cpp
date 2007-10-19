@@ -416,13 +416,13 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
 QPalette
 BespinStyle::standardPalette () const
 {
-   QPalette pal ( Qt::black, Qt::white, // windowText, button
-                     Qt::white, QColor(200,201,202), QColor(221,222,223), //light, dark, mid
+   QPalette pal ( QColor(70,70,70), QColor(70,70,70), // windowText, button
+                     Qt::white, QColor(211,211,212), QColor(226,226,227), //light, dark, mid
                      Qt::black, Qt::white, //text, bright_text
-                     Qt::white, QColor(226,227,231) ); //base, window
-   pal.setColor(QPalette::ButtonText, Qt::black);
-   pal.setColor(QPalette::Highlight, QColor(78, 156, 234));
-   pal.setColor(QPalette::HighlightedText, Qt::white);
+                     Qt::white, QColor(238,238,240) ); //base, window
+   pal.setColor(QPalette::ButtonText, Qt::white);
+   pal.setColor(QPalette::Highlight, QColor(164, 192, 228));
+   pal.setColor(QPalette::HighlightedText, Qt::black);
    return pal;
 }
 

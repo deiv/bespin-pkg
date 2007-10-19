@@ -106,17 +106,16 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    B_STATES
       
    const int f1 = dpi.f1, f2 = dpi.f2;
-   const bool fullHover = config.btn.fullHover || isCheckbox;
    QRect r = RECT;
    if (animStep < 0)
       animStep = sunken ? 6 : animator->hoverStep(widget);
    QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, animStep);
    
-   if (fullHover && (hover || animStep))
+   if (config.btn.fullHover && (hover || animStep))
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
    
    Gradients::Type gt = !isEnabled ? Gradients::None : GRAD(btn);
-   bool drawInner = !fullHover && (hover || animStep);
+   bool drawInner = !config.btn.fullHover && (hover || animStep);
    if (config.btn.cushion &&
        (sunken || (!hover && option->state & State_On))) {
           gt = Gradients::Sunken;
@@ -173,7 +172,8 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    
    if (drawInner) {
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
-      const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
+      const QRect ir = isCheckbox ? r.adjusted(f2, f2, -f2, -f2 ) :
+         r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
       masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(),
                           QPoint(0,f2));
    }
@@ -271,7 +271,7 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
    if (flat)
       fg = FCOLOR(WindowText);
    else
-      fg = Colors::btnFg(PAL, isEnabled, hover || animStep > 2);
+      fg = Colors::btnFg(PAL, isEnabled, hover, animStep);
    const QColor &bg = flat ? FCOLOR(Window) :
       (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
 
@@ -295,22 +295,18 @@ BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
    B_STATES
 
    QStyleOption copy = *option;
-   copy.state &= ~State_On; // don't want toggle cushion here
    if (config.btn.layer == 1)
       copy.rect.adjust(0,dpi.f1,0,-dpi.f1); // get rect appereance again
    else if (config.btn.layer == 0)
       copy.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0); // get rect appereance again
-//       if (!(option->state & State_Off))
    isCheckbox = true;
    drawButtonFrame(&copy, painter, widget);
    isCheckbox = false;
-   if (option->state & State_On)
-      copy.state |= State_On; // reset
    
    if (!(sunken || (option->state & State_Off))) {
       painter->save();
       const QPoint center = copy.rect.center() - QPoint(0,dpi.f1);
-      painter->setBrush(Colors::btnFg(PAL, isEnabled, hover || animStep > 2));
+      painter->setBrush(Colors::btnFg(PAL, isEnabled, hover, animStep));
       const int d = dpi.f5 - (config.btn.checkType + config.btn.layer) * dpi.f1;
       copy.rect.adjust(d, d, -d, -d);
       if (copy.rect.width() > copy.rect.height())
@@ -331,22 +327,22 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
    B_STATES
 
    bool isOn = option->state & State_On;
-   const int f2 = dpi.f2, f1 = dpi.f1;
-   int sz = dpi.ExclusiveIndicator;
+   const int f2 = dpi.f2, f1 = dpi.f1, f4 = dpi.f4;
    QPoint xy = RECT.topLeft();
    
    Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
    
-   if (isOn) hover = hasFocus = false;
+   if (isOn) hover = /*hasFocus = */false;
 //       else if (hover && sunken) isOn = true;
    
    animStep = isOn ? 0 : animator->hoverStep(widget);
-   QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, animStep);
+   QColor bc = Colors::btnBg(PAL, isEnabled, hasFocus, animStep);
+   QColor c = bc;
    if (animStep)
-      c = Colors::mid(c, CONF_COLOR(btn.active, 0), 6-animStep, animStep);
+      c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
    
    if (config.btn.layer == 2) {
-      QRect r = RECT.adjusted(dpi.f1,0,-dpi.f1,-dpi.f2);
+      QRect r = RECT.adjusted(dpi.f1,0,-dpi.f1,-f2);
       masks.tab.render(r, painter, sunken || isOn ? Gradients::Sunken : gt,
                        Qt::Vertical, c);
       r.setBottom(RECT.bottom());
@@ -389,25 +385,25 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
                           shadows.radio[sunken][isEnabled]);
       
       // plate
-      xy += QPoint(dpi.f2,f1);
-      fillWithMask(painter, xy, Gradients::brush(c, dpi.ExclusiveIndicator,
-                                                 Qt::Vertical, gt), masks.radio);
-      
-      if (isEnabled) {
-         sz = dpi.ExclusiveIndicator - dpi.f6;
-         painter->save();
-         painter->setBrush(Qt::NoBrush);
-         painter->setPen(QPen(Colors::mid(c,Qt::white,2,1), f2));
-         painter->setRenderHint(QPainter::Antialiasing);
-         painter->drawEllipse(xy.x(), xy.y(), sz+f1, sz+f1);
-         painter->restore();
+      xy += QPoint(f2,f1);
+      if (isOn || config.btn.fullHover)
+         fillWithMask(painter, xy, Gradients::brush(c, dpi.ExclusiveIndicator,
+            Qt::Vertical, gt), masks.radio);
+      else {
+         fillWithMask(painter, xy, Gradients::brush(bc, dpi.ExclusiveIndicator,
+            Qt::Vertical, gt), masks.radio);
+         if (hover || animStep) {
+            xy += QPoint(f4, f4);
+            fillWithMask(painter, xy, Gradients::brush(c, dpi.ExclusiveIndicator,
+               Qt::Vertical, gt), masks.radioIndicator, QPoint(0, dpi.f4));
+         }
       }
    }
    // drop
    if (isOn) {
-      xy += QPoint(dpi.f4, dpi.f4);
+      xy += QPoint(f4, f4);
       fillWithMask(painter, xy,
-                   Colors::btnFg(PAL, isEnabled, hasFocus, animStep),
+                   Colors::btnFg(PAL, isEnabled, hover, animStep),
                    masks.radioIndicator);
    }
    animStep = -1;

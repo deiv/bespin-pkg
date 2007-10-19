@@ -212,8 +212,9 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
          masks.tab.render(r, painter, GRAD(chooser), Qt::Vertical, c);
 
          if (hasFocus) {
-            const QColor hlc =
-               Colors::mid(CONF_COLOR(btn.std, Bg), FCOLOR(Highlight), 2, 1);
+            QColor hlc = FCOLOR(Highlight);
+            hlc.setAlpha(102);
+//                Colors::mid(CONF_COLOR(btn.std, Bg), FCOLOR(Highlight), 2, 1);
             masks.tab.outline(r, painter, hlc, f3);
          }
 

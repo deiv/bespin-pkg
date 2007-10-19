@@ -309,15 +309,22 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                   them with others.\
                   </p><p>\
                   You can also call the config dialog with the paramater \"demo\"\
-                  <pre>\
+                  <p><b>\
                   bespin demo [some style]\
-                  </pre>\
+                  </b></p>\
                   to test your settings on various widgets.\
                   </p><p>\
                   If you want to test settings before importing them, call\
-                  <pre>\
+                  <p><b>\
                   bespin try &lt;some_settings.conf&gt;\
-                  </pre>\
+                  </b></p>\
+                  Installed presets can be referred by the BESPIN_PRESET environment variable\
+                  <p><b>\
+                  BESPIN_PRESET=\"Bos Taurus\" bespin demo\
+                  </b></p>\
+                  will run the Bespin demo widget with the \"Bos Taurus\" preset\
+                  (this works - of course - with every Qt4 application,\
+                  not only the bespin executable)\
                   </p>");
    
    setContextHelp(ui.pwEchoChar, "<b>Pasword Echo Character</b><hr>\
@@ -417,7 +424,7 @@ void Config::saveAs() {
    if (!item) return;
    
    QString filename = QFileDialog::getSaveFileName(parentWidget(),
-      tr("Save Configuration"), lastPath, tr("Config Files (*.conf *.ini)"));
+      tr("Save Configuration"), lastPath, tr("Config Files (*.bespin *.conf *.ini)"));
    
    
    QSettings store("Bespin", "Store");
@@ -471,10 +478,31 @@ QString Config::sImport(const QString &filename) {
    return storeName;
 }
 
+bool
+Config::sExport(const QString &preset, const QString &filename)
+{
+   QSettings store("Bespin", "Store");
+   if (!store.childGroups().contains(preset))
+      return false;
+   store.beginGroup(preset);
+
+   QSettings file(filename, QSettings::IniFormat);
+   file.beginGroup("BespinStyle");
+
+   file.setValue("StoreName", preset);
+   foreach (QString key, store.allKeys())
+      file.setValue(key, store.value(key));
+   store.endGroup();
+   file.endGroup();
+   return true;
+}
+
 /** reimplemented - i just want to merge the data into the store */
-void Config::import() {
+void
+Config::import()
+{
    QString filename = QFileDialog::getOpenFileName(parentWidget(),
-      tr("Import Configuration"), lastPath, tr("Config Files (*.conf *.ini)"));
+      tr("Import Configuration"), lastPath, tr("Config Files (*.bespin *.conf *.ini)"));
    
    QString storeName = sImport(filename);
    if (storeName.isNull()) {

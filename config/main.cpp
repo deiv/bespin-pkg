@@ -31,6 +31,8 @@
 #include <unistd.h>
 #endif
 
+#define CHAR(_QSTRING_) _QSTRING_.toLatin1().data()
+
 class BStyle : public QStyle {
 public:
    BStyle() : QStyle (){}
@@ -38,19 +40,21 @@ public:
 };
 
 static int error(const QString & string) {
-   qWarning("Error: %s", string.toLatin1().data());
+   qWarning("Error: %s", CHAR(string));
    return 1;
 }
 
 static int usage(const char* appname) {
-   qWarning(
+   printf(
 "Usage:\n\
 ==========================\n\
 %s [config]\t\t\t\tConfigure the Bespin Style\n\
+%s presets\t\t\t\tList the available Presets\n\
 %s demo [style]\t\t\tLaunch a demo, you can pass other stylenames\n\
-%s try <some_config.bespin.conf>\tTry out an exported setting\n\
-%s import <some_config.bespin.conf>\tImport an exported setting\n\
-%s %s", appname, appname, appname, appname,
+%s try <some_config.bespin>\tTry out an exported setting\n\
+%s import <some_config.bespin>\tImport an exported setting\n\
+%s export <some_preset> <some_config.bespin>\tImport an exported setting\n\
+%s %s", appname, appname, appname, appname, appname, appname,
 #if PUSHER
 appname, "pusher [stop]\t\t\tThe Bg Pixmap daemon - you should not have to call this\n"
 #else
@@ -60,7 +64,7 @@ appname, "pusher [stop]\t\t\tThe Bg Pixmap daemon - you should not have to call 
    return 1;
 }
 
-enum Mode {Invalid = 0,  Configure, Import, Demo, Try, Pusher };
+enum Mode {Invalid = 0,  Configure, Presets, Import, Export, Demo, Try, Pusher };
 
 int main(int argc, char *argv[])
 {
@@ -69,7 +73,9 @@ int main(int argc, char *argv[])
    if (argc > 1) {
       mode = Invalid;
       if (!qstrcmp( argv[1], "config" )) mode = Configure;
+      else if (!qstrcmp( argv[1], "presets" )) mode = Presets;
       else if (!qstrcmp( argv[1], "import" )) mode = Import;
+      else if (!qstrcmp( argv[1], "export" )) mode = Export;
       else if (!qstrcmp( argv[1], "demo" )) mode = Demo;
       else if (!qstrcmp( argv[1], "try" )) mode = Try;
 #if PUSHER
@@ -88,17 +94,33 @@ int main(int argc, char *argv[])
       window->show();
       return app->exec();
    }
+   case Presets: {
+      QSettings store("Bespin", "Store");
+      foreach (QString name, store.childGroups())
+         printf("%s\n", CHAR(name));
+      return 0;
+   }
    case Import: {
       if (argc < 3)
-         return error("you lack <some_config.bespin.conf>");
+         return error("you lack <some_config.bespin>");
       if (!QFile::exists(argv[2]))
          return error(QString("The file %1 does not exist").arg(argv[2]));
       return Config::sImport(argv[2]).isNull();
    }
+   case Export: {
+      if (argc < 3)
+         return error("you lack <some_preset> <some_config.bespin>");
+      if (argc < 4)
+         return error("you lack <some_config.bespin>");
+      bool suc = Config::sExport(argv[2], argv[3]);
+      if (!suc)
+         return error("export failed (invalid preset name?)");
+      return 0;
+   }
    case Try: {
       app = new QApplication(argc, argv);
       if (argc < 3)
-         return error("you lack <some_config.bespin.conf>");
+         return error("you lack <some_config.bespin>");
       
       if (!QFile::exists(argv[2]))
          return error(QString("The file %1 does not exist").arg(argv[2]));

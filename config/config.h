@@ -28,7 +28,8 @@ class Config : public BConfig /** <-- inherit BConfig */
 public:
    /** The constructor... */
    Config(QWidget *parent = 0L);
-   static QString sImport(const QString &filename);
+   static QString sImport(const QString &file);
+   static bool sExport(const QString &preset, const QString &file);
    static QStringList colors(const QPalette &pal, QPalette::ColorGroup group);
    static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list);
 public slots:
