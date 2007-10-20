@@ -148,7 +148,7 @@ renderRelief(Tile::Set &set)
    QPen pen = p.pen(); pen.setWidth(f1); p.setPen(pen);
    p.setBrush(Qt::NoBrush);
    p.setPen(WHITE(95));
-   p.drawRoundRect(0,f1,f11,f9,80,80);
+   p.drawRoundRect(0,0,f11,dpi.f10,80,80);
    black.setAlpha(70); p.setPen(black);
    p.drawRoundRect(f1,0,f9,f9,80,80);
 //    p.setPen(WHITE(60));

@@ -169,10 +169,10 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
       int w, h;
       if (toolbutton &&
           toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon)
-         h = contentsSize.height() + dpi.f4;
+         h = contentsSize.height() + dpi.f6;
       else
-         h = contentsSize.height() + dpi.f2;
-      w = qMax(contentsSize.width()+dpi.f4, h*8/5);
+         h = contentsSize.height() + dpi.f4;
+      w = qMax(contentsSize.width()+dpi.f4, h*8/5-dpi.f2);
       if (toolbutton && (toolbutton->subControls & SC_ToolButtonMenu))
          w += pixelMetric(PM_MenuButtonIndicator, option, widget) + dpi.f4;
       return QSize(w, h);

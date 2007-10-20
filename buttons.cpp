@@ -124,16 +124,20 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    
    // sunken variant
    if (config.btn.layer) {
-      const int d = (config.btn.layer == 1) ? f1 : 0;
       if (isEnabled) {
-         r.adjust(d,d,-d,-f2+d);
+         if (config.btn.layer == 1)
+            r.adjust(f2, f1,-f2,-f2);
+         else
+            r.setBottom(r.bottom()-f2);
          masks.button.render(r, painter, gt, Qt::Vertical, c);
          if (drawInner) {
-            const QRect ir = r.adjusted(dpi.f3, f2, -dpi.f3, -(f2+d) );
+            const int f3 = dpi.f3;
+            const QRect ir =
+               r.adjusted(f3, (config.btn.layer == 1) ? f2 : f3, -f3, -f3 );
             masks.button.render(ir, painter, gt, Qt::Vertical,
                                 Colors::mid(c, CCOLOR(btn.active, Bg),
                                             6-animStep, animStep),
-                                r.height(), QPoint(0,f2+d));
+                                r.height(), QPoint(0,f2));
          }
          if (hasFocus) {
             r = RECT; r.setBottom(r.bottom()-f1);
@@ -183,7 +187,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
       painter->drawPixmap(QPoint(r.right()+1-16*r.height()/9, r.top()),
                           Gradients::ambient(r.height()));
 }
-
+#include <QtDebug>
 void
 BespinStyle::drawPushButtonLabel(const QStyleOption * option,
                                  QPainter * painter,
@@ -256,13 +260,19 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
          painter->restore();
          return;
       }
-      if (tr.width() > ir.width()) {
-//          ir.translate(0,1);
-         if (tmpFnt.pointSize() > -1)
+      const int oPtS = tmpFnt.pointSize();
+      const int oPxS = tmpFnt.pixelSize();
+      while (tr.width() > ir.width()) {
+         if (oPtS > -1)
             tmpFnt.setPointSize(tmpFnt.pointSize()*ir.width()/tr.width());
          else
             tmpFnt.setPixelSize(tmpFnt.pixelSize()*ir.width()/tr.width());
+         fm = QFontMetrics(tmpFnt);
+         tr = fm.boundingRect ( btn->text );
       }
+//       int dy = (oPtS > -1) ? (oPtS-tmpFnt.pointSize())/2 :
+//          (oPxS-tmpFnt.pixelSize())/2;
+//       tr.translate(0,dy);
       painter->setFont(tmpFnt);
    }
 

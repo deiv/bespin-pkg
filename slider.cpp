@@ -169,38 +169,37 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       // shadow
       QPoint xy = handle.topLeft();
       painter->drawPixmap(sunken ? xy + QPoint(dpi.f1,dpi.f1) : xy,
-                        shadows.sliderRound[sunken][isEnabled]);
+                          shadows.sliderRound[sunken][isEnabled]);
       // gradient
-      xy += QPoint(dpi.f2, dpi.f2/*direction?dpi.f1:0*/);
-      QColor c = Colors::mid(CONF_COLOR(btn.std, Bg),
-                             CONF_COLOR(btn.active, Bg), 6-step, step);
-      const int sz = dpi.SliderControl-dpi.f5;
-      const QBrush fill = Gradients::brush(c, sz, Qt::Vertical,
-                                          isEnabled ? GRAD(btn) : Gradients::None);
-//       fillWithMask(painter, xy, fill, masks.slider);
-      painter->save();
-      painter->setRenderHint(QPainter::Antialiasing);
-      painter->setPen(QPen(Colors::mid(c,Qt::white,2,1), dpi.f2));
-      painter->setBrush(fill);
-      painter->setBrushOrigin(xy);
-      handle = QRect(xy, QSize(sz+dpi.f1, sz));
-      painter->drawEllipse(handle);
-      painter->setRenderHint(QPainter::Antialiasing, false);
-      painter->setPen(Colors::mid(CONF_COLOR(btn.std, Fg),
-                                  CONF_COLOR(btn.active, Fg), 8-step, step));
+      xy += QPoint(dpi.f2, dpi.f1);
+      QColor bc = CONF_COLOR(btn.std, Bg);
+      QColor fc;
+      if (config.btn.fullHover) {
+         bc = Colors::mid(bc, CONF_COLOR(btn.active, Bg), 6-step, step);
+         fc = Colors::mid(bc, CONF_COLOR(btn.active, Fg), 9-step, step+3);
+      }
+      else
+         fc = Colors::mid(CONF_COLOR(btn.std, Bg),
+                          CONF_COLOR(btn.std, Fg), 9-step, step+3);
+
+      const int sz = dpi.SliderControl-dpi.f4;
+      const QBrush fill =
+         Gradients::brush(bc, sz, Qt::Vertical,
+                          isEnabled ? GRAD(btn) : Gradients::None);
+      fillWithMask(painter, xy, fill, masks.slider);
+      SAVE_PEN;
+      painter->setPen(fc);
       int x1, x2, y1, y2;
       if (slider->orientation == Qt::Horizontal) {
          x1 = x2 = handle.center().x();
-         y1 = handle.top()+dpi.f2; y2 = handle.bottom()-dpi.f2;
+         y1 = handle.top()+dpi.f4; y2 = handle.bottom()-dpi.f5;
       }
       else {
-         x1 = handle.left()+dpi.f2; x2 = handle.right()-dpi.f2;
-         y1 = y2 = handle.center().y();
+         x1 = handle.left()+dpi.f4; x2 = handle.right()-dpi.f4;
+         y1 = y2 = handle.center().y()-dpi.f1;
       }
       painter->drawLine(x1, y1, x2, y2);
-//       painter->setPen(QPen(c, dpi.f5, Qt::SolidLine, Qt::RoundCap));
-//       painter->drawPoint(handle.center());
-      painter->restore();
+      RESTORE_PEN;
    }
 }
 
