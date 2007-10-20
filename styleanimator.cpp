@@ -104,8 +104,6 @@ static inline QAbstractScrollArea* scrollAncestor(QWidget *w, QWidget *root) {
    return 0L;
 }
 
-#include <QtDebug>
-
 // QPixmap::grabWidget(.) currently fails on the background offset,
 // so we use our own implementation
 //TODO: fix scrollareas (the scrollbars aren't painted, so check for availability and usage...)

@@ -22,7 +22,6 @@
 #include <QRadialGradient>
 #include <cmath>
 
-#include "colors.h"
 #include "gradients.h"
 
 #ifndef QT_NO_XRENDER

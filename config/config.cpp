@@ -27,8 +27,8 @@ extern "C"
 /** Gradient enumeration for the comboboxes, so that i don't have to handle the
 integers - not of interest for you*/
 enum GradientType {
-   GradNone = 0, GradSimple, GradSunken, GradGloss,
-      GradGlass, GradButton, GradMetal, GradCloud
+   GradNone = 0, GradSimple, GradButton, GradSunken, GradGloss,
+      GradGlass, GradMetal, GradCloud
 };
 
 static const char* defInfo =

@@ -21,8 +21,6 @@
 #include <QStyleOptionMenuItem>
 #include "bespin.h"
 
-#include <QtDebug>
-
 using namespace Bespin;
 extern Dpi dpi;
 

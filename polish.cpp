@@ -138,7 +138,27 @@ makeStructure(QPixmap **pixp, const QColor &c, bool light)
    p.end();
 }
 
+#ifdef Q_WS_X11
+static Atom winTypePopup = 0;
+static Atom winTypeMenu = 0;
+static Atom winType = 0;
+#define SET_WINDOW_TYPE(_WINDOW_, _TYPE_)\
+XChangeProperty(QX11Info::display(), _WINDOW_->winId(), winType,\
+XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&_TYPE_, 1L)
+#endif
+
 void BespinStyle::polish ( QApplication * app ) {
+#ifdef Q_WS_X11
+#define ENSURE_ATOM(_VAR_, _TYPE_)\
+   if (!_VAR_)\
+      _VAR_ = XInternAtom(QX11Info::display(), _TYPE_, False)
+
+   ENSURE_ATOM(winTypePopup, "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU");
+   ENSURE_ATOM(winTypeMenu, "_NET_WM_WINDOW_TYPE_MENU");
+   ENSURE_ATOM(winType, "_NET_WM_WINDOW_TYPE");
+   
+#undef ENSURE_ATOM
+#endif
 //    if (timer && !timer->isActive())
 //       timer->start(50);
    QPalette pal = app->palette();
@@ -148,7 +168,7 @@ void BespinStyle::polish ( QApplication * app ) {
 }
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
-#include <QtDebug>
+
 void BespinStyle::polish( QPalette &pal )
 {
    QColor c = pal.color(QPalette::Active, QPalette::Background);
@@ -214,10 +234,6 @@ static QMenuBar *bar4popup(QMenu *menu) {
 }
 #endif
 
-#ifdef Q_WS_X11
-static Atom winTypePopup = XInternAtom(QX11Info::display(), "_NET_WM_WINDOW_TYPE_POPUP_MENU", False);
-static Atom winType = XInternAtom(QX11Info::display(), "_NET_WM_WINDOW_TYPE", False);
-#endif
 void BespinStyle::polish( QWidget * widget) {
    
    if (!widget) return; // !
@@ -345,7 +361,19 @@ void BespinStyle::polish( QWidget * widget) {
             widget->setPalette(pal);
          }
       }
-   
+#if 0
+#ifdef Q_WS_X11
+   if (qobject_cast<QMenuBar*>(widget)) {
+      widget->setParent(widget->parentWidget(), Qt::Window | Qt::Tool |
+                        Qt::FramelessWindowHint);
+      widget->move(0,0);
+      SET_WINDOW_TYPE(widget, winTypeMenu);
+      if( widget->parentWidget())
+         XSetTransientForHint( QX11Info::display(), widget->winId(),
+                               widget->parentWidget()->topLevelWidget()->winId());
+   }
+#endif
+#endif
    if (!widget->isWindow())
    if (QFrame *frame = qobject_cast<QFrame *>(widget)) {
    // kill ugly winblows frames...
@@ -420,15 +448,13 @@ void BespinStyle::polish( QWidget * widget) {
       }
    
    // swap qmenu colors
-   if (QMenu * menu = qobject_cast<QMenu *>(widget)) {
+   if (qobject_cast<QMenu *>(widget)) {
 #ifdef Q_WS_X11
-      // this should tell beryl et. al this is a popup - doesn't work... yet
-      XChangeProperty(QX11Info::display(), widget->winId(), winType,
-                      XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&winTypePopup, 1L);
+      // tell beryl et. al this is a popup TODO: doesn't work yet...
+      SET_WINDOW_TYPE(widget, winTypePopup);
+// WARNING: compmgrs like e.g. beryl/emerald deny to shadow shaped windows,
+// if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
 #endif
-      // WARNING: compmgrs like e.g. beryl/emerald deny to shadow shaped windows,
-      // if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
-//       widget->setAutoFillBackground (true);
       widget->setBackgroundRole ( config.menu.std_role[0] );
       widget->setForegroundRole ( config.menu.std_role[1] );
       if (config.menu.boldText) {

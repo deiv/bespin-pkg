@@ -322,7 +322,8 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
 // the allways shown base
    const QColor &bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
    masks.tab.render(r, painter, GRAD(scroll), o, bc, size);
-   masks.tab.outline(r, painter, Colors::mid(bc, Qt::white,2,1));
+   if (Gradients::isReflective(GRAD(scroll)))
+      masks.tab.outline(r, painter, Colors::mid(bc,Qt::white,2,1));
 
    if (config.btn.fullHover) return;
 

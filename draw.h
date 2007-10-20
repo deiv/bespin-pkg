@@ -21,6 +21,7 @@
 #include "colors.h"
 #include "bespin.h"
 #include "makros.h"
+
 using namespace Bespin;
 extern Config config;
 extern Dpi dpi;

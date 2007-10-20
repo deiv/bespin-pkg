@@ -27,6 +27,7 @@ class QSettings;
 #include "tileset.h"
 #include "styleanimator.h"
 #include "gradients.h"
+#include "debug.h"
 
 namespace Bespin {
 

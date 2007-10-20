@@ -41,7 +41,7 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
       drawPushButtonBevel(&tmpBtn, painter, widget);
    }
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
-   tmpBtn.rect.adjust(dpi.f6,dpi.f4,-dpi.f6,-dpi.f4);
+   tmpBtn.rect.adjust(dpi.f6,dpi.f5,-dpi.f6,-dpi.f4);
    drawPushButtonLabel(&tmpBtn, painter, widget);
 }
 
@@ -114,13 +114,13 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    if (config.btn.fullHover && (hover || animStep))
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
    
-   Gradients::Type gt = !isEnabled ? Gradients::None : GRAD(btn);
+   Gradients::Type gt = GRAD(btn);
    bool drawInner = !config.btn.fullHover && (hover || animStep);
    if (config.btn.cushion &&
        (sunken || (!hover && option->state & State_On))) {
-          gt = Gradients::Sunken;
-          drawInner = true;
-       }
+      gt = Gradients::Sunken;
+      drawInner = true;
+   }
    
    // sunken variant
    if (config.btn.layer) {
@@ -170,9 +170,9 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    // backlight & plate
    masks.button.render(r, painter, gt, Qt::Vertical, c);
    // outline?
-//    if (isEnabled)
-   masks.button.outline(r.adjusted(f1,f1,-f1,-f1), painter,
-                        Colors::mid(c, Qt::white), f2);
+   if (isEnabled && Gradients::isReflective(gt))
+      masks.button.outline(r.adjusted(f1,f1,-f1,-f1), painter,
+                           Colors::mid(c, Qt::white,2,1), f2);
    
    if (drawInner) {
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
@@ -187,7 +187,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
       painter->drawPixmap(QPoint(r.right()+1-16*r.height()/9, r.top()),
                           Gradients::ambient(r.height()));
 }
-#include <QtDebug>
+
 void
 BespinStyle::drawPushButtonLabel(const QStyleOption * option,
                                  QPainter * painter,
@@ -260,10 +260,10 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
          painter->restore();
          return;
       }
-      const int oPtS = tmpFnt.pointSize();
-      const int oPxS = tmpFnt.pixelSize();
+//       const int oPtS = tmpFnt.pointSize();
+//       const int oPxS = tmpFnt.pixelSize();
       while (tr.width() > ir.width()) {
-         if (oPtS > -1)
+         if (tmpFnt.pointSize() > -1)
             tmpFnt.setPointSize(tmpFnt.pointSize()*ir.width()/tr.width());
          else
             tmpFnt.setPixelSize(tmpFnt.pixelSize()*ir.width()/tr.width());

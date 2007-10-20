@@ -34,31 +34,13 @@
 #endif
 /**========================================================*/
 
-/**============= DEBUG includes ==========================*/
-// #undef DEBUG
-// #ifdef DEBUG
-// #define MOUSEDEBUG 1
-// #include <QtDebug>
-// #include "debug.h"
-// #define oDEBUG qDebug()
-// #include <QTime>
-// #include <QTimer>
-// #define _PROFILESTART_ QTime timer; int time; timer.start();
-// #define _PROFILERESTART_ timer.restart();
-// #define _PROFILESTOP_(_STRING_) time = timer.elapsed(); qDebug("%s: %d",_STRING_,time);
-// #else
-// #define oDEBUG //
-// #undef MOUSEDEBUG
-// #endif
-
-/**========================================================*/
 
 /**============= Bespin includes ==========================*/
 
 #ifndef QT_NO_XRENDER
 #include "oxrender.h"
 #endif
-
+#include "debug.h"
 #include "bespin.h"
 
 /**=========================================================*/
@@ -367,7 +349,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
    case QEvent::MouseButtonPress: {
       QMouseEvent *mev = (QMouseEvent*)ev;
 #ifdef MOUSEDEBUG
-      qDebug() << object;
+      DEBUG << object;
 #endif
       if (( mev->button() == Qt::LeftButton) &&
           object->inherits("QMdiSubWindow")) {

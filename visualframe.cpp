@@ -28,8 +28,6 @@
 #include <QWheelEvent>
 #include <QTimer>
 
-#include <QtDebug>
-
 using namespace VFrame;
 
 static QRegion corner[4];
@@ -49,8 +47,6 @@ QWidget(parent)
 //    setMouseTracking ( true );
 //    setAcceptDrops(true);
 }
-
-#include <QtDebug>
 
 void
 VisualFramePart::paintEvent ( QPaintEvent * event )

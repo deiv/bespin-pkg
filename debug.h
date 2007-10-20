@@ -1,3 +1,7 @@
+#ifdef QT_DEBUG
+#include <QtDebug>
+#define DEBUG qDebug() << "BESPIN: "
+
 #define PRINTDEVICE(p) qWarning("device is %s", (p->device()->devType() == QInternal::Widget) ?\
 "Widget": (p->device()->devType() == QInternal::Pixmap) ?\
 "Pixmap": (p->device()->devType() == QInternal::Printer) ?\
@@ -151,3 +155,6 @@ QStyle::CC_ListView     ? "CC_ListView " : "Unknow Control");
 #define _PROFILESTART_ QTime timer; int time; timer.start();
 #define _PROFILERESTART_ timer.restart();
 #define _PROFILESTOP_(_STRING_) time = timer.elapsed(); qWarning("%s: %d",_STRING_,time);
+#else
+#define DEBUG //
+#endif // QT_DEBUG

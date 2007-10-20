@@ -31,8 +31,6 @@ BespinStyle::drawFocusFrame(const QStyleOption * option, QPainter * painter,
    painter->restore();
 }
 
-#include <QtDebug>
-
 void
 BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
                        const QWidget * widget) const

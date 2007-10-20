@@ -22,13 +22,14 @@
 #include <QBrush>
 #include <QColor>
 #include <QPixmap>
+#include "colors.h"
 
 namespace Bespin {
 
 namespace Gradients {
 
 enum Type {
-   None = 0, Simple, Sunken, Gloss, Glass, Button, Metal, Progress, RadialGloss,
+   None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Progress, RadialGloss,
    TypeAmount
 };
 
@@ -49,6 +50,10 @@ brush(const QColor &c, int size, Qt::Orientation o, Type type  = Simple) {
    if (type == None)
       return QBrush(c);
    return QBrush(pix(c, size, o, type));
+}
+
+inline const bool isReflective(Type type = Simple) {
+   return type > Button;
 }
 
 /** a diagonal NW -> SE light */
