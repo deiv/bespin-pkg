@@ -693,11 +693,11 @@ void Config::generateColorModes(QComboBox *box) {
 void Config::generateGradientTypes(QComboBox *box) {
    box->clear();
    box->addItem("None");
-   box->addItem("Simple (pretty dull)");
+   box->addItem("Simple");
+   box->addItem("Button");
    box->addItem("Sunken");
    box->addItem("Gloss");
    box->addItem("Glass");
-   box->addItem("Button (Flat)");
    box->addItem("Metal");
    box->addItem("Cloudy");
 }
