@@ -86,10 +86,13 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
                         const QWidget * widget) const
 {
    ASSURE_OPTION(tbb, TabBarBase);
-   if (widget && (qobject_cast<const QTabBar*>(widget)))
-      return; // we alter the paintevent
-   if (widget->parentWidget() && qobject_cast<QTabWidget*>(widget->parentWidget()))
-      return; // KDE abuse, allready has a nice base
+   if (widget) {
+      if ((qobject_cast<const QTabBar*>(widget)))
+         return; // we alter the paintevent
+      if (widget->parentWidget() &&
+          qobject_cast<QTabWidget*>(widget->parentWidget()))
+         return; // KDE abuse, allready has a nice base
+   }
        
    QRect rect = RECT.adjusted(dpi.f2, 0, -dpi.f2, -dpi.f2);
    int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
