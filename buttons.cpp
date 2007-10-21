@@ -41,7 +41,7 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
       drawPushButtonBevel(&tmpBtn, painter, widget);
    }
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
-   tmpBtn.rect.adjust(dpi.f6,dpi.f5,-dpi.f6,-dpi.f4);
+   tmpBtn.rect.adjust(dpi.f6,dpi.f4,-dpi.f6,-dpi.f4);
    drawPushButtonLabel(&tmpBtn, painter, widget);
 }
 
@@ -170,22 +170,24 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    // backlight & plate
    masks.button.render(r, painter, gt, Qt::Vertical, c);
    // outline?
-   if (isEnabled && Gradients::isReflective(gt))
+   if (isEnabled) {
       masks.button.outline(r.adjusted(f1,f1,-f1,-f1), painter,
-                           Colors::mid(c, Qt::white,2,1), f2);
+                           Colors::mid(c, Qt::white),
+                           Gradients::isReflective(gt) ? f2 : f1);
    
-   if (drawInner) {
-      c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
-      const QRect ir = isCheckbox ? r.adjusted(f2, f2, -f2, -f2 ) :
-         r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
-      masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(),
-                          QPoint(0,f2));
+      if (drawInner) {
+         c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
+         const QRect ir = isCheckbox ? r.adjusted(f2, f2, -f2, -f2 ) :
+            r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
+         masks.button.render(ir, painter, gt, Qt::Vertical, c, r.height(),
+                           QPoint(0,f2));
+      }
+      
+      // ambient?
+      if (config.btn.ambientLight && !(sunken || isCheckbox))
+         painter->drawPixmap(QPoint(r.right()+1-16*r.height()/9, r.top()),
+                           Gradients::ambient(r.height()));
    }
-   
-   // ambient?
-   if (isEnabled && !(sunken || isCheckbox))
-      painter->drawPixmap(QPoint(r.right()+1-16*r.height()/9, r.top()),
-                          Gradients::ambient(r.height()));
 }
 
 void

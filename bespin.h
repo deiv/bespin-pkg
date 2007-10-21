@@ -68,7 +68,7 @@ typedef struct Config {
    struct btn {
       int layer;
       Check::Type checkType;
-      bool cushion, fullHover, swapFocusHover;
+      bool cushion, fullHover, swapFocusHover, ambientLight;
       Gradients::Type gradient, focusGradient;
       QPalette::ColorRole std_role[2], active_role[2];
    } btn;
