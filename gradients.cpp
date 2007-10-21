@@ -106,10 +106,10 @@ simpleGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
 static inline QLinearGradient
 metalGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
    QLinearGradient lg(start, stop);
-   QColor iC = c.light(104);
-   lg.setColorAt(0, iC); lg.setColorAt(0.5, iC);
-   iC = c.dark(104);
-   lg.setColorAt(0.5, iC); lg.setColorAt(1, iC);
+   QColor iC = c.light(104); lg.setColorAt(0, iC);
+   iC = c.light(103); lg.setColorAt(0.5, iC);
+   iC = c.dark(103); lg.setColorAt(0.5, iC);
+   iC = c.dark(104); lg.setColorAt(1, iC);
    return lg;
 }
 

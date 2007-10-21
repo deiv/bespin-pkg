@@ -147,6 +147,9 @@ BespinStyle::readSettings(const QSettings* settings)
    config.leftHanded = Qt::LeftToRight;
    if (iSettings->value("LeftHanded", false).toBool())
       config.leftHanded = Qt::RightToLeft;
+
+   // item single vs. double click, wizard appereance
+   config.macStyle = iSettings->value("MacStyle", true).toBool();
    
    // Menus ===========================
    config.menu.itemGradient = gradientType("Menu.ItemGradient", None);

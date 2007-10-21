@@ -187,6 +187,7 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
       c = Colors::mid(c, CCOLOR(tab.active, 0), quota, animStep);
    }
    const QPoint off(d, d+dpi.f4);
+//    const Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(tab);
    masks.tab.render(rect, painter, GRAD(tab), o, c, size, off);
    if (config.tab.activeTabSunken && sunken) {
       rect.setBottom(rect.bottom()+f2);

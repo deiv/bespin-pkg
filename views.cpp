@@ -179,6 +179,8 @@ BespinStyle::drawHeaderArrow(const QStyleOption * option, QPainter * painter,
    drawArrow(dir, option->rect, painter);
 }
 
+static const int decoration_size = 9;
+
 void
 BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
                         const QWidget * widget) const
@@ -199,7 +201,6 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
 
    const bool firstCol = (RECT.x() ==  -1);
    
-   static const int decoration_size = 9;
    if (option->state & State_Children) {
       SAVE_BRUSH
       int delta = decoration_size / 2 + 2;
@@ -212,7 +213,10 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
       if (firstCol)
          rect.moveRight(RECT.right()-dpi.f1);
       if (option->state & State_Open) {
-         painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text)));
+         if (option->state & State_Selected)
+            painter->setBrush(FCOLOR(HighlightedText));
+         else
+            painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text)));
          rect.translate(0,-decoration_size/6);
          if (option->direction == Qt::RightToLeft)
             drawSolidArrow(Navi::SW, rect, painter);
@@ -220,7 +224,10 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
             drawSolidArrow(Navi::SE, rect, painter);
       }
       else {
-         painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text), 6, 1));
+         if (option->state & State_Selected)
+            painter->setBrush(FCOLOR(HighlightedText));
+         else
+            painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text), 6, 1));
          if (option->direction == Qt::RightToLeft)
             drawArrow(Navi::W, rect, painter);
          else

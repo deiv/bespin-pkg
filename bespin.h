@@ -82,6 +82,7 @@ typedef struct Config {
    } input;
 
    Qt::LayoutDirection leftHanded;
+   bool macStyle;
    
    struct menu {
       QPalette::ColorRole std_role[2], active_role[2], bar_role[2];
