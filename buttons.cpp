@@ -56,17 +56,18 @@ BespinStyle::drawPushButtonBevel(const QStyleOption * option,
    animStep = sunken ? 6 : animator->hoverStep(widget);
    drawButtonFrame(option, painter, widget);
    if (btn->features & QStyleOptionButton::HasMenu) {
-//       int mbi = pixelMetric(PM_MenuButtonIndicator, btn, widget);
       int sz = (RECT.height()-dpi.f6)/2;
       QRect rect = RECT;
       rect.setLeft(RECT.right() - (dpi.f10+sz));
       shadows.line[1][Sunken].render(rect, painter);
       rect.setLeft(rect.left() + dpi.f4);
-      rect.setTop((RECT.height()-sz)/2 + dpi.f2);
-      rect.setHeight(sz); rect.setWidth(sz);
+      rect.setWidth(sz);
       painter->save();
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.active, Fg)));
+      const QColor c =
+         Colors::mid(Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg)),
+                     Colors::mid(CCOLOR(btn.active, Bg), CCOLOR(btn.active, Fg)),
+                     6-animStep, animStep);
+      painter->setPen(c); painter->setBrush(c);
       drawArrow(Navi::S, rect, painter);
       painter->restore();
    }

@@ -87,7 +87,7 @@ protected:
       QString entry;
    } SettingInfo;
    virtual bool eventFilter ( QObject * watched, QEvent * event );
-   virtual void loadSettings(QSettings *settings = 0, bool updateInitValue = true);
+   virtual void loadSettings(QSettings *settings = 0, bool updateInitValue = true, bool merge = false);
    virtual void _save(QSettings *settings = 0, bool makeDirty = true);
 signals:
    void changed(bool);

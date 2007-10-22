@@ -90,7 +90,8 @@ int main(int argc, char *argv[])
       BConfigDialog *window =
          new BConfigDialog(config, BConfigDialog::All &
                            ~(BConfigDialog::Import | BConfigDialog::Export));
-      window->resize(640,480);
+//       window->resize(848,480);
+      window->adjustSize();
       window->show();
       return app->exec();
    }

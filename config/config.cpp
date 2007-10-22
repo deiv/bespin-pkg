@@ -31,22 +31,28 @@ enum GradientType {
       GradGlass, GradMetal, GradCloud
 };
 
-static const char* defInfo =
+static const char* defInfo1 =
 "<div align=\"center\">\
-   <img src=\":/bespin.png\"/><br>\
+<img src=\":/bespin.png\"/><br>\
 </div>\
 <b>Bespin Style</b><hr>\
 <p>\
-   &copy;&nbsp;2006/2007 by Thomas L&uuml;bking<br>\
-   Includes Design Ideas by\
-   <ul type=\"disc\">\
-      <li>Nuno Pinheiro</li>\
-      <li>David Vignoni</li>\
-      <li>Kenneth Wimer</li>\
-   </ul>\
+&copy;&nbsp;2006/2007 by Thomas L&uuml;bking<br>\
+Includes Design Ideas by\
+<ul type=\"disc\">\
+<li>Nuno Pinheiro</li>\
+<li>David Vignoni</li>\
+<li>Kenneth Wimer</li>\
+</ul>\
 </p>\
-   <hr>\
+<hr>\
 Visit <a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>";
+
+static const char* defInfo2 =
+"<div align=\"center\">\
+<img src=\":/bespin.png\"/><br>\
+<a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>\
+</div>";
 
 
 /** Intenal class for the PW Char entry - not of interest */
@@ -108,6 +114,15 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    ui.btnExport->setEnabled(false);
    ui.btnDelete->setEnabled(false);
    ui.storeLine->hide();
+
+   ui.sectionHeader->setBackgroundRole(QPalette::WindowText);
+   ui.sectionHeader->setForegroundRole(QPalette::Window);
+   connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
+            ui.sectionHeader, SLOT(setText(const QString &)));
+   connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
+            ui.sections, SLOT(setCurrentIndex(int)));
+   connect (ui.generalTab, SIGNAL(currentChanged(int)),
+            this, SLOT(setSectionSelectVisible(int)));
    
    /** fill some comboboxes, not of interest */
    generateColorModes(ui.crProgressBar);
@@ -182,8 +197,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    setInfoBrowser(ui.info);
    /** 2. Define a context info that is displayed when no other context help is
    demanded */
-   setDefaultContextInfo(defInfo);
-   
+
    /** handleSettings(.) tells BConfig to take care (savwe load) of a widget
    In this case "ui.bgMode" is the widget on the form,
    "BackgroundMode" specifies the entry in the ini style config file and
@@ -198,10 +212,14 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.gradButton, "Btn.Gradient", GradButton);
    handleSettings(ui.btnRole, "Btn.Role", QPalette::Window);
    handleSettings(ui.btnActiveRole, "Btn.ActiveRole", QPalette::Button);
+   handleSettings(ui.ambientLight, "Btn.AmbientLight", true);
    
    handleSettings(ui.gradChoose, "Chooser.Gradient", GradSunken);
    
    handleSettings(ui.pwEchoChar, "Input.PwEchoChar", 0x26AB);
+
+   handleSettings(ui.leftHanded, "LeftHanded", false);
+   handleSettings(ui.macStyle, "MacStyle", true);
    
    handleSettings(ui.crMenuActive, "Menu.ActiveRole", QPalette::Highlight);
    handleSettings(ui.gradMenuItem, "Menu.ItemGradient", GradNone);
@@ -237,7 +255,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.headerSortingGradient, "View.SortingHeaderGradient", GradSunken);
    
    /** setContextHelp(.) attaches a context help string to a widget on your form */
-   setContextHelp(ui.btnRoles, "<b>Button Colors</b><hr>\
+   setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
+                  The default and the hovered color of a button.<br>\
+                  <b>Notice:</b> It's strongly suggested to select \"Button\" to\
+                  (at least and best excatly) one of the states!");
+   setContextHelp(ui.btnActiveRole, "<b>Button Colors</b><hr>\
                   The default and the hovered color of a button.<br>\
                   <b>Notice:</b> It's strongly suggested to select \"Button\" to\
                   (at least and best excatly) one of the states!");
@@ -344,6 +366,12 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                   If you check this, you'll get a more cushion kind look, i.e.\
                   the Button will be \"pressed in\"");
 
+   setContextHelp(ui.ambientLight, "<b>Ambient Lightning</b><hr>\
+                  Whether to paint a light reflex on the bottom right corner of\
+                  Pushbuttons.<br>\
+                  You can turn this off for artistic reasons or on bright color\
+                  settings (to save some CPU cycles)");
+
    setContextHelp(ui.showScrollButtons, "<b>Show Scrollbar buttons</b><hr>\
                   Seriously, honestly: when do you ever use the buttons to move\
                   a scrollbar slider? (ok, notebooks don't have a mousewheel...)");
@@ -381,6 +409,18 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                   button and Window color is low and also looks ok with Glass/Gloss\
                   gradient settings - but may be toggled whenever you want");
 
+   setContextHelp(ui.leftHanded, "<b>Are you a Flanders?</b><hr>\
+                  Some people (\"Lefties\") prefer a reverse orientation of eg.\
+                  Comboboxes or Spinboxes.<br>\
+                  If you are a Flanders, check this - maybe you like it.<br>\
+                  (Not exported from presets)");
+
+   setContextHelp(ui.macStyle, "<b>Mac Style Behaviour</b><hr>\
+                  This currently affects the appereance of Wizzards and allows\
+                  you to activate items with a SINGLE mouseclick, rather than\
+                  the M$ DOUBLEclick thing ;)<br>\
+                  (Not exported from presets)");
+
    
    /** setQSetting(.) tells BConfig to store values at
    "Company, Application, Group" - these strings are passed to QSettings */
@@ -400,7 +440,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     =========================================== */
 
    ui.generalTab->setCurrentIndex(0);
-   ui.config->setCurrentIndex(0);
+   ui.sections->setCurrentIndex(0);
 }
 
 
@@ -416,32 +456,6 @@ void Config::updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStr
          pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
 }
 
-/** reimplemented - i just want to extract the data from the store */
-static QString lastPath = QDir::home().path();
-void Config::saveAs() {
-   
-   QListWidgetItem *item = ui.store->currentItem();
-   if (!item) return;
-   
-   QString filename = QFileDialog::getSaveFileName(parentWidget(),
-      tr("Save Configuration"), lastPath, tr("Config Files (*.bespin *.conf *.ini)"));
-   
-   
-   QSettings store("Bespin", "Store");
-   store.beginGroup(item->text());
-   
-   QSettings file(filename, QSettings::IniFormat);
-   file.beginGroup("BespinStyle");
-   
-   file.setValue("StoreName", item->text());
-   
-   foreach (QString key, store.allKeys())
-      file.setValue(key, store.value(key));
-   
-   store.endGroup();
-   file.endGroup();
-
-}
 
 QString Config::sImport(const QString &filename) {
    
@@ -491,10 +505,24 @@ Config::sExport(const QString &preset, const QString &filename)
 
    file.setValue("StoreName", preset);
    foreach (QString key, store.allKeys())
-      file.setValue(key, store.value(key));
+      if (key != "MacStyle" && key != "LeftHanded" &&
+          key != "Tab.AnimSteps" && key != "Tab.Transition" &&
+          key != "Scroll.ShowButtons")
+         file.setValue(key, store.value(key));
    store.endGroup();
    file.endGroup();
    return true;
+}
+
+/** reimplemented - i just want to extract the data from the store */
+static QString lastPath = QDir::home().path();
+void Config::saveAs() {
+   if (!ui.store->currentItem())
+      return;
+   
+   QString filename = QFileDialog::getSaveFileName(parentWidget(),
+      tr("Save Configuration"), lastPath, tr("Config Files (*.bespin *.conf *.ini)"));
+   sExport(ui.store->currentItem()->text(), filename);
 }
 
 /** reimplemented - i just want to merge the data into the store */
@@ -518,14 +546,14 @@ Config::import()
 void Config::restore() {
    QListWidgetItem *item = ui.store->currentItem();
    setQSetting("Bespin", "Store", item->text());
-   loadSettings(0, false);
+   loadSettings(0, false, true);
    setQSetting("Bespin", "Style", "Style");
    
    /** import the color settings as well */
    if (!loadedPal)
       loadedPal = new QPalette;
    else
-      emit changed(true); // we must update casue we loded probably different colors before
+      emit changed(true); // we must update cause we loded probably different colors before
    
    QStringList list; int i;
    const QPalette &pal = QApplication::palette();
@@ -548,7 +576,7 @@ void Config::restore() {
    settings.endGroup();
    settings.endGroup();
 }
-#include <QtDebug>
+
 void Config::save() {
    /** manage the daemon */
    int former = savedValue(ui.bgMode).toInt();
@@ -629,9 +657,15 @@ void Config::store3( const QString &string, bool addItem ) {
    save();
    setQSetting("Bespin", "Style", "Style");
    
-   /** Now let's save colors as well */
    QSettings settings("Bespin", "Store");
    settings.beginGroup(string);
+   /** Clear unwanted keys*/
+   settings.remove("LeftHanded");
+   settings.remove("MacStyle");
+   settings.remove("Scroll.ShowButtons");
+   settings.remove("Tab.AnimSteps");
+   settings.remove("Tab.Transition");
+   /** Now let's save colors as well */
    settings.beginGroup("QPalette");
    
    const QPalette &pal = QApplication::palette();
@@ -700,4 +734,16 @@ void Config::generateGradientTypes(QComboBox *box) {
    box->addItem("Glass");
    box->addItem("Metal");
    box->addItem("Cloudy");
+}
+
+void Config::setSectionSelectVisible(int idx) {
+   ui.sectionSelectGroup->setVisible(idx);
+   if (idx) {
+      setDefaultContextInfo(defInfo2);
+      ui.info->setHtml(defInfo2);
+   }
+   else {
+      setDefaultContextInfo(defInfo1);
+      ui.info->setHtml(defInfo1);
+   }
 }

@@ -201,7 +201,7 @@ void BConfig::setQSetting(const QString organisation, const QString application,
    _qsetting[2] = group;
 }
 #include <QtDebug>
-void BConfig::loadSettings(QSettings *settings, bool updateInit) {
+void BConfig::loadSettings(QSettings *settings, bool updateInit, bool merge) {
    _infoBrowser->setHtml(_defaultContextInfo);
    bool delSettings = false;
    if (!settings) {
@@ -216,7 +216,8 @@ void BConfig::loadSettings(QSettings *settings, bool updateInit) {
    for (i = _settings.begin(); i != _settings.end(); ++i)
    {
       info = &(i.value());
-      value = settings->value( info->entry, info->defaultValue);
+      value = settings->value( info->entry, merge ?
+                               variant(i.key()) : info->defaultValue);
       if (updateInit)
          info->savedValue = info->initialValue = value;
       setVariant(i.key(), value);

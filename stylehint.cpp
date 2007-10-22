@@ -16,6 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
+// #include <QComboBox>
 #include <QEvent>
 #include <QFrame>
 #include <QStyleOptionComboBox>
@@ -85,7 +86,9 @@ int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const 
    case SH_TabBar_PreferNoArrows:
       return false; // the can grow horribly big...
    case SH_ComboBox_Popup: // Allows popups as a combobox drop-down menu.
-      return false; // maybe depend on item count?!
+//       if (const QComboBox *cmb = qobject_cast<const QComboBox *>(widget))
+//          return cmb->count() < 11; // maybe depend on item count?!
+      return false;
    case SH_ComboBox_PopupFrameStyle:
       return QFrame::NoFrame; //QFrame::StyledPanel | QFrame::Plain;
 ///    case SH_Workspace_FillSpaceOnMaximize: // The workspace should maximize the client area.
