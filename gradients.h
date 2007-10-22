@@ -66,6 +66,7 @@ const QPixmap &ambient(int height);
 const QPixmap &light(int height);
 
 const QPixmap &bg(const QColor &c, bool other = false);
+const QPixmap &bgCorner(const QColor &c, bool other = false);
 
 void init(BgMode mode);
 void wipe();

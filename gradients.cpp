@@ -106,10 +106,10 @@ simpleGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
 static inline QLinearGradient
 metalGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
    QLinearGradient lg(start, stop);
-   QColor iC = c.light(104); lg.setColorAt(0, iC);
-   iC = c.light(103); lg.setColorAt(0.5, iC);
-   iC = c.dark(103); lg.setColorAt(0.5, iC);
-   iC = c.dark(104); lg.setColorAt(1, iC);
+   QColor iC = c.light(105); lg.setColorAt(0, iC);
+   iC = c.light(104); lg.setColorAt(0.5, iC);
+   iC = c.dark(104); lg.setColorAt(0.5, iC);
+   iC = c.dark(105); lg.setColorAt(1, iC);
    return lg;
 }
 
@@ -242,12 +242,11 @@ progressGradient(const QColor &c, int size, Qt::Orientation o) {
    
    QPixmap alpha = QPixmap(dark->size());
    QRadialGradient rg(alpha.rect().center(), 3*size/2);
-#ifndef QT_NO_XRENDER
    rg.setColorAt(0, Qt::white);
+#ifndef QT_NO_XRENDER
    rg.setColorAt(0.9, Qt::transparent);
    alpha.fill(Qt::transparent);
 #else
-   rg.setColorAt(0, Qt::white);
    rg.setColorAt(0.9, Qt::black);
 #endif
    p.begin(&alpha); p.fillRect(alpha.rect(), rg); p.end();
@@ -260,7 +259,11 @@ progressGradient(const QColor &c, int size, Qt::Orientation o) {
    QPixmap *pix = new QPixmap(dark->size());
    p.begin(pix);
    p.fillRect(pix->rect(), lg2);
+#ifndef QT_NO_XRENDER
    p.drawPixmap(0,0, alpha);
+#else
+   p.drawPixmap(0,0, *dark);
+#endif
    p.end();
    
    delete dark;
@@ -277,6 +280,7 @@ typedef QCache<uint, QPixmap> PixmapCache;
 static PixmapCache gradients[2][Gradients::TypeAmount];
 static PixmapCache _btnAmbient, _tabShadow, _groupLight;
 static PixmapCache _bg[2];
+static PixmapCache _bgCorner[2];
 
 const QPixmap&
 Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type) {
@@ -445,7 +449,7 @@ const QPixmap &Gradients::bg(const QColor &c, bool other) {
          lg.setColorAt(0, c); lg.setColorAt(1, c.dark(106));
       }
       else {
-         lg.setColorAt(0, c.light(104)); lg.setColorAt(1, c);
+         lg.setColorAt(0, c.light(106)); lg.setColorAt(1, c);
       }
       break;
    }
@@ -475,10 +479,59 @@ const QPixmap &Gradients::bg(const QColor &c, bool other) {
    return *pix;
 }
 
+const QPixmap &
+Gradients::bgCorner(const QColor &c, bool other)
+{
+   QPixmap *pix = _bgCorner[other].object(c.rgb());
+   if (pix)
+      return *pix;
+   pix = new QPixmap(200, 100);
+
+   QPixmap *dark = new QPixmap(pix->size());
+   QLinearGradient lg(QPoint(0,0), QPoint(0,100));
+   const QColor c1 = c.light(106);
+   const QColor c2 = Colors::mid(c1, c, 156, 100);
+   lg.setColorAt(0, Colors::mid(c1, c2,1,4)); lg.setColorAt(1, c2);
+   QPainter p(dark); p.fillRect(dark->rect(), lg); p.end();
+   
+   QPixmap alpha(pix->size());
+   const QPoint &center =
+      other ? alpha.rect().topLeft() : alpha.rect().topRight();
+   QRadialGradient rg(center, 200);
+#ifndef QT_NO_XRENDER
+   alpha.fill(Qt::transparent);
+   rg.setColorAt(0, Qt::transparent);
+#else
+   rg.setColorAt(0, Qt::black);
+#endif
+   rg.setColorAt(1, Qt::white);
+   p.begin(&alpha); p.fillRect(alpha.rect(), rg); p.end();
+#ifndef QT_NO_XRENDER
+   alpha = OXRender::applyAlpha(*dark, alpha);
+#else
+   dark->setAlphaChannel(alpha);
+#endif
+   
+   p.begin(pix);
+   p.drawTiledPixmap(pix->rect(), bg(c));
+#ifndef QT_NO_XRENDER
+   p.drawPixmap(0,0, alpha);
+#else
+   p.drawPixmap(0,0,*dark);
+#endif
+   p.end();
+
+   delete dark;
+
+   _bgCorner[other].insert(c.rgb(), pix, costs(pix));
+   return *pix;
+}
+
 void Gradients::init(BgMode mode) {
    _mode = mode;
    for (int i = 0; i < 2; ++i) {
       _bg[i].setMaxCost( 128<<10 );
+      _bgCorner[i].setMaxCost( 320<<10 ); // 312 should be enough, though
       for (int j = 0; j < Gradients::TypeAmount; ++j)
          gradients[i][j].setMaxCost( 1024<<10 );
    }

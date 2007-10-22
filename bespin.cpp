@@ -401,7 +401,7 @@ BespinStyle::standardPalette () const
    QPalette pal ( QColor(70,70,70), QColor(70,70,70), // windowText, button
                      Qt::white, QColor(211,211,212), QColor(226,226,227), //light, dark, mid
                      Qt::black, Qt::white, //text, bright_text
-                     Qt::white, QColor(238,238,240) ); //base, window
+                     Qt::white, QColor(234,234,236) ); //base, window
    pal.setColor(QPalette::ButtonText, Qt::white);
    pal.setColor(QPalette::Highlight, QColor(164, 192, 228));
    pal.setColor(QPalette::HighlightedText, Qt::black);

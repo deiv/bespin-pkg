@@ -145,10 +145,15 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
                                  dpi.f3);
          }
       }
-      if (!isEnabled || (sunken && !config.btn.cushion) || config.btn.layer == 2)
+      if (!isEnabled || (sunken && !config.btn.cushion) ||
+          config.btn.layer == 2)
          shadows.lineEdit[isEnabled].render(RECT, painter);
-      else
+      else {
          shadows.relief.render(RECT, painter);
+         if (Gradients::isReflective(gt))
+            masks.button.outline(r.adjusted(f1,f1,-f1,-f1), painter,
+                                 Colors::mid(c, Qt::white), f1);
+      }
       return;
    }
    

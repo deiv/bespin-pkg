@@ -194,11 +194,19 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
 #endif
    case BevelV: { // also fallback for ComplexLights
       const QPixmap &upper = Gradients::bg(c);
+      const QPixmap &upperLeft = Gradients::bgCorner(c);
+      const QPixmap &upperRight = Gradients::bgCorner(c, true);
       const QPixmap &lower = Gradients::bg(c, true);
       int s1 = upper.height();
       int s2 = qMin(s1, (RECT.height()+1)/2);
+      s1 -= s2;
       painter->drawTiledPixmap( RECT.x(), RECT.y(), RECT.width(), s2,
-                                upper, 0, s1-s2 );
+                                upper, 0, s1 );
+      const int w = qMin(200, RECT.width()/4);
+      if (w) {
+         painter->drawPixmap(RECT.x(), RECT.y(), upperLeft, 200-w, s1, w, s2);
+         painter->drawPixmap(RECT.right()+1-w, RECT.y(), upperRight, 0, s1, w, s2);
+      }
       s1 = lower.height();
       s2 = qMin(s1, (RECT.height())/2);
       painter->drawTiledPixmap( RECT.x(), RECT.bottom() - s2,
