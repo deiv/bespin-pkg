@@ -241,7 +241,7 @@
        <item row="2" column="0" colspan="4" >
         <widget class="QStackedWidget" name="sections" >
          <property name="currentIndex" >
-          <number>0</number>
+          <number>4</number>
          </property>
          <widget class="QWidget" name="Buttons" >
           <layout class="QGridLayout" >
@@ -1360,5 +1360,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>scrollSunken</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>scrollGroove</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>80</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>185</x>
+     <y>147</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

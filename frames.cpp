@@ -17,6 +17,8 @@
  */
 
 #include <QLabel>
+#include <QTableView>
+#include <QTreeView>
 #include "visualframe.h"
 #include "draw.h"
 
@@ -104,7 +106,29 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
 //       else {
          h = FCOLOR(Highlight); h.setAlpha(102);
 //       }
+      if (const VisualFramePart* vfp =
+          qobject_cast<const VisualFramePart*>(widget)) {
+         Tile::setShape(Tile::Ring);
+         QWidget *vHeader = 0, *hHeader = 0;
+         if (const QTreeView* tv =
+             qobject_cast<const QTreeView*>(vfp->frame()))
+            hHeader = (QWidget*)tv->header();
+         else if (const QTableView* table =
+                  qobject_cast<const QTableView*>(vfp->frame())) {
+            hHeader = (QWidget*)table->horizontalHeader();
+            vHeader = (QWidget*)table->verticalHeader();
+         }
+         if (vHeader && vHeader->isVisible()) {
+            Tile::setShape(Tile::shape() & ~Tile::Left);
+            rect.setLeft(rect.left()+vHeader->width());
+         }
+         if (hHeader && hHeader->isVisible()) {
+            Tile::setShape(Tile::shape() & ~Tile::Top);
+            rect.setTop(rect.top()+hHeader->height());
+         }
+      }
       mask->outline(rect, painter, h, dpi.f3);
+      Tile::reset();
    }
    if (shadow)
       shadow->render(RECT, painter);

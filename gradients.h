@@ -26,6 +26,13 @@
 
 namespace Bespin {
 
+class BgSet {
+public:
+   BgSet(){}
+   QPixmap topTile, btmTile;
+   QPixmap cornerTile, lCorner, rCorner;
+};
+
 namespace Gradients {
 
 enum Type {
@@ -65,8 +72,8 @@ const QPixmap &ambient(int height);
 /** a vertical N -> S light */
 const QPixmap &light(int height);
 
-const QPixmap &bg(const QColor &c, bool other = false);
-const QPixmap &bgCorner(const QColor &c, bool other = false);
+const BgSet &bgSet(const QColor &c);
+// const QPixmap &bgCorner(const QColor &c, bool other = false);
 
 void init(BgMode mode);
 void wipe();

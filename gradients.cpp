@@ -106,10 +106,10 @@ simpleGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
 static inline QLinearGradient
 metalGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
    QLinearGradient lg(start, stop);
-   QColor iC = c.light(105); lg.setColorAt(0, iC);
-   iC = c.light(104); lg.setColorAt(0.5, iC);
-   iC = c.dark(104); lg.setColorAt(0.5, iC);
-   iC = c.dark(105); lg.setColorAt(1, iC);
+   QColor iC = c.light(106); lg.setColorAt(0, iC);
+   iC = c.light(103); lg.setColorAt(0.45, iC);
+   iC = c.dark(103); lg.setColorAt(0.45, iC);
+   iC = c.dark(110); lg.setColorAt(1, iC);
    return lg;
 }
 
@@ -276,11 +276,19 @@ static inline uint costs(QPixmap *pix) {
    return ((pix->width()*pix->height()*pix->depth())>>3);
 }
 
+static inline uint costs(BgSet *set) {
+   return (set->topTile.width()*set->topTile.height() +
+           set->btmTile.width()*set->btmTile.height() +
+           set->cornerTile.width()*set->cornerTile.height() +
+           set->lCorner.width()*set->lCorner.height() +
+           set->rCorner.width()*set->rCorner.height())*set->topTile.depth()/8;
+}
+
 typedef QCache<uint, QPixmap> PixmapCache;
 static PixmapCache gradients[2][Gradients::TypeAmount];
 static PixmapCache _btnAmbient, _tabShadow, _groupLight;
-static PixmapCache _bg[2];
-static PixmapCache _bgCorner[2];
+typedef QCache<uint, BgSet> BgSetCache;
+static BgSetCache _bgSet;
 
 const QPixmap&
 Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type) {
@@ -436,102 +444,126 @@ const QPixmap &Gradients::shadow(int height, bool bottom) {
    return *pix;
 }
 
-const QPixmap &Gradients::bg(const QColor &c, bool other) {
-   QPixmap *pix = _bg[other].object(c.rgb());
-   if (pix)
-      return *pix;
-   QLinearGradient lg;
-   switch (_mode) {
-   case BevelV: {
-      pix = new QPixmap(32, 256);
-      lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
-      if (other) {
-         lg.setColorAt(0, c); lg.setColorAt(1, c.dark(106));
-      }
-      else {
-         lg.setColorAt(0, c.light(106)); lg.setColorAt(1, c);
-      }
-      break;
-   }
-   case BevelH:
-      pix = new QPixmap(256, 32);
-      lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
-      if (other) {
-         lg.setColorAt(0, c); lg.setColorAt(1, c.dark(106));
-      }
-      else {
-         lg.setColorAt(0, c.dark(106)); lg.setColorAt(1, c);
-      }
-      break;
-   case LightV:
-      pix = new QPixmap(32, 512);
-      lg = QLinearGradient(QPoint(0,0), QPoint(0,512));
-      lg.setColorAt(0, c); lg.setColorAt(0.5, c.light(106)); lg.setColorAt(1, c);
-      break;
-   case LightH:
-      pix = new QPixmap(512, 32);
-      lg = QLinearGradient(QPoint(0,0), QPoint(512,0));
-      lg.setColorAt(0, c); lg.setColorAt(0.5, c.light(106)); lg.setColorAt(1, c);
-      break;
-   }
-   QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
-   _bg[other].insert(c.rgb(), pix, costs(pix));
-   return *pix;
-}
-
-const QPixmap &
-Gradients::bgCorner(const QColor &c, bool other)
-{
-   QPixmap *pix = _bgCorner[other].object(c.rgb());
-   if (pix)
-      return *pix;
-   pix = new QPixmap(200, 100);
-
-   QPixmap *dark = new QPixmap(pix->size());
-   QLinearGradient lg(QPoint(0,0), QPoint(0,100));
-   const QColor c1 = c.light(106);
-   const QColor c2 = Colors::mid(c1, c, 156, 100);
-   lg.setColorAt(0, Colors::mid(c1, c2,1,4)); lg.setColorAt(1, c2);
-   QPainter p(dark); p.fillRect(dark->rect(), lg); p.end();
-   
-   QPixmap alpha(pix->size());
-   const QPoint &center =
-      other ? alpha.rect().topLeft() : alpha.rect().topRight();
-   QRadialGradient rg(center, 200);
+static inline QPixmap *cornerMask(bool right = false) {
+   QPixmap *alpha = new QPixmap(128,128);
+   QRadialGradient rg(right ? alpha->rect().topLeft() :
+                      alpha->rect().topRight(), 128);
 #ifndef QT_NO_XRENDER
-   alpha.fill(Qt::transparent);
+   alpha->fill(Qt::transparent);
    rg.setColorAt(0, Qt::transparent);
 #else
    rg.setColorAt(0, Qt::black);
 #endif
    rg.setColorAt(1, Qt::white);
-   p.begin(&alpha); p.fillRect(alpha.rect(), rg); p.end();
-#ifndef QT_NO_XRENDER
-   alpha = OXRender::applyAlpha(*dark, alpha);
-#else
-   dark->setAlphaChannel(alpha);
-#endif
-   
-   p.begin(pix);
-   p.drawTiledPixmap(pix->rect(), bg(c));
-#ifndef QT_NO_XRENDER
-   p.drawPixmap(0,0, alpha);
-#else
-   p.drawPixmap(0,0,*dark);
-#endif
-   p.end();
+   QPainter p(alpha); p.fillRect(alpha->rect(), rg); p.end();
+   return alpha;
+}
 
-   delete dark;
+const BgSet &Gradients::bgSet(const QColor &c) {
+   BgSet *set = _bgSet.object(c.rgb());
+   if (set)
+      return *set;
+   set = new BgSet;
+   QLinearGradient lg;
+   QPainter p;
+   switch (_mode) {
+   case BevelV: {
+      set->topTile = QPixmap(32, 256);
+      set->btmTile = QPixmap(32, 256);
+      set->cornerTile = QPixmap(32, 128);
+      set->lCorner = QPixmap(128, 128);
+      set->rCorner = QPixmap(128, 128);
+      const QColor c1 = c.light(106);
+      const QColor c2 = Colors::mid(c1, c);
 
-   _bgCorner[other].insert(c.rgb(), pix, costs(pix));
-   return *pix;
+      lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
+      QGradientStops stops;
+      // Top Tile
+      p.begin(&set->topTile);
+      stops << QGradientStop(0, c1) << QGradientStop(1, c);
+      lg.setStops(stops); p.fillRect(set->topTile.rect(), lg);
+      stops.clear(); p.end();
+      // Bottom Tile
+      p.begin(&set->btmTile);
+      stops << QGradientStop(0, c) << QGradientStop(1, c.dark(106));
+      lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg);
+      stops.clear(); p.end();
+      if (Colors::value(c) > 244)
+         break; // would be mathematically nonsense, i.e. shoulders = 255...
+      // Corner Tile
+      lg = QLinearGradient(QPoint(0,0), QPoint(0,128));
+      p.begin(&set->cornerTile);
+      stops << QGradientStop(0, Colors::mid(c1, c2,1,4)) << QGradientStop(1, c2);
+      lg.setStops(stops); p.fillRect(set->cornerTile.rect(), lg);
+      stops.clear(); p.end();
+      // Left Corner
+      p.begin(&set->lCorner);
+      p.drawTiledPixmap(set->lCorner.rect(), set->topTile);
+      p.end();
+      QPixmap *mask = cornerMask();
+#ifndef QT_NO_XRENDER
+      for (int i = 0; i < 128; i += 32)
+         OXRender::composite(set->cornerTile, mask->x11PictureHandle(),
+                             set->lCorner, 0, 0, i, 0, i, 0, 32, 128, PictOpOver);
+#else
+      dark->setAlphaChannel(alpha);
+#endif
+      delete mask;
+      // Right Corner
+      p.begin(&set->rCorner);
+      p.drawTiledPixmap(set->rCorner.rect(), set->topTile);
+      p.end();
+      mask = cornerMask(true);
+#ifndef QT_NO_XRENDER
+      for (int i = 0; i < 128; i += 32)
+         OXRender::composite(set->cornerTile, mask->x11PictureHandle(),
+                             set->rCorner, 0, 0, i, 0, i, 0, 32, 128, PictOpOver);
+#else
+      dark->setAlphaChannel(alpha);
+#endif
+      delete mask;
+      break;
+   }
+   case BevelH: {
+      set->topTile = QPixmap(256, 32);
+      set->btmTile = QPixmap(256, 32);
+      lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
+      QGradientStops stops;
+      const QColor c1 = c.dark(106);
+      
+      // left
+      p.begin(&set->topTile);
+      stops << QGradientStop(0, c1) << QGradientStop(1, c);
+      lg.setStops(stops); p.fillRect(set->topTile.rect(), lg);
+      stops.clear(); p.end();
+      // right
+      p.begin(&set->btmTile);
+      stops << QGradientStop(0, c) << QGradientStop(1, c1);
+      lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg);
+      stops.clear(); p.end();
+      break;
+   }
+   case LightV:
+      set->topTile = QPixmap(32, 512); p.begin(&set->topTile);
+      lg = QLinearGradient(QPoint(0,0), QPoint(0,512));
+      lg.setColorAt(0, c); lg.setColorAt(0.5, c.light(106)); lg.setColorAt(1, c);
+      p.fillRect(set->topTile.rect(), lg); p.end();
+      break;
+   case LightH:
+      set->topTile = QPixmap(512, 32); p.begin(&set->topTile);
+      lg = QLinearGradient(QPoint(0,0), QPoint(512,0));
+      lg.setColorAt(0, c); lg.setColorAt(0.5, c.light(106)); lg.setColorAt(1, c);
+      p.fillRect(set->topTile.rect(), lg); p.end();
+      break;
+   }
+   _bgSet.insert(c.rgb(), set, costs(set));
+   return *set;
 }
 
 void Gradients::init(BgMode mode) {
    _mode = mode;
+   _bgSet.setMaxCost( 900<<10 ); // 832 should be enough - we keep some safety
    for (int i = 0; i < 2; ++i) {
-      _bg[i].setMaxCost( 128<<10 );
-      _bgCorner[i].setMaxCost( 320<<10 ); // 312 should be enough, though
       for (int j = 0; j < Gradients::TypeAmount; ++j)
          gradients[i][j].setMaxCost( 1024<<10 );
    }
@@ -541,6 +573,7 @@ void Gradients::init(BgMode mode) {
 }
 
 void Gradients::wipe() {
+   _bgSet.clear();
    for (int i = 0; i < 2; ++i)
       for (int j = 0; j < Gradients::TypeAmount; ++j)
          gradients[i][j].clear();

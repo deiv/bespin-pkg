@@ -40,6 +40,7 @@ public:
                    uint off1 = 0, uint off2 = 0, uint off3 = 0, uint off4 = 0);
    VisualFramePart(){};
    void paintEvent ( QPaintEvent * event );
+   inline const QFrame *frame() const {return _frame;}
 protected:
 //    void enterEvent ( QEvent * event ) { passDownEvent(event, event->globalPos()); }
 //    void leaveEvent ( QEvent * event ) { passDownEvent(event, event->globalPos()); }

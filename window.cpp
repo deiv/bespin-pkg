@@ -193,41 +193,43 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
          break;
 #endif
    case BevelV: { // also fallback for ComplexLights
-      const QPixmap &upper = Gradients::bg(c);
-      const QPixmap &upperLeft = Gradients::bgCorner(c);
-      const QPixmap &upperRight = Gradients::bgCorner(c, true);
-      const QPixmap &lower = Gradients::bg(c, true);
-      int s1 = upper.height();
+      const BgSet &set = Gradients::bgSet(c);
+      int s1 = set.topTile.height();
       int s2 = qMin(s1, (RECT.height()+1)/2);
       s1 -= s2;
       painter->drawTiledPixmap( RECT.x(), RECT.y(), RECT.width(), s2,
-                                upper, 0, s1 );
-      const int w = qMin(200, RECT.width()/4);
-      if (w) {
-         painter->drawPixmap(RECT.x(), RECT.y(), upperLeft, 200-w, s1, w, s2);
-         painter->drawPixmap(RECT.right()+1-w, RECT.y(), upperRight, 0, s1, w, s2);
+                                set.topTile, 0, s1 );
+      if (Colors::value(c) < 245) { // no sense otherwise
+         const int w = RECT.width()/4 - 128;
+         if (w > 0) {
+            painter->drawTiledPixmap( RECT.x(), RECT.y(), w, 128,
+                                      set.cornerTile, 0, s1 );
+            painter->drawTiledPixmap( RECT.right()+1-w, RECT.y(), w, 128,
+                                      set.cornerTile, 0, s1 );
+         }
+         painter->drawPixmap(RECT.x()+w, RECT.y(), set.lCorner, 0, s1, 128, s2);
+         painter->drawPixmap(RECT.right()-w-127, RECT.y(), set.rCorner, 0, s1, 128, s2);
       }
-      s1 = lower.height();
+      s1 = set.btmTile.height();
       s2 = qMin(s1, (RECT.height())/2);
       painter->drawTiledPixmap( RECT.x(), RECT.bottom() - s2,
-                                RECT.width(), s2, lower );
+                                RECT.width(), s2, set.btmTile );
       break;
    }
    case BevelH: {
-      const QPixmap &left = Gradients::bg(c);
-      const QPixmap &right = Gradients::bg(c, true);
-      int s1 = left.width();
+      const BgSet &set = Gradients::bgSet(c);
+      int s1 = set.topTile.width();
       int s2 = qMin(s1, (RECT.width()+1)/2);
       painter->drawTiledPixmap( RECT.x(), RECT.y(), s2, RECT.height(),
-                                left, s1-s2, 0 );
-      s1 = right.width();
+                                set.topTile, s1-s2, 0 );
+      s1 = set.btmTile.width();
       s2 = qMin(s1, (RECT.width())/2);
       painter->drawTiledPixmap( RECT.right() - s2, 0, s2, RECT.height(),
-                                right );
+                                set.btmTile );
       break;
    }
    case LightV: {
-      const QPixmap &center = Gradients::bg(c);
+      const QPixmap &center = Gradients::bgSet(c).topTile;
       int s1 = qMin(center.height(), RECT.height());
       int s2 = (RECT.height() - center.height())/2;
       painter->drawTiledPixmap( RECT.x(), RECT.y() + qMax(s2,0),
@@ -235,7 +237,7 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
       break;
    }
    case LightH: {
-      const QPixmap &center = Gradients::bg(c);
+      const QPixmap &center = Gradients::bgSet(c).topTile;
       int s1 = qMin(center.width(), RECT.width());
       int s2 = (RECT.width() - center.width())/2;
       painter->drawTiledPixmap( RECT.x() + qMax(s2,0), RECT.y(),
