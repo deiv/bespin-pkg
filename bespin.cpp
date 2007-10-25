@@ -346,15 +346,14 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
       return false;
    }
 #endif
+#ifdef MOUSEDEBUG
    case QEvent::MouseButtonPress: {
       QMouseEvent *mev = (QMouseEvent*)ev;
-#ifdef MOUSEDEBUG
       DEBUG << object;
-#endif
-      if (( mev->button() == Qt::LeftButton) &&
-          object->inherits("QMdiSubWindow")) {
+//       if (( mev->button() == Qt::LeftButton) &&
+//           object->inherits("QMdiSubWindow")) {
          //TODO this is a hack to get the popupmenu to the right side. bug TT to query the position with a SH
-         QWidget *MDI = (QWidget*)object;
+//          QWidget *MDI = (QWidget*)object;
          // check for menu button
 //          QWidget *MDI = qobject_cast<QWidget*>(widget->parent()); if (!MDI) return false; //this is elsewhat...
          /// this does not work as TT keeps the flag in a private to the titlebar (for no reason?)
@@ -362,22 +361,28 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
          // check if we clicked it..
 //          if (mev->x() < widget->width()-widget->height()-2) return false;
          // find popup
-         MDI = qobject_cast<QWidget*>(MDI->parent()); if (!MDI) return false; //this is elsewhat...
-         MDI = MDI->findChild<QMenu *>("qt_internal_mdi_popup");
-         if (!MDI) {
-            qWarning("MDI popup not found, unable to calc menu position");
-            return false;
-         }
-         // calc menu position
-         emit MDIPopup(mev->globalPos());
+//          MDI = qobject_cast<QWidget*>(MDI->parent()); if (!MDI) return false; //this is elsewhat...
+//          MDI = MDI->findChild<QMenu *>("qt_internal_mdi_popup");
+//          if (!MDI) {
+//             qWarning("MDI popup not found, unable to calc menu position");
+//             return false;
+//          }
+//          // calc menu position
+//          emit MDIPopup(mev->globalPos());
 //                        MDI->mapToGlobal( QPoint(widget->width() - MDI->sizeHint().width(), widget->height())));
-         return true;
-      }
       return false;
    }
-#if SHAPE_POPUP
+#endif
    case QEvent::Show:
       if (QMenu * menu = qobject_cast<QMenu*>(object)) {
+         if (menu->parentWidget() &&
+             menu->parentWidget()->inherits("QMdiSubWindow")) {
+            QPoint pt = menu->parentWidget()->rect().topRight();
+            pt += QPoint(-menu->width(), pixelMetric(PM_TitleBarHeight,0,0));
+            pt = menu->parentWidget()->mapToGlobal(pt);
+            menu->move(pt);
+         }
+#if SHAPE_POPUP
          QMenuBar *bar = bar4popup(menu);
          if (bar) {
             QPoint pos(dpi.f3, dpi.f1);
@@ -386,9 +391,9 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             menu->setActiveAction(menu->actions().at(0));
          }
          return false;
+#endif
       }
       return false;
-#endif
    default:
       return false;
    }

@@ -259,8 +259,8 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
          tmpOpt.state = tb->state;\
       else\
          tmpOpt.state &= ~(State_Sunken | State_MouseOver);\
-      pm = standardPixmap ( SP_TitleBar##_btn_##Button, &tmpOpt, widget );\
-      painter->drawPixmap(tmpOpt.rect.topLeft(), pm);\
+      painter->drawPixmap(tmpOpt.rect.topLeft(), \
+            standardPixmap ( SP_TitleBar##_btn_##Button, &tmpOpt, widget ));\
    }\
 }
 
@@ -272,7 +272,7 @@ BespinStyle::drawTitleBar(const QStyleOptionComplex * option,
       qstyleoption_cast<const QStyleOptionTitleBar *>(option);
    if (!tb) return;
 
-   painter->fillRect(RECT, PAL.brush(QPalette::Window));
+//    painter->fillRect(RECT, PAL.brush(QPalette::Window));
    QRect ir;
        
    // the label
@@ -281,22 +281,8 @@ BespinStyle::drawTitleBar(const QStyleOptionComplex * option,
       painter->setPen(PAL.color(QPalette::WindowText));
       ir.adjust(dpi.f2, 0, -dpi.f2, 0);
       painter->drawText(ir, Qt::AlignCenter | Qt::TextSingleLine, tb->text);
-
-      // button grounds
-      QRect gr = RECT;//.adjusted(0,dpi.f2, 0, -dpi.f2);
-      gr.setRight(ir.left() - dpi.f4);
-      const QPixmap &groove = Gradients::pix(FCOLOR(Window), gr.height(),
-                                             Qt::Vertical, Gradients::Sunken);
-      Tile::setShape(Tile::Full &~ Tile::Left);
-      masks.tab.render(gr, painter, groove);
-      gr.setRight(RECT.right());
-      gr.setLeft(ir.right() + dpi.f4);
-      Tile::setShape(Tile::Full &~ Tile::Right);
-      masks.tab.render(gr, painter, groove);
-      Tile::reset();
    }
    
-   QPixmap pm;
    QStyleOptionTitleBar tmpOpt = *tb;
    if (tb->subControls & SC_TitleBarCloseButton)
       PAINT_WINDOW_BUTTON(Close)

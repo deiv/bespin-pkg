@@ -330,11 +330,6 @@ void BespinStyle::polish( QWidget * widget) {
       widget->installEventFilter(this);
    }
    
-   else if (widget->inherits("QMdiSubWindow"))
-      widget->installEventFilter(this);
-   else if (widget->inherits("QWorkspace"))
-      connect(this, SIGNAL(MDIPopup(QPoint)), widget, SLOT(_q_popupOperationMenu(QPoint)));
-   
    
    if (false // to simplify the #ifdefs
 #ifndef QT_NO_MENUBAR
@@ -462,6 +457,9 @@ void BespinStyle::polish( QWidget * widget) {
          tmpFont.setBold(true);
          widget->setFont(tmpFont);
       }
+      if (widget->parentWidget() &&
+          widget->parentWidget()->inherits("QMdiSubWindow"))
+         widget->installEventFilter(this);
       // hmmmm... =)
 #if SHAPE_POPUP
       if (bar4popup(menu)) {

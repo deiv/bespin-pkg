@@ -264,9 +264,9 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
    case CC_TitleBar: // A Title bar, like what is used in Q3Workspace
       if (const QStyleOptionTitleBar *tb =
           qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
-         const int controlMargin = dpi.f2;
+         const int controlMargin = dpi.f3;
          const int controlHeight = tb->rect.height() - controlMargin*2;
-         const int delta = controlHeight + 4*controlMargin;
+         const int delta = controlHeight + 2*controlMargin;
          int offset = 0;
          
          bool isMinimized = tb->titleBarState & Qt::WindowMinimized;

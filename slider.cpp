@@ -185,7 +185,7 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       const int sz = dpi.SliderControl-dpi.f4;
       const QBrush fill =
          Gradients::brush(bc, sz, Qt::Vertical,
-                          isEnabled ? GRAD(btn) : Gradients::None);
+                          isEnabled ? GRAD(scroll) : Gradients::None);
       fillWithMask(painter, xy, fill, masks.slider);
       SAVE_PEN;
       painter->setPen(fc);
@@ -269,7 +269,7 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter,
    const QColor c = hover ? CONF_COLOR(btn.active, 0) : hasFocus ?
       FCOLOR(Highlight) : CONF_COLOR(btn.std, 0);
    const QPixmap &fill =
-      Gradients::pix(c, rect.height(), Qt::Vertical, GRAD(btn));
+      Gradients::pix(c, rect.height(), Qt::Vertical, GRAD(scroll));
    painter->setBrush(fill);
    painter->drawEllipse(rect);
    painter->restore();

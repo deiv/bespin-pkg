@@ -168,27 +168,30 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
    QRect rect = RECT.adjusted(dpi.f3, dpi.f5, -dpi.f4, -dpi.f5);
    int size = RECT.height()-f2;
    Qt::Orientation o = Qt::Vertical;
-
-   if (verticalTabs(tab->shape)) {
+   const bool vertical = verticalTabs(tab->shape);
+   if (vertical) {
       o = Qt::Horizontal;
       size = RECT.width()-f2;
    }
 
    QColor c;
-   int d = 0;
+   int d = vertical ? 0 : dpi.f3;
    if (sunken) {
-      rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
+      d += vertical ? dpi.f1 : -dpi.f1;
+      if (config.tab.activeTabSunken) {
+         rect.adjust(f2, -f2, -f2, 0);
+         if (!vertical) d -= dpi.f1;
+      }
+      else
+         rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
       c = CCOLOR(tab.active, 0);
-      d = (o == Qt::Vertical) ? -dpi.f1 : f2;
    }
    else {
       c = CCOLOR(tab.std, Bg);
       int quota = 6 + (int) (.16 * Colors::contrast(c, CCOLOR(tab.active, 0)));
       c = Colors::mid(c, CCOLOR(tab.active, 0), quota, animStep);
    }
-   const QPoint off(d, d+dpi.f4);
-//    const Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(tab);
-   masks.tab.render(rect, painter, GRAD(tab), o, c, size, off);
+   masks.tab.render(rect, painter, GRAD(tab), o, c, size, QPoint(d, d));
    if (config.tab.activeTabSunken && sunken) {
       rect.setBottom(rect.bottom()+f2);
       shadows.tabSunken.render(rect, painter);
@@ -201,17 +204,15 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
 {
    ASSURE_OPTION(tab, Tab);
    B_STATES
-
+   sunken = sunken || (option->state & State_Selected);
+   if (sunken) hover = false;
+   
    painter->save();
-   QStyleOptionTabV2 tabV2(*tab);
-   QRect tr = tabV2.rect;
+   QRect tr = RECT;
    
    bool verticalTabs = false;
    bool east = false;
-   bool selected = tabV2.state & State_Selected;
-   if (selected) hover = false;
-   if (config.tab.activeTabSunken && (selected || sunken))
-      tr.translate(0,dpi.f1);
+
    
    int alignment = Qt::AlignCenter | Qt::TextShowMnemonic;
 
@@ -239,13 +240,16 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
       painter->setMatrix(m, true);
    }
        
-   if (!tabV2.icon.isNull()) {
-      QSize iconSize = tabV2.iconSize;
+   if (!tab->icon.isNull()) {
+      QSize iconSize;
+      if (const QStyleOptionTabV2 *tabV2 =
+          qstyleoption_cast<const QStyleOptionTabV2*>(tab))
+         iconSize = tabV2->iconSize;
       if (!iconSize.isValid()) {
          int iconExtent = pixelMetric(PM_SmallIconSize);
          iconSize = QSize(iconExtent, iconExtent);
       }
-      QPixmap tabIcon = tabV2.icon.pixmap(iconSize, (isEnabled) ?
+      QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ?
                                           QIcon::Normal : QIcon::Disabled);
       painter->drawPixmap(tr.left() + dpi.f6,
                         tr.center().y() - tabIcon.height() / 2, tabIcon);
@@ -254,7 +258,7 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
        
    // color adjustment
    QColor cF, cB;
-   if (selected || sunken) {
+   if (sunken) {
       cF = CCOLOR(tab.active, 1);
       cB = CCOLOR(tab.active, 0);
    }
@@ -305,7 +309,7 @@ void
 BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter,
                                  const QWidget *) const
 {
-   B_STATES
+   OPT_HOVER; OPT_SUNKEN;
       
    QRect r = RECT; Tile::PosFlags pf = Tile::Full;
    if (const QStyleOptionToolBoxV2* tbt =
@@ -352,7 +356,7 @@ BespinStyle::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter,
                                  const QWidget *) const
 {
    ASSURE_OPTION(tbt, ToolBox);
-   B_STATES
+   OPT_ENABLED;
    const bool selected = option->state & (State_Selected);
 
    QColor cB = FCOLOR(Window), cF = FCOLOR(WindowText);

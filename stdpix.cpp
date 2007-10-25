@@ -20,6 +20,9 @@
 #include <QApplication>
 #include <QPainter>
 #include <QPen>
+
+#include <cmath>
+
 #include "bespin.h"
 #include "colors.h"
 
@@ -32,106 +35,89 @@ extern Config config;
 
 QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyleOption * option, const QWidget * widget ) const
 {
-
-   QRect rect; QPalette pal; QPixmap pm;
-   const QStyleOptionTitleBar *opt = qstyleoption_cast<const QStyleOptionTitleBar *>(option);
-   if (opt) {
-      if (opt->rect.isNull())
-         return QPixmap();
-      pal = opt->palette;
-      rect = opt->rect; rect.moveTo(0,0);
-      pm = QPixmap(opt->rect.size());
-   }
-   else {
-      rect = QRect(0,0,16,16);
-      pal = qApp->palette();
-      pm = QPixmap(rect.size());
-   }
-
-   pm.fill(Qt::transparent); // make transparent by default
-   QPainter painter(&pm);
    bool sunken = false, isEnabled = false, hover = false;
    if (option) {
       sunken = option->state & State_Sunken;
       isEnabled = option->state & State_Enabled;
       hover = isEnabled && (option->state & State_MouseOver);
    }
+   
+   QRect rect; QPalette pal;
+   const QStyleOptionTitleBar *opt =
+      qstyleoption_cast<const QStyleOptionTitleBar *>(option);
+   if (opt) {
+      if (opt->rect.isNull())
+         return QPixmap();
+      pal = opt->palette;
+      rect = opt->rect; rect.moveTo(0,0);
+      if (rect.width() > rect.height())
+         rect.setWidth(rect.height());
+      else
+         rect.setHeight(rect.width());
+   }
+   else {
+      rect = QRect(0,0,14,14);
+      pal = qApp->palette();
+   }
+   const int sz = rect.width();
+   const int s2 = lround(sz/2.0), s3 = lround(sz/3.0),
+      s4 = lround(sz/4.0), s6 = lround(sz/6.0);
 
-   int numPoints = 0;
-   QPoint *points;
+   QPixmap pm(rect.size()); pm.fill(Qt::transparent);
+   QPainter painter(&pm);
+   
+   bool needShape = true; QVector <QRect> shape;
+   
    switch (standardPixmap) {
    case SP_DockWidgetCloseButton:
-   case SP_TitleBarCloseButton: {
-      numPoints = 8;
-      points = new QPoint[8];
-      int d = rect.height()/8, d2 = 2*rect.height()/7,
-         c = rect.height()/2, s = rect.width()-d2;
-      points[0] = QPoint(c,c-d); points[1] = QPoint(d2,d2);
-      points[2] = QPoint(c-d,c); points[3] = QPoint(d2,s);
-      points[4] = QPoint(c,c+d); points[5] = QPoint(s,s);
-      points[6] = QPoint(c+d,c); points[7] = QPoint(s,d2);
-   }
+   case SP_TitleBarCloseButton:
+      needShape = false;
+      shape << QRect(0,0,sz,s4) << QRect(0,sz-s4,sz,s4) <<
+         QRect(0,s4,s4,sz-2*s4) << QRect(sz-s4,s4,s4,sz-2*s4) <<
+         QRect(s3, s3, sz-2*s3, sz-2*s3);
    case SP_TitleBarMinButton:
+      if (needShape) {
+         needShape = false;
+         shape << QRect(0,0,s4,sz) << QRect(s4,sz-s4,sz-s4,s4) << QRect(sz-s4,0,s4,s4);
+      }
    case SP_TitleBarMaxButton:
-      if (!numPoints) {
-         numPoints = 4;
-         points = new QPoint[4];
-         int dx = rect.height()/6, c = rect.width()/2;
-         int y = rect.center().y();
-         int dy = (standardPixmap == SP_TitleBarMaxButton) ? - dx : dx;
-         points[0] = QPoint(rect.x()+dx, y - dy);
-         points[1] = QPoint(rect.x()+c, y + dy);
-         points[2] = QPoint(rect.right()-dx, y - dy);
-         points[3] = QPoint(rect.x()+c, y);
+      if (needShape) {
+         needShape = false;
+         shape << QRect(0,0,sz,s4) << QRect(sz-s4,s4,s4,sz-s4) << QRect(0,sz-s4,s4,s4);
       }
-   case SP_TitleBarNormalButton: {
-      painter.setRenderHint ( QPainter::Antialiasing );
-      painter.setPen(Qt::NoPen);
-      Gradients::Type type = Gradients::Button;
-      if (hover && !sunken) {
-         const QPixmap &fill = Gradients::pix(COLOR(Window), rect.height(),
-                                             Qt::Vertical, Gradients::Button);
-         painter.setBrush(fill);
-         painter.drawEllipse(rect);
-         type = Gradients::Sunken;
+   case SP_TitleBarMenuButton:
+      if (needShape) {
+         needShape = false;
+         shape << QRect(0,0,sz,s4) << QRect(sz-s3,s4,s3,sz-s4);
       }
-      if (!numPoints) { // SP_TitleBarNormalButton
-         painter.setPen(QPen(Colors::mid(COLOR(Window), COLOR(WindowText),1,2), rect.width()/8));
-         painter.setBrush(Qt::NoBrush);
-         int d = rect.width()/3;
-         rect.adjust(d,d,-d,-d);
-         painter.drawRoundRect(rect);
+   case SP_TitleBarShadeButton:
+      if (needShape) {
+         needShape = false;
+         shape << QRect(0,0,sz,s6);
       }
-      else {
-         const QPixmap &fill = Gradients::pix(COLOR(WindowText), rect.height(),
-                                             Qt::Vertical, type);
-         painter.setBrush(fill);
-         painter.drawPolygon(points, numPoints);
-         delete [] points;
+   case SP_TitleBarNormalButton:
+   case SP_TitleBarUnshadeButton:
+      if (needShape) {
+         needShape = false;
+         shape << QRect(0,0,sz,s6) << QRect(0,sz-s6,sz,s6) <<
+            QRect(0,s6,s6,sz-2*s6) << QRect(sz-s6,s6,s6,sz-2*s6);
       }
-      break;
-   }
+   case SP_TitleBarContextHelpButton: {
+      if (needShape)
+         shape << QRect(0,0,s2,s4) << QRect(sz-s2-s4,s4,s4,sz-2*s4-s6) <<
+            QRect(sz-s2-s4,sz-s4,s4,s4);
       
-   case SP_TitleBarMenuButton: { //  0  Menu button on a title bar
-      QFont fnt = painter.font();
-      fnt.setPixelSize ( rect.height() );
-      painter.setFont(fnt);
-      painter.setPen(pal.color(QPalette::WindowText));
-      painter.drawText(rect, Qt::AlignCenter, ";P");
-      break;
-   }
-   case SP_TitleBarShadeButton: //  5  Shade button on title bars
-      painter.drawPoint(rect.center().x(), rect.top());
-      break;
-   case SP_TitleBarUnshadeButton: //  6  Unshade button on title bars
-      painter.drawPoint(rect.center().x(), rect.top());
-      painter.drawPoint(rect.center());
-      break;
-   case SP_TitleBarContextHelpButton: { //  7  The Context help button on title bars
-      QFont fnt = painter.font();
-      fnt.setPixelSize ( rect.height() );
-      painter.setFont(fnt);
-      painter.drawText(rect, Qt::AlignCenter, "?");
+      QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
+      if (widget) {
+         bg = widget->backgroundRole(); fg = widget->foregroundRole();
+      }
+
+      const QColor c =
+         Colors::mid(pal.color(bg), pal.color(fg), (!sunken)*(4-2*hover), 1);
+
+      painter.setPen(Qt::NoPen); painter.setBrush(c);
+      for (int r = 0; r < shape.size(); ++r)
+         painter.drawRect(shape.at(r));
       break;
    }
    case SP_MessageBoxInformation: { //  9  The "information" icon

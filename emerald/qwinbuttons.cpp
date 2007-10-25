@@ -16,7 +16,7 @@ int main (int argc, char **argv)
    int sz = 14;
    if (argc > 1) sz = QString(argv[1]).toUInt();
    
-   QColor c = Qt::black; c.setAlpha(128);
+   QColor c = Qt::black; c.setAlpha(0xaa);
    if (argc > 2) c.setRgba(QString(argv[2]).toUInt(0,16));
    int alpha = c.alpha();
    
@@ -27,9 +27,8 @@ int main (int argc, char **argv)
       QRect(s3, s3, sz-2*s3, sz-2*s3);
    shape[Min] << QRect(0,0,s4,sz) << QRect(s4,sz-s4,sz-s4,s4) << QRect(sz-s4,0,s4,s4);
    shape[Max] << QRect(0,0,sz,s4) << QRect(sz-s4,s4,s4,sz-s4) << QRect(0,sz-s4,s4,s4);
-   shape[Restore] << QRect(0,0,sz,s4) << QRect(0,sz-s4,sz,s4) <<
-      QRect(0,s4,s4,sz-2*s4) << QRect(sz-s4,s4,s4,sz-2*s4);
-   shape[Stick] << QRect(s4,s4,sz-2*s4,sz-2*s4);
+   shape[Restore] << QRect(sz-s4,0,s4,sz) << QRect(0,sz-s4,sz-s4,s4) << QRect(0,0,s4,s4);
+   shape[Stick] << QRect(s6,s6,sz-2*s6,sz-2*s6);
    shape[Unstick] << QRect(s3,s3,sz-2*s3,sz-2*s3);
    shape[Above] << QRect(0,0,sz,s3) << QRect(s4,sz-s3,sz-2*s4,s3);
    shape[Below] << QRect(0,sz-s3,sz,s3) << QRect(s4,0,sz-2*s4,s3);
