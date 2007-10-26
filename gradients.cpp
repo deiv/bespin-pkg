@@ -509,7 +509,11 @@ const BgSet &Gradients::bgSet(const QColor &c) {
             OXRender::composite(set->cornerTile, mask->x11PictureHandle(),
                                 *pix, 0, 0, i, 0, i, 0, 32, 128, PictOpOver);
 #else
-//          dark->setAlphaChannel(alpha);
+         QPixmap fill(pix->size());
+         p.begin(&fill);
+         p.drawTiledPixmap(fill.rect(), set->cornerTile); p.end();
+         fill.setAlphaChannel(*mask);
+         p.begin(pix); p.drawPixmap(0,0, fill); p.end();
 #endif
          delete mask;
       }
@@ -520,7 +524,8 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       set->btmTile = QPixmap(256, 32);
       set->lCorner = QPixmap(256, 32);
       set->rCorner = QPixmap(256, 32);
-
+      set->cornerTile = QPixmap(32, 128);
+      
       lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
       QGradientStops stops;
       const QColor c1 = c.dark(106);
@@ -557,10 +562,17 @@ const BgSet &Gradients::bgSet(const QColor &c) {
 #else
          lg.setColorAt(1, Qt::black);
          p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
-//       dark->setAlphaChannel(alpha);
+         QPixmap fill(pix->size());
+         p.begin(&fill); p.drawTiledPixmap(fill.rect(), *blend); p.end();
+         fill.setAlphaChannel(*mask);
+         p.begin(pix); p.drawPixmap(0,0, fill); p.end();
 #endif
          delete mask;
       }
+      lg = QLinearGradient(QPoint(0,0), QPoint(0, 128));
+      lg.setColorAt(0, c); lg.setColorAt(1, c1);
+      p.begin(&set->cornerTile);
+      p.fillRect(set->cornerTile.rect(), lg); p.end();
       break;
    }
    default:

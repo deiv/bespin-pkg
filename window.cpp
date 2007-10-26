@@ -229,6 +229,9 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
       painter->drawTiledPixmap( RECT.right() - s2, 0, s2, h,
                                 set.btmTile );
       painter->drawPixmap(RECT.right() - s2, RECT.y()+h, set.rCorner);
+      s2 = qMin(128, RECT.height()-(h+64));
+      painter->drawTiledPixmap( RECT.x(), RECT.bottom()-s2, RECT.width(), 128,
+                                set.cornerTile );
       break;
    }
    case Plain: // should not happen anyway...
