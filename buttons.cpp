@@ -168,10 +168,10 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    else {
       r.adjust(0, f1, 0, 0);
       shadows.button[false][isEnabled].render(r, painter);
-      if (hasFocus)
-         lights.tab.render(RECT, painter, FCOLOR(Highlight));
       r.adjust(f2, f1, -f2, -dpi.f3);
    }
+   if (hasFocus)
+      lights.tab.render(RECT, painter, FCOLOR(Highlight));
    
    // backlight & plate
    masks.button.render(r, painter, gt, Qt::Vertical, c);

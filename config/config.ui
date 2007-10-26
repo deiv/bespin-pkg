@@ -1192,22 +1192,12 @@
          </item>
          <item>
           <property name="text" >
-           <string>Vertical Top/Bottom Gradient</string>
+           <string>Vertical Gradient</string>
           </property>
          </item>
          <item>
           <property name="text" >
-           <string>Horizontal Left/Right Gradient</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Vertical Center Gradient</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Horizontal Center Gradient</string>
+           <string>Horizontal Gradient</string>
           </property>
          </item>
         </widget>

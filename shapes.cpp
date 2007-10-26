@@ -157,11 +157,11 @@ BespinStyle::drawArrow(Navi::Direction dir, const QRect &rect,
    int s = qMin(rect.width(), rect.height());
    QRect r;
    if (!(s%2)) s -= 1; // shall be odd!
-   if (dir > Navi::W) { // diagonal
+   if (dir > Navi::E) { // diagonal
       s = int(s/1.4142135623); // sqrt(2)...
       r.setRect ( 0, 0, s, s );
    }
-   else if (dir < Navi::E) // North/South
+   else if (dir < Navi::W) // North/South
       r.setRect ( 0, 0, s, s/2+1 );
    else // East/West
       r.setRect ( 0, 0, s/2+1, s );

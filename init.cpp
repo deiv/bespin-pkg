@@ -100,7 +100,7 @@ BespinStyle::readSettings(const QSettings* settings)
    config.bg.mode = (BGMode) iSettings->value("Bg.Mode", BevelV).toInt();
    
 #ifndef QT_NO_XRENDER
-   if (config.bg.mode > LightH)
+   if (config.bg.mode > BevelH)
       config.bg.mode = BevelV;
    else if(config.bg.mode == ComplexLights &&
            !QFile::exists(QDir::tempPath() + "bespinPP.lock"))

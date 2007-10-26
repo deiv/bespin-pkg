@@ -36,12 +36,15 @@ enum Type {X = 0, V, O};
 };
 
 namespace Navi {
-enum Direction {N = 0, S, E, W, NW, NE, SE, SW };
+enum Direction {
+   N = Qt::UpArrow, S = Qt::DownArrow,
+   E = Qt::RightArrow, W = Qt::LeftArrow,
+   NW = 5, NE, SE, SW
+   };
 };
 
 enum BGMode { Plain = 0, Scanlines, ComplexLights,
-      BevelV, BevelH,
-      LightV, LightH };
+      BevelV, BevelH };
 
 class BespinStyle;
 

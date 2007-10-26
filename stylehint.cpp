@@ -41,7 +41,9 @@ int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const 
    case SH_ScrollBar_ScrollWhenPointerLeavesControl:
       return true; // UIs are no ego shooters...
    case SH_TabBar_Alignment:
-      return Qt::AlignLeft; // Qt::AlignCenter and Qt::AlignRight
+//       return Qt::AlignRight;
+      return Qt::AlignLeft;
+//       return Qt::AlignCenter;
    case SH_Header_ArrowAlignment:
       return Qt::AlignLeft; // we move it to text center though...
    case SH_Slider_SnapToValue:

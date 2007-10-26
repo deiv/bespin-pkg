@@ -255,8 +255,8 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
       painter->save();
       painter->setPen(Qt::NoPen);
       if (cmb->editable) {
+         if (upDown || dir == Navi::N) dir = Navi::S;
          upDown = false; // shall never look like spinbox!
-         if (dir == Navi::N) dir = Navi::S;
          hover = hover && (cmb->activeSubControls == SC_ComboBoxArrow);
          if (!sunken) {
             painter->setBrush(FCOLOR(Base).dark(105));

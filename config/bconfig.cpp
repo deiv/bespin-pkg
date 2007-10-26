@@ -253,10 +253,11 @@ QVariant BConfig::variant(const QWidget *w) const {
 bool BConfig::setVariant(QWidget *w, const QVariant &v) const {
    if (QComboBox *box = qobject_cast<QComboBox*>(w)) {
       int idx = box->findData(v);
-      if (idx == -1)
-         box->setCurrentIndex(v.toInt());
-      else
-         box->setCurrentIndex(idx);
+      if (idx == -1) {
+         idx = v.toInt();
+         if (idx >= box->count()) idx = box->count()-1;
+      }
+      box->setCurrentIndex(idx);
    }
    else if (QCheckBox *box = qobject_cast<QCheckBox*>(w))
       box->setChecked(v.toBool());

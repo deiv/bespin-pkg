@@ -191,7 +191,8 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
 
    if (hasArrow) {
       const int f5 = dpi.f5;
-      drawSolidArrow(Navi::S, RECT.adjusted(f5,f5,-f5,-f5), painter);
+      drawSolidArrow(Navi::Direction(toolbutton->arrowType),
+                     RECT.adjusted(f5,f5,-f5,-f5), painter);
    }
    else
       drawItemPixmap(painter, RECT, Qt::AlignCenter, pm);

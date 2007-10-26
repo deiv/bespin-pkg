@@ -175,23 +175,20 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
    }
 
    QColor c;
-   int d = vertical ? 0 : dpi.f3;
    if (sunken) {
-      d += vertical ? dpi.f1 : -dpi.f1;
-      if (config.tab.activeTabSunken) {
+      c = CCOLOR(tab.active, 0);
+      if (config.tab.activeTabSunken)
          rect.adjust(f2, -f2, -f2, 0);
-         if (!vertical) d -= dpi.f1;
-      }
       else
          rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
-      c = CCOLOR(tab.active, 0);
    }
    else {
       c = CCOLOR(tab.std, Bg);
       int quota = 6 + (int) (.16 * Colors::contrast(c, CCOLOR(tab.active, 0)));
       c = Colors::mid(c, CCOLOR(tab.active, 0), quota, animStep);
    }
-   masks.tab.render(rect, painter, GRAD(tab), o, c, size, QPoint(d, d));
+   const QPoint off = rect.topLeft()-RECT.topLeft()-QPoint(dpi.f3,f2);
+   masks.tab.render(rect, painter, GRAD(tab), o, c, size, off);
    if (config.tab.activeTabSunken && sunken) {
       rect.setBottom(rect.bottom()+f2);
       shadows.tabSunken.render(rect, painter);
