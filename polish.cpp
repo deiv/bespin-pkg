@@ -408,7 +408,7 @@ void BespinStyle::polish( QWidget * widget) {
          else {
             QList<VisualFrame*> vfs = frame->findChildren<VisualFrame*>();
             if (vfs.isEmpty()) { // avoid double adds
-               qDebug() << frame << frame->parentWidget() << frame->autoFillBackground();
+//               qDebug() << frame << frame->parentWidget() << frame->autoFillBackground();
                int exts[4]; uint sizes[4]; // t/b/l/r
                const int f2 = dpi.f2, f3 = dpi.f3, f4 = dpi.f4, f6 = dpi.f6;
                if (frame->frameShadow() == QFrame::Sunken) {
