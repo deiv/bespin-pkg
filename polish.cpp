@@ -233,7 +233,7 @@ static QMenuBar *bar4popup(QMenu *menu) {
    return 0;
 }
 #endif
-
+#include <QtDebug>
 void BespinStyle::polish( QWidget * widget) {
    
    if (!widget) return; // !
@@ -402,11 +402,13 @@ void BespinStyle::polish( QWidget * widget) {
       }
       else if (frame->frameShape() == QFrame::StyledPanel) {
 
-         if (widget->inherits("QTextEdit") && frame->lineWidth() == 1)
-            frame->setLineWidth(dpi.f4);
+         if (isSpecialFrame(widget)) {
+            if (frame->lineWidth() == 1) frame->setLineWidth(dpi.f4);
+         }
          else {
             QList<VisualFrame*> vfs = frame->findChildren<VisualFrame*>();
             if (vfs.isEmpty()) { // avoid double adds
+               qDebug() << frame << frame->parentWidget() << frame->autoFillBackground();
                int exts[4]; uint sizes[4]; // t/b/l/r
                const int f2 = dpi.f2, f3 = dpi.f3, f4 = dpi.f4, f6 = dpi.f6;
                if (frame->frameShadow() == QFrame::Sunken) {

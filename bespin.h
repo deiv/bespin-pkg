@@ -71,7 +71,7 @@ typedef struct Config {
    struct btn {
       int layer;
       Check::Type checkType;
-      bool cushion, fullHover, swapFocusHover, ambientLight;
+      bool cushion, fullHover, backLightHover, ambientLight;
       Gradients::Type gradient, focusGradient;
       QPalette::ColorRole std_role[2], active_role[2];
    } btn;
@@ -211,9 +211,6 @@ public:
    
    // from QObject
    bool eventFilter( QObject *object, QEvent *event );
-   
-signals:
-   void MDIPopup(QPoint);
 
 protected:
    virtual void init(const QSettings *settings = 0L);
@@ -292,18 +289,14 @@ protected:
    void drawExclusiveCheck(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawArrow(Navi::Direction, const QRect&, QPainter*) const;
    void drawSolidArrow(Navi::Direction, const QRect&, QPainter*) const;
-   inline void drawSolidArrowUp(const QStyleOption * option,
-                                QPainter * painter, const QWidget *) const {
-      drawSolidArrow(Navi::N, option->rect, painter); }
-   inline void drawSolidArrowDown(const QStyleOption * option,
-                                  QPainter * painter, const QWidget *) const {
-      drawSolidArrow(Navi::S, option->rect, painter); }
-   inline void drawSolidArrowEast(const QStyleOption * option,
-                                  QPainter * painter, const QWidget *) const {
-      drawSolidArrow(Navi::E, option->rect, painter); }
-   inline void drawSolidArrowWest(const QStyleOption * option,
-                                  QPainter * painter, const QWidget *) const {
-      drawSolidArrow(Navi::W, option->rect, painter); }
+#define INDI_ARROW(_D_)\
+   inline void drawSolidArrow##_D_(const QStyleOption * option,\
+                                         QPainter * painter, const QWidget *) const {\
+      const int dx = option->rect.width()/8, dy = option->rect.height()/8;\
+      drawSolidArrow(Navi::_D_, option->rect.adjusted(dx,dy,-dx,-dy), painter);\
+}
+   INDI_ARROW(N) INDI_ARROW(S) INDI_ARROW(E) INDI_ARROW(W)
+#undef INDI_ARROW
    // slider.cpp
    void drawSlider(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
    void drawDial(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
@@ -355,6 +348,7 @@ private:
    void initMetrics();
    void readSettings(const QSettings *settings = 0L);
    void registerRoutines();
+   static bool isSpecialFrame(const QWidget *w);
    
 private:
    typedef QHash<uint, Tile::Set> TileCache;
@@ -396,7 +390,7 @@ private:
    bool mouseButtonPressed_;
    bool internalEvent_;
 private slots:
-   void reposMenu();
+   void fixKdePalette();
 };
 
 } // namespace Bespin

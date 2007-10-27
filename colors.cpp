@@ -20,7 +20,7 @@
 #include "makros.h"
 #include <QWidget>
 #include <QApplication>
-
+enum Role {Bg = 0, Fg = 1};
 using namespace Bespin;
 
 static QPalette::ColorRole btnRoles[2][2] = {
@@ -48,11 +48,11 @@ QColor Colors::btnBg(const QPalette &pal, bool isEnabled, int hasFocus, int step
    if (!isEnabled)
       return FCOLOR(Window).dark(104);
    QColor c = (hasFocus) ?
-      mid(FCOLOR(Highlight), COLOR(btnRoles[0][0]),
-          1, 10+contrast(FCOLOR(Highlight), COLOR(btnRoles[0][0]))) :
-         COLOR(btnRoles[0][0]);
+      mid(FCOLOR(Highlight), COLOR(btnRoles[0][Bg]),
+          1, 10+contrast(FCOLOR(Highlight), COLOR(btnRoles[0][Bg]))) :
+         COLOR(btnRoles[0][Bg]);
    if (step)
-      return mid(c, COLOR(btnRoles[1][0]), 36 - step, step);
+      return mid(c, COLOR(btnRoles[1][Bg]), 36 - step, step);
    return c;
 }
 
@@ -61,8 +61,8 @@ QColor Colors::btnFg(const QPalette &pal, bool isEnabled, int hover, int step) {
       return mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
    if (hover && !step) step = 6;
    if (step)
-      return mid(COLOR(btnRoles[0][1]), COLOR(btnRoles[1][1]), 6 - step, step);
-   return COLOR(btnRoles[0][1]);
+      return mid(COLOR(btnRoles[0][Fg]), COLOR(btnRoles[1][Fg]), 6 - step, step);
+   return COLOR(btnRoles[0][Fg]);
 }
 
 #undef PAL

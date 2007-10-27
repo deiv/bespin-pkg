@@ -213,6 +213,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.btnRole, "Btn.Role", QPalette::Window);
    handleSettings(ui.btnActiveRole, "Btn.ActiveRole", QPalette::Button);
    handleSettings(ui.ambientLight, "Btn.AmbientLight", true);
+   handleSettings(ui.backlightHover, "Btn.BacklightHover", false);
    
    handleSettings(ui.gradChoose, "Chooser.Gradient", GradSunken);
    

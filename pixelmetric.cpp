@@ -45,13 +45,13 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
    case PM_DefaultFrameWidth: // Default frame width (usually 2)
       if (widget && widget->inherits("QComboBoxPrivateContainer"))
          return 1;
-      if (widget && qobject_cast<const QFrame*>(widget) &&
-          static_cast<const QFrame*>(widget)->frameShape() == QFrame::StyledPanel) {
-	 if (widget->inherits("QTextEdit"))
-	    return dpi.f4;
-         return 0;
-      }
-      return dpi.f1;
+      if (!(widget && qobject_cast<const QFrame*>(widget) &&
+          static_cast<const QFrame*>(widget)->frameShape() ==
+            QFrame::StyledPanel))
+         return dpi.f1;
+      if (isSpecialFrame(widget))
+         return dpi.f4;
+      return 0;
    case PM_SpinBoxFrameWidth: // Frame width of a spin box, defaults to PM_DefaultFrameWidth
       return dpi.f1;
    case PM_ComboBoxFrameWidth: // Frame width of a combo box, defaults to PM_DefaultFrameWidth.
@@ -166,6 +166,8 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
 //    case PM_MenuDesktopFrameWidth: //  
 //    case PM_CheckListButtonSize: // Area (width/height) of the checkbox/radio button in a Q3CheckListItem
 //    case PM_CheckListControllerSize: // Area (width/height) of the controller in a Q3CheckListItem
+//       if (option) return option->rect.height()-dpi.f4;
+//       return dpi.f16;
 //    case PM_DialogButtonsSeparator: // Distance between buttons in a dialog buttons widget
 //    case PM_DialogButtonsButtonWidth: // Minimum width of a button in a dialog buttons widget
 //    case PM_DialogButtonsButtonHeight: // Minimum height of a button in a dialog buttons widget
@@ -189,8 +191,11 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
    case PM_FocusFrameVMargin: // Vertical margin that the focus frame will outset the widget by.
       return dpi.f2;
 //    case PM_IconViewIconSize: //  
-//    case PM_ListViewIconSize: //  
-//    case PM_ToolTipLabelFrameWidth: //  
+//    case PM_ListViewIconSize: //
+//       return 10;
+//       if (option) return option->rect.height()-dpi.f4;
+//       return dpi.f16;
+//    case PM_ToolTipLabelFrameWidth: //
    default:
 #endif
       return QCommonStyle::pixelMetric( pm, option, widget );

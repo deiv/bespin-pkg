@@ -45,7 +45,7 @@ p.setPen(Qt::NoPen)
 static int f1, f2, f3, f4, f7, f9, f11, f2_2, f9_2, f11_2;
 
 static QColor black = Qt::black;
-
+#if 0
 static void
 renderButtonLight(Tile::Set &set)
 {
@@ -64,7 +64,7 @@ renderButtonLight(Tile::Set &set)
    set.setDefaultShape(Tile::Ring);
    delete pix;
 }
-
+#endif
 static void
 renderButtonMask(Tile::Set &set)
 {
@@ -158,7 +158,7 @@ renderRelief(Tile::Set &set)
    set.setDefaultShape(Tile::Ring);
    delete pix;
 }
-
+#if 0
 static void
 renderLightLine(Tile::Line &line)
 {
@@ -175,7 +175,7 @@ renderLightLine(Tile::Line &line)
    line = Tile::Line(tmp,Qt::Horizontal,f49_2,-f49_2);
    delete pix;
 }
-
+#endif
 void BespinStyle::generatePixmaps()
 {
 
@@ -194,7 +194,7 @@ void BespinStyle::generatePixmaps()
          renderButtonShadow(shadows.button[j][i], i, j);
    
    // Pushbutton light
-   renderButtonLight(lights.button);
+//    renderButtonLight(lights.button);
 
    renderLineEditShadow(shadows.lineEdit[false], false);
    renderLineEditShadow(shadows.lineEdit[true], true);
@@ -467,19 +467,6 @@ void BespinStyle::generatePixmaps()
    shadows.group = Tile::Set(QPixmap::fromImage(tmpImg),f12,f12,f49-2*f12,f1);
    shadows.group.setDefaultShape(Tile::Ring);
    
-   // mask --> uses buttons
-//    int f25 = SCALE(25);
-//    tmp = QPixmap(f25,f25);
-//    tmp.fill(Qt::transparent);
-//    p.begin(&tmp);
-//    p.setPen(Qt::NoPen);
-//    p.setRenderHint(QPainter::Antialiasing);
-//    p.setBrush(QColor(0,0,0,255));
-//    p.drawRoundRect(0,0,f25,f25,22,22);
-//    p.end();
-//    f12 = (f25-1)/2;
-//    masks.group = Tile::Mask(tmp,f12,f12,f25-2*f12,f25-2*f12,0,0,0,0,22,22);
-   
    // shadow line
    int w,h,c1,c2;
    for (int i = 0; i < 2; ++i) { // orientarion
@@ -523,57 +510,6 @@ void BespinStyle::generatePixmaps()
             Tile::Line(tmp, i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);
       }
    }
-#if 0
-   // slider handles =================================================
-   QPoint triangle[3] = { QPoint(0, 100), QPoint(-100, -100), QPoint(100, -100) };
-   int size;
-   for (int i = 0; i < 4; ++i) { // direction
-      size = dpi.SliderControl;
-      for (int j = 0; j < 2; ++j) { // sunken?
-         if (j) size -= f2;
-         for (int k = 0; k < 2; ++k) { // opaque?
-            shadows.slider[i][j][k] = QPixmap(size, size);
-            shadows.slider[i][j][k].fill(Qt::transparent);
-            p.begin(&shadows.slider[i][j][k]);
-            p.setRenderHint(QPainter::Antialiasing);
-            p.setPen(Qt::NoPen);
-            p.setBrush(QColor(0,0,0, (1+j+k)*18));
-            p.translate(size/2, size/2);
-            p.scale(size/200.0, size/200.0);
-            p.rotate(-i*90.0);
-            p.drawPolygon(triangle, 3);
-            if (!j) {
-               p.scale(0.78, 0.78);
-               p.setBrush(QColor(0,0,0, (k+1)*12));
-               p.drawPolygon(triangle, 3);
-            }
-            p.end();
-         }
-      }
-      size = dpi.SliderControl - f4;
-      masks.slider[i] = QPixmap(size, size);
-      masks.slider[i].fill(Qt::transparent);
-      p.begin(&masks.slider[i]);
-      p.setRenderHint(QPainter::Antialiasing);
-      p.setPen(Qt::NoPen);
-      p.setBrush(Qt::black);
-      p.translate(size/2, size/2); p.scale(size/200.0, size/200.0);
-      p.rotate(-i*90.0);
-      p.drawPolygon(triangle, 3);
-      p.end();
-      lights.slider[i] = QPixmap(size, size);
-      lights.slider[i].fill(Qt::transparent);
-      p.begin(&lights.slider[i]);
-      p.setRenderHint(QPainter::Antialiasing);
-      p.setPen(Qt::white);
-      p.setBrush(Qt::NoBrush);
-      p.translate(size/2, size/2); p.scale(size/200.0, size/200.0);
-      p.rotate(-i*90.0);
-      p.drawPolygon(triangle, 3);
-      p.end();
-      UPDATE_COLORS(masks.slider[i]);
-   }
-#endif
 #if SHAPE_POPUP
    // ================================================================
    // ================================================================

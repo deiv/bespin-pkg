@@ -26,8 +26,7 @@ BespinStyle::drawToolButton(const QStyleOptionComplex * option,
       
    // special handling for the tabbar scrollers ------------------------------
    if (widget && widget->parentWidget() &&
-      qobject_cast<QTabBar*>(widget->parent()))
-   {
+      qobject_cast<QTabBar*>(widget->parent())) {
       QColor c = widget->parentWidget()->palette().color(config.tab.std_role[0]);
       QColor c2 = widget->parentWidget()->palette().color(config.tab.std_role[1]);
       if (sunken) {
@@ -104,15 +103,15 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
       return;
 
    bool isOn = option->state & State_On;
-   int step = animator->hoverStep(widget);
+   int step =  animator->hoverStep(widget);
    const QColor &c = Colors::bg(PAL, widget);
-   if (isOn && (!hover || step < 6))
+   if (isOn && step < 6)
       masks.tab.render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
    if (hover || step || sunken) {
       QRect r = RECT;
       if (!sunken && step) {
          step = 6 - step;
-         int dx = step*r.width()/18; int dy = step*r.height()/18;
+         const int dx = step*r.width()/18, dy = step*r.height()/18;
          r.adjust(dx, dy, -dx, -dy);
       }
       const Gradients::Type gt = sunken ? Gradients::Sunken :

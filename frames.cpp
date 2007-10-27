@@ -22,6 +22,14 @@
 #include "visualframe.h"
 #include "draw.h"
 
+bool
+BespinStyle::isSpecialFrame(const QWidget *w)
+{
+   return
+      w->inherits("QTextEdit") ||
+      (w->parentWidget() && w->parentWidget()->inherits("KateView"));
+}
+
 void
 BespinStyle::drawFocusFrame(const QStyleOption * option, QPainter * painter,
                             const QWidget *) const
@@ -59,7 +67,7 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
    bool fastFocus = false;
    const QBrush *brush = 0;
    if (qobject_cast<const QFrame*>(widget)) { // frame, can be killed unless...
-      if (widget->inherits("QTextEdit")) { // ...it's a TextEdit!
+      if (isSpecialFrame(widget)) { // ...TextEdit, KateView, ...
          fastFocus = true;
          brush = &PAL.brush(QPalette::Base);
       }

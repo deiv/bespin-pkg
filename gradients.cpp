@@ -45,37 +45,40 @@ would be some overhead and cause a lot of unused space in the dictionaries -
 while hashing by a string is stupid slow ;)
 
 So we store all the gradients by a uint index
-Therefore we substitute the alpha component (byte << 24) of the demanded color
-with the demanded size
-As this would limit the size to 255/256 pixels we'll be a bit sloppy,
-depending on the users resolution (e.g. use 0 to store a gradient with 2px,
-usefull for demand of 1px or 2px) and shift the index
-(e.g. gradients from 0 to 6 px size will hardly be needed -
-maybe add statistics on this)
+Therefore we squeeze the colors to 21 bit (rgba, 6665) and store the size in the
+remaining 9 bits
+As this would limit the size to 512 pixels we'll be a bit sloppy.
+We use size progressing clusters (25). Each stores twenty values and is n-1 px
+sloppy. This way we can manage up to 6800px!
 So the handled size is actually demandedSize + (demandedSize % sizeSloppyness),
 beeing at least demanded size and the next sloppy size above at max
 ====================================================== */
 static inline uint
 hash(int size, const QColor &c, int *sloppyAdd) {
-   
+
    uint magicNumber = 0;
+   // this IS functionizable, but includes a sqrt, some multiplications and
+   // subtractions
+   // as the loop is typically iterated < 4, it's faster this way for our
+   // purpose
    int sizeSloppyness = 1, frameBase = 0, frameSize = 20;
    while ((frameBase += frameSize) < size) {
       ++sizeSloppyness;
       frameSize += 20;
    }
-      
    frameBase -=frameSize; frameSize -= 20;
    
    *sloppyAdd = size % sizeSloppyness;
    if (!*sloppyAdd)
       *sloppyAdd = sizeSloppyness;
 
-   // first 11 bits to store the size, remaining 21 bits for the color (7bpc)
-   magicNumber =  (((frameSize + (size - frameBase)/sizeSloppyness) & 0xff) << 21) |
-      (((c.red() >> 1) & 0x7f) << 14) |
-      (((c.green() >> 1) & 0x7f) << 7 ) |
-      ((c.blue() >> 1) & 0x7f);
+   // first 9 bits to store the size, remaining 23 bits for the color (6bpc, 5b alpha)
+   magicNumber =
+      (((frameSize + (size - frameBase)/sizeSloppyness) & 0x1ff) << 23) |
+      (((c.red() >> 2) & 0x3f) << 17) |
+      (((c.green() >> 2) & 0x3f) << 11 ) |
+      ((c.blue() >> 2) & 0x3f << 5) |
+      ((c.alpha() >> 3) & 0x1f);
    
    return magicNumber;
 }
@@ -297,8 +300,8 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
       qWarning("NULL Pixmap requested, size was %d",size);
       return nullPix;
    }
-   else if (size > 105883) { // this is where our dictionary reaches - should be enough for the moment ;)
-      qWarning("gradient with more than 105883 steps requested, returning NULL pixmap");
+   else if (size > 6800) { // this is where our dictionary reaches - should be enough for the moment ;)
+      qWarning("gradient with more than 6800 steps requested, returning NULL pixmap");
       return nullPix;
    }
    
@@ -353,6 +356,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
          grad = metalGradient(iC, start, stop);
          break;
       }
+      if (c.alpha() < 255) pix->fill(Qt::transparent);
       QPainter p(pix); p.fillRect(pix->rect(), grad); p.end();
    }
    

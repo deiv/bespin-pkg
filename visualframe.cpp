@@ -232,7 +232,7 @@ VisualFrame::correctPosition()
    int x,y,r,b;
    _frame->frameRect().getRect(&x, &y, &r, &b);
    r += (x+1); b += (y+1);
-   QRegion mask(_frame->rect());
+   QRegion mask(_frame->rect());// _frame->mask().isEmpty() ? _frame->rect() : _frame->mask();
    mask -= corner[North].translated(x, y); // tl
    QRect br = corner[South].boundingRect();
    mask -= corner[South].translated(r-br.width(), y); // tr
@@ -296,6 +296,7 @@ VisualFrame::raise()
       bottom->stackUnder(up);
    }
    else {
+      qWarning("BESPIN: raising visualframe to top");
       top->raise();
       left->raise();
       right->raise();

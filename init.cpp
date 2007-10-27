@@ -53,6 +53,17 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
    return list;
 }
 
+#define FIX_KAPP_PALETTE 1
+#if FIX_KAPP_PALETTE
+// this seems to be necessary as KDE somehow sets it's own palette after
+// creating the style - god knows why...
+static QPalette originalPalette;
+
+void BespinStyle::fixKdePalette()
+{
+   qApp->setPalette(originalPalette);
+}
+#endif
 void
 BespinStyle::readSettings(const QSettings* settings)
 {
@@ -113,14 +124,22 @@ BespinStyle::readSettings(const QSettings* settings)
       config.bg.structure = iSettings->value("Bg.Structure", 0).toInt();
    
    // Buttons ===========================
-   config.btn.layer = CLAMP(iSettings->value("Btn.Layer", 0).toInt(), 0, 2);
    config.btn.checkType = (Check::Type) iSettings->value("Btn.CheckType", 0).toInt();
    
    GRAD(btn) = gradientType("Btn.Gradient", Button);
    _progressBase = GRAD(btn);
-   
    if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
       GRAD(btn) = Gradients::None;
+   
+   config.btn.backLightHover = iSettings->value("Btn.BackLightHover", false).toBool();
+   if (config.btn.backLightHover) {
+      config.btn.layer = 0;
+      config.btn.fullHover = false;
+   }
+   else {
+      config.btn.layer = CLAMP(iSettings->value("Btn.Layer", 0).toInt(), 0, 2);
+      config.btn.fullHover = iSettings->value("Btn.FullHover", true).toBool();
+   }
    
    if (config.btn.layer == 2)
       config.btn.cushion = true;
@@ -128,12 +147,11 @@ BespinStyle::readSettings(const QSettings* settings)
       config.btn.cushion = false;
    else
       config.btn.cushion = iSettings->value("Btn.Cushion", true).toBool();
-   config.btn.fullHover = iSettings->value("Btn.FullHover", true).toBool();
+   
    readRole("Btn.Role", btn.std, Window, WindowText);
    readRole("Btn.ActiveRole", btn.active, Button, ButtonText);
    Colors::setButtonRoles(config.btn.std_role[0], config.btn.std_role[1],
                           config.btn.active_role[0], config.btn.active_role[1]);
-   config.btn.swapFocusHover = iSettings->value("Btn.SwapFocusHover", false).toBool();
    config.btn.ambientLight = iSettings->value("Btn.AmbientLight", true).toBool();
    
    // Choosers ===========================
@@ -239,6 +257,9 @@ void BespinStyle::initMetrics()
 
 void BespinStyle::init(const QSettings* settings) {
    readSettings(settings);
+#if FIX_KAPP_PALETTE
+   originalPalette = qApp->palette();
+#endif
    initMetrics();
    generatePixmaps();
    Gradients::init(config.bg.mode > ComplexLights ?

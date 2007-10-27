@@ -24,6 +24,7 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QFrame>
+#include <QTimer>
 
 /**============= System includes ==========================*/
 #ifdef Q_WS_X11
@@ -152,15 +153,15 @@ BespinStyle::registerRoutines()
    registerPE(drawItemCheck, PE_Q3CheckListIndicator);
    registerPE(drawMenuCheck, PE_IndicatorMenuCheckMark);
    registerPE(drawExclusiveCheck, PE_Q3CheckListExclusiveIndicator);
-   registerPE(drawSolidArrowUp, PE_IndicatorArrowUp);
-   registerPE(drawSolidArrowUp, PE_IndicatorSpinUp);
-   registerPE(drawSolidArrowUp, PE_IndicatorSpinPlus);
-   registerPE(drawSolidArrowDown, PE_IndicatorArrowDown);
-   registerPE(drawSolidArrowDown, PE_IndicatorSpinDown);
-   registerPE(drawSolidArrowDown, PE_IndicatorSpinMinus);
-   registerPE(drawSolidArrowDown, PE_IndicatorButtonDropDown);
-   registerPE(drawSolidArrowEast, PE_IndicatorArrowRight);
-   registerPE(drawSolidArrowWest, PE_IndicatorArrowLeft);
+   registerPE(drawSolidArrowN, PE_IndicatorArrowUp);
+   registerPE(drawSolidArrowN, PE_IndicatorSpinUp);
+   registerPE(drawSolidArrowN, PE_IndicatorSpinPlus);
+   registerPE(drawSolidArrowS, PE_IndicatorArrowDown);
+   registerPE(drawSolidArrowS, PE_IndicatorSpinDown);
+   registerPE(drawSolidArrowS, PE_IndicatorSpinMinus);
+   registerPE(drawSolidArrowS, PE_IndicatorButtonDropDown);
+   registerPE(drawSolidArrowE, PE_IndicatorArrowRight);
+   registerPE(drawSolidArrowW, PE_IndicatorArrowLeft);
    // slider.cpp
    registerCC(drawSlider, CC_Slider);
    registerCC(drawDial, CC_Dial);
@@ -216,7 +217,7 @@ internalEvent_(false) {
 
    // start being animated
    animator = new StyleAnimator(this, config.tab.transition, config.tab.animSteps);
-
+   QTimer::singleShot(0, this, SLOT(fixKdePalette()));
 }
 
 BespinStyle::~BespinStyle() {
@@ -350,26 +351,6 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
    case QEvent::MouseButtonPress: {
       QMouseEvent *mev = (QMouseEvent*)ev;
       DEBUG << object;
-//       if (( mev->button() == Qt::LeftButton) &&
-//           object->inherits("QMdiSubWindow")) {
-         //TODO this is a hack to get the popupmenu to the right side. bug TT to query the position with a SH
-//          QWidget *MDI = (QWidget*)object;
-         // check for menu button
-//          QWidget *MDI = qobject_cast<QWidget*>(widget->parent()); if (!MDI) return false; //this is elsewhat...
-         /// this does not work as TT keeps the flag in a private to the titlebar (for no reason?)
-//             if (!(widget->windowFlags() & Qt::WindowSystemMenuHint)) return false;
-         // check if we clicked it..
-//          if (mev->x() < widget->width()-widget->height()-2) return false;
-         // find popup
-//          MDI = qobject_cast<QWidget*>(MDI->parent()); if (!MDI) return false; //this is elsewhat...
-//          MDI = MDI->findChild<QMenu *>("qt_internal_mdi_popup");
-//          if (!MDI) {
-//             qWarning("MDI popup not found, unable to calc menu position");
-//             return false;
-//          }
-//          // calc menu position
-//          emit MDIPopup(mev->globalPos());
-//                        MDI->mapToGlobal( QPoint(widget->width() - MDI->sizeHint().width(), widget->height())));
       return false;
    }
 #endif
