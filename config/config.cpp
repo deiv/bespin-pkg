@@ -115,8 +115,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    ui.btnDelete->setEnabled(false);
    ui.storeLine->hide();
 
-   ui.sectionHeader->setBackgroundRole(QPalette::WindowText);
-   ui.sectionHeader->setForegroundRole(QPalette::Window);
+   ui.sectionHeader->installEventFilter(this);
    connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
             ui.sectionHeader, SLOT(setText(const QString &)));
    connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
@@ -204,6 +203,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    "3" is the default value for this entry*/
    handleSettings(ui.bgMode, "Bg.Mode", 3);
    handleSettings(ui.structure, "Bg.Structure", 0);
+   handleSettings(ui.modalGlas, "Bg.Modal.Glassy", true);
+   handleSettings(ui.modalInvert, "Bg.Modal.Invert", true);
 
    handleSettings(ui.sunkenButtons, "Btn.Layer", 0);
    handleSettings(ui.checkMark, "Btn.CheckType", 0);
@@ -223,9 +224,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.macStyle, "MacStyle", true);
    
    handleSettings(ui.crMenuActive, "Menu.ActiveRole", QPalette::Highlight);
+   handleSettings(ui.menuGlas, "Menu.Glassy", true);
    handleSettings(ui.gradMenuItem, "Menu.ItemGradient", GradNone);
    handleSettings(ui.showMenuIcons, "Menu.ShowIcons", false);
    handleSettings(ui.menuShadow, "Menu.Shadow", false); // i have a compmgr running :P
+   handleSettings(ui.menuOpacity, "Menu.Opacity", 80);
    handleSettings(ui.crPopup, "Menu.Role", QPalette::Window);
    handleSettings(ui.crMenu, "Menu.BarRole", QPalette::Window);
    handleSettings(ui.barSunken, "Menu.BarSunken", false);
@@ -697,8 +700,8 @@ void Config::storedSettigSelected(QListWidgetItem *item) {
 }
 
 void Config::handleBgMode(int idx) {
-   ui.structure->setVisible(idx == 1);
-   ui.labelStructure->setVisible(idx == 1);
+   ui.structure->setEnabled(idx == 1);
+   ui.labelStructure->setEnabled(idx == 1);
 }
 
 void Config::learnPwChar() {
@@ -747,4 +750,20 @@ void Config::setSectionSelectVisible(int idx) {
       setDefaultContextInfo(defInfo1);
       ui.info->setHtml(defInfo1);
    }
+}
+
+#include <QStyleOptionToolBoxV2>
+#include <QPainter>
+
+bool Config::eventFilter(QObject *o, QEvent *ev)
+{
+   if (o != ui.sectionHeader) return false;
+   if (ev->type() != QEvent::Paint) return false;
+   QStyleOptionToolBoxV2 option;
+   option.initFrom(ui.sectionHeader); option.text = ui.sectionHeader->text();
+   option.position = QStyleOptionToolBoxV2::OnlyOneTab;
+   option.state |= (QStyle::State_Selected | QStyle::State_Enabled);
+   QPainter p(ui.sectionHeader);
+   style()->drawControl(QStyle::CE_ToolBoxTab, &option, &p, ui.sectionHeader);
+   return true;
 }

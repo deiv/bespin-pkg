@@ -188,14 +188,18 @@ void BespinStyle::polish( QPalette &pal )
       QBrush brush( c, *_scanlines[0] );
       pal.setBrush( QPalette::Background, brush );
    }
-   
-   // disabled palette
-   int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
-   pal.setColor(QPalette::Disabled, QPalette::Highlight,
-                QColor(highlightGray,highlightGray,highlightGray));
+   // AlternateBase
    pal.setColor(QPalette::Active, QPalette::AlternateBase,
                 Colors::mid(pal.color(QPalette::Active, QPalette::Base),
                             pal.color(QPalette::Active, QPalette::Text),15,1));
+   
+   // disabled palette highlight
+   int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
+   pal.setColor(QPalette::Disabled, QPalette::Highlight,
+                QColor(highlightGray,highlightGray,highlightGray));
+
+   if (false /*config.alterInactivePalette*/) {
+   //inactive palette
    pal.setColor(QPalette::Inactive, QPalette::WindowText,
                 Colors::mid(pal.color(QPalette::Active, QPalette::Window),
                             pal.color(QPalette::Active, QPalette::WindowText),2,1));
@@ -205,20 +209,21 @@ void BespinStyle::polish( QPalette &pal )
    pal.setColor(QPalette::Inactive, QPalette::Text,
                 Colors::mid(pal.color(QPalette::Active, QPalette::Base),
                             pal.color(QPalette::Active, QPalette::Text)));
-   
-   //inactive palette
-   pal.setColor(QPalette::Inactive, QPalette::WindowText,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Window),
-                            pal.color(QPalette::Active, QPalette::WindowText)));
-   pal.setColor(QPalette::Inactive, QPalette::Text,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Base),
-                            pal.color(QPalette::Active, QPalette::Text),1,3));
+   }
+   else {
+      pal.setColor(QPalette::Inactive, QPalette::WindowText,
+                   pal.color(QPalette::Active, QPalette::WindowText));
+      pal.setColor(QPalette::Inactive, QPalette::Base,
+                   pal.color(QPalette::Active, QPalette::Base));
+      pal.setColor(QPalette::Inactive, QPalette::Text,
+                   pal.color(QPalette::Active, QPalette::Text));
+   }
+   pal.setColor(QPalette::Inactive, QPalette::AlternateBase,
+                Colors::mid(pal.color(QPalette::Inactive, QPalette::Base),
+                            pal.color(QPalette::Inactive, QPalette::Text),15,1));
    pal.setColor(QPalette::Inactive, QPalette::Highlight,
                 Colors::mid(pal.color(QPalette::Active, QPalette::Highlight),
-                            pal.color(QPalette::Disabled, QPalette::Highlight),3,1));
-   pal.setColor(QPalette::Inactive, QPalette::AlternateBase,
-                Colors::mid(pal.color(QPalette::Active, QPalette::AlternateBase),
-                            pal.color(QPalette::Active, QPalette::Base),3,1));
+                            pal.color(QPalette::Disabled, QPalette::Highlight),2,1));
 }
 
 #if SHAPE_POPUP
@@ -238,9 +243,51 @@ void BespinStyle::polish( QWidget * widget) {
    
    if (!widget) return; // !
    
-   if (widget->isWindow() && config.bg.mode > Scanlines) {
-      widget->setAutoFillBackground(true);
-      widget->setAttribute(Qt::WA_StyledBackground);
+   if (widget->isWindow()) {
+      bool freakModals = config.bg.modal.invert || config.bg.modal.glassy;
+      if (freakModals)
+         widget->installEventFilter(this);
+      if (config.bg.mode > Scanlines)
+         widget->setAttribute(Qt::WA_StyledBackground);
+//       widget->setAutoFillBackground(true);
+      if (qobject_cast<QMenu *>(widget)) {
+// #ifdef Q_WS_X11
+//       // tell beryl et. al this is a popup TODO: doesn't work yet...
+//          SET_WINDOW_TYPE(widget, winTypePopup);
+// #endif
+         if (config.menu.glassy) {
+            if (config.bg.mode == Scanlines) {
+               QPalette pal = widget->palette();
+               pal.setBrush( QPalette::Background,
+                             pal.color(QPalette::Active, QPalette::Background) );
+               widget->setPalette(pal);
+            }
+            widget->setAttribute(Qt::WA_StyledBackground);
+         }
+         widget->setWindowOpacity( config.menu.opacity/100.0 );
+         // swap qmenu colors - in case
+         widget->setAutoFillBackground(true);
+         widget->setBackgroundRole ( config.menu.std_role[0] );
+         widget->setForegroundRole ( config.menu.std_role[1] );
+         if (config.menu.boldText) {
+            QFont tmpFont = widget->font();
+            tmpFont.setBold(true);
+            widget->setFont(tmpFont);
+         }
+         if (!freakModals && widget->parentWidget() &&
+             widget->parentWidget()->inherits("QMdiSubWindow"))
+            widget->installEventFilter(this);
+#if SHAPE_POPUP
+// WARNING: compmgrs like e.g. beryl/emerald deny to shadow shaped windows,
+// if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
+         if (bar4popup(menu)) {
+            QAction *action = new QAction( menu->menuAction()->iconText(), menu );
+            connect (action, SIGNAL(triggered(bool)), menu, SLOT(hide()));
+            menu->insertAction(menu->actions().at(0), action);
+            menu->installEventFilter(this); // reposition/round corners
+         }
+#endif
+      }
    }
    
 #ifdef MOUSEDEBUG
@@ -443,36 +490,6 @@ void BespinStyle::polish( QWidget * widget) {
          widget->parentWidget()->setAutoFillBackground(false);
          widget->setAutoFillBackground(false);
       }
-   
-   // swap qmenu colors
-   if (qobject_cast<QMenu *>(widget)) {
-#ifdef Q_WS_X11
-      // tell beryl et. al this is a popup TODO: doesn't work yet...
-      SET_WINDOW_TYPE(widget, winTypePopup);
-// WARNING: compmgrs like e.g. beryl/emerald deny to shadow shaped windows,
-// if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
-#endif
-      widget->setBackgroundRole ( config.menu.std_role[0] );
-      widget->setForegroundRole ( config.menu.std_role[1] );
-      if (config.menu.boldText) {
-         QFont tmpFont = widget->font();
-         tmpFont.setBold(true);
-         widget->setFont(tmpFont);
-      }
-      if (widget->parentWidget() &&
-          widget->parentWidget()->inherits("QMdiSubWindow"))
-         widget->installEventFilter(this);
-      // hmmmm... =)
-#if SHAPE_POPUP
-      if (bar4popup(menu)) {
-         QAction *action = new QAction( menu->menuAction()->iconText(), menu );
-         connect (action, SIGNAL(triggered(bool)), menu, SLOT(hide()));
-         menu->insertAction(menu->actions().at(0), action);
-         menu->installEventFilter(this); // reposition/round corners
-      }
-#endif
-   }
-   
    //========================
    
 }

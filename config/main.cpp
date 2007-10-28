@@ -156,8 +156,10 @@ int main(int argc, char *argv[])
    case Demo: {
       if (!app)
          app = new QApplication(argc, argv);
-      if (mode == Demo && argc > 2) // allow setting another style
+      if (mode == Demo && argc > 2) {// allow setting another style
          app->setStyle(argv[2]);
+         app->setPalette(app->style()->standardPalette());
+      }
       Ui::Demo ui;
       Dialog *window = new Dialog;
       ui.setupUi(window);

@@ -86,7 +86,7 @@ static QPixmap invertAlpha(const QPixmap & pix)
    delete dst;
    return ret;
 }
-
+#include <QtDebug>
 Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round)
 {
    if (pix.isNull()) {
@@ -94,14 +94,15 @@ Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int roun
       return;
    }
    _isBitmap = pix.isQBitmap();
-
+   int w = qMax(1, width), h = qMax(1, height);
+   
    int i = xOff*2*round/100;
    rndRect = QRect(i, i, i, i);
 
-   int rOff = pix.width() - xOff - width;
-   int bOff = pix.height() - yOff - height;
-   int amount = 32/width+1;
-   int amount2 = 32/height+1;
+   int rOff = pix.width() - xOff - w;
+   int bOff = pix.height() - yOff - h;
+   int amount = 32/w+1;
+   int amount2 = 32/h+1;
    
    QPainter p;
    
@@ -118,45 +119,45 @@ Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int roun
    p.drawPixmap(0, 0, pix, 0, 0, xOff, yOff);
    finishPixmap(TopLeft);
    
-   initPixmap(TopMid, amount*width, yOff);
+   initPixmap(TopMid, amount*w, yOff);
    for (i = 0; i < amount; i++)
-      p.drawPixmap(i*width, 0, pix, xOff, 0, width, yOff);
+      p.drawPixmap(i*w, 0, pix, xOff, 0, w, yOff);
    finishPixmap(TopMid);
    
    initPixmap(TopRight, rOff, yOff);
-   p.drawPixmap(0, 0, pix, xOff+width, 0, rOff, yOff);
+   p.drawPixmap(0, 0, pix, xOff+w, 0, rOff, yOff);
    finishPixmap(TopRight);
    
    //----------------------------------
-   initPixmap(MidLeft, xOff, amount2*height);
+   initPixmap(MidLeft, xOff, amount2*h);
    for (i = 0; i < amount2; i++)
-      p.drawPixmap(0, i*height, pix, 0, yOff, xOff, height);
+      p.drawPixmap(0, i*h, pix, 0, yOff, xOff, h);
    finishPixmap(MidLeft);
    
-   initPixmap(MidMid, amount*width, amount2*height);
+   initPixmap(MidMid, amount*w, amount2*h);
    for (i = 0; i < amount; i++)
       for (int j = 0; j < amount2; j++)
-         p.drawPixmap(i*width, j*height, pix, xOff, yOff, width, height);
+         p.drawPixmap(i*w, j*h, pix, xOff, yOff, w, h);
    finishPixmap(MidMid);
    
-   initPixmap(MidRight, rOff, amount2*height);
+   initPixmap(MidRight, rOff, amount2*h);
    for (i = 0; i < amount2; i++)
-      p.drawPixmap(0, i*height, pix, xOff+width, yOff, rOff, height);
+      p.drawPixmap(0, i*h, pix, xOff+w, yOff, rOff, h);
    finishPixmap(MidRight);
    
    //----------------------------------
    
    initPixmap(BtmLeft, xOff, bOff);
-   p.drawPixmap(0, 0, pix, 0, yOff+height, xOff, bOff);
+   p.drawPixmap(0, 0, pix, 0, yOff+h, xOff, bOff);
    finishPixmap(BtmLeft);
    
-   initPixmap(BtmMid, amount*width, bOff);
+   initPixmap(BtmMid, amount*w, bOff);
    for (i = 0; i < amount; i++)
-      p.drawPixmap(i*width, 0, pix, xOff, yOff+height, width, bOff);
+      p.drawPixmap(i*w, 0, pix, xOff, yOff+h, w, bOff);
    finishPixmap(BtmMid);
    
    initPixmap(BtmRight, rOff, bOff);
-   p.drawPixmap(0, 0, pix, xOff+width, yOff+height, rOff, bOff);
+   p.drawPixmap(0, 0, pix, xOff+w, yOff+h, rOff, bOff);
    finishPixmap(BtmRight);
    
    _clipOffset[0] = _clipOffset[2] =

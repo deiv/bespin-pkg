@@ -649,24 +649,45 @@ void StyleAnimator::updateTabAnimation() {
    if (!ANIMATIONS) timer->stop();
 }
 
+// works, cpu load is ok, but REALLY annoying!
+#define WOBBLE_HOVER 0
+
+#if WOBBLE_HOVER
+#define HOVER_IN_STEP 1
+#else
+#define HOVER_IN_STEP 2
+#endif
+
 void StyleAnimator::updateFades() {
    if (hoverWidgets.isEmpty())
       return;
    HoverFades::iterator it = hoverWidgets.begin();
    while (it != hoverWidgets.end()) {
       if (it.value().fadeIn) {
-         it.value().step += 2;
+         it.value().step += HOVER_IN_STEP;
          it.key()->repaint();
-         if (it.value().step > 4)
-            it = hoverWidgets.erase(it);
+         if (it.value().step > 4) {
+#if WOBBLE_HOVER
+            if (it.key()->testAttribute(Qt::WA_UnderMouse))
+               it.value().fadeIn = false;
+            else
+#endif
+               it = hoverWidgets.erase(it);
+         }
          else
             ++it;
       }
       else { // fade out
          --it.value().step;
          it.key()->repaint();
-         if (it.value().step < 1)
-            it = hoverWidgets.erase(it);
+         if (it.value().step < 1) {
+#if WOBBLE_HOVER
+            if (it.key()->testAttribute(Qt::WA_UnderMouse))
+               it.value().fadeIn = true;
+            else
+#endif
+               it = hoverWidgets.erase(it);
+         }
          else
             ++it;
       }

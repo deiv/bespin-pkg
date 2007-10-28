@@ -66,6 +66,9 @@ typedef struct Config {
    struct bg {
       BGMode mode;
       int structure;
+      struct {
+         bool glassy, invert;
+      } modal;
    } bg;
    
    struct btn {
@@ -90,7 +93,8 @@ typedef struct Config {
    struct menu {
       QPalette::ColorRole std_role[2], active_role[2], bar_role[2];
       Gradients::Type itemGradient;
-      bool showIcons, shadow, barSunken, boldText, activeItemSunken;
+      bool showIcons, shadow, barSunken, boldText, activeItemSunken, glassy;
+      int opacity;
    } menu;
    
    struct progress {
@@ -225,6 +229,7 @@ protected:
    void drawRadio(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawCheckBoxItem(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawRadioItem(const QStyleOption*, QPainter*, const QWidget*) const;
+   void drawCheckLabel(const QStyleOption*, QPainter*, const QWidget*) const;
    // docks.cpp
    void drawDockTitle(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawDockHandle(const QStyleOption*, QPainter*, const QWidget*) const;

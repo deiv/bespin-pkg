@@ -1,0 +1,62 @@
+#ifndef BESPIN_CONFIG_DEFAULTS
+#define BESPIN_CONFIG_DEFAULTS
+
+#define DEF_SCALE 1.0
+#define LEFTHANDED false
+#define MACSTYLE true
+
+#define BG_MODE BevelV
+#define BG_MODAL_GLASSY true
+#define BG_MODAL_INVERT true
+#define BG_STRUCTURE 0
+
+#define BTN_CHECKTYPE 0
+#define BTN_GRADIENT Button
+#define BTN_BACKLIGHTHOVER false
+#define BTN_LAYER 0
+#define BTN_FULLHOVER false
+#define BTN_CUSHION true
+#define BTN_ROLE Window
+#define BTN_ACTIVEROLE Button
+#define BTN_AMBIENTLIGHT true
+   
+#define CHOOSER_GRADIENT Sunken
+   
+#define INPUT_PWECHOCHAR 0x26AB
+
+#define MENU_GLASSY true
+#define MENU_OPACITY 80
+#define MENU_ITEMGRADIENT None
+#define MENU_SHOWICONS false
+#define MENU_SHADOW false
+#define MENU_ACTIVEROLE Window
+#define MENU_ROLE WindowText
+#define MENU_BARROLE Window
+#define MENU_BARSUNKEN false
+#define MENU_BOLDTEXT false
+#define MENU_ACTIVEITEMSUNKEN false
+   
+#define PROGRESS_GRADIENT Button
+#define PROGRESS_ROLE WindowText
+   
+#define SCROLL_GRADIENT Cloudy
+#define SCROLL_SHOWBUTTONS false
+#define SCROLL_SUNKEN false
+#define SCROLL_GROOVE false
+   
+#define TAB_ACTIVEROLE Window
+#define TAB_ANIMSTEPS 4
+#define TAB_GRADIENT Sunken
+#define TAB_ROLE WindowText
+#define TAB_TRANSITION 10
+#define TAB_ACTIVETABSUNKEN false
+   
+#define TOOLBOX_ACTIVEROLE WindowText
+#define TAB_ACTIVEGRADIENT Sunken
+   
+#define VIEW_HEADERROLE Text
+#define VIEW_SORTINGHEADERROLE Text
+#define VIEW_HEADERGRADIENT Button
+#define VIEW_SORTINGHEADERGRADIENT Sunken
+
+#endif // BESPIN_CONFIG_DEFAULTS

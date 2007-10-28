@@ -325,7 +325,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
    
    QPoint start, stop;
    
-   if (type == Gradients::Progress)
+   if (type == Gradients::Cloudy)
       pix = progressGradient(iC, size, o);
    else if (type == Gradients::RadialGloss)
       pix = rGlossGradient(iC, size);
@@ -477,7 +477,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       set->cornerTile = QPixmap(32, 128);
       set->lCorner = QPixmap(128, 128);
       set->rCorner = QPixmap(128, 128);
-      const QColor c1 = c.light(106);
+      const QColor c1 = c.light(110);
       const QColor c2 = Colors::mid(c1, c);
 
       lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
@@ -498,8 +498,10 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       lg = QLinearGradient(QPoint(0,0), QPoint(0,128));
       p.begin(&set->cornerTile);
       stops << QGradientStop(0, Colors::mid(c1, c2,1,4)) << QGradientStop(1, c2);
-      lg.setStops(stops); p.fillRect(set->cornerTile.rect(), lg);
-      stops.clear(); p.end();
+      lg.setStops(stops);
+      p.fillRect(set->cornerTile.rect(), c2);
+      stops.clear();
+      p.end();
       // Left Corner, right corner
       QPixmap *mask, *pix;
       for (int cnr = 0; cnr < 2; ++cnr) {

@@ -179,13 +179,21 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
 {
    if (!(widget && widget->isWindow()))
       return; // can't do anything here
-   if (!widget->isActiveWindow())
-      return; // experiment - plain inactives...
    if (PAL.brush(widget->backgroundRole()).style() > 1)
       return; // we'd cover a gradient/pixmap/whatever
    
    const QColor &c = PAL.color(widget->backgroundRole());
-   
+   if ((widget->isModal() && config.bg.modal.glassy) ||
+       ((widget->windowFlags() & 0x8) && config.menu.glassy)) {
+      QPainterPath path;
+      path.moveTo(RECT.topLeft());
+      path.lineTo(RECT.topRight());
+      path.quadTo(RECT.center()/2, RECT.bottomLeft());
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(c.light(115-Colors::value(c)/20));
+      painter->drawPath(path);
+      return;
+   }
    switch (config.bg.mode) {
 #ifndef QT_NO_XRENDER
    case ComplexLights:

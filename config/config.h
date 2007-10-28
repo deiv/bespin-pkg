@@ -39,6 +39,8 @@ public slots:
    void save(); // to store colors to qt configuration - in case
    void import();
    void saveAs();
+protected:
+   bool eventFilter(QObject *, QEvent *);
 private:
    /** This is the UI created with Qt Designer and included by ui_config.h */
    Ui::Config ui;

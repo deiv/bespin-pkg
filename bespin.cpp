@@ -107,6 +107,8 @@ BespinStyle::registerRoutines()
    registerPE(drawRadio, PE_IndicatorRadioButton);
    registerCE(drawCheckBoxItem, CE_CheckBox);
    registerCE(drawRadioItem, CE_RadioButton);
+   registerCE(drawCheckLabel, CE_CheckBoxLabel);
+   registerCE(drawCheckLabel, CE_RadioButtonLabel);
    // docks.cpp
    registerPE(skip, PE_Q3DockWindowSeparator);
    registerPE(skip, PE_FrameDockWidget);
@@ -284,7 +286,26 @@ BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy,
    painter->drawPixmap(xy, qPix);
 }
 
-
+static void swapPalette(QWidget *widget)
+{
+   QPalette pal(widget->palette());
+   QColor h;
+   for (int group = 0; group < 3; ++group) {
+      h = pal.color((QPalette::ColorGroup)group, QPalette::WindowText);
+      if (Colors::value(h) < 70) {
+         int hh,s,v; h.getHsv(&hh,&s,&v); h.setHsv(hh,s,70);
+      }
+      pal.setColor((QPalette::ColorGroup)group, QPalette::WindowText,
+                    pal.color((QPalette::ColorGroup)group, QPalette::Window));
+      pal.setColor((QPalette::ColorGroup)group, QPalette::Window, h);
+      h = pal.color((QPalette::ColorGroup)group, QPalette::Button);
+      pal.setColor((QPalette::ColorGroup)group, QPalette::Button,
+                    pal.color((QPalette::ColorGroup)group, QPalette::ButtonText));
+      pal.setColor((QPalette::ColorGroup)group, QPalette::ButtonText, h);
+   }
+   widget->setPalette(pal);
+}
+      
 bool
 BespinStyle::eventFilter( QObject *object, QEvent *ev )
 {
@@ -355,7 +376,13 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
    }
 #endif
    case QEvent::Show:
-      if (QMenu * menu = qobject_cast<QMenu*>(object)) {
+      if (QWidget * widget = qobject_cast<QWidget*>(object)) {
+         if (widget->isModal()) {
+         if (config.bg.modal.invert) swapPalette(widget);
+         if (config.bg.modal.glassy) widget->setWindowOpacity( .8 );
+         return false;
+      }
+      if (QMenu * menu = qobject_cast<QMenu*>(widget)) {
          if (menu->parentWidget() &&
              menu->parentWidget()->inherits("QMdiSubWindow")) {
             QPoint pt = menu->parentWidget()->rect().topRight();
@@ -374,6 +401,12 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
          return false;
 #endif
       }
+      return false;
+   }
+   case QEvent::Hide:
+      if (QWidget * widget = qobject_cast<QWidget*>(object))
+      if (widget->isModal())
+      if (config.bg.modal.invert) swapPalette(widget);
       return false;
    default:
       return false;

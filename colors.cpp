@@ -86,7 +86,7 @@ int Colors::contrast(const QColor &a, const QColor &b) {
    return perc;
 }
 
-QPalette::ColorRole counterRole(QPalette::ColorRole role) {
+QPalette::ColorRole Colors::counterRole(QPalette::ColorRole role) {
    switch (role) {
    case QPalette::ButtonText: //8
       return QPalette::Button;

@@ -459,7 +459,7 @@ BespinStyle::drawRadioItem(const QStyleOption * option, QPainter * painter,
    subopt.rect = subElementRect(SE_RadioButtonIndicator, btn, widget);
    drawRadio(&subopt, painter, widget);
    subopt.rect = subElementRect(SE_RadioButtonContents, btn, widget);
-   drawControl(CE_RadioButtonLabel, &subopt, painter, widget);
+   drawCheckLabel(&subopt, painter, widget);
 }
 
 void
@@ -471,8 +471,31 @@ BespinStyle::drawCheckBoxItem(const QStyleOption * option, QPainter * painter,
    subopt.rect = subElementRect(SE_CheckBoxIndicator, btn, widget);
    drawCheckBox(&subopt, painter, widget);
    subopt.rect = subElementRect(SE_CheckBoxContents, btn, widget);
-   drawControl(CE_CheckBoxLabel, &subopt, painter, widget);
+   drawCheckLabel(&subopt, painter, widget);
 }
 
-//    case CE_CheckBoxLabel: // The label (text or pixmap) of a QCheckBox
-//    case CE_RadioButtonLabel: // The label (text or pixmap) of a QRadioButton
+void
+BespinStyle::drawCheckLabel(const QStyleOption * option, QPainter * painter,
+                            const QWidget * widget) const
+{
+   ASSURE_OPTION(btn, Button);
+   OPT_ENABLED;
+   
+   uint alignment =
+      visualAlignment(btn->direction, Qt::AlignLeft | Qt::AlignVCenter);
+
+   QRect textRect = RECT;
+   if (!btn->icon.isNull()) {
+      const QPixmap pix =
+         btn->icon.pixmap(btn->iconSize,
+                          isEnabled ? QIcon::Normal : QIcon::Disabled);
+      drawItemPixmap(painter, btn->rect, alignment, pix);
+      if (btn->direction == Qt::RightToLeft)
+         textRect.setRight(textRect.right() - btn->iconSize.width() - dpi.f4);
+      else
+         textRect.setLeft(textRect.left() + btn->iconSize.width() + dpi.f4);
+   }
+   if (!btn->text.isEmpty())
+      drawItemText(painter, textRect, alignment | Qt::TextShowMnemonic,
+                   PAL, isEnabled, btn->text, QPalette::WindowText);
+}

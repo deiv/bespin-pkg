@@ -34,10 +34,9 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
    case CT_ComboBox: // A combo box, like QComboBox
       if (const QStyleOptionComboBox *cb =
           qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-         int margin = 0;
+	 int hgt = contentsSize.height();
          if ( cb->frame )
-            margin = (cb->editable || config.btn.fullHover) ? dpi.f1 : dpi.f2;
-         int hgt = contentsSize.height() + 2*margin;
+            hgt += (cb->editable || config.btn.fullHover) ? dpi.f2 : dpi.f4;
          return QSize(contentsSize.width()+dpi.f10+(int)(hgt/1.1), hgt);
       }
 //    case CT_DialogButtons: //
@@ -60,7 +59,7 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
          return sz;
       }
    case CT_LineEdit: // A line edit, like QLineEdit
-      return contentsSize + QSize(dpi.f4,dpi.f5);
+      return contentsSize + QSize(dpi.f4,dpi.f2);
    case CT_MenuBarItem: // A menu bar item, like the buttons in a QMenuBar
       return QSize(qMax(contentsSize.width()+dpi.f18,
                         (contentsSize.height()+dpi.f8)*8/5),
