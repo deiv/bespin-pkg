@@ -132,7 +132,7 @@ BespinStyle::readSettings(const QSettings* settings)
    
    // Buttons ===========================
    config.btn.checkType = (Check::Type) readInt("Btn.CheckType", BTN_CHECKTYPE);
-
+   config.btn.round = readBool("Btn.Round", false);
    GRAD(btn) = readGrad("Btn.Gradient", BTN_GRADIENT);
    _progressBase = GRAD(btn);
    if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
@@ -220,6 +220,7 @@ BespinStyle::readSettings(const QSettings* settings)
       readGrad("View.SortingHeaderGradient", VIEW_SORTINGHEADERGRADIENT);
    
    // General ===========================
+   config.shadowIntensity = iSettings->value("ShadowIntensity", 100).toInt()/100.0;
    config.scale = iSettings->value("Scale", DEF_SCALE).toDouble();
    if (config.scale != 1.0) {
       QFont fnt = qApp->font();
@@ -251,7 +252,7 @@ void BespinStyle::initMetrics()
    dpi.f20 = SCALE(20); dpi.f32 = SCALE(32);
    dpi.f80 = SCALE(80);
    
-   dpi.ScrollBarExtent = SCALE(17);
+   dpi.ScrollBarExtent = SCALE(15);
    dpi.ScrollBarSliderMin = SCALE(40);
    dpi.SliderThickness = SCALE(24);
    dpi.SliderControl = SCALE(19);

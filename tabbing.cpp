@@ -165,7 +165,8 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
    if (!(animStep || sunken)) return;
        
    const int f2 = dpi.f2;
-   QRect rect = RECT.adjusted(dpi.f3, dpi.f5, -dpi.f4, -dpi.f5);
+   QRect rect = RECT.adjusted(dpi.f3, dpi.f5, -dpi.f4,
+                              config.tab.activeTabSunken ? -dpi.f4 : -dpi.f5);
    int size = RECT.height()-f2;
    Qt::Orientation o = Qt::Vertical;
    const bool vertical = verticalTabs(tab->shape);

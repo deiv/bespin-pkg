@@ -101,8 +101,8 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
       mask = &masks.button;
    }
    else if (option->state & State_Raised) {
-      shadow = &shadows.tab[1][0];
-      mask = &masks.tab;
+      shadow = &shadows.group;
+      mask = &masks.button;
    }
    
    if (brush)

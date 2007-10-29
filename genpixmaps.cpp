@@ -11,7 +11,7 @@ using namespace Bespin;
 extern Dpi dpi;
 extern Config config;
 
-#define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
+// #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 
 #ifdef QT_NO_XRENDER
 // simply sets the pixmaps alpha value to all rgb (i.e. grey) channels
@@ -65,38 +65,48 @@ renderButtonLight(Tile::Set &set)
    delete pix;
 }
 #endif
-static void
-renderButtonMask(Tile::Set &set)
-{
-   NEW_EMPTY_PIX(f9, f9);
-   SET_ALPHA(255);
-   p.drawRoundRect(0,0,f9,f9,70,70);
-   p.end();
-   UPDATE_COLORS(*pix);
-   set = Tile::Set(*pix,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2, 70);
-   set.setClipOffsets(0,0,0,0);
-   delete pix;
-}
-
-static void
-renderButtonShadow(Tile::Set &set, bool opaque, bool sunken)
-{
-   NEW_EMPTY_PIX(f9, f9);
-   SET_ALPHA(((sunken?5:1)+opaque)*5);
-   p.drawRoundRect(0,0,f9,f9,90,90);
-   if (!sunken) {
-      SET_ALPHA((1+opaque)*11);
-      p.drawRoundRect(dpi.f1,f2,f9-f2,f9-dpi.f3,90,90);
-      SET_ALPHA((1+opaque)*10);
-      p.drawRoundRect(f2,f2,f9-f4,f9-f4,80,80);
-   }
-   p.end();
-   set = Tile::Set(*pix,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-   set.setDefaultShape(Tile::Ring);
-   delete pix;
-}
 
 #define WHITE(_A_) QColor(255,255,255, _A_)
+#define BLACK(_A_) QColor(0,0,0, _A_)
+
+static QPixmap
+shadow(int size, bool opaque, bool sunken, float factor = 1.0)
+{
+   QPixmap pix(size, size);
+   pix.fill(Qt::transparent);
+   QPainter p(&pix);
+   p.setRenderHint(QPainter::Antialiasing);
+   p.setPen(Qt::NoPen);
+   float d = size/2.0;
+   QRadialGradient rg(d, d, d);
+   int alpha = config.shadowIntensity * factor * (sunken ? 100 : (opaque ? 48 : 20));
+   rg.setColorAt(0.7, BLACK(CLAMP(alpha,0,255)));
+   rg.setColorAt(1.0, BLACK(0));
+   p.fillRect(pix.rect(), rg); p.end();
+   return pix;
+}
+
+static QPixmap
+roundMask(int size)
+{
+   QPixmap pix(size, size); pix.fill(Qt::transparent);
+   QPainter p(&pix); p.setRenderHint(QPainter::Antialiasing);
+   p.setPen(Qt::NoPen); p.setBrush(Qt::black);
+   p.drawEllipse(pix.rect()); p.end();
+   UPDATE_COLORS(pix);
+   return pix;
+}
+
+static QPixmap
+roundedMask(int size, int factor)
+{
+   QPixmap pix(size, size); pix.fill(Qt::transparent);
+   QPainter p(&pix); p.setRenderHint(QPainter::Antialiasing);
+   p.setPen(Qt::NoPen); p.setBrush(Qt::black);
+   p.drawRoundRect(pix.rect(),factor,factor); p.end();
+   UPDATE_COLORS(pix);
+   return pix;
+}
 
 static void
 renderLineEditShadow(Tile::Set &set, bool enabled)
@@ -186,12 +196,15 @@ void BespinStyle::generatePixmaps()
    f2_2 = lround(f2/2.0); f9_2 = (f9-1)/2; f11_2 = f11/2;
 
    // Pushbutton mask
-   renderButtonMask(masks.button);
+   masks.button = Tile::Set(roundedMask(f9, 70),f9/2,f9/2,1,1, 70);
+   masks.button.setClipOffsets(0,0,0,0);
    
    // Pushbutton shadows
    for (int i = 0; i < 2; ++i) // opaque?
-      for (int j = 0; j < 2; ++j) // sunken?
-         renderButtonShadow(shadows.button[j][i], i, j);
+      for (int j = 0; j < 2; ++j) {// sunken?
+         shadows.button[i][j] = Tile::Set(shadow(f9,i,j,.8), f9/2, f9/2, 1, 1);
+         shadows.button[i][j].setDefaultShape(Tile::Ring);
+      }
    
    // Pushbutton light
 //    renderButtonLight(lights.button);
@@ -210,105 +223,35 @@ void BespinStyle::generatePixmaps()
    int f49_2 = (f49-1)/2;
    // ================================================================
    
-   // SLIDERSHADOW =====================================
-   int rw = dpi.SliderControl, rh = dpi.SliderControl;
+   // SLIDER =====================================
    // shadow
    for (int i = 0; i < 2; ++i) { // opaque?
-      for (int j = 0; j < 2; ++j) { // sunken?
-         shadows.sliderRound[j][i] = QPixmap(rw-f1*2*j, rh-f1*2*j);
-         shadows.sliderRound[j][i].fill(Qt::transparent);
-         p.begin(&shadows.sliderRound[j][i]);
-         p.setPen(Qt::NoPen);
-         p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,(1+i+2*j)*14));
-         p.drawEllipse(shadows.sliderRound[j][i].rect());
-         if (!j) {
-            p.setBrush(QColor(0,0,0,(i+1)*14));
-            p.drawEllipse(f2_2,f2_2,rw-f2,rh-f2);
-         }
-         p.end();
-      }
+         shadows.sliderRound[i][false] = shadow(dpi.SliderControl, i,false);
+         shadows.sliderRound[i][true] = shadow(dpi.SliderControl-f2, i,true);
    }
-
-   rw -= f4; rh -= f4;
-   masks.slider = QPixmap(rw, rh);
-   masks.slider.fill(Qt::transparent);
-   p.begin(&masks.slider);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,255));
-   p.drawEllipse(0,0,rw,rh);
-   p.end();
-   UPDATE_COLORS(masks.slider);
+   masks.slider = roundMask(dpi.SliderControl-f4);
+   // ================================================================
 
    // RADIOUTTON =====================================
-   rw = dpi.ExclusiveIndicator;
-   rh = rw - f1;
    // shadow
    for (int i = 0; i < 2; ++i) { // opaque?
-      for (int j = 0; j < 2; ++j) { // sunken?
-         shadows.radio[j][i] = QPixmap(rw-f1*2*j, rh-f1*2*j);
-         shadows.radio[j][i].fill(Qt::transparent);
-         p.begin(&shadows.radio[j][i]);
-         p.setPen(Qt::NoPen);
-         p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,(1+i+2*j)*9));
-         p.drawEllipse(shadows.radio[j][i].rect());
-         if (!j) {
-            p.setBrush(QColor(0,0,0,(i+1)*14));
-            p.drawEllipse(f2_2,f2_2,rw-f2,rh-f2);
-         }
-         p.end();
-      }
+      shadows.radio[i][false] = shadow(dpi.ExclusiveIndicator, i,false);
+      shadows.radio[i][true] = shadow(dpi.ExclusiveIndicator-f2, i,true);
    }
-   
    // mask
-   rw -= f4; rh -= f3;
-   masks.radio = QPixmap(rw, rh);
-   masks.radio.fill(Qt::transparent);
-   p.begin(&masks.radio);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,255));
-   p.drawEllipse(0,0,rw,rh);
-   p.end();
-   UPDATE_COLORS(masks.radio);
-   
+   masks.radio = roundMask(dpi.ExclusiveIndicator-f4);
    // mask fill
-   if (config.btn.layer) {
-      rw -= dpi.f6; rh -= dpi.f6;
-   }
-   else {
-      rw -= dpi.f8; rh -= dpi.f8;
-   }
-   masks.radioIndicator = QPixmap(rw, rh);
-   masks.radioIndicator.fill(Qt::transparent);
-   p.begin(&masks.radioIndicator);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,255));
-   p.drawEllipse(0,0,rw,rh);
-   p.end();
-   UPDATE_COLORS(masks.radioIndicator);
-   
+   masks.radioIndicator =
+      roundMask(dpi.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
    // ================================================================
    
    // NOTCH =====================================
-   masks.notch = QPixmap(dpi.f6, dpi.f6);
-   masks.notch.fill(Qt::transparent);
-   p.begin(&masks.notch);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(Qt::black);
-   p.drawEllipse(0,0,dpi.f6,dpi.f6);
-   p.end();
-   UPDATE_COLORS(masks.notch);
+   masks.notch = roundMask(dpi.f6);
    // ================================================================
    
    // RECTANGULAR =====================================
-   
    // raised
-   
+   // TODO?!
    // sunken
    int f6 = dpi.f6;
    tmp = QPixmap(f9,f9);
@@ -340,73 +283,27 @@ void BespinStyle::generatePixmaps()
    // ================================================================
    
    // TABBAR =====================================
-   
    // mask
-   int f13 = SCALE(13);
-   tmp = QPixmap(f13,f13);
-   tmp.fill(Qt::transparent);
-   p.begin(&tmp);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,255));
-   p.drawRoundRect(0,0,f13,f13,99,99);
-   p.end();
-   int f13_2 = (f13-1)/2;
-   UPDATE_COLORS(tmp);
-   masks.tab = Tile::Set(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2, 99);
+   int f13 = SCALE(13), f13_2 = f13/2;
+   masks.tab = Tile::Set(roundedMask(f13,99),f13/2,f13/2,1,1, 99);
    masks.tab.setClipOffsets(0,0,0,0);
    
    // light
-   tmp.fill(Qt::transparent);
-   p.begin(&tmp);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,20));
-   p.drawRoundRect(0,0,f13,f13,99,99);
-   p.setBrush(QColor(0,0,0,44));
-   p.drawRoundRect(f1,f1,f13-2*f1,f13-2*f1,95,95);
-   p.setBrush(QColor(0,0,0,64));
-   p.drawRoundRect(f2,f2,f13-2*f2,f13-2*f2,93,93);
-   p.setBrush(QColor(0,0,0,64));
-   p.drawRoundRect(f3,f3,f13-2*f3,f13-2*f3,91,91);
-   p.end();
-   lights.tab = Tile::Set(tmp,f13_2,f13_2,f13-2*f13_2,f13-2*f13_2);
+   lights.tab = Tile::Set(shadow(f11, true, false, 3.0), f11/2,f11/2,1,1);
    lights.tab.setClipOffsets(f3,f3,f3,f3);
    lights.tab.setDefaultShape(Tile::Ring);
    
    // shadow
    int f17 = SCALE(17), f17_2 = (f17-1)/2;
-   QImage tmpImg = QImage(f17,f17, QImage::Format_ARGB32);
-   for (int i = 0; i < 2; ++i) { // opaque?
-      for (int j = 0; j < 2; ++j) { // sunken?
-         int add = 5*(i+2*j);
-         tmpImg.fill(Qt::transparent);
-         p.begin(&tmpImg);
-         p.setPen(Qt::NoPen);
-         p.setRenderHint(QPainter::Antialiasing);
-         p.setBrush(QColor(0,0,0,10+add));
-         p.drawRoundRect(0,0,f17,f17,90,90);
-         p.setBrush(QColor(0,0,0,13+add));
-         p.drawRoundRect(f1,f1,f17-f2,f17-f2,93,93);
-         p.setBrush(QColor(0,0,0,18+add));
-         p.drawRoundRect(f2,f2,f17-f4,f17-f4,96,96);
-         p.setBrush(QColor(0,0,0,23+add));
-         p.drawRoundRect(dpi.f3,dpi.f3,f17-dpi.f6,f17-dpi.f6,99,99);
-         p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
-         p.setBrush(QColor(0,0,0,255));
-         p.drawRoundRect(f2,f1,f17-f4,f17-dpi.f5,99,99);
-         p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-         p.setPen(QColor(255,255,255,170));
-         p.setBrush(Qt::NoBrush);
-         p.drawRoundRect(f2,f1,f17-f4,f17-dpi.f5,99,99);
-         p.end();
-         shadows.tab[i][j] =
-                  Tile::Set(QPixmap::fromImage(tmpImg),f17_2,f17_2,f17-2*f17_2,f17-2*f17_2);
+   for (int i = 0; i < 2; ++i) // opaque?
+      for (int j = 0; j < 2; ++j) {// sunken?
+         shadows.tab[i][j] = Tile::Set(shadow(f17, i, j), f17/2, f17/2, 1, 1);
          shadows.tab[i][j].setDefaultShape(Tile::Ring);
       }
-   }
+
    
-   
+   QImage tmpImg = QImage(f17,f17, QImage::Format_ARGB32);
+
    // sunken
    int f15 = SCALE(15);
    tmpImg.fill(Qt::transparent);
@@ -437,9 +334,9 @@ void BespinStyle::generatePixmaps()
    p.end();
    shadows.tabSunken = Tile::Set(QPixmap::fromImage(tmpImg),f17_2,f17_2,f17-2*f17_2,f17-2*f17_2);
    shadows.tabSunken.setDefaultShape(Tile::Ring);
+   // ================================================================
    
    // GROUPBOX =====================================
-   
    // shadow
    tmpImg = QImage(f49,f49, QImage::Format_ARGB32);
    tmpImg.fill(Qt::transparent);
@@ -466,8 +363,9 @@ void BespinStyle::generatePixmaps()
    int f12 = dpi.f12;
    shadows.group = Tile::Set(QPixmap::fromImage(tmpImg),f12,f12,f49-2*f12,f1);
    shadows.group.setDefaultShape(Tile::Ring);
+   // ================================================================
    
-   // shadow line
+   // LINES =============================================
    int w,h,c1,c2;
    for (int i = 0; i < 2; ++i) { // orientarion
       if (i) {

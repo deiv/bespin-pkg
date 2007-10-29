@@ -120,11 +120,10 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
                 qobject_cast<const QAbstractButton*>(widget))
             if (abn->isCheckable())
                w += contentsSize.height()/2+dpi.f10;
+	    int h = contentsSize.height() + (config.btn.layer ? dpi.f4 : dpi.f6);
+	    if (config.btn.round) { w += dpi.f8; h -= dpi.f2; }
             if (w < dpi.f80) w = dpi.f80;
-            if (config.btn.layer)
-               return QSize(w, contentsSize.height() + dpi.f4);
-            else
-               return QSize(w, contentsSize.height() + dpi.f6);
+            return QSize(w, h);
          }
       }
 //    case CT_RadioButton: // A radio button, like QRadioButton

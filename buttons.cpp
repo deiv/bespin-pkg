@@ -127,11 +127,20 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    bool drawInner = false;
    Gradients::Type gt = GRAD(btn);
    if (animStep) {
-      iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
-      if (config.btn.fullHover)
+      if (config.btn.fullHover) {
+         iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
          c = iC;
-      else
-         drawInner = !config.btn.backLightHover;
+      }
+      else {
+         if (config.btn.backLightHover) {
+            drawInner = false;
+            iC = Colors::mid(FCOLOR(Window), CCOLOR(btn.active, Bg), 6-animStep, animStep);
+         }
+         else {
+            drawInner = true;
+            iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
+         }
+      }
       if ((config.btn.cushion && sunken) || toggled) {
          gt = Gradients::Sunken;
          drawInner = true;
@@ -155,54 +164,53 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
          }
          if (hasFocus) {
             r = RECT; r.setBottom(r.bottom()-f1);
-            masks.button.outline(r, painter, Colors::mid(c, FCOLOR(Highlight)),
-                                 dpi.f3);
+            masks.button.outline(r, painter, FCOLOR(Highlight), dpi.f3);
          }
       }
-      if (!isEnabled ||
-          (sunken && !config.btn.cushion) ||
-          config.btn.layer == 2)
+      if (config.btn.layer == 2 || (sunken && !config.btn.cushion) || !isEnabled )
          shadows.lineEdit[isEnabled].render(RECT, painter);
-      else {
+      else
          shadows.relief.render(RECT, painter);
-         if (Gradients::isReflective(gt))
-            masks.button.outline(r.adjusted(f1,f1,-f1,-f1), painter,
-                                 Colors::mid(c, Qt::white), f1);
-      }
       return;
    }
    
    // normal buttons ---------------
-   if (hasFocus) // focus?
-      lights.tab.render(RECT, painter, FCOLOR(Highlight));
+   const bool round = config.btn.round && !isCheckbox;
+   const Tile::Set *mask = round ? &masks.tab : &masks.button;
+   if (hasFocus) {// focus?
+      const int contrast = Colors::contrast(FCOLOR(Window), FCOLOR(Highlight));
+      lights.tab.render(RECT, painter, Colors::mid(FCOLOR(Window),
+         FCOLOR(Highlight), contrast/10, 1));
+   }
    else if (config.btn.backLightHover && animStep) {
       lights.tab.render(RECT, painter, iC); // backlight
    }
    // shadow
    if (sunken && !config.btn.cushion) {
       r.adjust(f1, f1, -f1, -f2);
-      shadows.button[true][isEnabled].render(r, painter);
+      round ? shadows.tab[isEnabled][true].render(r, painter) :
+         shadows.button[isEnabled][true].render(r, painter);
       r.adjust(f1, f1, -f1, -f1);
    }
    else {
       r.adjust(0, f1, 0, 0);
-      shadows.button[false][isEnabled].render(r, painter);
+      round ? shadows.tab[isEnabled][false].render(r, painter) :
+         shadows.button[isEnabled][false].render(r, painter);
       r.adjust(f2, f1, -f2, -dpi.f3);
    }
    
    // plate
-   masks.button.render(r, painter, GRAD(btn), Qt::Vertical, c);
+   mask->render(r, painter, GRAD(btn), Qt::Vertical, c);
 
    // outline?
    if (isEnabled) {
-      masks.button.outline(r.adjusted(f1,f1,-f1,-f1), painter,
-                           Colors::mid(c, Qt::white),
-                           Gradients::isReflective(gt) ? f2 : f1);
+      mask->outline(r.adjusted(f1,f1,-f1,-f1), painter,
+                           Colors::mid(c, Qt::white), f1);
       
       if (drawInner) {
          const QRect ir = isCheckbox ? r.adjusted(f2, f2, -f2, -f2 ) :
             r.adjusted(dpi.f3, f2, -dpi.f3, -f2 );
-         masks.button.render(ir, painter, gt, Qt::Vertical,
+         mask->render(ir, painter, gt, Qt::Vertical,
                              config.btn.backLightHover ? c : iC,
                              r.height(), QPoint(0,f2));
       }
@@ -409,7 +417,7 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
    }
    else {
       
-      if (!sunken && hasFocus) {
+      if (hasFocus) {
          painter->save();
          painter->setBrush(Colors::mid(FCOLOR(Window), FCOLOR(Highlight), 3, 1));
          painter->setPen(Qt::NoPen);
@@ -421,7 +429,7 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
       // shadow
       sunken = sunken || isOn;
       painter->drawPixmap(sunken ? xy + QPoint(f1,f1) : xy,
-                          shadows.radio[sunken][isEnabled]);
+                          shadows.radio[isEnabled][sunken]);
       
       // plate
       xy += QPoint(f2,f1);

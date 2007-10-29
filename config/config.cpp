@@ -215,6 +215,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.btnActiveRole, "Btn.ActiveRole", QPalette::Button);
    handleSettings(ui.ambientLight, "Btn.AmbientLight", true);
    handleSettings(ui.backlightHover, "Btn.BacklightHover", false);
+   handleSettings(ui.btnRound, "Btn.Round", false);
    
    handleSettings(ui.gradChoose, "Chooser.Gradient", GradSunken);
    
@@ -242,6 +243,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.scrollSunken, "Scroll.Sunken", false);
    handleSettings(ui.gradScroll, "Scroll.Gradient", GradButton);
    handleSettings(ui.scrollGroove, "Scroll.Groove", false);
+
+   handleSettings(ui.shadowIntensity, "ShadowIntensity", 100);
    
    handleSettings(ui.crTabBarActive, "Tab.ActiveRole", QPalette::Highlight);
    handleSettings(ui.tabAnimSteps, "Tab.AnimSteps", 4);

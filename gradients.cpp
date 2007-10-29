@@ -150,10 +150,12 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false) {
    c.getHsv(&h,&s,&v);
 
    // calculate the variation
-   add = ((180-qGray(c.rgb()))>>1);
+   add = (180-qGray(c.rgb()))>>1;
    if (add < 0) add = -add/2;
    if (glass)
       add = add>>4;
+   else
+      add = add>>2;
 
    // the brightest color (top)
    cv = v+27+add;
@@ -178,8 +180,9 @@ gl_ssGradient(const QColor &c, const QPoint &start, const QPoint &stop, bool gla
    QColor bb,dd; // b = d = c;
    gl_ssColors(c, &bb, &dd, glass);
    QLinearGradient lg(start, stop);
-   lg.setColorAt(0,bb); lg.setColorAt(0.5,c);
-   lg.setColorAt(0.5, dd); lg.setColorAt(glass ? 1 : .90, bb);
+   lg.setColorAt(0,bb); lg.setColorAt(glass ? 0.5 : 0.35,c);
+   lg.setColorAt(0.5, dd); lg.setColorAt(glass ? 1 : .80, bb);
+   if (!glass) lg.setColorAt(1, Qt::white);
    return lg;
 }
 

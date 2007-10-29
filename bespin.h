@@ -74,7 +74,7 @@ typedef struct Config {
    struct btn {
       int layer;
       Check::Type checkType;
-      bool cushion, fullHover, backLightHover, ambientLight;
+      bool cushion, fullHover, backLightHover, ambientLight, round;
       Gradients::Type gradient, focusGradient;
       QPalette::ColorRole std_role[2], active_role[2];
    } btn;
@@ -102,12 +102,14 @@ typedef struct Config {
       QPalette::ColorRole std_role[2];
    } progress;
    
-   double scale;
+   float scale;
    
    struct scroll {
       Gradients::Type gradient;
       bool groove, showButtons, sunken;
    } scroll;
+
+   float shadowIntensity;
    
    struct tab {
       QPalette::ColorRole std_role[2], active_role[2];

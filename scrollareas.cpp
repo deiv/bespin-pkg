@@ -294,20 +294,10 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    const int f1 = dpi.f1, f2 = dpi.f2;
 
    // shadow
-   if (config.scroll.sunken) {
-      r.adjust(f2, f2, -f2, -f2);
-   }
-   else {
-      if (!sunken) // save some CPU cycles...
-         shadows.tab[true][false].render(r, painter);
-      r.adjust(f2, f1, -f2, -dpi.f3);
-//    if (sunken) {
-//       r.adjust(f1, f1, -f1, -f1);
-//       shadows.tab[true][true].render(r, painter);
-//       r.adjust(f1, 0, -f1, -f2);
-//    }
-   }
-      
+   if (!sunken) // save some CPU cycles...
+      shadows.tab[true][false].render(r, painter);
+   r.adjust(f2, f2, -f2, (option->state & QStyle::State_Horizontal) &&
+            config.scroll.sunken ? -f2 : -dpi.f3 );
 
    // gradient setup
    Qt::Orientation o; int size; Tile::PosFlags pf;

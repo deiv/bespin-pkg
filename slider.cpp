@@ -169,7 +169,7 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       // shadow
       QPoint xy = handle.topLeft();
       painter->drawPixmap(sunken ? xy + QPoint(dpi.f1,dpi.f1) : xy,
-                          shadows.sliderRound[sunken][isEnabled]);
+                          shadows.sliderRound[isEnabled][sunken]);
       // gradient
       xy += QPoint(dpi.f2, dpi.f1);
       QColor bc = CONF_COLOR(btn.std, Bg);
