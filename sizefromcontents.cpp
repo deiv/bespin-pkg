@@ -168,7 +168,8 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
          h = contentsSize.height() + dpi.f6;
       else
          h = contentsSize.height() + dpi.f4;
-      w = qMax(contentsSize.width()+dpi.f4, h*8/5-dpi.f2);
+      w = qMax(contentsSize.width()+dpi.f4, h*8/5-dpi.f2); // 8/5 == 16/10 == screen
+//      w = contentsSize.width()+dpi.f8;
       if (toolbutton && (toolbutton->subControls & SC_ToolButtonMenu))
          w += pixelMetric(PM_MenuButtonIndicator, option, widget) + dpi.f4;
       return QSize(w, h);

@@ -181,7 +181,7 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
 //    case PM_DefaultChildMargin: //  
 //    case PM_DefaultLayoutSpacing: //  
    case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize
-      return 32;
+      return 22;
    case PM_SmallIconSize: // Default small icon size
       return 22;
    case PM_LargeIconSize: // Default large icon size

@@ -179,8 +179,10 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    const Tile::Set *mask = round ? &masks.tab : &masks.button;
    if (hasFocus) {// focus?
       const int contrast = Colors::contrast(FCOLOR(Window), FCOLOR(Highlight));
-      lights.tab.render(RECT, painter, Colors::mid(FCOLOR(Window),
+      if (!config.btn.cushion && sunken) r.setBottom(r.bottom()-dpi.f1);
+      lights.tab.render(r, painter, Colors::mid(FCOLOR(Window),
          FCOLOR(Highlight), contrast/10, 1));
+      r = RECT;
    }
    else if (config.btn.backLightHover && animStep) {
       lights.tab.render(RECT, painter, iC); // backlight
