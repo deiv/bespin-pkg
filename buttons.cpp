@@ -127,7 +127,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    bool drawInner = false;
    Gradients::Type gt = GRAD(btn);
    if (animStep) {
-      if (config.btn.fullHover) {
+      if (config.btn.fullHover && !config.btn.backLightHover) {
          iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
          c = iC;
       }

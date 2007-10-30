@@ -228,7 +228,7 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
       const BgSet &set = Gradients::bgSet(c);
       int s1 = set.topTile.width();
       int s2 = qMin(s1, (RECT.width()+1)/2);
-      const int h = 3*RECT.height()/4;
+      const int h = RECT.height()-qMin(128+64, RECT.height()/4);
       painter->drawTiledPixmap( RECT.x(), RECT.y(), s2, h,
                                 set.topTile, s1-s2, 0 );
       painter->drawPixmap(RECT.x(), RECT.y()+h, set.lCorner, s1-s2, 0,0,0);
@@ -237,9 +237,7 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
       painter->drawTiledPixmap( RECT.right() - s2, 0, s2, h,
                                 set.btmTile );
       painter->drawPixmap(RECT.right() - s2, RECT.y()+h, set.rCorner);
-      s2 = qMin(128, RECT.height()-(h+64));
-      painter->drawTiledPixmap( RECT.x(), RECT.bottom()-s2, RECT.width(), 128,
-                                set.cornerTile );
+      painter->drawTiledPixmap( RECT.x(), RECT.y()+h+64, RECT.width(), 128, set.cornerTile );
       break;
    }
    case Plain: // should not happen anyway...

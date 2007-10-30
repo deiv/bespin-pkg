@@ -455,9 +455,12 @@ static inline QPixmap *cornerMask(bool right = false) {
    QPixmap *alpha = new QPixmap(128,128);
    QRadialGradient rg(right ? alpha->rect().topLeft() :
                       alpha->rect().topRight(), 128);
+//    QLinearGradient rg;
+//    if (right) rg = QLinearGradient(0,0, 128,0);
+//    else rg = QLinearGradient(128,0, 0,0);
 #ifndef QT_NO_XRENDER
    alpha->fill(Qt::transparent);
-   rg.setColorAt(0, Qt::transparent);
+   rg.setColorAt(0.4, Qt::transparent);
 #else
    rg.setColorAt(0, Qt::black);
 #endif
@@ -492,15 +495,17 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       stops.clear(); p.end();
       // Bottom Tile
       p.begin(&set->btmTile);
-      stops << QGradientStop(0, c) << QGradientStop(1, c.dark(106));
+      stops << QGradientStop(0, c) << QGradientStop(1, Colors::mid(c, Qt::black,8,1));
       lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg);
       stops.clear(); p.end();
+      
       if (Colors::value(c) > 244)
          break; // would be mathematically nonsense, i.e. shoulders = 255...
+
       // Corner Tile
       lg = QLinearGradient(QPoint(0,0), QPoint(0,128));
       p.begin(&set->cornerTile);
-      stops << QGradientStop(0, Colors::mid(c1, c2,1,4)) << QGradientStop(1, c2);
+      stops << QGradientStop(0, Colors::mid(c1, c2,1,6)) << QGradientStop(1, c2);
       lg.setStops(stops);
       p.fillRect(set->cornerTile.rect(), c2);
       stops.clear();
@@ -537,7 +542,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       
       lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
       QGradientStops stops;
-      const QColor c1 = c.dark(106);
+      const QColor c1 = Colors::mid(c, Qt::black,10,1);
       
       // left
       p.begin(&set->topTile);
