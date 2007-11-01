@@ -80,7 +80,7 @@ BespinStyle::drawTabWidget(const QStyleOption *option, QPainter *painter,
    // the bar
    drawTabBar(&tbb, painter, widget);
 }
-
+#include <QtDebug>
 void
 BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
                         const QWidget * widget) const
@@ -166,7 +166,7 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
        
    const int f2 = dpi.f2;
    QRect rect = RECT.adjusted(dpi.f3, dpi.f5, -dpi.f4,
-                              config.tab.activeTabSunken ? -dpi.f4 : -dpi.f5);
+                              /*config.tab.activeTabSunken ? -dpi.f4 : */-dpi.f5);
    int size = RECT.height()-f2;
    Qt::Orientation o = Qt::Vertical;
    const bool vertical = verticalTabs(tab->shape);
@@ -184,9 +184,10 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
          rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
    }
    else {
-      c = CCOLOR(tab.std, Bg);
-      int quota = 6 + (int) (.16 * Colors::contrast(c, CCOLOR(tab.active, 0)));
-      c = Colors::mid(c, CCOLOR(tab.active, 0), quota, animStep);
+//       c = CCOLOR(tab.std, Bg);
+//       int quota = 6 + (int) (.16 * Colors::contrast(c, CCOLOR(tab.active, 0)));
+//       c = Colors::mid(c, CCOLOR(tab.active, 0), quota, animStep);
+      c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 8-animStep, animStep);
    }
    const Gradients::Type gt =
       GRAD(tab) == Gradients::Sunken ? Gradients::None : GRAD(tab);
@@ -259,15 +260,14 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
    // color adjustment
    QColor cF, cB;
    if (sunken) {
-      cF = CCOLOR(tab.active, 1);
-      cB = CCOLOR(tab.active, 0);
+      cF = CCOLOR(tab.active, Fg);
+      cB = CCOLOR(tab.active, Bg);
    }
-   else if (hover || animStep > 2) {
-      cF = CCOLOR(tab.std, 1);
-      cB = Colors::mid(CCOLOR(tab.std ,0 ), FCOLOR(Window), 2, 1);
-      cB = Colors::mid(cB, CCOLOR(tab.active, 0));
-      if (Colors::contrast(CCOLOR(tab.active, 1), cB) > Colors::contrast(cF, cB))
-         cF = CCOLOR(tab.active, 1);
+   else if (animStep) {
+      cF = CCOLOR(tab.std, Fg);
+      cB = Colors::mid(CCOLOR(tab.std, Bg ), CCOLOR(tab.active, Bg), 8-animStep, animStep);
+      if (Colors::contrast(CCOLOR(tab.active, Fg), cB) > Colors::contrast(cF, cB))
+         cF = CCOLOR(tab.active, Fg);
    }
    else {
       cB = Colors::mid(CCOLOR(tab.std, 0), FCOLOR(Window), 2, 1);

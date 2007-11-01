@@ -65,9 +65,10 @@ typedef struct {
 typedef struct Config {
    struct bg {
       BGMode mode;
-      int structure;
+      int structure, intensity;
       struct {
          bool glassy, invert;
+         int opacity;
       } modal;
    } bg;
    

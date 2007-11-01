@@ -1,62 +1,66 @@
 #ifndef BESPIN_CONFIG_DEFAULTS
 #define BESPIN_CONFIG_DEFAULTS
 
-#define DEF_SCALE 1.0
-#define LEFTHANDED false
-#define MACSTYLE true
+#define DEF_SCALE "Scale", 1.0
+#define SHADOW_INTENSITY "ShadowIntensity", 100
+#define LEFTHANDED "LeftHanded", false
+#define MACSTYLE "MacStyle", true
 
-#define BG_MODE BevelV
-#define BG_MODAL_GLASSY true
-#define BG_MODAL_INVERT true
-#define BG_STRUCTURE 0
+#define BG_MODE "Bg.Mode", Gradients::BevelV
+#define BG_MODAL_GLASSY "Bg.Modal.Glassy", true
+#define BG_MODAL_OPACITY "Bg.Modal.Opacity", 80
+#define BG_MODAL_INVERT "Bg.Modal.Invert", true
+#define BG_STRUCTURE "Bg.Structure", 0
+#define BG_INTENSITY "Bg.Intensity", 10
 
-#define BTN_CHECKTYPE 0
-#define BTN_GRADIENT Button
-#define BTN_BACKLIGHTHOVER false
-#define BTN_LAYER 0
-#define BTN_FULLHOVER false
-#define BTN_CUSHION true
-#define BTN_ROLE Window
-#define BTN_ACTIVEROLE Button
-#define BTN_AMBIENTLIGHT true
+#define BTN_CHECKTYPE "Btn.CheckType", 0
+#define BTN_GRADIENT "Btn.Gradient", Gradients::Button
+#define BTN_BACKLIGHTHOVER "Btn.BackLightHover", false
+#define BTN_LAYER "Btn.Layer", 0
+#define BTN_FULLHOVER "Btn.FullHover", false
+#define BTN_CUSHION "Btn.Cushion", true
+#define BTN_ROLE "Btn.Role", QPalette::Window
+#define BTN_ACTIVEROLE "Btn.ActiveRole", QPalette::Button
+#define BTN_AMBIENTLIGHT "Btn.AmbientLight", true
+#define BTN_ROUND "Btn.Round", false
    
-#define CHOOSER_GRADIENT Sunken
+#define CHOOSER_GRADIENT "Chooser.Gradient", Gradients::Sunken
    
-#define INPUT_PWECHOCHAR 0x26AB
+#define INPUT_PWECHOCHAR "Input.PwEchoChar", 0x26AB
 
-#define MENU_GLASSY true
-#define MENU_OPACITY 80
-#define MENU_ITEMGRADIENT None
-#define MENU_SHOWICONS false
-#define MENU_SHADOW false
-#define MENU_ACTIVEROLE Window
-#define MENU_ROLE WindowText
-#define MENU_BARROLE Window
-#define MENU_BARSUNKEN false
-#define MENU_BOLDTEXT false
-#define MENU_ACTIVEITEMSUNKEN false
-   
-#define PROGRESS_GRADIENT Button
-#define PROGRESS_ROLE WindowText
-   
-#define SCROLL_GRADIENT Cloudy
-#define SCROLL_SHOWBUTTONS false
-#define SCROLL_SUNKEN false
-#define SCROLL_GROOVE false
-   
-#define TAB_ACTIVEROLE Window
-#define TAB_ANIMSTEPS 4
-#define TAB_GRADIENT Sunken
-#define TAB_ROLE WindowText
-#define TAB_TRANSITION 10
-#define TAB_ACTIVETABSUNKEN false
-   
-#define TOOLBOX_ACTIVEROLE WindowText
-#define TAB_ACTIVEGRADIENT Sunken
-   
-#define VIEW_HEADERROLE Text
-#define VIEW_SORTINGHEADERROLE Text
-#define VIEW_HEADERGRADIENT Button
-#define VIEW_SORTINGHEADERGRADIENT Sunken
+#define MENU_GLASSY "Menu.Glassy", true
+#define MENU_OPACITY "Menu.Opacity", 80
+#define MENU_ITEMGRADIENT "Menu.ItemGradient", Gradients::None
+#define MENU_SHOWICONS "Menu.ShowIcons", false
+#define MENU_SHADOW "Menu.Shadow", false
+#define MENU_ACTIVEROLE "Menu.ActiveRole", QPalette::Window
+#define MENU_ROLE "Menu.Role", QPalette::WindowText
+#define MENU_BARROLE "Menu.BarRole", QPalette::Window
+#define MENU_BARSUNKEN "Menu.BarSunken", false
+#define MENU_BOLDTEXT "Menu.BoldText", false
+#define MENU_ACTIVEITEMSUNKEN "Menu.ActiveItemSunken", false
+
+#define PROGRESS_GRADIENT "Progress.Gradient", Gradients::Button
+#define PROGRESS_ROLE "Progress.Role", QPalette::WindowText
+
+#define SCROLL_GRADIENT "Scroll.Gradient", Gradients::Cloudy
+#define SCROLL_SHOWBUTTONS "Scroll.ShowButtons", false
+#define SCROLL_SUNKEN "Scroll.Sunken", false
+#define SCROLL_GROOVE "Scroll.Groove", false
+
+#define TAB_ACTIVEROLE "Tab.ActiveRole", QPalette::Window
+#define TAB_ANIMSTEPS "Tab.AnimSteps", 4
+#define TAB_GRADIENT "Tab.Gradient", Gradients::Sunken
+#define TAB_ROLE "Tab.Role", QPalette::WindowText
+#define TAB_TRANSITION "Tab.Transition", 10
+#define TAB_ACTIVETABSUNKEN "Tab.ActiveTabSunken", true
+
+#define TOOLBOX_ACTIVEROLE "ToolBox.ActiveRole", QPalette::WindowText
+#define TAB_ACTIVEGRADIENT "Tab.ActiveGradient", Gradients::Sunken
+
+#define VIEW_HEADERROLE "View.HeaderRole", QPalette::Text
+#define VIEW_SORTINGHEADERROLE "View.SortingHeaderRole", QPalette::Text
+#define VIEW_HEADERGRADIENT "View.HeaderGradient", Gradients::Button
+#define VIEW_SORTINGHEADERGRADIENT "View.SortingHeaderGradient", Gradients::Sunken
 
 #endif // BESPIN_CONFIG_DEFAULTS

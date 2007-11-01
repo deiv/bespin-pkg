@@ -106,7 +106,6 @@ static inline QAbstractScrollArea* scrollAncestor(QWidget *w, QWidget *root) {
 
 // QPixmap::grabWidget(.) currently fails on the background offset,
 // so we use our own implementation
-//TODO: fix scrollareas (the scrollbars aren't painted, so check for availability and usage...)
 static void grabWidget(QWidget * root, QPixmap *pix) {
     if (!root)
         return;
@@ -169,19 +168,12 @@ static void grabWidget(QWidget * root, QPixmap *pix) {
             p.begin(saPix); p.drawPixmap(zero, *pix, rect);
             p.end();
             const QPoint &pt = scrollarea->frameRect().topLeft();
-            QPainter::setRedirected( w, saPix, w->mapFrom(scrollarea, pt) );
-            e = QPaintEvent(QRect(zero, w->size()));
-            QCoreApplication::sendEvent(w, &e);
-            QPainter::restoreRedirected(w);
+            w->render(saPix, w->mapTo(scrollarea, pt), w->rect(), 0);
             p.begin(pix); p.drawPixmap(rect.topLeft(), *saPix); p.end();
          }
          // default painting redirection
-         else {
-            QPainter::setRedirected( w, pix, w->mapFrom(root, zero) );
-            e = QPaintEvent(QRect(zero, w->size()));
-            QCoreApplication::sendEvent(w, &e);
-            QPainter::restoreRedirected(w);
-         }
+         else
+            w->render(pix, w->mapTo(root, zero), w->rect(), 0);
       }
    }
    delete saPix;
@@ -538,6 +530,10 @@ void StyleAnimator::tabChanged(int index) {
          tai->autofillingWidgets.append(widget);
          widget->setAutoFillBackground(false);
       }
+      else if (widget->testAttribute(Qt::WA_OpaquePaintEvent)) {
+         tai->opaqueWidgets.append(widget);
+         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+      }
    }
    ctw->repaint();
    startTimer;
@@ -621,11 +617,17 @@ void StyleAnimator::updateTabAnimation() {
                tai->autofillingWidgets.removeAt(index);
                widget->setAutoFillBackground(true);
             }
+            index = tai->autofillingWidgets.indexOf(widget);
+            if (index != -1) {
+               tai->opaqueWidgets.removeAt(index);
+               widget->setAttribute(Qt::WA_OpaquePaintEvent, true);
+            }
             _UNBLOCKEVENTS_(widget);
             widget->update(); //if necessary
          }
          ctw->repaint(); //asap
          tai->autofillingWidgets.clear();
+         tai->opaqueWidgets.clear();
          tai->lastTabUpdate = QTime();
          continue;
       }

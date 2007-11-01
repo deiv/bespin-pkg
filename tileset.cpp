@@ -39,6 +39,7 @@ static QPixmap nullPix;
 static PosFlags _shape = 0;
 static const QPixmap *_texPix = 0;
 static const QColor *_texColor = 0;
+static const QColor *_bgColor = 0;
 static const QPoint *_offset = 0;
 static bool _preferClip = true;
 
@@ -51,12 +52,17 @@ void Tile::setPreferClip(bool b) {
    _preferClip = b;
 }
 
+void Tile::setSolidBackground(const QColor &c) {
+   _bgColor = &c;
+}
+
 void Tile::setShape(PosFlags pf) {
    _shape = pf;
 }
 
 void Tile::reset() {
    _shape = 0;
+   _bgColor = 0;
    _preferClip = true;
 }
 
@@ -188,6 +194,7 @@ QRect Set::rect(const QRect &rect, PosFlags pf) const
 
 void Set::render(const QRect &r, QPainter *p) const
 {
+
 #ifndef QT_NO_XRENDER
 #define ADJUST_ALPHA(_PIX_) filledPix = OXRender::applyAlpha(filledPix, _PIX_)
 #else
@@ -196,19 +203,29 @@ void Set::render(const QRect &r, QPainter *p) const
 #endif
 
 #define MAKE_FILL(_OFF_)\
-   if ((_texPix || _texColor) && !tile->isNull()) {\
-      if (filledPix.size() != tile->size())\
-         filledPix = QPixmap(tile->size());\
-      filledPix.fill(Qt::transparent);\
-      if (_texPix) {\
-         pixPainter.begin(&filledPix);\
-         pixPainter.drawTiledPixmap(filledPix.rect(), *_texPix, _OFF_-off);\
-         pixPainter.end();\
+   if (!tile->isNull()) {\
+      if (_texPix || _texColor) {\
+         if (filledPix.size() != tile->size())\
+            filledPix = QPixmap(tile->size());\
+         filledPix.fill(Qt::transparent);\
+         if (_texPix) {\
+            pixPainter.begin(&filledPix);\
+            pixPainter.drawTiledPixmap(filledPix.rect(), *_texPix, _OFF_-off);\
+            pixPainter.end();\
+         }\
+         else\
+            filledPix.fill(*_texColor);\
+         ADJUST_ALPHA(*tile);\
+         tile = &filledPix;\
       }\
-      else\
-         filledPix.fill(*_texColor);\
-      ADJUST_ALPHA(*tile); \
-      tile = &filledPix;\
+      if (solidBg) {\
+         if (solidPix.size() != tile->size())\
+            solidPix = QPixmap(tile->size());\
+         solidPix.fill(*solidBg);\
+         pixPainter.begin(&solidPix);\
+         pixPainter.drawPixmap(0,0, *tile); pixPainter.end();\
+         tile = &solidPix;\
+      }\
    } // skip semicolon
 
    PosFlags pf = _shape ? _shape : _defShape;
@@ -233,7 +250,8 @@ void Set::render(const QRect &r, QPainter *p) const
       pf &= ~Center;
    }
 
-   QPixmap filledPix; QPainter pixPainter;
+   QPixmap filledPix, solidPix; QPainter pixPainter;
+   const QColor *solidBg = 0;
 
    QPoint off = r.topLeft();
    if (_offset)
@@ -292,9 +310,11 @@ void Set::render(const QRect &r, QPainter *p) const
       
       // upper line
       if (w > 0 && !pixmap[TopMid].isNull()) {
+         solidBg = _bgColor;
          tile = &pixmap[TopMid];
          MAKE_FILL(QPoint(xOff, r.y()));
          p->drawTiledPixmap(xOff, r.y(), w, tlh, *tile);
+         solidBg = 0;
       }
    }
    if (pf & Bottom) {
@@ -323,9 +343,11 @@ void Set::render(const QRect &r, QPainter *p) const
       
       // lower line
       if (w > 0 && !pixmap[BtmMid].isNull()) {
+         solidBg = _bgColor;
          tile = &pixmap[BtmMid];
          MAKE_FILL(QPoint(xOff, bOff));
          p->drawTiledPixmap(xOff, bOff, w, height(BtmMid), *tile);
+         solidBg = 0;
       }
    }
    
@@ -336,15 +358,19 @@ void Set::render(const QRect &r, QPainter *p) const
          p->drawTiledPixmap(xOff, yOff, w, h, *tile);
       }
       if (pf & Left && !pixmap[MidLeft].isNull()) {
+         solidBg = _bgColor;
          tile = &pixmap[MidLeft];
          MAKE_FILL(QPoint(r.x(), yOff));
          p->drawTiledPixmap(r.x(), yOff, width(MidLeft), h, *tile);
+         solidBg = 0;
       }
       if (pf & Right && !pixmap[MidRight].isNull()) {
+         solidBg = _bgColor;
          tile = &pixmap[MidRight];
          rOff = r.right()-width(MidRight)+1;
          MAKE_FILL(QPoint(rOff, yOff));
          p->drawTiledPixmap(rOff, yOff, width(MidRight), h, *tile);
+         solidBg = 0;
       }
    }
 

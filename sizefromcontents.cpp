@@ -155,9 +155,9 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
             return contentsSize + QSize(0, add);
          }
       }
-      return contentsSize + QSize(dpi.f6, dpi.f6);
+      return contentsSize + QSize(dpi.f8, dpi.f6);
    case CT_TabWidget: // A tab widget, like QTabWidget
-      return contentsSize + QSize(dpi.f8,dpi.f10);
+      return contentsSize + QSize(dpi.f8,dpi.f6);
    case CT_ToolButton: { // A tool button, like QToolButton
       const QStyleOptionToolButton *toolbutton
          = qstyleoption_cast<const QStyleOptionToolButton *>(option);

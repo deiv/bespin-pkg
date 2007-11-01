@@ -173,27 +173,40 @@ BespinStyle::drawWindowFrame(const QStyleOption * option, QPainter * painter,
    painter->restore();
 }
 
+static QPainterPath glasPath;
+static QSize glasSize;
+
 void
 BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
+   // cause of scrollbars - kinda optimization
+   if (config.bg.mode < ComplexLights) return;
+   
+
    if (!(widget && widget->isWindow()))
       return; // can't do anything here
    if (PAL.brush(widget->backgroundRole()).style() > 1)
       return; // we'd cover a gradient/pixmap/whatever
-   
+
+   // glassy Modal dialog/Popup menu ==========
    const QColor &c = PAL.color(widget->backgroundRole());
    if ((widget->isModal() && config.bg.modal.glassy) ||
        ((widget->windowFlags() & 0x8) && config.menu.glassy)) {
-      QPainterPath path;
-      path.moveTo(RECT.topLeft());
-      path.lineTo(RECT.topRight());
-      path.quadTo(RECT.center()/2, RECT.bottomLeft());
+      if (widget->size() != glasSize) {
+         glasSize = widget->size();
+         glasPath = QPainterPath();
+         glasPath.moveTo(RECT.topLeft());
+         glasPath.lineTo(RECT.topRight());
+         glasPath.quadTo(RECT.center()/2, RECT.bottomLeft());
+      }
       painter->setPen(Qt::NoPen);
       painter->setBrush(c.light(115-Colors::value(c)/20));
-      painter->drawPath(path);
+      painter->drawPath(glasPath);
       return;
    }
+   // ===================
+   
    switch (config.bg.mode) {
 #ifndef QT_NO_XRENDER
    case ComplexLights:
@@ -228,20 +241,21 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
       const BgSet &set = Gradients::bgSet(c);
       int s1 = set.topTile.width();
       int s2 = qMin(s1, (RECT.width()+1)/2);
-      const int h = RECT.height()-qMin(128+64, RECT.height()/4);
-      painter->drawTiledPixmap( RECT.x(), RECT.y(), s2, h,
+      const int h = qMin(128+32, RECT.height()/8);
+      const int y = RECT.y()+h;
+      painter->drawTiledPixmap( RECT.x(), y, s2, RECT.height()-h,
                                 set.topTile, s1-s2, 0 );
-      painter->drawPixmap(RECT.x(), RECT.y()+h, set.lCorner, s1-s2, 0,0,0);
+      painter->drawPixmap(RECT.x(), y-32, set.lCorner, s1-s2, 0,0,0);
       s1 = set.btmTile.width();
       s2 = qMin(s1, (RECT.width())/2);
-      painter->drawTiledPixmap( RECT.right() - s2, 0, s2, h,
+      painter->drawTiledPixmap( RECT.right() - s2, y , s2, RECT.height()-h,
                                 set.btmTile );
-      painter->drawPixmap(RECT.right() - s2, RECT.y()+h, set.rCorner);
-      painter->drawTiledPixmap( RECT.x(), RECT.y()+h+64, RECT.width(), 128, set.cornerTile );
+      painter->drawPixmap(RECT.right() - s2, y-32, set.rCorner);
+      painter->drawTiledPixmap( RECT.x(), y-(128+32), RECT.width(), 128, set.cornerTile );
       break;
    }
-   case Plain: // should not happen anyway...
-   case Scanlines: // --"--
+//    case Plain: // should not happen anyway...
+//    case Scanlines: // --"--
    default:
       break;
    }

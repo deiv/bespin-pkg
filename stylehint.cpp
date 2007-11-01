@@ -20,6 +20,7 @@
 #include <QEvent>
 #include <QFrame>
 #include <QStyleOptionComboBox>
+#include "colors.h"
 #include "bespin.h"
 
 using namespace Bespin;

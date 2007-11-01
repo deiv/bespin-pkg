@@ -22,7 +22,6 @@
 #include <QBrush>
 #include <QColor>
 #include <QPixmap>
-#include "colors.h"
 
 namespace Bespin {
 
@@ -75,7 +74,7 @@ const QPixmap &light(int height);
 const BgSet &bgSet(const QColor &c);
 // const QPixmap &bgCorner(const QColor &c, bool other = false);
 
-void init(BgMode mode);
+void init(BgMode mode, Type progress = Glass, int bgBevelIntesity = 110);
 void wipe();
 
 };

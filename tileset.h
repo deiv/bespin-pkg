@@ -120,6 +120,7 @@ private:
 PosFlags shape();
 void setPreferClip(bool b);
 void setShape(PosFlags pf);
+void setSolidBackground(const QColor &c);
 void reset();
 
 class Line

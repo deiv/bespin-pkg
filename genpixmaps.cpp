@@ -207,7 +207,10 @@ void BespinStyle::generatePixmaps()
       }
    
    // Pushbutton light
-//    renderButtonLight(lights.button);
+// light
+   lights.button = Tile::Set(shadow(f11, true, false, 3.0), f11/2,f11/2,1,1);
+   lights.button.setClipOffsets(f3,f3,f3,f3);
+   lights.button.setDefaultShape(Tile::Ring);
 
    renderLineEditShadow(shadows.lineEdit[false], false);
    renderLineEditShadow(shadows.lineEdit[true], true);
@@ -284,28 +287,27 @@ void BespinStyle::generatePixmaps()
    
    // TABBAR =====================================
    // mask
-   int f13 = SCALE(13), f13_2 = f13/2;
+   int f13 = SCALE(13);
    masks.tab = Tile::Set(roundedMask(f13,99),f13/2,f13/2,1,1, 99);
    masks.tab.setClipOffsets(0,0,0,0);
    
    // light
-   lights.tab = Tile::Set(shadow(f11, true, false, 3.0), f11/2,f11/2,1,1);
+   int f17 = SCALE(17), f17_2 = (f17-1)/2;
+   lights.tab = Tile::Set(shadow(f17, true, false, 3.0), f17/2,f17/2,1,1);
    lights.tab.setClipOffsets(f3,f3,f3,f3);
    lights.tab.setDefaultShape(Tile::Ring);
    
    // shadow
-   int f17 = SCALE(17), f17_2 = (f17-1)/2;
    for (int i = 0; i < 2; ++i) // opaque?
       for (int j = 0; j < 2; ++j) {// sunken?
          shadows.tab[i][j] = Tile::Set(shadow(f17, i, j), f17/2, f17/2, 1, 1);
          shadows.tab[i][j].setDefaultShape(Tile::Ring);
       }
 
-   
+   int f15 = SCALE(15);
    QImage tmpImg = QImage(f17,f17, QImage::Format_ARGB32);
 
    // sunken
-   int f15 = SCALE(15);
    tmpImg.fill(Qt::transparent);
    p.begin(&tmpImg);
    p.setPen(Qt::NoPen);

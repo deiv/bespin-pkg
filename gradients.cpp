@@ -22,6 +22,7 @@
 #include <QRadialGradient>
 #include <cmath>
 
+#include "colors.h"
 #include "gradients.h"
 
 #ifndef QT_NO_XRENDER
@@ -31,10 +32,9 @@
 using namespace Bespin;
 
 static QPixmap nullPix;
-static Gradients::BgMode _mode;
-// if you don't link the style, this will create a vtabel error
-// define e.g. "Gradients::Type _progressBase = Glass;" instead
-extern Gradients::Type _progressBase;
+static Gradients::BgMode _mode = Gradients::BevelV;
+static Gradients::Type _progressBase = Gradients::Glass;
+static int _bgBevelIntesity = 110;
 
 
 /* ========= MAGIC NUMBERS ARE COOL ;) =================
@@ -483,7 +483,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       set->cornerTile = QPixmap(32, 128);
       set->lCorner = QPixmap(128, 128);
       set->rCorner = QPixmap(128, 128);
-      const QColor c1 = c.light(110);
+      const QColor c1 = c.light(_bgBevelIntesity);
       const QColor c2 = Colors::mid(c1, c);
 
       lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
@@ -495,7 +495,8 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       stops.clear(); p.end();
       // Bottom Tile
       p.begin(&set->btmTile);
-      stops << QGradientStop(0, c) << QGradientStop(1, Colors::mid(c, Qt::black,8,1));
+      stops << QGradientStop(0, c) <<
+         QGradientStop(1, c.dark(_bgBevelIntesity));
       lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg);
       stops.clear(); p.end();
       
@@ -542,7 +543,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       
       lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
       QGradientStops stops;
-      const QColor c1 = Colors::mid(c, Qt::black,10,1);
+      const QColor c1 = c.dark(_bgBevelIntesity);
       
       // left
       p.begin(&set->topTile);
@@ -566,15 +567,15 @@ const BgSet &Gradients::bgSet(const QColor &c) {
          pix->fill(c);
          mask = new QPixmap(256,32);
          lg = QLinearGradient(0,0, 0,32);
-         lg.setColorAt(0, Qt::white);
+         lg.setColorAt(1, Qt::white);
 #ifndef QT_NO_XRENDER
          mask->fill(Qt::transparent);
-         lg.setColorAt(1, Qt::transparent);
+         lg.setColorAt(0, Qt::transparent);
          p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
          OXRender::composite(*blend, mask->x11PictureHandle(),
                              *pix, 0, 0, 0, 0, 0, 0, 256, 32, PictOpOver);
 #else
-         lg.setColorAt(1, Qt::black);
+         lg.setColorAt(0, Qt::black);
          p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
          QPixmap fill(pix->size());
          p.begin(&fill); p.drawTiledPixmap(fill.rect(), *blend); p.end();
@@ -584,7 +585,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
          delete mask;
       }
       lg = QLinearGradient(QPoint(0,0), QPoint(0, 128));
-      lg.setColorAt(0, c); lg.setColorAt(1, c1);
+      lg.setColorAt(0, c.light(_bgBevelIntesity)); lg.setColorAt(1, c);
       p.begin(&set->cornerTile);
       p.fillRect(set->cornerTile.rect(), lg); p.end();
       break;
@@ -596,8 +597,12 @@ const BgSet &Gradients::bgSet(const QColor &c) {
    return *set;
 }
 
-void Gradients::init(BgMode mode) {
+void
+Gradients::init(BgMode mode, Type progress, int bgBevelIntesity)
+{
    _mode = mode;
+   _progressBase = progress;
+   _bgBevelIntesity = bgBevelIntesity;
    _bgSet.setMaxCost( 900<<10 ); // 832 should be enough - we keep some safety
    for (int i = 0; i < 2; ++i) {
       for (int j = 0; j < Gradients::TypeAmount; ++j)

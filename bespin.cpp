@@ -42,6 +42,7 @@
 #include "oxrender.h"
 #endif
 #include "debug.h"
+#include "colors.h"
 #include "bespin.h"
 
 /**=========================================================*/
@@ -70,7 +71,6 @@ using namespace Bespin;
 /** static config object */
 Config config;
 Dpi dpi;
-Gradients ::Type _progressBase;
 
 #define N_PE 50
 #define N_CE 50
@@ -329,6 +329,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             }
             return true;
          }
+         return false;
       }
       else if (QTabBar *tabBar = qobject_cast<QTabBar*>(object)) {
          if (tabBar->parentWidget() &&
@@ -368,6 +369,20 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
       return false;
    }
 #endif
+//    case QEvent::MouseButtonRelease:
+//    case QEvent::MouseButtonPress:
+//       qWarning("pressed/released");
+//       if (object->inherits("QScrollBar")) {
+//          qWarning("QScrollBar pressed/released");
+//          QWidget *w = static_cast<QWidget*>(object)->parentWidget();
+//          if (w && isSpecialFrame(w)) {
+//             qWarning("set frame updates to %s",
+//                      ev->type() == QEvent::MouseButtonRelease ? "active" : "INactive");
+//             w->setUpdatesEnabled(ev->type() == QEvent::MouseButtonRelease);
+//          }
+//          return false;
+//       }
+//       return false;
 #ifdef MOUSEDEBUG
    case QEvent::MouseButtonPress: {
       QMouseEvent *mev = (QMouseEvent*)ev;
@@ -379,7 +394,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
       if (QWidget * widget = qobject_cast<QWidget*>(object)) {
          if (widget->isModal()) {
          if (config.bg.modal.invert) swapPalette(widget);
-         if (config.bg.modal.glassy) widget->setWindowOpacity( .8 );
+         widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
          return false;
       }
       if (QMenu * menu = qobject_cast<QMenu*>(widget)) {

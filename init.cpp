@@ -33,7 +33,7 @@ using namespace Bespin;
 
 extern Config config;
 extern Dpi dpi;
-extern Gradients ::Type _progressBase;
+static Gradients::Type _progressBase;
 
 
 static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list) {
@@ -60,12 +60,13 @@ void BespinStyle::fixKdePalette()
 }
 #endif
 
-#define readInt(_ENTRY_, _DEF_) iSettings->value(_ENTRY_, _DEF_).toInt()
-#define readBool(_ENTRY_, _DEF_) iSettings->value(_ENTRY_, _DEF_).toBool()
-#define readRole(_ENTRY_, _VAR_, _DEF_)\
-config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_ENTRY_, QPalette::_DEF_).toInt();\
-Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1], QPalette::_DEF_, Colors::counterRole(QPalette::_DEF_))
-#define readGrad(_ENTRY_, _DEF_) (Gradients::Type) iSettings->value(_ENTRY_, Gradients::_DEF_).toInt();
+#define readInt(_DEF_) iSettings->value(_DEF_).toInt()
+#define readBool(_DEF_) iSettings->value(_DEF_).toBool()
+#define readRole(_VAR_, _DEF_)\
+config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_DEF_).toInt();\
+Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1])
+//, QPalette::_DEF_, Colors::counterRole(QPalette::_DEF_))
+#define readGrad(_DEF_) (Gradients::Type) iSettings->value(_DEF_).toInt();
 
 void
 BespinStyle::readSettings(const QSettings* settings)
@@ -111,9 +112,11 @@ BespinStyle::readSettings(const QSettings* settings)
    
    
    // Background ===========================
-   config.bg.mode = (BGMode) readInt("Bg.Mode", BG_MODE);
-   config.bg.modal.glassy = readBool("Bg.Modal.Glassy", BG_MODAL_GLASSY);
-   config.bg.modal.invert = readBool("Bg.Modal.Invert", BG_MODAL_INVERT);
+   config.bg.mode = (BGMode) readInt(BG_MODE);
+   config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
+   config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
+   config.bg.modal.invert = readBool(BG_MODAL_INVERT);
+   config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
    
 #ifndef QT_NO_XRENDER
    if (config.bg.mode > BevelH)
@@ -127,95 +130,95 @@ BespinStyle::readSettings(const QSettings* settings)
 #endif
    
    if (config.bg.mode == Scanlines)
-      config.bg.structure = readInt("Bg.Structure", BG_STRUCTURE);
+      config.bg.structure = readInt(BG_STRUCTURE);
       
    
    // Buttons ===========================
-   config.btn.checkType = (Check::Type) readInt("Btn.CheckType", BTN_CHECKTYPE);
-   config.btn.round = readBool("Btn.Round", false);
-   GRAD(btn) = readGrad("Btn.Gradient", BTN_GRADIENT);
+   config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
+   config.btn.round = readBool(BTN_ROUND);
+   GRAD(btn) = readGrad(BTN_GRADIENT);
    _progressBase = GRAD(btn);
    if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
       GRAD(btn) = Gradients::None;
    
-   config.btn.backLightHover = readBool("Btn.BackLightHover", BTN_BACKLIGHTHOVER);
-   config.btn.layer = config.btn.backLightHover ? 0 : CLAMP(readInt("Btn.Layer", BTN_LAYER), 0, 2);
-   config.btn.fullHover = readBool("Btn.FullHover", BTN_FULLHOVER);
+   config.btn.backLightHover = readBool(BTN_BACKLIGHTHOVER);
+   config.btn.layer = config.btn.backLightHover ? 0 : CLAMP(readInt(BTN_LAYER), 0, 2);
+   config.btn.fullHover = readBool(BTN_FULLHOVER);
    
    if (config.btn.layer == 2) config.btn.cushion = true;
    else if (GRAD(btn) ==  Gradients::Sunken) config.btn.cushion = false;
-   else config.btn.cushion = readBool("Btn.Cushion", BTN_CUSHION);
+   else config.btn.cushion = readBool(BTN_CUSHION);
    
-   readRole("Btn.Role", btn.std, BTN_ROLE);
-   readRole("Btn.ActiveRole", btn.active, BTN_ACTIVEROLE);
+   readRole(btn.std, BTN_ROLE);
+   readRole(btn.active, BTN_ACTIVEROLE);
    Colors::setButtonRoles(config.btn.std_role[0], config.btn.std_role[1],
                           config.btn.active_role[0], config.btn.active_role[1]);
-   config.btn.ambientLight = readBool("Btn.AmbientLight", BTN_AMBIENTLIGHT);
+   config.btn.ambientLight = readBool(BTN_AMBIENTLIGHT);
    
    // Choosers ===========================
-   GRAD(chooser) = readGrad("Chooser.Gradient", CHOOSER_GRADIENT);
+   GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
    
    // PW Echo Char ===========================
    config.input.pwEchoChar =
-      ushort(iSettings->value("Input.PwEchoChar", INPUT_PWECHOCHAR).toUInt());
+      ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
    
    // flanders
    config.leftHanded =
-      readBool("LeftHanded", LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
+      readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
 
    // item single vs. double click, wizard appereance
-   config.macStyle = readBool("MacStyle", MACSTYLE);
+   config.macStyle = readBool(MACSTYLE);
    
    // Menus ===========================
-   config.menu.glassy = readBool("Menu.Glassy", MENU_GLASSY);
-   config.menu.opacity = readInt("Menu.Opacity", MENU_OPACITY);
-   config.menu.itemGradient = readGrad("Menu.ItemGradient", MENU_ITEMGRADIENT);
-   config.menu.showIcons = readBool("Menu.ShowIcons", MENU_SHOWICONS);
-   config.menu.shadow = readBool("Menu.Shadow", MENU_SHADOW);
-   readRole("Menu.ActiveRole", menu.active, MENU_ACTIVEROLE);
-   readRole("Menu.Role", menu.std, MENU_ROLE);
-   readRole("Menu.BarRole", menu.bar, MENU_BARROLE);
-   config.menu.barSunken = readBool("Menu.BarSunken", MENU_BARSUNKEN);
-   config.menu.boldText = readBool("Menu.BoldText", MENU_BOLDTEXT);
+   config.menu.glassy = readBool(MENU_GLASSY);
+   config.menu.opacity = readInt(MENU_OPACITY);
+   config.menu.itemGradient = readGrad(MENU_ITEMGRADIENT);
+   config.menu.showIcons = readBool(MENU_SHOWICONS);
+   config.menu.shadow = readBool(MENU_SHADOW);
+   readRole(menu.active, MENU_ACTIVEROLE);
+   readRole(menu.std, MENU_ROLE);
+   readRole(menu.bar, MENU_BARROLE);
+   config.menu.barSunken = readBool(MENU_BARSUNKEN);
+   config.menu.boldText = readBool(MENU_BOLDTEXT);
    config.menu.activeItemSunken =
-      readBool("Menu.ActiveItemSunken", MENU_ACTIVEITEMSUNKEN);
+      readBool(MENU_ACTIVEITEMSUNKEN);
    
    // Progress ===========================
-   GRAD(progress) = readGrad("Progress.Gradient", PROGRESS_GRADIENT);
-   readRole("Progress.Role", progress.std, PROGRESS_ROLE);
+   GRAD(progress) = readGrad(PROGRESS_GRADIENT);
+   readRole(progress.std, PROGRESS_ROLE);
    
    // ScrollStuff ===========================
-   GRAD(scroll) = readGrad("Scroll.Gradient", SCROLL_GRADIENT);
-   config.scroll.showButtons = readBool("Scroll.ShowButtons", SCROLL_SHOWBUTTONS);
-   config.scroll.sunken = readBool("Scroll.Sunken", SCROLL_SUNKEN);
+   GRAD(scroll) = readGrad(SCROLL_GRADIENT);
+   config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
+   config.scroll.sunken = readBool(SCROLL_SUNKEN);
    config.scroll.groove =
-      (!config.scroll.sunken) ? false : readBool("Scroll.Groove", SCROLL_GROOVE);
+      (!config.scroll.sunken) ? false : readBool(SCROLL_GROOVE);
    
    // Tabs ===========================
-   readRole("Tab.ActiveRole", tab.active, TAB_ACTIVEROLE);
+   readRole(tab.active, TAB_ACTIVEROLE);
    config.tab.animSteps =
-      CLAMP(iSettings->value("Tab.AnimSteps", TAB_ANIMSTEPS).toUInt(), 2, 18);
-   GRAD(tab) = readGrad("Tab.Gradient", TAB_GRADIENT);
-   readRole("Tab.Role", tab.std, TAB_ROLE);
+      CLAMP(iSettings->value(TAB_ANIMSTEPS).toUInt(), 2, 18);
+   GRAD(tab) = readGrad(TAB_GRADIENT);
+   readRole(tab.std, TAB_ROLE);
    config.tab.transition =
-      (TabAnimInfo::TabTransition) readInt("Tab.Transition", TAB_TRANSITION);
+      (TabAnimInfo::TabTransition) readInt(TAB_TRANSITION);
    config.tab.activeTabSunken =
-      readBool("Tab.ActiveTabSunken", TAB_ACTIVETABSUNKEN);
+      readBool(TAB_ACTIVETABSUNKEN);
    
    // ToolBoxes
-   readRole("ToolBox.ActiveRole", toolbox.active, TOOLBOX_ACTIVEROLE);
-   GRAD(toolbox) = readGrad("Tab.ActiveGradient", TAB_ACTIVEGRADIENT);
+   readRole(toolbox.active, TOOLBOX_ACTIVEROLE);
+   GRAD(toolbox) = readGrad(TAB_ACTIVEGRADIENT);
    
    // Views ===========================
-   readRole("View.HeaderRole", view.header, VIEW_HEADERROLE);
-   readRole("View.SortingHeaderRole", view.sortingHeader, VIEW_SORTINGHEADERROLE);
-   config.view.headerGradient = readGrad("View.HeaderGradient", VIEW_HEADERGRADIENT);
+   readRole(view.header, VIEW_HEADERROLE);
+   readRole(view.sortingHeader, VIEW_SORTINGHEADERROLE);
+   config.view.headerGradient = readGrad(VIEW_HEADERGRADIENT);
    config.view.sortingHeaderGradient =
-      readGrad("View.SortingHeaderGradient", VIEW_SORTINGHEADERGRADIENT);
+      readGrad(VIEW_SORTINGHEADERGRADIENT);
    
    // General ===========================
-   config.shadowIntensity = iSettings->value("ShadowIntensity", 100).toInt()/100.0;
-   config.scale = iSettings->value("Scale", DEF_SCALE).toDouble();
+   config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;
+   config.scale = iSettings->value(DEF_SCALE).toDouble();
    if (config.scale != 1.0) {
       QFont fnt = qApp->font();
       if (fnt.pointSize() > -1) fnt.setPointSize(fnt.pointSize()*config.scale);
@@ -246,7 +249,7 @@ void BespinStyle::initMetrics()
    dpi.f20 = SCALE(20); dpi.f32 = SCALE(32);
    dpi.f80 = SCALE(80);
    
-   dpi.ScrollBarExtent = SCALE(15);
+   dpi.ScrollBarExtent = SCALE(config.btn.fullHover ? 15 : 17);
    dpi.ScrollBarSliderMin = SCALE(40);
    dpi.SliderThickness = SCALE(24);
    dpi.SliderControl = SCALE(19);
@@ -264,5 +267,6 @@ void BespinStyle::init(const QSettings* settings) {
    initMetrics();
    generatePixmaps();
    Gradients::init(config.bg.mode > ComplexLights ?
-                   (Gradients::BgMode)config.bg.mode : Gradients::BevelV);
+                   (Gradients::BgMode)config.bg.mode :
+                   Gradients::BevelV, _progressBase, config.bg.intensity);
 }

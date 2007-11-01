@@ -62,14 +62,41 @@ scrollAreaHovered(const QWidget* slider, StyleAnimator *animator)
 }
 
 static bool isComboDropDownSlider;
-
+#include <QtDebug>
 void
 BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
                            QPainter * painter, const QWidget * widget) const
 {
+
    const QStyleOptionSlider *scrollbar =
       qstyleoption_cast<const QStyleOptionSlider *>(option);
    if (!scrollbar) return;
+
+   // we paint the slider bg ourselves, as otherwise a frame repaint would be
+   // triggered (for no sense)
+   if (!widget)
+      painter->fillRect(RECT, FCOLOR(Window));
+   else if (widget->testAttribute(Qt::WA_OpaquePaintEvent)) {
+      const QWidget *grampa = widget;
+      while (!(grampa->isWindow() || grampa->autoFillBackground()))
+         grampa = grampa->parentWidget();
+
+      QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());
+      painter->save();
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
+      painter->setBrushOrigin(tl);
+      painter->drawRect(RECT);
+      if (grampa->isWindow())  { // means we need to paint the global bg as well
+         painter->setClipRect(RECT, Qt::IntersectClip);
+         QStyleOption tmpOpt = *option;
+         tmpOpt.rect = QRect(tl, grampa->size());
+         painter->fillRect(RECT, grampa->palette().color(QPalette::Window));
+         drawWindowBg(&tmpOpt, painter, grampa);
+      }
+      painter->restore();
+   }
+   // =================
 
    OPT_ENABLED
    

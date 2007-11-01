@@ -1,5 +1,3 @@
-
-#include "config.h"
 #include <QApplication>
 #include <QFileDialog>
 #include <QDir>
@@ -10,6 +8,10 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QValidator>
+
+#include "../gradients.h"
+#include "../config.defaults"
+#include "config.h"
 
 /** This function declares the kstyle config plugin, you may need to adjust it
 for other plugins or won't need it at all, if you're not interested in a plugin */
@@ -30,6 +32,8 @@ enum GradientType {
    GradNone = 0, GradSimple, GradButton, GradSunken, GradGloss,
       GradGlass, GradMetal, GradCloud
 };
+
+using namespace Bespin;
 
 static const char* defInfo1 =
 "<div align=\"center\">\
@@ -91,6 +95,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    ui.setupUi(this);
    ui.info->setMinimumWidth( 200 ); /** min width for the info browser */
    ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
+//    ui.sectionHeader->installEventFilter(this);
+   connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
+            ui.sectionHeader, SLOT(setText(const QString &)));
+   connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
+            ui.sections, SLOT(setCurrentIndex(int)));
+   connect (ui.generalTab, SIGNAL(currentChanged(int)),
+            this, SLOT(setSectionSelectVisible(int)));
    
    /** Prepare the settings store, not of interest */
    QSettings settings("Bespin", "Store");
@@ -114,14 +125,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    ui.btnExport->setEnabled(false);
    ui.btnDelete->setEnabled(false);
    ui.storeLine->hide();
-
-   ui.sectionHeader->installEventFilter(this);
-   connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
-            ui.sectionHeader, SLOT(setText(const QString &)));
-   connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
-            ui.sections, SLOT(setCurrentIndex(int)));
-   connect (ui.generalTab, SIGNAL(currentChanged(int)),
-            this, SLOT(setSectionSelectVisible(int)));
    
    /** fill some comboboxes, not of interest */
    generateColorModes(ui.crProgressBar);
@@ -197,14 +200,16 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    /** 2. Define a context info that is displayed when no other context help is
    demanded */
 
-   /** handleSettings(.) tells BConfig to take care (savwe load) of a widget
+   /** handleSettings(.) tells BConfig to take care (save/load) of a widget
    In this case "ui.bgMode" is the widget on the form,
    "BackgroundMode" specifies the entry in the ini style config file and
    "3" is the default value for this entry*/
-   handleSettings(ui.bgMode, "Bg.Mode", 3);
-   handleSettings(ui.structure, "Bg.Structure", 0);
-   handleSettings(ui.modalGlas, "Bg.Modal.Glassy", true);
-   handleSettings(ui.modalInvert, "Bg.Modal.Invert", true);
+   handleSettings(ui.bgMode, BG_MODE);
+   handleSettings(ui.bgIntensity, BG_INTENSITY);
+   handleSettings(ui.structure, BG_STRUCTURE);
+   handleSettings(ui.modalGlas, BG_MODAL_GLASSY);
+   handleSettings(ui.modalOpacity, BG_MODAL_OPACITY);
+   handleSettings(ui.modalInvert, BG_MODAL_INVERT);
 
    handleSettings(ui.sunkenButtons, "Btn.Layer", 0);
    handleSettings(ui.checkMark, "Btn.CheckType", 0);

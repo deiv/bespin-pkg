@@ -81,6 +81,7 @@ private:
    friend class StyleAnimator;
    uint _numSteps, _n; float _q;
    QList < QWidget* > autofillingWidgets;
+   QList < QWidget* > opaqueWidgets;
    int lastTab, animStep;
    QPixmap tabPix[3];
    QTime lastTabUpdate;

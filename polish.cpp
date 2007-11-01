@@ -52,13 +52,14 @@ makeStructure(QPixmap **pixp, const QColor &c, bool light)
       (*pixp) = new QPixmap(64, 64);
    QPixmap *pix = (*pixp);
    QPainter p(pix);
+   int i;
    switch (config.bg.structure)
    {
    default:
-   case 0: { // scanlines
-      pix->fill( c.light(110).rgb() );
-      p.setPen( light ? c.light(106) : c.light(103) );
-      int i;
+   case 0: // scanlines
+      pix->fill( c.light(config.bg.intensity).rgb() );
+      i = 100 + (light?6:3)*(config.bg.intensity - 100)/10;
+      p.setPen(c.light(i));
       for ( i = 1; i < 64; i += 4 ) {
          p.drawLine( 0, i, 63, i );
          p.drawLine( 0, i+2, 63, i+2 );
@@ -67,10 +68,10 @@ makeStructure(QPixmap **pixp, const QColor &c, bool light)
       for ( i = 2; i < 63; i += 4 )
          p.drawLine( 0, i, 63, i );
       break;
-   }
-   case 1: { //checkboard
+   case 1: //checkboard
       p.setPen(Qt::NoPen);
-      p.setBrush(c.light(102));
+      i = 100 + 2*(config.bg.intensity - 100)/10;
+      p.setBrush(c.light(i));
       if (light) {
          p.drawRect(0,0,16,16); p.drawRect(32,0,16,16);
          p.drawRect(16,16,16,16); p.drawRect(48,16,16,16);
@@ -81,7 +82,7 @@ makeStructure(QPixmap **pixp, const QColor &c, bool light)
          p.drawRect(0,0,32,32);
          p.drawRect(32,32,32,32);
       }
-      p.setBrush(c.dark(102));
+      p.setBrush(c.dark(i));
       if (light) {
          p.drawRect(16,0,16,16); p.drawRect(48,0,16,16);
          p.drawRect(0,16,16,16); p.drawRect(32,16,16,16);
@@ -93,39 +94,41 @@ makeStructure(QPixmap **pixp, const QColor &c, bool light)
          p.drawRect(0,32,32,32);
       }
       break;
-   }
-   case 2: // fat scans
-      pix->fill( c.light(103).rgb() );
-      p.setPen(QPen(light ? c.light(101) : c, 3));
-      p.setBrush( c.dark(102) );
+   case 2:  // fat scans
+      i = (config.bg.intensity - 100);
+      pix->fill( c.light(100+3*i/10).rgb() );
+      p.setPen(QPen(light ? c.light(100+i/10) : c, 3));
+      p.setBrush( c.dark(100+2*i/10) );
       p.drawRect(-3,8,70,8);
       p.drawRect(-3,24,70,8);
       p.drawRect(-3,40,70,8);
       p.drawRect(-3,56,70,8);
       break;
    case 3: // "blue"print
-      pix->fill( c.dark(101).rgb() );
-      p.setPen(light ? c.light(104) : c.light(102));
-      for ( int i = 0; i < 64; i += 16 )
+      i = (config.bg.intensity - 100);
+      pix->fill( c.dark(100+i/10).rgb() );
+      p.setPen(c.light(100+(light?4:2)*i/10));
+      for ( i = 0; i < 64; i += 16 )
          p.drawLine( 0, i, 63, i );
-      for ( int i = 0; i < 64; i += 16 )
+      for ( i = 0; i < 64; i += 16 )
          p.drawLine( i, 0, i, 63 );
       break;
    case 4: // verticals
-      pix->fill( c.light(110).rgb() );
-      p.setPen( light ? c.light(106) : c.light(103) );
-      for ( int i = 1; i < 64; i += 4 ) {
+      i = (config.bg.intensity - 100);
+      pix->fill( c.light(100+i).rgb() );
+      p.setPen(c.light(100+(light?6:3)*i/10));
+      for ( i = 1; i < 64; i += 4 ) {
          p.drawLine( i, 0, i, 63 );
          p.drawLine( i+2, 0, i+2, 63 );
       }
       p.setPen( c );
-      for ( int i = 2; i < 63; i += 4 )
+      for ( i = 2; i < 63; i += 4 )
          p.drawLine( i, 0, i, 63 );
       break;
-   case 5: { // diagonals
-      pix->fill( c.light(102).rgb() );
-      QPen pen(c.dark(102-light), 11);
-      p.setPen(pen);
+   case 5: // diagonals
+      i = 2*(config.bg.intensity - 100)/100;
+      pix->fill( c.light(100+i).rgb() );
+      p.setPen(QPen(c.dark(100 + i/(2*light)), 11));
       p.setRenderHint(QPainter::Antialiasing);
       p.drawLine(-64,64,64,-64);
       p.drawLine(0,64,64,0);
@@ -133,7 +136,6 @@ makeStructure(QPixmap **pixp, const QColor &c, bool light)
       p.drawLine(32,64,64,32);
       p.drawLine(0,32,32,0);
       break;
-   }
    }
    p.end();
 }
@@ -244,7 +246,9 @@ void BespinStyle::polish( QWidget * widget) {
    if (!widget) return; // !
    
    if (widget->isWindow()) {
-      bool freakModals = config.bg.modal.invert || config.bg.modal.glassy;
+      bool freakModals = config.bg.modal.invert ||
+         config.bg.modal.glassy ||
+         config.bg.modal.opacity < 100;
       if (freakModals)
          widget->installEventFilter(this);
       if (config.bg.mode > Scanlines)
@@ -263,6 +267,14 @@ void BespinStyle::polish( QWidget * widget) {
                widget->setPalette(pal);
             }
             widget->setAttribute(Qt::WA_StyledBackground);
+         }
+         if (config.bg.mode == Scanlines) {
+            QPalette pal = widget->palette();
+            QColor c = pal.color(QPalette::Active, QPalette::Window);
+            if (!_scanlines[1]) makeStructure(&_scanlines[1], c, true);
+            QBrush brush( c, *_scanlines[1] );
+            pal.setBrush( QPalette::Window, brush );
+            widget->setPalette(pal);
          }
          widget->setWindowOpacity( config.menu.opacity/100.0 );
          // swap qmenu colors - in case
@@ -337,12 +349,15 @@ void BespinStyle::polish( QWidget * widget) {
    }
    
    else if (qobject_cast<QAbstractSlider *>(widget)) {
-      widget->installEventFilter(this);
       if (qobject_cast<QScrollBar *>(widget)) {
-         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+         // NOTICE slows down things as it triggers a repaint of the frame
+//          widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+         // ================
          QWidget *area = 0;
          if (widget->parentWidget()) {
             area = widget->parentWidget();
+//             if (isSpecialFrame(area))
+//                widget->installEventFilter(this);
             if (area->parentWidget()) {
                area = area->parentWidget();
                if (qobject_cast<QAbstractScrollArea*>(area)) {
@@ -429,9 +444,9 @@ void BespinStyle::polish( QWidget * widget) {
          animator->registrate(frame);
 
    // map a toolbox frame to it's elements
-      if (qobject_cast<QAbstractScrollArea*>(frame) &&
-            frame->parentWidget() && frame->parentWidget()->inherits("QToolBox"))
-         frame->setFrameStyle( static_cast<QFrame*>(frame->parentWidget())->frameStyle() );
+//       if (qobject_cast<QAbstractScrollArea*>(frame) &&
+//             frame->parentWidget() && frame->parentWidget()->inherits("QToolBox"))
+//          frame->setFrameStyle( static_cast<QFrame*>(frame->parentWidget())->frameStyle() );
 
    // overwrite ugly lines
       if (frame->frameShape() == QFrame::HLine ||

@@ -64,12 +64,10 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
       return;
    }
 
-   bool fastFocus = false;
-   const QBrush *brush = 0;
+   const QColor *brush = 0;
    if (qobject_cast<const QFrame*>(widget)) { // frame, can be killed unless...
       if (isSpecialFrame(widget)) { // ...TextEdit, KateView, ...
-         fastFocus = true;
-         brush = &PAL.brush(QPalette::Base);
+         brush = &PAL.color(QPalette::Base);
       }
       else { // maybe we need to corect a textlabels margin
          if (const QLabel* label = qobject_cast<const QLabel*>(widget))
@@ -107,13 +105,22 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
    
    if (brush)
       mask->render(rect, painter, *brush);
+   if (shadow) {
+//       if (brush)
+//          Tile::setSolidBackground(*brush);
+      shadow->render(RECT, painter);
+//       Tile::reset();
+   }
+   else { // plain frame
+         //horizontal
+      shadows.line[false][Sunken].render(RECT, painter, Tile::Full, false);
+      shadows.line[false][Sunken].render(RECT, painter, Tile::Full, true);
+         //vertical
+      shadows.line[true][Sunken].render(RECT, painter, Tile::Full, false);
+      shadows.line[true][Sunken].render(RECT, painter, Tile::Full, true);
+   }
    if (hasFocus) {
-      QColor h;
-//       if (fastFocus)
-//          h = Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
-//       else {
-         h = FCOLOR(Highlight); h.setAlpha(102);
-//       }
+      QColor h = FCOLOR(Highlight); h.setAlpha(102);
       if (const VisualFramePart* vfp =
           qobject_cast<const VisualFramePart*>(widget)) {
          Tile::setShape(Tile::Ring);
@@ -137,16 +144,6 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
       }
       mask->outline(rect, painter, h, dpi.f3);
       Tile::reset();
-   }
-   if (shadow)
-      shadow->render(RECT, painter);
-   else { // plain frame
-         //horizontal
-      shadows.line[false][Sunken].render(RECT, painter, Tile::Full, false);
-      shadows.line[false][Sunken].render(RECT, painter, Tile::Full, true);
-         //vertical
-      shadows.line[true][Sunken].render(RECT, painter, Tile::Full, false);
-      shadows.line[true][Sunken].render(RECT, painter, Tile::Full, true);
    }
 }
 
