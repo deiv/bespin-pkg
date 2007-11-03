@@ -42,8 +42,6 @@ p.setPen(Qt::NoPen)
 
 #define SET_ALPHA(_A_) black.setAlpha(_A_); p.setBrush(black)
 
-static int f1, f2, f3, f4, f7, f9, f11, f2_2, f9_2, f11_2;
-
 static QColor black = Qt::black;
 #if 0
 static void
@@ -108,48 +106,55 @@ roundedMask(int size, int factor)
    return pix;
 }
 
-static void
-renderLineEditShadow(Tile::Set &set, bool enabled)
+static QPixmap
+sunkenShadow(int size, bool enabled)
 {
-   QImage *tmpImg = new QImage(f9,f9, QImage::Format_ARGB32);
-   tmpImg->fill(Qt::transparent);
-   QPainter p(tmpImg);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setPen(Qt::NoPen);
-   
+   QImage *tmpImg = new QImage(size,size, QImage::Format_ARGB32);
+   tmpImg->fill(Qt::transparent); QPainter p(tmpImg);
+   p.setRenderHint(QPainter::Antialiasing); p.setPen(Qt::NoPen);
+
+   const int f1 = dpi.f1, f2 = dpi.f2, f4 = dpi.f4;
    int add = enabled*30;
+   const int add2 = 80/f4;
+   const float rAdd = 25.0/f4;
+
+   // draw a flat shadow
    SET_ALPHA(55+add);
-   p.drawRoundRect(0,0,f9,f7,80,80);
+   p.drawRoundRect(0,0,size,size-f2,80,80);
 
+   // subtract light
    p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
-   add = 30 - add;
-   SET_ALPHA(120+add); p.drawRoundRect(0,f1,f9,dpi.f6,75,75);
-   SET_ALPHA(140+add); p.drawRoundRect(0,f2,f9,dpi.f5,80,80);
-   SET_ALPHA(160+add); p.drawRoundRect(f1,f3,f7,f4,85,85);
-   SET_ALPHA(180+add); p.drawRoundRect(f2,f4,dpi.f5,f3,90,90);
+   add = 100 + 30 - add; int xOff;
+   for (int i = 1; i <= f4; ++i) {
+      xOff = qMax(i-f2,0); SET_ALPHA(add+i*add2);
+      p.drawRoundRect(xOff,i,size-2*xOff,size-(f2+i), 75+rAdd, 75+rAdd);
+   }
 
+   // add bottom highlight
    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-   QLinearGradient lg(0,0,f9,0);
+   QLinearGradient lg(0,0,size,0);
    QGradientStops stops;
    stops << QGradientStop( 0, WHITE(20) ) << QGradientStop( 0.5, WHITE(90) ) <<
       QGradientStop( 1, WHITE(20) );
    lg.setStops(stops);
-   p.fillRect(f2,f9-f2,f9-f4,f1, lg);
+   p.fillRect(dpi.f3,size-f2,size-2*dpi.f3,f1, lg);
    stops.clear();
-
-   lg = QLinearGradient(0,0,f9,0);
+   
    stops << QGradientStop( 0, WHITE(10) ) << QGradientStop( 0.5, WHITE(55) ) <<
       QGradientStop( 1, WHITE(10) );
    lg.setStops(stops);
-   p.fillRect(f3,f9-f1,f3,f1, lg);
+   p.fillRect(f4,size-f1,size-2*f4,f1, lg);
    stops.clear();
-
+   
    p.end();
 
-   set = Tile::Set(QPixmap::fromImage(*tmpImg),f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-   set.setDefaultShape(Tile::Ring);
-   delete tmpImg;
+   // create pixmap from image
+   QPixmap ret = QPixmap::fromImage(*tmpImg);
+   delete tmpImg; return ret;
 }
+
+static int f1, f2, f3, f4, f7, f9, f11, f2_2, f9_2, f11_2;
+
 
 static void
 renderRelief(Tile::Set &set)
@@ -161,8 +166,6 @@ renderRelief(Tile::Set &set)
    p.drawRoundRect(0,0,f11,dpi.f10,80,80);
    black.setAlpha(70); p.setPen(black);
    p.drawRoundRect(f1,0,f9,f9,80,80);
-//    p.setPen(WHITE(60));
-//    p.drawRoundRect(f2,f2,f9-f2,f9-f2,60,60);
    p.end();
    set = Tile::Set(*pix,f11_2,f11_2,f11-2*f11_2,f11-2*f11_2);
    set.setDefaultShape(Tile::Ring);
@@ -212,8 +215,13 @@ void BespinStyle::generatePixmaps()
    lights.button.setClipOffsets(f3,f3,f3,f3);
    lights.button.setDefaultShape(Tile::Ring);
 
+   for (int i = 0; i < 2; ++i) {
+      shadows.lineEdit[i] = Tile::Set(sunkenShadow(f9, i), f9/2,f9/2,1,1);
+      shadows.lineEdit[i].setDefaultShape(Tile::Ring);
+   }
+/*   
    renderLineEditShadow(shadows.lineEdit[false], false);
-   renderLineEditShadow(shadows.lineEdit[true], true);
+   renderLineEditShadow(shadows.lineEdit[true], true);*/
 
    // relief
    renderRelief(shadows.relief);
@@ -253,8 +261,7 @@ void BespinStyle::generatePixmaps()
    // ================================================================
    
    // RECTANGULAR =====================================
-   // raised
-   // TODO?!
+   // TODO: raised/relief?
    // sunken
    int f6 = dpi.f6;
    tmp = QPixmap(f9,f9);
@@ -292,7 +299,7 @@ void BespinStyle::generatePixmaps()
    masks.tab.setClipOffsets(0,0,0,0);
    
    // light
-   int f17 = SCALE(17), f17_2 = (f17-1)/2;
+   int f17 = SCALE(17);
    lights.tab = Tile::Set(shadow(f17, true, false, 3.0), f17/2,f17/2,1,1);
    lights.tab.setClipOffsets(f3,f3,f3,f3);
    lights.tab.setDefaultShape(Tile::Ring);
@@ -304,43 +311,13 @@ void BespinStyle::generatePixmaps()
          shadows.tab[i][j].setDefaultShape(Tile::Ring);
       }
 
-   int f15 = SCALE(15);
-   QImage tmpImg = QImage(f17,f17, QImage::Format_ARGB32);
-
-   // sunken
-   tmpImg.fill(Qt::transparent);
-   p.begin(&tmpImg);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,85)); p.drawRoundRect(0,0,f17,f17-f2,80,80);
-   p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
-   p.setBrush(QColor(0,0,0,120)); p.drawRoundRect(0,f1,f17,f17-f3,75,75);
-   p.setBrush(QColor(0,0,0,140)); p.drawRoundRect(0,f2,f17,dpi.f13,80,80);
-   p.setBrush(QColor(0,0,0,160)); p.drawRoundRect(f1,f3,f15,dpi.f12,85,85);
-   p.setBrush(QColor(0,0,0,180)); p.drawRoundRect(f2,dpi.f4,dpi.f13,f11,90,90);
-   p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-   QLinearGradient lg(dpi.f4,0,f17-dpi.f4,0);
-   QGradientStops stops;
-   stops << QGradientStop( 0, QColor(255,255,255, 20) )
-      << QGradientStop( 0.5, QColor(255,255,255, 90) )
-      << QGradientStop( 1, QColor(255,255,255, 20) );
-   lg.setStops(stops);
-   p.fillRect(f2,f17-f2,f13,f1, lg);
-   stops.clear();
-   stops << QGradientStop( 0, QColor(255,255,255, 10) )
-      << QGradientStop( 0.5, QColor(255,255,255, 55) )
-      << QGradientStop( 1, QColor(255,255,255, 10) );
-   lg.setStops(stops);
-   p.fillRect(f4,f17-f1,f9,f1, lg);
-   stops.clear();
-   p.end();
-   shadows.tabSunken = Tile::Set(QPixmap::fromImage(tmpImg),f17_2,f17_2,f17-2*f17_2,f17-2*f17_2);
+   shadows.tabSunken = Tile::Set(sunkenShadow(f17, true), f17/2,f17/2,1,1);
    shadows.tabSunken.setDefaultShape(Tile::Ring);
    // ================================================================
    
    // GROUPBOX =====================================
    // shadow
-   tmpImg = QImage(f49,f49, QImage::Format_ARGB32);
+   QImage tmpImg(f49,f49, QImage::Format_ARGB32);
    tmpImg.fill(Qt::transparent);
    p.begin(&tmpImg);
    p.setPen(Qt::NoPen);
@@ -368,6 +345,7 @@ void BespinStyle::generatePixmaps()
    // ================================================================
    
    // LINES =============================================
+   QLinearGradient lg; QGradientStops stops;
    int w,h,c1,c2;
    for (int i = 0; i < 2; ++i) { // orientarion
       if (i) {
@@ -381,30 +359,24 @@ void BespinStyle::generatePixmaps()
       tmp = QPixmap(w,h);
       for (int j = 0; j < 3; ++j) { // direction
          c1 = (j > 0) ? 255 : 111; c2 = (j > 0) ? 111 : 255;
-         tmp.fill(Qt::transparent);
-         p.begin(&tmp);
+         tmp.fill(Qt::transparent); p.begin(&tmp);
+
          stops << QGradientStop( 0, QColor(c1,c1,c1,0) )
             << QGradientStop( 0.5, QColor(c1,c1,c1,71) )
             << QGradientStop( 1, QColor(c1,c1,c1,0) );
          lg.setStops(stops);
-         if (i) {
-            p.fillRect(0,0,f1,f49,lg);
-         }
-         else {
-            p.fillRect(0,0,f49,f1,lg);
-         }
+         if (i) p.fillRect(0,0,f1,f49,lg);
+         else p.fillRect(0,0,f49,f1,lg);
          stops.clear();
+         
          stops << QGradientStop( 0, QColor(c2,c2,c2,0) )
             << QGradientStop( 0.5, QColor(c2,c2,c2,74) )
             << QGradientStop( 1, QColor(c2,c2,c2,0) );
          lg.setStops(stops);
-         if (i) {
-            p.fillRect(f1,0,f2-f1,f49,lg);
-         }
-         else {
-            p.fillRect(0,f1,f49,f2-f1,lg);
-         }
+         if (i) p.fillRect(f1,0,f2-f1,f49,lg);
+         else p.fillRect(0,f1,f49,f2-f1,lg);
          stops.clear();
+
          p.end();
          shadows.line[i][j] =
             Tile::Line(tmp, i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);

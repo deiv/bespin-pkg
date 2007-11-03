@@ -113,10 +113,13 @@ void
 BespinStyle::drawButtonFrame(const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
 {
-   B_STATES
-      
+   B_STATES;
+
+   const QAbstractButton* btn = qobject_cast<const QAbstractButton*>(widget);
    const int f1 = dpi.f1, f2 = dpi.f2;
    const bool toggled = !hover && option->state & State_On;
+   const bool round = !isCheckbox && (config.btn.round ||
+                                      (btn && btn->isCheckable()));
    QRect r = RECT;
    if (animStep < 0)
       animStep = sunken ? 6 : animator->hoverStep(widget);
@@ -175,7 +178,6 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    }
    
    // normal buttons ---------------
-   const bool round = config.btn.round && !isCheckbox;
    const Tile::Set *mask, *light;
    if (round) { mask = &masks.tab; light = &lights.tab; }
    else { mask = &masks.button; light = &lights.button; }
@@ -205,12 +207,13 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    }
    
    // plate
-   mask->render(r, painter, GRAD(btn), Qt::Vertical, c);
+   mask->render(r, painter, toggled ? Gradients::Sunken : GRAD(btn), Qt::Vertical, c);
 
-   // outline?
+   // outline
+   mask->outline(r.adjusted(f1,f1,-f1,-f1), painter,
+                 Colors::mid(c, Qt::white), f1);
+
    if (isEnabled) {
-      mask->outline(r.adjusted(f1,f1,-f1,-f1), painter,
-                           Colors::mid(c, Qt::white), f1);
       
       if (drawInner) {
          const QRect ir = isCheckbox ? r.adjusted(f2, f2, -f2, -f2 ) :

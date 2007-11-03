@@ -92,7 +92,7 @@ static QPixmap invertAlpha(const QPixmap & pix)
    delete dst;
    return ret;
 }
-#include <QtDebug>
+
 Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round)
 {
    if (pix.isNull()) {
@@ -191,7 +191,7 @@ QRect Set::rect(const QRect &rect, PosFlags pf) const
    return ret;
 }
 
-
+#include <QtDebug>
 void Set::render(const QRect &r, QPainter *p) const
 {
 
@@ -346,7 +346,7 @@ void Set::render(const QRect &r, QPainter *p) const
          solidBg = _bgColor;
          tile = &pixmap[BtmMid];
          MAKE_FILL(QPoint(xOff, bOff));
-         p->drawTiledPixmap(xOff, bOff, w, height(BtmMid), *tile);
+         p->drawTiledPixmap(xOff, bOff, w, blh, *tile);
          solidBg = 0;
       }
    }

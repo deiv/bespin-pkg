@@ -61,8 +61,31 @@ scrollAreaHovered(const QWidget* slider, StyleAnimator *animator)
    return isActive;
 }
 
-static bool isComboDropDownSlider;
-#include <QtDebug>
+#define PAINT_ELEMENT(_E_)\
+if (scrollbar->subControls & SC_ScrollBar##_E_) {\
+newScrollbar.rect = scrollbar->rect;\
+newScrollbar.state = saveFlags;\
+newScrollbar.rect =\
+subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBar##_E_, widget);\
+if (newScrollbar.rect.isValid()) {\
+if (!(scrollbar->activeSubControls & SC_ScrollBar##_E_))\
+newScrollbar.state &= ~(State_Sunken | State_MouseOver);\
+if (info && (info->fadeIns & SC_ScrollBar##_E_ ||\
+info->fadeOuts & SC_ScrollBar##_E_))\
+complexStep = info->step(SC_ScrollBar##_E_);\
+else \
+complexStep = 0; \
+drawScrollBar##_E_(&newScrollbar, cPainter, widget);\
+}\
+}//
+
+static bool isComboDropDownSlider, scrollAreaHovered_;
+static int complexStep, widgetStep;
+
+static QPixmap *scrollBgCache = 0;
+const static QWidget *cachedScroller = 0;
+static QPainter *cPainter = 0;
+
 void
 BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
                            QPainter * painter, const QWidget * widget) const
@@ -72,102 +95,110 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
       qstyleoption_cast<const QStyleOptionSlider *>(option);
    if (!scrollbar) return;
 
+   cPainter = painter;
+   bool flushCache = false, needsPaint = true;
+
    // we paint the slider bg ourselves, as otherwise a frame repaint would be
    // triggered (for no sense)
-   if (!widget)
+   if (!widget) // fallback ===========
       painter->fillRect(RECT, FCOLOR(Window));
-   else if (widget->testAttribute(Qt::WA_OpaquePaintEvent)) {
-      const QWidget *grampa = widget;
-      while (!(grampa->isWindow() || grampa->autoFillBackground()))
-         grampa = grampa->parentWidget();
+   else {
 
-      QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());
-      painter->save();
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
-      painter->setBrushOrigin(tl);
-      painter->drawRect(RECT);
-      if (grampa->isWindow())  { // means we need to paint the global bg as well
-         painter->setClipRect(RECT, Qt::IntersectClip);
-         QStyleOption tmpOpt = *option;
-         tmpOpt.rect = QRect(tl, grampa->size());
-         painter->fillRect(RECT, grampa->palette().color(QPalette::Window));
-         drawWindowBg(&tmpOpt, painter, grampa);
+      // catch combobox dropdowns ==========
+      if (widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+          widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) {
+         painter->fillRect(RECT, PAL.brush(QPalette::Base));
+         isComboDropDownSlider = true;
       }
-      painter->restore();
+      else { // default scrollbar ===============
+         isComboDropDownSlider = false;
+
+         // opaque fill (default)
+         if (widget->testAttribute(Qt::WA_OpaquePaintEvent)) {
+
+            if (option->state & State_Sunken) { // use the caching
+               flushCache = true;
+               if (widget != cachedScroller) { // update cache
+                  cachedScroller = widget;
+                  if (!scrollBgCache ||
+                      scrollBgCache->size() != RECT.size()) {
+                     delete scrollBgCache;
+                     scrollBgCache = new QPixmap(RECT.size());
+                  }
+                  cPainter = new QPainter(scrollBgCache);
+               }
+               else
+                  needsPaint = false;
+            }
+
+            if (needsPaint) {
+               // draw background
+               const QWidget *grampa = widget;
+               while (!(grampa->isWindow() || grampa->autoFillBackground()))
+                  grampa = grampa->parentWidget();
+
+               QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());
+               cPainter->save();
+               cPainter->setPen(Qt::NoPen);
+               cPainter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
+               cPainter->setBrushOrigin(tl);
+               cPainter->drawRect(RECT);
+               if (grampa->isWindow())  { // means we need to paint the global bg as well
+                  cPainter->setClipRect(RECT, Qt::IntersectClip);
+                  QStyleOption tmpOpt = *option;
+                  tmpOpt.rect = QRect(tl, grampa->size());
+                  cPainter->fillRect(RECT, grampa->palette().brush(QPalette::Window));
+                  drawWindowBg(&tmpOpt, cPainter, grampa);
+               }
+               cPainter->restore();
+            }
+         }
+      }
    }
    // =================
 
    OPT_ENABLED
-   
+
    // Make a copy here and reset it for each primitive.
    QStyleOptionSlider newScrollbar = *scrollbar;
-   BespinStyle *that = const_cast<BespinStyle*>( this );
-
-   if (widget && widget->parentWidget() &&
-      widget->parentWidget()->parentWidget() &&
-      widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) {
-         painter->fillRect(RECT, PAL.brush(QPalette::Base));
-         isComboDropDownSlider = true;
-   }
-   else
-      isComboDropDownSlider = false;
-
    State saveFlags = newScrollbar.state;
    if (scrollbar->minimum == scrollbar->maximum)
       saveFlags &= ~State_Enabled;
 
+   // hover animations =================
    if (scrollbar->activeSubControls & SC_ScrollBarSlider) {
-      that->widgetStep = 0;
-      that->scrollAreaHovered_ = true;
+      widgetStep = 0; scrollAreaHovered_ = true;
    }
    else {
-      that->widgetStep = animator->hoverStep(widget);
-      that->scrollAreaHovered_ = scrollAreaHovered(widget, animator);
+      widgetStep = animator->hoverStep(widget);
+      scrollAreaHovered_ = scrollAreaHovered(widget, animator);
    }
 
    SubControls hoverControls = scrollbar->activeSubControls &
       (SC_ScrollBarSubLine | SC_ScrollBarAddLine | SC_ScrollBarSlider);
-   const ComplexHoverFadeInfo *info =
-      animator->fadeInfo(widget, hoverControls);
-       
-#define PAINT_ELEMENT(_E_)\
-   if (scrollbar->subControls & SC_ScrollBar##_E_) {\
-      newScrollbar.rect = scrollbar->rect;\
-      newScrollbar.state = saveFlags;\
-      newScrollbar.rect =\
-         subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBar##_E_, widget);\
-      if (newScrollbar.rect.isValid()) {\
-         if (!(scrollbar->activeSubControls & SC_ScrollBar##_E_))\
-            newScrollbar.state &= ~(State_Sunken | State_MouseOver);\
-         if (info && (info->fadeIns & SC_ScrollBar##_E_ ||\
-         info->fadeOuts & SC_ScrollBar##_E_))\
-            that->complexStep = info->step(SC_ScrollBar##_E_);\
-         else \
-            that->complexStep = 0; \
-         drawScrollBar##_E_(&newScrollbar, painter, widget);\
-      }\
-   }//
+   const ComplexHoverFadeInfo *info = animator->fadeInfo(widget, hoverControls);
+   // =======================================
 
-   QRect groove = RECT;
+   QRect groove;
+   if (needsPaint) {
+      PAINT_ELEMENT(Groove);
+      groove = newScrollbar.rect;
+   }
+   else
+      groove =
+      subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBarGroove, widget);
+
+   if (cPainter != painter) {
+      cPainter->end(); delete cPainter; cPainter = painter;
+   }
+
+   // Background and groove have been painted - flush the cache (in case)
+   if (flushCache)
+      painter->drawPixmap(RECT.topLeft(), *scrollBgCache);
+       
    if (config.scroll.showButtons) {
       PAINT_ELEMENT(SubLine);
       PAINT_ELEMENT(AddLine);
-      if (config.scroll.sunken)
-         groove = subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget);
-   }
-
-   if (!isComboDropDownSlider) {
-      if (!config.scroll.sunken) {
-         PAINT_ELEMENT(Groove);
-         PAINT_ELEMENT(Groove);
-      }
-//          PAINT_ELEMENT(SC_ScrollBarFirst, CE_ScrollBarFirst);
-//          PAINT_ELEMENT(SC_ScrollBarLast, CE_ScrollBarLast);
-      if (config.scroll.groove)
-         masks.tab.render(groove, painter, Gradients::Sunken,
-                        option->state & QStyle::State_Horizontal ?
-                        Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
    }
        
    if (isEnabled && scrollbar->subControls & SC_ScrollBarSlider) {
@@ -186,15 +217,17 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
             newScrollbar.state |= (State_Sunken | State_MouseOver);
          if (info && (info->fadeIns & SC_ScrollBarSlider ||
                      info->fadeOuts & SC_ScrollBarSlider))
-            that->complexStep = info->step(SC_ScrollBarSlider);
+            complexStep = info->step(SC_ScrollBarSlider);
          else
-            that->complexStep = 0;
-         drawScrollBarSlider(&newScrollbar, painter, widget);
+            complexStep = 0;
+         drawScrollBarSlider(&newScrollbar, cPainter, widget);
       }
    }
+   
    if (!isComboDropDownSlider && config.scroll.sunken)
       shadows.tabSunken.render(groove, painter);
 }
+#undef PAINT_ELEMENT
 
 void
 BespinStyle::drawScrollBarButton(const QStyleOption * option,
@@ -253,6 +286,13 @@ BespinStyle::drawScrollBarGroove(const QStyleOption * option,
 {
    if (isComboDropDownSlider) return;
 
+   if (config.scroll.groove) {
+      masks.tab.render(RECT, painter, Gradients::Sunken,
+                       option->state & QStyle::State_Horizontal ?
+                       Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
+      return;
+   }
+
    // the groove TODO: might be Colors::mid(bg, fg) is better?!
    SAVE_PEN;
    painter->setPen(FCOLOR(Window).dark(115));
@@ -285,14 +325,7 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
       return;
    }
 
-//    const QStyleOptionSlider opt =
-//       qstyleoption_cast<const QStyleOptionSlider *>(option);
-//    if (!opt) return;
-   
    if (!isEnabled) {
-//       if (!config.scroll.sunken)
-//          shadows.tabSunken.render(RECT, painter);
-//       else
       if (!config.scroll.sunken)
          drawScrollBarGroove(option, painter, widget);
       return;
@@ -321,10 +354,19 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    const int f1 = dpi.f1, f2 = dpi.f2;
 
    // shadow
-   if (!sunken) // save some CPU cycles...
+   if (sunken) {
+      r.adjust(f1, f1, -f1, -f1);
+      shadows.tab[true][true].render(r, painter);
+      r.adjust(f1, f1, -f1,
+               (option->state & QStyle::State_Horizontal) &&
+               config.scroll.sunken ? -f1 : -f2 );
+   }
+   else {
       shadows.tab[true][false].render(r, painter);
-   r.adjust(f2, f2, -f2, (option->state & QStyle::State_Horizontal) &&
-            config.scroll.sunken ? -f2 : -dpi.f3 );
+      r.adjust(f2, f2, -f2,
+               (option->state & QStyle::State_Horizontal) &&
+               config.scroll.sunken ? -f2 : -dpi.f3 );
+   }
 
    // gradient setup
    Qt::Orientation o; int size; Tile::PosFlags pf;
@@ -345,8 +387,15 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
 
    if (config.btn.fullHover) return;
 
-   r.adjust(f2, f2, -f2, -f2);
-   masks.button.render(r, painter, GRAD(scroll), o, c, size, QPoint(f2,f2));
+   int dw, dh;
+   if (o == Qt::Vertical) {
+      dw = r.width()/8; dh = r.height()/4;
+   }
+   else {
+      dw = r.width()/4; dh = r.height()/8;
+   }
+   r.adjust(dw, dh, -dw, -dh);
+   masks.button.render(r, painter, GRAD(scroll), o, c, size, QPoint(dw,dh));
 }
 
 //    case CE_ScrollBarFirst: // Scroll bar first line indicator (i.e., home).

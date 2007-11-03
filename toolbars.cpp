@@ -16,6 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QAbstractButton>
 #include "draw.h"
 
 void
@@ -104,10 +105,12 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
 
    bool isOn = option->state & State_On;
    int step =  animator->hoverStep(widget);
+   const QAbstractButton* btn = qobject_cast<const QAbstractButton*>(widget);
+   const bool wantFrame = isOn || (step > 4 && btn && btn->isCheckable());
    const QColor &c = Colors::bg(PAL, widget);
-   if (isOn && step < 6)
+   if (isOn)
       masks.tab.render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
-   if (hover || step || sunken) {
+   if (step || sunken) {
       QRect r = RECT;
       if (!sunken && step) {
          step = 6 - step;
@@ -118,7 +121,7 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
          (Colors::value(c) < 108 ? Gradients::Simple : Gradients::Button);
       masks.tab.render(r, painter, gt, Qt::Vertical, c);
    }
-   if (isOn)
+   if (wantFrame)
       shadows.tabSunken.render(RECT, painter);
 }
 

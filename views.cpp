@@ -36,9 +36,6 @@ BespinStyle::drawHeader(const QStyleOption * option, QPainter * painter,
    drawHeaderSection(header, painter, widget);
 
    // label
-//    QStyleOptionHeader subopt = *header;
-//    subopt.rect = subElementRect(SE_HeaderLabel, header, widget);
-//    if (subopt.rect.isValid())
    drawHeaderLabel(header, painter, widget);
        
    // sort Indicator on sorting or (inverted) on hovered headers
@@ -102,7 +99,7 @@ BespinStyle::drawHeaderSection(const QStyleOption * option, QPainter * painter,
       painter->drawTiledPixmap(r, Gradients::pix(c, s, o,
          Gradients::Sunken));
       painter->save();
-      painter->setPen(QColor(0,0,0, 50));
+      painter->setPen(Colors::mid(FCOLOR(Base), Qt::black, 8, 1));
       painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
       painter->restore();
    }

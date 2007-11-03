@@ -214,15 +214,17 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
                ret.setRect(0, sliderstart + sliderlen - dpi.f3,
                            sbextent, maxlen - sliderstart - sliderlen);
             break;
-         case SC_ScrollBarGroove:
+         case SC_ScrollBarGroove: {
+            const int off = config.scroll.sunken ? 0 : dpi.f2;
             if (scrollbar->orientation == Qt::Horizontal)
-               ret.setRect(dpi.f2, 0,
-                           scrollbar->rect.width() - buttonSpace -dpi.f4,
+               ret.setRect(off, 0,
+                           scrollbar->rect.width() - buttonSpace - 2*off,
                            scrollbar->rect.height());
             else
-               ret.setRect(0, dpi.f2, scrollbar->rect.width(),
-                           scrollbar->rect.height() - buttonSpace - dpi.f4);
+               ret.setRect(0, off, scrollbar->rect.width(),
+                           scrollbar->rect.height() - buttonSpace - 2*off);
             break;
+         }
          case SC_ScrollBarSlider:
             if (scrollbar->orientation == Qt::Horizontal)
                ret.setRect(sliderstart, 0, sliderlen, sbextent);

@@ -336,22 +336,18 @@ protected:
    void drawTitleBar(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
    void drawSizeGrip(const QStyleOption*, QPainter*, const QWidget*) const;
    // ==========================================
+   void fillWithMask(QPainter *painter,
+                     const QPoint &xy,
+                     const QBrush &brush,
+                     const QPixmap &mask,
+                     QPoint offset = QPoint()) const;
 //private slots:
 //   void fakeMouse();
    
 private:
    BespinStyle( const BespinStyle & );
    BespinStyle& operator=( const BespinStyle & );
-   
-   void fillWithMask(QPainter *painter,
-                     const QPoint &xy,
-                     const QBrush &brush,
-                     const QPixmap &mask,
-                     QPoint offset = QPoint()) const;
-   
    QColor mapFadeColor(const QColor &color, int index) const;
-   QPixmap *tint(const QImage &img, const QColor& c) const;
-   const Tile::Set &glow(const QColor & c, bool round = false) const;
    void generatePixmaps();
    void initMetrics();
    void readSettings(const QSettings *settings = 0L);
@@ -390,9 +386,7 @@ private:
    
    //anmiated progressbars
    StyleAnimator *animator;
-   int complexStep, widgetStep;
-   bool scrollAreaHovered_;
-   
+
    // toolbar title functionality ========================
    QPoint cursorPos_;
    bool mouseButtonPressed_;
