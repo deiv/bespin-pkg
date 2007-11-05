@@ -286,6 +286,30 @@ BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy,
    painter->drawPixmap(xy, qPix);
 }
 
+void
+BespinStyle::erase(const QStyleOption *option, QPainter *painter,
+                   const QWidget *widget) const
+{
+   const QWidget *grampa = widget;
+   while (!(grampa->isWindow() || grampa->autoFillBackground()))
+      grampa = grampa->parentWidget();
+
+   QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());
+   painter->save();
+   painter->setPen(Qt::NoPen);
+   painter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
+   painter->setBrushOrigin(tl);
+   painter->drawRect(option->rect);
+   if (grampa->isWindow())  { // means we need to paint the global bg as well
+      painter->setClipRect(option->rect, Qt::IntersectClip);
+      QStyleOption tmpOpt = *option;
+      tmpOpt.rect = QRect(tl, grampa->size());
+      painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
+      drawWindowBg(&tmpOpt, painter, grampa);
+   }
+   painter->restore();
+}
+
 static void swapPalette(QWidget *widget)
 {
    QPalette pal(widget->palette());

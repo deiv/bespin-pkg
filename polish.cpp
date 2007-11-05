@@ -349,6 +349,10 @@ void BespinStyle::polish( QWidget * widget) {
    }
    
    else if (qobject_cast<QAbstractSlider *>(widget)) {
+      // NOTICE we could get slight more performance by this and cache ourselve,
+      // but that's gonna add more complexity, and as the slider is usually not
+      // bound to e.g. a scrollarea surprisinlgy little CPU gain...
+//       widget->setAttribute(Qt::WA_OpaquePaintEvent);
       if (qobject_cast<QScrollBar *>(widget)) {
          // NOTICE slows down things as it triggers a repaint of the frame
 //          widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
@@ -360,12 +364,9 @@ void BespinStyle::polish( QWidget * widget) {
 //                widget->installEventFilter(this);
             if (area->parentWidget()) {
                area = area->parentWidget();
-               if (qobject_cast<QAbstractScrollArea*>(area)) {
-                  if (area->inherits("QComboBoxListView"))
-                     widget->setAttribute(Qt::WA_OpaquePaintEvent, true);
-                  area = 0;
-               }
-               else // konsole, kate, etc.
+               if (qobject_cast<QAbstractScrollArea*>(area))
+                  area = 0; // this is handled with the scrollarea, but...
+               else // konsole, kate, etc. need a special handling!
                   area = widget->parentWidget();
             }
          }

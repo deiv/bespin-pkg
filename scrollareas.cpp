@@ -81,6 +81,7 @@ drawScrollBar##_E_(&newScrollbar, cPainter, widget);\
 
 static bool isComboDropDownSlider, scrollAreaHovered_;
 static int complexStep, widgetStep;
+static const bool round_ = true;
 
 static QPixmap *scrollBgCache = 0;
 const static QWidget *cachedScroller = 0;
@@ -96,7 +97,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
    if (!scrollbar) return;
 
    cPainter = painter;
-   bool flushCache = false, needsPaint = true;
+   bool useCache = false, needsPaint = true;
 
    // we paint the slider bg ourselves, as otherwise a frame repaint would be
    // triggered (for no sense)
@@ -117,7 +118,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
          if (widget->testAttribute(Qt::WA_OpaquePaintEvent)) {
 
             if (option->state & State_Sunken) { // use the caching
-               flushCache = true;
+               useCache = true;
                if (widget != cachedScroller) { // update cache
                   cachedScroller = widget;
                   if (!scrollBgCache ||
@@ -130,28 +131,8 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
                else
                   needsPaint = false;
             }
-
-            if (needsPaint) {
-               // draw background
-               const QWidget *grampa = widget;
-               while (!(grampa->isWindow() || grampa->autoFillBackground()))
-                  grampa = grampa->parentWidget();
-
-               QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());
-               cPainter->save();
-               cPainter->setPen(Qt::NoPen);
-               cPainter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
-               cPainter->setBrushOrigin(tl);
-               cPainter->drawRect(RECT);
-               if (grampa->isWindow())  { // means we need to paint the global bg as well
-                  cPainter->setClipRect(RECT, Qt::IntersectClip);
-                  QStyleOption tmpOpt = *option;
-                  tmpOpt.rect = QRect(tl, grampa->size());
-                  cPainter->fillRect(RECT, grampa->palette().brush(QPalette::Window));
-                  drawWindowBg(&tmpOpt, cPainter, grampa);
-               }
-               cPainter->restore();
-            }
+            if (needsPaint)
+               erase(option, cPainter, widget);
          }
       }
    }
@@ -193,7 +174,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
    }
 
    // Background and groove have been painted - flush the cache (in case)
-   if (flushCache)
+   if (useCache)
       painter->drawPixmap(RECT.topLeft(), *scrollBgCache);
        
    if (config.scroll.showButtons) {
@@ -225,7 +206,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
    }
    
    if (!isComboDropDownSlider && config.scroll.sunken)
-      shadows.tabSunken.render(groove, painter);
+      shadows.sunken[round_][isEnabled].render(groove, painter);
 }
 #undef PAINT_ELEMENT
 
@@ -287,9 +268,9 @@ BespinStyle::drawScrollBarGroove(const QStyleOption * option,
    if (isComboDropDownSlider) return;
 
    if (config.scroll.groove) {
-      masks.tab.render(RECT, painter, Gradients::Sunken,
-                       option->state & QStyle::State_Horizontal ?
-                       Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
+      masks.rect[round_].render(RECT, painter, Gradients::Sunken,
+                                option->state & QStyle::State_Horizontal ?
+                                Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
       return;
    }
 
@@ -352,25 +333,30 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
 
    QRect r = RECT;
    const int f1 = dpi.f1, f2 = dpi.f2;
+   const bool horizontal = option->state & QStyle::State_Horizontal;
 
    // shadow
+   painter->save();
+   if (horizontal)
+      painter->setClipRegion(QRegion(RECT) -
+                             r.adjusted(dpi.f9, dpi.f3, -dpi.f9, -dpi.f3));
+   else
+      painter->setClipRegion(QRegion(RECT) -
+                             r.adjusted(dpi.f3, dpi.f9, -dpi.f3, -dpi.f9));
    if (sunken) {
       r.adjust(f1, f1, -f1, -f1);
-      shadows.tab[true][true].render(r, painter);
-      r.adjust(f1, f1, -f1,
-               (option->state & QStyle::State_Horizontal) &&
-               config.scroll.sunken ? -f1 : -f2 );
+      shadows.raised[round_][true][true].render(r, painter);
+      r.adjust(f1, f1, -f1, horizontal && config.scroll.sunken ? -f1 : -f2 );
    }
    else {
-      shadows.tab[true][false].render(r, painter);
-      r.adjust(f2, f2, -f2,
-               (option->state & QStyle::State_Horizontal) &&
-               config.scroll.sunken ? -f2 : -dpi.f3 );
+      shadows.raised[round_][true][false].render(r, painter);
+      r.adjust(f2, f2, -f2, horizontal && config.scroll.sunken ? -f2 : -dpi.f3 );
    }
+   painter->restore();
 
    // gradient setup
    Qt::Orientation o; int size; Tile::PosFlags pf;
-   if (option->state & QStyle::State_Horizontal) {
+   if (horizontal) {
       o = Qt::Vertical; size = r.height();
       pf = Tile::Top | Tile::Bottom;
    }
@@ -381,21 +367,21 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
 
 // the allways shown base
    const QColor &bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
-   masks.tab.render(r, painter, GRAD(scroll), o, bc, size);
+   masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size);
    if (Gradients::isReflective(GRAD(scroll)))
-      masks.tab.outline(r, painter, Colors::mid(bc,Qt::white,2,1));
+      masks.rect[round_].outline(r, painter, Colors::mid(bc,Qt::white,2,1));
 
    if (config.btn.fullHover) return;
 
    int dw, dh;
-   if (o == Qt::Vertical) {
+   if (horizontal) {
       dw = r.width()/8; dh = r.height()/4;
    }
    else {
       dw = r.width()/4; dh = r.height()/8;
    }
    r.adjust(dw, dh, -dw, -dh);
-   masks.button.render(r, painter, GRAD(scroll), o, c, size, QPoint(dw,dh));
+   masks.rect[true].render(r, painter, GRAD(scroll), o, c, size, QPoint(dw,dh));
 }
 
 //    case CE_ScrollBarFirst: // Scroll bar first line indicator (i.e., home).

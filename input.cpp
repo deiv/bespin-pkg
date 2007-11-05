@@ -29,9 +29,9 @@ BespinStyle::drawLineEditFrame(const QStyleOption * option, QPainter * painter,
    QRect r = RECT.adjusted(0,0,0,-dpi.f2);
    if (hasFocus) {
       QColor h = FCOLOR(Highlight); h.setAlpha(102);
-      masks.button.outline(r, painter, h, dpi.f3);
+      masks.rect[false].outline(r, painter, h, dpi.f3);
    }
-   shadows.lineEdit[isEnabled].render(r, painter);
+   shadows.sunken[false][isEnabled].render(r, painter);
 }
 
 void
@@ -51,26 +51,27 @@ BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
    isEnabled = isEnabled && !(option->state & State_ReadOnly);
    QRect r = RECT;
    if (isEnabled) {
+      const Tile::Set &mask = masks.rect[false];
       if (hasFocus) {
          r.adjust(0,0,0,-dpi.f2);
-         masks.button.render(r, painter, FCOLOR(Base).light(112));
+         mask.render(r, painter, FCOLOR(Base).light(112));
          r.setBottom(r.bottom()+dpi.f1);
          QColor h = FCOLOR(Highlight); h.setAlpha(102);
 //          Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
-         masks.button.outline(r, painter, h, dpi.f3);
+         mask.outline(r, painter, h, dpi.f3);
       }
       else {
          r.setBottom(r.y()+r.height()/2);
          Tile::setShape(Tile::Full & ~Tile::Bottom);
-         masks.button.render(r, painter, Gradients::Sunken,
+         mask.render(r, painter, Gradients::Sunken,
                              Qt::Vertical, FCOLOR(Base));
          r.setTop(r.bottom()+1); r.setBottom(RECT.bottom()-dpi.f2);
          Tile::setShape(Tile::Full & ~Tile::Top);
-         masks.button.render(r, painter, FCOLOR(Base).light(112));
+         mask.render(r, painter, FCOLOR(Base).light(112));
          Tile::reset();
       }
    }
-   shadows.lineEdit[isEnabled].render(RECT, painter);
+   shadows.sunken[false][isEnabled].render(RECT, painter);
 }
 
 void
@@ -98,7 +99,7 @@ BespinStyle::drawSpinBox(const QStyleOptionComplex * option, QPainter * painter,
    if (!isEnabled)
       return; // why bother the user with elements he can't use... ;)
 
-   const int f1 = dpi.f1, f2 = dpi.f2;
+   const int f2 = dpi.f2;
 
    int arrowHeight = -1;
    painter->setPen(Qt::NoPen);
@@ -201,6 +202,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
       drawLineEdit(option, painter, widget);
    else {
       if (!ar.isNull()) {
+         const Tile::Set &mask = masks.rect[true];
          // ground
          animStep = animator->hoverStep(widget);
          if (listShown) animStep = 6;
@@ -209,13 +211,13 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
          if (config.btn.fullHover)
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
 
-         masks.tab.render(r, painter, GRAD(chooser), Qt::Vertical, c);
+         mask.render(r, painter, GRAD(chooser), Qt::Vertical, c);
 
          if (hasFocus) {
             QColor hlc = /*FCOLOR(Highlight);*/
 //             hlc.setAlpha(102);
                Colors::mid(c, FCOLOR(Highlight), 2, 1);
-            masks.tab.outline(r, painter, hlc, f3);
+            mask.outline(r, painter, hlc, f3);
          }
 
          // maybe hover indicator?
@@ -223,11 +225,11 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
             r.adjust(f3, f3, -f3, -f3);
             const QColor c2 =
                Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-            masks.tab.render(r, painter, GRAD(chooser), Qt::Vertical,
-                                c2, RECT.height()-f2, QPoint(0,f3));
+            mask.render(r, painter, GRAD(chooser), Qt::Vertical,
+                        c2, RECT.height()-f2, QPoint(0,f3));
          }
       }
-      shadows.tabSunken.render(RECT, painter);
+      shadows.sunken[true][isEnabled].render(RECT, painter);
    }
    }
 
@@ -273,8 +275,8 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
          ar.adjust(f2, dpi.f4, -f2, -dpi.f4);
-         masks.tab.render(ar, painter, GRAD(chooser), Qt::Vertical, c,
-                           RECT.height()-f2, QPoint(0,dpi.f4));
+         masks.rect[true].render(ar, painter, GRAD(chooser), Qt::Vertical, c,
+                                 RECT.height()-f2, QPoint(0,dpi.f4));
          painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
       }
       if (upDown) {

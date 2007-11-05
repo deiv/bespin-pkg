@@ -98,31 +98,29 @@ void
 BespinStyle::drawToolButtonShape(const QStyleOption * option,
                                  QPainter * painter, const QWidget * widget) const
 {
-   B_STATES
+   OPT_ENABLED; OPT_SUNKEN;
       
    if (!isEnabled)
       return;
 
    bool isOn = option->state & State_On;
    int step =  animator->hoverStep(widget);
-   const QAbstractButton* btn = qobject_cast<const QAbstractButton*>(widget);
-   const bool wantFrame = isOn || (step > 4 && btn && btn->isCheckable());
    const QColor &c = Colors::bg(PAL, widget);
    if (isOn)
-      masks.tab.render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
+      masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
    if (step || sunken) {
       QRect r = RECT;
       if (!sunken && step) {
-         step = 6 - step;
-         const int dx = step*r.width()/18, dy = step*r.height()/18;
+         step = 5 - step;
+         const int dx = step*r.width()/20, dy = step*r.height()/20;
          r.adjust(dx, dy, -dx, -dy);
       }
       const Gradients::Type gt = sunken ? Gradients::Sunken :
          (Colors::value(c) < 108 ? Gradients::Simple : Gradients::Button);
-      masks.tab.render(r, painter, gt, Qt::Vertical, c);
+      masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
    }
-   if (wantFrame)
-      shadows.tabSunken.render(RECT, painter);
+   if (isOn)
+      shadows.sunken[true][true].render(RECT, painter);
 }
 
 void

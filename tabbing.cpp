@@ -100,9 +100,9 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
    if (verticalTabs(tbb->shape)) {
       o = Qt::Horizontal; size = RECT.width();
    }
-   masks.tab.render(rect, painter, GRAD(tab), o, CCOLOR(tab.std, Bg), size);
+   masks.rect[true].render(rect, painter, GRAD(tab), o, CCOLOR(tab.std, Bg), size);
    rect.setBottom(rect.bottom()+dpi.f2);
-   shadows.tabSunken.render(rect, painter);
+   shadows.sunken[true][true].render(rect, painter);
 }
 
 void
@@ -192,10 +192,10 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
    const Gradients::Type gt =
       GRAD(tab) == Gradients::Sunken ? Gradients::None : GRAD(tab);
    const QPoint off = rect.topLeft()-RECT.topLeft()-QPoint(dpi.f3,f2);
-   masks.tab.render(rect, painter, gt, o, c, size, off);
+   masks.rect[true].render(rect, painter, gt, o, c, size, off);
    if (config.tab.activeTabSunken && sunken) {
       rect.setBottom(rect.bottom()+f2);
-      shadows.tabSunken.render(rect, painter);
+      shadows.sunken[true][true].render(rect, painter);
    }
 }
 
@@ -342,12 +342,12 @@ BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter,
          CCOLOR(toolbox.active, Bg) : FCOLOR(Window);
       Gradients::Type gt = selected ? GRAD(toolbox) :
          (sunken ? Gradients::Sunken : Gradients::Button);
-      masks.tab.render(r, painter, gt, Qt::Vertical, c);
+      masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
    }
    else
-      masks.tab.render(r, painter, FCOLOR(Window).dark(108));
+      masks.rect[true].render(r, painter, FCOLOR(Window).dark(108));
    Tile::setShape(pf & ~Tile::Center);
-   shadows.tabSunken.render(RECT, painter);
+   shadows.sunken[true][true].render(RECT, painter);
    Tile::reset();
 }
 

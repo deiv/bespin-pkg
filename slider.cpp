@@ -27,7 +27,7 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       qstyleoption_cast<const QStyleOptionSlider *>(option);
    if (!slider) return;
 
-   B_STATES
+   B_STATES;
 
    QRect groove = QCommonStyle::subControlRect(CC_Slider, slider, SC_SliderGroove, widget);
    QRect handle = QCommonStyle::subControlRect(CC_Slider, slider, SC_SliderHandle, widget);

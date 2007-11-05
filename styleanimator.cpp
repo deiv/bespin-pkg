@@ -617,7 +617,7 @@ void StyleAnimator::updateTabAnimation() {
                tai->autofillingWidgets.removeAt(index);
                widget->setAutoFillBackground(true);
             }
-            index = tai->autofillingWidgets.indexOf(widget);
+            index = tai->opaqueWidgets.indexOf(widget);
             if (index != -1) {
                tai->opaqueWidgets.removeAt(index);
                widget->setAttribute(Qt::WA_OpaquePaintEvent, true);

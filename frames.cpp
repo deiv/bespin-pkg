@@ -49,7 +49,7 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
       
    if (!widget) { // fallback, we cannot paint shaped frame contents
       if (sunken)
-         shadows.sunken.render(RECT,painter);
+         shadows.fallback.render(RECT,painter);
       else if (option->state & State_Raised) //TODO!
 //          shadows.raised.render(RECT,painter);
          return;
@@ -95,12 +95,12 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
    
    const Tile::Set *mask = 0L, *shadow = 0L;
    if (sunken) {
-      shadow = &shadows.lineEdit[isEnabled];
-      mask = &masks.button;
+      shadow = &shadows.sunken[false][isEnabled];
+      mask = &masks.rect[false];
    }
    else if (option->state & State_Raised) {
       shadow = &shadows.group;
-      mask = &masks.button;
+      mask = &masks.rect[false];
    }
    
    if (brush)
@@ -205,7 +205,7 @@ BespinStyle::drawGroupBoxFrame(const QStyleOption * option, QPainter * painter,
    QRect rect = RECT.adjusted(dpi.f4,dpi.f2,-dpi.f4,0);
    rect.setHeight(qMin(2*dpi.f32, RECT.height()));
    Tile::setShape(Tile::Full & ~Tile::Bottom);
-   masks.button.render(rect, painter, Gradients::light(rect.height()));
+   masks.rect[false].render(rect, painter, Gradients::light(rect.height()));
    rect.setBottom(RECT.bottom()-dpi.f32);
    Tile::setShape(Tile::Full);
    shadows.group.render(RECT, painter);

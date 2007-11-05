@@ -20,6 +20,8 @@
 #include <QMenuBar>
 #include "draw.h"
 
+static const bool round_ = true;
+
 void
 BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
                            const QWidget *) const
@@ -29,7 +31,7 @@ BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
                         Colors::mid(FCOLOR(Window),CCOLOR(menu.bar, Bg),1,2));
    if (config.menu.barSunken) {
       Tile::setShape(Tile::Top | Tile::Bottom);
-      shadows.lineEdit[false].render(RECT, painter);
+      shadows.sunken[false][false].render(RECT, painter);
       Tile::reset();
    }
 }
@@ -43,7 +45,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       qstyleoption_cast<const QStyleOptionMenuItem *>(option);
    if (!mbi) return;
 
-   B_STATES
+   B_STATES;
 
    ROLES(menu.active);
    hover = option->state & State_Selected;
@@ -83,10 +85,10 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       }
       const Gradients::Type gt =
          sunken ? Gradients::Sunken : config.menu.itemGradient;
-      masks.tab.render(r, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,dy));
+      masks.rect[round_].render(r, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,dy));
       if (config.menu.activeItemSunken && sunken) {
          r.setBottom(r.bottom()+dpi.f2);
-         shadows.tabSunken.render(r, painter);
+         shadows.sunken[round_][true].render(r, painter);
          r.adjust(0,dpi.f1,0,-dpi.f1); // -> text repositioning
       }
    }
@@ -180,8 +182,8 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
          bg = Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 1, 2);
          fg = COLOR(ROLE[Bg]);
       }
-      masks.tab.render(r, painter, sunken ? Gradients::Sunken :
-                       config.menu.itemGradient, Qt::Vertical, bg);
+      masks.rect[round_].render(r, painter, sunken ? Gradients::Sunken :
+                                config.menu.itemGradient, Qt::Vertical, bg);
 //             masks.tab.outline(r, painter, QColor(0,0,0,45));
    }
        

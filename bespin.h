@@ -353,11 +353,12 @@ private:
    void readSettings(const QSettings *settings = 0L);
    void registerRoutines();
    static bool isSpecialFrame(const QWidget *w);
+   void erase(const QStyleOption*, QPainter*, const QWidget*) const;
    
 private:
    typedef QHash<uint, Tile::Set> TileCache;
    struct {
-      Tile::Set button, tab;
+      Tile::Set rect[2]; // round
       QPixmap radio, radioIndicator, notch, slider;
       QPixmap winClose, winMin, winMax;
 #if SHAPE_POPUP
@@ -365,20 +366,21 @@ private:
 #endif
    } masks;
    struct {
-      Tile::Set button[2][2],
-         tab[2][2], tabSunken,
-         group, lineEdit[2],
-         sunken, raised, relief;
+      Tile::Set
+         fallback, group,
+         sunken[2][2], // round/enabled/sunken
+         raised[2][2][2],  // round/enabled/sunken
+         relief[2][2]; // round/enabled
       QPixmap radio[2][2];
       Tile::Line line[2][3];
-//       QPixmap slider[4][2][2];
+//       QPixmap slider[4][2][2]; // for triangles, currently not...
       QPixmap sliderRound[2][2];
    } shadows;
    
    struct {
       Tile::Line top;
 //       QPixmap slider[4];
-      Tile::Set button, tab;
+      Tile::Set rect[2];
    } lights;
    
    // pixmaps

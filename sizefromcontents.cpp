@@ -60,10 +60,10 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
       }
    case CT_LineEdit: // A line edit, like QLineEdit
       return contentsSize + QSize(dpi.f4,dpi.f2);
-   case CT_MenuBarItem: // A menu bar item, like the buttons in a QMenuBar
-      return QSize(qMax(contentsSize.width()+dpi.f18,
-                        (contentsSize.height()+dpi.f8)*8/5),
-                   contentsSize.height()+dpi.f6);
+   case CT_MenuBarItem: { // A menu bar item, like the buttons in a QMenuBar
+      const int h = contentsSize.height()+dpi.f6;
+      return QSize(qMax(contentsSize.width()+dpi.f18, h*8/5), h);
+   }
    case CT_MenuItem: // A menu item, like QMenuItem
       if (const QStyleOptionMenuItem *menuItem =
           qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
@@ -75,13 +75,12 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
          bool checkable = menuItem->menuHasCheckableItems;
          int maxpmw = config.menu.showIcons*menuItem->maxIconWidth;
          int w = contentsSize.width();
-         int h = qMax(contentsSize.height()+dpi.f2,
-                      menuItem->fontMetrics.lineSpacing());
+         int h = qMin(contentsSize.height(),
+                      menuItem->fontMetrics.lineSpacing()) +dpi.f2;
          
          if (config.menu.showIcons && !menuItem->icon.isNull())
-            h = qMax(h,
-                     menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize),
-                                             QIcon::Normal).height() + dpi.f4);
+            h = qMax(h, menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize),
+                                              QIcon::Normal).height() + dpi.f2);
          if (menuItem->text.contains('\t'))
             w += dpi.f12;
          if (maxpmw > 0)
@@ -165,10 +164,10 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
       int w, h;
       if (toolbutton &&
           toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon)
-         h = contentsSize.height() + dpi.f6;
+         h = contentsSize.height() + dpi.f8;
       else
-         h = contentsSize.height() + dpi.f4;
-      w = qMax(contentsSize.width()+dpi.f4, h*8/5-dpi.f2); // 8/5 == 16/10 == screen
+         h = contentsSize.height() + dpi.f6;
+      w = qMax(contentsSize.width()+dpi.f4, h*16/11-dpi.f2); // 4/3 - 16/9
 //      w = contentsSize.width()+dpi.f8;
       if (toolbutton && (toolbutton->subControls & SC_ToolButtonMenu))
          w += pixelMetric(PM_MenuButtonIndicator, option, widget) + dpi.f4;
