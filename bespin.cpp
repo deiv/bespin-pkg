@@ -329,7 +329,7 @@ static void swapPalette(QWidget *widget)
    }
    widget->setPalette(pal);
 }
-      
+
 bool
 BespinStyle::eventFilter( QObject *object, QEvent *ev )
 {
@@ -358,7 +358,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
       else if (QTabBar *tabBar = qobject_cast<QTabBar*>(object)) {
          if (tabBar->parentWidget() &&
              qobject_cast<QTabWidget*>(tabBar->parentWidget()))
-            return false; // no extra tabbar here please...
+            return false; // no extra tabbar here please... ;)
          QPainter p(tabBar);
          QStyleOptionTabBarBase opt;
          opt.initFrom(tabBar);

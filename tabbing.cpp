@@ -86,6 +86,7 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
                         const QWidget * widget) const
 {
    ASSURE_OPTION(tbb, TabBarBase);
+
    if (widget) {
       if ((qobject_cast<const QTabBar*>(widget)))
          return; // we alter the paintevent
@@ -93,7 +94,6 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
           qobject_cast<QTabWidget*>(widget->parentWidget()))
          return; // KDE abuse, allready has a nice base
    }
-       
    QRect rect = RECT.adjusted(dpi.f2, 0, -dpi.f2, -dpi.f2);
    int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
 
@@ -110,7 +110,7 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
                      const QWidget * widget) const
 {
    ASSURE_OPTION(tab, Tab);
-
+   
    // do we have to exclude the scrollers?
    bool needRestore = false;
    if (widget && (RECT.right() > widget->width())) {
@@ -124,6 +124,10 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
    
    // paint shape and label
    QStyleOptionTab copy = *tab;
+   if (widget) copy.palette = widget->palette(); // workaround for e.g. konsole,
+   // which sets the tabs bg, but not the fg color to the palette, but just
+   // presets the painter and hopes for the best... tststs
+   // TODO: bug Konsole/Konqueror authors
    copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
    drawTabShape(&copy, painter, widget);
    drawTabLabel(&copy, painter, widget);
@@ -270,8 +274,8 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
          cF = CCOLOR(tab.active, Fg);
    }
    else {
-      cB = Colors::mid(CCOLOR(tab.std, 0), FCOLOR(Window), 2, 1);
-      cF = Colors::mid(cB, CCOLOR(tab.std, 1), 1,4);
+      cB = Colors::mid(CCOLOR(tab.std, Bg), FCOLOR(Window), 2, 1);
+      cF = Colors::mid(cB, CCOLOR(tab.std, Fg), 1,4);
    }
 
    // dark background, let's paint an emboss
