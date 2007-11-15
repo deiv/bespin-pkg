@@ -93,7 +93,7 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
 
    int nn = (val < 0) ? 0 : int(n*val);
    if (content)
-      p.setBrush(Gradients::pix(CCOLOR(progress.std, 0), ss, Qt::Vertical,
+      p.setBrush(Gradients::pix(CCOLOR(progress.std, Fg), ss, Qt::Vertical,
                                 GRAD(progress) ));
    else {
       if (busy)
@@ -101,7 +101,7 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
       else {
          x += nn*s; nn = n - nn;
       }
-      const QColor c = FCOLOR(Window).dark(110);
+      const QColor c = CCOLOR(progress.std, Bg);
       p.setBrush(Gradients::pix(c, ss, Qt::Vertical, GRAD(progress) ));
    }
    p.setPen(Qt::NoPen);
@@ -145,8 +145,8 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
             painter->save();
             painter->setRenderHint(QPainter::Antialiasing);
 
-            const QColor c = Colors::mid(FCOLOR(Window).dark(110),
-                                    CCOLOR(progress.std, 0), 10-q, q);
+            const QColor c = Colors::mid(CCOLOR(progress.std, Bg),
+                                    CCOLOR(progress.std, Fg), 10-q, q);
             painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
                               GRAD(progress) ));
             painter->setPen(Qt::NoPen);

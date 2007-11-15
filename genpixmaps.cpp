@@ -222,7 +222,7 @@ void BespinStyle::generatePixmaps()
    // raised
    for (int r = 0; r < 2; ++r) {
       int s;  float f;
-      if (r) {s = f17; f = 1.0;} else {s = f9; f = .8;}
+      if (r) {s = f17; f = 0.8;} else {s = f9; f = .8;}
       for (int i = 0; i < 2; ++i) // opaque?
          for (int j = 0; j < 2; ++j) { // sunken?
             shadows.raised[r][i][j] = Tile::Set(shadow(s,i,j,f), s/2, s/2, 1, 1);

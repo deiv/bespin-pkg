@@ -161,8 +161,8 @@ QObject(parent)
       deleteLater();
       return;
    }
+   
    // generate corner regions
-
    if (corner[North].isEmpty()) {
       int f5 = 4;
       QBitmap bm(2*f5, 2*f5);
@@ -186,7 +186,9 @@ QObject(parent)
    _frame = parent;
    _window = _frame;
    while (_window->parentWidget() &&
-          !(_window->isWindow() || _window->inherits("QMdiSubWindow"))) {
+          !(_window->isWindow() ||
+            _window->inherits("QMdiSubWindow") ||
+            (_window != _frame && _window->inherits("QAbstractScrollArea")))) {
       _window->installEventFilter(this);
       _window = _window->parentWidget();
    }

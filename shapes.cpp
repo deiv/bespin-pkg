@@ -50,13 +50,20 @@ BespinStyle::drawCheckMark(const QStyleOption *option, QPainter *painter,
    }
    default:
    case Check::V: {
-      const QPoint points[4] = {
-         QPoint(RECT.right(), RECT.top()),
-            QPoint(RECT.x()+RECT.width()/4, RECT.bottom()),
-            QPoint(RECT.x(), RECT.bottom()-RECT.height()/2),
-            QPoint(RECT.x()+RECT.width()/4, RECT.bottom()-RECT.height()/4)
-      };
-      painter->drawPolygon(points, 4);
+      if (isOn) {
+         const QPoint points[4] = {
+            QPoint(RECT.right(), RECT.top()),
+               QPoint(RECT.x()+RECT.width()/4, RECT.bottom()),
+               QPoint(RECT.x(), RECT.bottom()-RECT.height()/2),
+               QPoint(RECT.x()+RECT.width()/4, RECT.bottom()-RECT.height()/4)
+         };
+         painter->drawPolygon(points, 4);
+      }
+      else { // tristate
+         const int d = 2*RECT.height()/5;
+         QRect r = RECT.adjusted(dpi.f2,d,-dpi.f2,-d);
+         painter->drawRect(r);
+      }
       break;
    }
    case Check::O: {

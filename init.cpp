@@ -185,7 +185,10 @@ BespinStyle::readSettings(const QSettings* settings)
    
    // Progress ===========================
    GRAD(progress) = readGrad(PROGRESS_GRADIENT);
-   readRole(progress.std, PROGRESS_ROLE);
+   config.progress.std_role[Bg] = 
+      (QPalette::ColorRole) iSettings->value(PROGRESS_ROLE_BG).toInt();
+   config.progress.std_role[Fg] =
+      (QPalette::ColorRole) iSettings->value(PROGRESS_ROLE_FG).toInt();
    
    // ScrollStuff ===========================
    GRAD(scroll) = readGrad(SCROLL_GRADIENT);

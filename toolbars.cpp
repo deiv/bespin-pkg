@@ -33,7 +33,7 @@ BespinStyle::drawToolButton(const QStyleOptionComplex * option,
       if (sunken) {
          int dy = (RECT.height()-RECT.width())/2;
          QRect r = RECT.adjusted(dpi.f2,dy,-dpi.f2,-dy);
-         painter->drawTiledPixmap(r, Gradients::pix(c, r.height(), Qt::Vertical, Gradients::Sunken));
+         masks.rect[true].render(r, painter, Gradients::Sunken, Qt::Vertical, c);
       }
       painter->save();
       painter->setPen( isEnabled ? c2 : Colors::mid(c, c2) );

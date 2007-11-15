@@ -291,7 +291,9 @@ BespinStyle::erase(const QStyleOption *option, QPainter *painter,
                    const QWidget *widget) const
 {
    const QWidget *grampa = widget;
-   while (!(grampa->isWindow() || grampa->autoFillBackground()))
+   while (!(grampa->isWindow() ||
+            (grampa->autoFillBackground() &&
+             grampa->objectName() != "qt_scrollarea_viewport")))
       grampa = grampa->parentWidget();
 
    QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());

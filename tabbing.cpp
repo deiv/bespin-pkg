@@ -17,6 +17,7 @@
  */
 
 #include "draw.h"
+#include <QToolButton>
 
 inline static bool verticalTabs(QTabBar::Shape shape) {
    return shape == QTabBar::RoundedEast ||
@@ -80,7 +81,7 @@ BespinStyle::drawTabWidget(const QStyleOption *option, QPainter *painter,
    // the bar
    drawTabBar(&tbb, painter, widget);
 }
-#include <QtDebug>
+
 void
 BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
                         const QWidget * widget) const
@@ -113,15 +114,20 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
    
    // do we have to exclude the scrollers?
    bool needRestore = false;
-   if (widget && (RECT.right() > widget->width())) {
-      painter->save();
-      needRestore = true;
-      QRect r = RECT;
-      r.setRight(widget->width() -
-                 2*pixelMetric(PM_TabBarScrollButtonWidth,option,widget));
-      painter->setClipRect(r);
+   if (widget && qobject_cast<const QTabBar*>(widget)) {
+      QRegion clipRgn = painter->clipRegion();
+      if (clipRgn.isEmpty()) clipRgn = RECT;
+      QList<QToolButton*> buttons = widget->findChildren<QToolButton*>();
+      foreach (QToolButton* button, buttons) {
+         if (button->isVisible())
+            clipRgn -= QRect(button->pos(), button->size());
+      }
+      if (!clipRgn.isEmpty()) {
+         painter->save(); needRestore = true;
+         painter->setClipRegion(clipRgn);
+      }
    }
-   
+      
    // paint shape and label
    QStyleOptionTab copy = *tab;
    if (widget) copy.palette = widget->palette(); // workaround for e.g. konsole,

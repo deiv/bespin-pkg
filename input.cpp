@@ -167,6 +167,7 @@ BespinStyle::drawSpinBox(const QStyleOptionComplex * option, QPainter * painter,
 }
 
 static int animStep = -1;
+static bool round_ = true;
 
 void
 BespinStyle::drawComboBox(const QStyleOptionComplex * option,
@@ -202,7 +203,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
       drawLineEdit(option, painter, widget);
    else {
       if (!ar.isNull()) {
-         const Tile::Set &mask = masks.rect[true];
+         const Tile::Set &mask = masks.rect[round_];
          // ground
          animStep = animator->hoverStep(widget);
          if (listShown) animStep = 6;
@@ -229,7 +230,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
                         c2, RECT.height()-f2, QPoint(0,f3));
          }
       }
-      shadows.sunken[true][isEnabled].render(RECT, painter);
+      shadows.sunken[round_][isEnabled].render(RECT, painter);
    }
    }
 
@@ -275,7 +276,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
          ar.adjust(f2, dpi.f4, -f2, -dpi.f4);
-         masks.rect[true].render(ar, painter, GRAD(chooser), Qt::Vertical, c,
+         masks.rect[round_].render(ar, painter, GRAD(chooser), Qt::Vertical, c,
                                  RECT.height()-f2, QPoint(0,dpi.f4));
          painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
       }
