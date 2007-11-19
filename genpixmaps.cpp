@@ -12,6 +12,7 @@ extern Dpi dpi;
 extern Config config;
 
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
+// #define fillRect2(_R_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_R_)
 
 #ifdef QT_NO_XRENDER
 // simply sets the pixmaps alpha value to all rgb (i.e. grey) channels
@@ -165,6 +166,38 @@ relief(int size, bool enabled)
    p.end(); return pix;
 }
 
+static QPixmap
+groupShadow(int size)
+{
+   QImage *tmpImg = new QImage(size,size, QImage::Format_ARGB32);
+   tmpImg->fill(Qt::transparent); QPainter p(tmpImg);
+   p.setRenderHint(QPainter::Antialiasing); p.setPen(Qt::NoPen);
+
+   int ss = 2*size;
+
+   p.setBrush(QColor(0,0,0,5)); p.drawRoundRect(0,0,size,ss,14,7);
+   p.setBrush(QColor(0,0,0,9)); p.drawRoundRect(f1,f1,size-f2,ss,13,7);
+   p.setBrush(QColor(0,0,0,11)); p.drawRoundRect(f2,f2,size-f4,ss,12,6);
+   p.setBrush(QColor(0,0,0,13)); p.drawRoundRect(f3,f3,size-dpi.f6,ss,48,24);
+   p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
+   p.setBrush(QColor(0,0,0,0)); p.drawRoundRect(f4,f2,size-dpi.f8,ss,11,6);
+//    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
+//    p.setPen(QColor(255,255,255,200)); p.setBrush(Qt::NoBrush);
+//    p.drawRoundRect(dpi.f4,dpi.f2,f49-dpi.f8,2*f49,11,6);
+   p.setRenderHint(QPainter::Antialiasing, false);
+//    p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
+   int f33 = SCALE(33);
+   for (int i = 1; i < f33; ++i) {
+      p.setPen(QColor(0,0,0,CLAMP(i*lround(255.0/dpi.f32),0,255)));
+      p.drawLine(0, size-i, size, size-i);
+   }
+   p.end();
+
+   // create pixmap from image
+   QPixmap ret = QPixmap::fromImage(*tmpImg);
+   delete tmpImg; return ret;
+}
+
 
 #if 0
 static void
@@ -301,30 +334,8 @@ void BespinStyle::generatePixmaps()
    
    // GROUPBOX =====================================
    // shadow
-   QImage tmpImg(f49,f49, QImage::Format_ARGB32);
-   tmpImg.fill(Qt::transparent);
-   p.begin(&tmpImg);
-   p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   p.setBrush(QColor(0,0,0,5)); p.drawRoundRect(0,0,f49,2*f49,14,7);
-   p.setBrush(QColor(0,0,0,9)); p.drawRoundRect(f1,f1,f49-f2,2*f49,13,7);
-   p.setBrush(QColor(0,0,0,11)); p.drawRoundRect(f2,f2,f49-dpi.f4,2*f49,12,6);
-   p.setBrush(QColor(0,0,0,13)); p.drawRoundRect(f3,f3,f49-dpi.f6,2*f49,48,24);
-   p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
-   p.setBrush(QColor(0,0,0,0)); p.drawRoundRect(f4,f2,f49-dpi.f8,2*f49,11,6);
-//    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-//    p.setPen(QColor(255,255,255,200)); p.setBrush(Qt::NoBrush);
-//    p.drawRoundRect(dpi.f4,dpi.f2,f49-dpi.f8,2*f49,11,6);
-   p.setRenderHint(QPainter::Antialiasing, false);
-//    p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
-   int f33 = SCALE(33);
-   for (int i = 1; i < f33; ++i) {
-      p.setPen(QColor(0,0,0,CLAMP(i*lround(255.0/dpi.f32),0,255)));
-      p.drawLine(0, f49-i, f49, f49-i);
-   }
-   p.end();
    int f12 = dpi.f12;
-   shadows.group = Tile::Set(QPixmap::fromImage(tmpImg),f12,f12,f49-2*f12,f1);
+   shadows.group = Tile::Set(groupShadow(f49),f12,f12,f49-2*f12,f1);
    shadows.group.setDefaultShape(Tile::Ring);
    // ================================================================
    
@@ -350,16 +361,16 @@ void BespinStyle::generatePixmaps()
             << QGradientStop( 0.5, QColor(c1,c1,c1,71) )
             << QGradientStop( 1, QColor(c1,c1,c1,0) );
          lg.setStops(stops);
-         if (i) p.fillRect(0,0,f1,f49,lg);
-         else p.fillRect(0,0,f49,f1,lg);
+         if (i) { p.fillRect(0,0,f1,f49,lg); }
+         else {p.fillRect(0,0,f49,f1,lg);}
          stops.clear();
          
          stops << QGradientStop( 0, QColor(c2,c2,c2,0) )
             << QGradientStop( 0.5, QColor(c2,c2,c2,74) )
             << QGradientStop( 1, QColor(c2,c2,c2,0) );
          lg.setStops(stops);
-         if (i) p.fillRect(f1,0,f2-f1,f49,lg);
-         else p.fillRect(0,f1,f49,f2-f1,lg);
+         if (i) {p.fillRect(f1,0,f2-f1,f49,lg);}
+         else {p.fillRect(0,f1,f49,f2-f1,lg);}
          stops.clear();
 
          p.end();
