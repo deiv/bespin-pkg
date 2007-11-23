@@ -152,25 +152,28 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
 
    // sunken variant
    if (config.btn.layer) {
+      sunken = (sunken && !config.btn.cushion) || config.btn.layer == 2;
       if (isEnabled) {
-         if (config.btn.layer == 1)
+         if (!sunken /*config.btn.layer == 1*/)
             r.adjust(f2, f1,-f2,-f2);
          else
             r.setBottom(r.bottom()-f2);
-         masks.rect[round].render(r, painter, GRAD(btn), Qt::Vertical, c);
+         masks.rect[round].render(r, painter, gt/*GRAD(btn)*/, Qt::Vertical, c);
          if (drawInner) {
             const int f3 = dpi.f3;
             const QRect ir =
-               r.adjusted(f3, (config.btn.layer == 1) ? f2 : f3, -f3, -f3 );
+               r.adjusted(f3, sunken ? f3 : f2, -f3, -f3 );
             masks.rect[round].render(ir, painter, gt, Qt::Vertical, iC,
                                      r.height(), QPoint(0,f2));
          }
          if (hasFocus) {
+            const int contrast = Colors::contrast(FCOLOR(Window), FCOLOR(Highlight));
             r = RECT; r.setBottom(r.bottom()-f1);
-            masks.rect[round].outline(r, painter, FCOLOR(Highlight), dpi.f3);
+            masks.rect[round].outline(r, painter, Colors::mid(FCOLOR(Window),
+               FCOLOR(Highlight), contrast/10, 1), dpi.f3);
          }
       }
-      if (config.btn.layer == 2 || (sunken && !config.btn.cushion))
+      if (sunken)
          shadows.sunken[round][isEnabled].render(RECT, painter);
       else
          shadows.relief[round][isEnabled].render(RECT, painter);

@@ -93,15 +93,12 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    
    /** Setup the UI and geometry */
    ui.setupUi(this);
-   ui.info->setMinimumWidth( 200 ); /** min width for the info browser */
    ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
-//    ui.sectionHeader->installEventFilter(this);
+   ui.sectionHeader->installEventFilter(this);
    connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
             ui.sectionHeader, SLOT(setText(const QString &)));
    connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
             ui.sections, SLOT(setCurrentIndex(int)));
-   connect (ui.generalTab, SIGNAL(currentChanged(int)),
-            this, SLOT(setSectionSelectVisible(int)));
    
    /** Prepare the settings store, not of interest */
    QSettings settings("Bespin", "Store");
@@ -199,6 +196,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    setInfoBrowser(ui.info);
    /** 2. Define a context info that is displayed when no other context help is
    demanded */
+   setDefaultContextInfo(defInfo1);
 
    /** handleSettings(.) tells BConfig to take care (save/load) of a widget
    In this case "ui.bgMode" is the widget on the form,
@@ -451,7 +449,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    at the end of this file as well - but there's nothing special about it...
     =========================================== */
 
-   ui.generalTab->setCurrentIndex(0);
    ui.sections->setCurrentIndex(0);
 }
 
@@ -748,25 +745,15 @@ void Config::generateGradientTypes(QComboBox *box) {
    box->addItem("Cloudy");
 }
 
-void Config::setSectionSelectVisible(int idx) {
-   ui.sectionSelectGroup->setVisible(idx);
-   if (idx) {
-      setDefaultContextInfo(defInfo2);
-      ui.info->setHtml(defInfo2);
-   }
-   else {
-      setDefaultContextInfo(defInfo1);
-      ui.info->setHtml(defInfo1);
-   }
-}
-
 #include <QStyleOptionToolBoxV2>
 #include <QPainter>
 
 bool Config::eventFilter(QObject *o, QEvent *ev)
 {
-   if (o != ui.sectionHeader) return false;
-   if (ev->type() != QEvent::Paint) return false;
+   if (o != ui.sectionHeader)
+      return BConfig::eventFilter(o, ev);
+   if (ev->type() != QEvent::Paint)
+      return false;
    QStyleOptionToolBoxV2 option;
    option.initFrom(ui.sectionHeader); option.text = ui.sectionHeader->text();
    option.position = QStyleOptionToolBoxV2::OnlyOneTab;

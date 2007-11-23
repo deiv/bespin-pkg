@@ -59,7 +59,6 @@ private slots:
    void remove();
    void handleBgMode(int);
    void learnPwChar();
-   void setSectionSelectVisible(int);
 };
 
 #endif

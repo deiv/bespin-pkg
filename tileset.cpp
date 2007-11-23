@@ -346,7 +346,7 @@ void Set::render(const QRect &r, QPainter *p) const
          solidBg = _bgColor;
          tile = &pixmap[BtmMid];
          MAKE_FILL(QPoint(xOff, bOff));
-         p->drawTiledPixmap(xOff, bOff, w, blh, *tile);
+         p->drawTiledPixmap(xOff, bOff, w, blh, *tile, 0, height(BtmMid) - blh);
          solidBg = 0;
       }
    }

@@ -229,7 +229,6 @@ BespinStyle::readSettings(const QSettings* settings)
       qApp->setFont(fnt);
    }
    
-   
    if (delSettings)
       delete iSettings;
 }
