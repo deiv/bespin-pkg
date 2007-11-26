@@ -225,6 +225,12 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
       if (config.btn.ambientLight && !(sunken || isCheckbox))
          painter->drawPixmap(QPoint(r.right()+1-16*r.height()/9, r.top()),
                            Gradients::ambient(r.height()));
+      if (config.btn.bevelEnds && !isCheckbox) {
+         QRect bevelRect = r; bevelRect.setWidth(dpi.f10);
+         masks.rect[round].render(bevelRect, painter, Gradients::bevel());
+         bevelRect.moveTopRight(r.topRight());
+         masks.rect[round].render(bevelRect, painter, Gradients::bevel(false));
+      }
    }
 }
 

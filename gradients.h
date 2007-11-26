@@ -68,13 +68,17 @@ const QPixmap &shadow(int height, bool bottom = false);
 /** a diagonal 16:9 SE -> NW light */
 const QPixmap &ambient(int height);
 
+/** a horizontal black bevel from low alpha to transparent */
+const QPixmap &bevel(bool ltr = true);
+
 /** a vertical N -> S light */
 const QPixmap &light(int height);
 
 const BgSet &bgSet(const QColor &c);
 // const QPixmap &bgCorner(const QColor &c, bool other = false);
 
-void init(BgMode mode, Type progress = Glass, int bgBevelIntesity = 110);
+void init(BgMode mode, Type progress = Glass,
+          int bgBevelIntesity = 110, int btnBevelSize = 16);
 void wipe();
 
 };

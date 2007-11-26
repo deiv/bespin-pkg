@@ -32,6 +32,7 @@
 using namespace Bespin;
 
 static QPixmap nullPix;
+static QPixmap _bevel[2];
 static Gradients::BgMode _mode = Gradients::BevelV;
 static Gradients::Type _progressBase = Gradients::Glass;
 static int _bgBevelIntesity = 110;
@@ -154,15 +155,15 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false) {
    if (add < 0) add = -add/2;
    if (glass)
       add = add>>4;
-   else
-      add = add>>2;
+    else
+       add = add>>2;
 
    // the brightest color (top)
    cv = v+27+add;
    if (cv > 255) {
       delta = cv-255; cv = 255;
       cs = s - delta; if (cs < 0) cs = 0;
-      ch = h - delta/6; if (ch < 0) ch = 360+ch;
+      ch = h - delta/2; if (ch < 0) ch = 360+ch;
    }
    else {
       ch = h; cs = s;
@@ -170,8 +171,8 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false) {
    bb->setHsv(ch,cs,cv);
    
    // the darkest color (lower center)
-   cv = v - 14-add; if (cv < 0) cv = 0;
-   cs = s*13/7; if (cs > 255) cs = 255;
+   cv = v - 14 - add; if (cv < 0) cv = 0;
+   cs = s*(glass?13:10)/7; if (cs > 255) cs = 255;
    dd->setHsv(h,cs,cv);
 }
 
@@ -180,9 +181,9 @@ gl_ssGradient(const QColor &c, const QPoint &start, const QPoint &stop, bool gla
    QColor bb,dd; // b = d = c;
    gl_ssColors(c, &bb, &dd, glass);
    QLinearGradient lg(start, stop);
-   lg.setColorAt(0,bb); lg.setColorAt(glass ? 0.5 : 0.35,c);
-   lg.setColorAt(0.5, dd); lg.setColorAt(glass ? 1 : .80, bb);
-   if (!glass) lg.setColorAt(1, Qt::white);
+   lg.setColorAt(0,bb); lg.setColorAt(glass ? 0.5 : 0.25,c);
+   lg.setColorAt(glass ? 0.5 : 0.4, dd); lg.setColorAt(glass ? 1 : .80, bb);
+//    if (!glass) lg.setColorAt(1, Qt::white);
    return lg;
 }
 
@@ -415,6 +416,10 @@ const QPixmap &Gradients::ambient(int height) {
    return *pix;
 }
 
+const QPixmap &Gradients::bevel(bool ltr) {
+   return _bevel[ltr];
+}
+
 const QPixmap &Gradients::shadow(int height, bool bottom) {
    if (height <= 0) {
       qWarning("NULL Pixmap requested, height was %d",height);
@@ -598,7 +603,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
 }
 
 void
-Gradients::init(BgMode mode, Type progress, int bgBevelIntesity)
+Gradients::init(BgMode mode, Type progress, int bgBevelIntesity, int btnBevelSize)
 {
    _mode = mode;
    _progressBase = progress;
@@ -611,6 +616,16 @@ Gradients::init(BgMode mode, Type progress, int bgBevelIntesity)
    _btnAmbient.setMaxCost( 64<<10 );
    _tabShadow.setMaxCost( 64<<10 );
    _groupLight.setMaxCost( 256<<10 );
+   QLinearGradient lg(0,0,btnBevelSize,0);
+   QPainter p; QGradientStops stops;
+   for (int i = 0; i < 2; ++i) {
+      _bevel[i] = QPixmap(btnBevelSize, 32);
+      stops << QGradientStop(0, QColor(0,0,0,i?20:0)) <<
+         QGradientStop(1, QColor(0,0,0,i?0:20));
+      lg.setStops(stops); stops.clear();
+      _bevel[i].fill(Qt::transparent);
+      p.begin(&_bevel[i]); p.fillRect(_bevel[i].rect(), lg); p.end();
+   }
 }
 
 void Gradients::wipe() {

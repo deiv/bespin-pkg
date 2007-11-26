@@ -466,7 +466,7 @@ int StyleAnimator::hoverStep(const QWidget *widget) const {
       return 0;
    HoverFades::iterator it = hoverWidgets.find(const_cast<QWidget*>(widget));
    if (it != hoverWidgets.end())
-      return it.value().step;
+      return it.value().step+it.value().fadeIn; // (map 1,3,5 -> 2,4,6)
    if (widget->testAttribute(Qt::WA_UnderMouse))
       return 6;
    return 0;

@@ -67,7 +67,7 @@ config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_DEF_).toInt();\
 Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1])
 //, QPalette::_DEF_, Colors::counterRole(QPalette::_DEF_))
 #define readGrad(_DEF_) (Gradients::Type) iSettings->value(_DEF_).toInt();
-
+#include <QtDebug>
 void
 BespinStyle::readSettings(const QSettings* settings)
 {
@@ -100,7 +100,6 @@ BespinStyle::readSettings(const QSettings* settings)
          else {
             delete iSettings; iSettings = 0L;
          }
-         free(preset);
       }
       if (!iSettings) {
          iSettings = new QSettings("Bespin", "Style");
@@ -109,7 +108,6 @@ BespinStyle::readSettings(const QSettings* settings)
    }
    else
       qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
-   
    
    // Background ===========================
    config.bg.mode = (BGMode) readInt(BG_MODE);
@@ -132,7 +130,6 @@ BespinStyle::readSettings(const QSettings* settings)
    if (config.bg.mode == Scanlines)
       config.bg.structure = readInt(BG_STRUCTURE);
       
-   
    // Buttons ===========================
    config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
    config.btn.round = readBool(BTN_ROUND);
@@ -154,6 +151,7 @@ BespinStyle::readSettings(const QSettings* settings)
    Colors::setButtonRoles(config.btn.std_role[0], config.btn.std_role[1],
                           config.btn.active_role[0], config.btn.active_role[1]);
    config.btn.ambientLight = readBool(BTN_AMBIENTLIGHT);
+   config.btn.bevelEnds = readBool(BTN_BEVEL_ENDS);
    
    // Choosers ===========================
    GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
@@ -161,7 +159,7 @@ BespinStyle::readSettings(const QSettings* settings)
    // PW Echo Char ===========================
    config.input.pwEchoChar =
       ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
-   
+
    // flanders
    config.leftHanded =
       readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
@@ -189,7 +187,7 @@ BespinStyle::readSettings(const QSettings* settings)
       (QPalette::ColorRole) iSettings->value(PROGRESS_ROLE_BG).toInt();
    config.progress.std_role[Fg] =
       (QPalette::ColorRole) iSettings->value(PROGRESS_ROLE_FG).toInt();
-   
+
    // ScrollStuff ===========================
    GRAD(scroll) = readGrad(SCROLL_GRADIENT);
    config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
@@ -218,7 +216,7 @@ BespinStyle::readSettings(const QSettings* settings)
    config.view.headerGradient = readGrad(VIEW_HEADERGRADIENT);
    config.view.sortingHeaderGradient =
       readGrad(VIEW_SORTINGHEADERGRADIENT);
-   
+
    // General ===========================
    config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;
    config.scale = iSettings->value(DEF_SCALE).toDouble();
@@ -229,8 +227,7 @@ BespinStyle::readSettings(const QSettings* settings)
       qApp->setFont(fnt);
    }
    
-   if (delSettings)
-      delete iSettings;
+   if (delSettings) delete iSettings;
 }
 
 #undef readRole
@@ -270,5 +267,5 @@ void BespinStyle::init(const QSettings* settings) {
    generatePixmaps();
    Gradients::init(config.bg.mode > ComplexLights ?
                    (Gradients::BgMode)config.bg.mode :
-                   Gradients::BevelV, _progressBase, config.bg.intensity);
+                   Gradients::BevelV, _progressBase, config.bg.intensity, dpi.f10);
 }
