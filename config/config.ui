@@ -212,7 +212,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>0</number>
+      <number>8</number>
      </property>
      <widget class="QWidget" name="Seite_3" >
       <layout class="QGridLayout" >
@@ -900,6 +900,13 @@
         </widget>
        </item>
        <item row="8" column="0" >
+        <widget class="QCheckBox" name="btnBevelEnds" >
+         <property name="text" >
+          <string>Bevel Ends</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0" >
         <layout class="QHBoxLayout" >
          <item>
           <widget class="QLabel" name="label_8" >
@@ -941,15 +948,15 @@
          </item>
         </layout>
        </item>
-       <item row="9" column="0" >
+       <item row="10" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" >
           <size>
-           <width>40</width>
-           <height>185</height>
+           <width>24</width>
+           <height>214</height>
           </size>
          </property>
         </spacer>
@@ -1708,33 +1715,6 @@
        <item row="0" column="0" >
         <layout class="QHBoxLayout" >
          <item>
-          <widget class="QLabel" name="label_3" >
-           <property name="font" >
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text" >
-            <string>Color</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="crProgressBar" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0" >
-        <layout class="QHBoxLayout" >
-         <item>
           <widget class="QLabel" name="label_13" >
            <property name="font" >
             <font>
@@ -1759,7 +1739,61 @@
          </item>
         </layout>
        </item>
+       <item row="1" column="0" >
+        <layout class="QHBoxLayout" >
+         <item>
+          <widget class="QLabel" name="label_3" >
+           <property name="font" >
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text" >
+            <string>Background Color</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="crProgressBg" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item row="2" column="0" >
+        <layout class="QHBoxLayout" >
+         <item>
+          <widget class="QLabel" name="label_40" >
+           <property name="font" >
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text" >
+            <string>Foreground Color</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="crProgressFg" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -1767,7 +1801,7 @@
          <property name="sizeHint" >
           <size>
            <width>20</width>
-           <height>392</height>
+           <height>323</height>
           </size>
          </property>
         </spacer>

@@ -45,8 +45,11 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
       }
    }
    else {
-      if (sunken && config.btn.layer == 1 && !config.btn.cushion)
-         tmpBtn.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
+      if (sunken && !config.btn.cushion)
+         if (config.btn.layer == 1)
+            tmpBtn.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
+      else if (!config.btn.layer)
+         tmpBtn.rect.adjust(0,dpi.f1,0,dpi.f1);
       drawPushButtonBevel(&tmpBtn, painter, widget);
    }
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
@@ -124,30 +127,21 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    if (animStep < 0)
       animStep = sunken ? 6 : animator->hoverStep(widget);
 
-   QColor c = Colors::btnBg(PAL, isEnabled, hasFocus, animStep);
-   QColor iC;
+   QColor c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover);
+   QColor iC = FCOLOR(Window);
 
-   bool drawInner = false;
    Gradients::Type gt = GRAD(btn);
+   bool drawInner = false;
    if (animStep) {
-      if (config.btn.fullHover && !config.btn.backLightHover) {
-         iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
-         c = iC;
-      }
-      else {
-         if (config.btn.backLightHover) {
-            drawInner = false;
-            iC = Colors::mid(FCOLOR(Window), CCOLOR(btn.active, Bg), 6-animStep, animStep);
-         }
-         else {
-            drawInner = true;
-            iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
-         }
-      }
       if ((config.btn.cushion && sunken) || toggled) {
          gt = Gradients::Sunken;
          drawInner = true;
       }
+      if (!config.btn.fullHover)
+         drawInner = true;
+
+      if (drawInner || config.btn.backLightHover)
+         iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
    }
 
    // sunken variant
@@ -167,9 +161,10 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
                                      r.height(), QPoint(0,f2));
          }
          if (hasFocus) {
-            const int contrast = Colors::contrast(FCOLOR(Window), FCOLOR(Highlight));
+            QColor fc = !sunken ? FCOLOR(Window) : c;
+            const int contrast = Colors::contrast(fc, FCOLOR(Highlight));
             r = RECT; r.setBottom(r.bottom()-f1);
-            masks.rect[round].outline(r, painter, Colors::mid(FCOLOR(Window),
+            masks.rect[round].outline(r, painter, Colors::mid(fc,
                FCOLOR(Highlight), contrast/10, 1), dpi.f3);
          }
       }
@@ -181,16 +176,18 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    }
    
    // normal buttons ---------------
-   if (hasFocus) {// focus?
+   if (hasFocus) { // focus?
+      if (!config.btn.cushion && sunken)
+         r.setBottom(r.bottom()-dpi.f1);
       const int contrast = Colors::contrast(FCOLOR(Window), FCOLOR(Highlight));
-      if (!config.btn.cushion && sunken) r.setBottom(r.bottom()-dpi.f1);
-      lights.rect[round].render(r, painter, Colors::mid(FCOLOR(Window),
-         FCOLOR(Highlight), contrast/10, 1));
+      QColor fc = (config.btn.backLightHover && animStep) ? iC : FCOLOR(Window);
+      fc = Colors::mid(fc, FCOLOR(Highlight), contrast/10, 1);
+      lights.rect[round].render(r, painter, fc);
       r = RECT;
    }
-   else if (config.btn.backLightHover && animStep) {
+   else if (config.btn.backLightHover && animStep)
       lights.rect[round].render(RECT, painter, iC); // backlight
-   }
+   
    // shadow
    if (sunken && !config.btn.cushion) {
       r.adjust(f1, f1, -f1, -f2);
@@ -226,7 +223,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
          painter->drawPixmap(QPoint(r.right()+1-16*r.height()/9, r.top()),
                            Gradients::ambient(r.height()));
       if (config.btn.bevelEnds && !isCheckbox) {
-         QRect bevelRect = r; bevelRect.setWidth(dpi.f10);
+         QRect bevelRect = r; bevelRect.setWidth(dpi.f8);
          masks.rect[round].render(bevelRect, painter, Gradients::bevel());
          bevelRect.moveTopRight(r.topRight());
          masks.rect[round].render(bevelRect, painter, Gradients::bevel(false));
@@ -329,7 +326,7 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
    if (flat)
       fg = FCOLOR(WindowText);
    else
-      fg = Colors::btnFg(PAL, isEnabled, hover, animStep);
+      fg = btnFg(PAL, isEnabled, hover, animStep);
    const QColor &bg = flat ? FCOLOR(Window) :
       (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
 
@@ -365,7 +362,7 @@ BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
       painter->save();
       if (config.btn.backLightHover) hover = animStep = 0;
       const QPoint center = copy.rect.center() - QPoint(0,dpi.f1);
-      painter->setBrush(Colors::btnFg(PAL, isEnabled, hover, animStep));
+      painter->setBrush(btnFg(PAL, isEnabled, hover, animStep));
       const int d = dpi.f5 - (config.btn.checkType + config.btn.layer) * dpi.f1;
       copy.rect.adjust(d, d, -d, -d);
       if (copy.rect.width() > copy.rect.height())
@@ -391,12 +388,13 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
    
    Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
    
-   if (isOn) hover = /*hasFocus = */false;
+   if (isOn) hover = hasFocus = false;
 //       else if (hover && sunken) isOn = true;
-   
-   animStep = isOn ? 0 : animator->hoverStep(widget);
-   QColor bc = Colors::btnBg(PAL, isEnabled, hasFocus, animStep);
+
+   QColor bc = btnBg(PAL, isEnabled, hasFocus, 0, false);
    QColor c = bc;
+   
+   animStep = isOn ? 0 : (sunken ? 6 : animator->hoverStep(widget));
    if (animStep)
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
    
@@ -475,8 +473,7 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
    // drop
    if (isOn) {
       xy += QPoint(f4, f4);
-      fillWithMask(painter, xy,
-                   Colors::btnFg(PAL, isEnabled, hover, animStep),
+      fillWithMask(painter, xy, btnFg(PAL, isEnabled, hover, animStep),
                    masks.radioIndicator);
    }
    animStep = -1;

@@ -82,7 +82,7 @@ shadow(int size, bool opaque, bool sunken, float factor = 1.0)
    float d = size/2.0;
    QRadialGradient rg(d, d, d);
    const int alpha =
-      (int) (config.shadowIntensity * factor * (sunken ? 64 : (opaque ? 48 : 20)));
+      (int) (config.shadowIntensity * factor * (sunken ? 70 : (opaque ? 48 : 20)));
    rg.setColorAt(0.7, BLACK(CLAMP(alpha,0,255)));
    rg.setColorAt(1.0, BLACK(0));
    p.fillRect(pix.rect(), rg); p.end();

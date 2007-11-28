@@ -37,7 +37,62 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
    sunken = sunken && (slider->activeSubControls & SC_SliderHandle);
        
    const int ground = 0;
-       
+
+   if (slider->subControls & SC_SliderTickmarks) {
+      int ticks = slider->tickPosition;
+      if (ticks != QSlider::NoTicks) {
+      
+         int available = pixelMetric(PM_SliderSpaceAvailable, slider, widget);
+         int interval = slider->tickInterval;
+         if (interval < 1) interval = slider->pageStep;
+         if (interval) {
+            int tickOffset = (ticks == QSlider::TicksBothSides) ? 0 :
+               pixelMetric(PM_SliderTickmarkOffset, slider, widget);
+            const int thickness =
+               pixelMetric(PM_SliderControlThickness, slider, widget);
+            const int len =
+               pixelMetric(PM_SliderLength, slider, widget);
+            const int fudge = len / 2;
+            int pos, v = slider->minimum, nextInterval;
+            // Since there is no subrect for tickmarks do a translation here.
+            painter->save();
+            painter->translate(RECT.x(), RECT.y());
+
+#define DRAW_TICKS(_X1_, _Y1_, _X2_, _Y2_) \
+            while (v <= slider->maximum) { \
+               pos = sliderPositionFromValue(slider->minimum,\
+                  slider->maximum, v, available) + fudge;\
+               painter->drawLine(_X1_, _Y1_, _X2_, _Y2_);\
+               nextInterval = v + interval;\
+               if (nextInterval < v) break;\
+               v = nextInterval; \
+            } // skip semicolon
+
+            painter->setPen(Colors::mid(BGCOLOR, FGCOLOR, 4,1));
+            if (slider->orientation == Qt::Horizontal) {
+               if (ticks == QSlider::TicksAbove) {
+                  DRAW_TICKS(pos, 0, pos, tickOffset); }
+               else if (ticks == QSlider::TicksBelow) {
+                  DRAW_TICKS(pos, tickOffset + thickness, pos, RECT.height()); }
+               else {
+                  tickOffset = RECT.height()/4;
+                  DRAW_TICKS(pos, tickOffset-1, pos, RECT.height()-tickOffset); }
+            }
+            else {
+               if (ticks == QSlider::TicksAbove) {
+                  DRAW_TICKS(0, pos, tickOffset, pos); }
+               else if (ticks == QSlider::TicksBelow) {
+                  DRAW_TICKS(tickOffset + thickness, pos, RECT.width(), pos); }
+               else {
+                  tickOffset = RECT.width()/4;
+                  DRAW_TICKS(tickOffset-1, pos, RECT.width()-tickOffset, pos); }
+            }
+            painter->restore();
+         }
+      }
+   }
+
+   // groove
    if ((slider->subControls & SC_SliderGroove) && groove.isValid()) {
       painter->save();
 
@@ -135,21 +190,6 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
    if (slider->orientation == Qt::Vertical)
       ++direction;
 
-   // ticks - TODO: paint our own ones?
-   if ((slider->subControls & SC_SliderTickmarks) &&
-       (slider->tickPosition != QSlider::NoTicks) ) {
-      if (slider->tickPosition == QSlider::TicksAbove) {
-         direction += 2;
-         if (slider->orientation == Qt::Horizontal)
-            handle.translate(0,-dpi.f6);
-         else
-            handle.translate(-dpi.f6,0);
-      }
-      QStyleOptionSlider tmpSlider = *slider;
-      tmpSlider.subControls = SC_SliderTickmarks;
-      QCommonStyle::drawComplexControl(CC_Slider, &tmpSlider, painter, widget);
-   }
-       
    // handle
    if (slider->subControls & SC_SliderHandle) {
       int step;

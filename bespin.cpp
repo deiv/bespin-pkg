@@ -226,6 +226,41 @@ BespinStyle::~BespinStyle() {
    Gradients::wipe();
 }
 
+#include "makros.h"
+#undef PAL
+#define PAL pal
+
+QColor
+BespinStyle::btnBg(const QPalette &pal, bool isEnabled, int hasFocus,
+                   int step, bool fullHover) const {
+
+   if (!isEnabled)
+      return Colors::mid(Qt::black, FCOLOR(Window),5,100);
+   
+   QColor c = CCOLOR(btn.std, Bg);
+   if (hasFocus)
+      c = Colors::mid(FCOLOR(Highlight), c,
+                      1, 10 + Colors::contrast(FCOLOR(Highlight), c));
+
+   if (fullHover && step)
+      c = Colors::mid(c, CCOLOR(btn.active, Bg),
+                      (config.btn.backLightHover ? 36 : 6) - step, step);
+
+   return c;
+}
+
+QColor
+BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hover, int step) const {
+   if (!isEnabled)
+      return Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
+   if (hover && !step) step = 6;
+   if (step)
+      return Colors::mid(CCOLOR(btn.std,Fg), CCOLOR(btn.active, Fg), 6 - step, step);
+   return CCOLOR(btn.std, Fg);
+}
+
+#undef PAL
+
 void
 BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const

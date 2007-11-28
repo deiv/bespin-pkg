@@ -17,16 +17,13 @@
  */
 
 #include "colors.h"
-#include "makros.h"
+#define CLAMP(x,l,u) (x) < (l) ? (l) :\
+(x) > (u) ? (u) :\
+(x)
 #include <QWidget>
 #include <QApplication>
-enum Role {Bg = 0, Fg = 1};
-using namespace Bespin;
 
-static QPalette::ColorRole btnRoles[2][2] = {
-   {QPalette::Window, QPalette::WindowText},
-   {QPalette::Button, QPalette::ButtonText}
-};
+using namespace Bespin;
 
 const QColor &Colors::bg(const QPalette &pal, const QWidget *w) {
    QPalette::ColorRole role;
@@ -40,33 +37,6 @@ const QColor &Colors::bg(const QPalette &pal, const QWidget *w) {
       return pal.color(role);
    return QApplication::palette().color(role);
 }
-
-#undef PAL
-#define PAL pal
-
-QColor Colors::btnBg(const QPalette &pal, bool isEnabled, int hasFocus, int step) {
-   if (!isEnabled)
-      return mid(Qt::black, FCOLOR(Window),5,100);
-   QColor c = (hasFocus) ?
-      mid(FCOLOR(Highlight), COLOR(btnRoles[0][Bg]),
-          1, 10+contrast(FCOLOR(Highlight), COLOR(btnRoles[0][Bg]))) :
-         COLOR(btnRoles[0][Bg]);
-   if (step)
-      return mid(c, COLOR(btnRoles[1][Bg]), 36 - step, step);
-   return c;
-}
-
-QColor Colors::btnFg(const QPalette &pal, bool isEnabled, int hover, int step) {
-   if (!isEnabled)
-      return mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
-   if (hover && !step) step = 6;
-   if (step)
-      return mid(COLOR(btnRoles[0][Fg]), COLOR(btnRoles[1][Fg]), 6 - step, step);
-   return COLOR(btnRoles[0][Fg]);
-}
-
-#undef PAL
-#define PAL option->palette
 
 int Colors::contrast(const QColor &a, const QColor &b) {
    int ar,ag,ab,br,bg,bb;
@@ -214,14 +184,6 @@ QColor Colors::mid(const QColor &oc1, const QColor &c2, int w1, int w2) {
                  (w1*c1.green() + w2*c2.green())/sum,
                  (w1*c1.blue() + w2*c2.blue())/sum,
                  (w1*c1.alpha() + w2*c2.alpha())/sum);
-}
-
-void Colors::setButtonRoles(QPalette::ColorRole bg, QPalette::ColorRole fg,
-                    QPalette::ColorRole bgActive, QPalette::ColorRole fgActive) {
-   btnRoles[0][0] = bg;
-   btnRoles[0][1] = fg;
-   btnRoles[1][0] = bgActive;
-   btnRoles[1][1] = fgActive;
 }
 
 int Colors::value(const QColor &c) {

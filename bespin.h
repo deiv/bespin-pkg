@@ -27,28 +27,13 @@ class QSettings;
 #include "tileset.h"
 #include "styleanimator.h"
 #include "gradients.h"
+#include "types.h"
+#include "config.h"
 #include "debug.h"
 
 namespace Bespin {
 
-namespace Check {
-enum Type {X = 0, V, O};
-};
-
-namespace Navi {
-enum Direction {
-   N = Qt::UpArrow, S = Qt::DownArrow,
-   E = Qt::RightArrow, W = Qt::LeftArrow,
-   NW = 5, NE, SE, SW
-   };
-};
-
-enum BGMode { Plain = 0, Scanlines, ComplexLights,
-      BevelV, BevelH };
-
-class BespinStyle;
-
-enum Orientation3D {Sunken = 0, Relief, Raised};
+// class BespinStyle;
 
 typedef struct {
    int f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
@@ -61,76 +46,6 @@ typedef struct {
    int ExclusiveIndicator;
 } Dpi;
 
-
-typedef struct Config {
-   struct bg {
-      BGMode mode;
-      int structure, intensity;
-      struct {
-         bool glassy, invert;
-         int opacity;
-      } modal;
-   } bg;
-   
-   struct btn {
-      int layer;
-      Check::Type checkType;
-      bool cushion, fullHover, backLightHover, ambientLight, bevelEnds, round;
-      Gradients::Type gradient, focusGradient;
-      QPalette::ColorRole std_role[2], active_role[2];
-   } btn;
-   
-   struct chooser {
-      Gradients::Type gradient;
-   } chooser;
-   
-   struct input {
-      ushort pwEchoChar;
-   } input;
-
-   Qt::LayoutDirection leftHanded;
-   bool macStyle;
-   
-   struct menu {
-      QPalette::ColorRole std_role[2], active_role[2], bar_role[2];
-      Gradients::Type itemGradient;
-      bool showIcons, shadow, barSunken, boldText, activeItemSunken, glassy;
-      int opacity;
-   } menu;
-   
-   struct progress {
-      Gradients::Type gradient;
-      QPalette::ColorRole std_role[2];
-   } progress;
-   
-   float scale;
-   
-   struct scroll {
-      Gradients::Type gradient;
-      bool groove, showButtons, sunken;
-   } scroll;
-
-   float shadowIntensity;
-   
-   struct tab {
-      QPalette::ColorRole std_role[2], active_role[2];
-      Gradients::Type gradient;
-      int animSteps;
-      bool activeTabSunken;
-      TabAnimInfo::TabTransition transition;
-   } tab;
-
-   struct toolbox {
-      QPalette::ColorRole active_role[2];
-      Gradients::Type gradient;
-   } toolbox;
-
-   struct view {
-      QPalette::ColorRole header_role[2], sortingHeader_role[2];
-      Gradients::Type headerGradient, sortingHeaderGradient;
-   } view;
-
-} Config;
 
 class BespinStyle : public QCommonStyle {
    Q_OBJECT
@@ -221,6 +136,11 @@ public:
 
 protected:
    virtual void init(const QSettings *settings = 0L);
+
+   QColor btnBg(const QPalette &pal, bool isEnabled, int hasFocus = false,
+                int step = 0, bool fullHover = true) const;
+   QColor btnFg(const QPalette &pal, bool isEnabled, int hover, int step = 0) const;
+
    // element painting routines ===============
    void skip(const QStyleOption*, QPainter*, const QWidget*) const {}
    // buttons.cpp

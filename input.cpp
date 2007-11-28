@@ -208,26 +208,22 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
          animStep = animator->hoverStep(widget);
          if (listShown) animStep = 6;
 
-         c = Colors::btnBg(PAL, isEnabled, hasFocus, 0);
-         if (config.btn.fullHover)
-            c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-
+         c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover);
+         
          mask.render(r, painter, GRAD(chooser), Qt::Vertical, c);
 
          if (hasFocus) {
-            QColor hlc = /*FCOLOR(Highlight);*/
-//             hlc.setAlpha(102);
-               Colors::mid(c, FCOLOR(Highlight), 2, 1);
-            mask.outline(r, painter, hlc, f3);
+            const int contrast = Colors::contrast(c, FCOLOR(Highlight));
+            const QColor fc = Colors::mid(c, FCOLOR(Highlight), contrast/10, 1);
+            mask.outline(r, painter, fc, f3);
          }
 
          // maybe hover indicator?
          if (!config.btn.fullHover && animStep) { // jupp ;)
             r.adjust(f3, f3, -f3, -f3);
-            const QColor c2 =
-               Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-            mask.render(r, painter, GRAD(chooser), Qt::Vertical,
-                        c2, RECT.height()-f2, QPoint(0,f3));
+            c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
+            mask.render(r, painter, GRAD(chooser), Qt::Vertical, c,
+                        RECT.height()-f2, QPoint(0,f3));
          }
       }
       shadows.sunken[round_][isEnabled].render(RECT, painter);

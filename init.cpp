@@ -148,8 +148,6 @@ BespinStyle::readSettings(const QSettings* settings)
    
    readRole(btn.std, BTN_ROLE);
    readRole(btn.active, BTN_ACTIVEROLE);
-   Colors::setButtonRoles(config.btn.std_role[0], config.btn.std_role[1],
-                          config.btn.active_role[0], config.btn.active_role[1]);
    config.btn.ambientLight = readBool(BTN_AMBIENTLIGHT);
    config.btn.bevelEnds = readBool(BTN_BEVEL_ENDS);
    
@@ -267,5 +265,5 @@ void BespinStyle::init(const QSettings* settings) {
    generatePixmaps();
    Gradients::init(config.bg.mode > ComplexLights ?
                    (Gradients::BgMode)config.bg.mode :
-                   Gradients::BevelV, _progressBase, config.bg.intensity, dpi.f10);
+                   Gradients::BevelV, _progressBase, config.bg.intensity, dpi.f8);
 }

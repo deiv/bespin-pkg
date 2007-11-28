@@ -28,8 +28,6 @@ namespace Bespin {
 namespace Colors {
 
 const QColor &bg(const QPalette &pal, const QWidget *w);
-QColor btnBg(const QPalette &pal, bool isEnabled, int hasFocus = false, int step = 0);
-QColor btnFg(const QPalette &pal, bool isEnabled, int hover, int step = 0);
 int contrast(const QColor &a, const QColor &b);
 QPalette::ColorRole counterRole(QPalette::ColorRole role);
 bool counterRole(QPalette::ColorRole &from, QPalette::ColorRole &to,
@@ -40,9 +38,6 @@ bool haveContrast(const QColor &a, const QColor &b);
 QColor light(const QColor &c, int value);
 QColor mid(const QColor &oc1, const QColor &c2, int w1 = 1, int w2 = 1);
 int value(const QColor &c);
-
-void setButtonRoles(QPalette::ColorRole bg, QPalette::ColorRole fg,
-                    QPalette::ColorRole bgActive, QPalette::ColorRole fgActive);
 
 };
 };

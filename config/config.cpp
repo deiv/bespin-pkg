@@ -124,7 +124,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    ui.storeLine->hide();
    
    /** fill some comboboxes, not of interest */
-   generateColorModes(ui.crProgressBar);
+   generateColorModes(ui.crProgressBg);
+   generateColorModes(ui.crProgressFg);
    generateColorModes(ui.crTabBar);
    generateColorModes(ui.crTabBarActive);
    generateColorModes(ui.crPopup);
@@ -219,6 +220,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.ambientLight, "Btn.AmbientLight", true);
    handleSettings(ui.backlightHover, "Btn.BacklightHover", false);
    handleSettings(ui.btnRound, "Btn.Round", false);
+   handleSettings(ui.btnBevelEnds, BTN_BEVEL_ENDS);
    
    handleSettings(ui.gradChoose, "Chooser.Gradient", GradSunken);
    
@@ -240,7 +242,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.menuActiveItemSunken, "Menu.ActiveItemSunken", false);
    
    handleSettings(ui.gradProgress, "Progress.Gradient", GradGloss);
-   handleSettings(ui.crProgressBar, "Progress.Role", QPalette::Highlight);
+   handleSettings(ui.crProgressBg, PROGRESS_ROLE_BG);
+   handleSettings(ui.crProgressFg, PROGRESS_ROLE_FG);
    
    handleSettings(ui.showScrollButtons, "Scroll.ShowButtons", false);
    handleSettings(ui.scrollSunken, "Scroll.Sunken", false);
@@ -385,10 +388,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    setContextHelp(ui.showScrollButtons, "<b>Show Scrollbar buttons</b><hr>\
                   Seriously, honestly: when do you ever use the buttons to move\
                   a scrollbar slider? (ok, notebooks don't have a mousewheel...)");
-
-   setContextHelp(ui.crProgressBar, "<b>ProgressBar Roles</b><hr>\
-                  This is the \"done\" part of the Progressbar<br>\
-                  Choose any mode you like - the other part is like the window");
 
    setContextHelp(ui.crPopup, "<b>Popup Menu Role</b><hr>\
                   Choose anything you like (hint: saturated colors annoy me :)<br>\

@@ -316,21 +316,24 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
 
    // the hover indicator color (inside area)
    QColor c;
+   if (scrollAreaHovered_ && !widgetStep) widgetStep = 6;
+#define SCROLL_COLOR(_X_) btnBg(PAL, true, false, _X_, true)
    if (sunken)
-      c = CCOLOR(btn.active, 0);
+      c = SCROLL_COLOR(6);
    else if (complexStep) {
-      c = Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 2, 1);
-      c = Colors::mid(c, CCOLOR(btn.active, 0), 6-complexStep, complexStep);
+      c = Colors::mid(CCOLOR(btn.std, Bg), SCROLL_COLOR(widgetStep));
+      c = Colors::mid(c, SCROLL_COLOR(complexStep),6-complexStep,complexStep);
    }
-   else if (hover)
-      c = CCOLOR(btn.active, 0);
+   else if (hover) {
+      complexStep = 6;
+      c = SCROLL_COLOR(6);
+   }
    else if (widgetStep)
-      c = Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 18-widgetStep, widgetStep);
-   else if (scrollAreaHovered_)
-      c = Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 2, 1);
+      c = Colors::mid(CCOLOR(btn.std, Bg), SCROLL_COLOR(widgetStep));
    else
       c = CCOLOR(btn.std, 0);
-
+#undef SCROLL_COLOR
+   
    QRect r = RECT;
    const int f1 = dpi.f1, f2 = dpi.f2;
    const bool horizontal = option->state & QStyle::State_Horizontal;
@@ -343,17 +346,22 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    else
       painter->setClipRegion(QRegion(RECT) -
                              r.adjusted(dpi.f3, dpi.f9, -dpi.f3, -dpi.f9));
-   if (sunken) {
+   if (!config.scroll.sunken && sunken) {
       r.adjust(f1, f1, -f1, -f1);
       shadows.raised[round_][true][true].render(r, painter);
       r.adjust(f1, f1, -f1, horizontal && config.scroll.sunken ? -f1 : -f2 );
    }
    else {
+      if (config.btn.backLightHover && complexStep) {
+         QColor blh =
+            Colors::mid(c, CCOLOR(btn.active, Bg), 6-complexStep, complexStep);
+         lights.rect[round_].render(r, painter, blh); // backlight
+      }
       shadows.raised[round_][true][false].render(r, painter);
       r.adjust(f2, f2, -f2, horizontal && config.scroll.sunken ? -f2 : -dpi.f3 );
    }
    painter->restore();
-
+   
    // gradient setup
    Qt::Orientation o; int size; Tile::PosFlags pf;
    if (horizontal) {

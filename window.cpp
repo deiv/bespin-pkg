@@ -194,15 +194,19 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
    if ((widget->isModal() && config.bg.modal.glassy) ||
        ((widget->windowFlags() & 0x8) && config.menu.glassy)) {
       if (widget->size() != glasSize) {
+         const QRect &wr = widget->rect();
          glasSize = widget->size();
          glasPath = QPainterPath();
-         glasPath.moveTo(RECT.topLeft());
-         glasPath.lineTo(RECT.topRight());
-         glasPath.quadTo(RECT.center()/2, RECT.bottomLeft());
+         glasPath.moveTo(wr.topLeft());
+         glasPath.lineTo(wr.topRight());
+         glasPath.quadTo(wr.center()/2, wr.bottomLeft());
       }
+      painter->save();
       painter->setPen(Qt::NoPen);
       painter->setBrush(c.light(115-Colors::value(c)/20));
+      painter->translate(RECT.topLeft());
       painter->drawPath(glasPath);
+      painter->restore();
       return;
    }
    // ===================
