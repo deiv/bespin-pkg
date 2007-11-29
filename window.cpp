@@ -265,6 +265,22 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
    }
 }
 
+void
+BespinStyle::drawToolTip(const QStyleOption * option, QPainter * painter,
+                         const QWidget *) const
+{
+   painter->save();
+   painter->setBrush(Gradients::pix(FCOLOR(Window), RECT.height(),
+                                    Qt::Vertical, Gradients::Button));
+   painter->setPen(Qt::NoPen);
+   painter->drawRect(RECT);
+   const int f1 = dpi.f1;
+   QPen pen(Colors::mid(FCOLOR(Window), FCOLOR(WindowText),6,1), f1);
+   painter->setPen(pen);
+   painter->drawRect(RECT.adjusted(f1/2,f1/2,-f1,-f1));
+   painter->restore();
+}
+
 #define PAINT_WINDOW_BUTTON(_btn_) {\
    tmpOpt.rect =\
       subControlRect(CC_TitleBar, tb, SC_TitleBar##_btn_##Button, widget);\

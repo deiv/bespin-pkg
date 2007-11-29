@@ -138,7 +138,7 @@ protected:
    virtual void init(const QSettings *settings = 0L);
 
    QColor btnBg(const QPalette &pal, bool isEnabled, int hasFocus = false,
-                int step = 0, bool fullHover = true) const;
+                int step = 0, bool fullHover = true, bool reflective = false) const;
    QColor btnFg(const QPalette &pal, bool isEnabled, int hover, int step = 0) const;
 
    // element painting routines ===============
@@ -253,6 +253,7 @@ protected:
    // window.cpp
    void drawWindowFrame(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawWindowBg(const QStyleOption*, QPainter*, const QWidget*) const;
+   void drawToolTip(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawTitleBar(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
    void drawSizeGrip(const QStyleOption*, QPainter*, const QWidget*) const;
    // ==========================================

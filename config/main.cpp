@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
 {
    Mode mode = Configure;
    QApplication *app = 0;
+   QString title;
    if (argc > 1) {
       mode = Invalid;
       if (!qstrcmp( argv[1], "config" )) mode = Configure;
@@ -134,7 +135,8 @@ int main(int argc, char *argv[])
          return error("Fatal: Bespin Style not found or loadable!");
       
       file.beginGroup("BespinStyle");
-            // palette update =============================
+      title = file.value ( "StoreName", "" ).toString();
+      // palette update =============================
       QPalette pal = app->palette();
       file.beginGroup("QPalette");
       QStringList list =
@@ -148,24 +150,32 @@ int main(int argc, char *argv[])
       Config::updatePalette(pal, QPalette::Disabled, list);
       file.endGroup();
       app->setPalette(pal);
-            // ================================================
+      // ================================================
       static_cast<BStyle*>(app->style())->init(&file);
       
       file.endGroup();
    }
    case Demo: {
+      if (title.isEmpty())
+         title = "Bespin Demo";
       if (!app)
          app = new QApplication(argc, argv);
+      Dialog *window = new Dialog;
       if (mode == Demo && argc > 2) {// allow setting another style
          app->setStyle(argv[2]);
          app->setPalette(app->style()->standardPalette());
+         title = QString("Bespin Demo / %1 Style").arg(argv[2]);
+      }
+      else {
+         char *preset = getenv("BESPIN_PRESET");
+         if (preset) title = QString("%1 @ Bespin Demo").arg(preset);
       }
       Ui::Demo ui;
-      Dialog *window = new Dialog;
       ui.setupUi(window);
       ui.tabWidget->setCurrentIndex(0);
       QObject::connect (ui.rtl, SIGNAL(toggled(bool)),
                         window, SLOT(setLayoutDirection(bool)));
+      window->setWindowTitle ( title );
       window->show();
       return app->exec();
    }

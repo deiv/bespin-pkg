@@ -112,16 +112,13 @@ BespinStyle::drawMenuFrame(const QStyleOption * option, QPainter * painter,
 {
    if (!config.menu.shadow)
       return;
-   
-   QRect rect = RECT.adjusted(0,0, // don't ask...
-                              shadows.line[true][Sunken].thickness()+1,
-                              shadows.line[false][Sunken].thickness()+1);
-   //horizontal
-   shadows.line[false][Sunken].render(rect, painter, Tile::Full, false);
-   shadows.line[false][Sunken].render(rect, painter, Tile::Full, true);
-      //vertical
-   shadows.line[true][Sunken].render(rect, painter, Tile::Full, false);
-   shadows.line[true][Sunken].render(rect, painter, Tile::Full, true);
+   const int f1 = dpi.f1;
+   QPen pen(Colors::mid(CCOLOR(menu.std, Bg), CCOLOR(menu.std, Fg),4,1), f1);
+   painter->save();
+   painter->setBrush(Qt::NoBrush);
+   painter->setPen(pen);
+   painter->drawRect(RECT.adjusted(f1/2,f1/2,-f1,-f1));
+   painter->restore();
 }
 
 static const int windowsItemFrame   = 1; // menu item frame width

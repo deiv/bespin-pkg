@@ -198,6 +198,7 @@ BespinStyle::registerRoutines()
    // window.cpp
    registerPE(drawWindowFrame, PE_FrameWindow);
    registerPE(drawWindowBg, PE_Widget);
+   registerPE(drawToolTip, PE_PanelTipLabel);
    registerCC(drawTitleBar, CC_TitleBar);
    registerCE(drawDockHandle, CE_Splitter);
    registerCE(drawSizeGrip, CE_SizeGrip);
@@ -232,7 +233,7 @@ BespinStyle::~BespinStyle() {
 
 QColor
 BespinStyle::btnBg(const QPalette &pal, bool isEnabled, int hasFocus,
-                   int step, bool fullHover) const {
+                   int step, bool fullHover, bool reflective) const {
 
    if (!isEnabled)
       return Colors::mid(Qt::black, FCOLOR(Window),5,100);
@@ -244,7 +245,7 @@ BespinStyle::btnBg(const QPalette &pal, bool isEnabled, int hasFocus,
 
    if (fullHover && step)
       c = Colors::mid(c, CCOLOR(btn.active, Bg),
-                      (config.btn.backLightHover ? 36 : 6) - step, step);
+                      (config.btn.backLightHover ? (80-32*reflective) : 6) - step, step);
 
    return c;
 }
@@ -253,9 +254,14 @@ QColor
 BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hover, int step) const {
    if (!isEnabled)
       return Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
+
+   if (config.btn.backLightHover)
+      return CCOLOR(btn.std,Fg);
+   
    if (hover && !step) step = 6;
    if (step)
       return Colors::mid(CCOLOR(btn.std,Fg), CCOLOR(btn.active, Fg), 6 - step, step);
+
    return CCOLOR(btn.std, Fg);
 }
 
@@ -367,6 +373,18 @@ static void swapPalette(QWidget *widget)
    widget->setPalette(pal);
 }
 
+#include <QMenuBar>
+static QMenuBar *bar4popup(QMenu *menu) {
+   if (!menu->menuAction())
+      return 0;
+   if (menu->menuAction()->associatedWidgets().isEmpty())
+      return 0;
+   foreach (QWidget *w, menu->menuAction()->associatedWidgets())
+      if (qobject_cast<QMenuBar*>(w))
+         return static_cast<QMenuBar *>(w);
+   return 0;
+}
+
 bool
 BespinStyle::eventFilter( QObject *object, QEvent *ev )
 {
@@ -408,11 +426,12 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
 #if SHAPE_POPUP
    case QEvent::Resize: {
       if (QMenu *menu = qobject_cast<QMenu*>(object)) {
+         if (!menu->isWindow()) return false;
          QAction *head = menu->actions().at(0);
          QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
          Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | Qt::TextShowMnemonic,
          head->iconText());
-         r.adjust(-dpi.f5, -dpi.f2, dpi.f5, dpi.f2);
+         r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
          QResizeEvent *rev = (QResizeEvent*)ev;
          QRegion mask(menu->rect());
          mask -= QRect(0,0,menu->width(),r.bottom());
@@ -426,6 +445,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
          mask -= masks.corner[3].translated(menu->width()-br.width(),
                                             menu->height()-br.height()); // br
          menu->setMask(mask);
+         return false;
       }
       return false;
    }
@@ -466,10 +486,13 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             pt = menu->parentWidget()->mapToGlobal(pt);
             menu->move(pt);
          }
+         QMenuBar *bar = bar4popup(menu);
+         if (bar)
+            menu->move(menu->pos()-QPoint(0,dpi.f2));
 #if SHAPE_POPUP
          QMenuBar *bar = bar4popup(menu);
          if (bar) {
-            QPoint pos(dpi.f3, dpi.f1);
+            QPoint pos(dpi.f1, 0);
             pos += bar->actionGeometry(menu->menuAction()).topLeft();
             menu->move(bar->mapToGlobal(pos));
             menu->setActiveAction(menu->actions().at(0));

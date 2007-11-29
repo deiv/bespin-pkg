@@ -127,10 +127,11 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    if (animStep < 0)
       animStep = sunken ? 6 : animator->hoverStep(widget);
 
-   QColor c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover);
+   Gradients::Type gt = GRAD(btn);
+   QColor c = btnBg(PAL, isEnabled, hasFocus, animStep,
+                    config.btn.fullHover, Gradients::isReflective(gt));
    QColor iC = FCOLOR(Window);
 
-   Gradients::Type gt = GRAD(btn);
    bool drawInner = false;
    if (animStep) {
       if ((config.btn.cushion && sunken) || toggled) {
@@ -391,7 +392,8 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
    if (isOn) hover = hasFocus = false;
 //       else if (hover && sunken) isOn = true;
 
-   QColor bc = btnBg(PAL, isEnabled, hasFocus, 0, false);
+   QColor bc = btnBg(PAL, isEnabled, hasFocus, 0,
+                     false, Gradients::isReflective(gt));
    QColor c = bc;
    
    animStep = isOn ? 0 : (sunken ? 6 : animator->hoverStep(widget));

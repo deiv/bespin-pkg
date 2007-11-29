@@ -228,7 +228,7 @@ void BespinStyle::polish( QPalette &pal )
                             pal.color(QPalette::Disabled, QPalette::Highlight),2,1));
 }
 
-#if SHAPE_POPUP
+
 static QMenuBar *bar4popup(QMenu *menu) {
    if (!menu->menuAction())
       return 0;
@@ -239,8 +239,7 @@ static QMenuBar *bar4popup(QMenu *menu) {
          return static_cast<QMenuBar *>(w);
    return 0;
 }
-#endif
-#include <QtDebug>
+
 void BespinStyle::polish( QWidget * widget) {
    
    if (!widget) return; // !
@@ -254,7 +253,7 @@ void BespinStyle::polish( QWidget * widget) {
       if (config.bg.mode > Scanlines)
          widget->setAttribute(Qt::WA_StyledBackground);
 //       widget->setAutoFillBackground(true);
-      if (qobject_cast<QMenu *>(widget)) {
+      if (QMenu *menu = qobject_cast<QMenu *>(widget)) {
 // #ifdef Q_WS_X11
 //       // tell beryl et. al this is a popup TODO: doesn't work yet...
 //          SET_WINDOW_TYPE(widget, winTypePopup);
@@ -289,6 +288,8 @@ void BespinStyle::polish( QWidget * widget) {
          if (!freakModals && widget->parentWidget() &&
              widget->parentWidget()->inherits("QMdiSubWindow"))
             widget->installEventFilter(this);
+         if (bar4popup(menu))
+            menu->installEventFilter(this); // reposition
 #if SHAPE_POPUP
 // WARNING: compmgrs like e.g. beryl/emerald deny to shadow shaped windows,
 // if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here

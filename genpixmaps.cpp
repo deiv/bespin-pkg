@@ -132,19 +132,9 @@ sunkenShadow(int size, bool enabled)
 
    // add bottom highlight
    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-   QLinearGradient lg(0,0,size,0);
-   QGradientStops stops;
-   stops << QGradientStop( 0, WHITE(20) ) << QGradientStop( 0.5, WHITE(90) ) <<
-      QGradientStop( 1, WHITE(20) );
-   lg.setStops(stops);
-   p.fillRect(f3,size-f2,size-2*f3,f1, lg);
-   stops.clear();
-   
-   stops << QGradientStop( 0, WHITE(10) ) << QGradientStop( 0.5, WHITE(55) ) <<
-      QGradientStop( 1, WHITE(10) );
-   lg.setStops(stops);
-   p.fillRect(f4,size-f1,size-2*f4,f1, lg);
-   stops.clear();
+   p.fillRect(f3,size-f2,size-2*f3,f1, BLACK(10));
+   int w = size/f3;
+   p.fillRect(w,size-f1,size-2*w,f1, WHITE(30));
    
    p.end();
 

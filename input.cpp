@@ -208,7 +208,8 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
          animStep = animator->hoverStep(widget);
          if (listShown) animStep = 6;
 
-         c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover);
+         c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover,
+                   Gradients::isReflective(GRAD(chooser)));
          
          mask.render(r, painter, GRAD(chooser), Qt::Vertical, c);
 
@@ -271,7 +272,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
       else {
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-         ar.adjust(f2, dpi.f4, -f2, -dpi.f4);
+         ar.adjust(f2, f2, -f2, -f2);
          masks.rect[round_].render(ar, painter, GRAD(chooser), Qt::Vertical, c,
                                  RECT.height()-f2, QPoint(0,dpi.f4));
          painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));

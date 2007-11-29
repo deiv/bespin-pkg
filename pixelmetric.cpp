@@ -194,7 +194,8 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
 //       return 10;
 //       if (option) return option->rect.height()-dpi.f4;
 //       return dpi.f16;
-//    case PM_ToolTipLabelFrameWidth: //
+   case PM_ToolTipLabelFrameWidth: //
+      return dpi.f2; // they're so tiny ;)
    default:
 #endif
       return QCommonStyle::pixelMetric( pm, option, widget );

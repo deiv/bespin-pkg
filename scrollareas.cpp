@@ -317,7 +317,8 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    // the hover indicator color (inside area)
    QColor c;
    if (scrollAreaHovered_ && !widgetStep) widgetStep = 6;
-#define SCROLL_COLOR(_X_) btnBg(PAL, true, false, _X_, true)
+#define SCROLL_COLOR(_X_) \
+   btnBg(PAL, true, false, _X_, true, Gradients::isReflective(GRAD(scroll)))
    if (sunken)
       c = SCROLL_COLOR(6);
    else if (complexStep) {
