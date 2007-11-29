@@ -208,10 +208,10 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
 
       // shadow
       QPoint xy = handle.topLeft();
-      painter->drawPixmap(sunken ? xy + QPoint(dpi.f1,dpi.f1) : xy,
-                          shadows.sliderRound[isEnabled][sunken]);
+      shadows.raised[false][isEnabled][sunken].render(sunken ?
+         handle.adjusted(dpi.f1,dpi.f1,-dpi.f1,-dpi.f1) : handle, painter);
+
       // gradient
-      xy += QPoint(dpi.f2, dpi.f1);
       QColor bc = CONF_COLOR(btn.std, Bg);
       QColor fc;
       if (config.btn.fullHover) {
@@ -222,11 +222,10 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
          fc = Colors::mid(CONF_COLOR(btn.std, Bg),
                           CONF_COLOR(btn.std, Fg), 9-step, step+3);
 
-      const int sz = dpi.SliderControl-dpi.f4;
-      const QBrush fill =
-         Gradients::brush(bc, sz, Qt::Vertical,
-                          isEnabled ? GRAD(scroll) : Gradients::None);
-      fillWithMask(painter, xy, fill, masks.slider);
+      handle.adjust(dpi.f1, dpi.f1, -dpi.f1, -dpi.f2);
+      masks.rect[false].render(handle, painter, isEnabled ? GRAD(scroll) :
+                               Gradients::None, Qt::Vertical, bc);
+
       SAVE_PEN;
       painter->setPen(fc);
       int x1, x2, y1, y2;
@@ -236,7 +235,7 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       }
       else {
          x1 = handle.left()+dpi.f4; x2 = handle.right()-dpi.f4;
-         y1 = y2 = handle.center().y()-dpi.f1;
+         y1 = y2 = handle.center().y();
       }
       painter->drawLine(x1, y1, x2, y2);
       RESTORE_PEN;

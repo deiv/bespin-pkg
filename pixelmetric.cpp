@@ -68,8 +68,8 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
    case PM_ScrollBarSliderMin: // The minimum height of a vertical scroll bar's slider and the minimum width of a horizontal scroll bar's slider
       return dpi.ScrollBarSliderMin;
    case PM_SliderThickness: // Total slider thickness
-      return dpi.SliderThickness;
    case PM_SliderControlThickness: // Thickness of the slider handle
+      return dpi.SliderThickness;
    case PM_SliderLength: // Length of the slider
       return dpi.SliderControl;
 //    case PM_SliderTickmarkOffset: // The offset between the tickmarks and the slider
