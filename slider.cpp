@@ -210,6 +210,8 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       QPoint xy = handle.topLeft();
       shadows.raised[false][isEnabled][sunken].render(sunken ?
          handle.adjusted(dpi.f1,dpi.f1,-dpi.f1,-dpi.f1) : handle, painter);
+      if (hasFocus && !sunken)
+         lights.rect[false].render(handle, painter, FCOLOR(Highlight));
 
       // gradient
       QColor bc = CONF_COLOR(btn.std, Bg);

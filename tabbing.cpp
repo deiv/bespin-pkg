@@ -130,10 +130,12 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
       
    // paint shape and label
    QStyleOptionTab copy = *tab;
-   if (widget) copy.palette = widget->palette(); // workaround for e.g. konsole,
+   // NOTICE: workaround for e.g. konsole,
    // which sets the tabs bg, but not the fg color to the palette, but just
    // presets the painter and hopes for the best... tststs
    // TODO: bug Konsole/Konqueror authors
+   if (widget) copy.palette = widget->palette();
+   
    copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
    drawTabShape(&copy, painter, widget);
    drawTabLabel(&copy, painter, widget);
@@ -175,15 +177,17 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
    if (!(animStep || sunken)) return;
        
    const int f2 = dpi.f2;
-   QRect rect = RECT.adjusted(dpi.f3, dpi.f5, -dpi.f4,
-                              /*config.tab.activeTabSunken ? -dpi.f4 : */-dpi.f5);
+   QRect rect = RECT;
    int size = RECT.height()-f2;
    Qt::Orientation o = Qt::Vertical;
    const bool vertical = verticalTabs(tab->shape);
    if (vertical) {
+      rect.adjust(dpi.f5, dpi.f1, dpi.f5, -dpi.f1);
       o = Qt::Horizontal;
       size = RECT.width()-f2;
    }
+   else
+      rect.adjust(dpi.f1, dpi.f5, -dpi.f1, -dpi.f5);
 
    QColor c;
    if (sunken) {
@@ -262,9 +266,10 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
       }
       QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ?
                                           QIcon::Normal : QIcon::Disabled);
-      painter->drawPixmap(tr.left() + dpi.f6,
+      painter->drawPixmap(tr.left() + dpi.f9,
                         tr.center().y() - tabIcon.height() / 2, tabIcon);
-      tr.setLeft(tr.left() + iconSize.width() + dpi.f4);
+      tr.setLeft(tr.left() + iconSize.width() + dpi.f12);
+      alignment = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic;
    }
        
    // color adjustment

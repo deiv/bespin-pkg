@@ -241,9 +241,11 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
    ASSURE_OPTION(btn, Button);
 
    QRect ir = btn->rect;
-   uint tf = Qt::AlignVCenter | Qt::TextShowMnemonic;
+   uint tf = Qt::AlignCenter;
    if (!styleHint(SH_UnderlineShortcut, btn, widget))
       tf |= Qt::TextHideMnemonic;
+   else
+      tf |= Qt::TextShowMnemonic;
 
    if (!btn->icon.isNull()) {
       QIcon::Mode mode = isEnabled ? QIcon::Normal
@@ -265,21 +267,15 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
          point = QPoint(ir.x() + 2, ir.y() + ir.height() / 2 - pixh / 2);
 
       if (btn->direction == Qt::RightToLeft)
-         point.rx() += pixw;
+         point.rx() += pixw/2;
 
       painter->drawPixmap(visualPos(btn->direction, btn->rect, point), pixmap);
 
-      if (btn->direction == Qt::RightToLeft)
-         ir.translate(-4, 0);
+      if (btn->direction == Qt::LeftToRight)
+         ir.setLeft(ir.left() + pixw + dpi.f4);
       else
-         ir.translate(pixw + 4, 0);
-      ir.setWidth(ir.width() - (pixw + 4));
-            // left-align text if there is
-      if (!btn->text.isEmpty())
-         tf |= Qt::AlignLeft;
+         ir.setWidth(ir.width() - (pixw + dpi.f4));
    }
-   else
-      tf |= Qt::AlignHCenter;
 
    if (btn->text.isEmpty())
       return;
@@ -296,17 +292,13 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
    painter->save();
    const bool flat = btn->features & QStyleOptionButton::Flat;
    if ((flat && hover ) || hasFocus) {
-//       ir.translate(0,-1);
       QFont tmpFnt = painter->font();
       tmpFnt.setBold(true);
       QFontMetrics fm(tmpFnt);
       QRect tr = fm.boundingRect ( btn->text );
       if (!tr.isValid()) {
-         painter->restore();
-         return;
+         painter->restore(); return;
       }
-//       const int oPtS = tmpFnt.pointSize();
-//       const int oPxS = tmpFnt.pixelSize();
       while (tr.width() > ir.width()) {
          if (tmpFnt.pointSize() > -1)
             tmpFnt.setPointSize(tmpFnt.pointSize()*ir.width()/tr.width());
@@ -315,9 +307,6 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
          fm = QFontMetrics(tmpFnt);
          tr = fm.boundingRect ( btn->text );
       }
-//       int dy = (oPtS > -1) ? (oPtS-tmpFnt.pointSize())/2 :
-//          (oPxS-tmpFnt.pixelSize())/2;
-//       tr.translate(0,dy);
       painter->setFont(tmpFnt);
    }
    

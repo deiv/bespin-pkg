@@ -114,7 +114,8 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
             int w = contentsSize.width() + dpi.f20;
             if (btn->features & QStyleOptionButton::HasMenu)
                w += contentsSize.height()/2+dpi.f10;
-            else if (widget)
+            else
+            if (widget)
             if (const QAbstractButton* abn =
                 qobject_cast<const QAbstractButton*>(widget))
             if (abn->isCheckable())
@@ -142,9 +143,6 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
       if (const QStyleOptionTab *tab =
           qstyleoption_cast<const QStyleOptionTab *>(option)) {
          int add = dpi.f8;
-         if (!tab->icon.isNull()) {
-            add += dpi.f12;
-         }
          switch (tab->shape) {
          case QTabBar::RoundedNorth: case QTabBar::TriangularNorth:
          case QTabBar::RoundedSouth: case QTabBar::TriangularSouth:

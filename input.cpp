@@ -272,7 +272,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
       else {
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-         ar.adjust(f2, f2, -f2, -f2);
+         ar.adjust(f2, f3, -f2, -f3);
          masks.rect[round_].render(ar, painter, GRAD(chooser), Qt::Vertical, c,
                                  RECT.height()-f2, QPoint(0,dpi.f4));
          painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
