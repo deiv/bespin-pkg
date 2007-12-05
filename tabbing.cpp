@@ -182,7 +182,7 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
    Qt::Orientation o = Qt::Vertical;
    const bool vertical = verticalTabs(tab->shape);
    if (vertical) {
-      rect.adjust(dpi.f5, dpi.f1, dpi.f5, -dpi.f1);
+      rect.adjust(dpi.f5, dpi.f1, -dpi.f5, -dpi.f1);
       o = Qt::Horizontal;
       size = RECT.width()-f2;
    }
@@ -194,8 +194,12 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
       c = CCOLOR(tab.active, 0);
       if (config.tab.activeTabSunken)
          rect.adjust(f2, -f2, -f2, 0);
-      else
-         rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
+      else {
+         if (vertical)
+            rect.adjust(-dpi.f1, f2, dpi.f1, -f2);
+         else
+            rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
+      }
    }
    else {
 //       c = CCOLOR(tab.std, Bg);

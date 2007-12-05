@@ -176,8 +176,8 @@ BespinStyle::readSettings(const QSettings* settings)
    readRole(menu.bar, MENU_BARROLE);
    config.menu.barSunken = readBool(MENU_BARSUNKEN);
    config.menu.boldText = readBool(MENU_BOLDTEXT);
-   config.menu.activeItemSunken =
-      readBool(MENU_ACTIVEITEMSUNKEN);
+   config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);
+   config.menu.activeItemSunken = config.menu.itemSunken || readBool(MENU_ACTIVEITEMSUNKEN);
    
    // Progress ===========================
    GRAD(progress) = readGrad(PROGRESS_GRADIENT);
@@ -246,10 +246,10 @@ void BespinStyle::initMetrics()
    dpi.f20 = SCALE(20); dpi.f32 = SCALE(32);
    dpi.f80 = SCALE(80);
    
-   dpi.ScrollBarExtent = SCALE(config.btn.fullHover ? 15 : 17);
+   dpi.ScrollBarExtent = SCALE(config.scroll.sunken ? 15 : 17);
    dpi.ScrollBarSliderMin = SCALE(40);
-   dpi.SliderThickness = SCALE(24);
-   dpi.SliderControl = SCALE(13);
+   dpi.SliderThickness = SCALE(20);
+   dpi.SliderControl = SCALE(20);
    dpi.Indicator = SCALE(20 - 2*config.btn.layer);
    dpi.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
 }

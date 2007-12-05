@@ -39,6 +39,7 @@
 #define MENU_BARROLE "Menu.BarRole", QPalette::Window
 #define MENU_BARSUNKEN "Menu.BarSunken", false
 #define MENU_BOLDTEXT "Menu.BoldText", false
+#define MENU_ITEM_SUNKEN "Menu.ItemSunken", false
 #define MENU_ACTIVEITEMSUNKEN "Menu.ActiveItemSunken", false
 
 #define PROGRESS_GRADIENT "Progress.Gradient", Gradients::Button

@@ -299,8 +299,8 @@ void BespinStyle::generatePixmaps()
    // SLIDER =====================================
    // shadow
    for (int i = 0; i < 2; ++i) { // opaque?
-         shadows.sliderRound[i][false] = shadow(dpi.SliderControl, i,false);
-         shadows.sliderRound[i][true] = shadow(dpi.SliderControl-f2, i,true);
+         shadows.slider[i][false] = shadow(dpi.SliderControl, i,false);
+         shadows.slider[i][true] = shadow(dpi.SliderControl-f2, i,true);
    }
    masks.slider = roundMask(dpi.SliderControl-f4);
    // ================================================================

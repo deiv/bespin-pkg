@@ -52,9 +52,11 @@ static int usage(const char* appname) {
 %s presets\t\t\t\tList the available Presets\n\
 %s demo [style]\t\t\tLaunch a demo, you can pass other stylenames\n\
 %s try <some_config.bespin>\tTry out an exported setting\n\
+%s sshot [preset] [-w<width>] <some_file.png>\tSave a screenshot\n\
+%s load <some_preset>\tLoad a preset to current settings\n\
 %s import <some_config.bespin>\tImport an exported setting\n\
 %s export <some_preset> <some_config.bespin>\tImport an exported setting\n\
-%s %s", appname, appname, appname, appname, appname, appname,
+%s %s", appname, appname, appname, appname, appname, appname, appname, appname,
 #if PUSHER
 appname, "pusher [stop]\t\t\tThe Bg Pixmap daemon - you should not have to call this\n"
 #else
@@ -64,7 +66,10 @@ appname, "pusher [stop]\t\t\tThe Bg Pixmap daemon - you should not have to call 
    return 1;
 }
 
-enum Mode {Invalid = 0,  Configure, Presets, Import, Export, Demo, Try, Pusher };
+enum Mode {
+   Invalid = 0, Configure, Presets,
+      Import, Export, Load,
+      Demo, Try, Screenshot, Pusher };
 
 int main(int argc, char *argv[])
 {
@@ -79,6 +84,8 @@ int main(int argc, char *argv[])
       else if (!qstrcmp( argv[1], "export" )) mode = Export;
       else if (!qstrcmp( argv[1], "demo" )) mode = Demo;
       else if (!qstrcmp( argv[1], "try" )) mode = Try;
+      else if (!qstrcmp( argv[1], "sshot" )) mode = Screenshot;
+      else if (!qstrcmp( argv[1], "load" )) mode = Load;
 #if PUSHER
       else if (!qstrcmp( argv[1], "pusher" )) mode = Pusher;
 #endif
@@ -101,6 +108,11 @@ int main(int argc, char *argv[])
       foreach (QString name, store.childGroups())
          printf("%s\n", CHAR(name));
       return 0;
+   }
+   case Load: {
+      if (argc < 3)
+         return error("you lack <some_preset>");
+      return Config::load(argv[2]);
    }
    case Import: {
       if (argc < 3)
@@ -178,6 +190,19 @@ int main(int argc, char *argv[])
       window->setWindowTitle ( title );
       window->show();
       return app->exec();
+   }
+   case Screenshot: {
+      app = new QApplication(argc, argv);
+      Dialog *window = new Dialog;
+      setenv("BESPIN_PRESET", argv[2], 1);
+      Ui::Demo ui;
+      ui.setupUi(window);
+      ui.tabWidget->setCurrentIndex(0);
+      QImage image(window->size(), QImage::Format_RGB32);
+      window->render ( &image );
+      image.save ( argv[3], "png" );
+      return true;
+//       return app->exec();
    }
 #if PUSHER
    case Pusher: {

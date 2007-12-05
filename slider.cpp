@@ -29,16 +29,7 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
 
    B_STATES;
 
-   QRect groove = QCommonStyle::subControlRect(CC_Slider, slider, SC_SliderGroove, widget);
-   QRect handle = QCommonStyle::subControlRect(CC_Slider, slider, SC_SliderHandle, widget);
-
-   isEnabled = isEnabled && (slider->maximum > slider->minimum);
-   hover = isEnabled && hover && (slider->activeSubControls & SC_SliderHandle);
-   sunken = sunken && (slider->activeSubControls & SC_SliderHandle);
-       
-   const int ground = 0;
-
-   if (slider->subControls & SC_SliderTickmarks) {
+   if (isEnabled && slider->subControls & SC_SliderTickmarks) {
       int ticks = slider->tickPosition;
       if (ticks != QSlider::NoTicks) {
       
@@ -46,8 +37,6 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
          int interval = slider->tickInterval;
          if (interval < 1) interval = slider->pageStep;
          if (interval) {
-            int tickOffset = (ticks == QSlider::TicksBothSides) ? 0 :
-               pixelMetric(PM_SliderTickmarkOffset, slider, widget);
             const int thickness =
                pixelMetric(PM_SliderControlThickness, slider, widget);
             const int len =
@@ -68,32 +57,46 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
                v = nextInterval; \
             } // skip semicolon
 
-            painter->setPen(Colors::mid(BGCOLOR, FGCOLOR, 4,1));
+            painter->setPen(Colors::mid(BGCOLOR, FGCOLOR, 3,1));
             if (slider->orientation == Qt::Horizontal) {
+               const int y = RECT.height()/2;
                if (ticks == QSlider::TicksAbove) {
-                  DRAW_TICKS(pos, 0, pos, tickOffset); }
+                  DRAW_TICKS(pos, 0, pos, y); }
                else if (ticks == QSlider::TicksBelow) {
-                  DRAW_TICKS(pos, tickOffset + thickness, pos, RECT.height()); }
+                  DRAW_TICKS(pos, y, pos, RECT.height()); }
                else {
-                  tickOffset = RECT.height()/4;
-                  DRAW_TICKS(pos, tickOffset-1, pos, RECT.height()-tickOffset); }
+                  DRAW_TICKS(pos, RECT.y(), pos, RECT.height()); }
             }
             else {
+               const int x = RECT.width()/2;
                if (ticks == QSlider::TicksAbove) {
-                  DRAW_TICKS(0, pos, tickOffset, pos); }
+                  DRAW_TICKS(0, pos, x, pos); }
                else if (ticks == QSlider::TicksBelow) {
-                  DRAW_TICKS(tickOffset + thickness, pos, RECT.width(), pos); }
+                  DRAW_TICKS(x, pos, RECT.width(), pos); }
                else {
-                  tickOffset = RECT.width()/4;
-                  DRAW_TICKS(tickOffset-1, pos, RECT.width()-tickOffset, pos); }
+                  DRAW_TICKS(0, pos, RECT.width(), pos); }
             }
             painter->restore();
          }
       }
    }
 
+   QRect groove = subControlRect(CC_Slider, slider, SC_SliderGroove, widget);
+   QRect handle = subControlRect(CC_Slider, slider, SC_SliderHandle, widget);
+
+   isEnabled = isEnabled && (slider->maximum > slider->minimum);
+   hover = isEnabled && hover && (slider->activeSubControls & SC_SliderHandle);
+   sunken = sunken && (slider->activeSubControls & SC_SliderHandle);
+   const int ground = 0;
+
    // groove
    if ((slider->subControls & SC_SliderGroove) && groove.isValid()) {
+
+      masks.rect[true].render(groove, painter, Gradients::Sunken,
+                              option->state & QStyle::State_Horizontal ?
+                              Qt::Vertical : Qt::Horizontal,
+                              Colors::mid(FCOLOR(Window), Qt::black, 6,1));
+#if 0
       painter->save();
 
       QRect r;
@@ -184,11 +187,12 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
             handle.translate(dpi.f6, 0);
       }
       painter->restore();
+#endif
    }
-       
-   int direction = 0;
-   if (slider->orientation == Qt::Vertical)
-      ++direction;
+
+//    int direction = 0;
+//    if (slider->orientation == Qt::Vertical)
+//       ++direction;
 
    // handle
    if (slider->subControls & SC_SliderHandle) {
@@ -208,12 +212,14 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
 
       // shadow
       QPoint xy = handle.topLeft();
-      shadows.raised[false][isEnabled][sunken].render(sunken ?
-         handle.adjusted(dpi.f1,dpi.f1,-dpi.f1,-dpi.f1) : handle, painter);
+      if (sunken) xy += QPoint(dpi.f1, 0);
+      painter->drawPixmap(xy, shadows.slider[isEnabled][sunken]);
       if (hasFocus && !sunken)
-         lights.rect[false].render(handle, painter, FCOLOR(Highlight));
+         fillWithMask(painter, xy, FCOLOR(Highlight), shadows.slider[true][false]);
 
       // gradient
+      xy += QPoint(sunken ? dpi.f1 : dpi.f2, dpi.f1);
+      
       QColor bc = CONF_COLOR(btn.std, Bg);
       QColor fc;
       if (config.btn.fullHover) {
@@ -224,10 +230,13 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
          fc = Colors::mid(CONF_COLOR(btn.std, Bg),
                           CONF_COLOR(btn.std, Fg), 9-step, step+3);
 
-      handle.adjust(dpi.f1, dpi.f1, -dpi.f1, -dpi.f2);
-      masks.rect[false].render(handle, painter, isEnabled ? GRAD(scroll) :
-                               Gradients::None, Qt::Vertical, bc);
-
+      const QPixmap &fill =
+         Gradients::pix(bc, masks.slider.height(), Qt::Vertical,
+                        isEnabled ? GRAD(scroll) : Gradients::None);
+      fillWithMask(painter, xy, fill, masks.slider);
+      xy += QPoint(dpi.f5, dpi.f5);
+      fillWithMask(painter, xy, fc, masks.notch);
+#if 0
       SAVE_PEN;
       painter->setPen(fc);
       int x1, x2, y1, y2;
@@ -241,6 +250,7 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       }
       painter->drawLine(x1, y1, x2, y2);
       RESTORE_PEN;
+#endif
    }
 }
 

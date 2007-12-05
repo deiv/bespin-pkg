@@ -453,7 +453,8 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
          }
       }
       if (isEnabled) {
-         painter->setPen(QPen(Colors::mid(bc, Qt::white),f1));
+         painter->setPen(QPen(Colors::mid(config.btn.fullHover ? c : bc,
+                                          Qt::white),f1));
          painter->setBrush(Qt::NoBrush);
          painter->setRenderHint(QPainter::Antialiasing);
          QRect r(xy, QSize(sz, sz));

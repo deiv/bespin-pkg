@@ -39,7 +39,7 @@ typedef struct Config {
    struct menu {
       QPalette::ColorRole std_role[2], active_role[2], bar_role[2];
       Gradients::Type itemGradient;
-      bool showIcons, shadow, barSunken, boldText, activeItemSunken, glassy;
+      bool showIcons, shadow, barSunken, boldText, itemSunken, activeItemSunken, glassy;
       int opacity;
    } menu;
    

@@ -464,6 +464,30 @@ void Config::updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStr
          pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
 }
 
+bool Config::load(const QString &preset) {
+   QSettings store("Bespin", "Store");
+   if (!store.childGroups().contains(preset))
+      return false;
+   store.beginGroup(preset);
+
+   QSettings system("Bespin", "Style");
+   system.beginGroup("Style");
+   foreach (QString key, store.allKeys())
+      if (key != "QPalette")
+         system.setValue(key, store.value(key));
+   system.endGroup();
+
+   store.beginGroup("QPalette");
+   QSettings qt("Trolltech");
+   qt.beginGroup("Qt"); qt.beginGroup("Palette");
+   qt.setValue ( "active", store.value("active") );
+   qt.setValue ( "inactive", store.value("inactive") );
+   qt.setValue ( "disabled", store.value("disabled") );
+   qt.endGroup(); qt.endGroup();
+   store.endGroup();
+   
+   store.endGroup();
+}
 
 QString Config::sImport(const QString &filename) {
    

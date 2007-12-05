@@ -265,31 +265,13 @@ BespinStyle::drawScrollBarGroove(const QStyleOption * option,
                                  QPainter * painter,
                                  const QWidget *) const
 {
-   if (isComboDropDownSlider) return;
-
-   if (config.scroll.groove) {
-      masks.rect[round_].render(RECT, painter, Gradients::Sunken,
-                                option->state & QStyle::State_Horizontal ?
-                                Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
+   if (isComboDropDownSlider)
       return;
-   }
-
-   // the groove TODO: might be Colors::mid(bg, fg) is better?!
-   SAVE_PEN;
-   painter->setPen(FCOLOR(Window).dark(115));
-   if (option->state & QStyle::State_Horizontal) {
-      int y = RECT.center().y()-dpi.f1;
-      painter->drawLine(RECT.x(), y, RECT.right(), y);
-      ++y; painter->setPen(FCOLOR(Window).light(108));
-      painter->drawLine(RECT.x(), y, RECT.right(), y);
-   }
-   else {
-      int x = RECT.center().x();
-      painter->drawLine(x, RECT.y(), x, RECT.bottom());
-      ++x; painter->setPen(FCOLOR(Window).light(108));
-      painter->drawLine(x, RECT.y(), x, RECT.bottom());
-   }
-   RESTORE_PEN;
+   
+   masks.rect[true].render(RECT, painter, Gradients::Sunken,
+                             option->state & QStyle::State_Horizontal ?
+                             Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
+   return;
 }
 
 void
@@ -380,7 +362,9 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    if (Gradients::isReflective(GRAD(scroll)))
       masks.rect[round_].outline(r, painter, Colors::mid(bc,Qt::white,2,1));
 
-   if (config.btn.fullHover) return;
+   if (config.btn.fullHover ||
+       !(hover || complexStep || widgetStep))
+      return;
 
    int dw, dh;
    if (horizontal) {

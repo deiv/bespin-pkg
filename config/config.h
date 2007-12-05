@@ -31,6 +31,7 @@ public:
    static QString sImport(const QString &file);
    static bool sExport(const QString &preset, const QString &file);
    static QStringList colors(const QPalette &pal, QPalette::ColorGroup group);
+   static bool load(const QString&);
    static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list);
 public slots:
    /** We'll reimplement the im/export functions to handle color settings as well*/

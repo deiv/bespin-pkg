@@ -291,7 +291,7 @@ void Set::render(const QRect &r, QPainter *p) const
          tlw = tlw*r.width()/(tlw+trw);
          trw = r.width() - tlw;
       }
-      
+
       rOff = r.right()-trw+1;
       yOff += tlh;
       h -= tlh;
@@ -304,7 +304,7 @@ void Set::render(const QRect &r, QPainter *p) const
 
       if (pf & Right) {
          tile = &pixmap[TopRight];
-         MAKE_FILL(QPoint(rOff, r.y()));
+         MAKE_FILL(r.topRight()-tile->rect().topRight());
          p->drawPixmap(rOff, r.y(), *tile, width(TopRight)-trw, 0, trw, trh);
       }
       
@@ -324,19 +324,19 @@ void Set::render(const QRect &r, QPainter *p) const
          brw = r.width() - blw;
       }
       
-      rOff = r.right()-brw+1;
       int bOff = r.bottom()-blh+1;
+      rOff = r.right()-brw+1;
       h -= blh;
 
       if (pf & Left) {
          tile = &pixmap[BtmLeft];
-         MAKE_FILL(QPoint(r.x(), bOff));
+         MAKE_FILL(r.bottomLeft()-tile->rect().bottomLeft());
          p->drawPixmap(r.x(), bOff, *tile, 0, height(BtmLeft)-blh, blw, blh);
       }
 
       if (pf & Right) {
          tile = &pixmap[BtmRight];
-         MAKE_FILL(QPoint(rOff, bOff));
+         MAKE_FILL(r.bottomRight()-tile->rect().bottomRight());
          p->drawPixmap(rOff, bOff, *tile, width(BtmRight)-brw,
                        height(BtmRight)-brh, brw, brh);
       }

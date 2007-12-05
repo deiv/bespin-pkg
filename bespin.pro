@@ -1,5 +1,5 @@
 HEADERS = colors.h bespin.h tileset.h debug.h eventkiller.h \
-          visualframe.h gradients.h styleanimator.h draw.h
+          visualframe.h gradients.h styleanimator.h draw.h config.h types.h
 SOURCES = colors.cpp bespin.cpp tileset.cpp stylehint.cpp \
           sizefromcontents.cpp qsubcmetrics.cpp \
           pixelmetric.cpp stdpix.cpp styleanimator.cpp \

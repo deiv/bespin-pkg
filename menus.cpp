@@ -35,7 +35,7 @@ BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
       Tile::reset();
    }
 }
-
+#include <QtDebug>
 void
 BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
                              const QWidget * widget) const
@@ -73,8 +73,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       QColor c = (config.menu.bar_role[Bg] == QPalette::Window) ?
          FCOLOR(Window) :
          Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,2);
-      c = Colors::mid(c, COLOR(ROLE[Bg]), 9-step,step);
-
+      c = Colors::mid(c, COLOR(ROLE[Bg]), 1,2);
       int dy = 0;
       if (!sunken) {
          step = 6-step;
@@ -85,12 +84,14 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       }
       const Gradients::Type gt =
          sunken ? Gradients::Sunken : config.menu.itemGradient;
-      masks.rect[round_].render(r, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,dy));
+      masks.rect[round_].render(r, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,-dy));
       if (config.menu.activeItemSunken && sunken) {
          r.setBottom(r.bottom()+dpi.f2);
          shadows.sunken[round_][true].render(r, painter);
          r.adjust(0,dpi.f1,0,-dpi.f1); // -> text repositioning
       }
+      else if (step == 6 && config.menu.itemSunken)
+         shadows.sunken[round_][false].render(r, painter);
    }
    QPixmap pix =
       mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ?
@@ -181,6 +182,8 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
       }
       masks.rect[round_].render(r, painter, sunken ? Gradients::Sunken :
                                 config.menu.itemGradient, Qt::Vertical, bg);
+      if (config.menu.itemSunken)
+         shadows.sunken[round_][false].render(r, painter);
 //             masks.tab.outline(r, painter, QColor(0,0,0,45));
    }
        

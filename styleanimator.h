@@ -93,7 +93,12 @@ class StyleAnimator : public QObject {
    Q_OBJECT
 public:
    StyleAnimator(QObject *parent, TabAnimInfo::TabTransition tabTransition =
-                 TabAnimInfo::CrossFade, uint tabAnimSteps = 6);
+#ifndef QT_NO_XRENDER
+         TabAnimInfo::CrossFade,
+#else
+         TabAnimInfo::ScanlineBlend,
+#endif
+         uint tabAnimSteps = 6);
    ~StyleAnimator();
    
    void registrate(QWidget *w);

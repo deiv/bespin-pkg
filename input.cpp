@@ -38,11 +38,16 @@ void
 BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
+
    // spinboxes and combos allready have a lineedit as global frame
+   // TODO: exclude Q3Combo??
    if (qstyleoption_cast<const QStyleOptionFrame *>(option) &&
        static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1) {
-          if (!widget || widget->autoFillBackground())
-             painter->fillRect(RECT, FCOLOR(Base));
+      if (widget && widget->parentWidget() &&
+          ( qobject_cast<QComboBox*>(widget->parentWidget()) ||
+            widget->parentWidget()->inherits("QAbstractSpinBox")))
+         return;
+      painter->fillRect(RECT, FCOLOR(Base));
       return;
    }
 

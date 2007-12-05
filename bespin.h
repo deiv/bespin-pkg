@@ -289,13 +289,13 @@ private:
    struct {
       Tile::Set
          fallback, group,
-         sunken[2][2], // round/enabled/sunken
+         sunken[2][2], // round/enabled
          raised[2][2][2],  // round/enabled/sunken
          relief[2][2]; // round/enabled
       QPixmap radio[2][2];
       Tile::Line line[2][3];
 //       QPixmap slider[4][2][2]; // for triangles, currently not...
-      QPixmap sliderRound[2][2];
+      QPixmap slider[2][2];
    } shadows;
    
    struct {

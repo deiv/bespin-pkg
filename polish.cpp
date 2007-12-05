@@ -191,41 +191,32 @@ void BespinStyle::polish( QPalette &pal )
       pal.setBrush( QPalette::Background, brush );
    }
    // AlternateBase
-   pal.setColor(QPalette::Active, QPalette::AlternateBase,
+   pal.setColor(QPalette::AlternateBase,
                 Colors::mid(pal.color(QPalette::Active, QPalette::Base),
                             pal.color(QPalette::Active, QPalette::Text),15,1));
    
-   // disabled palette highlight
-   int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
-   pal.setColor(QPalette::Disabled, QPalette::Highlight,
-                QColor(highlightGray,highlightGray,highlightGray));
+   // highlight colors
+   const int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
+   const QColor grey(highlightGray,highlightGray,highlightGray);
+   pal.setColor(QPalette::Disabled, QPalette::Highlight, grey);
+   if (false)
+      pal.setColor(QPalette::Inactive, QPalette::Highlight,
+                   Colors::mid(pal.color(QPalette::Active, QPalette::Highlight),
+                               grey,2,1));
 
-   if (false /*config.alterInactivePalette*/) {
-   //inactive palette
-   pal.setColor(QPalette::Inactive, QPalette::WindowText,
+   // fade disabled palette
+   pal.setColor(QPalette::Disabled, QPalette::WindowText,
                 Colors::mid(pal.color(QPalette::Active, QPalette::Window),
                             pal.color(QPalette::Active, QPalette::WindowText),2,1));
-   pal.setColor(QPalette::Inactive, QPalette::Base,
+   pal.setColor(QPalette::Disabled, QPalette::Base,
                 Colors::mid(pal.color(QPalette::Active, QPalette::Window),
                             pal.color(QPalette::Active, QPalette::Base),1,2));
-   pal.setColor(QPalette::Inactive, QPalette::Text,
+   pal.setColor(QPalette::Disabled, QPalette::Text,
                 Colors::mid(pal.color(QPalette::Active, QPalette::Base),
                             pal.color(QPalette::Active, QPalette::Text)));
-   }
-   else {
-      pal.setColor(QPalette::Inactive, QPalette::WindowText,
-                   pal.color(QPalette::Active, QPalette::WindowText));
-      pal.setColor(QPalette::Inactive, QPalette::Base,
-                   pal.color(QPalette::Active, QPalette::Base));
-      pal.setColor(QPalette::Inactive, QPalette::Text,
-                   pal.color(QPalette::Active, QPalette::Text));
-   }
-   pal.setColor(QPalette::Inactive, QPalette::AlternateBase,
-                Colors::mid(pal.color(QPalette::Inactive, QPalette::Base),
-                            pal.color(QPalette::Inactive, QPalette::Text),15,1));
-   pal.setColor(QPalette::Inactive, QPalette::Highlight,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Highlight),
-                            pal.color(QPalette::Disabled, QPalette::Highlight),2,1));
+   pal.setColor(QPalette::Disabled, QPalette::AlternateBase,
+                Colors::mid(pal.color(QPalette::Disabled, QPalette::Base),
+                            pal.color(QPalette::Disabled, QPalette::Text),15,1));
 }
 
 
