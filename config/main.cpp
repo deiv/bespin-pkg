@@ -22,6 +22,7 @@
 #include <QDir>
 #include <QFile>
 #include <QSettings>
+#include <QTimer>
 
 #if PUSHER
 #include <QX11Info>
@@ -52,7 +53,7 @@ static int usage(const char* appname) {
 %s presets\t\t\t\tList the available Presets\n\
 %s demo [style]\t\t\tLaunch a demo, you can pass other stylenames\n\
 %s try <some_config.bespin>\tTry out an exported setting\n\
-%s sshot [preset] [-w<width>] <some_file.png>\tSave a screenshot\n\
+%s sshot <some_file.png> [preset] [width]\tSave a screenshot\n\
 %s load <some_preset>\tLoad a preset to current settings\n\
 %s import <some_config.bespin>\tImport an exported setting\n\
 %s export <some_preset> <some_config.bespin>\tImport an exported setting\n\
@@ -192,17 +193,26 @@ int main(int argc, char *argv[])
       return app->exec();
    }
    case Screenshot: {
+      if (argc < 3)
+         return error("you lack <some_output.png>");
+      if (argc > 3)
+         setenv("BESPIN_PRESET", argv[3], 1);
       app = new QApplication(argc, argv);
       Dialog *window = new Dialog;
-      setenv("BESPIN_PRESET", argv[2], 1);
       Ui::Demo ui;
       ui.setupUi(window);
       ui.tabWidget->setCurrentIndex(0);
+      ui.buttonBox->button(QDialogButtonBox::Ok)->setAttribute( Qt::WA_UnderMouse );
+      ui.demoBrowser->setAttribute( Qt::WA_UnderMouse );
+//       ui.demoLineEdit->setFocus(Qt::MouseFocusReason);
+      
       QImage image(window->size(), QImage::Format_RGB32);
-      window->render ( &image );
-      image.save ( argv[3], "png" );
-      return true;
-//       return app->exec();
+      window->showMinimized();
+      window->QDialog::render(&image);
+      if (argc > 4)
+         image = image.scaledToWidth(atoi(argv[4]), Qt::SmoothTransformation);
+      image.save ( argv[2], "png" );
+      return 0;
    }
 #if PUSHER
    case Pusher: {

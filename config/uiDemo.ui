@@ -19,7 +19,7 @@
    <item row="0" column="0" colspan="4" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="demo" >
       <attribute name="title" >
@@ -73,7 +73,7 @@
         </widget>
        </item>
        <item row="1" column="0" >
-        <widget class="QLineEdit" name="lineEdit_2" >
+        <widget class="QLineEdit" name="demoLineEdit" >
          <property name="sizePolicy" >
           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
            <horstretch>0</horstretch>
@@ -90,7 +90,7 @@
         </widget>
        </item>
        <item rowspan="3" row="2" column="0" >
-        <widget class="QTextBrowser" name="textBrowser_2" >
+        <widget class="QTextBrowser" name="demoBrowser" >
          <property name="sizePolicy" >
           <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
            <horstretch>0</horstretch>
@@ -100,7 +100,7 @@
          <property name="html" >
           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans Condensed'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
 &lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Luxi Sans';">Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p>
 &lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Luxi Sans';">--&lt;/p>
 &lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Luxi Sans';">Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.&lt;/p>
@@ -162,12 +162,18 @@ p, li { white-space: pre-wrap; }
             <property name="text" >
              <string>RadioButton</string>
             </property>
+            <property name="checked" >
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="1" column="0" >
            <widget class="QCheckBox" name="checkBox_5" >
             <property name="text" >
              <string>CheckBox</string>
+            </property>
+            <property name="checked" >
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -471,9 +477,9 @@ p, li { white-space: pre-wrap; }
          <property name="html" >
           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans Condensed'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">This is a textedit&lt;/span>&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">try typing something...&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed';">&lt;span style=" font-weight:600;">This is a textedit&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed';">try typing something...&lt;/p>&lt;/body>&lt;/html></string>
          </property>
         </widget>
        </item>
@@ -482,22 +488,22 @@ p, li { white-space: pre-wrap; }
          <property name="html" >
           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans Condensed'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; text-decoration: underline;">This is a TextBrowser&lt;/span>&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-style:italic;">You cannot type anthing here&lt;/span>&lt;/p>
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">So:&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:x-large; font-weight:600; color:#000000;">Detailed Description&lt;/span>&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;">The QTextBrowser class provides a rich text browser with hypertext navigation.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;">This class extends &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a> (in read-only mode), adding some navigation functionality so that users can follow links in hypertext documents.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;">If you want to provide your users with an editable rich text editor, use &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a>. If you want a text browser without hypertext navigation use &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a>, and use &lt;a href="qtextedit.html#readOnly-prop">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit::setReadOnly&lt;/span>&lt;/a>() to disable editing. If you just need to display a small piece of rich text use &lt;a href="qlabel.html">&lt;span style=" text-decoration: underline; color:#004faf;">QLabel&lt;/span>&lt;/a>.&lt;a name="document-source-and-contents">&lt;/a> &lt;/p>
-&lt;p style=" margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:large; font-weight:600; color:#000000;">&lt;span style=" font-size:large;">Document Source and Contents&lt;/span>&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;">The contents of &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a> are set with &lt;a href="qtextedit.html#html-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setHtml&lt;/span>&lt;/a>() or &lt;a href="qtextedit.html#plainText-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setPlainText&lt;/span>&lt;/a>(), but QTextBrowser also implements the &lt;a href="qtextbrowser.html#source-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setSource&lt;/span>&lt;/a>() function, making it possible to use a named document as the source text. The name is looked up in a list of search paths and in the directory of the current document factory.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;">If a document name ends with an anchor (for example, "&lt;span style=" font-family:'Courier New,courier';">#anchor"&lt;/span>), the text browser automatically scrolls to that position (using &lt;a href="qtextedit.html#scrollToAnchor">&lt;span style=" text-decoration: underline; color:#004faf;">scrollToAnchor&lt;/span>&lt;/a>()). When the user clicks on a hyperlink, the browser will call &lt;a href="qtextbrowser.html#source-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setSource&lt;/span>&lt;/a>() itself with the link's &lt;span style=" font-family:'Courier New,courier';">href&lt;/span> value as argument. You can track the current source by connecting to the &lt;a href="qtextbrowser.html#sourceChanged">&lt;span style=" text-decoration: underline; color:#004faf;">sourceChanged&lt;/span>&lt;/a>() signal.&lt;a name="navigation">&lt;/a> &lt;/p>
-&lt;p style=" margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:large; font-weight:600; color:#000000;">&lt;span style=" font-size:large;">Navigation&lt;/span>&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;">QTextBrowser provides &lt;a href="qtextbrowser.html#backward">&lt;span style=" text-decoration: underline; color:#004faf;">backward&lt;/span>&lt;/a>() and &lt;a href="qtextbrowser.html#forward">&lt;span style=" text-decoration: underline; color:#004faf;">forward&lt;/span>&lt;/a>() slots which you can use to implement Back and Forward buttons. The &lt;a href="qtextbrowser.html#home">&lt;span style=" text-decoration: underline; color:#004faf;">home&lt;/span>&lt;/a>() slot sets the text to the very first document displayed. The &lt;a href="qtextbrowser.html#anchorClicked">&lt;span style=" text-decoration: underline; color:#004faf;">anchorClicked&lt;/span>&lt;/a>() signal is emitted when the user clicks an anchor. To override the default navigation behavior of the browser, call the &lt;a href="qtextbrowser.html#source-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setSource&lt;/span>&lt;/a>() function to supply new document text in a slot connected to this signal.&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;">If you want to load documents stored in the Qt resource system use &lt;span style=" font-family:'Courier New,courier';">qrc&lt;/span> as the scheme in the URL to load. For example, for the document resource path &lt;span style=" font-family:'Courier New,courier';">:/docs/index.html&lt;/span> use &lt;span style=" font-family:'Courier New,courier';">qrc:/docs/index.html&lt;/span> as the URL with &lt;a href="qtextbrowser.html#source-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setSource&lt;/span>&lt;/a>().&lt;/p>
-&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;">See also &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a> and &lt;a href="qtextdocument.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextDocument&lt;/span>&lt;/a>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed';">&lt;span style=" font-weight:600; text-decoration: underline;">This is a TextBrowser&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed';">&lt;span style=" font-style:italic;">You cannot type anthing here&lt;/span>&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed';">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed';">So:&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed';">&lt;span style=" font-size:x-large; font-weight:600; color:#000000;">Detailed Description&lt;/span>&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; color:#000000;">The QTextBrowser class provides a rich text browser with hypertext navigation.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; color:#000000;">This class extends &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a> (in read-only mode), adding some navigation functionality so that users can follow links in hypertext documents.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; color:#000000;">If you want to provide your users with an editable rich text editor, use &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a>. If you want a text browser without hypertext navigation use &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a>, and use &lt;a href="qtextedit.html#readOnly-prop">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit::setReadOnly&lt;/span>&lt;/a>() to disable editing. If you just need to display a small piece of rich text use &lt;a href="qlabel.html">&lt;span style=" text-decoration: underline; color:#004faf;">QLabel&lt;/span>&lt;/a>.&lt;a name="document-source-and-contents">&lt;/a> &lt;/p>
+&lt;p style=" margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; font-size:large; font-weight:600; color:#000000;">&lt;span style=" font-size:large;">Document Source and Contents&lt;/span>&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; color:#000000;">The contents of &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a> are set with &lt;a href="qtextedit.html#html-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setHtml&lt;/span>&lt;/a>() or &lt;a href="qtextedit.html#plainText-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setPlainText&lt;/span>&lt;/a>(), but QTextBrowser also implements the &lt;a href="qtextbrowser.html#source-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setSource&lt;/span>&lt;/a>() function, making it possible to use a named document as the source text. The name is looked up in a list of search paths and in the directory of the current document factory.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; color:#000000;">If a document name ends with an anchor (for example, "&lt;span style=" font-family:'Courier New,courier';">#anchor"&lt;/span>), the text browser automatically scrolls to that position (using &lt;a href="qtextedit.html#scrollToAnchor">&lt;span style=" text-decoration: underline; color:#004faf;">scrollToAnchor&lt;/span>&lt;/a>()). When the user clicks on a hyperlink, the browser will call &lt;a href="qtextbrowser.html#source-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setSource&lt;/span>&lt;/a>() itself with the link's &lt;span style=" font-family:'Courier New,courier';">href&lt;/span> value as argument. You can track the current source by connecting to the &lt;a href="qtextbrowser.html#sourceChanged">&lt;span style=" text-decoration: underline; color:#004faf;">sourceChanged&lt;/span>&lt;/a>() signal.&lt;a name="navigation">&lt;/a> &lt;/p>
+&lt;p style=" margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; font-size:large; font-weight:600; color:#000000;">&lt;span style=" font-size:large;">Navigation&lt;/span>&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; color:#000000;">QTextBrowser provides &lt;a href="qtextbrowser.html#backward">&lt;span style=" text-decoration: underline; color:#004faf;">backward&lt;/span>&lt;/a>() and &lt;a href="qtextbrowser.html#forward">&lt;span style=" text-decoration: underline; color:#004faf;">forward&lt;/span>&lt;/a>() slots which you can use to implement Back and Forward buttons. The &lt;a href="qtextbrowser.html#home">&lt;span style=" text-decoration: underline; color:#004faf;">home&lt;/span>&lt;/a>() slot sets the text to the very first document displayed. The &lt;a href="qtextbrowser.html#anchorClicked">&lt;span style=" text-decoration: underline; color:#004faf;">anchorClicked&lt;/span>&lt;/a>() signal is emitted when the user clicks an anchor. To override the default navigation behavior of the browser, call the &lt;a href="qtextbrowser.html#source-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setSource&lt;/span>&lt;/a>() function to supply new document text in a slot connected to this signal.&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; color:#000000;">If you want to load documents stored in the Qt resource system use &lt;span style=" font-family:'Courier New,courier';">qrc&lt;/span> as the scheme in the URL to load. For example, for the document resource path &lt;span style=" font-family:'Courier New,courier';">:/docs/index.html&lt;/span> use &lt;span style=" font-family:'Courier New,courier';">qrc:/docs/index.html&lt;/span> as the URL with &lt;a href="qtextbrowser.html#source-prop">&lt;span style=" text-decoration: underline; color:#004faf;">setSource&lt;/span>&lt;/a>().&lt;/p>
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed'; color:#000000;">See also &lt;a href="qtextedit.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextEdit&lt;/span>&lt;/a> and &lt;a href="qtextdocument.html">&lt;span style=" text-decoration: underline; color:#004faf;">QTextDocument&lt;/span>&lt;/a>&lt;/p>&lt;/body>&lt;/html></string>
          </property>
         </widget>
        </item>
