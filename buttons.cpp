@@ -206,8 +206,9 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
                             Qt::Vertical, c);
 
    // outline
-   masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter,
-                             Colors::mid(c, Qt::white), f1);
+   if (Gradients::isReflective(GRAD(btn)) || qGray(c.rgb()) > 128)
+      masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter,
+                                Colors::mid(c, Qt::white), f1);
 
    if (isEnabled) {
       
@@ -452,7 +453,7 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
                          masks.radioIndicator, QPoint(0, dpi.f4));
          }
       }
-      if (isEnabled) {
+      if (isEnabled && (Gradients::isReflective(GRAD(btn)) || qGray(c.rgb()) > 128)) {
          painter->setPen(QPen(Colors::mid(config.btn.fullHover ? c : bc,
                                           Qt::white),f1));
          painter->setBrush(Qt::NoBrush);
