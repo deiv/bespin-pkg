@@ -465,7 +465,7 @@ static inline QPixmap *cornerMask(bool right = false) {
 //    else rg = QLinearGradient(128,0, 0,0);
 #ifndef QT_NO_XRENDER
    alpha->fill(Qt::transparent);
-   rg.setColorAt(0.4, Qt::transparent);
+   rg.setColorAt(0, Qt::transparent);
 #else
    rg.setColorAt(0, Qt::black);
 #endif

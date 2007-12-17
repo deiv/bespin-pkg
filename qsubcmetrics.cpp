@@ -75,17 +75,18 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
           qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
          int x,y,wi,he;
          cb->rect.getRect(&x,&y,&wi,&he);
-         int margin = 1;//(!cb->editable) ? dpi.f1 : (cb->frame ? dpi.f4 : 0);
+         int margin = cb->editable ? 1 : config.btn.fullHover ? dpi.f1 : dpi.f4;
 
          switch (subControl) {
          case SC_ComboBoxFrame:
             ret = cb->rect;
             break;
          case SC_ComboBoxArrow:
-            x += wi; wi = (int)((he - 2*margin)/1.1);//1.618
-            x -= margin + wi; // golden mean
-//             y += margin;
-            ret.setRect(x, y, wi, he/* - 2*margin*/);
+            he -= 2*margin;
+            x += wi; wi = (int)(he*1.1); //1.618
+            x -= margin + wi;
+            y += margin;
+            ret.setRect(x, y, wi, he);
             break;
          case SC_ComboBoxEditField:
             wi -= (int)((he - 2*margin)/1.1) + 3*margin;

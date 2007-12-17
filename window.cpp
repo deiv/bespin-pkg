@@ -227,9 +227,10 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
       if (Colors::value(c) < 245) { // no sense otherwise
          const int w = RECT.width()/4 - 128;
          if (w > 0) {
-            painter->drawTiledPixmap( RECT.x(), RECT.y(), w, 128,
+            s2 = 128-s1;
+            painter->drawTiledPixmap( RECT.x(), RECT.y(), w, s2,
                                       set.cornerTile, 0, s1 );
-            painter->drawTiledPixmap( RECT.right()+1-w, RECT.y(), w, 128,
+            painter->drawTiledPixmap( RECT.right()+1-w, RECT.y(), w, s2,
                                       set.cornerTile, 0, s1 );
          }
          painter->drawPixmap(RECT.x()+w, RECT.y(), set.lCorner, 0, s1, 128, s2);

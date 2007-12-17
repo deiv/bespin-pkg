@@ -6,6 +6,7 @@
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QPainter>
 #include <QProcess>
 #include <QValidator>
 
@@ -487,6 +488,7 @@ bool Config::load(const QString &preset) {
    store.endGroup();
    
    store.endGroup();
+   return true;
 }
 
 QString Config::sImport(const QString &filename) {
@@ -743,17 +745,46 @@ void Config::learnPwChar() {
    settings.setValue("UserPwChars", list);
 }
 
+static bool haveIcons = false;
+static QIcon icons[8];
+static const QPalette::ColorRole roles[] =
+{
+   QPalette::Window, QPalette::WindowText,
+   QPalette::Base, QPalette::Text,
+   QPalette::Button, QPalette::ButtonText,
+   QPalette::Highlight, QPalette::HighlightedText
+};
+static const char* roleStrings[] =
+{
+   "Window", "Window Text",
+   "Base (text editor)", "Text (text editor)",
+   "Button", "Button Text",
+   "Highlight", "Highlighted Text"
+};
+static void ensureIcons()
+{
+   if (haveIcons) return;
+   QPixmap pix(16,16);
+   pix.fill(Qt::white);
+   QPainter p(&pix);
+   p.fillRect(1,1,14,14, Qt::black);
+   p.end();
+   QPalette *pal = /*loadedPal ? loadedPal :*/ &qApp->palette();
+   for (int i = 0; i < 8; ++i) {
+      p.begin(&pix);
+      p.fillRect(2,2,12,12, pal->color(roles[i]));
+      p.end();
+      icons[i] = QIcon(pix);
+   }
+}
+
 /** The combobox filler you've read of several times before ;) */
 void Config::generateColorModes(QComboBox *box) {
+   ensureIcons();
    box->clear();
-   box->addItem("Window", QPalette::Window);
-   box->addItem("Window Text", QPalette::WindowText);
-   box->addItem("Base (text editor)", QPalette::Base);
-   box->addItem("Text (text editor)", QPalette::Text);
-   box->addItem("Button", QPalette::Button);
-   box->addItem("Button Text", QPalette::ButtonText);
-   box->addItem("Highlight", QPalette::Highlight);
-   box->addItem("Highlighted Text", QPalette::HighlightedText);
+   box->setIconSize ( QSize(16,16) );
+   for (int i = 0; i < 8; ++i)
+      box->addItem(icons[i], roleStrings[i], roles[i]);
 }
 
 void Config::generateGradientTypes(QComboBox *box) {

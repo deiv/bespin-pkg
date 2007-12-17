@@ -239,8 +239,8 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
    // the arrow
    if (!ar.isNull()) {
       if (!(ar.width()%2)) ar.setWidth(ar.width()-1);
-      const int dx = 7*ar.width()/24, dy = ar.height()/3;
-      QRect rect = ar.adjusted(dx, dy, -dx, -dy);
+      const int dy = ar.height()/4;
+      QRect rect = ar.adjusted(0, dy, 0, -dy);
 
       Navi::Direction dir;
       bool upDown = false;
@@ -277,7 +277,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
       else {
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
          c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-         ar.adjust(f2, f3, -f2, -f3);
+//          ar.adjust(f2, f3, -f2, -f3);
          masks.rect[round_].render(ar, painter, GRAD(chooser), Qt::Vertical, c,
                                  RECT.height()-f2, QPoint(0,dpi.f4));
          painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
@@ -307,12 +307,13 @@ BespinStyle::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
    painter->setClipRect(editRect);
    // icon
    if (!cb->currentIcon.isNull()) {
-      QIcon::Mode mode = isEnabled ? QIcon::Normal
-         : QIcon::Disabled;
+      QIcon::Mode mode = isEnabled ? QIcon::Normal : QIcon::Disabled;
       QPixmap pixmap = cb->currentIcon.pixmap(cb->iconSize, mode);
       QRect iconRect(editRect);
       iconRect.setWidth(cb->iconSize.width() + 4);
-      iconRect = alignedRect(QApplication::layoutDirection(), Qt::AlignLeft | Qt::AlignVCenter, iconRect.size(), editRect);
+      iconRect = alignedRect(QApplication::layoutDirection(),
+                             Qt::AlignLeft | Qt::AlignVCenter,
+                             iconRect.size(), editRect);
 //       if (cb->editable)
 //          painter->fillRect(iconRect, opt->palette.brush(QPalette::Base));
       drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
