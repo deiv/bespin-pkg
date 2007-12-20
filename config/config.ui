@@ -212,7 +212,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>8</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="Seite_3" >
       <layout class="QGridLayout" >
@@ -1857,5 +1857,70 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>bgIntensity</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_36</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>644</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>779</x>
+     <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>shadowIntensity</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_29</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>678</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>771</x>
+     <y>161</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>modalOpacity</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_32</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>617</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>803</x>
+     <y>72</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>menuOpacity</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_27</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>587</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>795</x>
+     <y>248</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

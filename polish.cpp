@@ -126,9 +126,9 @@ makeStructure(QPixmap **pixp, const QColor &c, bool light)
          p.drawLine( i, 0, i, 63 );
       break;
    case 5: // diagonals
-      i = 2*(config.bg.intensity - 100)/100;
+      i = config.bg.intensity - 100;
       pix->fill( c.light(100+i).rgb() );
-      p.setPen(QPen(c.dark(100 + i/(2*light)), 11));
+      p.setPen(QPen(c.dark(100 + i/(2*(light+1))), 11));
       p.setRenderHint(QPainter::Antialiasing);
       p.drawLine(-64,64,64,-64);
       p.drawLine(0,64,64,0);
