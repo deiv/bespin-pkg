@@ -27,12 +27,13 @@ using namespace Bespin;
 
 const QColor &Colors::bg(const QPalette &pal, const QWidget *w) {
    QPalette::ColorRole role;
-   if (w->parentWidget())
-      role = w->parentWidget()->backgroundRole();
-   else if (w)
-      role = w->backgroundRole();
-   else
+   if (!w)
       role = QPalette::Window;
+   else if (w->parentWidget())
+      role = w->parentWidget()->backgroundRole();
+   else
+      role = w->backgroundRole();
+   
    if (pal.brush(role).style() > 1)
       return pal.color(role);
    return QApplication::palette().color(role);
@@ -174,6 +175,7 @@ QColor Colors::light(const QColor &c, int value)
 
 QColor Colors::mid(const QColor &oc1, const QColor &c2, int w1, int w2) {
    int sum = (w1+w2);
+//    if (!sum) return Qt::black;
    QColor c1 = oc1;
    int h,s, v = value(c1);
    if (v < 70) {

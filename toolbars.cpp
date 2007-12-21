@@ -110,7 +110,7 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
       masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
    if (step || sunken) {
       QRect r = RECT;
-      if (!sunken && step) {
+      if (!sunken) {
          step = 6 - step;
          const int dx = step*r.width()/20, dy = step*r.height()/20;
          r.adjust(dx, dy, -dx, -dy);
