@@ -97,13 +97,13 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
    case PM_MenuBarVMargin: // Spacing between menubar items and top/bottom of bar
       return 0;
    case PM_ToolBarFrameWidth: // Width of the frame around toolbars
-      return dpi.f4;
+      return dpi.f1;//f4;
    case PM_ToolBarHandleExtent: // Width of a toolbar handle in a horizontal toolbar and the height of the handle in a vertical toolbar
       return dpi.f6;
    case PM_ToolBarItemMargin: // Spacing between the toolbar frame and the items
-      return dpi.f4;
+      return dpi.f1;//f4
    case PM_ToolBarItemSpacing: // Spacing between toolbar items
-      return dpi.f3;
+      return dpi.f2;
    case PM_ToolBarSeparatorExtent: // Width of a toolbar separator in a horizontal toolbar and the height of a separator in a vertical toolbar
       return dpi.f2;
    case PM_ToolBarExtensionExtent: // Width of a toolbar extension button in a horizontal toolbar and the height of the button in a vertical toolbar
