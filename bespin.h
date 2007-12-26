@@ -186,6 +186,7 @@ protected:
                                        const QWidget * widget) const {
       drawProgressBarGC(option, painter, widget, true);
    }
+
    void drawProgressBarLabel(const QStyleOption*, QPainter*, const QWidget*) const;
    // scrollareas.cpp
    void drawScrollBar(const QStyleOptionComplex*, QPainter*, const QWidget*) const;

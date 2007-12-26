@@ -328,8 +328,9 @@ BespinStyle::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
       if (cb->frame) {
          const QComboBox* combo = widget ?
             qobject_cast<const QComboBox*>(widget) : 0;
-         hover = hover || animStep > 2 || ( combo && combo->view() &&
-                           ((QWidget*)(combo->view()))->isVisible());
+         hover = !config.btn.backLightHover &&
+            (hover || animStep > 2 || ( combo && combo->view() &&
+                                        ((QWidget*)(combo->view()))->isVisible()));
          int f3 = dpi.f3;
          editRect.adjust(f3,0, -f3, 0);
          painter->setPen(hover ? CCOLOR(btn.active, 1) : CCOLOR(btn.std, 1));

@@ -207,9 +207,9 @@ BespinStyle::registerRoutines()
 /**THE STYLE ITSELF*/
 BespinStyle::BespinStyle() : QCommonStyle(), mouseButtonPressed_(false),
 internalEvent_(false) {
-   registerRoutines();
    _scanlines[0] = _scanlines[1] = 0L;
    init();
+   registerRoutines();
 
    //====== TOOLTIP ======================
 //    tooltipPalette = qApp->palette();

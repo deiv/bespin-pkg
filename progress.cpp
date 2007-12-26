@@ -28,15 +28,11 @@ BespinStyle::drawProgressBar(const QStyleOption * option, QPainter * painter,
 
    OPT_HOVER
 
-//    QStyleOptionProgressBarV2 subopt = *pb;
    // groove + contents ======
-//    subopt.rect = subElementRect(SE_ProgressBarGroove, pb, widget);
    drawProgressBarGroove(pb, painter, widget);
-   // subopt.rect = subElementRect(SE_ProgressBarContents, pb, widget);
    drawProgressBarContents(pb, painter, widget);
    // label? =========
    if (hover && pb->textVisible) {
-//       subopt.rect = subElementRect(SE_ProgressBarLabel, pb, widget);
       drawProgressBarLabel(pb, painter, widget);
    }
 }
@@ -66,6 +62,7 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
       val = -3.0*animator->progressStep(widget)/l;
    else
       val = pb->progress / double(pb->maximum - pb->minimum);
+
    if (content) {
       if (val == 0.0) return;
    }
