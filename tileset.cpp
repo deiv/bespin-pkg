@@ -191,7 +191,6 @@ QRect Set::rect(const QRect &rect, PosFlags pf) const
    return ret;
 }
 
-#include <QtDebug>
 void Set::render(const QRect &r, QPainter *p) const
 {
 

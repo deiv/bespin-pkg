@@ -93,15 +93,11 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
    else
       rect.adjust(dpi.f2,dpi.f2,-dpi.f2,-dpi.f2);
    
-   const Tile::Set *mask = 0L, *shadow = 0L;
-   if (sunken) {
+   const Tile::Set *mask = &masks.rect[false], *shadow = 0L;
+   if (sunken)
       shadow = &shadows.sunken[false][isEnabled];
-      mask = &masks.rect[false];
-   }
-   else if (option->state & State_Raised) {
+   else if (option->state & State_Raised)
       shadow = &shadows.group;
-      mask = &masks.rect[false];
-   }
    
    if (brush)
       mask->render(rect, painter, *brush);
