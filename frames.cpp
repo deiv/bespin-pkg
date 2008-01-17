@@ -198,6 +198,15 @@ void
 BespinStyle::drawGroupBoxFrame(const QStyleOption * option, QPainter * painter,
                                const QWidget *) const
 {
+   const QStyleOptionFrameV2 *groupBox =
+      qstyleoption_cast<const QStyleOptionFrameV2 *>(option);
+   
+   if (groupBox && groupBox->features == QStyleOptionFrameV2::Flat) {
+      Tile::setShape(Tile::Bottom);
+      shadows.relief[true][false].render(RECT, painter);
+      Tile::reset();
+      return;
+   }
    QRect rect = RECT.adjusted(dpi.f4,dpi.f2,-dpi.f4,0);
    rect.setHeight(qMin(2*dpi.f32, RECT.height()));
    Tile::setShape(Tile::Full & ~Tile::Bottom);

@@ -150,9 +150,9 @@ relief(int size, bool enabled)
    EMPTY_PIX(size, size);
    p.setBrush(Qt::NoBrush);
    p.setPen(QPen(WHITE(int(f*95)), f1));
-   p.drawRoundRect(0,0,size,size-f1,80,80);
+   p.drawRoundRect(0,0,size,size,80,80);
    p.setPen(QPen(BLACK(int(f*70)), f1));
-   p.drawRoundRect(f1,0,size-f2,size-f2,80,80);
+   p.drawRoundRect(f1,f1,size-f2,size-f2,80,80);
    p.end(); return pix;
 }
 

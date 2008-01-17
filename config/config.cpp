@@ -140,6 +140,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
+   generateGradientTypes(ui.gradMenuBar);
    generateGradientTypes(ui.gradMenuItem);
    generateGradientTypes(ui.gradProgress);
    generateGradientTypes(ui.gradTab);
@@ -237,6 +238,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.menuShadow, "Menu.Shadow", false); // i have a compmgr running :P
    handleSettings(ui.menuOpacity, "Menu.Opacity", 80);
    handleSettings(ui.crPopup, "Menu.Role", QPalette::Window);
+   handleSettings(ui.gradMenuBar, MENU_BAR_GRADIENT);
    handleSettings(ui.crMenu, "Menu.BarRole", QPalette::Window);
    handleSettings(ui.barSunken, "Menu.BarSunken", false);
    handleSettings(ui.menuBoldText, "Menu.BoldText", false);

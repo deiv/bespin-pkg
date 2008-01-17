@@ -36,6 +36,7 @@
 #define MENU_SHADOW "Menu.Shadow", false
 #define MENU_ACTIVEROLE "Menu.ActiveRole", QPalette::Window
 #define MENU_ROLE "Menu.Role", QPalette::WindowText
+#define MENU_BAR_GRADIENT "Menu.BarGradient", Gradients::None
 #define MENU_BARROLE "Menu.BarRole", QPalette::Window
 #define MENU_BARSUNKEN "Menu.BarSunken", false
 #define MENU_BOLDTEXT "Menu.BoldText", false

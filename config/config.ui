@@ -212,7 +212,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>1</number>
+      <number>7</number>
      </property>
      <widget class="QWidget" name="Seite_3" >
       <layout class="QGridLayout" >
@@ -1254,6 +1254,27 @@
           <item row="0" column="0" >
            <layout class="QHBoxLayout" >
             <item>
+             <widget class="QLabel" name="label_41" >
+              <property name="text" >
+               <string>Gradient</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="gradMenuBar" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0" >
+           <layout class="QHBoxLayout" >
+            <item>
              <widget class="QLabel" name="label_24" >
               <property name="text" >
                <string>Color role</string>
@@ -1272,7 +1293,7 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="0" >
+          <item row="2" column="0" >
            <widget class="QCheckBox" name="barSunken" >
             <property name="text" >
              <string>Sunken frame</string>
@@ -1454,7 +1475,7 @@
          </property>
          <property name="sizeHint" >
           <size>
-           <width>20</width>
+           <width>523</width>
            <height>93</height>
           </size>
          </property>
@@ -1541,7 +1562,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="headerGradient" />
+             <widget class="QComboBox" name="headerGradient" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -1616,7 +1644,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="headerSortingGradient" />
+             <widget class="QComboBox" name="headerSortingGradient" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -1865,12 +1900,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>644</x>
-     <y>127</y>
+     <x>394</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>779</x>
-     <y>130</y>
+     <x>394</x>
+     <y>79</y>
     </hint>
    </hints>
   </connection>
@@ -1881,12 +1916,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>678</x>
-     <y>165</y>
+     <x>394</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>771</x>
-     <y>161</y>
+     <x>394</x>
+     <y>79</y>
     </hint>
    </hints>
   </connection>
@@ -1897,12 +1932,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>617</x>
+     <x>394</x>
      <y>79</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>803</x>
-     <y>72</y>
+     <x>394</x>
+     <y>79</y>
     </hint>
    </hints>
   </connection>
@@ -1913,12 +1948,28 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>587</x>
-     <y>236</y>
+     <x>773</x>
+     <y>279</y>
     </hint>
     <hint type="destinationlabel" >
      <x>795</x>
-     <y>248</y>
+     <y>279</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scrollSunken</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>scrollGroove</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>375</x>
+     <y>107</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>583</x>
+     <y>96</y>
     </hint>
    </hints>
   </connection>

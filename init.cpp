@@ -174,6 +174,7 @@ BespinStyle::readSettings(const QSettings* settings)
    readRole(menu.active, MENU_ACTIVEROLE);
    readRole(menu.std, MENU_ROLE);
    readRole(menu.bar, MENU_BARROLE);
+   config.menu.barGradient = readGrad(MENU_BAR_GRADIENT);
    config.menu.barSunken = readBool(MENU_BARSUNKEN);
    config.menu.boldText = readBool(MENU_BOLDTEXT);
    config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);

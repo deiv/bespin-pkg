@@ -26,9 +26,13 @@ void
 BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
                            const QWidget *) const
 {
-   if (config.menu.bar_role[Bg] != QPalette::Window)
+   if (config.menu.bar_role[Bg] != QPalette::Window ||
+       config.menu.barGradient != Gradients::None)
       painter->fillRect(RECT.adjusted(0,0,0,-dpi.f2),
-                        Colors::mid(FCOLOR(Window),CCOLOR(menu.bar, Bg),1,2));
+                        Gradients::brush(Colors::mid(FCOLOR(Window),
+                                                     CCOLOR(menu.bar, Bg),1,4),
+                                         RECT.height()-dpi.f2,
+                                         Qt::Vertical, config.menu.barGradient));
    if (config.menu.barSunken) {
       Tile::setShape(Tile::Top | Tile::Bottom);
       shadows.sunken[false][false].render(RECT, painter);
