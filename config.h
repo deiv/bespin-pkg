@@ -52,7 +52,8 @@ typedef struct Config {
    
    struct scroll {
       Gradients::Type gradient;
-      bool groove, showButtons, sunken;
+      Groove::Mode groove;
+      bool showButtons;
    } scroll;
 
    float shadowIntensity;

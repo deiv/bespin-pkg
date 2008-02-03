@@ -20,6 +20,9 @@ enum BGMode { Plain = 0, Scanlines, ComplexLights,
 
 enum Orientation3D {Sunken = 0, Relief, Raised};
 
+namespace Groove {
+enum Mode { Line = 0, Groove, Sunken, SunkenGroove };
+};
 }
 
 #endif // BESPIN_TYPES

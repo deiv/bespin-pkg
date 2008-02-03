@@ -162,7 +162,9 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
 
    QRect groove;
    if (needsPaint) {
-      PAINT_ELEMENT(Groove);
+      if (config.scroll.groove != Groove::Sunken) {
+         PAINT_ELEMENT(Groove);
+      }
       groove = newScrollbar.rect;
    }
    else
@@ -181,13 +183,15 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
       PAINT_ELEMENT(SubLine);
       PAINT_ELEMENT(AddLine);
    }
-       
+
+   const bool grooveIsSunken = config.scroll.groove > Groove::Groove;
+   
    if (isEnabled && scrollbar->subControls & SC_ScrollBarSlider) {
       newScrollbar.rect = scrollbar->rect;
       newScrollbar.state = saveFlags;
       newScrollbar.rect = subControlRect(CC_ScrollBar, &newScrollbar,
                                        SC_ScrollBarSlider, widget);
-      if (config.scroll.sunken) {
+      if (grooveIsSunken) {
          const int f1 = dpi.f1;
          newScrollbar.rect.adjust(-f1,-f1,f1,0);
       }
@@ -205,7 +209,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
       }
    }
    
-   if (!isComboDropDownSlider && config.scroll.sunken)
+   if (!isComboDropDownSlider && grooveIsSunken)
       shadows.sunken[round_][isEnabled].render(groove, painter);
 }
 #undef PAINT_ELEMENT
@@ -267,10 +271,22 @@ BespinStyle::drawScrollBarGroove(const QStyleOption * option,
 {
    if (isComboDropDownSlider)
       return;
-   
-   masks.rect[true].render(RECT, painter, Gradients::Sunken,
-                             option->state & QStyle::State_Horizontal ?
-                             Qt::Vertical : Qt::Horizontal, FCOLOR(Window));
+
+   const QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText),3,1);
+   if (config.scroll.groove)
+      masks.rect[false].render(RECT, painter, Gradients::Sunken,
+                               option->state & QStyle::State_Horizontal ?
+                               Qt::Vertical : Qt::Horizontal, bg);
+   else {
+      SAVE_PEN;
+      painter->setPen(QPen(bg, dpi.f1));
+      QPoint c = RECT.center();
+      if (option->state & QStyle::State_Horizontal)
+         painter->drawLine(RECT.left(), c.y(), RECT.right(), c.y());
+      else
+         painter->drawLine(c.x(), RECT.top(), c.x(), RECT.bottom());
+      RESTORE_PEN;
+   }
    return;
 }
 
@@ -289,7 +305,7 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    }
 
    if (!isEnabled) {
-      if (!config.scroll.sunken)
+      if (config.scroll.groove != Groove::Sunken)
          drawScrollBarGroove(option, painter, widget);
       return;
    }
@@ -320,6 +336,7 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    QRect r = RECT;
    const int f1 = dpi.f1, f2 = dpi.f2;
    const bool horizontal = option->state & QStyle::State_Horizontal;
+   const bool grooveIsSunken = config.scroll.groove >= Groove::Sunken;
 
    // shadow
    painter->save();
@@ -329,10 +346,10 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    else
       painter->setClipRegion(QRegion(RECT) -
                              r.adjusted(dpi.f3, dpi.f9, -dpi.f3, -dpi.f9));
-   if (!config.scroll.sunken && sunken) {
+   if (!grooveIsSunken && sunken) {
       r.adjust(f1, f1, -f1, -f1);
       shadows.raised[round_][true][true].render(r, painter);
-      r.adjust(f1, f1, -f1, horizontal && config.scroll.sunken ? -f1 : -f2 );
+      r.adjust(f1, f1, -f1, horizontal && grooveIsSunken ? -f1 : -f2 );
    }
    else {
       if (config.btn.backLightHover && complexStep) {
@@ -341,7 +358,7 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
          lights.rect[round_].render(r, painter, blh); // backlight
       }
       shadows.raised[round_][true][false].render(r, painter);
-      r.adjust(f2, f2, -f2, horizontal && config.scroll.sunken ? -f2 : -dpi.f3 );
+      r.adjust(f2, f2, -f2, horizontal && grooveIsSunken ? -f2 : -dpi.f3 );
    }
    painter->restore();
    
@@ -374,7 +391,7 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
       dw = r.width()/4; dh = r.height()/8;
    }
    r.adjust(dw, dh, -dw, -dh);
-   masks.rect[true].render(r, painter, GRAD(scroll), o, c, size, QPoint(dw,dh));
+   masks.rect[false].render(r, painter, GRAD(scroll), o, c, size, QPoint(dw,dh));
 }
 
 //    case CE_ScrollBarFirst: // Scroll bar first line indicator (i.e., home).

@@ -59,6 +59,7 @@ private slots:
    void store2b(QListWidgetItem *);
    void remove();
    void handleBgMode(int);
+   void handleGrooveMode(int);
    void learnPwChar();
 };
 

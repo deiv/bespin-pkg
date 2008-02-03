@@ -101,6 +101,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
             ui.sections, SLOT(setCurrentIndex(int)));
    
+   
    /** Prepare the settings store, not of interest */
    QSettings settings("Bespin", "Store");
    ui.store->addItems( settings.childGroups() );
@@ -193,6 +194,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 /** connection between the bgmode and the structure combo -
    not of interest*/
    connect(ui.bgMode, SIGNAL(currentIndexChanged(int)), this, SLOT(handleBgMode(int)));
+   connect(ui.sliderGroove, SIGNAL(valueChanged(int)), this, SLOT(handleGrooveMode(int)));
    
    /** 1. name the info browser, you'll need it to show up context help
    Can be any QTextBrowser on your UI form */
@@ -249,9 +251,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.crProgressFg, PROGRESS_ROLE_FG);
    
    handleSettings(ui.showScrollButtons, "Scroll.ShowButtons", false);
-   handleSettings(ui.scrollSunken, "Scroll.Sunken", false);
+   handleSettings(ui.sliderGroove, "Scroll.Groove", false);
    handleSettings(ui.gradScroll, "Scroll.Gradient", GradButton);
-   handleSettings(ui.scrollGroove, "Scroll.Groove", false);
 
    handleSettings(ui.shadowIntensity, "ShadowIntensity", 100);
    
@@ -734,6 +735,15 @@ void Config::storedSettigSelected(QListWidgetItem *item) {
 void Config::handleBgMode(int idx) {
    ui.structure->setEnabled(idx == 1);
    ui.labelStructure->setEnabled(idx == 1);
+}
+
+static const char *grooveModes[4] = {"Line", "Groove", "Inlay", "Sunken"};
+
+void Config::handleGrooveMode(int v) {
+   if (v > 3 || v < 0)
+      ui.grooveLabel->setText("INVALID");
+   else
+      ui.grooveLabel->setText(grooveModes[v]);
 }
 
 void Config::learnPwChar() {

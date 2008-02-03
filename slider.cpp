@@ -91,11 +91,9 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
 
    // groove
    if ((slider->subControls & SC_SliderGroove) && groove.isValid()) {
-
-      masks.rect[true].render(groove, painter, Gradients::Sunken,
-                              option->state & QStyle::State_Horizontal ?
-                              Qt::Vertical : Qt::Horizontal,
-                              Colors::mid(FCOLOR(Window), Qt::black, 6,1));
+      QStyleOption grooveOpt = *option;
+      grooveOpt.rect = groove;
+      drawScrollBarGroove(&grooveOpt, painter, widget);
 #if 0
       painter->save();
 

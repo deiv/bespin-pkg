@@ -216,9 +216,14 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
                            sbextent, maxlen - sliderstart - sliderlen);
             break;
          case SC_ScrollBarGroove: {
+            if (!config.scroll.groove) {
+               int off = dpi.f4;
+               ret = scrollbar->rect.adjusted(off,off,-off,-off);
+               break;
+            }
             int off = 0, d = 0;
             if (scrollbar->orientation == Qt::Horizontal) {
-               if (!config.scroll.sunken) {
+               if (config.scroll.groove == Groove::Groove) {
                   off = dpi.f2; d = scrollbar->rect.height()/3;
                }
                ret.setRect(off, d,
@@ -226,7 +231,7 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
                            scrollbar->rect.height()-(2*d+off));
             }
             else {
-               if (!config.scroll.sunken) {
+               if (config.scroll.groove == Groove::Groove) {
                   off = dpi.f2; d = scrollbar->rect.width()/3;
                }
                ret.setRect(d, off, scrollbar->rect.width()-2*d,

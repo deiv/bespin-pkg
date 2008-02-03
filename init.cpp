@@ -182,28 +182,21 @@ BespinStyle::readSettings(const QSettings* settings)
    
    // Progress ===========================
    GRAD(progress) = readGrad(PROGRESS_GRADIENT);
-   config.progress.std_role[Bg] = 
-      (QPalette::ColorRole) iSettings->value(PROGRESS_ROLE_BG).toInt();
-   config.progress.std_role[Fg] =
-      (QPalette::ColorRole) iSettings->value(PROGRESS_ROLE_FG).toInt();
+   config.progress.std_role[Bg] =  (QPalette::ColorRole) readInt(PROGRESS_ROLE_BG);
+   config.progress.std_role[Fg] = (QPalette::ColorRole) readInt(PROGRESS_ROLE_FG);
 
    // ScrollStuff ===========================
    GRAD(scroll) = readGrad(SCROLL_GRADIENT);
    config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
-   config.scroll.sunken = readBool(SCROLL_SUNKEN);
-   config.scroll.groove =
-      (!config.scroll.sunken) ? false : readBool(SCROLL_GROOVE);
-   
+   config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
+
    // Tabs ===========================
    readRole(tab.active, TAB_ACTIVEROLE);
-   config.tab.animSteps =
-      CLAMP(iSettings->value(TAB_ANIMSTEPS).toUInt(), 2, 18);
+   config.tab.animSteps = CLAMP(iSettings->value(TAB_ANIMSTEPS).toUInt(), 2, 18);
    GRAD(tab) = readGrad(TAB_GRADIENT);
    readRole(tab.std, TAB_ROLE);
-   config.tab.transition =
-      (TabAnimInfo::TabTransition) readInt(TAB_TRANSITION);
-   config.tab.activeTabSunken =
-      readBool(TAB_ACTIVETABSUNKEN);
+   config.tab.transition = (TabAnimInfo::TabTransition) readInt(TAB_TRANSITION);
+   config.tab.activeTabSunken = readBool(TAB_ACTIVETABSUNKEN);
    
    // ToolBoxes
    readRole(toolbox.active, TOOLBOX_ACTIVEROLE);
@@ -213,8 +206,7 @@ BespinStyle::readSettings(const QSettings* settings)
    readRole(view.header, VIEW_HEADERROLE);
    readRole(view.sortingHeader, VIEW_SORTINGHEADERROLE);
    config.view.headerGradient = readGrad(VIEW_HEADERGRADIENT);
-   config.view.sortingHeaderGradient =
-      readGrad(VIEW_SORTINGHEADERGRADIENT);
+   config.view.sortingHeaderGradient = readGrad(VIEW_SORTINGHEADERGRADIENT);
 
    // General ===========================
    config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;
@@ -247,7 +239,7 @@ void BespinStyle::initMetrics()
    dpi.f20 = SCALE(20); dpi.f32 = SCALE(32);
    dpi.f80 = SCALE(80);
    
-   dpi.ScrollBarExtent = SCALE(config.scroll.sunken ? 15 : 17);
+   dpi.ScrollBarExtent = SCALE(config.scroll.groove > Groove::Groove ? 15 : 17);
    dpi.ScrollBarSliderMin = SCALE(40);
    dpi.SliderThickness = SCALE(20);
    dpi.SliderControl = SCALE(20);
