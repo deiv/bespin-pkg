@@ -37,6 +37,7 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
 	 int hgt = contentsSize.height();
          if ( cb->frame )
             hgt += (cb->editable || config.btn.fullHover) ? dpi.f2 : dpi.f4;
+         if ( !cb->currentIcon.isNull()) hgt += dpi.f2;
          return QSize(contentsSize.width()+dpi.f10+(int)(hgt/1.1), hgt);
       }
 //    case CT_DialogButtons: //
@@ -120,8 +121,9 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
                 qobject_cast<const QAbstractButton*>(widget))
             if (abn->isCheckable())
                w += contentsSize.height()/2+dpi.f10;
-	    int h = contentsSize.height() + (config.btn.layer ? dpi.f4 : dpi.f6);
-	    if (config.btn.round) { w += dpi.f8; h -= dpi.f2; }
+	         int h = contentsSize.height() + (config.btn.layer ? dpi.f4 : dpi.f6);
+            if (!btn->icon.isNull()) {w += dpi.f10; h += dpi.f2;}
+	         if (config.btn.round) { w += dpi.f8; h -= dpi.f2; }
             if (w < dpi.f80) w = dpi.f80;
             return QSize(w, h);
          }
