@@ -46,7 +46,8 @@ namespace OXRender {
    void setColor(XRenderColor &xc, double r, double g, double b, double a = 1);
    void setColor(XRenderColor &xc, QColor qc);
 
-   bool blend(const QPixmap &upper, QPixmap &lower, double opacity = 0.5);
+   bool blend(const QPixmap &upper, QPixmap &lower,
+              double opacity = 0.5, int x = 0, int y = 0);
    QPixmap fade(const QPixmap &pix, double percent);
    
    void setAlpha(QPixmap &pix, const OXPicture &mask);

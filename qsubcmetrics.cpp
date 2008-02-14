@@ -82,10 +82,12 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
             ret = cb->rect;
             break;
          case SC_ComboBoxArrow:
-            he -= 2*margin;
+            he = cb->fontMetrics.ascent() + dpi.f2;
+//             he -= 2*margin;
             x += wi; wi = (int)(he*1.1); //1.618
             x -= margin + wi;
-            y += margin;
+//             y += margin;
+            y += (cb->rect.height()-he)/2;
             ret.setRect(x, y, wi, he);
             break;
          case SC_ComboBoxEditField:

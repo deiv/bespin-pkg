@@ -77,13 +77,15 @@ void OXRender::composite(const QPixmap &src, OXPicture mask, const QPixmap &dst,
                      dst.x11PictureHandle(), sx, sy, mx, my, dx, dy, w, h);
 }
 
-bool OXRender::blend(const QPixmap &upper, QPixmap &lower, double opacity) {
+bool
+OXRender::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
+{
    XRenderColor c = {0,0,0, ushort(opacity * 0xffff) };
    OXPicture alpha = createFill (dpy, &c);
    if (alpha == X::None)
       return false;
    XRenderComposite (dpy, PictOpOver, upper.x11PictureHandle(), alpha,
-                     lower.x11PictureHandle(), 0, 0, 0, 0, 0, 0,
+                     lower.x11PictureHandle(), 0, 0, 0, 0, x, y,
                      upper.width(), upper.height());
    XRenderFreePicture (dpy, alpha);
    return true;

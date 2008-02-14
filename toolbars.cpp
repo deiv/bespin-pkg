@@ -17,7 +17,10 @@
  */
 
 #include <QAbstractButton>
+#include "oxrender.h"
 #include "draw.h"
+
+static int step;
 
 void
 BespinStyle::drawToolButton(const QStyleOptionComplex * option,
@@ -64,6 +67,8 @@ BespinStyle::drawToolButton(const QStyleOptionComplex * option,
 
    QStyleOption tool(0); tool.palette = toolbutton->palette;
 
+   step = animator->hoverStep(widget);
+
    // frame around whole button
    /*if (hover)*/ {
       tool.rect = RECT; tool.state = bflags;
@@ -104,7 +109,6 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
       return;
 
    bool isOn = option->state & State_On;
-   int step =  animator->hoverStep(widget);
    const QColor &c = Colors::bg(PAL, widget);
    if (isOn)
       masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
@@ -114,6 +118,7 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
          step = 6 - step;
          const int dx = step*r.width()/20, dy = step*r.height()/20;
          r.adjust(dx, dy, -dx, -dy);
+         step = 6 - step;
       }
       const Gradients::Type gt = sunken ? Gradients::Sunken :
          (Colors::value(c) < 108 ? Gradients::Simple : Gradients::Button);
@@ -122,6 +127,27 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
    if (isOn)
       shadows.sunken[true][true].render(RECT, painter);
 }
+
+#ifndef QT_NO_XRENDER
+static QPixmap scaledIcon, emptyIcon;
+qint64 lastIconPix = 0;
+static QPixmap &
+icon(QPixmap &pix, int step)
+{
+   if (pix.cacheKey() != lastIconPix) {
+      scaledIcon = pix.scaledToHeight ( pix.height() + dpi.f4, Qt::SmoothTransformation );
+      if (emptyIcon.size() != scaledIcon.size())
+         emptyIcon = QPixmap(scaledIcon.size());
+      lastIconPix = pix.cacheKey();
+   }
+   emptyIcon.fill(Qt::transparent);
+   OXRender::composite(pix, NULL, emptyIcon,
+                       0, 0, 0, 0, dpi.f2, dpi.f2,
+                       pix.width(), pix.height(), PictOpOver);
+   OXRender::blend(scaledIcon, emptyIcon, step/6.0);
+   return emptyIcon;
+}
+#endif
 
 void
 BespinStyle::drawToolButtonLabel(const QStyleOption * option,
@@ -148,6 +174,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
    QPixmap pm;
    QSize pmSize = toolbutton->iconSize;
    if (!toolbutton->icon.isNull()) {
+      OPT_SUNKEN
       QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
       QIcon::Mode mode;
       if (!isEnabled)
@@ -158,6 +185,14 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
          mode = QIcon::Normal;
       pm = toolbutton->icon.pixmap(RECT.size().boundedTo(toolbutton->iconSize),
                                    mode, state);
+      if (step && !sunken) {
+#ifndef QT_NO_XRENDER // crossblend
+         pm = icon(pm, step);
+#else
+         if (hover)
+            pm = pm.scaledToHeight ( pm.height() + dpi.f4, Qt::SmoothTransformation );
+#endif
+      }
       pmSize = pm.size();
    }
 
