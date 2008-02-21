@@ -26,18 +26,18 @@ class QPaintEvent;
 
 #include <QWidget>
 #include <QPoint>
+#include <QFrame>
 
 namespace VFrame
 {
 enum Side { North, South, West, East };
+enum Type {Sunken, Plain, Raised};
 }
 
 class VisualFramePart : public QWidget {
    Q_OBJECT
 public:
-   VisualFramePart(QWidget *window, QFrame *parent, VFrame::Side side,
-                   uint thickness = 0, int ext = 0,
-                   uint off1 = 0, uint off2 = 0, uint off3 = 0, uint off4 = 0);
+   VisualFramePart(QWidget *window, QFrame *parent, VFrame::Side side);
    VisualFramePart(){};
    void paintEvent ( QPaintEvent * event );
    inline const QFrame *frame() const {return _frame;}
@@ -51,18 +51,16 @@ protected:
    void wheelEvent ( QWheelEvent * event );
 private:
    QFrame *_frame; // parent, to avoid nasty casting
-   void passDownEvent(QEvent *ev, const QPoint &gMousePos);
-   int _thickness;
-   int _off[4];
-   int _ext;
    VFrame::Side _side;
+   void passDownEvent(QEvent *ev, const QPoint &gMousePos);
 };
 
 class VisualFrame : public QObject {
    Q_OBJECT
 public:
-   VisualFrame( QFrame *parent, uint (&sizes)[4], int (&exts)[4] );
    bool eventFilter ( QObject * o, QEvent * ev );
+   static void setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer);
+   static bool manage(QFrame *frame);
 public slots:
    void show();
    void hide();
@@ -70,11 +68,12 @@ public slots:
    void update();
    void repaint();
 private:
+   VisualFrame( QFrame *parent );
+   void updateShape();
    QFrame *_frame; // parent, to avoid nasty casting
+   QFrame::Shape _style;
    QWidget *_window;
    VisualFramePart *top, *bottom, *left, *right;
-   uint _s[4];
-   int _e[4];
 private slots:
    void correctPosition();
 };

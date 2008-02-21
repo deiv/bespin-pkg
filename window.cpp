@@ -22,6 +22,10 @@
 #include <QDesktopWidget>
 #include "draw.h"
 
+#ifndef Q_WS_X11
+#define QT_NO_XRENDER #
+#endif
+
 #ifndef QT_NO_XRENDER
 
 #include <X11/Xatom.h>

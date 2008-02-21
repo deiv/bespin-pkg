@@ -33,6 +33,14 @@ using namespace Bespin;
 extern Dpi dpi;
 extern Config config;
 
+static void
+setIconFont(QPainter &painter, const QRect &rect, float f = 0.75)
+{
+   QFont fnt = painter.font();
+   fnt.setPixelSize ( (int)(f*rect.height()) );
+   fnt.setBold(true); painter.setFont(fnt);
+}
+
 QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyleOption * option, const QWidget * widget ) const
 {
    bool sunken = false, isEnabled = false, hover = false;
@@ -45,11 +53,11 @@ QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyl
    QRect rect; QPalette pal;
    const QStyleOptionTitleBar *opt =
       qstyleoption_cast<const QStyleOptionTitleBar *>(option);
-   if (opt) {
-      if (opt->rect.isNull())
+   if (option) {
+      if (option->rect.isNull())
          return QPixmap();
-      pal = opt->palette;
-      rect = opt->rect; rect.moveTo(0,0);
+      pal = option->palette;
+      rect = option->rect; rect.moveTo(0,0);
       if (rect.width() > rect.height())
          rect.setWidth(rect.height());
       else
@@ -121,40 +129,51 @@ QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyl
       break;
    }
    case SP_MessageBoxInformation: { //  9  The "information" icon
-      QFont fnt = painter.font(); fnt.setPixelSize ( rect.height()-2 ); painter.setFont(fnt);
+      setIconFont(painter, rect);
       painter.setRenderHint ( QPainter::Antialiasing );
-      painter.drawEllipse(rect);
-      painter.drawText(rect, Qt::AlignHCenter | Qt::AlignBottom, "!");
+      painter.setPen(QPen(Qt::white, rect.width()/14));
+      const int s = 6*rect.height()/7;
+      painter.setBrush(Gradients::pix(QColor(0,102,255), s, Qt::Vertical,
+                                      Gradients::Gloss));
+      const int o = (rect.height()-s)/2;
+      const QRect r = QRect(o,o,s,s);
+      painter.drawEllipse(r);
+      painter.setPen(Qt::white);
+      painter.drawText(r, Qt::AlignHCenter | Qt::AlignBottom, "i");
       break;
    }
    case SP_MessageBoxWarning: { //  10  The "warning" icon
-      QFont fnt = painter.font(); fnt.setPixelSize ( rect.height()-2 ); painter.setFont(fnt);
+      setIconFont(painter, rect);
       painter.setRenderHint ( QPainter::Antialiasing );
+      painter.setPen(QPen(QColor(227,173,0),rect.width()/14));
+      painter.setBrush(Gradients::pix(QColor(255,235,85), 6*rect.height()/7,
+                                       Qt::Vertical, Gradients::Gloss));
       int hm = rect.x()+rect.width()/2;
-      const QPoint points[4] = {
+      const QPoint points[3] = {
          QPoint(hm, rect.top()),
          QPoint(rect.left(), rect.bottom()),
-         QPoint(rect.right(), rect.bottom()),
-         QPoint(hm, rect.top())
+         QPoint(rect.right(), rect.bottom())
       };
-      painter.drawPolyline(points, 4);
-      painter.drawLine(hm, rect.top()+4, hm, rect.bottom() - 6);
-      painter.drawPoint(hm, rect.bottom() - 3);
+      painter.drawPolygon(points, 3);
+      painter.setPen(Qt::black);
+      painter.drawText(rect, Qt::AlignHCenter | Qt::AlignBottom, "!");
       break;
    }
-//    case SP_MessageBoxCritical: //  11  The "critical" icon
-//       QFont fnt = painter.font(); fnt.setPixelSize ( rect.height() ); painter.setFont(fnt);
-//       const QPoint points[3] =
-//       {
-//          QPoint(rect.width()/3, rect.top()),
-//          QPoint(2*rect.width()/3, rect.top()),
-//          QPoint(rect.right(), rect.height()/2),
-//          QPoint(rect.right(), rect.bottom())
-//       };
-//       painter.drawPolyLine(points);
-//       painter.drawText(rect, Qt::AlignCenter, "-");
+   case SP_MessageBoxCritical: { //  11  The "critical" icon
+      setIconFont(painter, rect);
+      painter.setRenderHint ( QPainter::Antialiasing );
+      painter.setPen(QPen(QColor(226,8,0), dpi.f1));
+      painter.setBrush(Gradients::pix(QColor(156,15,15), rect.height(),
+                                      Qt::Vertical, Gradients::Gloss));
+      painter.drawEllipse(rect);
+      painter.setPen(Qt::white);
+      painter.drawText(rect, Qt::AlignCenter, "X");
+      break;
+   }
    case SP_MessageBoxQuestion: { //  12  The "question" icon
-      QFont fnt = painter.font(); fnt.setPixelSize ( rect.height() ); painter.setFont(fnt);
+      setIconFont(painter, rect, 1);
+      QColor c = COLOR(WindowText); c.setAlpha(128);
+      painter.setPen(c);
       painter.drawText(rect, Qt::AlignCenter, "?");
       break;
    }

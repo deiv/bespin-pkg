@@ -26,6 +26,7 @@
 
 #include "colors.h"
 #include "bespin.h"
+#include "visualframe.h"
 #include "makros.h"
 #include "config.defaults"
 
@@ -259,4 +260,17 @@ void BespinStyle::init(const QSettings* settings) {
    Gradients::init(config.bg.mode > ComplexLights ?
                    (Gradients::BgMode)config.bg.mode :
                    Gradients::BevelV, _progressBase, config.bg.intensity, dpi.f8);
+
+   int f2 = dpi.f2, f4 = dpi.f4;
+   QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
+   inner.adjust(f4,f4,-f4,-dpi.f1); outer.adjust(0,0,0,dpi.f3);
+   VisualFrame::setGeometry(QFrame::Sunken, inner, outer);
+
+   inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
+   inner.adjust(f2,f2,-f2,-f2); outer.adjust(-f2,-f2,f2,f2);
+   VisualFrame::setGeometry(QFrame::Plain, inner, outer);
+
+   inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
+   inner.adjust(f2,f2,-f2,0); outer.adjust(-f2,-f2,f2,0);
+   VisualFrame::setGeometry(QFrame::Raised, inner, outer);
 }

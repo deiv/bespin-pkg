@@ -31,6 +31,10 @@ class QSettings;
 #include "config.h"
 #include "debug.h"
 
+#ifndef Q_WS_X11
+#define QT_NO_XRENDER #
+#endif
+
 namespace Bespin {
 
 // class BespinStyle;

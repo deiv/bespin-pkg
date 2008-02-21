@@ -18,9 +18,7 @@
 
 #include <QPainter>
 #include <cmath>
-#ifndef QT_NO_XRENDER
 #include "oxrender.h"
-#endif
 #include "tileset.h"
 
 #ifndef MIN
@@ -376,8 +374,6 @@ void Set::render(const QRect &r, QPainter *p) const
 #undef ADJUST_ALPHA
 #undef MAKE_FILL
 }
-
-static Window root = RootWindow (QX11Info::display(), DefaultScreen (QX11Info::display()));
 
 void Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
 {

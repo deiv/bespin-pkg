@@ -23,6 +23,10 @@
 #include <QColor>
 #include <QPixmap>
 
+#ifndef Q_WS_X11
+#define QT_NO_XRENDER #
+#endif
+
 namespace Bespin {
 
 class BgSet {

@@ -31,9 +31,7 @@
 #include <Q3ScrollView>
 
 #include "styleanimator.h"
-#ifndef QT_NO_XRENDER
 #include "oxrender.h"
-#endif
 #include "eventkiller.h"
 
 #define ANIMATIONS (activeTabs + progressbars.count() + \

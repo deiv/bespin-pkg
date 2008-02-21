@@ -149,7 +149,7 @@ relief(int size, bool enabled)
    const float f = enabled ? 1.0 : 0.7;
    EMPTY_PIX(size, size);
    p.setBrush(Qt::NoBrush);
-   p.setPen(QPen(WHITE(int(f*95)), f1));
+   p.setPen(QPen(WHITE(int(f*70)), f1));
    p.drawRoundRect(0,0,size,size,80,80);
    p.setPen(QPen(BLACK(int(f*70)), f1));
    p.drawRoundRect(f1,f1,size-f2,size-f2,80,80);

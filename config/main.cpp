@@ -71,7 +71,7 @@ enum Mode {
    Invalid = 0, Configure, Presets,
       Import, Export, Load,
       Demo, Try, Screenshot, Pusher };
-
+#include <QMessageBox>
 int main(int argc, char *argv[])
 {
    Mode mode = Configure;
@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
                            ~(BConfigDialog::Import | BConfigDialog::Export));
 //       window->resize(848,480);
       window->adjustSize();
+//       QMessageBox::warning(0,"bespin error!", "this is a really bad error - look: there's a white rabbit behind you!");
       window->show();
       return app->exec();
    }
@@ -195,8 +196,10 @@ int main(int argc, char *argv[])
    case Screenshot: {
       if (argc < 3)
          return error("you lack <some_output.png>");
+#ifndef Q_WS_WIN
       if (argc > 3)
          setenv("BESPIN_PRESET", argv[3], 1);
+#endif
       app = new QApplication(argc, argv);
       Dialog *window = new Dialog;
       Ui::Demo ui;

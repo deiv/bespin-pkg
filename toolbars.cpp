@@ -185,7 +185,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
          mode = QIcon::Normal;
       pm = toolbutton->icon.pixmap(RECT.size().boundedTo(toolbutton->iconSize),
                                    mode, state);
-      if (step && !sunken) {
+      if (step && !sunken && !pm.isNull()) {
 #ifndef QT_NO_XRENDER // crossblend
          pm = icon(pm, step);
 #else

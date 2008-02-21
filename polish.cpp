@@ -40,6 +40,7 @@
 #include "visualframe.h"
 #include "eventkiller.h"
 #include "bespin.h"
+#include "hacks.h"
 using namespace Bespin;
 
 extern Config config;
@@ -230,10 +231,13 @@ static QMenuBar *bar4popup(QMenu *menu) {
          return static_cast<QMenuBar *>(w);
    return 0;
 }
-
+// #include <QtDebug>
 void BespinStyle::polish( QWidget * widget) {
    
-   if (!widget) return; // !
+   if (!widget) return; // ! protect against polishing QObject trials !
+   if (qobject_cast<VisualFramePart*>(widget)) return;
+//    qDebug() << widget;
+   Hacks::add(widget);
    
    if (widget->isWindow()) {
       bool freakModals = config.bg.modal.invert ||
@@ -455,33 +459,12 @@ void BespinStyle::polish( QWidget * widget) {
             widget->layout()->setSpacing ( 0 );
          }
       }
-      else if (frame->frameShape() == QFrame::StyledPanel) {
-
-         if (isSpecialFrame(widget)) {
-            if (frame->lineWidth() == 1) frame->setLineWidth(dpi.f4);
-         }
-         else {
-            QList<VisualFrame*> vfs = frame->findChildren<VisualFrame*>();
-            if (vfs.isEmpty()) { // avoid double adds
-//               qDebug() << frame << frame->parentWidget() << frame->autoFillBackground();
-               int exts[4]; uint sizes[4]; // t/b/l/r
-               const int f2 = dpi.f2, f3 = dpi.f3, f4 = dpi.f4, f6 = dpi.f6;
-               if (frame->frameShadow() == QFrame::Sunken) {
-                  exts[0] = exts[2] = exts[3] = 0; exts[1] = f3;
-                  sizes[0] = sizes[1] = sizes[2] = sizes[3] = f4;
-               }
-               else if (frame->frameShadow() == QFrame::Raised) {
-                  exts[0] = f2; exts[1] = f4; exts[2] = exts[3] = f2;
-                  sizes[0] = sizes[2] = sizes[3] = f4; sizes[1] = f6;
-               }
-               else { // plain
-                  exts[0] = exts[1] = exts[2] = exts[3] = f2;
-                  sizes[0] = sizes[1] = sizes[2] = sizes[3] = f2;
-               }
-               new VisualFrame(frame, sizes, exts);
-            }
-         }
+      else if (isSpecialFrame(widget)) {
+            if (frame->lineWidth() == 1)
+               frame->setLineWidth(dpi.f4);
       }
+      else
+         VisualFrame::manage(frame);
    }
    
    if (widget->autoFillBackground() &&
@@ -510,6 +493,7 @@ void BespinStyle::unPolish( QApplication *app )
 void BespinStyle::unPolish( QWidget *widget )
 {
    animator->unregistrate(widget);
+   Hacks::remove(widget);
    
    if (qobject_cast<VisualFrame*>(widget))
       delete widget; widget = 0L;
