@@ -28,6 +28,10 @@ typedef struct Config {
    struct chooser {
       Gradients::Type gradient;
    } chooser;
+
+   struct hack {
+      bool messages;
+   } hack;
    
    struct input {
       ushort pwEchoChar;

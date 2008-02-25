@@ -46,7 +46,7 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
                        const QWidget * widget) const
 {
    B_STATES
-      
+
    if (!widget) { // fallback, we cannot paint shaped frame contents
       if (sunken)
          shadows.fallback.render(RECT,painter);
@@ -70,19 +70,19 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
          brush = &PAL.color(QPalette::Base);
       }
       else { // maybe we need to corect a textlabels margin
-         if (const QLabel* label = qobject_cast<const QLabel*>(widget))
+         if (const QLabel* label = qobject_cast<const QLabel*>(widget)) {
             if (label->text() != QString() && label->margin() < dpi.f3)
                const_cast<QLabel*>(label)->setMargin(dpi.f3);
+         }
+         else if (widget->inherits("QComboBoxPrivateContainer")) {
+            // combo dropdowns
+            SAVE_PEN;
+            painter->setPen(Colors::mid(FCOLOR(Base),FCOLOR(Text)));
+            painter->drawRect(RECT.adjusted(0,0,-1,-1));
+            RESTORE_PEN;
+         }
          return; // painted on visual frame
       }
-   }
-   else if (widget->inherits("QComboBoxPrivateContainer")) {
-      // comob dropdowns
-      SAVE_PEN;
-      painter->setPen(FCOLOR(Base));
-      painter->drawRect(RECT.adjusted(0,0,-1,-1));
-      RESTORE_PEN;
-      return;
    }
 
    QRect rect = RECT;

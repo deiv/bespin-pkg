@@ -229,8 +229,8 @@ BespinStyle::drawScrollBarButton(const QStyleOption * option,
       painter->save();
       painter->setPen(hover ? FCOLOR(Text) :
                         Colors::mid(FCOLOR(Base), FCOLOR(Text)));
-      QRect rect = RECT.adjusted(RECT.width()/4, RECT.height()/4,
-                                 -RECT.width()/4, -RECT.height()/4);
+      const int dx = RECT.width()/4, dy = RECT.height()/4;
+      QRect rect = RECT.adjusted(dx, dy, -dx, -dy);
       if (option->state & QStyle::State_Horizontal)
          drawSolidArrow(up ? Navi::W : Navi::E, rect, painter);
       else
@@ -269,14 +269,26 @@ BespinStyle::drawScrollBarGroove(const QStyleOption * option,
                                  QPainter * painter,
                                  const QWidget *) const
 {
-   if (isComboDropDownSlider)
+   const bool horizontal = option->state & QStyle::State_Horizontal;
+   
+   if (isComboDropDownSlider) {
+      QRect r;
+      if (horizontal) {
+         const int d = RECT.height()/3;
+         r = RECT.adjusted(dpi.f2, d, -dpi.f2, -d);
+      }
+      else {
+         const int d = RECT.width()/3;
+         r = RECT.adjusted(d, dpi.f2, -d, -dpi.f2);
+      }
+      painter->fillRect(r, Colors::mid(FCOLOR(Base), FCOLOR(Text), 20, 1));
       return;
+   }
 
    const QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText),3,1);
    if (config.scroll.groove)
       masks.rect[false].render(RECT, painter, Gradients::Sunken,
-                               option->state & QStyle::State_Horizontal ?
-                               Qt::Vertical : Qt::Horizontal, bg);
+                               horizontal ? Qt::Vertical : Qt::Horizontal, bg);
    else {
       SAVE_PEN;
       painter->setPen(QPen(bg, dpi.f1));
@@ -296,10 +308,19 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
                                  const QWidget * widget) const
 {
    B_STATES
-      
+   const bool horizontal = option->state & QStyle::State_Horizontal;
+   
    if (isComboDropDownSlider) {
-      painter->fillRect(RECT.adjusted(dpi.f2, 0, -dpi.f2, 0),
-                        (hover || sunken) ? FCOLOR(Text) :
+      QRect r;
+      if (horizontal) {
+         const int d = RECT.height()/3;
+         r = RECT.adjusted(dpi.f2, d, -dpi.f2, -d);
+      }
+      else {
+         const int d = RECT.width()/3;
+         r = RECT.adjusted(d, dpi.f2, -d, -dpi.f2);
+      }
+      painter->fillRect(r, (hover || sunken) ? FCOLOR(Text) :
                         Colors::mid(FCOLOR(Base), FCOLOR(Text), 8, 1));
       return;
    }
@@ -335,7 +356,6 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
    
    QRect r = RECT;
    const int f1 = dpi.f1, f2 = dpi.f2;
-   const bool horizontal = option->state & QStyle::State_Horizontal;
    const bool grooveIsSunken = config.scroll.groove >= Groove::Sunken;
 
    // shadow

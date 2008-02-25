@@ -20,17 +20,23 @@
 #include <QLabel>
 #include <QLayout>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QStyle>
 #include <QStyleOption>
 
 #include <QtDebug>
 #include "colors.h"
+#include "config.h"
 #include "hacks.h"
 
 using namespace Bespin;
+extern Config config;
 
 static Hacks *bespinHacks = new Hacks;
+
+static bool inDrag = false;
+static QPoint dragPos;
 
 static bool
 hackMessageBox(QMessageBox* box, QEvent *e)
@@ -53,17 +59,36 @@ hackMessageBox(QMessageBox* box, QEvent *e)
       case QMessageBox::Critical:
          logo = QStyle::SP_MessageBoxCritical; break;
       }
+      QPainter p(box);
       if (logo) {
-         QPainter p(box);
          const int y = (box->height()-s)/2 - qMax(0,(box->height()-164)/3);
          p.drawPixmap(-s/3,y, box->style()->standardPixmap ( logo, &opt, box ));
-         p.end();
       }
+      p.setPen(Colors::mid(box->palette().color(QPalette::Window),
+                           box->palette().color(QPalette::WindowText)));
+      p.drawRect(box->rect().adjusted(0,0,-1,-1));
+      p.end();
       return true;
    }
+   case QEvent::MouseButtonPress: {
+      QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+      if (mev->button() == Qt::LeftButton) {
+         inDrag = true;
+         dragPos = mev->pos();
+      }
+       return false;
+   }
+   case QEvent::MouseButtonRelease:
+      if (static_cast<QMouseEvent*>(e)->button() == Qt::LeftButton)
+         inDrag = false;
+      return false;
+   case QEvent::MouseMove: {
+      QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+      if (inDrag)
+         box->move(mev->globalPos() - dragPos);
+      return false;
+   }
    case QEvent::Show: {
-//       qDebug() << box->windowFlags() << "|" << Qt::Dialog << "-->" << Qt::FramelessWindowHint;
-//       box->setWindowFlags ( Qt::FramelessWindowHint );
       QLabel *icon = box->findChild<QLabel*>("qt_msgboxex_icon_label");
       if (icon) {
          icon->setPixmap(QPixmap());
@@ -135,7 +160,9 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 
 bool
 Hacks::add(QWidget *w) {
-   if (qobject_cast<QMessageBox*>(w)) {
+   if (config.hack.messages &&
+       qobject_cast<QMessageBox*>(w)) {
+      w->setWindowFlags ( Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint | Qt::FramelessWindowHint);
       w->removeEventFilter(bespinHacks); // just to be sure
       w->installEventFilter(bespinHacks);
       return true;

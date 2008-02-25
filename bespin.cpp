@@ -273,7 +273,7 @@ BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
 {
    Q_ASSERT(option);
    Q_ASSERT(painter);
-   if (primitiveRoutine[pe])
+   if (pe < N_PE && primitiveRoutine[pe])
       (this->*primitiveRoutine[pe])(option, painter, widget);
    else
       QCommonStyle::drawPrimitive( pe, option, painter, widget );
@@ -285,7 +285,7 @@ BespinStyle::drawControl ( ControlElement element, const QStyleOption * option,
 {
    Q_ASSERT(option);
    Q_ASSERT(painter);
-   if (controlRoutine[element])
+   if (element < N_CE && controlRoutine[element])
       (this->*controlRoutine[element])(option, painter, widget);
    else
       QCommonStyle::drawControl( element, option, painter, widget );
@@ -299,7 +299,7 @@ BespinStyle::drawComplexControl ( ComplexControl control,
 {
    Q_ASSERT(option);
    Q_ASSERT(painter);
-   if (complexRoutine[control])
+   if (control < N_CC && complexRoutine[control])
       (this->*complexRoutine[control])(option, painter, widget);
    else
       QCommonStyle::drawComplexControl( control, option, painter, widget );

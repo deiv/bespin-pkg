@@ -26,7 +26,9 @@
 #define BTN_ROUND "Btn.Round", false
    
 #define CHOOSER_GRADIENT "Chooser.Gradient", Gradients::Sunken
-   
+
+#define HACK_MESSAGES "Hack.Messages", false
+
 #define INPUT_PWECHOCHAR "Input.PwEchoChar", 0x26AB
 
 #define MENU_GLASSY "Menu.Glassy", true

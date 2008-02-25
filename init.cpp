@@ -154,6 +154,9 @@ BespinStyle::readSettings(const QSettings* settings)
    
    // Choosers ===========================
    GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
+
+   // Hacks ==================================
+   config.hack.messages = readBool(HACK_MESSAGES);
    
    // PW Echo Char ===========================
    config.input.pwEchoChar =
