@@ -392,7 +392,7 @@ static QMenuBar *bar4popup(QMenu *menu) {
          return static_cast<QMenuBar *>(w);
    return 0;
 }
-
+#include <QToolButton>
 bool
 BespinStyle::eventFilter( QObject *object, QEvent *ev )
 {
@@ -482,34 +482,34 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
    case QEvent::Show:
       if (QWidget * widget = qobject_cast<QWidget*>(object)) {
          if (widget->isModal()) {
-         if (config.bg.modal.invert) swapPalette(widget);
-         widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
-         return false;
-      }
-      if (QMenu * menu = qobject_cast<QMenu*>(widget)) {
-         if (menu->parentWidget() &&
-             menu->parentWidget()->inherits("QMdiSubWindow")) {
-            QPoint pt = menu->parentWidget()->rect().topRight();
-            pt += QPoint(-menu->width(), pixelMetric(PM_TitleBarHeight,0,0));
-            pt = menu->parentWidget()->mapToGlobal(pt);
-            menu->move(pt);
+            if (config.bg.modal.invert) swapPalette(widget);
+            widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
+            return false;
          }
-         QMenuBar *bar = bar4popup(menu);
-         if (bar)
-            menu->move(menu->pos()-QPoint(0,dpi.f2));
+         if (QMenu * menu = qobject_cast<QMenu*>(widget)) {
+            if (menu->parentWidget() &&
+               menu->parentWidget()->inherits("QMdiSubWindow")) {
+               QPoint pt = menu->parentWidget()->rect().topRight();
+               pt += QPoint(-menu->width(), pixelMetric(PM_TitleBarHeight,0,0));
+               pt = menu->parentWidget()->mapToGlobal(pt);
+               menu->move(pt);
+            }
+            QMenuBar *bar = bar4popup(menu);
+            if (bar)
+               menu->move(menu->pos()-QPoint(0,dpi.f2));
 #if SHAPE_POPUP
-         QMenuBar *bar = bar4popup(menu);
-         if (bar) {
-            QPoint pos(dpi.f1, 0);
-            pos += bar->actionGeometry(menu->menuAction()).topLeft();
-            menu->move(bar->mapToGlobal(pos));
-            menu->setActiveAction(menu->actions().at(0));
+            QMenuBar *bar = bar4popup(menu);
+            if (bar) {
+               QPoint pos(dpi.f1, 0);
+               pos += bar->actionGeometry(menu->menuAction()).topLeft();
+               menu->move(bar->mapToGlobal(pos));
+               menu->setActiveAction(menu->actions().at(0));
+            }
+            return false;
+#endif
          }
          return false;
-#endif
       }
-      return false;
-   }
    case QEvent::Hide:
       if (QWidget * widget = qobject_cast<QWidget*>(object))
       if (widget->isModal())

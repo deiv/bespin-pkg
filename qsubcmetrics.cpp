@@ -485,8 +485,35 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
       return r;
    }
 //    case SE_HeaderLabel: //  
-//    case SE_TabWidgetLeftCorner: //  
-//    case SE_TabWidgetRightCorner: //  
+   case SE_TabWidgetLeftCorner:
+   case SE_TabWidgetRightCorner:
+      if (const QStyleOptionTabWidgetFrame *twf =
+          qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option)) {
+         int off = 0, x = 0, y = 0;
+         switch (twf->shape) {
+         case QTabBar::RoundedSouth:
+         case QTabBar::TriangularSouth:
+            y = twf->rect.bottom() - twf->tabBarSize.height();
+         case QTabBar::RoundedNorth:
+         case QTabBar::TriangularNorth:
+            off = twf->tabBarSize.height()/4;
+            if (element == SE_TabWidgetRightCorner)
+               x = twf->rect.right() - twf->tabBarSize.height();
+            break;
+         case QTabBar::RoundedEast:
+         case QTabBar::TriangularEast:
+            x = twf->rect.right() - twf->tabBarSize.width();
+         case QTabBar::RoundedWest:
+         case QTabBar::TriangularWest:
+            off = twf->tabBarSize.width()/4;
+            if (element == SE_TabWidgetRightCorner)
+               y = twf->rect.bottom() - twf->tabBarSize.width();
+         default:
+            break;
+         }
+         x +=off; y += off; off *= 2;
+         return QRect(x,y,off,off);
+      }
    case SE_TabWidgetTabBar: { //
       if (const QStyleOptionTabWidgetFrame *twf =
           qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option)) {
@@ -497,7 +524,7 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
             r.setBottom(option->rect.bottom());
          }
          else {
-            r.translate(dpi.f4,0);
+            r.translate(dpi.f4, 0);
          if (r.right() > option->rect.right())
             r.setRight(option->rect.right());
          }
