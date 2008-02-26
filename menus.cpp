@@ -39,7 +39,7 @@ BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
       Tile::reset();
    }
 }
-#include <QtDebug>
+
 void
 BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
                              const QWidget * widget) const
@@ -76,19 +76,19 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       if (!step) step = 6;
       QColor c = (config.menu.bar_role[Bg] == QPalette::Window) ?
          FCOLOR(Window) :
-         Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,2);
-      c = Colors::mid(c, COLOR(ROLE[Bg]), 1,2);
-      int dy = 0;
-      if (!sunken) {
-         step = 6-step;
-         int dx = step*r.width()/18;
-         dy = step*r.height()/18;
-         r.adjust(dx, dy, -dx, -dy);
-         step = 6-step;
-      }
+         Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,4);
+      c = Colors::mid(c, COLOR(ROLE[Bg]), 9-step, step);
+//       int dy = 0;
+//       if (!sunken) {
+//          step = 6-step;
+//          int dx = step*r.width()/18;
+//          dy = step*r.height()/18;
+//          r.adjust(dx, dy, -dx, -dy);
+//          step = 6-step;
+//       }
       const Gradients::Type gt =
          sunken ? Gradients::Sunken : config.menu.itemGradient;
-      masks.rect[round_].render(r, painter, gt, Qt::Vertical, c, r.height(), QPoint(0,-dy));
+      masks.rect[round_].render(r, painter, gt, Qt::Vertical, c, r.height()/*, QPoint(0,-dy)*/);
       if (config.menu.activeItemSunken && sunken) {
          r.setBottom(r.bottom()+dpi.f2);
          shadows.sunken[round_][true].render(r, painter);

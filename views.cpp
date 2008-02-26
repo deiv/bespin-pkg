@@ -17,6 +17,7 @@
  */
 
 #include <QApplication>
+#include <QAbstractItemView>
 #include "draw.h"
 
 void
@@ -405,3 +406,40 @@ BespinStyle::drawRubberBand(const QStyleOption * option, QPainter * painter,
    painter->restore();
 }
 
+void
+BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
+                      const QWidget *widget) const
+{
+   const QStyleOptionViewItemV2 *item =
+      qstyleoption_cast<const QStyleOptionViewItemV2 *>(option);
+   if (!item) return;
+
+   // this could just lead to cluttered listviews...?!
+//    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled
+//       ? QPalette::Normal : QPalette::Disabled;
+//    if (cg == QPalette::Normal && !(item->state & QStyle::State_Active))
+//       cg = QPalette::Inactive;
+
+   if ((item->state & QStyle::State_Selected)) {
+      if (widget && qobject_cast<const QAbstractItemView *>(widget) &&
+          static_cast<const QAbstractItemView *>(widget)->selectionMode() ==
+          QAbstractItemView::SingleSelection) {
+         const QPixmap &sunk =
+                Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical,
+                               Gradients::Button);
+         painter->drawTiledPixmap(RECT, sunk);
+      }
+      else
+         painter->fillRect(RECT, PAL.brush(QPalette::Highlight));
+   }
+   // TODO: requires Qt4.4 ...
+//    else if (item->backgroundBrush.style() != Qt::NoBrush) {
+//       QPoint oldBO = painter->brushOrigin();
+//       painter->setBrushOrigin(item->rect.topLeft());
+//       painter->fillRect(item->rect, item->backgroundBrush);
+//       painter->setBrushOrigin(oldBO);
+//    }
+   else if (item->features & QStyleOptionViewItemV2::Alternate)
+      painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
+   
+}

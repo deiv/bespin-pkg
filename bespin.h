@@ -255,6 +255,7 @@ protected:
    void drawTree(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
    void drawRubberBand(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawHeaderArrow(const QStyleOption*, QPainter*, const QWidget*) const;
+   void drawItem(const QStyleOption*, QPainter*, const QWidget*) const;
    // window.cpp
    void drawWindowFrame(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawWindowBg(const QStyleOption*, QPainter*, const QWidget*) const;

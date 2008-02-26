@@ -70,7 +70,9 @@ BespinStyle::drawToolButton(const QStyleOptionComplex * option,
    step = animator->hoverStep(widget);
 
    // frame around whole button
-   /*if (hover)*/ {
+//    if (option->state & State_On ||
+//        toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly)
+   {
       tool.rect = RECT; tool.state = bflags;
       drawToolButtonShape(&tool, painter, widget);
    }
@@ -107,8 +109,8 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
       
    if (!isEnabled)
       return;
-
-   bool isOn = option->state & State_On;
+   
+   const bool isOn = option->state & State_On;
    const QColor &c = Colors::bg(PAL, widget);
    if (isOn)
       masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
@@ -197,6 +199,8 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
    }
 
    if (toolbutton->toolButtonStyle != Qt::ToolButtonIconOnly) {
+//       QFont fnt = toolbutton->font;
+//       if (hover) fnt.setBold(true);
       painter->setFont(toolbutton->font);
       QRect pr = RECT, tr = RECT;
       int alignment = Qt::TextShowMnemonic;

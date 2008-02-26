@@ -72,7 +72,7 @@ using namespace Bespin;
 Config config;
 Dpi dpi;
 
-#define N_PE 50
+#define N_PE 54
 #define N_CE 50
 #define N_CC 10
 static void
@@ -195,6 +195,8 @@ BespinStyle::registerRoutines()
    registerCC(drawTree, CC_Q3ListView);
    registerCE(drawRubberBand, CE_RubberBand);
    registerPE(drawHeaderArrow, PE_IndicatorHeaderArrow);
+   registerPE(drawItem, PE_PanelItemViewRow);
+   registerPE(drawItem, PE_PanelItemViewItem);
    // window.cpp
    registerPE(drawWindowFrame, PE_FrameWindow);
    registerPE(drawWindowBg, PE_Widget);
@@ -275,10 +277,6 @@ BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
    Q_ASSERT(painter);
 //    if (pe == PE_IndicatorItemViewItemDrop)
 //       qWarning("IndicatorItemViewItemDrop, %d", pe);
-//    if (pe == PE_PanelItemViewItem)
-//       qWarning("PanelItemViewItem, %d", pe);
-//    if (pe == PE_PanelItemViewRow)
-//       qWarning("PanelItemViewRow, %d", pe);
 //    if (pe == PE_PanelStatusBar)
 //       qWarning("PanelStatusBar, %d", pe);
    if (pe < N_PE && primitiveRoutine[pe])

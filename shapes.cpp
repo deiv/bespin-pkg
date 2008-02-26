@@ -80,6 +80,10 @@ void
 BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter,
                        const QWidget *, bool itemview) const
 {
+   if (const QStyleOptionViewItemV2 *item =
+       qstyleoption_cast<const QStyleOptionViewItemV2 *>(option))
+   if (!(item->features & QStyleOptionViewItemV2::HasCheckIndicator))
+      return;
 //       if (option->state & State_NoChange)
 //          break;
    QStyleOption copy = *option;
@@ -101,6 +105,7 @@ BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter,
    // box (requires set pen for PE_IndicatorMenuCheckMark)
    painter->setBrush(Qt::NoBrush);
    QPalette::ColorRole fg, bg;
+
    if (itemview) { // itemViewCheck
       r.adjust(f2, f2, -f2, -f2);
       if (!(option->state & State_Off))
@@ -113,7 +118,7 @@ BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter,
       }
       painter->setPen(Colors::mid(COLOR(bg), COLOR(fg)));
    }
-   
+
    if (painter->pen() != Qt::NoPen) {
       r.adjust(f2, f2, -f2, -f2);
       painter->drawRoundRect(r);

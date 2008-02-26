@@ -19,9 +19,17 @@
    <item row="0" column="0" colspan="4" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="demo" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>521</width>
+        <height>420</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Demo</string>
       </attribute>
@@ -98,7 +106,8 @@
           </sizepolicy>
          </property>
          <property name="html" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+          <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
 &lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
 &lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Luxi Sans';">Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p>
@@ -182,7 +191,7 @@ p, li { white-space: pre-wrap; }
             <property name="orientation" >
              <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0" >
              <size>
               <width>20</width>
               <height>40</height>
@@ -288,6 +297,14 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="tab" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>521</width>
+        <height>420</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Buttons</string>
       </attribute>
@@ -355,6 +372,9 @@ p, li { white-space: pre-wrap; }
             <property name="text" >
              <string>Text Only</string>
             </property>
+            <property name="toolButtonStyle" >
+             <enum>Qt::ToolButtonTextOnly</enum>
+            </property>
            </widget>
           </item>
           <item row="0" column="2" >
@@ -363,7 +383,8 @@ p, li { white-space: pre-wrap; }
              <string>Text Under</string>
             </property>
             <property name="icon" >
-             <iconset>designer.png</iconset>
+             <iconset>
+              <normaloff>designer.png</normaloff>designer.png</iconset>
             </property>
             <property name="toolButtonStyle" >
              <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -376,7 +397,8 @@ p, li { white-space: pre-wrap; }
              <string>Text aside</string>
             </property>
             <property name="icon" >
-             <iconset>designer.png</iconset>
+             <iconset>
+              <normaloff>designer.png</normaloff>designer.png</iconset>
             </property>
             <property name="toolButtonStyle" >
              <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -396,7 +418,8 @@ p, li { white-space: pre-wrap; }
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset>designer.png</iconset>
+             <iconset>
+              <normaloff>designer.png</normaloff>designer.png</iconset>
             </property>
            </widget>
           </item>
@@ -468,6 +491,14 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="tab_2" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>800</width>
+        <height>480</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Input</string>
       </attribute>
@@ -475,7 +506,8 @@ p, li { white-space: pre-wrap; }
        <item row="0" column="0" >
         <widget class="QTextEdit" name="textEdit" >
          <property name="html" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+          <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
 &lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed';">&lt;span style=" font-weight:600;">This is a textedit&lt;/span>&lt;/p>
@@ -486,7 +518,8 @@ p, li { white-space: pre-wrap; }
        <item row="0" column="1" colspan="3" >
         <widget class="QTextBrowser" name="textBrowser" >
          <property name="html" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+          <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
 &lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'DejaVu Sans Condensed';">&lt;span style=" font-weight:600; text-decoration: underline;">This is a TextBrowser&lt;/span>&lt;/p>
@@ -554,6 +587,14 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="Seite" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>800</width>
+        <height>480</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Views</string>
       </attribute>
@@ -955,6 +996,14 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="Seite_3" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>800</width>
+        <height>480</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Container</string>
       </attribute>
@@ -968,6 +1017,14 @@ p, li { white-space: pre-wrap; }
           <number>1</number>
          </property>
          <widget class="QWidget" name="tab_3" >
+          <property name="geometry" >
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>800</width>
+            <height>480</height>
+           </rect>
+          </property>
           <attribute name="title" >
            <string>Frames</string>
           </attribute>
@@ -1069,6 +1126,14 @@ p, li { white-space: pre-wrap; }
           </layout>
          </widget>
          <widget class="QWidget" name="tab_4" >
+          <property name="geometry" >
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>100</width>
+            <height>30</height>
+           </rect>
+          </property>
           <attribute name="title" >
            <string>Tabs</string>
           </attribute>
@@ -1079,11 +1144,27 @@ p, li { white-space: pre-wrap; }
               <enum>QTabWidget::West</enum>
              </property>
              <widget class="QWidget" name="tab_5" >
+              <property name="geometry" >
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>100</width>
+                <height>30</height>
+               </rect>
+              </property>
               <attribute name="title" >
                <string>Tab 1</string>
               </attribute>
              </widget>
              <widget class="QWidget" name="tab_6" >
+              <property name="geometry" >
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>800</width>
+                <height>480</height>
+               </rect>
+              </property>
               <attribute name="title" >
                <string>Tab 2</string>
               </attribute>
@@ -1100,8 +1181,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>100</width>
-                <height>30</height>
+                <width>19</width>
+                <height>16</height>
                </rect>
               </property>
               <attribute name="label" >
@@ -1139,7 +1220,7 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>100</width>
+                <width>66</width>
                 <height>38</height>
                </rect>
               </property>
@@ -1180,11 +1261,27 @@ p, li { white-space: pre-wrap; }
               <enum>QTabWidget::East</enum>
              </property>
              <widget class="QWidget" name="tab_7" >
+              <property name="geometry" >
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>100</width>
+                <height>30</height>
+               </rect>
+              </property>
               <attribute name="title" >
                <string>Tab 1</string>
               </attribute>
              </widget>
              <widget class="QWidget" name="tab_8" >
+              <property name="geometry" >
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>800</width>
+                <height>480</height>
+               </rect>
+              </property>
               <attribute name="title" >
                <string>Tab 2</string>
               </attribute>
@@ -1198,6 +1295,14 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="Seite_2" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>800</width>
+        <height>480</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Slider</string>
       </attribute>
@@ -1246,7 +1351,7 @@ p, li { white-space: pre-wrap; }
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>40</height>
@@ -1272,7 +1377,7 @@ p, li { white-space: pre-wrap; }
          <property name="orientation" >
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>40</width>
            <height>20</height>
@@ -1295,7 +1400,7 @@ p, li { white-space: pre-wrap; }
          <property name="orientation" >
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>40</width>
            <height>20</height>
@@ -1318,7 +1423,7 @@ p, li { white-space: pre-wrap; }
          <property name="orientation" >
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>40</width>
            <height>20</height>
@@ -1331,7 +1436,7 @@ p, li { white-space: pre-wrap; }
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>75</width>
            <height>31</height>
@@ -1382,6 +1487,14 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="Seite_4" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>800</width>
+        <height>480</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Calendar</string>
       </attribute>
@@ -1415,7 +1528,7 @@ p, li { white-space: pre-wrap; }
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>161</width>
        <height>20</height>
@@ -1429,7 +1542,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
