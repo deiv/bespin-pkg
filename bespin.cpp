@@ -273,6 +273,14 @@ BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
 {
    Q_ASSERT(option);
    Q_ASSERT(painter);
+//    if (pe == PE_IndicatorItemViewItemDrop)
+//       qWarning("IndicatorItemViewItemDrop, %d", pe);
+//    if (pe == PE_PanelItemViewItem)
+//       qWarning("PanelItemViewItem, %d", pe);
+//    if (pe == PE_PanelItemViewRow)
+//       qWarning("PanelItemViewRow, %d", pe);
+//    if (pe == PE_PanelStatusBar)
+//       qWarning("PanelStatusBar, %d", pe);
    if (pe < N_PE && primitiveRoutine[pe])
       (this->*primitiveRoutine[pe])(option, painter, widget);
    else

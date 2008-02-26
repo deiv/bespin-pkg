@@ -36,9 +36,14 @@ extern Config config;
 extern Dpi dpi;
 static Gradients::Type _progressBase;
 
-
+#include <QtDebug>
 static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list) {
-   for (int i = 0; i < QPalette::NColorRoles; i++)
+   int max = QPalette::NColorRoles;
+   if (max > list.count()) {
+      qWarning("The demanded palette seems to be incomplete!");
+      max = list.count();
+   }
+   for (int i = 0; i < max; i++)
       pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
 }
 
@@ -49,17 +54,20 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
    return list;
 }
 
-#define FIX_KAPP_PALETTE 1
+#define FIX_KAPP_PALETTE 0
 #if FIX_KAPP_PALETTE
 // this seems to be necessary as KDE somehow sets it's own palette after
 // creating the style - god knows why...
-static QPalette originalPalette;
 
+static QPalette originalPalette;
+#endif
 void BespinStyle::fixKdePalette()
 {
+#if FIX_KAPP_PALETTE
    qApp->setPalette(originalPalette);
-}
 #endif
+}
+
 
 #define readInt(_DEF_) iSettings->value(_DEF_).toInt()
 #define readBool(_DEF_) iSettings->value(_DEF_).toBool()
@@ -68,7 +76,7 @@ config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_DEF_).toInt();\
 Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1])
 //, QPalette::_DEF_, Colors::counterRole(QPalette::_DEF_))
 #define readGrad(_DEF_) (Gradients::Type) iSettings->value(_DEF_).toInt();
-#include <QtDebug>
+
 void
 BespinStyle::readSettings(const QSettings* settings)
 {
@@ -263,16 +271,13 @@ void BespinStyle::init(const QSettings* settings) {
    Gradients::init(config.bg.mode > ComplexLights ?
                    (Gradients::BgMode)config.bg.mode :
                    Gradients::BevelV, _progressBase, config.bg.intensity, dpi.f8);
-
    int f2 = dpi.f2, f4 = dpi.f4;
    QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
    inner.adjust(f4,f4,-f4,-dpi.f1); outer.adjust(0,0,0,dpi.f3);
    VisualFrame::setGeometry(QFrame::Sunken, inner, outer);
-
    inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
    inner.adjust(f2,f2,-f2,-f2); outer.adjust(-f2,-f2,f2,f2);
    VisualFrame::setGeometry(QFrame::Plain, inner, outer);
-
    inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
    inner.adjust(f2,f2,-f2,0); outer.adjust(-f2,-f2,f2,0);
    VisualFrame::setGeometry(QFrame::Raised, inner, outer);

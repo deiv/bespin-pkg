@@ -464,8 +464,13 @@ QStringList Config::colors(const QPalette &pal, QPalette::ColorGroup group) {
 }
 
 void Config::updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list) {
-      for (int i = 0; i < QPalette::NColorRoles; i++)
-         pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
+   int max = QPalette::NColorRoles;
+   if (max > list.count()) {
+      qWarning("The demanded palette seems to be incomplete!");
+      max = list.count();
+   }
+   for (int i = 0; i < max; i++)
+      pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
 }
 
 bool Config::load(const QString &preset) {
@@ -592,23 +597,18 @@ void Config::restore() {
    else
       emit changed(true); // we must update cause we loded probably different colors before
    
-   QStringList list; int i;
+   QStringList list;
    const QPalette &pal = QApplication::palette();
    QSettings settings("Bespin", "Store");
    settings.beginGroup(item->text());
    settings.beginGroup("QPalette");
    
    list = settings.value ( "active", colors(pal, QPalette::Active) ).toStringList();
-   for (i = 0; i < QPalette::NColorRoles; i++)
-      loadedPal->setColor ( QPalette::Active, (QPalette::ColorRole) i, QColor(list.at(i)) );
-   
+   updatePalette(*loadedPal, QPalette::Active, list);
    list = settings.value ( "inactive", colors(pal, QPalette::Inactive) ).toStringList();
-   for (i = 0; i < QPalette::NColorRoles; i++)
-      loadedPal->setColor ( QPalette::Inactive, (QPalette::ColorRole) i, QColor(list.at(i)) );
-   
+   updatePalette(*loadedPal, QPalette::Inactive, list);
    list = settings.value ( "disabled", colors(pal, QPalette::Disabled) ).toStringList();
-   for (i = 0; i < QPalette::NColorRoles; i++)
-      loadedPal->setColor ( QPalette::Disabled, (QPalette::ColorRole) i, QColor(list.at(i)) );
+   updatePalette(*loadedPal, QPalette::Disabled, list);
 
    settings.endGroup();
    settings.endGroup();
