@@ -24,6 +24,7 @@ inline static bool
 scrollAreaHovered(const QWidget* slider, StyleAnimator *animator)
 {
 //    bool scrollerActive = false;
+   if (!slider) return true;
    QWidget *scrollWidget = const_cast<QWidget*>(slider);
    if (!scrollWidget->isEnabled())
       return false;
@@ -98,7 +99,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
 
    cPainter = painter;
    bool useCache = false, needsPaint = true;
-
+   
    // we paint the slider bg ourselves, as otherwise a frame repaint would be
    // triggered (for no sense)
    if (!widget) // fallback ===========
@@ -137,7 +138,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
       }
    }
    // =================
-
+   
    OPT_ENABLED
 
    // Make a copy here and reset it for each primitive.
@@ -145,7 +146,6 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
    State saveFlags = newScrollbar.state;
    if (scrollbar->minimum == scrollbar->maximum)
       saveFlags &= ~State_Enabled;
-
    // hover animations =================
    if (scrollbar->activeSubControls & SC_ScrollBarSlider) {
       widgetStep = 0; scrollAreaHovered_ = true;
@@ -154,7 +154,6 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
       widgetStep = animator->hoverStep(widget);
       scrollAreaHovered_ = scrollAreaHovered(widget, animator);
    }
-
    SubControls hoverControls = scrollbar->activeSubControls &
       (SC_ScrollBarSubLine | SC_ScrollBarAddLine | SC_ScrollBarSlider);
    const ComplexHoverFadeInfo *info = animator->fadeInfo(widget, hoverControls);
@@ -170,11 +169,10 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
    else
       groove =
       subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBarGroove, widget);
-
    if (cPainter != painter) {
       cPainter->end(); delete cPainter; cPainter = painter;
    }
-
+   
    // Background and groove have been painted - flush the cache (in case)
    if (useCache)
       painter->drawPixmap(RECT.topLeft(), *scrollBgCache);
@@ -185,7 +183,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
    }
 
    const bool grooveIsSunken = config.scroll.groove > Groove::Groove;
-   
+
    if (isEnabled && scrollbar->subControls & SC_ScrollBarSlider) {
       newScrollbar.rect = scrollbar->rect;
       newScrollbar.state = saveFlags;

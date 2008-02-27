@@ -195,7 +195,7 @@ StyleAnimator::~StyleAnimator(){
 }
 
 void StyleAnimator::addProgressBar(QWidget* progress) {
-   if (progressbars.contains(progress)) return; // accidental double add
+   if (!progress || progressbars.contains(progress)) return; // accidental double add
    progressbars[progress] = 0;
    connect(progress, SIGNAL(destroyed(QObject*)),
            this, SLOT(destroyed(QObject*)));
@@ -213,7 +213,7 @@ void StyleAnimator::addScrollArea(QWidget *area) {
 }
 
 void StyleAnimator::addTab(QTabWidget* tab, int currentIndex) {
-   if (tabwidgets.contains(tab)) return; // accidental double add
+   if (!tab || tabwidgets.contains(tab)) return; // accidental double add
    tabwidgets[tab] = new TabAnimInfo(tab, currentIndex, _tabAnimSteps);
    connect(tab, SIGNAL(currentChanged(int)),
            this, SLOT(tabChanged(int)));
@@ -388,7 +388,8 @@ bool StyleAnimator::eventFilter( QObject* object, QEvent *e ) {
 
 const ComplexHoverFadeInfo *StyleAnimator::fadeInfo(const QWidget *widget,
    QStyle::SubControls activeSubControls) const {
-      QWidget *w = const_cast<QWidget*>(widget);
+   if (!widget) return 0L;
+   QWidget *w = const_cast<QWidget*>(widget);
    ComplexHoverFades::iterator it = complexHoverWidgets.find(w);
    if (it == complexHoverWidgets.end()) {
       // we have no entry yet
@@ -426,6 +427,7 @@ const ComplexHoverFadeInfo *StyleAnimator::fadeInfo(const QWidget *widget,
 
 const IndexedFadeInfo *StyleAnimator::fadeInfo(const QWidget *widget,
    long int index) const {
+   if (!widget) return 0L;
    QWidget *w = const_cast<QWidget*>(widget);
    IndexedFades::iterator it = indexedHoverWidgets.find(w);
    if (it == indexedHoverWidgets.end()) {

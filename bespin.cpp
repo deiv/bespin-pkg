@@ -86,6 +86,18 @@ static void
 #define registerCE(_FUNC_, _ELEM_) controlRoutine[QStyle::_ELEM_] = &BespinStyle::_FUNC_
 #define registerCC(_FUNC_, _ELEM_) complexRoutine[QStyle::_ELEM_] = &BespinStyle::_FUNC_
 
+// static void registerPE(char *S0, ...)
+// {
+//    register char *s;
+//    if (s=S0, s!=NULL)  { register char *sa;
+//       va_list a;
+//       for (va_start(a,S0);  (sa=va_arg(a,char*), sa!=NULL);  )
+//          while (*s=*sa, *sa)  ++s,++sa;
+//       va_end(a);
+//    }
+//    return ((int)(s-S0));
+// }
+
 void
 BespinStyle::registerRoutines()
 {
@@ -118,6 +130,7 @@ BespinStyle::registerRoutines()
    // frames.cpp
    registerCE(skip, CE_FocusFrame);
    registerPE(skip, PE_FrameStatusBar);
+   registerPE(skip, PE_FrameStatusBarItem);
    registerPE(drawFocusFrame, PE_FrameFocusRect);
    registerPE(drawFrame, PE_Frame);
    registerCC(drawGroupBox, CC_GroupBox);
@@ -276,9 +289,9 @@ BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
    Q_ASSERT(option);
    Q_ASSERT(painter);
 //    if (pe == PE_IndicatorItemViewItemDrop)
+// An indicator that is drawn to show where an item in an item view is about to
+// be dropped during a drag-and-drop operation in an item view.
 //       qWarning("IndicatorItemViewItemDrop, %d", pe);
-//    if (pe == PE_PanelStatusBar)
-//       qWarning("PanelStatusBar, %d", pe);
    if (pe < N_PE && primitiveRoutine[pe])
       (this->*primitiveRoutine[pe])(option, painter, widget);
    else

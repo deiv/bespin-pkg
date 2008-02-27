@@ -410,8 +410,14 @@ void
 BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
                       const QWidget *widget) const
 {
-   const QStyleOptionViewItemV2 *item =
-      qstyleoption_cast<const QStyleOptionViewItemV2 *>(option);
+#if QT_VERSION >= 0x04040
+#define OPTION_VIEW_ITEM QStyleOptionViewItemV4
+#else
+#define OPTION_VIEW_ITEM QStyleOptionViewItemV2
+#endif
+   const OPTION_VIEW_ITEM *item =
+      qstyleoption_cast<const OPTION_VIEW_ITEM *>(option);
+
    if (!item) return;
 
    // this could just lead to cluttered listviews...?!
@@ -432,13 +438,15 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
       else
          painter->fillRect(RECT, PAL.brush(QPalette::Highlight));
    }
-   // TODO: requires Qt4.4 ...
-//    else if (item->backgroundBrush.style() != Qt::NoBrush) {
-//       QPoint oldBO = painter->brushOrigin();
-//       painter->setBrushOrigin(item->rect.topLeft());
-//       painter->fillRect(item->rect, item->backgroundBrush);
-//       painter->setBrushOrigin(oldBO);
-//    }
+#if QT_VERSION >= 0x04040
+#warning Compiling with Qt4.4 - do NOT use with lower versions
+   else if (item->backgroundBrush.style() != Qt::NoBrush) {
+      QPoint oldBO = painter->brushOrigin();
+      painter->setBrushOrigin(item->rect.topLeft());
+      painter->fillRect(item->rect, item->backgroundBrush);
+      painter->setBrushOrigin(oldBO);
+   }
+#endif
    else if (item->features & QStyleOptionViewItemV2::Alternate)
       painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
    
