@@ -70,8 +70,7 @@ BespinStyle::drawToolButton(const QStyleOptionComplex * option,
    step = animator->hoverStep(widget);
 
    // frame around whole button
-//    if (option->state & State_On ||
-//        toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly)
+   if (option->state & State_On)
    {
       tool.rect = RECT; tool.state = bflags;
       drawToolButtonShape(&tool, painter, widget);
@@ -112,25 +111,25 @@ BespinStyle::drawToolButtonShape(const QStyleOption * option,
    
    const bool isOn = option->state & State_On;
    const QColor &c = Colors::bg(PAL, widget);
-   if (isOn)
+   if (isOn) {
       masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
-   if (step || sunken) {
-      QRect r = RECT;
-      if (!sunken) {
-         step = 6 - step;
-         const int dx = step*r.width()/20, dy = step*r.height()/20;
-         r.adjust(dx, dy, -dx, -dy);
-         step = 6 - step;
-      }
-      const Gradients::Type gt = sunken ? Gradients::Sunken :
-         (Colors::value(c) < 108 ? Gradients::Simple : Gradients::Button);
-      masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
-   }
-   if (isOn)
+//    if (step || sunken) {
+//       QRect r = RECT;
+//       if (!sunken) {
+//          step = 6 - step;
+//          const int dx = step*r.width()/20, dy = step*r.height()/20;
+//          r.adjust(dx, dy, -dx, -dy);
+//          step = 6 - step;
+//       }
+//       const Gradients::Type gt = sunken ? Gradients::Sunken :
+//          (Colors::value(c) < 108 ? Gradients::Simple : Gradients::Button);
+//       masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
+//    }
+//    if (isOn)
       shadows.sunken[true][true].render(RECT, painter);
+   }
 }
 
-#ifndef QT_NO_XRENDER
 static QPixmap scaledIcon, emptyIcon;
 qint64 lastIconPix = 0;
 static QPixmap &
@@ -142,14 +141,17 @@ icon(QPixmap &pix, int step)
          emptyIcon = QPixmap(scaledIcon.size());
       lastIconPix = pix.cacheKey();
    }
+#ifndef QT_NO_XRENDER
    emptyIcon.fill(Qt::transparent);
    OXRender::composite(pix, NULL, emptyIcon,
                        0, 0, 0, 0, dpi.f2, dpi.f2,
                        pix.width(), pix.height(), PictOpOver);
    OXRender::blend(scaledIcon, emptyIcon, step/6.0);
    return emptyIcon;
-}
+#else
+   return step ? scaledIcon : pix;
 #endif
+}
 
 void
 BespinStyle::drawToolButtonLabel(const QStyleOption * option,
@@ -158,16 +160,25 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
    const QStyleOptionToolButton *toolbutton
       = qstyleoption_cast<const QStyleOptionToolButton *>(option);
    if (!toolbutton) return;
-
    OPT_ENABLED
-      
+
    // Arrow type always overrules and is always shown
-   bool hasArrow = toolbutton->features & QStyleOptionToolButton::Arrow;
-   if ((!hasArrow && toolbutton->icon.isNull()) &&
-         !toolbutton->text.isEmpty() ||
-         toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly) {
+   const bool hasArrow = toolbutton->features & QStyleOptionToolButton::Arrow;
+   const bool justText =
+      (!hasArrow && toolbutton->icon.isNull()) &&
+      !toolbutton->text.isEmpty() ||
+      toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
+
+   OPT_SUNKEN
+      
+   if (justText) { // the most simple way
+      painter->setPen(Colors::mid(FCOLOR(WindowText),
+                                  FCOLOR(Highlight), 6-step, step));
+      QFont fnt = toolbutton->font;
+      if (sunken) fnt.setBold(true);
+      painter->setFont(fnt);
       drawItemText(painter, RECT, Qt::AlignCenter | Qt::TextShowMnemonic, PAL,
-                   isEnabled, toolbutton->text, QPalette::WindowText);
+                   isEnabled, toolbutton->text);
       return;
    }
 
@@ -176,7 +187,6 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
    QPixmap pm;
    QSize pmSize = toolbutton->iconSize;
    if (!toolbutton->icon.isNull()) {
-      OPT_SUNKEN
       QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
       QIcon::Mode mode;
       if (!isEnabled)
@@ -187,21 +197,26 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
          mode = QIcon::Normal;
       pm = toolbutton->icon.pixmap(RECT.size().boundedTo(toolbutton->iconSize),
                                    mode, state);
-      if (step && !sunken && !pm.isNull()) {
-#ifndef QT_NO_XRENDER // crossblend
+      if (step && !sunken && !pm.isNull())
+#ifndef QT_NO_XRENDER
          pm = icon(pm, step);
 #else
-         if (hover)
-            pm = pm.scaledToHeight ( pm.height() + dpi.f4, Qt::SmoothTransformation );
+         pm = icon(pm, hover);
 #endif
-      }
       pmSize = pm.size();
    }
 
-   if (toolbutton->toolButtonStyle != Qt::ToolButtonIconOnly) {
+   if (!(toolbutton->text.isEmpty() ||
+         toolbutton->toolButtonStyle == Qt::ToolButtonIconOnly)) {
+      QColor c = FCOLOR(Window);
+      if (pm.isNull())
+         c = Colors::mid(c, FCOLOR(Highlight), 6-step, step);
+      painter->setPen(c);
+            
 //       QFont fnt = toolbutton->font;
-//       if (hover) fnt.setBold(true);
+//       if (hover) fnt.setUnderline(true);
       painter->setFont(toolbutton->font);
+      
       QRect pr = RECT, tr = RECT;
       int alignment = Qt::TextShowMnemonic;
 
@@ -224,7 +239,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
             drawSolidArrow(Navi::S, pr, painter);
          alignment |= Qt::AlignLeft | Qt::AlignVCenter;
       }
-      drawItemText(painter, tr, alignment, PAL, isEnabled, toolbutton->text, QPalette::WindowText);
+      drawItemText(painter, tr, alignment, PAL, isEnabled, toolbutton->text);
       return;
    }
 

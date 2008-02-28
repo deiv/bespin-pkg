@@ -30,9 +30,9 @@ public:
    }
 };
 
-static EventKiller *eventKiller = new EventKiller();
+static EventKiller eventKiller;
 
-#define _BLOCKEVENTS_(obj) obj->installEventFilter(eventKiller)
-#define _UNBLOCKEVENTS_(obj) obj->removeEventFilter(eventKiller)
+#define _BLOCKEVENTS_(obj) obj->installEventFilter(&eventKiller)
+#define _UNBLOCKEVENTS_(obj) obj->removeEventFilter(&eventKiller)
 
 #endif // EVENTKILLER_H

@@ -36,7 +36,6 @@ extern Config config;
 extern Dpi dpi;
 static Gradients::Type _progressBase;
 
-#include <QtDebug>
 static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list) {
    int max = QPalette::NColorRoles;
    if (max > list.count()) {

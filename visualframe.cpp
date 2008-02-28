@@ -77,20 +77,20 @@ VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect 
    sizes[t][East] = outer.right() - inner.right();
    sizes[t][West] = inner.x() - outer.x();
    extends[t][North] = -outer.y();
-   extends[t][South] = outer.bottom() - 99;
-   extends[t][East] = outer.right() - 99;
+   extends[t][South] = outer.bottom() - 98; // TODO: this should be 99 - understand why not...
+   extends[t][East] = outer.right() - 98; // as above
    extends[t][West] = -outer.x();
 }
 
 class StdChildAdd : public QObject
 {
 public:
-   bool eventFilter( QObject *, QEvent *ev) {
+   bool eventFilter( QObject *o, QEvent *ev) {
       return (ev->type() == QEvent::ChildAdded);
    }
 };
 
-static StdChildAdd *stdChildAdd = 0L;
+static StdChildAdd stdChildAdd;
 
 bool
 VisualFrame::manage(QFrame *frame)
@@ -150,12 +150,15 @@ VisualFrame::updateShape()
       _window = _window->parentWidget();
    }
 
-   _frame->installEventFilter(stdChildAdd);
+   _window->installEventFilter(&stdChildAdd);
+//    const bool on = _window->testAttribute(Qt::WA_NoChildEventsFromChildren);
+//    _window->setAttribute(Qt::WA_NoChildEventsFromChildren, true);
    top = new VisualFramePart(_window, _frame, North);
    bottom = new VisualFramePart(_window, _frame, South);
    left = new VisualFramePart(_window, _frame, West);
    right = new VisualFramePart(_window, _frame, East);
-   _frame->removeEventFilter(stdChildAdd);
+//    _window->setAttribute(Qt::WA_NoChildEventsFromChildren, on);
+   _window->removeEventFilter(&stdChildAdd);
 
    // manage events
    top->installEventFilter(this);

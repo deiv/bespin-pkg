@@ -60,6 +60,17 @@ static const char* defInfo2 =
 </div>";
 
 
+static const char* defInfo3 =
+"<div align=\"center\">\
+<img src=\":/bespin.png\"/><br>\
+<a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>\
+</div>\
+<h2>Warning!</h2>\
+<p>\
+Activating these hacks...\
+</p>\
+";
+
 /** Intenal class for the PW Char entry - not of interest */
 
 static ushort unicode(const QString &string) {
@@ -270,6 +281,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.headerSortingRole, "View.SortingHeaderRole", QPalette::Text);
    handleSettings(ui.headerGradient, "View.HeaderGradient", GradButton);
    handleSettings(ui.headerSortingGradient, "View.SortingHeaderGradient", GradSunken);
+
+   handleSettings(ui.hackMessages, HACK_MESSAGES);
    
    /** setContextHelp(.) attaches a context help string to a widget on your form */
    setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
@@ -433,6 +446,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                   you to activate items with a SINGLE mouseclick, rather than\
                   the M$ DOUBLEclick thing ;)<br>\
                   (Not exported from presets)");
+
+   setContextHelp(ui.hackMessages, "<b>Hack Messageboxes</b><hr>");
 
    
    /** setQSetting(.) tells BConfig to store values at
