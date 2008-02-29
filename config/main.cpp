@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
    }
 #if PUSHER
    case Pusher: {
-      QFile lock(QDir::tempPath() + "bespinPP.lock");
+      QFile lock(QDir::tempPath() + "/bespinPP.lock");
       
       if (argc > 2 && !qstrcmp( argv[2], "stop" )) {
          if (!lock.exists()) // nope...
