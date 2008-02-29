@@ -44,7 +44,7 @@ type(QFrame::Shadow shadow)
    case QFrame::Sunken: return VFrame::Sunken;
    }
 }
-
+#include <QtDebug>
 void
 VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer)
 {
@@ -77,8 +77,8 @@ VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect 
    sizes[t][East] = outer.right() - inner.right();
    sizes[t][West] = inner.x() - outer.x();
    extends[t][North] = -outer.y();
-   extends[t][South] = outer.bottom() - 98; // TODO: this should be 99 - understand why not...
-   extends[t][East] = outer.right() - 98; // as above
+   extends[t][South] = outer.bottom() - 99; 
+   extends[t][East] = outer.right() - 99;
    extends[t][West] = -outer.x();
 }
 
@@ -175,11 +175,12 @@ VisualFrame::correctPosition()
    if (_style != QFrame::StyledPanel) return;
    
    QRect rect = _frame->frameRect();
-   // TODO: this works around a Qt rtl (bug(?))!
+   // NOTICE: this works around a Qt rtl (bug(?))!
    if ((_frame->layoutDirection() == Qt::RightToLeft) &&
        rect.right() != _frame->rect().right() &&
        _frame->inherits("QAbstractScrollArea"))
       rect.moveLeft(rect.x() + (_frame->rect().right() - rect.right()));
+   //-------------------------
    rect.translate(_frame->mapTo(_window, QPoint(0,0)));
 //    int offs = _off[0]+_off[1];
 
@@ -221,6 +222,7 @@ VisualFrame::correctPosition()
    right->resize(sizes[t][East], rect.height() - offs);
    right->move(rect.right() + 1 - sizes[t][East] + extends[t][East],
                rect.y() + sizes[t][North] - extends[t][North]);
+//    qDebug() << _frame->frameRect() << rect << right->geometry();
 }
 
 #define PARTS(_FUNC_) top->_FUNC_; left->_FUNC_; right->_FUNC_; bottom->_FUNC_

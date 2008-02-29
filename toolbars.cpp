@@ -222,7 +222,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
 
       if (toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon) {
          int fh = painter->fontMetrics().height();
-         pr.adjust(0, dpi.f3, 0, -fh - dpi.f5);
+         pr.adjust(0, 0, 0, -fh - dpi.f2);
          tr.adjust(0, pr.bottom(), 0, -dpi.f3);
          if (!hasArrow)
             drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
