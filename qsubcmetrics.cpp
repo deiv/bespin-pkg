@@ -511,7 +511,8 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
          default:
             break;
          }
-         x +=off; y += off; off *= 2;
+         off -= dpi.f2; x +=off; y += off;
+         off = 2*(off+dpi.f4);
          return QRect(x,y,off,off);
       }
    case SE_TabWidgetTabBar: { //

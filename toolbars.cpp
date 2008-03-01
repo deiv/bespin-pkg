@@ -155,7 +155,7 @@ icon(QPixmap &pix, int step)
 
 void
 BespinStyle::drawToolButtonLabel(const QStyleOption * option,
-                                 QPainter * painter, const QWidget *) const
+                                 QPainter * painter, const QWidget *widget) const
 {
    const QStyleOptionToolButton *toolbutton
       = qstyleoption_cast<const QStyleOptionToolButton *>(option);
@@ -185,9 +185,12 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
    OPT_HOVER
       
    QPixmap pm;
-   QSize pmSize = toolbutton->iconSize;
+   QSize pmSize = RECT.size() - QSize(dpi.f4, dpi.f4);
+   pmSize = pmSize.boundedTo(toolbutton->iconSize);
+
    if (!toolbutton->icon.isNull()) {
-      QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
+      const QIcon::State state =
+         toolbutton->state & State_On ? QIcon::On : QIcon::Off;
       QIcon::Mode mode;
       if (!isEnabled)
          mode = QIcon::Disabled;
@@ -195,8 +198,8 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
          mode = QIcon::Active;
       else
          mode = QIcon::Normal;
-      pm = toolbutton->icon.pixmap(RECT.size().boundedTo(toolbutton->iconSize),
-                                   mode, state);
+
+      pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), mode, state);
       if (step && !sunken && !pm.isNull())
 #ifndef QT_NO_XRENDER
          pm = icon(pm, step);
@@ -208,7 +211,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
 
    if (!(toolbutton->text.isEmpty() ||
          toolbutton->toolButtonStyle == Qt::ToolButtonIconOnly)) {
-      QColor c = FCOLOR(Window);
+      QColor c = FCOLOR(WindowText);
       if (pm.isNull())
          c = Colors::mid(c, FCOLOR(Highlight), 6-step, step);
       painter->setPen(c);
@@ -231,12 +234,13 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
          alignment |= Qt::AlignCenter;
       }
       else {
-         pr.setWidth(pmSize.width() + dpi.f8);
-         tr.adjust(pr.right(), 0, 0, 0);
          if (!hasArrow)
             drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
          else
             drawSolidArrow(Navi::S, pr, painter);
+
+         pr.setWidth(pmSize.width() + dpi.f4);
+         tr.adjust(pr.right(), 0, 0, 0);
          alignment |= Qt::AlignLeft | Qt::AlignVCenter;
       }
       drawItemText(painter, tr, alignment, PAL, isEnabled, toolbutton->text);
