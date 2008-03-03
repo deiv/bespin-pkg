@@ -275,6 +275,7 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter,
        
    int d = qMax(rect.width()/6, dpi.f10);
    int r = (rect.width()-d)/2;
+   // angle calculation from qcommonstyle.cpp (c) Trolltech 1992-2007, ASA.
    qreal a;
    if (dial->maximum == dial->minimum)
       a = M_PI / 2;
@@ -298,11 +299,13 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter,
    painter->drawEllipse(rect);
    // the value
    QFont fnt = painter->font();
-   fnt.setPixelSize( rect.height()/3 );
+   int h = rect.height()/2;
+   h -= 2 * (h - qMin(h, painter->fontMetrics().xHeight())) / 3;
+   fnt.setPixelSize( h );
    painter->setFont(fnt);
    painter->setBrush(Qt::NoBrush);
    painter->setPen(Colors::mid(PAL.background().color(),
-                               PAL.foreground().color(),2,1));
+                               PAL.foreground().color(),1,2));
    drawItemText(painter, rect,  Qt::AlignCenter, PAL, isEnabled,
                 QString::number(dial->sliderValue));
    

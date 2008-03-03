@@ -69,15 +69,17 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
       if (isSpecialFrame(widget)) { // ...TextEdit, KateView, ...
          brush = &PAL.color(QPalette::Base);
       }
-      else { // maybe we need to corect a textlabels margin
+      else {
+         // maybe we need to corect a textlabels margin
          if (const QLabel* label = qobject_cast<const QLabel*>(widget)) {
             if (label->text() != QString() && label->margin() < dpi.f3)
                const_cast<QLabel*>(label)->setMargin(dpi.f3);
          }
+         // or paint a decent combobox dropdown frame...
          else if (widget->inherits("QComboBoxPrivateContainer")) {
             // combo dropdowns
             SAVE_PEN;
-            painter->setPen(Colors::mid(FCOLOR(Base),FCOLOR(Text)));
+            painter->setPen(Colors::mid(FCOLOR(Base),FCOLOR(Text),4,1));
             painter->drawRect(RECT.adjusted(0,0,-1,-1));
             RESTORE_PEN;
          }

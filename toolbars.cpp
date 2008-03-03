@@ -234,13 +234,14 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
          alignment |= Qt::AlignCenter;
       }
       else {
+         pr.setWidth(toolbutton->iconSize.width() + dpi.f4);
+         
          if (!hasArrow)
             drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
          else
             drawSolidArrow(Navi::S, pr, painter);
 
-         pr.setWidth(pmSize.width() + dpi.f4);
-         tr.adjust(pr.right(), 0, 0, 0);
+         tr.adjust(pr.width() + dpi.f4, 0, 0, 0);
          alignment |= Qt::AlignLeft | Qt::AlignVCenter;
       }
       drawItemText(painter, tr, alignment, PAL, isEnabled, toolbutton->text);

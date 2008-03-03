@@ -19,7 +19,7 @@
    <item row="0" column="0" colspan="4" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="demo" >
       <property name="geometry" >
@@ -383,8 +383,8 @@ p, li { white-space: pre-wrap; }
              <string>Text Under</string>
             </property>
             <property name="icon" >
-             <iconset>
-              <normaloff>designer.png</normaloff>designer.png</iconset>
+             <iconset resource="config.qrc" >
+              <normaloff>:/bespin.png</normaloff>:/bespin.png</iconset>
             </property>
             <property name="toolButtonStyle" >
              <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -397,8 +397,8 @@ p, li { white-space: pre-wrap; }
              <string>Text aside</string>
             </property>
             <property name="icon" >
-             <iconset>
-              <normaloff>designer.png</normaloff>designer.png</iconset>
+             <iconset resource="config.qrc" >
+              <normaloff>:/bespin.png</normaloff>:/bespin.png</iconset>
             </property>
             <property name="toolButtonStyle" >
              <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -418,8 +418,8 @@ p, li { white-space: pre-wrap; }
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset>
-              <normaloff>designer.png</normaloff>designer.png</iconset>
+             <iconset resource="config.qrc" >
+              <normaloff>:/bespin.png</normaloff>:/bespin.png</iconset>
             </property>
            </widget>
           </item>
@@ -495,8 +495,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>800</width>
-        <height>480</height>
+        <width>521</width>
+        <height>420</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -591,8 +591,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>800</width>
-        <height>480</height>
+        <width>521</width>
+        <height>420</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -1000,8 +1000,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>800</width>
-        <height>480</height>
+        <width>521</width>
+        <height>420</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -1021,8 +1021,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>800</width>
-            <height>480</height>
+            <width>495</width>
+            <height>365</height>
            </rect>
           </property>
           <attribute name="title" >
@@ -1130,8 +1130,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>100</width>
-            <height>30</height>
+            <width>495</width>
+            <height>365</height>
            </rect>
           </property>
           <attribute name="title" >
@@ -1148,8 +1148,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>100</width>
-                <height>30</height>
+                <width>199</width>
+                <height>163</height>
                </rect>
               </property>
               <attribute name="title" >
@@ -1181,8 +1181,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>19</width>
-                <height>16</height>
+                <width>235</width>
+                <height>117</height>
                </rect>
               </property>
               <attribute name="label" >
@@ -1220,8 +1220,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>66</width>
-                <height>38</height>
+                <width>236</width>
+                <height>116</height>
                </rect>
               </property>
               <attribute name="label" >
@@ -1265,8 +1265,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>100</width>
-                <height>30</height>
+                <width>198</width>
+                <height>162</height>
                </rect>
               </property>
               <attribute name="title" >
@@ -1299,8 +1299,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>800</width>
-        <height>480</height>
+        <width>521</width>
+        <height>420</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -1491,8 +1491,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>800</width>
-        <height>480</height>
+        <width>521</width>
+        <height>420</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -1638,7 +1638,9 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="config.qrc" />
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

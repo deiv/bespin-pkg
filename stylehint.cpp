@@ -93,16 +93,16 @@ int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const 
 //          return cmb->count() < 11; // maybe depend on item count?!
       return false;
    case SH_ComboBox_PopupFrameStyle:
-      return QFrame::NoFrame; //QFrame::StyledPanel | QFrame::Plain;
+      return QFrame::StyledPanel | QFrame::Plain;
 ///    case SH_Workspace_FillSpaceOnMaximize: // The workspace should maximize the client area.
    case SH_TitleBar_NoBorder:
       return true; // The title bar has no border.
    case SH_ScrollBar_StopMouseOverSlider:
-      return false; // Stops auto-repeat when the slider reaches the mouse position. (hähh?)
+      return false; // Stops auto-repeat when the slider reaches the mouse position. (hï¿½hh?)
    case SH_BlinkCursorWhenTextSelected:
       return false; // that's annoying
    case SH_RichText_FullWidthSelection:
-      return true; /// (hähh?)
+      return true; /// (hï¿½hh?)
    case SH_GroupBox_TextLabelVerticalAlignment:
       return Qt::AlignTop; // we've no halfheight frame
    case SH_GroupBox_TextLabelColor:
@@ -142,7 +142,7 @@ int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const 
    case SH_MenuBar_DismissOnSecondClick:
       return true; // simple close popups
    case SH_MessageBox_UseBorderForButtonSpacing:
-      return false; // hähh?
+      return false; // hï¿½hh?
    case SH_TitleBar_AutoRaise:
       return true; // hover titlebar buttons in MDI
    case SH_ToolButton_PopupDelay:

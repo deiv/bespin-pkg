@@ -42,7 +42,7 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
    case PM_ButtonShiftHorizontal: // Horizontal contents shift of a button when the button is down
    case PM_ButtonShiftVertical: // Vertical contents shift of a button when the button is down
       return 0;
-   case PM_DefaultFrameWidth: // Default frame width (usually 2)
+   case PM_DefaultFrameWidth: // 2
       if (widget && widget->inherits("QComboBoxPrivateContainer"))
          return 1;
       if (!(widget && qobject_cast<const QFrame*>(widget) &&
