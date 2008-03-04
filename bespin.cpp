@@ -130,7 +130,9 @@ BespinStyle::registerRoutines()
    // frames.cpp
    registerCE(skip, CE_FocusFrame);
    registerPE(skip, PE_FrameStatusBar);
+#if QT_VERSION >= 0x04040
    registerPE(skip, PE_FrameStatusBarItem);
+#endif
    registerPE(drawFocusFrame, PE_FrameFocusRect);
    registerPE(drawFrame, PE_Frame);
    registerCC(drawGroupBox, CC_GroupBox);
@@ -208,8 +210,10 @@ BespinStyle::registerRoutines()
    registerCC(drawTree, CC_Q3ListView);
    registerCE(drawRubberBand, CE_RubberBand);
    registerPE(drawHeaderArrow, PE_IndicatorHeaderArrow);
+#if QT_VERSION >= 0x04040
    registerPE(drawItem, PE_PanelItemViewRow);
    registerPE(drawItem, PE_PanelItemViewItem);
+#endif
    // window.cpp
    registerPE(drawWindowFrame, PE_FrameWindow);
    registerPE(drawWindowBg, PE_Widget);
