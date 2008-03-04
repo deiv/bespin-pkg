@@ -120,7 +120,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
 
    const QAbstractButton* btn = qobject_cast<const QAbstractButton*>(widget);
    const int f1 = dpi.f1, f2 = dpi.f2;
-   const bool toggled = !hover && (option->state & State_On);
+//    const bool toggled = !hover && (option->state & State_On);
    const bool round = !isCheckbox && (config.btn.round ||
                                       (btn && btn->isCheckable()));
    const bool fullHover =
@@ -133,10 +133,10 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    Gradients::Type gt = GRAD(btn);
    QColor c = btnBg(PAL, isEnabled, hasFocus, animStep,
                     fullHover, Gradients::isReflective(gt));
-   QColor iC = FCOLOR(Window);
+   QColor iC = CCOLOR(btn.std, Bg); //FCOLOR(Window);
 
    bool drawInner = false;
-   if ((config.btn.cushion && sunken) || toggled) {
+   if ((config.btn.cushion && sunken)/* || toggled*/) {
       gt = Gradients::Sunken;
       drawInner = true;
    }
@@ -208,7 +208,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    }
    
    // plate
-   masks.rect[round].render(r, painter, toggled ? Gradients::Sunken : GRAD(btn),
+   masks.rect[round].render(r, painter, /*toggled ? Gradients::Sunken : */GRAD(btn),
                             Qt::Vertical, c);
 
    // outline

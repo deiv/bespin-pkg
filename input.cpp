@@ -28,7 +28,7 @@ BespinStyle::drawLineEditFrame(const QStyleOption * option, QPainter * painter,
       
    QRect r = RECT.adjusted(0,0,0,-dpi.f2);
    if (hasFocus) {
-      QColor h = FCOLOR(Highlight); h.setAlpha(102);
+      QColor h = FCOLOR(Highlight); h.setAlpha(128);
       masks.rect[false].outline(r, painter, h, dpi.f3);
    }
    shadows.sunken[false][isEnabled].render(r, painter);
@@ -215,14 +215,18 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
 
          c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover,
                    Gradients::isReflective(GRAD(chooser)));
+         if (hasFocus) {
+            const int contrast = Colors::contrast(c, FCOLOR(Highlight));
+            c = Colors::mid(c, FCOLOR(Highlight), contrast/5, 1);
+         }
          
          mask.render(r, painter, GRAD(chooser), Qt::Vertical, c);
 
-         if (hasFocus) {
-            const int contrast = Colors::contrast(c, FCOLOR(Highlight));
-            const QColor fc = Colors::mid(c, FCOLOR(Highlight), contrast/10, 1);
-            mask.outline(r, painter, fc, f3);
-         }
+//          if (hasFocus) {
+//             const int contrast = Colors::contrast(c, FCOLOR(Highlight));
+//             const QColor fc = Colors::mid(c, FCOLOR(Highlight), contrast/10, 1);
+//             mask.outline(r, painter, fc, f3);
+//          }
 
          // maybe hover indicator?
          if (!config.btn.fullHover && animStep) { // jupp ;)

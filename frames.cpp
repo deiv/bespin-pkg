@@ -118,7 +118,7 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
       shadows.line[true][Sunken].render(RECT, painter, Tile::Full, true);
    }
    if (hasFocus) {
-      QColor h = FCOLOR(Highlight); h.setAlpha(102);
+      QColor h = FCOLOR(Highlight); h.setAlpha(128);
       if (const VisualFramePart* vfp =
           qobject_cast<const VisualFramePart*>(widget)) {
          Tile::setShape(Tile::Ring);

@@ -93,7 +93,11 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
    if ((slider->subControls & SC_SliderGroove) && groove.isValid()) {
       QStyleOption grooveOpt = *option;
       grooveOpt.rect = groove;
+
+      const Groove::Mode gType = config.scroll.groove;
+      if (gType) config.scroll.groove = Groove::Groove;
       drawScrollBarGroove(&grooveOpt, painter, widget);
+      config.scroll.groove = gType;
 #if 0
       painter->save();
 

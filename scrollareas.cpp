@@ -282,10 +282,11 @@ BespinStyle::drawScrollBarGroove(const QStyleOption * option,
       painter->fillRect(r, Colors::mid(FCOLOR(Base), FCOLOR(Text), 20, 1));
       return;
    }
-
-   const QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText),3,1);
-   if (config.scroll.groove)
-      masks.rect[false].render(RECT, painter, Gradients::Sunken,
+   const Groove::Mode gType = config.scroll.groove;
+   const QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText),
+                                 1+gType*gType, 1);
+   if (gType)
+      masks.rect[true].render(RECT, painter, Gradients::Sunken,
                                horizontal ? Qt::Vertical : Qt::Horizontal, bg);
    else {
       SAVE_PEN;
