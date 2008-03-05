@@ -131,6 +131,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    connect (ui.store, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)),
             this, SLOT(storedSettigSelected(QListWidgetItem *)));
    connect (ui.btnDelete, SIGNAL(clicked()), this, SLOT(remove()));
+   connect (ui.presetFilter, SIGNAL(textChanged (const QString &)),
+            this, SLOT(filterPresets(const QString &)));
    ui.btnRestore->setEnabled(false);
    ui.btnExport->setEnabled(false);
    ui.btnDelete->setEnabled(false);
@@ -586,13 +588,15 @@ void Config::saveAs() {
 void
 Config::import()
 {
-   QString filename = QFileDialog::getOpenFileName(parentWidget(),
+   QStringList filenames = QFileDialog::getOpenFileNames(parentWidget(),
       tr("Import Configuration"), lastPath, tr("Config Files (*.bespin *.conf *.ini)"));
-   
-   QString storeName = sImport(filename);
-   if (storeName.isNull()) {
-      ui.store->addItem(storeName);
-      ui.store->sortItems();
+
+   foreach(QString filename, filenames) {
+      QString storeName = sImport(filename);
+      if (!storeName.isNull()) {
+         ui.store->addItem(storeName);
+         ui.store->sortItems();
+      }
    }
 }
 
@@ -770,6 +774,16 @@ void Config::learnPwChar() {
    QStringList list = settings.value ( "UserPwChars", QStringList() ).toStringList();
    list << QString::number( n, 16 );
    settings.setValue("UserPwChars", list);
+}
+
+void Config::filterPresets(const QString & string)
+{
+   QListWidgetItem *item;
+   const int cnt = ui.store->count();
+   for (int i = 0; i < cnt; ++i) {
+      item = ui.store->item(i);
+      item->setHidden(!item->text().contains(string, Qt::CaseInsensitive));
+   }
 }
 
 static bool haveIcons = false;

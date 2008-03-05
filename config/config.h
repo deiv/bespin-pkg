@@ -61,6 +61,7 @@ private slots:
    void handleBgMode(int);
    void handleGrooveMode(int);
    void learnPwChar();
+   void filterPresets(const QString & text);
 };
 
 #endif

@@ -119,9 +119,18 @@ int main(int argc, char *argv[])
    case Import: {
       if (argc < 3)
          return error("you lack <some_config.bespin>");
-      if (!QFile::exists(argv[2]))
-         return error(QString("The file %1 does not exist").arg(argv[2]));
-      return Config::sImport(argv[2]).isNull();
+      bool errors = false;
+      for (int i = 2; i < argc; ++i) {
+         if (!QFile::exists(argv[i])) {
+            errors = true;
+            error(QString("The file %1 does not exist").arg(argv[i]));
+         }
+         else {
+            if (Config::sImport(argv[i]).isNull())
+               errors = true;
+         }
+      }
+      return errors;
    }
    case Export: {
       if (argc < 3)
