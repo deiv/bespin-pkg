@@ -438,7 +438,7 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
       else
          painter->fillRect(RECT, PAL.brush(QPalette::Highlight));
    }
-#if QT_VERSION >= 0x04040
+#if QT_VERSION >= 0x040400
 #warning Compiling with Qt4.4 - do NOT use with lower versions
    else if (item->backgroundBrush.style() != Qt::NoBrush) {
       QPoint oldBO = painter->brushOrigin();

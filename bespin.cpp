@@ -210,7 +210,7 @@ BespinStyle::registerRoutines()
    registerCC(drawTree, CC_Q3ListView);
    registerCE(drawRubberBand, CE_RubberBand);
    registerPE(drawHeaderArrow, PE_IndicatorHeaderArrow);
-#if QT_VERSION >= 0x04040
+#if QT_VERSION >= 0x040400
    registerPE(drawItem, PE_PanelItemViewRow);
    registerPE(drawItem, PE_PanelItemViewItem);
 #endif
