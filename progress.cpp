@@ -105,10 +105,10 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
    p.setBrushOrigin(0,1);
    p.drawEllipse(1,1,ss,ss-1);
    p.setBrush(Qt::NoBrush);
+   p.setPen(QColor(255,255,255,40));
+   p.drawEllipse(1,1,ss,ss);
    p.setPen(QColor(0,0,0,70));
-   p.drawEllipse(1,1,ss,ss-1);
-   p.setPen(QColor(255,255,255,70));
-   p.drawEllipse(1,2,ss,ss-1);
+   p.drawEllipse(2,2,ss-2,ss-2);
    p.end();
 
    if (vertical) {

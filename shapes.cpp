@@ -80,10 +80,12 @@ void
 BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter,
                        const QWidget *, bool itemview) const
 {
+#if QT_VERSION >= 0x040400
    if (const QStyleOptionViewItemV2 *item =
        qstyleoption_cast<const QStyleOptionViewItemV2 *>(option))
    if (!(item->features & QStyleOptionViewItemV2::HasCheckIndicator))
       return;
+#endif
 //       if (option->state & State_NoChange)
 //          break;
    QStyleOption copy = *option;
