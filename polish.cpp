@@ -492,12 +492,14 @@ void BespinStyle::unPolish( QApplication *app )
 
 void BespinStyle::unPolish( QWidget *widget )
 {
+   if (QFrame *frame = qobject_cast<QFrame *>(widget))
+      VisualFrame::release(frame);
+/*   if (qobject_cast<VisualFramePart*>(widget)) {
+      delete widget; widget = 0L; return
+   }*/
+   
    animator->unregistrate(widget);
    Hacks::remove(widget);
-   
-   if (qobject_cast<VisualFrame*>(widget))
-      delete widget; widget = 0L;
-   
+
    widget->removeEventFilter(this);
-   
 }

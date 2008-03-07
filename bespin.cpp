@@ -130,7 +130,7 @@ BespinStyle::registerRoutines()
    // frames.cpp
    registerCE(skip, CE_FocusFrame);
    registerPE(skip, PE_FrameStatusBar);
-#if QT_VERSION >= 0x04040
+#if QT_VERSION >= 0x040400
    registerPE(skip, PE_FrameStatusBarItem);
 #endif
    registerPE(drawFocusFrame, PE_FrameFocusRect);
@@ -544,8 +544,8 @@ BespinStyle::standardPalette () const
                      Qt::black, Qt::white, //text, bright_text
                      Qt::white, QColor(234,234,236) ); //base, window
    pal.setColor(QPalette::ButtonText, Qt::white);
-   pal.setColor(QPalette::Highlight, QColor(164, 192, 228));
-   pal.setColor(QPalette::HighlightedText, Qt::black);
+   pal.setColor(QPalette::Highlight, QColor(97, 147, 207));
+   pal.setColor(QPalette::HighlightedText, Qt::white);
    return pal;
 }
 

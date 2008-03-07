@@ -103,9 +103,18 @@ VisualFrame::manage(QFrame *frame)
    return true;
 }
 
+void
+VisualFrame::release(QFrame *frame)
+{
+   if (!frame) return;
+
+   VisualFrame* vf = frame->findChild<VisualFrame*>();
+   if (vf) delete vf;
+}
+
 // TODO: mange ALL frames and catch shape/shadow changes!!!
 VisualFrame::VisualFrame(QFrame *parent) : QObject(parent),
-top(0), bottom(0), left(0), right(0)
+top(0), bottom(0), left(0), right(0), hidden(true)
 {
    if (notInited) {
       qWarning("You need to initialize the VisualFrames with VisualFrame::setGeometry() for all three QFrame::Shadow types first!\nNo Frame added.");
@@ -118,6 +127,8 @@ top(0), bottom(0), left(0), right(0)
    // create frame elements
    _frame = parent;
    _frame->installEventFilter(this);
+   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
+   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
    updateShape();
 }
 
@@ -136,7 +147,7 @@ VisualFrame::updateShape()
          runner->removeEventFilter(this);
          runner = runner->parentWidget();
       }
-
+      hidden = true;
       return;
    }
 
@@ -172,6 +183,7 @@ VisualFrame::updateShape()
 void
 VisualFrame::correctPosition()
 {
+   if (hidden) return;
    if (_style != QFrame::StyledPanel) return;
    
    QRect rect = _frame->frameRect();
@@ -229,12 +241,15 @@ VisualFrame::correctPosition()
 
 void
 VisualFrame::show() {
+   hidden = false;
    if (_style != QFrame::StyledPanel) return;
+   correctPosition();
    PARTS(show());
 }
 
 void
 VisualFrame::hide() {
+   hidden = true;
    if (_style != QFrame::StyledPanel) return;
    PARTS(hide());
 }
@@ -262,12 +277,14 @@ VisualFrame::raise()
 
 void
 VisualFrame::repaint() {
+   if (hidden) return;
    if (_style != QFrame::StyledPanel) return;
    PARTS(repaint());
 }
 
 void
 VisualFrame::update() {
+   if (hidden) return;
    if (_style != QFrame::StyledPanel) return;
    PARTS(update());
 }

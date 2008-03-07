@@ -61,6 +61,7 @@ public:
    bool eventFilter ( QObject * o, QEvent * ev );
    static void setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer);
    static bool manage(QFrame *frame);
+   static void release(QFrame *frame);
 public slots:
    void show();
    void hide();
@@ -74,6 +75,7 @@ private:
    QFrame::Shape _style;
    QWidget *_window;
    VisualFramePart *top, *bottom, *left, *right;
+   bool hidden;
 private slots:
    void correctPosition();
 };

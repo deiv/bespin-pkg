@@ -110,7 +110,7 @@ void
 BespinStyle::drawHeaderLabel(const QStyleOption * option, QPainter * painter,
                              const QWidget *) const
 {
-   OPT_ENABLED OPT_SUNKEN
+   OPT_ENABLED
    
    const QStyleOptionHeader* header =
       qstyleoption_cast<const QStyleOptionHeader*>(option);
@@ -135,7 +135,7 @@ BespinStyle::drawHeaderLabel(const QStyleOption * option, QPainter * painter,
    painter->save();
    
    // this works around a possible Qt bug?!?
-   QFont tmpFnt = painter->font(); tmpFnt.setBold(sunken);
+   QFont tmpFnt = painter->font(); tmpFnt.setBold(option->state & State_On);
    const QColor *bg, *fg;
    if (header->sortIndicator != QStyleOptionHeader::None) {
       tmpFnt.setBold(true);

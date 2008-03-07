@@ -49,6 +49,14 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       qstyleoption_cast<const QStyleOptionMenuItem *>(option);
    if (!mbi) return;
 
+   if (mbi->menuRect.height() > mbi->rect.height()) {
+      QStyleOptionMenuItem copy = *mbi;
+      copy.rect.setHeight(mbi->menuRect.height());
+      drawMenuBarBg( &copy, painter, widget );
+   }
+   else
+      drawMenuBarBg(option, painter, widget);
+
    B_STATES;
 
    ROLES(menu.active);

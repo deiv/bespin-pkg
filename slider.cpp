@@ -223,14 +223,10 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       xy += QPoint(sunken ? dpi.f1 : dpi.f2, dpi.f1);
       
       QColor bc = CONF_COLOR(btn.std, Bg);
-      QColor fc;
-      if (config.btn.fullHover) {
+      if (config.btn.fullHover)
          bc = Colors::mid(bc, CONF_COLOR(btn.active, Bg), 6-step, step);
-         fc = Colors::mid(bc, CONF_COLOR(btn.active, Fg), 9-step, step+3);
-      }
-      else
-         fc = Colors::mid(CONF_COLOR(btn.std, Bg),
-                          CONF_COLOR(btn.std, Fg), 9-step, step+3);
+      const QColor fc = Colors::mid(bc, hasFocus ? FCOLOR(Highlight) :
+                                    CONF_COLOR(btn.std, Fg), 6-step, step+3);
 
       const QPixmap &fill =
          Gradients::pix(bc, masks.slider.height(), Qt::Vertical,
