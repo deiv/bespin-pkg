@@ -27,6 +27,15 @@
 #include <QWheelEvent>
 #include <QTimer>
 
+#define DEBUG_VF 0
+#if DEBUG_VF
+#include <QtDebug>
+#define VDebug(_STREAM_) qDebug() << _STREAM_
+#else
+#define VDebug(_STREAM_) //
+#define DEBUG //
+#endif
+
 using namespace VFrame;
 
 static QRegion corner[4];
@@ -44,7 +53,7 @@ type(QFrame::Shadow shadow)
    case QFrame::Sunken: return VFrame::Sunken;
    }
 }
-#include <QtDebug>
+
 void
 VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer)
 {
@@ -96,9 +105,18 @@ bool
 VisualFrame::manage(QFrame *frame)
 {
    if (!frame) return false;
+   VDebug ("======= MANAGE" << frame << "===============");
    QList<VisualFrame*> vfs = frame->findChildren<VisualFrame*>();
-   if (!vfs.isEmpty()) return false; // avoid double adds
+   foreach (VisualFrame* vf, vfs) {
+      VDebug ("test" << vf);
+      if (vf->parent() == frame) {
+         VDebug (frame << "is allready managed by" << vf);
+         return false;
+      }
+   }
+//    if (!vfs.isEmpty()) return false; // avoid double adds
 
+   VDebug ("add new visual frame for" << frame);
    new VisualFrame(frame);
    return true;
 }
@@ -107,9 +125,15 @@ void
 VisualFrame::release(QFrame *frame)
 {
    if (!frame) return;
-
-   VisualFrame* vf = frame->findChild<VisualFrame*>();
-   if (vf) delete vf;
+   VDebug ("======= RELEASE" << frame << "===============");
+   QList<VisualFrame*> vfs = frame->findChildren<VisualFrame*>();
+   foreach (VisualFrame* vf, vfs) {
+      VDebug ("test" << vf);
+      if (vf->parent() == frame) {
+         VDebug (frame << "matches" << vf << "... releasing");
+         delete vf;
+      }
+   }
 }
 
 // TODO: mange ALL frames and catch shape/shadow changes!!!
@@ -117,7 +141,10 @@ VisualFrame::VisualFrame(QFrame *parent) : QObject(parent),
 top(0), bottom(0), left(0), right(0), hidden(true)
 {
    if (notInited) {
-      qWarning("You need to initialize the VisualFrames with VisualFrame::setGeometry() for all three QFrame::Shadow types first!\nNo Frame added.");
+      qWarning("You need to initialize the VisualFrames with\n\
+               VisualFrame::setGeometry()\n\
+               for all three QFrame::Shadow types first!\n\
+               No Frame added.");
       deleteLater(); return;
    }
    if (!parent) {
@@ -359,8 +386,8 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
 VisualFramePart::VisualFramePart(QWidget * parent, QFrame *frame, Side side) :
 QWidget(parent), _frame(frame), _side(side)
 {
-   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
-   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+//    connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
+//    connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
 //    setMouseTracking ( true );
 //    setAcceptDrops(true);
 }
