@@ -159,6 +159,15 @@ top(0), bottom(0), left(0), right(0), hidden(true)
    updateShape();
 }
 
+VisualFrame::~VisualFrame()
+{
+   delete top; top = 0L;
+   delete bottom; bottom = 0L;
+   delete left; left = 0L;
+   delete right; right = 0L;
+//    QObject::~QObject();
+}
+
 void
 VisualFrame::updateShape()
 {
