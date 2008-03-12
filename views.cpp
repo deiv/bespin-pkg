@@ -410,7 +410,7 @@ void
 BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
                       const QWidget *widget) const
 {
-#if QT_VERSION >= 0x04040
+#if QT_VERSION >= 0x040400
 #define OPTION_VIEW_ITEM QStyleOptionViewItemV4
 #else
 #define OPTION_VIEW_ITEM QStyleOptionViewItemV2
