@@ -57,15 +57,18 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
    drawPushButtonLabel(&tmpBtn, painter, widget);
 }
 
+#define HOVER_STEP sunken ? 6 : ((isGTK || !widget) ? 6*hover : animator->hoverStep(widget))
+
 void
 BespinStyle::drawPushButtonBevel(const QStyleOption * option,
                                  QPainter * painter,
                                  const QWidget * widget) const
 {
    ASSURE_OPTION(btn, Button);
-   OPT_SUNKEN
-
-   animStep = sunken ? 6 : animator->hoverStep(widget);
+   OPT_SUNKEN OPT_HOVER
+      
+   animStep = HOVER_STEP;
+   
    drawButtonFrame(option, painter, widget);
    if (btn->features & QStyleOptionButton::HasMenu) {
       int sz = (RECT.height()-dpi.f6)/2;
@@ -127,12 +130,12 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
       config.btn.fullHover || (isCheckbox && config.btn.checkType == Check::O);
 
    QRect r = RECT;
-   if (animStep < 0)
-      animStep = sunken ? 6 : animator->hoverStep(widget);
-
+   if (animStep < 0) animStep = HOVER_STEP;
+   
    Gradients::Type gt = GRAD(btn);
    QColor c = btnBg(PAL, isEnabled, hasFocus, animStep,
                     fullHover, Gradients::isReflective(gt));
+   
    QColor iC = CCOLOR(btn.std, Bg); //FCOLOR(Window);
 
    bool drawInner = false;
@@ -392,7 +395,7 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
                      false, Gradients::isReflective(gt));
    QColor c = bc;
    
-   animStep = isOn ? 0 : (sunken ? 6 : animator->hoverStep(widget));
+   animStep = isOn ? 0 : HOVER_STEP;
    if (animStep)
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
    

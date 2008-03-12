@@ -75,15 +75,20 @@ config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_DEF_).toInt();\
 Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1])
 //, QPalette::_DEF_, Colors::counterRole(QPalette::_DEF_))
 #define readGrad(_DEF_) (Gradients::Type) iSettings->value(_DEF_).toInt();
-
+#include <QtDebug>
 void
 BespinStyle::readSettings(const QSettings* settings)
 {
    bool delSettings = false;
+   
    QSettings *iSettings = const_cast<QSettings*>(settings);
    if (!iSettings) {
       delSettings = true;
-      char *preset = getenv("BESPIN_PRESET");
+      char *preset = getenv("__gtk_qt4_dummy");
+      if (isGTK = preset && !qstrcmp(preset, "1"))
+         qWarning("Bespin: Detected GKT+ application");
+
+      preset = getenv("BESPIN_PRESET");
       if (preset) {
          iSettings = new QSettings("Bespin", "Store");
          if (iSettings->childGroups().contains(preset)) {
@@ -118,12 +123,20 @@ BespinStyle::readSettings(const QSettings* settings)
       qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
    
    // Background ===========================
-   config.bg.mode = (BGMode) readInt(BG_MODE);
-   config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
-   config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
-   config.bg.modal.invert = readBool(BG_MODAL_INVERT);
-   config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
-   
+   if (isGTK) {
+      config.bg.mode = Plain;
+      config.bg.modal.glassy = false;
+      config.bg.modal.opacity = 100;
+      config.bg.modal.invert = false;
+      config.bg.intensity = 0;
+   }
+   else {
+      config.bg.mode = (BGMode) readInt(BG_MODE);
+      config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
+      config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
+      config.bg.modal.invert = readBool(BG_MODAL_INVERT);
+      config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
+
 #ifndef QT_NO_XRENDER
    if (config.bg.mode > BevelH)
       config.bg.mode = BevelV;
@@ -137,7 +150,8 @@ BespinStyle::readSettings(const QSettings* settings)
    
    if (config.bg.mode == Scanlines)
       config.bg.structure = readInt(BG_STRUCTURE);
-      
+   } // !isGTK
+   
    // Buttons ===========================
    config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
    config.btn.round = readBool(BTN_ROUND);
@@ -153,9 +167,15 @@ BespinStyle::readSettings(const QSettings* settings)
    if (config.btn.layer == 2) config.btn.cushion = true;
    else if (GRAD(btn) ==  Gradients::Sunken) config.btn.cushion = false;
    else config.btn.cushion = readBool(BTN_CUSHION);
-   
-   readRole(btn.std, BTN_ROLE);
-   readRole(btn.active, BTN_ACTIVEROLE);
+
+//    if (isGTK) {
+//       config.btn.std_role[0] = config.btn.active_role[0] = QPalette::Window;
+//       config.btn.std_role[1] = config.btn.active_role[1] = QPalette::WindowText;
+//    }
+//    else {
+      readRole(btn.std, BTN_ROLE);
+      readRole(btn.active, BTN_ACTIVEROLE);
+//    }
    config.btn.ambientLight = readBool(BTN_AMBIENTLIGHT);
    config.btn.bevelEnds = readBool(BTN_BEVEL_ENDS);
    
@@ -163,7 +183,12 @@ BespinStyle::readSettings(const QSettings* settings)
    GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
 
    // Hacks ==================================
-   config.hack.messages = readBool(HACK_MESSAGES);
+   if (isGTK) {
+      config.hack.messages = false;
+   }
+   else {
+      config.hack.messages = readBool(HACK_MESSAGES);
+   }
    
    // PW Echo Char ===========================
    config.input.pwEchoChar =
@@ -198,7 +223,7 @@ BespinStyle::readSettings(const QSettings* settings)
 
    // ScrollStuff ===========================
    GRAD(scroll) = readGrad(SCROLL_GRADIENT);
-   config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
+   config.scroll.showButtons = isGTK ? true : readBool(SCROLL_SHOWBUTTONS);
    config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
 
    // Tabs ===========================

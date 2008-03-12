@@ -320,6 +320,7 @@ private:
    QPoint cursorPos_;
    bool mouseButtonPressed_;
    bool internalEvent_;
+   bool isGTK;
 private slots:
    void fixKdePalette();
 };

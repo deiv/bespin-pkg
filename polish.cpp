@@ -327,10 +327,14 @@ void BespinStyle::polish( QWidget * widget) {
       widget->setAttribute(Qt::WA_Hover);
    
    if (qobject_cast<QAbstractButton*>(widget)) {
-      widget->setBackgroundRole ( QPalette::Window );
-      widget->setForegroundRole ( QPalette::WindowText );
-      if (!widget->inherits("QToolBoxButton"))
-         animator->registrate(widget);
+      if (isGTK)
+         widget->setAttribute(Qt::WA_Hover);
+      else {
+         widget->setBackgroundRole ( QPalette::Window );
+         widget->setForegroundRole ( QPalette::WindowText );
+         if (!widget->inherits("QToolBoxButton"))
+            animator->registrate(widget);
+      }
    }
    else if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
       if (box->isEditable()) {

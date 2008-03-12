@@ -159,14 +159,14 @@ top(0), bottom(0), left(0), right(0), hidden(true)
    updateShape();
 }
 
-VisualFrame::~VisualFrame()
-{
-   delete top; top = 0L;
-   delete bottom; bottom = 0L;
-   delete left; left = 0L;
-   delete right; right = 0L;
+// VisualFrame::~VisualFrame()
+// {
+//    delete top; top = 0L;
+//    delete bottom; bottom = 0L;
+//    delete left; left = 0L;
+//    delete right; right = 0L;
 //    QObject::~QObject();
-}
+// }
 
 void
 VisualFrame::updateShape()
@@ -395,8 +395,8 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
 VisualFramePart::VisualFramePart(QWidget * parent, QFrame *frame, Side side) :
 QWidget(parent), _frame(frame), _side(side)
 {
-//    connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
-//    connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
+   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
 //    setMouseTracking ( true );
 //    setAcceptDrops(true);
 }

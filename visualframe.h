@@ -70,7 +70,7 @@ public slots:
    void repaint();
 private:
    VisualFrame( QFrame *parent );
-   ~VisualFrame();
+//    ~VisualFrame();
    void updateShape();
    QFrame *_frame; // parent, to avoid nasty casting
    QFrame::Shape _style;
