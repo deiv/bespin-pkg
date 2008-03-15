@@ -151,6 +151,7 @@ XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&_TYPE_, 1L)
 #endif
 
 void BespinStyle::polish ( QApplication * app ) {
+
 #ifdef Q_WS_X11
 #define ENSURE_ATOM(_VAR_, _TYPE_)\
    if (!_VAR_)\
@@ -327,14 +328,10 @@ void BespinStyle::polish( QWidget * widget) {
       widget->setAttribute(Qt::WA_Hover);
    
    if (qobject_cast<QAbstractButton*>(widget)) {
-      if (isGTK)
-         widget->setAttribute(Qt::WA_Hover);
-      else {
-         widget->setBackgroundRole ( QPalette::Window );
-         widget->setForegroundRole ( QPalette::WindowText );
-         if (!widget->inherits("QToolBoxButton"))
-            animator->registrate(widget);
-      }
+      widget->setBackgroundRole ( QPalette::Window );
+      widget->setForegroundRole ( QPalette::WindowText );
+      if (!widget->inherits("QToolBoxButton"))
+         animator->registrate(widget);
    }
    else if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
       if (box->isEditable()) {

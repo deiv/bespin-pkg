@@ -30,17 +30,22 @@ void
 BespinStyle::drawTabWidget(const QStyleOption *option, QPainter *painter,
                            const QWidget * widget) const
 {
+   if (isGTK) {
+      shadows.sunken[true][true].render(RECT, painter);
+      return;
+   }
+   
    ASSURE_OPTION(twf, TabWidgetFrame);
 
    QLine line[2];
    QStyleOptionTabBarBase tbb; tbb.initFrom(widget);
    tbb.shape = twf->shape; tbb.rect = twf->rect;
-       
+
 #define SET_BASE_HEIGHT(_o_) \
-   baseHeight = twf->tabBarSize._o_(); \
-   if (baseHeight < 0) \
+      baseHeight = twf->tabBarSize._o_(); \
+      if (baseHeight < 0) \
       baseHeight = pixelMetric( PM_TabBarBaseHeight, option, widget )
-          
+         
    int baseHeight;
    switch (twf->shape) {
    case QTabBar::RoundedNorth: case QTabBar::TriangularNorth:
@@ -69,7 +74,7 @@ BespinStyle::drawTabWidget(const QStyleOption *option, QPainter *painter,
       break;
    }
 #undef SET_BASE_HEIGHT
-       
+   
    // the "frame"
    painter->save();
    painter->setPen(FCOLOR(Window).dark(120));
@@ -127,7 +132,8 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
          painter->setClipRegion(clipRgn);
       }
    }
-      
+
+   
    // paint shape and label
    QStyleOptionTab copy = *tab;
    // NOTICE: workaround for e.g. konsole,
@@ -137,6 +143,25 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
    if (widget) copy.palette = widget->palette();
    
    copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
+
+   if (isGTK) {
+      switch (tab->position) {
+      default:
+      case QStyleOptionTab::OnlyOneTab:
+         break;
+      case QStyleOptionTab::Beginning:
+         Tile::setShape(Tile::Full &~ Tile::Right); break;
+      case QStyleOptionTab::End:
+         Tile::setShape(Tile::Full &~ Tile::Left); break;
+      case QStyleOptionTab::Middle:
+         Tile::setShape(Tile::Full &~ (Tile::Left | Tile::Right)); break;
+      }
+      masks.rect[true].render(copy.rect, painter, GRAD(tab), Qt::Vertical,
+                              FCOLOR(Window), copy.rect.height());
+      shadows.sunken[true][true].render(RECT, painter);
+      Tile::reset();
+   }
+   
    drawTabShape(&copy, painter, widget);
    drawTabLabel(&copy, painter, widget);
    if (needRestore)
@@ -151,8 +176,12 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
 {
    ASSURE_OPTION(tab, Tab);
    B_STATES
-   sunken = sunken || (option->state & State_Selected);
 
+   if (isGTK)
+      sunken = option->state & State_Selected;
+   else
+      sunken = sunken || (option->state & State_Selected);
+   
    animStep = 0;
    // animation stuff
    if (isEnabled && !sunken) {

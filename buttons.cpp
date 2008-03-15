@@ -16,6 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QApplication>
 #include <QAbstractButton>
 #include <QStyleOptionButton>
 
@@ -30,7 +31,9 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
 {
    ASSURE_OPTION(btn, Button);
    OPT_SUNKEN;
-
+   if (isGTK)
+      const_cast<QStyleOption*>(option)->palette = qApp->palette();
+   
    QStyleOptionButton tmpBtn = *btn;
    if (btn->features & QStyleOptionButton::Flat) { // more like a toolbtn
       if (option->state & State_Enabled) {

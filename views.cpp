@@ -29,6 +29,9 @@ BespinStyle::drawHeader(const QStyleOption * option, QPainter * painter,
       qstyleoption_cast<const QStyleOptionHeader *>(option);
    if (!header) return;
 
+   if (isGTK)
+      const_cast<QStyleOption*>(option)->palette = qApp->palette();
+   
    // init
 //    const QRegion clipRegion = painter->clipRegion();
 //    painter->setClipRect(RECT/*, Qt::IntersectClip*/);
@@ -70,6 +73,8 @@ BespinStyle::drawHeaderSection(const QStyleOption * option, QPainter * painter,
       (header->sortIndicator != QStyleOptionHeader::None) ?
       COLOR(config.view.sortingHeader_role[Bg]) :
       COLOR(config.view.header_role[Bg]);
+   if (isGTK)
+      sunken = option->state & State_HasFocus;
    if (sunken) {
       const QPixmap &sunk = Gradients::pix(c, s, o, Gradients::Sunken);
       painter->drawTiledPixmap(RECT, sunk);

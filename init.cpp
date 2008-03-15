@@ -123,19 +123,11 @@ BespinStyle::readSettings(const QSettings* settings)
       qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
    
    // Background ===========================
-   if (isGTK) {
-      config.bg.mode = Plain;
-      config.bg.modal.glassy = false;
-      config.bg.modal.opacity = 100;
-      config.bg.modal.invert = false;
-      config.bg.intensity = 0;
-   }
-   else {
-      config.bg.mode = (BGMode) readInt(BG_MODE);
-      config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
-      config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
-      config.bg.modal.invert = readBool(BG_MODAL_INVERT);
-      config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
+   config.bg.mode = (BGMode) readInt(BG_MODE);
+   config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
+   config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
+   config.bg.modal.invert = readBool(BG_MODAL_INVERT);
+   config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
 
 #ifndef QT_NO_XRENDER
    if (config.bg.mode > BevelH)
@@ -150,7 +142,6 @@ BespinStyle::readSettings(const QSettings* settings)
    
    if (config.bg.mode == Scanlines)
       config.bg.structure = readInt(BG_STRUCTURE);
-   } // !isGTK
    
    // Buttons ===========================
    config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
@@ -168,14 +159,8 @@ BespinStyle::readSettings(const QSettings* settings)
    else if (GRAD(btn) ==  Gradients::Sunken) config.btn.cushion = false;
    else config.btn.cushion = readBool(BTN_CUSHION);
 
-//    if (isGTK) {
-//       config.btn.std_role[0] = config.btn.active_role[0] = QPalette::Window;
-//       config.btn.std_role[1] = config.btn.active_role[1] = QPalette::WindowText;
-//    }
-//    else {
-      readRole(btn.std, BTN_ROLE);
-      readRole(btn.active, BTN_ACTIVEROLE);
-//    }
+   readRole(btn.std, BTN_ROLE);
+   readRole(btn.active, BTN_ACTIVEROLE);
    config.btn.ambientLight = readBool(BTN_AMBIENTLIGHT);
    config.btn.bevelEnds = readBool(BTN_BEVEL_ENDS);
    
@@ -183,12 +168,7 @@ BespinStyle::readSettings(const QSettings* settings)
    GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
 
    // Hacks ==================================
-   if (isGTK) {
-      config.hack.messages = false;
-   }
-   else {
-      config.hack.messages = readBool(HACK_MESSAGES);
-   }
+   config.hack.messages = readBool(HACK_MESSAGES);
    
    // PW Echo Char ===========================
    config.input.pwEchoChar =
@@ -223,7 +203,7 @@ BespinStyle::readSettings(const QSettings* settings)
 
    // ScrollStuff ===========================
    GRAD(scroll) = readGrad(SCROLL_GRADIENT);
-   config.scroll.showButtons = isGTK ? true : readBool(SCROLL_SHOWBUTTONS);
+   config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
    config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
 
    // Tabs ===========================
@@ -252,6 +232,37 @@ BespinStyle::readSettings(const QSettings* settings)
       if (fnt.pointSize() > -1) fnt.setPointSize(fnt.pointSize()*config.scale);
       else fnt.setPixelSize(fnt.pixelSize()*config.scale);
       qApp->setFont(fnt);
+   }
+
+   //NOTICE gtk-qt fails on several features
+   // a key problem seems to be fixed text colors
+   // also it will segfault if we hide scrollbar buttons
+   // so we adjust some settings here
+   if (isGTK) {
+      config.bg.mode = Plain;
+      config.bg.modal.glassy = false;
+      config.bg.modal.opacity = 100;
+      config.bg.modal.invert = false;
+      config.bg.intensity = 0;
+      
+      config.btn.std_role[Bg] = QPalette::Window;
+      config.btn.active_role[Bg] = QPalette::Highlight;
+      config.btn.std_role[Fg] = config.btn.active_role[Fg] = QPalette::WindowText;
+      
+      config.hack.messages = false;
+      
+      config.progress.std_role[Bg] =
+         config.progress.std_role[Fg] = QPalette::Window;
+
+      config.scroll.showButtons = true;
+
+//       GRAD(tab) = readGrad(TAB_GRADIENT);
+      config.tab.active_role[Bg] =  QPalette::Highlight;
+      config.tab.std_role[Bg] =  QPalette::Window;
+      config.tab.activeTabSunken = false;
+      
+      config.view.header_role[Bg] = QPalette::Window;
+      config.view.sortingHeader_role[Bg] = QPalette::Window;
    }
    
    if (delSettings) delete iSettings;
