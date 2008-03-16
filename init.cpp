@@ -84,11 +84,13 @@ BespinStyle::readSettings(const QSettings* settings)
    QSettings *iSettings = const_cast<QSettings*>(settings);
    if (!iSettings) {
       delSettings = true;
-      char *preset = getenv("__gtk_qt4_dummy");
-      if (isGTK = preset && !qstrcmp(preset, "1"))
+      isGTK = getenv("GTK_QT_ENGINE_ACTIVE");
+//       char *preset = getenv("GTK_QT_ENGINE_ACTIVE");
+//       if (isGTK = preset && !qstrcmp(preset, "1"))
+      if (isGTK)
          qWarning("Bespin: Detected GKT+ application");
 
-      preset = getenv("BESPIN_PRESET");
+      const char *preset = getenv("BESPIN_PRESET");
       if (preset) {
          iSettings = new QSettings("Bespin", "Store");
          if (iSettings->childGroups().contains(preset)) {
