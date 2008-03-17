@@ -247,21 +247,23 @@ BespinStyle::readSettings(const QSettings* settings)
       config.bg.modal.invert = false;
       config.bg.intensity = 0;
       
-      config.btn.std_role[Bg] = QPalette::Window;
-      config.btn.active_role[Bg] = QPalette::Highlight;
-      config.btn.std_role[Fg] = config.btn.active_role[Fg] = QPalette::WindowText;
+//       config.btn.std_role[Bg] = QPalette::Window;
+//       config.btn.active_role[Bg] = QPalette::Highlight;
+//       config.btn.std_role[Fg] = config.btn.active_role[Fg] = QPalette::WindowText;
       
       config.hack.messages = false;
       
       config.progress.std_role[Bg] =
          config.progress.std_role[Fg] = QPalette::Window;
 
-      config.scroll.showButtons = true;
-
-//       GRAD(tab) = readGrad(TAB_GRADIENT);
-      config.tab.active_role[Bg] =  QPalette::Highlight;
       config.tab.std_role[Bg] =  QPalette::Window;
-      config.tab.activeTabSunken = false;
+      // gtk fixes the label color... so try to ensure it will be visible
+      if (!Colors::haveContrast(QApplication::palette().color(QPalette::WindowText),
+                                QApplication::palette().color(config.tab.active_role[Bg])))
+      {
+         config.tab.active_role[Bg] =  QPalette::Window;
+         config.tab.activeTabSunken = true;
+      }
       
       config.view.header_role[Bg] = QPalette::Window;
       config.view.sortingHeader_role[Bg] = QPalette::Window;

@@ -31,10 +31,9 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
 {
    ASSURE_OPTION(btn, Button);
    OPT_SUNKEN;
-   if (isGTK)
-      const_cast<QStyleOption*>(option)->palette = qApp->palette();
-   
+
    QStyleOptionButton tmpBtn = *btn;
+   if (isGTK) const_cast<QStyleOptionButton*>(btn)->palette = qApp->palette();
    if (btn->features & QStyleOptionButton::Flat) { // more like a toolbtn
       if (option->state & State_Enabled) {
          if (option->state & State_HasFocus)
@@ -56,6 +55,7 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
       drawPushButtonBevel(&tmpBtn, painter, widget);
    }
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
+   if (isGTK) return; // GTK paints the label itself
    tmpBtn.rect.adjust(dpi.f6,dpi.f4,-dpi.f6,-dpi.f4);
    drawPushButtonLabel(&tmpBtn, painter, widget);
 }
@@ -152,6 +152,12 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
 
       if (drawInner || config.btn.backLightHover)
          iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
+
+      // gtk HATES color inversion on labels, so we invert the nonlabled part...
+      if (isGTK && !isCheckbox &&
+          !Colors::haveContrast(FCOLOR(WindowText), CCOLOR(btn.active, Bg))) {
+         QColor h = c; c = iC; iC = h;
+      }
    }
 
    if (sunken) hasFocus = false; // no frame add on trigger - looks nasty
@@ -244,7 +250,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
       }
    }
 }
-
+#include <QtDebug>
 void
 BespinStyle::drawPushButtonLabel(const QStyleOption * option,
                                  QPainter * painter,
@@ -290,8 +296,20 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
          ir.setWidth(ir.width() - (pixw + dpi.f4));
    }
 
-   if (btn->text.isEmpty())
+   if (!isGTK && btn->text.isEmpty())
       return;
+
+   const bool flat = btn->features & QStyleOptionButton::Flat;
+   
+   QColor fg;
+   if (config.btn.backLightHover)
+      hover = animStep = 0;
+   if (flat)
+      fg = FCOLOR(WindowText);
+   else
+      fg = btnFg(PAL, isEnabled, hover, animStep);
+   const QColor &bg = flat ? FCOLOR(Window) :
+      (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
 
    if (btn->features & QStyleOptionButton::HasMenu) {
       ir.setRight(ir.right() - ir.height()/2 - dpi.f10);
@@ -303,7 +321,6 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
             ir.setRight(ir.right() - ir.height()/2 - dpi.f10);
 
    painter->save();
-   const bool flat = btn->features & QStyleOptionButton::Flat;
    if ((flat && hover ) || hasFocus) {
       QFont tmpFnt = painter->font();
       tmpFnt.setBold(true);
@@ -322,16 +339,6 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
       }
       painter->setFont(tmpFnt);
    }
-   
-   QColor fg;
-   if (config.btn.backLightHover)
-      hover = animStep = 0;
-   if (flat)
-      fg = FCOLOR(WindowText);
-   else
-      fg = btnFg(PAL, isEnabled, hover, animStep);
-   const QColor &bg = flat ? FCOLOR(Window) :
-      (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
 
    if (!flat && isEnabled) {
       painter->setPen(bg.dark(120));

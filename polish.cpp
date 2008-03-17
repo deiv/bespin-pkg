@@ -173,6 +173,7 @@ void BespinStyle::polish ( QApplication * app ) {
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
 
+
 void BespinStyle::polish( QPalette &pal )
 {
    QColor c = pal.color(QPalette::Active, QPalette::Background);

@@ -26,6 +26,7 @@ inline static bool verticalTabs(QTabBar::Shape shape) {
       shape == QTabBar::TriangularWest;
 }
 
+
 void
 BespinStyle::drawTabWidget(const QStyleOption *option, QPainter *painter,
                            const QWidget * widget) const
@@ -220,7 +221,7 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
 
    QColor c;
    if (sunken) {
-      c = CCOLOR(tab.active, 0);
+      c = CCOLOR(tab.active, Bg);
       if (config.tab.activeTabSunken)
          rect.adjust(f2, -f2, -f2, 0);
       else {
@@ -236,6 +237,7 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
 //       c = Colors::mid(c, CCOLOR(tab.active, 0), quota, animStep);
       c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 8-animStep, animStep);
    }
+
    const Gradients::Type gt = GRAD(tab) == Gradients::Sunken ?
       Gradients::None : GRAD(tab);
    const QPoint off = rect.topLeft()-RECT.topLeft()-QPoint(dpi.f3,f2);

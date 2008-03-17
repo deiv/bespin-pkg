@@ -41,6 +41,8 @@ void
 BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
                                const QWidget * widget, bool content) const
 {
+   if (isGTK && !content) return; // looks really crap
+   
    const QStyleOptionProgressBarV2 *pb =
       qstyleoption_cast<const QStyleOptionProgressBarV2*>(option);
    if (!pb) return;
