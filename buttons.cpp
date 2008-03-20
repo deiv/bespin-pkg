@@ -32,7 +32,8 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
    ASSURE_OPTION(btn, Button);
    OPT_SUNKEN;
 
-   QStyleOptionButton tmpBtn = *btn;
+   QRect oldRect = btn->rect;
+   QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
    if (isGTK) const_cast<QStyleOptionButton*>(btn)->palette = qApp->palette();
    if (btn->features & QStyleOptionButton::Flat) { // more like a toolbtn
       if (option->state & State_Enabled) {
@@ -49,15 +50,16 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
    else {
       if (sunken && !config.btn.cushion)
          if (config.btn.layer == 1)
-            tmpBtn.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
+            _btn->rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
       else if (!config.btn.layer)
-         tmpBtn.rect.adjust(0,dpi.f1,0,dpi.f1);
-      drawPushButtonBevel(&tmpBtn, painter, widget);
+         _btn->rect.adjust(0,dpi.f1,0,dpi.f1);
+      drawPushButtonBevel(btn, painter, widget);
    }
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
    if (isGTK) return; // GTK paints the label itself
-   tmpBtn.rect.adjust(dpi.f6,dpi.f4,-dpi.f6,-dpi.f4);
-   drawPushButtonLabel(&tmpBtn, painter, widget);
+   _btn->rect.adjust(dpi.f6,dpi.f4,-dpi.f6,-dpi.f4);
+   drawPushButtonLabel(btn, painter, widget);
+   _btn->rect = oldRect;
 }
 
 #define HOVER_STEP sunken ? 6 : ((isGTK || !widget) ? 6*hover : animator->hoverStep(widget))

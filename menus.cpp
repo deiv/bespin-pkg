@@ -148,7 +148,7 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
    if (!menuItem) return;
 
    ROLES(menu.std);
-   B_STATES;
+   B_STATES; if (isGTK) sunken = false;
        
    // separator
    if (menuItem->menuItemType == QStyleOptionMenuItem::Separator) {

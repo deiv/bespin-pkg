@@ -506,9 +506,19 @@ bool Config::load(const QString &preset) {
    store.beginGroup("QPalette");
    QSettings qt("Trolltech");
    qt.beginGroup("Qt"); qt.beginGroup("Palette");
-   qt.setValue ( "active", store.value("active") );
-   qt.setValue ( "inactive", store.value("inactive") );
-   qt.setValue ( "disabled", store.value("disabled") );
+   //NOTICE: we pass the loaded palette through ::updatePalette() to ensure
+   // we'll get a complete palette for this Qt version as otherwise Qt will
+   // fallback to the default palette... ===================================
+   QPalette pal;
+   updatePalette(pal, QPalette::Active,
+                 store.value("active").toStringList());
+   updatePalette(pal, QPalette::Inactive,
+                 store.value("inactive").toStringList());
+   updatePalette(pal, QPalette::Disabled,
+                 store.value("disabled").toStringList());
+   qt.setValue ( "active", colors(pal, QPalette::Active) );
+   qt.setValue ( "inactive", colors(pal, QPalette::Inactive) );
+   qt.setValue ( "disabled", colors(pal, QPalette::Disabled) );
    qt.endGroup(); qt.endGroup();
    store.endGroup();
    
