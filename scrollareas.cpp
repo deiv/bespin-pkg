@@ -122,7 +122,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
                useCache = true;
                if (widget != cachedScroller) { // update cache
                   cachedScroller = widget;
-                  delete scrollBgCache;
+                  delete scrollBgCache; scrollBgCache = 0L;
                }
                if (!scrollBgCache ||
                      scrollBgCache->size() != RECT.size()) {

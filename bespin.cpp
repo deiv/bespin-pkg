@@ -18,6 +18,7 @@
 
 /**================== Qt4 includes ======================*/
 
+#include <QAbstractScrollArea>
 #include <QEvent>
 #include <QPainter>
 #include <QStylePlugin>

@@ -507,8 +507,9 @@ void BespinStyle::polish( QWidget * widget) {
          frame->setFrameShape(QFrame::StyledPanel);
 
       if (qobject_cast<QAbstractScrollArea*>(frame) ||
-            qobject_cast<Q3ScrollView*>(frame))
+          qobject_cast<Q3ScrollView*>(frame)) {
          animator->registrate(frame);
+      }
 
    // map a toolbox frame to it's elements
 //       if (qobject_cast<QAbstractScrollArea*>(frame) &&
