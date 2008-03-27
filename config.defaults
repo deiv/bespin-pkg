@@ -28,6 +28,7 @@
 #define CHOOSER_GRADIENT "Chooser.Gradient", Gradients::Sunken
 
 #define HACK_MESSAGES "Hack.Messages", false
+#define HACK_KHTMLVIEW "Hack.KHTMLView", false
 
 #define INPUT_PWECHOCHAR "Input.PwEchoChar", 0x26AB
 

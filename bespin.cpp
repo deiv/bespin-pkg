@@ -370,6 +370,7 @@ BespinStyle::erase(const QStyleOption *option, QPainter *painter,
       painter->setClipRect(option->rect, Qt::IntersectClip);
       QStyleOption tmpOpt = *option;
       tmpOpt.rect = QRect(tl, grampa->size());
+      tmpOpt.palette = grampa->palette();
       painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
       drawWindowBg(&tmpOpt, painter, grampa);
    }
@@ -388,6 +389,15 @@ static void swapPalette(QWidget *widget)
       pal.setColor((QPalette::ColorGroup)group, QPalette::WindowText,
                     pal.color((QPalette::ColorGroup)group, QPalette::Window));
       pal.setColor((QPalette::ColorGroup)group, QPalette::Window, h);
+
+//       h = pal.color((QPalette::ColorGroup)group, QPalette::Text);
+//       if (Colors::value(h) < 70) {
+//          int hh,s,v; h.getHsv(&hh,&s,&v); h.setHsv(hh,s,70);
+//       }
+//       pal.setColor((QPalette::ColorGroup)group, QPalette::Text,
+//                     pal.color((QPalette::ColorGroup)group, QPalette::Base));
+//       pal.setColor((QPalette::ColorGroup)group, QPalette::Base, h);
+
       h = pal.color((QPalette::ColorGroup)group, QPalette::Button);
       pal.setColor((QPalette::ColorGroup)group, QPalette::Button,
                     pal.color((QPalette::ColorGroup)group, QPalette::ButtonText));

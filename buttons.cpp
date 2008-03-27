@@ -22,6 +22,8 @@
 
 #include "draw.h"
 
+#include <QtDebug>
+
 static int animStep = -1;
 static bool isCheckbox = false;
 
@@ -34,7 +36,6 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
 
    QRect oldRect = btn->rect;
    QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
-   if (isGTK) const_cast<QStyleOptionButton*>(btn)->palette = qApp->palette();
    if (btn->features & QStyleOptionButton::Flat) { // more like a toolbtn
       if (option->state & State_Enabled) {
          if (option->state & State_HasFocus)
@@ -156,10 +157,10 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
          iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
 
       // gtk HATES color inversion on labels, so we invert the nonlabled part...
-      if (isGTK && !isCheckbox &&
-          !Colors::haveContrast(FCOLOR(WindowText), CCOLOR(btn.active, Bg))) {
-         QColor h = c; c = iC; iC = h;
-      }
+//       if (isGTK && !isCheckbox &&
+//           !Colors::haveContrast(FCOLOR(WindowText), CCOLOR(btn.active, Bg))) {
+//          QColor h = c; c = iC; iC = h;
+//       }
    }
 
    if (sunken) hasFocus = false; // no frame add on trigger - looks nasty
@@ -202,7 +203,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
          r.setBottom(r.bottom()-dpi.f1);
       const int contrast = Colors::contrast(FCOLOR(Window), FCOLOR(Highlight));
       QColor fc = (config.btn.backLightHover && animStep) ? iC : FCOLOR(Window);
-      fc = Colors::mid(fc, FCOLOR(Highlight), contrast/10, 1);
+      fc = Colors::mid(fc, FCOLOR(Highlight), contrast/20, 1);
       lights.rect[round].render(r, painter, fc);
       r = RECT;
    }
@@ -252,7 +253,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
       }
    }
 }
-#include <QtDebug>
+
 void
 BespinStyle::drawPushButtonLabel(const QStyleOption * option,
                                  QPainter * painter,
@@ -260,7 +261,7 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
 {
    OPT_ENABLED OPT_FOCUS OPT_HOVER;
    ASSURE_OPTION(btn, Button);
-
+   
    QRect ir = btn->rect;
    uint tf = Qt::AlignCenter;
    if (!styleHint(SH_UnderlineShortcut, btn, widget))
@@ -298,7 +299,7 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
          ir.setWidth(ir.width() - (pixw + dpi.f4));
    }
 
-   if (!isGTK && btn->text.isEmpty())
+   if (btn->text.isEmpty())
       return;
 
    const bool flat = btn->features & QStyleOptionButton::Flat;
@@ -310,17 +311,19 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
       fg = FCOLOR(WindowText);
    else
       fg = btnFg(PAL, isEnabled, hover, animStep);
+
    const QColor &bg = flat ? FCOLOR(Window) :
       (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
 
    if (btn->features & QStyleOptionButton::HasMenu) {
       ir.setRight(ir.right() - ir.height()/2 - dpi.f10);
    }
-   else if (widget)
+   else
+      if (widget)
       if (const QAbstractButton* btn =
          qobject_cast<const QAbstractButton*>(widget))
-         if (btn->isCheckable())
-            ir.setRight(ir.right() - ir.height()/2 - dpi.f10);
+      if (btn->isCheckable())
+         ir.setRight(ir.right() - ir.height()/2 - dpi.f10);
 
    painter->save();
    if ((flat && hover ) || hasFocus) {

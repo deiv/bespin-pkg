@@ -87,7 +87,7 @@ static const bool round_ = true;
 static QPixmap *scrollBgCache = 0;
 const static QWidget *cachedScroller = 0;
 static QPainter *cPainter = 0;
-
+#include <QtDebug>
 void
 BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
                            QPainter * painter, const QWidget * widget) const
@@ -122,11 +122,12 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
                useCache = true;
                if (widget != cachedScroller) { // update cache
                   cachedScroller = widget;
-                  if (!scrollBgCache ||
-                      scrollBgCache->size() != RECT.size()) {
-                     delete scrollBgCache;
-                     scrollBgCache = new QPixmap(RECT.size());
-                  }
+                  delete scrollBgCache;
+               }
+               if (!scrollBgCache ||
+                     scrollBgCache->size() != RECT.size()) {
+                  delete scrollBgCache;
+                  scrollBgCache = new QPixmap(RECT.size());
                   cPainter = new QPainter(scrollBgCache);
                }
                else

@@ -173,7 +173,7 @@ void BespinStyle::polish ( QApplication * app ) {
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
 
-
+#include "makros.h"
 void BespinStyle::polish( QPalette &pal )
 {
    QColor c = pal.color(QPalette::Active, QPalette::Background);
@@ -233,10 +233,72 @@ static QMenuBar *bar4popup(QMenu *menu) {
          return static_cast<QMenuBar *>(w);
    return 0;
 }
-// #include <QtDebug>
+#include <QtDebug>
+#undef PAL
+#define PAL pal
 void BespinStyle::polish( QWidget * widget) {
    
-   if (!widget) return; // ! protect against polishing QObject trials !
+   if (!widget) return; // !!! protect against polishing QObject trials !
+
+   if (isGTK) {
+      if (widget->objectName() == "QPushButton" ||
+          widget->objectName() == "QComboBox" ||
+          widget->objectName() == "QCheckBox" ||
+          widget->objectName() == "QRadioButton" )
+      {
+         QPalette pal = widget->palette();
+         pal.setColor(QPalette::Disabled, QPalette::Button,
+                     Colors::mid(Qt::black, FCOLOR(Window),5,100));
+         pal.setColor(QPalette::Inactive, QPalette::Button, CCOLOR(btn.std, Bg));
+         pal.setColor(QPalette::Active, QPalette::Button, CCOLOR(btn.active, Bg));
+
+         pal.setColor(QPalette::Disabled, QPalette::ButtonText,
+                     Colors::mid(FCOLOR(Window), FCOLOR(WindowText),3,1));
+         pal.setColor(QPalette::Inactive, QPalette::ButtonText, CCOLOR(btn.std, Fg));
+         pal.setColor(QPalette::Active, QPalette::ButtonText, CCOLOR(btn.active, Fg));
+         widget->setPalette(pal);
+      }
+      if (widget->objectName() == "QTabWidget" ||
+			 widget->objectName() == "QTabBar")
+      {
+         QPalette pal = widget->palette();
+         pal.setColor(QPalette::Inactive, QPalette::Window, CCOLOR(tab.std, Bg));
+         pal.setColor(QPalette::Active, QPalette::Window, CCOLOR(tab.active, Bg));
+         
+         pal.setColor(QPalette::Disabled, QPalette::WindowText,
+                      Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg),3,1));
+         pal.setColor(QPalette::Inactive, QPalette::WindowText, CCOLOR(tab.std, Fg));
+         pal.setColor(QPalette::Active, QPalette::WindowText, CCOLOR(tab.active, Fg));
+         widget->setPalette(pal);
+      }
+
+      if (widget->objectName() == "QMenuBar" )
+      {
+         QPalette pal = widget->palette();
+         pal.setColor(QPalette::Inactive, QPalette::Window,
+							 Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg)));
+         pal.setColor(QPalette::Active, QPalette::Window, CCOLOR(menu.active, Bg));
+
+         pal.setColor(QPalette::Inactive, QPalette::WindowText, CCOLOR(menu.bar, Fg));
+         pal.setColor(QPalette::Active, QPalette::WindowText, CCOLOR(menu.active, Fg));
+         widget->setPalette(pal);
+      }
+
+      if (widget->objectName() == "QMenu" )
+      {
+         QPalette pal = widget->palette();
+         pal.setColor(QPalette::Inactive, QPalette::Window, CCOLOR(menu.std, Bg));
+         pal.setColor(QPalette::Active, QPalette::Window, CCOLOR(menu.active, Bg));
+
+         pal.setColor(QPalette::Inactive, QPalette::WindowText, CCOLOR(menu.std, Fg));
+         pal.setColor(QPalette::Active, QPalette::WindowText, CCOLOR(menu.active, Fg));
+         widget->setPalette(pal);
+      }
+
+      return;
+   }
+
+   
    if (qobject_cast<VisualFramePart*>(widget)) return;
 //    qDebug() << widget;
    Hacks::add(widget);
@@ -331,7 +393,10 @@ void BespinStyle::polish( QWidget * widget) {
    if (qobject_cast<QAbstractButton*>(widget)) {
       widget->setBackgroundRole ( QPalette::Window );
       widget->setForegroundRole ( QPalette::WindowText );
-      if (!widget->inherits("QToolBoxButton"))
+      if (widget->inherits("QToolBoxButton") ||
+          widget->objectName() == "RenderFormElementWidget" )
+         widget->setAttribute(Qt::WA_Hover);
+      else
          animator->registrate(widget);
    }
    else if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
@@ -343,7 +408,10 @@ void BespinStyle::polish( QWidget * widget) {
          widget->setBackgroundRole ( QPalette::Window );
          widget->setForegroundRole ( QPalette::WindowText );
       }
-      animator->registrate(widget);
+      if (widget->objectName() == "RenderFormElementWidget")
+         widget->setAttribute(Qt::WA_Hover);
+      else
+         animator->registrate(widget);
    }
    
    else if (qobject_cast<QAbstractSlider *>(widget)) {
@@ -486,7 +554,7 @@ void BespinStyle::polish( QWidget * widget) {
    //========================
    
 }
-
+#undef PAL
 void BespinStyle::unPolish( QApplication *app )
 {
    app->setPalette(QPalette());

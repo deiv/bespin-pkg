@@ -30,7 +30,7 @@ typedef struct Config {
    } chooser;
 
    struct hack {
-      bool messages;
+      bool messages, KHTMLView;
    } hack;
    
    struct input {

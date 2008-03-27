@@ -53,7 +53,7 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
    return list;
 }
 
-#define FIX_KAPP_PALETTE 0
+#define FIX_KAPP_PALETTE 1
 #if FIX_KAPP_PALETTE
 // this seems to be necessary as KDE somehow sets it's own palette after
 // creating the style - god knows why...
@@ -75,7 +75,7 @@ config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_DEF_).toInt();\
 Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1])
 //, QPalette::_DEF_, Colors::counterRole(QPalette::_DEF_))
 #define readGrad(_DEF_) (Gradients::Type) iSettings->value(_DEF_).toInt();
-#include <QtDebug>
+
 void
 BespinStyle::readSettings(const QSettings* settings)
 {
@@ -171,6 +171,7 @@ BespinStyle::readSettings(const QSettings* settings)
 
    // Hacks ==================================
    config.hack.messages = readBool(HACK_MESSAGES);
+   config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
    
    // PW Echo Char ===========================
    config.input.pwEchoChar =
@@ -256,14 +257,14 @@ BespinStyle::readSettings(const QSettings* settings)
       config.progress.std_role[Bg] =
          config.progress.std_role[Fg] = QPalette::Window;
 
-      config.tab.std_role[Bg] =  QPalette::Window;
+//       config.tab.std_role[Bg] =  QPalette::Window;
       // gtk fixes the label color... so try to ensure it will be visible
-      if (!Colors::haveContrast(QApplication::palette().color(QPalette::WindowText),
-                                QApplication::palette().color(config.tab.active_role[Bg])))
-      {
-         config.tab.active_role[Bg] =  QPalette::Window;
-         config.tab.activeTabSunken = true;
-      }
+//       if (!Colors::haveContrast(QApplication::palette().color(QPalette::WindowText),
+//                                 QApplication::palette().color(config.tab.active_role[Bg])))
+//       {
+//          config.tab.active_role[Bg] =  QPalette::Window;
+//          config.tab.activeTabSunken = true;
+//       }
       
       config.view.header_role[Bg] = QPalette::Window;
       config.view.sortingHeader_role[Bg] = QPalette::Window;

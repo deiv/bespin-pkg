@@ -167,6 +167,12 @@ Hacks::add(QWidget *w) {
       w->installEventFilter(bespinHacks);
       return true;
    }
+   if (config.hack.KHTMLView)
+   if (QFrame *frame = qobject_cast<QFrame*>(w))
+   if (frame->inherits("KHTMLView")) {
+      frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+      return true;
+   }
    return false;
 }
 

@@ -95,11 +95,19 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
    ASSURE_OPTION(tbb, TabBarBase);
 
    if (widget) {
-      if ((qobject_cast<const QTabBar*>(widget)))
-         return; // we alter the paintevent
       if (widget->parentWidget() &&
-          qobject_cast<QTabWidget*>(widget->parentWidget()))
-         return; // KDE abuse, allready has a nice base
+          qobject_cast<QTabWidget*>(widget->parentWidget())) {
+         // in general we don't want a tabbar on a tabwidget
+         // that's nonsense, looks crap... and still used by some KDE apps
+         // the konqueror guys however want the konqueror tabbar to look
+         // somewhat like Bespin =) - so permit their workaround for all other
+         // styles TODO: ask them why not just use a tabbar and a stack instead
+         // of a tabwidget
+         if (!widget->parentWidget()->inherits("KonqFrameTabs"))
+            return;
+      }
+      else if (qobject_cast<const QTabBar*>(widget))
+         return; // usually we alter the paintevent by eventfiltering
    }
    QRect rect = RECT.adjusted(dpi.f2, 0, -dpi.f2, -dpi.f2);
    int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
@@ -158,7 +166,7 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
          Tile::setShape(Tile::Full &~ (Tile::Left | Tile::Right)); break;
       }
       masks.rect[true].render(copy.rect, painter, GRAD(tab), Qt::Vertical,
-                              FCOLOR(Window), copy.rect.height());
+                              CCOLOR(tab.std, Bg), copy.rect.height());
       shadows.sunken[true][true].render(RECT, painter);
       Tile::reset();
    }

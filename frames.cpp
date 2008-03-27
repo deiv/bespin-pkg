@@ -27,6 +27,7 @@ BespinStyle::isSpecialFrame(const QWidget *w)
 {
    return
       w->inherits("QTextEdit") ||
+      w->objectName() == "RenderFormElementWidget" ||
       (w->parentWidget() && w->parentWidget()->inherits("KateView"));
 }
 
@@ -46,13 +47,13 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
                        const QWidget * widget) const
 {
    B_STATES
-
+   
    if (!widget) { // fallback, we cannot paint shaped frame contents
       if (sunken)
          shadows.fallback.render(RECT,painter);
       else if (option->state & State_Raised) //TODO!
+         shadows.fallback.render(RECT,painter);
 //          shadows.raised.render(RECT,painter);
-         return;
       else {
          //horizontal
          shadows.line[false][Sunken].render(RECT, painter, Tile::Full, false);
