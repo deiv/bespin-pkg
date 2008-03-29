@@ -296,7 +296,11 @@ void BespinStyle::initMetrics()
    dpi.SliderThickness = SCALE(20);
    dpi.SliderControl = SCALE(20);
    dpi.Indicator = SCALE(20 - 2*config.btn.layer);
+#if 0
    dpi.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
+#else
+	dpi.ExclusiveIndicator = SCALE(17);
+#endif
 }
 
 #undef SCALE

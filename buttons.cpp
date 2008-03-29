@@ -22,8 +22,6 @@
 
 #include "draw.h"
 
-#include <QtDebug>
-
 static int animStep = -1;
 static bool isCheckbox = false;
 
@@ -303,7 +301,7 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
       return;
 
    const bool flat = btn->features & QStyleOptionButton::Flat;
-   
+
    QColor fg;
    if (config.btn.backLightHover)
       hover = animStep = 0;
@@ -399,21 +397,21 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
 
    bool isOn = option->state & State_On;
    const int f2 = dpi.f2, f1 = dpi.f1, f4 = dpi.f4;
-   QPoint xy = RECT.topLeft();
-   
-   Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
-   
+	
    if (isOn) hover = hasFocus = false;
 //       else if (hover && sunken) isOn = true;
 
+#if 0
+	QPoint xy = RECT.topLeft();
+	Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
+	animStep = isOn ? 0 : HOVER_STEP;
    QColor bc = btnBg(PAL, isEnabled, hasFocus, 0,
                      false, Gradients::isReflective(gt));
    QColor c = bc;
-   
-   animStep = isOn ? 0 : HOVER_STEP;
+	
    if (animStep)
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
-   
+
    if (config.btn.layer == 2) { // sunken ==================
       QRect r = RECT.adjusted(dpi.f1,0,-dpi.f1,-f2);
       masks.rect[true].render(r, painter, sunken || isOn ?
@@ -487,12 +485,26 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
       }
       painter->restore();
    }
-   // drop
+	// drop
    if (isOn) {
       xy += QPoint(f4, f4);
       fillWithMask(painter, xy, btnFg(PAL, isEnabled, hover, animStep),
                    masks.radioIndicator);
    }
+#else
+		QRect r = RECT.adjusted(f2,0,0,-f2);
+      masks.rect[true].render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Window));
+		r.setBottom(RECT.bottom());
+      shadows.sunken[true][isEnabled].render(r, painter);
+		animStep = isOn ? 12 : HOVER_STEP;
+		if (animStep) {
+			QColor c = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 12-animStep, animStep);
+			const int off = (dpi.ExclusiveIndicator/4);
+			QPoint xy = r.topLeft() + QPoint(off, off);
+			const Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
+			fillWithMask(painter, xy, c, masks.radioIndicator);
+		}
+#endif
    animStep = -1;
 }
 

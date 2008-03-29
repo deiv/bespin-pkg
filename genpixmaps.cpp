@@ -314,8 +314,12 @@ void BespinStyle::generatePixmaps()
    // mask
    masks.radio = roundMask(dpi.ExclusiveIndicator-f4);
    // mask fill
+#if 0
    masks.radioIndicator =
       roundMask(dpi.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
+#else
+	masks.radioIndicator = roundMask(dpi.ExclusiveIndicator/2);
+#endif
    // ================================================================
    
    // NOTCH =====================================

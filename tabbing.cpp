@@ -120,6 +120,8 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
    shadows.sunken[true][true].render(rect, painter);
 }
 
+static int animStep = -1;
+
 void
 BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
                      const QWidget * widget) const
@@ -170,6 +172,27 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
       shadows.sunken[true][true].render(RECT, painter);
       Tile::reset();
    }
+
+   B_STATES
+   animStep = 0;
+   // animation stuff
+   if (isEnabled && !sunken) {
+      IndexedFadeInfo *info = 0;
+      int index = -1, hoveredIndex = -1;
+      if (widget)
+         if (const QTabBar* tbar =
+             qobject_cast<const QTabBar*>(widget)) {
+         // NOTICE: the index increment is IMPORTANT to make sure it's no "0"
+                index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
+                hoveredIndex = hover ? index :
+                   tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
+                info = const_cast<IndexedFadeInfo *>
+                   (animator->fadeInfo(widget, hoveredIndex));
+             }
+      if (info)
+         animStep = info->step(index);
+      if (hover && !animStep) animStep = 6;
+   }
    
    drawTabShape(&copy, painter, widget);
    drawTabLabel(&copy, painter, widget);
@@ -177,40 +200,18 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
       painter->restore();
 }
 
-static int animStep = -1;
-
 void
 BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
                           const QWidget * widget) const
 {
    ASSURE_OPTION(tab, Tab);
-   B_STATES
+   OPT_SUNKEN
 
    if (isGTK)
       sunken = option->state & State_Selected;
    else
       sunken = sunken || (option->state & State_Selected);
    
-   animStep = 0;
-   // animation stuff
-   if (isEnabled && !sunken) {
-      IndexedFadeInfo *info = 0;
-      int index = -1, hoveredIndex = -1;
-      if (widget)
-      if (const QTabBar* tbar =
-         qobject_cast<const QTabBar*>(widget)) {
-         // NOTICE: the index increment is IMPORTANT to make sure it's no "0"
-         index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
-         hoveredIndex = hover ? index :
-            tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
-         info = const_cast<IndexedFadeInfo *>
-            (animator->fadeInfo(widget, hoveredIndex));
-      }
-      if (info)
-         animStep = info->step(index);
-      if (hover && !animStep) animStep = 6;
-   }
-       
    // maybe we're done here?!
    if (!(animStep || sunken)) return;
        
@@ -322,7 +323,7 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
       cB = CCOLOR(tab.active, Bg);
    }
    else if (animStep) {
-      cF = CCOLOR(tab.std, Fg);
+      cF = cF = CCOLOR(tab.std, Fg);
       cB = Colors::mid(CCOLOR(tab.std, Bg ), CCOLOR(tab.active, Bg), 8-animStep, animStep);
       if (Colors::contrast(CCOLOR(tab.active, Fg), cB) > Colors::contrast(cF, cB))
          cF = CCOLOR(tab.active, Fg);

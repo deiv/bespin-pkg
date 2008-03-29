@@ -182,7 +182,7 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
    case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize
       return 22;
    case PM_SmallIconSize: // Default small icon size
-      return 22;
+      return 16;
    case PM_LargeIconSize: // Default large icon size
       return 32;
    case PM_FocusFrameHMargin: // Horizontal margin that the focus frame will outset the widget by.

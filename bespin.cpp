@@ -419,6 +419,7 @@ static QMenuBar *bar4popup(QMenu *menu) {
    return 0;
 }
 #include <QToolButton>
+#include <QtDebug>
 bool
 BespinStyle::eventFilter( QObject *object, QEvent *ev )
 {
