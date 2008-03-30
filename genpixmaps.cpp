@@ -318,7 +318,9 @@ void BespinStyle::generatePixmaps()
    masks.radioIndicator =
       roundMask(dpi.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
 #else
-	masks.radioIndicator = roundMask(dpi.ExclusiveIndicator/2);
+	int s = (dpi.ExclusiveIndicator)/4; s *= 2; // cause of int div...
+	s += f2; // cause sunken frame "outer" part covers f2 pixels
+	masks.radioIndicator = roundMask(dpi.ExclusiveIndicator - s);
 #endif
    // ================================================================
    
