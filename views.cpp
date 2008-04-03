@@ -440,9 +440,11 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
                                Gradients::Button);
          painter->drawTiledPixmap(RECT, sunk);
       }
+#if QT_VERSION >= 0x040400
       else if (item->viewItemPosition == QStyleOptionViewItemV4::Invalid)
 			masks.rect[true].render(RECT, painter, Gradients::Sunken,
 											 Qt::Vertical, FCOLOR(Highlight));
+#endif
 		else
          painter->fillRect(RECT, PAL.brush(QPalette::Highlight));
    }
