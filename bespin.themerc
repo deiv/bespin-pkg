@@ -1,7 +1,7 @@
 [Misc]
 Name=Bespin
 Name[x-test]=xxBespinxx
-ConfigPage=libkstyle-bespin-config
+ConfigPage=kstyle-bespin-config
 Comment=Strike back the Empire
 [KDE]
 WidgetStyle=Bespin

@@ -29,12 +29,14 @@
 
 namespace Bespin {
 
+#ifndef BESPIN_DECO
 class BgSet {
 public:
    BgSet(){}
    QPixmap topTile, btmTile;
    QPixmap cornerTile, lCorner, rCorner;
 };
+#endif
 
 namespace Gradients {
 
@@ -44,7 +46,7 @@ enum Type {
 };
 
 enum BgMode {
-   BevelV = 3, BevelH, LightV, LightH
+   BevelV = 2, BevelH, LightV, LightH
 };
 
 
@@ -66,6 +68,7 @@ inline const bool isReflective(Type type = Simple) {
    return type > Button;
 }
 
+#ifndef BESPIN_DECO
 /** a diagonal NW -> SE light */
 const QPixmap &shadow(int height, bool bottom = false);
 
@@ -83,7 +86,15 @@ const BgSet &bgSet(const QColor &c);
 
 void init(BgMode mode, Type progress = Glass,
           int bgBevelIntesity = 110, int btnBevelSize = 16);
+#else
+void init();
+enum Position { Top = 0, Bottom, Left, Right };
+const QPixmap &borderline(const QColor &c, Position pos);
+#endif
 void wipe();
+
+Type fromInfo(int info);
+int toInfo(Type type);
 
 };
 };

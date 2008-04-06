@@ -126,14 +126,14 @@ BespinStyle::readSettings(const QSettings* settings)
    
    // Background ===========================
    config.bg.mode = (BGMode) readInt(BG_MODE);
+   if (config.bg.mode > BevelH) config.bg.mode = BevelV;
    config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
    config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
    config.bg.modal.invert = readBool(BG_MODAL_INVERT);
    config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
 
+#if 0
 #ifndef QT_NO_XRENDER
-   if (config.bg.mode > BevelH)
-      config.bg.mode = BevelV;
    else if(config.bg.mode == ComplexLights &&
            !QFile::exists(QDir::tempPath() + "bespinPP.lock"))
       QProcess::startDetached(iSettings->
@@ -141,7 +141,8 @@ BespinStyle::readSettings(const QSettings* settings)
 #else
    if (config.bg.mode == ComplexLights) config.bg.mode = BevelV;
 #endif
-   
+#endif
+
    if (config.bg.mode == Scanlines)
       config.bg.structure = readInt(BG_STRUCTURE);
    
@@ -176,6 +177,26 @@ BespinStyle::readSettings(const QSettings* settings)
    // PW Echo Char ===========================
    config.input.pwEchoChar =
       ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
+
+   // kwin - yes i let the style control the deco, iff the deco permits, though :)
+   config.kwin.gradient[0] = readGrad(KWIN_INACTIVE_GRADIENT);
+   config.kwin.gradient[0] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[0]);
+   config.kwin.gradient[1] = readGrad(KWIN_ACTIVE_GRADIENT);
+   config.kwin.gradient[1] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[1]);
+   if (config.kwin.gradient[0]) {
+      readRole(kwin.inactive, KWIN_INACTIVE_ROLE);
+   }
+   else {
+      config.kwin.inactive_role[Bg] = QPalette::Window;
+      config.kwin.inactive_role[Fg] = QPalette::WindowText;
+   }
+   if (config.kwin.gradient[1]) {
+      readRole(kwin.active, KWIN_ACTIVE_ROLE);
+   }
+   else {
+      config.kwin.active_role[Bg] = QPalette::Window;
+      config.kwin.active_role[Fg] = QPalette::WindowText;
+   }
 
    // flanders
    config.leftHanded =
@@ -312,7 +333,7 @@ void BespinStyle::init(const QSettings* settings) {
 #endif
    initMetrics();
    generatePixmaps();
-   Gradients::init(config.bg.mode > ComplexLights ?
+   Gradients::init(config.bg.mode > Scanlines ?
                    (Gradients::BgMode)config.bg.mode :
                    Gradients::BevelV, _progressBase, config.bg.intensity, dpi.f8);
    int f2 = dpi.f2, f4 = dpi.f4;

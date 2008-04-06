@@ -1,2 +1,6 @@
+
 TEMPLATE = subdirs
-SUBDIRS = bespin.pro config
+SUBDIRS = bespin.pro config 
+
+SUBDIRS += kwin
+

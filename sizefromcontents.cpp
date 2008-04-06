@@ -76,7 +76,7 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
          bool checkable = menuItem->menuHasCheckableItems;
          int maxpmw = config.menu.showIcons*menuItem->maxIconWidth;
          int w = contentsSize.width();
-         int h = qMin(contentsSize.height(),
+         int h = qMax(contentsSize.height(),
                       menuItem->fontMetrics.lineSpacing()) +dpi.f2;
          
          if (config.menu.showIcons && !menuItem->icon.isNull())

@@ -1,53 +1,240 @@
 #!/bin/sh
-CONFIG_QT=1
-CONFIG_KDE=1
-for parameter in "$@"; do
-   if echo $parameter | grep prefix > /dev/null; then
-      PREFIX="$(echo $parameter | cut -d"=" -f2-)"
-   elif echo $parameter | grep kde-dir > /dev/null; then
-      KDEDIR="$(echo $parameter | cut -d"=" -f2-)"
-   elif echo $parameter | grep qt-dir > /dev/null; then
-      QTDIR="$(echo $parameter | cut -d"=" -f2-)"
-  elif [ $parameter = "without-qt-config" ]; then
-     CONFIG_QT=0
-  elif [ $parameter = "without-kde-config" ]; then
-     CONFIG_KDE=0
+
+good() {
+  echo -e "\e[0;32;40m\n$*\e[m"
+}
+
+bad() {
+   echo -e "\e[0;31;47m\nWarning: $*\e[m"
+}
+
+ui() {
+   echo -e "\e[0;34;47m\n$*\e[m"
+}
+
+ask_for_qt() {
+   bad "Qt4 could not be found in usual locations, pass it here"
+   QT_DIR="/"
+   while [ "$QT_DIR" != "" ]; do
+      read -p "Path to Qt4: " QT_DIR
+      check="$($QT_DIR/bin/qmake --version 2>&1 | grep -E "Qt *version *4")"
+      if [ "$check" != "" ]; then
+         break;
+      fi
+   done
+}
+
+ask_for_kde() {
+   bad "KDE 4 could not be found in usual locations, pass it here"
+   KDE_DIR="/"
+   while [ "$KDE_DIR" != "" ]; do
+      read -p "Path to KDE 4: " KDE_DIR
+      check="$($KDE_DIR/bin/kde4-config -v 2>&1 | grep -E "KDE *4")"
+      if [ "$check" != "" ]; then
+         break;
+      fi
+   done
+}
+
+QT_DIRS="/opt/qt4 /usr/local/qt4"
+
+find_qt() {
+   check="$(qmake --version 2>&1 | grep -E "Qt *version *4")"
+   if [ "$check" = "" ]; then
+      for DIR in $QT_DIRS; do
+         check="$($DIR/bin/qmake --version 2>&1 | grep -E "Qt *version *4")"
+         if [ "$check" != "" ]; then
+               QT_DIR="$DIR"
+               bad "Qt4 was found in non dominant path \"$QT_DIR\""
+               break
+         fi
+      done
    else
-      echo -e "
-\e[0;34;47m\n!!! Unknown parameter \"$parameter\" !!!
-
-Usage:\n-------------\nconfigure [prefix=path] [qt-dir=<Path to Qt4>] [kde-dir=<Path to KDE4>] [without-qt-config] [without-kde-config]
-
-prefix: Where apps get installed ($PREFIX)
-
-without-qt-config:\nDo NOT build the standalone configuration dialog
-
-without-kde-config:\nDo NOT build the kcontrol configuration plugin (auto turned off if KDE not found)
-
-\e[m"
-      exit 0
+      QT_DIR="$(which qmake)"
+      QT_DIR="${QT_DIR%/bin/qmake}"
+      QMAKE="$QT_DIR/bin/qmake"
+      good "Qt4 found in\"$QT_DIR\""
    fi
-done
-QMAKE=qmake
-qt4check="$($QMAKE --version 2>&1 | grep -E "Qt *version *4")"
-if [ "$qt4check" = "" ]; then
-   QMAKE=$QTDIR/bin/qmake
-   qt4check="$($QMAKE --version 2>&1 | grep -E "Qt *version *4")"
+   [ "$QT_DIR" != "" ]
+}
+
+KDE_DIRS="/opt/kde4 /usr/local/kde4"
+find_kde() {
+   check="$(kde4-config -v 2>&1 | grep -E "KDE *4")"
+   if [ "$check" = "" ]; then
+      for DIR in $KDE_DIRS; do
+         check="$($DIR/bin/kde4-config -v 2>&1 | grep -E "KDE *4")"
+         if [ "$check" != "" ]; then
+               KDE_DIR="$DIR"
+               bad "KDE 4 was found in non dominant path \"$KDE_DIR\""
+               break
+         fi
+      done
+   else
+      KDE_DIR="$(which kde4-config)"
+      KDE_DIR="${KDE_DIR%/bin/kde4-config}"
+      good "KDE 4 found in\"$KDE_DIR\""
+   fi
+   [ "KDE_DIR" != "" ]
+}
+
+write_general_pro() {
+echo "
+TEMPLATE = subdirs
+SUBDIRS = bespin.pro config " > qmake.pro
+if $CONFIG_KDE; then
+echo "
+SUBDIRS += kwin
+" >> qmake.pro
 fi
-if [ "$qt4check" = "" ]; then
-   echo -e "\e[0;31;47m$QTDIR does not seem to be a proper qt4 environment, try passing \"qt-dir=<Path to Qt4>\"\e[m"
-   exit 0
+}
+
+write_bespin_pro () {
+echo "
+HEADERS = colors.h bespin.h tileset.h debug.h eventkiller.h \\
+          visualframe.h gradients.h styleanimator.h draw.h config.h types.h\\
+          hacks.h xproperty.h
+SOURCES = colors.cpp bespin.cpp tileset.cpp stylehint.cpp \\
+          sizefromcontents.cpp qsubcmetrics.cpp \\
+          pixelmetric.cpp stdpix.cpp styleanimator.cpp \\
+          visualframe.cpp gradients.cpp init.cpp genpixmaps.cpp polish.cpp \\
+          buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp \\
+          scrollareas.cpp shapes.cpp slider.cpp tabbing.cpp toolbars.cpp \\
+          views.cpp window.cpp hacks.cpp xproperty.cpp
+unix {
+   HEADERS += oxrender.h
+   SOURCES += oxrender.cpp
+}
+TEMPLATE = lib
+PLUGIN = true
+CONFIG += qt x11 plugin
+QT += qt3support
+VERSION       = 0.1
+target.path += \$\$[QT_INSTALL_PLUGINS]/styles
+INSTALLS += target DATA
+DEFINES += SHAPE_POPUP=0
+" > bespin.pro
+
+if $CONFIG_KDE; then
+echo "
+DATA.files = bespin.themerc
+DATA.path += $KDE_DIR/share/apps/kstyle/themes/
+" >> bespin.pro
 fi
 
-kdecheck="$(kde4-config -v 2>&1 | grep -E "KDE *4")"
-if [ "$kdecheck" = "" ]; then
-   kdecheck="$($KDEDIR/bin/kde4-config -v 2>&1 | grep -E "KDE *4")"
+}
+
+write_config_pro() {
+echo "TEMPLATE = subdirs
+" > config/config.pro
+if $CONFIG_QT; then
+echo "
+SUBDIRS += bespin.pro
+" >> config/config.pro
 fi
-if [ "$kdecheck" = "" ]; then
-   echo -e "\e[0;33;40m!!!$KDEDIR does not seem to be a proper KDE4 environment\nThe config plugin will NOT be build\n(Try passing \"kde-dir=<Path to KDE4>\")\e[m"
-   CONFIG_KDE=0
+if $CONFIG_KDE; then
+echo "
+SUBDIRS += kstyle-bespin-config.pro
+" >> config/config.pro
+fi
+}
+
+write_config_qt_pro() {
+echo "
+TEMPLATE    = app
+HEADERS     = bconfig.h config.h dialog.h
+FORMS       = config.ui uiDemo.ui
+SOURCES     = main.cpp bconfig.cpp config.cpp
+RESOURCES   = config.qrc
+target.path = $PREFIX/bin
+INSTALLS = target
+DEFINES += EXECUTABLE=1
+unix {
+HEADERS += bpp.h
+SOURCES += bpp.cpp
+DEFINES += PUSHER=1
+}
+" > config/bespin.pro
+}
+
+write_config_kde_pro() {
+echo "
+TEMPLATE    = lib
+CONFIG     += plugin
+HEADERS     = bconfig.h config.h
+FORMS       = config.ui
+SOURCES     = bconfig.cpp config.cpp
+RESOURCES   = config.qrc
+target.path += $KDE_DIR/lib/kde4
+target.prefix = ""
+INSTALLS += target
+DEFINES += EXECUTABLE=0
+" > config/kstyle-bespin-config.pro
+}
+
+write_kwin_pro() {
+echo "
+HEADERS = button.h client.h ../colors.h factory.h ../gradients.h ../xproperty.h
+SOURCES = button.cpp client.cpp ../colors.cpp factory.cpp ../gradients.cpp ../xproperty.cpp
+INCLUDEPATH += $KDE_DIR/include $KDE_DIR/include/KDE
+LIBS += -L$KDE_DIR/lib -lkdecorations
+TARGET = kwin3_bespin
+TEMPLATE = lib
+PLUGIN = true
+CONFIG += qt x11 plugin
+VERSION       = 0.1
+target.path += $KDE_DIR/lib/kde4/
+DATA.files = bespin.desktop
+DATA.path += $KDE_DIR/share/apps/kwin
+INSTALLS += target DATA
+DEFINES += BESPIN_DECO
+" > kwin/kwin.pro
+}
+
+
+ui "Welcome to Bespins interactive configurator"
+
+QMAKE="qmake"
+export CONFIG_QT=false
+
+find_qt || ask_for_qt
+
+if [ "$QT_DIR" = "" ]; then
+   bad "Qt4 not found - exiting"
+   exit 1;
+fi
+export CONFIG_QT=true
+
+find_kde || ask_for_kde
+
+if [ "$KDE_DIR" = "" ]; then
+   export CONFIG_KDE=false
+   bad "KDE 4 not found - compiling without KWin deco and style config plugin"
+else
+   export CONFIG_KDE=true
+   export KDE_DIR
 fi
 
-if $QMAKE qmake.pro; then
-   echo -e "\e[32;40mconfiguration done, now \"make && make install\"\e[m"
+write_general_pro
+write_bespin_pro
+write_config_pro
+write_config_qt_pro
+if $CONFIG_KDE; then
+   write_config_kde_pro
+   write_kwin_pro
+fi
+
+if $QT_DIR/bin/qmake qmake.pro; then
+   good "Configuration done, now \"make && make install\""
+   if $CONFIG_KDE; then
+      cd kwin
+      rm -f Makefile
+      $QMAKE kwin.pro
+      sed -i -e "s/libkwin3_/kwin3_/g" Makefile
+      cd ../config
+      rm -f Makefile.kstyle-bespin-config
+      $QMAKE kstyle-bespin-config.pro -o Makefile.kstyle-bespin-config
+      sed -i -e "s/libkstyle-bespin/kstyle-bespin/g" Makefile.kstyle-bespin-config
+      cd ..
+   fi
 fi

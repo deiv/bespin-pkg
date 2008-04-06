@@ -25,18 +25,16 @@
 #include "colors.h"
 #include "gradients.h"
 
+#ifndef BESPIN_DECO
 #ifndef QT_NO_XRENDER
 #include "oxrender.h"
+#endif
 #endif
 
 using namespace Bespin;
 
 static QPixmap nullPix;
-static QPixmap _bevel[2];
-static Gradients::BgMode _mode = Gradients::BevelV;
-static Gradients::Type _progressBase = Gradients::Glass;
-static int _bgBevelIntesity = 110;
-
+// static Gradients::Type _progressBase = Gradients::Glass;
 
 /* ========= MAGIC NUMBERS ARE COOL ;) =================
 Ok, we want to cache the gradients, but unfortunately we have no idea about
@@ -199,6 +197,7 @@ rGlossGradient(const QColor &c, int size) {
    return pix;
 }
 
+#ifndef BESPIN_DECO
 static inline QPixmap *
 progressGradient(const QColor &c, int size, Qt::Orientation o) {
 #define GLASS true
@@ -279,10 +278,12 @@ progressGradient(const QColor &c, int size, Qt::Orientation o) {
 #undef GLOSS
 }
 
+#endif
+
 static inline uint costs(QPixmap *pix) {
    return ((pix->width()*pix->height()*pix->depth())>>3);
 }
-
+#ifndef BESPIN_DECO
 static inline uint costs(BgSet *set) {
    return (set->topTile.width()*set->topTile.height() +
            set->btmTile.width()*set->btmTile.height() +
@@ -290,12 +291,16 @@ static inline uint costs(BgSet *set) {
            set->lCorner.width()*set->lCorner.height() +
            set->rCorner.width()*set->rCorner.height())*set->topTile.depth()/8;
 }
-
+#endif
 typedef QCache<uint, QPixmap> PixmapCache;
 static PixmapCache gradients[2][Gradients::TypeAmount];
+#ifndef BESPIN_DECO
 static PixmapCache _btnAmbient, _tabShadow, _groupLight;
 typedef QCache<uint, BgSet> BgSetCache;
 static BgSetCache _bgSet;
+#else
+static PixmapCache _borderline[4];
+#endif
 
 const QPixmap&
 Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type) {
@@ -328,12 +333,14 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
       return *pix;
    
    QPoint start, stop;
-   
+#ifndef BESPIN_DECO
    if (type == Gradients::Cloudy)
       pix = progressGradient(iC, size, o);
    else if (type == Gradients::RadialGloss)
       pix = rGlossGradient(iC, size);
-   else {
+   else
+#endif
+   {
       pix = newPix(size, o, &start, &stop);
    
       QGradient grad;
@@ -370,7 +377,10 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
    return *pix;
 }
 
-const QPixmap &Gradients::light(int height) {
+#ifndef BESPIN_DECO
+
+const QPixmap
+&Gradients::light(int height) {
    if (height <= 0) {
       qWarning("NULL Pixmap requested, height was %d",height);
       return nullPix;
@@ -415,6 +425,8 @@ const QPixmap &Gradients::ambient(int height) {
    _btnAmbient.insert(height, pix, costs(pix));
    return *pix;
 }
+
+static QPixmap _bevel[2];
 
 const QPixmap &Gradients::bevel(bool ltr) {
    return _bevel[ltr];
@@ -473,6 +485,9 @@ static inline QPixmap *cornerMask(bool right = false) {
    QPainter p(alpha); p.fillRect(alpha->rect(), rg); p.end();
    return alpha;
 }
+
+static int _bgBevelIntesity = 110;
+static Gradients::BgMode _mode = Gradients::BevelV;
 
 const BgSet &Gradients::bgSet(const QColor &c) {
    BgSet *set = _bgSet.object(c.rgb());
@@ -606,13 +621,9 @@ void
 Gradients::init(BgMode mode, Type progress, int bgBevelIntesity, int btnBevelSize)
 {
    _mode = mode;
-   _progressBase = progress;
+//    _progressBase = progress;
    _bgBevelIntesity = bgBevelIntesity;
    _bgSet.setMaxCost( 900<<10 ); // 832 should be enough - we keep some safety
-   for (int i = 0; i < 2; ++i) {
-      for (int j = 0; j < Gradients::TypeAmount; ++j)
-         gradients[i][j].setMaxCost( 1024<<10 );
-   }
    _btnAmbient.setMaxCost( 64<<10 );
    _tabShadow.setMaxCost( 64<<10 );
    _groupLight.setMaxCost( 256<<10 );
@@ -626,14 +637,88 @@ Gradients::init(BgMode mode, Type progress, int bgBevelIntesity, int btnBevelSiz
       _bevel[i].fill(Qt::transparent);
       p.begin(&_bevel[i]); p.fillRect(_bevel[i].rect(), lg); p.end();
    }
+#else
+
+const QPixmap&
+Gradients::borderline(const QColor &c, Position pos)
+{
+   QPixmap *pix = _borderline[pos].object(c.rgba());
+   if (pix)
+      return *pix;
+   
+   QColor c1 = c, c2 = c;
+   c1.setAlpha(c.alpha()*0.7); c2.setAlpha(0);
+   
+   QPoint start(0,0), stop;
+   if (pos > Bottom) {
+      pix = new QPixmap(32, 1); stop = QPoint(32,0); }
+   else {
+      pix = new QPixmap(1, 32); stop = QPoint(0,32); }
+   pix->fill(Qt::transparent);
+         
+   QLinearGradient lg(start, stop);
+   if (pos % 2) { // Bottom, right
+      lg.setColorAt(0, c1); lg.setColorAt(1, c2); }
+   else {
+      lg.setColorAt(0, c2); lg.setColorAt(1, c1); }
+
+   QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
+
+   // cache for later ;)
+   _borderline[pos].insert(c.rgba(), pix, costs(pix));
+   return *pix;
+}
+
+
+void Gradients::init() {
+   for (int i = 0; i < 4; ++i)
+      _borderline[i].setMaxCost( ((32*32)<<3)<<4 ); // enough for 16 different colors
+#endif
+   for (int i = 0; i < 2; ++i) {
+      for (int j = 0; j < Gradients::TypeAmount; ++j)
+         gradients[i][j].setMaxCost( 1024<<10 );
+   }
 }
 
 void Gradients::wipe() {
-   _bgSet.clear();
    for (int i = 0; i < 2; ++i)
       for (int j = 0; j < Gradients::TypeAmount; ++j)
          gradients[i][j].clear();
+#ifndef BESPIN_DECO
+   _bgSet.clear();
    _btnAmbient.clear();
    _tabShadow.clear();
    _groupLight.clear();
+#else
+   for (int i = 0; i < 4; ++i)
+      _borderline[i].clear();
+#endif
+}
+
+Gradients::Type Gradients::fromInfo(int info)
+{
+   switch(info) {
+      case 0: return Gradients::None;
+      case 1: return Gradients::Sunken;
+      default:
+      case 2: return Gradients::Button;
+      case 3: return Gradients::Glass;
+   }
+   return Gradients::Button;
+}
+
+int Gradients::toInfo(Gradients::Type type)
+{
+   switch (type) {
+      case Gradients::None: return 0;
+      default:
+      case Gradients::Simple:
+      case Gradients::Button: return 2;
+      case Gradients::Sunken: return 1;
+      case Gradients::Gloss:
+      case Gradients::Glass:
+      case Gradients::Metal:
+      case Gradients::Cloudy: return 3;
+   }
+   return 2;
 }

@@ -151,6 +151,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateColorModes(ui.headerSortingRole);
    generateColorModes(ui.crTool);
    generateColorModes(ui.crMenu);
+   generateColorModes(ui.kwinInactiveRole);
+   generateColorModes(ui.kwinActiveRole);
    
    generateGradientTypes(ui.gradButton);
    generateGradientTypes(ui.gradChoose);
@@ -162,6 +164,16 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    generateGradientTypes(ui.headerGradient);
    generateGradientTypes(ui.headerSortingGradient);
    generateGradientTypes(ui.gradTool);
+   ui.kwinInactiveGrad->clear();
+   ui.kwinInactiveGrad->addItem("None", GradNone);
+   ui.kwinInactiveGrad->addItem("Sunken", GradSunken);
+   ui.kwinInactiveGrad->addItem("Button", GradButton);
+   ui.kwinInactiveGrad->addItem("Glassy", GradGlass);
+   ui.kwinActiveGrad->clear();
+   ui.kwinActiveGrad->addItem("None", GradNone);
+   ui.kwinActiveGrad->addItem("Sunken", GradSunken);
+   ui.kwinActiveGrad->addItem("Button", GradButton);
+   ui.kwinActiveGrad->addItem("Glassy", GradGlass);
    
    
    QSettings csettings("Bespin", "Config");
@@ -283,6 +295,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.headerSortingRole, "View.SortingHeaderRole", QPalette::Text);
    handleSettings(ui.headerGradient, "View.HeaderGradient", GradButton);
    handleSettings(ui.headerSortingGradient, "View.SortingHeaderGradient", GradSunken);
+
+   handleSettings(ui.kwinActiveGrad, KWIN_ACTIVE_GRADIENT);
+   handleSettings(ui.kwinInactiveGrad, KWIN_INACTIVE_GRADIENT);
+   handleSettings(ui.kwinActiveRole, KWIN_ACTIVE_ROLE);
+   handleSettings(ui.kwinInactiveRole, KWIN_INACTIVE_ROLE);
 
    handleSettings(ui.hackMessages, HACK_MESSAGES);
    

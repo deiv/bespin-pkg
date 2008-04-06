@@ -15,8 +15,7 @@ enum Direction {
    };
 };
 
-enum BGMode { Plain = 0, Scanlines, ComplexLights,
-      BevelV, BevelH };
+enum BGMode { Plain = 0, Scanlines, BevelV, BevelH };
 
 enum Orientation3D {Sunken = 0, Relief, Raised};
 

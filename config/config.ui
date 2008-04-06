@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>1019</width>
-    <height>584</height>
+    <height>591</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -136,6 +136,11 @@
         </item>
         <item>
          <property name="text" >
+          <string>KWin Titlebar</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
           <string>Hacks</string>
          </property>
         </item>
@@ -217,7 +222,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>0</number>
+      <number>11</number>
      </property>
      <widget class="QWidget" name="Seite_3" >
       <property name="geometry" >
@@ -225,7 +230,7 @@
         <x>0</x>
         <y>0</y>
         <width>541</width>
-        <height>525</height>
+        <height>530</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2" >
@@ -412,7 +417,7 @@
         <x>0</x>
         <y>0</y>
         <width>541</width>
-        <height>706</height>
+        <height>530</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -441,11 +446,6 @@
            <item>
             <property name="text" >
              <string>Tiled Structure</string>
-            </property>
-           </item>
-           <item>
-            <property name="text" >
-             <string>Complex</string>
             </property>
            </item>
            <item>
@@ -1944,13 +1944,100 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="Seite_6" >
+      <layout class="QGridLayout" name="gridLayout_7" >
+       <item row="0" column="0" >
+        <widget class="QLabel" name="label_5" >
+         <property name="text" >
+          <string>Active Titlebar</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QComboBox" name="kwinActiveGrad" />
+       </item>
+       <item row="0" column="2" >
+        <widget class="QLabel" name="label_22" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>@</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3" >
+        <widget class="QComboBox" name="kwinActiveRole" />
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="label_7" >
+         <property name="text" >
+          <string>Inactive Titlebar</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QComboBox" name="kwinInactiveGrad" />
+       </item>
+       <item row="1" column="2" >
+        <widget class="QLabel" name="label_23" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font" >
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text" >
+          <string>@</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QComboBox" name="kwinInactiveRole" />
+       </item>
+       <item row="2" column="1" >
+        <spacer name="verticalSpacer_3" >
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>449</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="Seite_5" >
       <property name="geometry" >
        <rect>
         <x>0</x>
         <y>0</y>
         <width>541</width>
-        <height>525</height>
+        <height>530</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" >
@@ -1962,6 +2049,13 @@
         </widget>
        </item>
        <item row="1" column="0" >
+        <widget class="QCheckBox" name="hackKHtml" >
+         <property name="text" >
+          <string>Sunken KHtml view (Konqueror)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
         <spacer name="verticalSpacer" >
          <property name="orientation" >
           <enum>Qt::Vertical</enum>

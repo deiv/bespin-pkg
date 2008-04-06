@@ -20,18 +20,20 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QtDebug>
 #include "draw.h"
+#include "xproperty.h"
 
 #ifndef Q_WS_X11
 #define QT_NO_XRENDER #
 #endif
 
-#ifndef QT_NO_XRENDER
+#if 0
+// #ifndef QT_NO_XRENDER
 
 #include <X11/Xatom.h>
 
-static const Atom bespin_decoDim =
-XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
+
 static const Atom bespin_bgYoff =
 XInternAtom(QX11Info::display(), "BESPIN_BG_Y_OFFSET", False);
 static const Atom bespin_bgPicture =
@@ -129,7 +131,7 @@ drawTiledBackground(const QRect &r, QPainter *p, const QColor &c,
    // anything)
    
    QPixmap *tmp = new QPixmap(r.size());
-   Qt::HANDLE dst = tmp->x11PictureHandle();
+   Qt::HANDLE dst = tmp;
    // painter has no clips, thus this doesn't help at all - for the moment
 //       int numRects = 0;
 //       XRectangle *rects =
@@ -185,7 +187,7 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
    // cause of scrollbars - kinda optimization
-   if (config.bg.mode < ComplexLights) return;
+   if (config.bg.mode < BevelV) return;
    
 
    if (!(widget && widget->isWindow()))
@@ -214,53 +216,72 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
       return;
    }
    // ===================
-   
-   switch (config.bg.mode) {
+   const BgSet &set = Gradients::bgSet(c); QRect rect = RECT;
+
 #ifndef QT_NO_XRENDER
+   uint decoDim = 0;
+   XProperty::get(widget->winId(), XProperty::decoDim, decoDim);
+   if (decoDim) {
+      Qt::HANDLE picture = set.topTile.x11PictureHandle();
+      XProperty::set(widget->winId(), XProperty::topTile, picture);
+      picture = set.btmTile.x11PictureHandle();
+      XProperty::set(widget->winId(), XProperty::btmTile, picture);
+      picture = set.cornerTile.x11PictureHandle();
+      XProperty::set(widget->winId(), XProperty::cnrTile, picture);
+      picture = set.lCorner.x11PictureHandle();
+      XProperty::set(widget->winId(), XProperty::lCorner, picture);
+      picture = set.rCorner.x11PictureHandle();
+      XProperty::set(widget->winId(), XProperty::rCorner, picture);
+      rect.adjust(-((decoDim >> 24) & 0xff),
+                  -((decoDim >> 16) & 0xff),
+                    (decoDim >> 8) & 0xff, decoDim & 0xff);
+   }
+#endif
+
+   switch (config.bg.mode) {
+#if 0 // #ifndef QT_NO_XRENDER
    case ComplexLights:
       if (drawTiledBackground(RECT, painter, c, widget))
          break;
 #endif
    case BevelV: { // also fallback for ComplexLights
-      const BgSet &set = Gradients::bgSet(c);
       int s1 = set.topTile.height();
-      int s2 = qMin(s1, (RECT.height()+1)/2);
+      int s2 = qMin(s1, (rect.height()+1)/2);
       s1 -= s2;
-      painter->drawTiledPixmap( RECT.x(), RECT.y(), RECT.width(), s2,
+      painter->drawTiledPixmap( rect.x(), rect.y(), rect.width(), s2,
                                 set.topTile, 0, s1 );
       if (Colors::value(c) < 245) { // no sense otherwise
-         const int w = RECT.width()/4 - 128;
+         const int w = rect.width()/4 - 128;
          if (w > 0) {
             s2 = 128-s1;
-            painter->drawTiledPixmap( RECT.x(), RECT.y(), w, s2,
+            painter->drawTiledPixmap( rect.x(), rect.y(), w, s2,
                                       set.cornerTile, 0, s1 );
-            painter->drawTiledPixmap( RECT.right()+1-w, RECT.y(), w, s2,
+            painter->drawTiledPixmap( rect.right()+1-w, rect.y(), w, s2,
                                       set.cornerTile, 0, s1 );
          }
-         painter->drawPixmap(RECT.x()+w, RECT.y(), set.lCorner, 0, s1, 128, s2);
-         painter->drawPixmap(RECT.right()-w-127, RECT.y(), set.rCorner, 0, s1, 128, s2);
+         painter->drawPixmap(rect.x()+w, rect.y(), set.lCorner, 0, s1, 128, s2);
+         painter->drawPixmap(rect.right()-w-127, rect.y(), set.rCorner, 0, s1, 128, s2);
       }
       s1 = set.btmTile.height();
-      s2 = qMin(s1, (RECT.height())/2);
-      painter->drawTiledPixmap( RECT.x(), RECT.bottom() - s2,
-                                RECT.width(), s2, set.btmTile );
+      s2 = qMin(s1, (rect.height())/2);
+      painter->drawTiledPixmap( rect.x(), rect.bottom() - s2,
+                                rect.width(), s2, set.btmTile );
       break;
    }
    case BevelH: {
-      const BgSet &set = Gradients::bgSet(c);
       int s1 = set.topTile.width();
-      int s2 = qMin(s1, (RECT.width()+1)/2);
-      const int h = qMin(128+32, RECT.height()/8);
-      const int y = RECT.y()+h;
-      painter->drawTiledPixmap( RECT.x(), y, s2, RECT.height()-h,
+      int s2 = qMin(s1, (rect.width()+1)/2);
+      const int h = qMin(128+32, rect.height()/8);
+      const int y = rect.y()+h;
+      painter->drawTiledPixmap( rect.x(), y, s2, rect.height()-h,
                                 set.topTile, s1-s2, 0 );
-      painter->drawPixmap(RECT.x(), y-32, set.lCorner, s1-s2, 0,0,0);
+      painter->drawPixmap(rect.x(), y-32, set.lCorner, s1-s2, 0,0,0);
       s1 = set.btmTile.width();
-      s2 = qMin(s1, (RECT.width())/2);
-      painter->drawTiledPixmap( RECT.right() - s2, y , s2, RECT.height()-h,
+      s2 = qMin(s1, (rect.width())/2);
+      painter->drawTiledPixmap( rect.right() - s2, y , s2, rect.height()-h,
                                 set.btmTile );
-      painter->drawPixmap(RECT.right() - s2, y-32, set.rCorner);
-      painter->drawTiledPixmap( RECT.x(), y-(128+32), RECT.width(), 128, set.cornerTile );
+      painter->drawPixmap(rect.right() - s2, y-32, set.rCorner);
+      painter->drawTiledPixmap( rect.x(), y-(128+32), rect.width(), 128, set.cornerTile );
       break;
    }
 //    case Plain: // should not happen anyway...

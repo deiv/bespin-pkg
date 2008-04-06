@@ -37,7 +37,12 @@ typedef struct Config {
       ushort pwEchoChar;
    } input;
 
+   struct kwin {
+      int gradient[2]; // this is NOT Gradients::Type!!!
+      QPalette::ColorRole inactive_role[2], active_role[2];
+   } kwin;
    Qt::LayoutDirection leftHanded;
+
    bool macStyle;
    
    struct menu {

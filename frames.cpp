@@ -35,6 +35,8 @@ void
 BespinStyle::drawFocusFrame(const QStyleOption * option, QPainter * painter,
                             const QWidget *) const
 {
+   if (option->state & State_Selected || option->state & State_MouseOver)
+      return; // looks crap...
    painter->save();
    painter->setBrush(Qt::NoBrush);
    painter->setPen(FCOLOR(Highlight));

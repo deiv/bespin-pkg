@@ -32,6 +32,11 @@
 
 #define INPUT_PWECHOCHAR "Input.PwEchoChar", 0x26AB
 
+#define KWIN_INACTIVE_ROLE "KWin.InactiveRole", QPalette::Window
+#define KWIN_ACTIVE_ROLE "KWin.ActiveRole", QPalette::WindowText
+#define KWIN_INACTIVE_GRADIENT "KWin.InactiveGradient", Gradients::None
+#define KWIN_ACTIVE_GRADIENT "KWin.ActiveGradient", Gradients::Button
+
 #define MENU_GLASSY "Menu.Glassy", true
 #define MENU_OPACITY "Menu.Opacity", 80
 #define MENU_ITEMGRADIENT "Menu.ItemGradient", Gradients::None

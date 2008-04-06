@@ -493,7 +493,7 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
    }
 #else
 		QRect r = RECT.adjusted(f2,0,0,-f2);
-      masks.rect[true].render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Window));
+      masks.rect[true].render(r, painter, GRAD(chooser), Qt::Vertical, FCOLOR(Window));
 		r.setBottom(RECT.bottom());
       shadows.sunken[true][isEnabled].render(r, painter);
 		animStep = isOn ? 12 : HOVER_STEP;

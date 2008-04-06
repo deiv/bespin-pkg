@@ -18,6 +18,7 @@
 
 #include <Q3ScrollView>
 #include <QAbstractButton>
+#include <QListView>
 #include <QAbstractScrollArea>
 #include <QAbstractSlider>
 #include <QAbstractSpinBox>
@@ -32,11 +33,8 @@
 #include <QSplitterHandle>
 #include <QToolBar>
 
-#ifdef Q_WS_X11
-#include <X11/Xatom.h>
-#endif
-
 #include "colors.h"
+#include "xproperty.h"
 #include "visualframe.h"
 #include "eventkiller.h"
 #include "bespin.h"
@@ -141,28 +139,8 @@ makeStructure(QPixmap **pixp, const QColor &c, bool light)
    p.end();
 }
 
-#ifdef Q_WS_X11
-static Atom winTypePopup = 0;
-static Atom winTypeMenu = 0;
-static Atom winType = 0;
-#define SET_WINDOW_TYPE(_WINDOW_, _TYPE_)\
-XChangeProperty(QX11Info::display(), _WINDOW_->winId(), winType,\
-XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&_TYPE_, 1L)
-#endif
-
 void BespinStyle::polish ( QApplication * app ) {
 
-#ifdef Q_WS_X11
-#define ENSURE_ATOM(_VAR_, _TYPE_)\
-   if (!_VAR_)\
-      _VAR_ = XInternAtom(QX11Info::display(), _TYPE_, False)
-
-   ENSURE_ATOM(winTypePopup, "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU");
-   ENSURE_ATOM(winTypeMenu, "_NET_WM_WINDOW_TYPE_MENU");
-   ENSURE_ATOM(winType, "_NET_WM_WINDOW_TYPE");
-   
-#undef ENSURE_ATOM
-#endif
 //    if (timer && !timer->isActive())
 //       timer->start(50);
    QPalette pal = app->palette();
@@ -309,6 +287,18 @@ void BespinStyle::polish( QWidget * widget ) {
    Hacks::add(widget);
    
    if (widget->isWindow()) {
+      QPalette pal = widget->palette();
+
+      uint info = XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode);
+      XProperty::set(widget->winId(), XProperty::bgInfo, info);
+      info = XProperty::encode(CCOLOR(kwin.active, Bg),
+                                CCOLOR(kwin.active, Fg), GRAD(kwin)[1]);
+      XProperty::set(widget->winId(), XProperty::actInfo, info);
+      const QColor fg = Colors::mid(CCOLOR(kwin.inactive, Bg),
+                                     CCOLOR(kwin.inactive, Fg), 2, 1);
+      info = XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]);
+      XProperty::set(widget->winId(), XProperty::inactInfo, info);
+      
       bool freakModals = config.bg.modal.invert ||
          config.bg.modal.glassy ||
          config.bg.modal.opacity < 100;
@@ -318,10 +308,6 @@ void BespinStyle::polish( QWidget * widget ) {
          widget->setAttribute(Qt::WA_StyledBackground);
 //       widget->setAutoFillBackground(true);
       if (QMenu *menu = qobject_cast<QMenu *>(widget)) {
-// #ifdef Q_WS_X11
-//       // tell beryl et. al this is a popup TODO: doesn't work yet...
-//          SET_WINDOW_TYPE(widget, winTypePopup);
-// #endif
          if (config.menu.glassy) {
             if (config.bg.mode == Scanlines) {
                QPalette pal = widget->palette();
@@ -394,6 +380,10 @@ void BespinStyle::polish( QWidget * widget ) {
        || widget->inherits("Q3DockWindowResizeHandle")
       )
       widget->setAttribute(Qt::WA_Hover);
+
+   // Enable hover effects in listview, all itemviews like in kde is pretty annoying
+   if (QListView *listView = qobject_cast<QListView*>(widget) )
+      listView->viewport()->setAttribute(Qt::WA_Hover);
    
    if (qobject_cast<QAbstractButton*>(widget)) {
       widget->setBackgroundRole ( QPalette::Window );
@@ -559,19 +549,17 @@ void BespinStyle::polish( QWidget * widget ) {
          widget->setAutoFillBackground(false);
       }
    //========================
-
-   if (widget->objectName() == "RenderFormElementWidget" &&
-       Colors::contrast(widget->palette().color(QPalette::Active,
-                                                QPalette::Window),
-                        widget->palette().color(QPalette::Active,
-                                                QPalette::WindowText)) < 20)
-   {
-      QPalette pal = widget->palette();
-      pal.setColor(QPalette::WindowText,
-                   Colors::value(widget->palette().color(QPalette::Active,
-                      QPalette::Window)) < 128 ? Qt::white : Qt::black);
-      widget->setPalette(pal);
-   }
+#define LACK_CONTRAST(_C_) Colors::contrast(pal.color(QPalette::Active, QPalette::_C_), pal.color(QPalette::Active, QPalette::_C_##Text)) < 20
+#define HARD_CONTRAST(_C_) Colors::value(pal.color(QPalette::Active, QPalette::_C_)) < 128 ? Qt::white : Qt::black
+   if (widget->objectName() == "RenderFormElementWidget")
+	{
+		QPalette pal = widget->palette();
+		if (LACK_CONTRAST(Window))
+			pal.setColor(QPalette::WindowText, HARD_CONTRAST(Window));
+		if (LACK_CONTRAST(Button))
+			pal.setColor(QPalette::WindowText, HARD_CONTRAST(Button));
+		widget->setPalette(pal);
+	}
    
 }
 #undef PAL

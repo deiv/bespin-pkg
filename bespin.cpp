@@ -42,7 +42,8 @@
 #ifndef QT_NO_XRENDER
 #include "oxrender.h"
 #endif
-#include "debug.h"
+// #include "debug.h"
+#include "xproperty.h"
 #include "colors.h"
 #include "bespin.h"
 
@@ -285,8 +286,6 @@ BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hover, int step) con
    return CCOLOR(btn.std, Fg);
 }
 
-#undef PAL
-
 void
 BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
@@ -510,6 +509,23 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
       if (QWidget * widget = qobject_cast<QWidget*>(object)) {
          if (widget->isModal()) {
             if (config.bg.modal.invert) swapPalette(widget);
+            const QPalette &pal = widget->palette();
+            BGMode bgMode = config.bg.mode;
+            QColor bg = FCOLOR(Window);
+            int gt[2] = { GRAD(kwin)[0], GRAD(kwin)[1] };
+            if (config.bg.modal.glassy) {
+               bgMode = Plain;
+               bg = bg.light(117-Colors::value(bg)/20);
+               gt[0] = 0; gt[1] = 3;
+            }
+            int info = XProperty::encode(bg, FCOLOR(WindowText), bgMode);
+            XProperty::set(widget->winId(), XProperty::bgInfo, info);
+            info = XProperty::encode(CCOLOR(kwin.active, Bg),
+                                      CCOLOR(kwin.active, Fg), gt[1]);
+            XProperty::set(widget->winId(), XProperty::actInfo, info);
+            info = XProperty::encode(CCOLOR(kwin.inactive, Bg),
+                                      CCOLOR(kwin.inactive, Fg), gt[0]);
+            XProperty::set(widget->winId(), XProperty::inactInfo, info);
             widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
             return false;
          }
@@ -560,6 +576,8 @@ BespinStyle::standardPalette () const
    pal.setColor(QPalette::HighlightedText, Qt::white);
    return pal;
 }
+
+#undef PAL
 
 /** eventcontrol slots*/
 #if 0

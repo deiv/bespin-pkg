@@ -410,11 +410,12 @@ BespinStyle::drawRubberBand(const QStyleOption * option, QPainter * painter,
    painter->drawRect(RECT.adjusted(0,0,-1,-1));
    painter->restore();
 }
-
+#include <QtDebug>
 void
 BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
                       const QWidget *widget) const
 {
+
 #if QT_VERSION >= 0x040400
 #define OPTION_VIEW_ITEM QStyleOptionViewItemV4
 #else
@@ -425,28 +426,42 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
 
    if (!item) return;
 
+   const QAbstractItemView *view =
+   qobject_cast<const QAbstractItemView *>(widget);
+
+   OPT_HOVER
+   hover = hover &&
+   (!view || view->selectionMode() != QAbstractItemView::NoSelection);
+
    // this could just lead to cluttered listviews...?!
 //    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled
 //       ? QPalette::Normal : QPalette::Disabled;
 //    if (cg == QPalette::Normal && !(item->state & QStyle::State_Active))
 //       cg = QPalette::Inactive;
 
-   if ((item->state & QStyle::State_Selected)) {
-      if (widget && qobject_cast<const QAbstractItemView *>(widget) &&
-          static_cast<const QAbstractItemView *>(widget)->selectionMode() ==
-          QAbstractItemView::SingleSelection) {
-         const QPixmap &sunk =
-                Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical,
-                               Gradients::Button);
+   const bool round =
+#if QT_VERSION >= 0x040400
+      item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
+      item->viewItemPosition == QStyleOptionViewItemV4::Invalid;
+#else
+      false;
+#endif
+
+   Gradients::Type gt = hover ? Gradients::Button : Gradients::Sunken;
+   
+   if (hover || (item->state & QStyle::State_Selected)) {
+      if (widget && view && view->selectionMode() == QAbstractItemView::SingleSelection) {
+         const QPixmap &sunk = Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical, gt);
          painter->drawTiledPixmap(RECT, sunk);
       }
-#if QT_VERSION >= 0x040400
-      else if (item->viewItemPosition == QStyleOptionViewItemV4::Invalid)
-			masks.rect[true].render(RECT, painter, Gradients::Sunken,
-											 Qt::Vertical, FCOLOR(Highlight));
-#endif
-		else
-         painter->fillRect(RECT, PAL.brush(QPalette::Highlight));
+      else if (round)
+			masks.rect[true].render(RECT, painter, gt, Qt::Vertical, FCOLOR(Highlight));
+		else {
+         const QColor high =
+         hover ? Colors::mid(FCOLOR(Base), FCOLOR(Highlight),1,4) :
+         FCOLOR(Highlight);
+         painter->fillRect(RECT, high);
+      }
    }
 #if QT_VERSION >= 0x040400
 #warning Compiling with Qt4.4 - do NOT use with lower versions
@@ -459,5 +474,4 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
 #endif
    else if (item->features & QStyleOptionViewItemV2::Alternate)
       painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
-   
 }

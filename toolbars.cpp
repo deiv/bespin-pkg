@@ -200,7 +200,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
          mode = QIcon::Normal;
 
       pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), mode, state);
-      if (step && !sunken && !pm.isNull())
+		if (step && !sunken && !pm.isNull())
 #ifndef QT_NO_XRENDER
          pm = icon(pm, step);
 #else
