@@ -65,7 +65,7 @@ PreviewWidget::paintEvent(QPaintEvent *pe)
 }
 
 Client::Client(KDecorationBridge *b, Factory *f) :
-KDecoration(b, f), bgMode(1), retry(0), _factory(f), _preview(0) {
+KDecoration(b, f), retry(0), bgMode(1), _factory(f), _preview(0) {
 }
 Client::~Client(){ delete _preview; }
 
@@ -579,6 +579,13 @@ Client::showWindowMenu(const QPoint &p)
    QPoint gp = widget()->mapToGlobal(QPoint(width()-200, 0));
    if (ip.x() > gp.x()) ip.setX(gp.x());
    KDecoration::showWindowMenu(ip);
+}
+
+void
+Client::toggleOnAllDesktops()
+{
+   emit stickyChanged(!isOnAllDesktops());
+   KDecoration::toggleOnAllDesktops();
 }
 
 QString

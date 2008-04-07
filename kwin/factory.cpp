@@ -26,7 +26,7 @@
 
 #include <QFontMetrics>
 #include <QSettings>
-#include "button.h"
+// #include "button.h"
 #include "client.h"
 #include "factory.h"
 
@@ -49,6 +49,7 @@ int Factory::buttonSize_ = -1;
 int Factory::borderSize_ = 4;
 int Factory::titleSize_[2] = {20,20};
 Gradients::Type Factory::gradient_[2] = {Gradients::None, Gradients::Button};
+QVector<Button::Type> Factory::multiButton_(0);
 
 Factory::Factory()
 {
@@ -61,7 +62,6 @@ Factory::~Factory() { initialized_ = false; }
 
 KDecoration* Factory::createDecoration(KDecorationBridge* b)
 {
-   qDebug() << "BESPIN: Client requested" << b;
 	return new Client(b, this);
 }
 
@@ -85,7 +85,42 @@ bool Factory::reset(unsigned long changed)
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////
+static void
+multiVector(const QString & string, QVector<Button::Type> &vector)
+{
+   Button::Type type; vector.clear();
+   for (int i = 0; i < string.length(); ++i) {
+      switch (string.at(i).toAscii()) {
+         case 'M': type = Button::Menu; break;
+         case 'S': type = Button::Stick; break;
+         case 'H': type = Button::Help; break;
+         case 'F': type = Button::Above; break;
+         case 'B': type = Button::Below; break;
+//          case 'L': type = Button::Shade; // Shade button
+         default: continue;
+      }
+      vector.append(type);
+   }
+}
+
+static QString
+multiString(const QVector<Button::Type> &vector)
+{
+   QString string; char c;
+   for (int i = 0; i < vector.size(); ++i) {
+      switch (vector.at(i)) {
+         case Button::Menu: c = 'M'; break;
+         case Button::Stick: c = 'S'; break;
+         case Button::Help: c = 'H'; break;
+         case Button::Above: c = 'F'; break;
+         case Button::Below: c = 'B'; break;
+         //          case 'L': type = Button::Shade; // Shade button
+         default: continue;
+      }
+      string.append(c);
+   }
+   return string;
+}
 
 bool Factory::readConfig()
 {
@@ -110,6 +145,13 @@ bool Factory::readConfig()
    gradient_[1] = (Gradients::Type)settings.value("ActiveGradient",
                                                    Gradients::Button).toInt();
    if (oldgradient != gradient_[1]) ret = true;
+
+   QString oldmultiorder = multiString(multiButton_);
+   QString newmultiorder = settings.value("MultiButtonOrder", "MHFBS").toString();
+   if (oldmultiorder != newmultiorder) {
+      ret = true;
+      multiVector(newmultiorder, multiButton_);
+   }
 
    int oldbordersize = borderSize_;
    switch (options()->preferredBorderSize(this)) {

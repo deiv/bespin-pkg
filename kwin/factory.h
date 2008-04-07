@@ -26,8 +26,10 @@
 #ifndef BESPIN_H
 #define BESPIN_H
 
+#include <QVector>
 #include <kdecorationfactory.h>
 #include "../gradients.h"
+#include "button.h"
 
 namespace Bespin
 {
@@ -53,12 +55,14 @@ public:
    inline static bool forceUserColors() { return forceUserColors_; }
    inline static bool trimmCaption() { return trimmCaption_; }
    inline static Gradients::Type gradient(bool active) { return gradient_[active]; }
+   inline static const QVector<Button::Type> &multiButtons() { return multiButton_; }
 private:
 	bool readConfig();
 private:
    static bool initialized_, forceUserColors_, trimmCaption_;
    static int buttonSize_, borderSize_, titleSize_[2];
    static Gradients::Type gradient_[2];
+   static QVector<Button::Type> multiButton_;
 };
 
 } //namespace

@@ -28,30 +28,56 @@
 #include <cmath>
 
 #include "../colors.h"
-#include "factory.h"
 #include "client.h"
+#include "factory.h"
 #include "button.h"
 
 using namespace Bespin;
 
 Button::Button(Client *parent, Type type) : QWidget(parent->widget()),
-client(parent), zoomTimer(0), zoomLevel(0)
+client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
 {
-   if (type == Multi)
-      this->type = Menu;
-   else
-      this->type = type;
-	setAutoFillBackground(false);
-	setAttribute(Qt::WA_OpaquePaintEvent, false);
+   setAutoFillBackground(false);
+   setAttribute(Qt::WA_OpaquePaintEvent, false);
    setFixedSize(parent->buttonSize(), parent->buttonSize());
-	setCursor(Qt::ArrowCursor);
+   setCursor(Qt::ArrowCursor);
+   
+   if (type == Multi) {
+      _type = client->factory()->multiButtons().at(0);
+      connect (client, SIGNAL (keepAboveChanged(bool)),
+                this, SLOT (clientStateChanged(bool)));
+      connect (client, SIGNAL (keepBelowChanged(bool)),
+                this, SLOT (clientStateChanged(bool)));
+      connect (client, SIGNAL (stickyChanged(bool)),
+                this, SLOT (clientStateChanged(bool)));
+      clientStateChanged(false);
+   }
+   else
+      _type = type;
+
 // 	setToolTip(tip);
 }
 
-bool Button::isEnabled() const {
+void
+Button::clientStateChanged(bool) {
+   if ((_type == Above && client->keepAbove()) ||
+      (_type == Below && client->keepBelow()))
+      _type = UnAboveBelow;
+   else if (_type == Stick && client->isOnAllDesktops() )
+      _type = Unstick;
+   else if ( _type == Unstick && !client->isOnAllDesktops() )
+      _type = Stick;
+   else if ( _type == UnAboveBelow &&
+      !(client->keepAbove() || client->keepBelow()) )
+      _type = client->factory()->multiButtons().at(multiIdx);
+   repaint();
+}
+
+bool
+Button::isEnabled() const {
    if (!QWidget::isEnabled())
       return false;
-   switch (type) {
+   switch (_type) {
       case Close: return client->isCloseable();
       case Min: return client->isMinimizable();
       case Max: return client->isMaximizable();
@@ -62,7 +88,8 @@ bool Button::isEnabled() const {
 
 QPainterPath Button::shape[NumTypes];
 
-void Button::init(int sz)
+void
+Button::init(int sz)
 {
    for (int t = 0; t < NumTypes; ++t)
       shape[t] = QPainterPath();
@@ -120,7 +147,8 @@ void Button::init(int sz)
 //    tip[Unstick] = i18n("This Desktops only");
 }
 #include <QtDebug>
-void Button::enterEvent(QEvent *)
+void
+Button::enterEvent(QEvent *)
 {
    if (!isEnabled()) return;
    
@@ -136,7 +164,8 @@ void Button::enterEvent(QEvent *)
 	if (!zoomTimer) zoomTimer = startTimer ( 50 );
 }
 
-void Button::leaveEvent(QEvent *)
+void
+Button::leaveEvent(QEvent *)
 {
    if (!isEnabled()) return;
    
@@ -152,7 +181,8 @@ void Button::leaveEvent(QEvent *)
 	if (!zoomTimer) zoomTimer = startTimer ( 50 );
 }
 
-void Button::mousePressEvent ( QMouseEvent * event )
+void
+Button::mousePressEvent ( QMouseEvent * event )
 {
    if (!isEnabled()) return;
    
@@ -160,14 +190,15 @@ void Button::mousePressEvent ( QMouseEvent * event )
       state |= Sunken; repaint();
 }
 
-void Button::mouseReleaseEvent ( QMouseEvent * event )
+void
+Button::mouseReleaseEvent ( QMouseEvent * event )
 {
    if (!isEnabled() || !underMouse()) return;
    
    KDecorationFactory* f = client->factory(); // needs to be saved before
 	state &= ~Sunken;
    const bool lb = (event->button() == Qt::LeftButton);
-   switch (type) {
+   switch (_type) {
    case Close:
       if (lb && client->isCloseable ())
          client->closeWindow();
@@ -179,7 +210,7 @@ void Button::mouseReleaseEvent ( QMouseEvent * event )
       break;
    case Max:
       if (client->isMaximizable ()) {
-         type = Restore;
+         _type = Restore;
          //TODO support alt/ctrl click?!
 //          KDecorationDefines::MaximizeMode mode;
 //          MaximizeRestore    The window is not maximized in any direction.
@@ -190,7 +221,7 @@ void Button::mouseReleaseEvent ( QMouseEvent * event )
       }
       break;
    case Restore:
-      type = Max;
+      _type = Max;
       client->maximize(event->button());
       break;
    case Menu:
@@ -200,34 +231,18 @@ void Button::mouseReleaseEvent ( QMouseEvent * event )
    case Help:
       if (lb) client->showContextHelp(); break;
    case Above:
-      if (lb) {
-         type = UnAboveBelow;
-         client->setKeepAbove (!client->keepAbove());
-      }
-      break;
+      if (lb) client->setKeepAbove (!client->keepAbove()); break;
    case Below:
-      if (lb) {
-         type = UnAboveBelow;
-         client->setKeepBelow (!client->keepBelow());
-      }
-      break;
+      if (lb) client->setKeepBelow (!client->keepBelow()); break;
    case UnAboveBelow:
       if (lb) {
          client->setKeepAbove(false);
          client->setKeepBelow(false);
-         type = Above;
       }
       break;
    case Stick:
    case Unstick:
-      if (lb) {
-         client->toggleOnAllDesktops();
-         if (client->isOnAllDesktops())
-            type = Stick;
-         else
-            type = Unstick;
-      }
-      break;
+      if (lb) client->toggleOnAllDesktops(); break;
    default:
       return; // invalid type
    }
@@ -236,7 +251,8 @@ void Button::mouseReleaseEvent ( QMouseEvent * event )
    repaint();
 }
 
-QColor Button::color() const
+QColor
+Button::color() const
 {
    QColor c =
    client->color(KDecorationDefines::ColorButtonBg, client->isActive());
@@ -249,7 +265,8 @@ QColor Button::color() const
    return c;
 }
 
-void Button::paintEvent(QPaintEvent *)
+void
+Button::paintEvent(QPaintEvent *)
 {
    QPainter p(this);
    p.setRenderHint(QPainter::Antialiasing);
@@ -257,11 +274,12 @@ void Button::paintEvent(QPaintEvent *)
    const float f = (18 + zoomLevel)/24.0; p.scale ( f, f );
    p.setPen(Qt::NoPen);
    p.setBrush(color());
-   p.drawPath(shape[type]);
+   p.drawPath(shape[_type]);
    p.end();
 }
 
-void Button::timerEvent ( QTimerEvent * )
+void
+Button::timerEvent ( QTimerEvent * )
 {
 	if (zoomOut) {
 		--zoomLevel;
@@ -278,20 +296,29 @@ void Button::timerEvent ( QTimerEvent * )
 	repaint();
 }
 
-void Button::wheelEvent(QWheelEvent *e)
+void
+Button::wheelEvent(QWheelEvent *e)
 {
 //    if (!isEnabled()) return; // NOTICE remember Obama: "Yes we can!" ;-)
+   if (_type < Multi) return;
+
+   const QVector<Type> &mb = client->factory()->multiButtons();
    int d = (e->delta() < 0) ? 1 : -1;
-   if (type > Multi) {
-      type = (Type)(type + d);
-      if (type == Help && !client->providesContextHelp())
-//          || type == Shade && !client->isShadeable()
-         type = (Type)(type + d);
-      if (type >= Special)
-         type = (Type)(Multi + 1);
-      else if (type <= Multi)
-         type = (Type)(Special - 1);
-   }
+   
+   multiIdx += d;
+   if (mb.at(multiIdx) == Help && !client->providesContextHelp())
+//       || (mb.at(multiIdx) == Shade && !client->isShadeable()))
+      multiIdx += d;
+   if (multiIdx >= mb.size() ) multiIdx = 0;
+   else if (multiIdx < 0 ) multiIdx = mb.size()-1;
+
+   _type = mb.at(multiIdx);
+   if ((_type == Above && client->keepAbove()) ||
+      (_type == Below && client->keepBelow()))
+      _type = UnAboveBelow;
+   else if (_type == Stick && client->isOnAllDesktops())
+      _type = Unstick;
+
    //TODO: roll max/vert/hori?!
    repaint();
 }

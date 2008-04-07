@@ -29,14 +29,14 @@
 
 #include <QWidget>
 
-#include "factory.h"
-#include "client.h"
-
 namespace Bespin
 {
 
+class Client;
+
 class Button : public QWidget
 {
+   Q_OBJECT
 public:
    enum State { Normal, Hovered, Sunken };
    enum Type { Close = 0, Min, Max, Multi,
@@ -46,6 +46,7 @@ public:
    Button(Client *parent, Type type);
    static void init(int sz);
    bool isEnabled() const;
+   inline bool type() {return _type;}
 protected:
 	void enterEvent(QEvent *e);
 	void leaveEvent(QEvent *e);
@@ -58,10 +59,12 @@ private:
    QColor color() const;
 	bool zoomOut;
 	Client *client;
-	Type type;
-   int state, zoomTimer, zoomLevel;
+	Type _type;
+   int state, multiIdx, zoomTimer, zoomLevel;
    static QPainterPath shape[NumTypes];
    static QString tip[NumTypes];
+private slots:
+   void clientStateChanged(bool);
 };
 
 } //namespace

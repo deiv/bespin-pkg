@@ -41,7 +41,7 @@ class Button;
 class PreviewWidget : public QWidget
 {
    Q_OBJECT
-   public:
+public:
    PreviewWidget(QWidget *p = 0, Qt::WindowFlags f = 0);
    ~PreviewWidget();
 protected:
@@ -73,6 +73,7 @@ public:
 	void resize( const QSize& s );
    void showWindowMenu(const QPoint &p);
    void showWindowMenu(const QRect &r);
+   void toggleOnAllDesktops();
    QString trimm(const QString &string);
 	/**
 	 * This function is called whenever the window is shaded or unshaded. Use
@@ -80,6 +81,8 @@ public:
 	 */
 	void shadeChange();
    inline Factory *factory() {return _factory;}
+signals:
+   void stickyChanged(bool);
 private:
 	void repaint(QPainter &p);
    QColor colors[2][4]; // [inactive,active][titlebg,bg,title,fg(bar,blend,font,btn)]
