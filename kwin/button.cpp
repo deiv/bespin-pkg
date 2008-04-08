@@ -89,7 +89,7 @@ Button::isEnabled() const {
 QPainterPath Button::shape[NumTypes];
 
 void
-Button::init(int sz)
+Button::init(int sz, bool leftMenu)
 {
    for (int t = 0; t < NumTypes; ++t)
       shape[t] = QPainterPath();
@@ -127,7 +127,10 @@ Button::init(int sz)
    shape[UnAboveBelow].addRect(s2-s3,-s4,s3,s2);
    
    shape[Menu].addRect(-s2,-s2,sz,sz);
-   shape[Menu].addRect(-s2,-s4,s2,sz-s4);
+   if (leftMenu)
+      shape[Menu].addRect(0,-s4,s2,sz-s4);
+   else
+      shape[Menu].addRect(-s2,-s4,s2,sz-s4);
    
    shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
    shape[Help].addRect(-s3,-s4,s3,sz-(s3+s4));

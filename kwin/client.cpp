@@ -279,7 +279,7 @@ Client::repaint(QPainter &p)
          p.drawRect(left); p.drawRect(right);
          p.drawRect(top); p.drawRect(bottom);
          if (retry < 10)
-            QTimer::singleShot(100, widget(), SLOT(update()));
+            QTimer::singleShot(200-16*retry, widget(), SLOT(update()));
          ++retry;
          break;
       }
@@ -586,8 +586,18 @@ Client::showWindowMenu(const QPoint &p)
 void
 Client::toggleOnAllDesktops()
 {
-   emit stickyChanged(!isOnAllDesktops());
    KDecoration::toggleOnAllDesktops();
+   emit stickyChanged(isOnAllDesktops());
+}
+
+static bool
+isBrowser(const QString &s)
+{
+   return !s.compare("konqueror", Qt::CaseInsensitive) ||
+   !s.compare("opera", Qt::CaseInsensitive) ||
+   !s.compare("firefox", Qt::CaseInsensitive) ||
+   !s.compare("mozilla", Qt::CaseInsensitive) ||
+   !s.compare("safari", Qt::CaseInsensitive); // just in case ;)
 }
 
 QString
@@ -617,18 +627,28 @@ Client::trimm(const QString &string)
    if (ret.contains(": "))
       ret = ret.section(": ", 1, -1, QString::SectionSkipEmpty );
 
-   /* if this is a url, please get rid of http:// and /file.html --------- */
-   if (ret.contains("http://"))
-      ret = ret.remove("http://", Qt::CaseInsensitive)/*.section()*/;
-
-   /* last: if the remaining string still contains the app name, please shape
-   away additional ifon like compile time, version numbers etc. ------------ */
    KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
    QString appName(info.windowClassName());
-   // TODO maybe check with regexp and word bounds?
-   int i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
-   if (i > -1)
-      ret = ret.mid(i, appName.length());
+
+   /* Browsers set the title to <html><title/></html> - appname
+   Now the page titles can be ridiculously looooong, especially on news
+   pages, where it consists of article - section - page
+   we drop anything, but the page.... ------------------------*/
+   if (isBrowser(appName)) {
+      if (ret.contains(" - "))
+         ret = ret.section(" - ", -1, -1, QString::SectionSkipEmpty);
+      /* if this is a url, please get rid of http:// and /file.html ------- */
+      if (ret.contains("http://"))
+         ret = ret.remove("http://", Qt::CaseInsensitive)/*.section()*/;
+   }
+   /* last: if the remaining string still contains the app name, please shape
+   away additional ifon like compile time, version numbers etc. ------------ */
+   else {
+      // TODO maybe check with regexp and word bounds?
+      int i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
+      if (i > -1)
+         ret = ret.mid(i, appName.length());
+   }
 
    /* in general, remove leading and ending blanks... */
    return ret.trimmed();

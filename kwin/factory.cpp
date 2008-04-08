@@ -176,7 +176,8 @@ bool Factory::readConfig()
 
    if (buttonSize_ != titleSize_[1]) {
       buttonSize_ = titleSize_[1]-8; // for the moment
-      Button::init(buttonSize_);
+      Button::init(buttonSize_, options()->titleButtonsLeft().
+      contains(QRegExp("(M|S|H|F|B|L)")));
    }
 
    return ret;

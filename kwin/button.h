@@ -44,7 +44,7 @@ public:
    //    VertMax, HoriMax,
    Restore, Unstick, UnAboveBelow, NumTypes };
    Button(Client *parent, Type type);
-   static void init(int sz);
+   static void init(int sz, bool leftMenu = false);
    bool isEnabled() const;
    inline bool type() {return _type;}
 protected:
