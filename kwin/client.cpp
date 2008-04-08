@@ -33,6 +33,8 @@
 #include <QX11Info>
 #include <QtDebug>
 
+#include <kwindowinfo.h>
+
 #include <X11/Xlib.h>
 #include <X11/extensions/shape.h>
 #include <X11/extensions/Xrender.h>
@@ -592,8 +594,48 @@ QString
 Client::trimm(const QString &string)
 {
    if (!_factory->trimmCaption()) return string;
-   QString ret = string.section(" - ", 0, 0, QString::SectionSkipEmpty );
-   if (ret.contains(':'))
-      ret = ret.section(':', 1, -1, QString::SectionSkipEmpty );
+
+   /* Ok, *some* apps have really long and nasty window captions
+   this looks clutterd, so we allow to crop them a bit and remove
+   considered uninteresting informations ======================= */
+
+   QString ret = string;
+
+   /* 1st off: we assume the part beyond the last dash (if any) to be the
+   uninteresting one (usually it's the apps name, if there's add info, that's
+   more important to the user) ------------------------------------- */
+
+   // ok, here's currently some conflict
+   // in e.g. amarok, i'd like to snip "amarok" and preserver "<song> by <artist>"
+   // but for e.g. k3b, i'd like to get rid of stupid
+   // "the kde application to burn cds and dvds" ...
+   if (ret.contains(" - "))
+      ret = ret.section(" - ", 0, -2, QString::SectionSkipEmpty );
+
+   /* next, if there're details, cut of by ": ",
+   we remove the general part as well ------------------------------*/
+   if (ret.contains(": "))
+      ret = ret.section(": ", 1, -1, QString::SectionSkipEmpty );
+
+   /* if this is a url, please get rid of http:// and /file.html --------- */
+   if (ret.contains("http://"))
+      ret = ret.remove("http://", Qt::CaseInsensitive)/*.section()*/;
+
+   /* last: if the remaining string still contains the app name, please shape
+   away additional ifon like compile time, version numbers etc. ------------ */
+   KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
+   QString appName(info.windowClassName());
+   // TODO maybe check with regexp and word bounds?
+   int i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
+   if (i > -1)
+      ret = ret.mid(i, appName.length());
+
+   /* in general, remove leading and ending blanks... */
    return ret.trimmed();
+   
+//    KWindowInfo info(windowId(), NET::WMVisibleName | NET::WMName, NET::WM2WindowClass);
+//    qDebug() << "BESPIN:" << info.windowClassClass() <<  << info.name() << info.visibleName();
+//    QByteArray windowClassClass() const;
+//    QByteArray windowClassName() const;
+//    QString visibleName() const;
 }
