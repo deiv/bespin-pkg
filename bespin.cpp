@@ -457,10 +457,11 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
       }
       return false;
    }
-#if SHAPE_POPUP
+#if 0
    case QEvent::Resize: {
       if (QMenu *menu = qobject_cast<QMenu*>(object)) {
          if (!menu->isWindow()) return false;
+#if SHAPE_POPUP
          QAction *head = menu->actions().at(0);
          QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
          Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | Qt::TextShowMnemonic,
@@ -478,6 +479,15 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
          br = masks.corner[3].boundingRect();
          mask -= masks.corner[3].translated(menu->width()-br.width(),
                                             menu->height()-br.height()); // br
+#else
+         const int w = menu->width();
+         const int h = menu->height();
+
+         QRegion mask(4, 0, w-8, h);
+         mask += QRegion(0, 4, w, h-8);
+         mask += QRegion(2, 1, w-4, h-2);
+         mask += QRegion(1, 2, w-2, h-4);
+#endif
          menu->setMask(mask);
          return false;
       }

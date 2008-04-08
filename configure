@@ -177,7 +177,7 @@ echo "
 HEADERS = button.h client.h ../colors.h factory.h ../gradients.h ../xproperty.h
 SOURCES = button.cpp client.cpp ../colors.cpp factory.cpp ../gradients.cpp ../xproperty.cpp
 INCLUDEPATH += $KDE_DIR/include $KDE_DIR/include/KDE
-LIBS += -L$KDE_DIR/lib -lkdecorations
+LIBS += -L$KDE_DIR/lib -lkdecorations -lkdeui
 TARGET = kwin3_bespin
 TEMPLATE = lib
 PLUGIN = true

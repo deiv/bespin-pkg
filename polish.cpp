@@ -347,7 +347,7 @@ void BespinStyle::polish( QWidget * widget ) {
             QAction *action = new QAction( menu->menuAction()->iconText(), menu );
             connect (action, SIGNAL(triggered(bool)), menu, SLOT(hide()));
             menu->insertAction(menu->actions().at(0), action);
-            menu->installEventFilter(this); // reposition/round corners
+//             menu->installEventFilter(this); // reposition/round corners
          }
 #endif
       }
@@ -557,7 +557,7 @@ void BespinStyle::polish( QWidget * widget ) {
 		if (LACK_CONTRAST(Window))
 			pal.setColor(QPalette::WindowText, HARD_CONTRAST(Window));
 		if (LACK_CONTRAST(Button))
-			pal.setColor(QPalette::WindowText, HARD_CONTRAST(Button));
+			pal.setColor(QPalette::ButtonText, HARD_CONTRAST(Button));
 		widget->setPalette(pal);
 	}
    
