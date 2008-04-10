@@ -106,10 +106,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    /** Setup the UI and geometry */
    ui.setupUi(this);
    ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
-   ui.sectionHeader->installEventFilter(this);
-   connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
-            ui.sectionHeader, SLOT(setText(const QString &)));
-   connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
+   connect (ui.sectionSelect, SIGNAL(currentIndexChanged(int)),
             ui.sections, SLOT(setCurrentIndex(int)));
    
    
@@ -865,22 +862,4 @@ void Config::generateGradientTypes(QComboBox *box) {
    box->addItem("Glass");
    box->addItem("Metal");
    box->addItem("Cloudy");
-}
-
-#include <QStyleOptionToolBoxV2>
-#include <QPainter>
-
-bool Config::eventFilter(QObject *o, QEvent *ev)
-{
-   if (o != ui.sectionHeader)
-      return BConfig::eventFilter(o, ev);
-   if (ev->type() != QEvent::Paint)
-      return false;
-   QStyleOptionToolBoxV2 option;
-   option.initFrom(ui.sectionHeader); option.text = ui.sectionHeader->text();
-   option.position = QStyleOptionToolBoxV2::OnlyOneTab;
-   option.state |= (QStyle::State_Selected | QStyle::State_Enabled);
-   QPainter p(ui.sectionHeader);
-   style()->drawControl(QStyle::CE_ToolBoxTab, &option, &p, ui.sectionHeader);
-   return true;
 }

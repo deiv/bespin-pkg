@@ -5,152 +5,50 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1019</width>
-    <height>591</height>
+    <width>790</width>
+    <height>489</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="baseSize" >
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle" >
    <string>Bespin Configuration</string>
   </property>
-  <layout class="QGridLayout" >
+  <layout class="QGridLayout" name="gridLayout_13" >
    <item rowspan="3" row="0" column="0" >
-    <widget class="QGroupBox" name="sectionSelectGroup" >
-     <property name="title" >
-      <string>Sections</string>
+    <widget class="QTextBrowser" name="info" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QListWidget" name="sectionSelect" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="MinimumExpanding" hsizetype="Expanding" >
-          <horstretch>20</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize" >
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="font" >
-         <font>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="horizontalScrollBarPolicy" >
-         <enum>Qt::ScrollBarAsNeeded</enum>
-        </property>
-        <property name="alternatingRowColors" >
-         <bool>true</bool>
-        </property>
-        <property name="iconSize" >
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="verticalScrollMode" >
-         <enum>QAbstractItemView::ScrollPerPixel</enum>
-        </property>
-        <property name="horizontalScrollMode" >
-         <enum>QAbstractItemView::ScrollPerPixel</enum>
-        </property>
-        <property name="movement" >
-         <enum>QListView::Static</enum>
-        </property>
-        <property name="resizeMode" >
-         <enum>QListView::Fixed</enum>
-        </property>
-        <property name="layoutMode" >
-         <enum>QListView::SinglePass</enum>
-        </property>
-        <property name="spacing" >
-         <number>1</number>
-        </property>
-        <property name="viewMode" >
-         <enum>QListView::ListMode</enum>
-        </property>
-        <property name="modelColumn" >
-         <number>0</number>
-        </property>
-        <property name="uniformItemSizes" >
-         <bool>true</bool>
-        </property>
-        <property name="selectionRectVisible" >
-         <bool>false</bool>
-        </property>
-        <property name="currentRow" >
-         <number>-1</number>
-        </property>
-        <item>
-         <property name="text" >
-          <string>Management</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>General</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Modal Dialogs</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Buttons</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Tabs</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Menus</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Itemviews</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Slider</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Progressbars</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Misc</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>KWin Titlebar</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Hacks</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
+     <property name="minimumSize" >
+      <size>
+       <width>210</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="frameShape" >
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
     </widget>
    </item>
    <item row="0" column="1" >
-    <widget class="QLabel" name="sectionHeader" >
+    <widget class="QComboBox" name="sectionSelect" >
      <property name="font" >
       <font>
        <pointsize>14</pointsize>
@@ -158,52 +56,66 @@
        <bold>true</bold>
       </font>
      </property>
-     <property name="autoFillBackground" >
-      <bool>false</bool>
-     </property>
-     <property name="frameShape" >
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow" >
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="lineWidth" >
-      <number>4</number>
-     </property>
-     <property name="midLineWidth" >
-      <number>0</number>
-     </property>
-     <property name="text" >
-      <string>Management</string>
-     </property>
-     <property name="alignment" >
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item rowspan="3" row="0" column="2" >
-    <widget class="QGroupBox" name="groupBox_7" >
-     <property name="title" >
-      <string/>
-     </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QTextBrowser" name="info" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-          <horstretch>20</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize" >
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <item>
+      <property name="text" >
+       <string>Management</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>General</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Modal Dialogs</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Buttons</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Tabs</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Menus</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Itemviews</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Slider</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Progressbars</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Misc</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>KWin Titlebar</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Hacks</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="1" column="1" >
@@ -222,38 +134,49 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>11</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="Seite_3" >
       <property name="geometry" >
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>530</height>
+        <width>556</width>
+        <height>426</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2" >
        <item row="0" column="0" >
-        <widget class="QLabel" name="label_43" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text" >
-          <string>Filter</string>
-         </property>
-         <property name="alignment" >
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout" >
+         <item>
+          <widget class="QLabel" name="label_43" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text" >
+            <string>Filter</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="presetFilter" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="0" column="1" colspan="3" >
-        <widget class="QLineEdit" name="presetFilter" />
-       </item>
-       <item row="1" column="0" colspan="4" >
+       <item row="1" column="0" >
         <widget class="QListWidget" name="store" >
          <property name="alternatingRowColors" >
           <bool>true</bool>
@@ -275,139 +198,149 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="4" >
+       <item row="2" column="0" >
         <widget class="QLineEdit" name="storeLine" />
        </item>
-       <item row="3" column="0" colspan="2" >
-        <widget class="QPushButton" name="btnRestore" >
-         <property name="text" >
-          <string>Load</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2" >
-        <widget class="QPushButton" name="btnImport" >
-         <property name="text" >
-          <string>Import...</string>
-         </property>
-        </widget>
-       </item>
-       <item rowspan="2" row="3" column="3" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0" >
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="0" colspan="2" >
-        <widget class="QPushButton" name="btnStore" >
-         <property name="text" >
-          <string>Store...</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2" >
-        <widget class="QPushButton" name="btnExport" >
-         <property name="text" >
-          <string>Export...</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="3" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0" >
-          <size>
-           <width>184</width>
-           <height>27</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="5" column="3" >
-        <widget class="QPushButton" name="btnDelete" >
-         <property name="palette" >
-          <palette>
-           <active>
-            <colorrole role="Button" >
-             <brush brushstyle="SolidPattern" >
-              <color alpha="255" >
-               <red>255</red>
-               <green>85</green>
-               <blue>0</blue>
-              </color>
-             </brush>
-            </colorrole>
-            <colorrole role="ButtonText" >
-             <brush brushstyle="SolidPattern" >
-              <color alpha="255" >
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </active>
-           <inactive>
-            <colorrole role="Button" >
-             <brush brushstyle="SolidPattern" >
-              <color alpha="255" >
-               <red>255</red>
-               <green>85</green>
-               <blue>0</blue>
-              </color>
-             </brush>
-            </colorrole>
-            <colorrole role="ButtonText" >
-             <brush brushstyle="SolidPattern" >
-              <color alpha="255" >
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </inactive>
-           <disabled>
-            <colorrole role="Button" >
-             <brush brushstyle="SolidPattern" >
-              <color alpha="255" >
-               <red>255</red>
-               <green>85</green>
-               <blue>0</blue>
-              </color>
-             </brush>
-            </colorrole>
-            <colorrole role="ButtonText" >
-             <brush brushstyle="SolidPattern" >
-              <color alpha="255" >
-               <red>128</red>
-               <green>128</green>
-               <blue>128</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </disabled>
-          </palette>
-         </property>
-         <property name="font" >
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text" >
-          <string>Delete</string>
-         </property>
-        </widget>
+       <item row="3" column="0" >
+        <layout class="QHBoxLayout" name="horizontalLayout_2" >
+         <item>
+          <widget class="QPushButton" name="btnRestore" >
+           <property name="text" >
+            <string>Load</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnStore" >
+           <property name="text" >
+            <string>Store...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType" >
+            <enum>QSizePolicy::MinimumExpanding</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>20</width>
+             <height>27</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnImport" >
+           <property name="text" >
+            <string>Import...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnExport" >
+           <property name="text" >
+            <string>Export...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer" >
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType" >
+            <enum>QSizePolicy::MinimumExpanding</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>80</width>
+             <height>27</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDelete" >
+           <property name="palette" >
+            <palette>
+             <active>
+              <colorrole role="Button" >
+               <brush brushstyle="SolidPattern" >
+                <color alpha="255" >
+                 <red>255</red>
+                 <green>85</green>
+                 <blue>0</blue>
+                </color>
+               </brush>
+              </colorrole>
+              <colorrole role="ButtonText" >
+               <brush brushstyle="SolidPattern" >
+                <color alpha="255" >
+                 <red>255</red>
+                 <green>255</green>
+                 <blue>255</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </active>
+             <inactive>
+              <colorrole role="Button" >
+               <brush brushstyle="SolidPattern" >
+                <color alpha="255" >
+                 <red>255</red>
+                 <green>85</green>
+                 <blue>0</blue>
+                </color>
+               </brush>
+              </colorrole>
+              <colorrole role="ButtonText" >
+               <brush brushstyle="SolidPattern" >
+                <color alpha="255" >
+                 <red>255</red>
+                 <green>255</green>
+                 <blue>255</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </inactive>
+             <disabled>
+              <colorrole role="Button" >
+               <brush brushstyle="SolidPattern" >
+                <color alpha="255" >
+                 <red>255</red>
+                 <green>85</green>
+                 <blue>0</blue>
+                </color>
+               </brush>
+              </colorrole>
+              <colorrole role="ButtonText" >
+               <brush brushstyle="SolidPattern" >
+                <color alpha="255" >
+                 <red>128</red>
+                 <green>128</green>
+                 <blue>128</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </disabled>
+            </palette>
+           </property>
+           <property name="font" >
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text" >
+            <string>Delete</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -416,8 +349,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>530</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -692,7 +625,7 @@
          <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
-           <height>305</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -704,8 +637,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>706</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -787,7 +720,7 @@
          <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -799,8 +732,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>706</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -1012,7 +945,7 @@
          <property name="sizeHint" stdset="0" >
           <size>
            <width>24</width>
-           <height>214</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -1024,8 +957,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>525</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_6" >
@@ -1046,6 +979,13 @@
            </widget>
           </item>
           <item row="0" column="1" >
+           <widget class="QLabel" name="label_44" >
+            <property name="text" >
+             <string>@</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
            <widget class="QComboBox" name="crTabBar" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
@@ -1214,6 +1154,13 @@
            </widget>
           </item>
           <item row="0" column="1" >
+           <widget class="QLabel" name="label_45" >
+            <property name="text" >
+             <string>@</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
            <widget class="QComboBox" name="crTool" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
@@ -1234,7 +1181,7 @@
          <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
-           <height>159</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -1246,60 +1193,45 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>525</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
-      <layout class="QGridLayout" >
+      <layout class="QGridLayout" name="gridLayout_18" >
        <item row="0" column="0" >
         <widget class="QGroupBox" name="groupBox_5" >
          <property name="title" >
           <string>Menubar</string>
          </property>
-         <layout class="QGridLayout" >
+         <layout class="QGridLayout" name="gridLayout_8" >
           <item row="0" column="0" >
-           <layout class="QHBoxLayout" >
-            <item>
-             <widget class="QLabel" name="label_41" >
-              <property name="text" >
-               <string>Gradient</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="gradMenuBar" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QComboBox" name="gradMenuBar" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
-          <item row="1" column="0" >
-           <layout class="QHBoxLayout" >
-            <item>
-             <widget class="QLabel" name="label_24" >
-              <property name="text" >
-               <string>Color role</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="crMenu" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <item row="0" column="1" >
+           <widget class="QLabel" name="label_41" >
+            <property name="text" >
+             <string>@</string>
+            </property>
+           </widget>
           </item>
-          <item row="2" column="0" >
+          <item row="0" column="2" >
+           <widget class="QComboBox" name="crMenu" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="3" >
            <widget class="QCheckBox" name="barSunken" >
             <property name="text" >
              <string>Sunken frame</string>
@@ -1314,22 +1246,38 @@
          <property name="title" >
           <string>Popups</string>
          </property>
-         <layout class="QGridLayout" >
+         <layout class="QGridLayout" name="gridLayout_10" >
           <item row="0" column="0" >
-           <layout class="QHBoxLayout" >
-            <item>
-             <widget class="QLabel" name="label_6" >
-              <property name="text" >
-               <string>Color role</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="crPopup" />
-            </item>
-           </layout>
+           <widget class="QCheckBox" name="menuGlas" >
+            <property name="text" >
+             <string>Glas Look</string>
+            </property>
+           </widget>
           </item>
-          <item row="1" column="0" >
+          <item row="0" column="1" >
+           <widget class="QLabel" name="label_49" >
+            <property name="text" >
+             <string>@</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QComboBox" name="crPopup" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="3" >
            <layout class="QHBoxLayout" >
             <item>
              <widget class="QLabel" name="label_25" >
@@ -1385,31 +1333,24 @@
             </item>
            </layout>
           </item>
-          <item row="2" column="0" >
-           <widget class="QCheckBox" name="menuGlas" >
+          <item row="2" column="0" colspan="3" >
+           <widget class="QCheckBox" name="menuShadow" >
             <property name="text" >
-             <string>Glas Look</string>
+             <string>"Shadow" outline</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0" >
-           <widget class="QCheckBox" name="menuBoldText" >
-            <property name="text" >
-             <string>Bold Text</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" >
+          <item row="3" column="0" colspan="3" >
            <widget class="QCheckBox" name="showMenuIcons" >
             <property name="text" >
              <string>Show icons</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0" >
-           <widget class="QCheckBox" name="menuShadow" >
+          <item row="4" column="0" colspan="3" >
+           <widget class="QCheckBox" name="menuBoldText" >
             <property name="text" >
-             <string>"Shadow" outline</string>
+             <string>Bold Text</string>
             </property>
            </widget>
           </item>
@@ -1421,50 +1362,35 @@
          <property name="title" >
           <string>Selected</string>
          </property>
-         <layout class="QGridLayout" >
+         <layout class="QGridLayout" name="gridLayout_9" >
           <item row="0" column="0" >
-           <layout class="QHBoxLayout" >
-            <item>
-             <widget class="QLabel" name="label_9" >
-              <property name="text" >
-               <string>Color role</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="crMenuActive" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QComboBox" name="gradMenuItem" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
-          <item row="1" column="0" >
-           <layout class="QHBoxLayout" >
-            <item>
-             <widget class="QLabel" name="label_10" >
-              <property name="text" >
-               <string>Gradient</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="gradMenuItem" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <item row="0" column="1" >
+           <widget class="QLabel" name="label_46" >
+            <property name="text" >
+             <string>@</string>
+            </property>
+           </widget>
           </item>
-          <item row="2" column="0" >
+          <item row="0" column="2" >
+           <widget class="QComboBox" name="crMenuActive" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="3" >
            <widget class="QCheckBox" name="menuActiveItemSunken" >
             <property name="text" >
              <string>Sunken frame when active</string>
@@ -1481,8 +1407,8 @@
          </property>
          <property name="sizeHint" stdset="0" >
           <size>
-           <width>523</width>
-           <height>93</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -1494,18 +1420,58 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>525</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
-      <layout class="QGridLayout" >
+      <layout class="QGridLayout" name="gridLayout_12" >
        <item row="0" column="0" >
         <widget class="QGroupBox" name="groupBox_3" >
          <property name="title" >
           <string>Header</string>
          </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
+         <layout class="QGridLayout" name="gridLayout_11" >
+          <item row="1" column="0" >
+           <widget class="QComboBox" name="headerGradient" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" >
+           <widget class="QComboBox" name="headerRole" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" >
+           <widget class="QComboBox" name="headerSortingGradient" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2" >
+           <widget class="QComboBox" name="headerSortingRole" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="3" >
            <widget class="QLabel" name="label_19" >
             <property name="font" >
              <font>
@@ -1521,73 +1487,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0" >
-           <layout class="QHBoxLayout" >
-            <item>
-             <widget class="QLabel" name="label_20" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="font" >
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text" >
-               <string>Color role</string>
-              </property>
-              <property name="alignment" >
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="headerRole" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-                <horstretch>1</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="2" column="0" >
-           <layout class="QHBoxLayout" >
-            <item>
-             <widget class="QLabel" name="label_21" >
-              <property name="font" >
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text" >
-               <string>Gradient</string>
-              </property>
-              <property name="alignment" >
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="headerGradient" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="3" column="0" >
+          <item row="2" column="0" colspan="3" >
            <widget class="QLabel" name="label_15" >
             <property name="font" >
              <font>
@@ -1603,71 +1503,19 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0" >
-           <layout class="QHBoxLayout" >
-            <item>
-             <widget class="QLabel" name="label_38" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="font" >
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text" >
-               <string>Color role</string>
-              </property>
-              <property name="alignment" >
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="headerSortingRole" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-                <horstretch>1</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <item row="1" column="1" >
+           <widget class="QLabel" name="label_47" >
+            <property name="text" >
+             <string>@</string>
+            </property>
+           </widget>
           </item>
-          <item row="5" column="0" >
-           <layout class="QHBoxLayout" >
-            <item>
-             <widget class="QLabel" name="label_39" >
-              <property name="font" >
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text" >
-               <string>Gradient</string>
-              </property>
-              <property name="alignment" >
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="headerSortingGradient" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <item row="3" column="1" >
+           <widget class="QLabel" name="label_48" >
+            <property name="text" >
+             <string>@</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -1679,8 +1527,8 @@
          </property>
          <property name="sizeHint" stdset="0" >
           <size>
-           <width>16</width>
-           <height>113</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -1692,8 +1540,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>525</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -1778,8 +1626,8 @@
          </property>
          <property name="sizeHint" stdset="0" >
           <size>
-           <width>20</width>
-           <height>363</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -1791,12 +1639,12 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>525</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
+      <layout class="QGridLayout" name="gridLayout_16" >
+       <item row="0" column="0" colspan="3" >
         <layout class="QHBoxLayout" >
          <item>
           <widget class="QLabel" name="label_13" >
@@ -1824,60 +1672,33 @@
         </layout>
        </item>
        <item row="1" column="0" >
-        <layout class="QHBoxLayout" >
-         <item>
-          <widget class="QLabel" name="label_3" >
-           <property name="font" >
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text" >
-            <string>Background Color</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="crProgressBg" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QComboBox" name="crProgressBg" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
-       <item row="2" column="0" >
-        <layout class="QHBoxLayout" >
-         <item>
-          <widget class="QLabel" name="label_40" >
-           <property name="font" >
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text" >
-            <string>Foreground Color</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="crProgressFg" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <item row="1" column="1" >
+        <widget class="QLabel" name="label_3" >
+         <property name="text" >
+          <string>--></string>
+         </property>
+        </widget>
        </item>
-       <item row="3" column="0" >
+       <item row="1" column="2" >
+        <widget class="QComboBox" name="crProgressFg" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="3" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -1885,7 +1706,7 @@
          <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
-           <height>323</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -1897,8 +1718,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>525</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -1937,7 +1758,7 @@
          <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
-           <height>144</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -1945,78 +1766,112 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Seite_6" >
-      <layout class="QGridLayout" name="gridLayout_7" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>556</width>
+        <height>722</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_15" >
        <item row="0" column="0" >
-        <widget class="QLabel" name="label_5" >
-         <property name="text" >
+        <widget class="QGroupBox" name="groupBox_10" >
+         <property name="title" >
           <string>Active Titlebar</string>
          </property>
-         <property name="alignment" >
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_7" >
+          <item row="0" column="0" >
+           <widget class="QComboBox" name="kwinActiveGrad" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QLabel" name="label_22" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text" >
+             <string>@</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QComboBox" name="kwinActiveRole" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="kwinActiveGrad" />
-       </item>
-       <item row="0" column="2" >
-        <widget class="QLabel" name="label_22" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text" >
-          <string>@</string>
-         </property>
-         <property name="alignment" >
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3" >
-        <widget class="QComboBox" name="kwinActiveRole" />
        </item>
        <item row="1" column="0" >
-        <widget class="QLabel" name="label_7" >
-         <property name="text" >
+        <widget class="QGroupBox" name="groupBox_11" >
+         <property name="title" >
           <string>Inactive Titlebar</string>
          </property>
-         <property name="alignment" >
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_14" >
+          <item row="0" column="0" >
+           <widget class="QComboBox" name="kwinInactiveGrad" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QLabel" name="label_23" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font" >
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text" >
+             <string>@</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QComboBox" name="kwinInactiveRole" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="kwinInactiveGrad" />
-       </item>
-       <item row="1" column="2" >
-        <widget class="QLabel" name="label_23" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font" >
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text" >
-          <string>@</string>
-         </property>
-         <property name="alignment" >
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3" >
-        <widget class="QComboBox" name="kwinInactiveRole" />
-       </item>
-       <item row="2" column="1" >
+       <item row="2" column="0" >
         <spacer name="verticalSpacer_3" >
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -2024,7 +1879,7 @@
          <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
-           <height>449</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -2036,8 +1891,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>541</width>
-        <height>530</height>
+        <width>556</width>
+        <height>722</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" >
@@ -2063,7 +1918,7 @@
          <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
-           <height>656</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>

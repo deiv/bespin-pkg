@@ -99,8 +99,6 @@ int main(int argc, char *argv[])
       BConfigDialog *window =
          new BConfigDialog(config, BConfigDialog::All &
                            ~(BConfigDialog::Import | BConfigDialog::Export));
-//       window->resize(848,480);
-      window->adjustSize();
 //       QMessageBox::warning(0,"bespin error!", "this is a really bad error - look: there's a white rabbit behind you!");
       window->show();
       return app->exec();
