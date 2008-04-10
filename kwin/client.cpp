@@ -622,27 +622,29 @@ Client::trimm(const QString &string)
    if (ret.contains(" - "))
       ret = ret.section(" - ", 0, -2, QString::SectionSkipEmpty );
 
-   /* next, if there're details, cut of by ": ",
-   we remove the general part as well ------------------------------*/
-   if (ret.contains(": "))
-      ret = ret.section(": ", 1, -1, QString::SectionSkipEmpty );
-
    KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
    QString appName(info.windowClassName());
 
    /* Browsers set the title to <html><title/></html> - appname
    Now the page titles can be ridiculously looooong, especially on news
-   pages, where it consists of article - section - page
-   we drop anything, but the page.... ------------------------*/
+   pages --------------------------------- */
    if (isBrowser(appName)) {
-      if (ret.contains(" - "))
-         ret = ret.section(" - ", -1, -1, QString::SectionSkipEmpty);
-      /* if this is a url, please get rid of http:// and /file.html ------- */
-      if (ret.contains("http://"))
-         ret = ret.remove("http://", Qt::CaseInsensitive)/*.section()*/;
+      int n = qMin(2, ret.count(" - "));
+      if (n--) // select last two if 3 or more sects, prelast otherwise
+         ret = ret.section(" - ", -2, n-2, QString::SectionSkipEmpty);
    }
+
+   /* next, if there're details, cut of by ": ",
+   we remove the general part as well ------------------------------*/
+   if (ret.contains(": "))
+      ret = ret.section(": ", 1, -1, QString::SectionSkipEmpty );
+
+   /* if this is a url, please get rid of http:// and /file.html ------- */
+   if (ret.contains("http://"))
+      ret = ret.remove("http://", Qt::CaseInsensitive)/*.section()*/;
+   
    /* last: if the remaining string still contains the app name, please shape
-   away additional ifon like compile time, version numbers etc. ------------ */
+   away additional info like compile time, version numbers etc. ------------ */
    else {
       // TODO maybe check with regexp and word bounds?
       int i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
