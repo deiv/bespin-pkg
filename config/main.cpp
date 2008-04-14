@@ -24,14 +24,6 @@
 #include <QSettings>
 #include <QTimer>
 
-#if PUSHER
-#include <QX11Info>
-#include "bpp.h"
-#include <signal.h>
-#include <sys/types.h>
-#include <unistd.h>
-#endif
-
 #define CHAR(_QSTRING_) _QSTRING_.toLatin1().data()
 
 class BStyle : public QStyle {
@@ -56,22 +48,16 @@ static int usage(const char* appname) {
 %s sshot <some_file.png> [preset] [width]\tSave a screenshot\n\
 %s load <some_preset>\tLoad a preset to current settings\n\
 %s import <some_config.bespin>\tImport an exported setting\n\
-%s export <some_preset> <some_config.bespin>\tImport an exported setting\n\
-%s %s", appname, appname, appname, appname, appname, appname, appname, appname,
-#if PUSHER
-appname, "pusher [stop]\t\t\tThe Bg Pixmap daemon - you should not have to call this\n"
-#else
-"",""
-#endif
-   );
+%s export <some_preset> <some_config.bespin>\tImport an exported setting\n",
+appname, appname, appname, appname, appname, appname, appname, appname );
    return 1;
 }
 
 enum Mode {
    Invalid = 0, Configure, Presets,
       Import, Export, Load,
-      Demo, Try, Screenshot, Pusher };
-#include <QMessageBox>
+      Demo, Try, Screenshot };
+
 int main(int argc, char *argv[])
 {
    Mode mode = Configure;
@@ -87,9 +73,6 @@ int main(int argc, char *argv[])
       else if (!qstrcmp( argv[1], "try" )) mode = Try;
       else if (!qstrcmp( argv[1], "sshot" )) mode = Screenshot;
       else if (!qstrcmp( argv[1], "load" )) mode = Load;
-#if PUSHER
-      else if (!qstrcmp( argv[1], "pusher" )) mode = Pusher;
-#endif
    }
 
    switch (mode) {
@@ -99,7 +82,6 @@ int main(int argc, char *argv[])
       BConfigDialog *window =
          new BConfigDialog(config, BConfigDialog::All &
                            ~(BConfigDialog::Import | BConfigDialog::Export));
-//       QMessageBox::warning(0,"bespin error!", "this is a really bad error - look: there's a white rabbit behind you!");
       window->show();
       return app->exec();
    }
@@ -224,37 +206,6 @@ int main(int argc, char *argv[])
       image.save ( argv[2], "png" );
       return 0;
    }
-#if PUSHER
-   case Pusher: {
-      QFile lock(QDir::tempPath() + "/bespinPP.lock");
-      
-      if (argc > 2 && !qstrcmp( argv[2], "stop" )) {
-         if (!lock.exists()) // nope...
-            return 1;
-         lock.open(QIODevice::ReadOnly);
-         QString pid = lock.readLine();
-         lock.close();
-         kill(pid.toUInt(), SIGTERM);
-         return 0;
-      }
-      
-      if (lock.exists()) // we've allready an instance
-         return 1;
-      
-      // make a lock!
-      lock.open(QIODevice::WriteOnly);
-      lock.write(QString::number(getpid()).toAscii());
-      lock.close();
-      
-      int argc_ = argc;
-      BespinPP app(argc_, argv);
-      signal (SIGTERM, BespinPP::cleanup); signal (SIGINT, BespinPP::cleanup);
-      signal (SIGQUIT, BespinPP::cleanup); signal (SIGKILL, BespinPP::cleanup);
-      signal (SIGHUP, BespinPP::cleanup); signal (SIGSEGV, BespinPP::cleanup);
-      int ret = app.exec();
-      return ret;
-   }
-#endif
    default:
       return usage(argv[0]);
    }

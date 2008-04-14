@@ -51,6 +51,7 @@ private:
    QPalette *loadedPal;
    bool infoIsManage;
    void store3(const QString &, bool);
+	static void savePalette(const QPalette &pal);
 private slots:
    void storedSettigSelected(QListWidgetItem *);
    void store2a();

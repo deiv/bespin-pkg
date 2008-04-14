@@ -25,7 +25,6 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QFrame>
-#include <QTimer>
 
 /**============= System includes ==========================*/
 #ifdef Q_WS_X11
@@ -241,7 +240,6 @@ internalEvent_(false) {
 
    // start being animated
    animator = new StyleAnimator(this, config.tab.transition, config.tab.animSteps);
-   QTimer::singleShot(0, this, SLOT(fixKdePalette()));
 }
 
 BespinStyle::~BespinStyle() {
@@ -525,7 +523,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             int gt[2] = { GRAD(kwin)[0], GRAD(kwin)[1] };
             if (config.bg.modal.glassy) {
                bgMode = Plain;
-               bg = bg.light(117-Colors::value(bg)/20);
+               bg = bg.light(125-Colors::value(bg)/20);
                gt[0] = 0; gt[1] = 3;
             }
             int info = XProperty::encode(bg, FCOLOR(WindowText), bgMode);

@@ -21,6 +21,7 @@
 #include <QDir>
 #include <QProcess>
 #include <QApplication>
+#include <QTimer>
 
 #include <cmath>
 
@@ -115,6 +116,7 @@ BespinStyle::readSettings(const QSettings* settings)
          else {
             delete iSettings; iSettings = 0L;
          }
+			QTimer::singleShot(0, this, SLOT(fixKdePalette()));
       }
       if (!iSettings) {
          iSettings = new QSettings("Bespin", "Style");

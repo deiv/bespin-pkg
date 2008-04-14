@@ -517,26 +517,19 @@ bool Config::load(const QString &preset) {
          system.setValue(key, store.value(key));
    system.endGroup();
 
-   store.beginGroup("QPalette");
-   QSettings qt("Trolltech");
-   qt.beginGroup("Qt"); qt.beginGroup("Palette");
    //NOTICE: we pass the loaded palette through ::updatePalette() to ensure
    // we'll get a complete palette for this Qt version as otherwise Qt will
    // fallback to the default palette... ===================================
    QPalette pal;
+	store.beginGroup("QPalette");
    updatePalette(pal, QPalette::Active,
                  store.value("active").toStringList());
    updatePalette(pal, QPalette::Inactive,
                  store.value("inactive").toStringList());
    updatePalette(pal, QPalette::Disabled,
                  store.value("disabled").toStringList());
-   qt.setValue ( "active", colors(pal, QPalette::Active) );
-   qt.setValue ( "inactive", colors(pal, QPalette::Inactive) );
-   qt.setValue ( "disabled", colors(pal, QPalette::Disabled) );
-   qt.endGroup(); qt.endGroup();
-   store.endGroup();
-   
-   store.endGroup();
+	store.endGroup(); store.endGroup();
+	savePalette(pal);
    return true;
 }
 
@@ -658,32 +651,158 @@ void Config::restore() {
 }
 
 void Config::save() {
-   /** manage the daemon */
-   int former = savedValue(ui.bgMode).toInt();
-   int current = ui.bgMode->currentIndex();
-   if (current != former) {
-      QSettings settings("Bespin");
-      settings.beginGroup("Style");
-      if (former == 2) // was complex -> stop daemon
-         QProcess::startDetached ( settings.value("BgDaemon", "bespin pusher").toString().append(" stop") );
-      else if (current == 2) // IS complex -> start daemon
-         QProcess::startDetached ( settings.value("BgDaemon", "bespin pusher").toString() );
-      settings.endGroup();
-   }
    BConfig::save();
    /** save the palette loaded from store to qt configuration */
-   if (loadedPal) {
-      QSettings settings("Trolltech");
-      settings.beginGroup("Qt");
-      settings.beginGroup("Palette");
-      
-      settings.setValue ( "active", colors(*loadedPal, QPalette::Active) );
-      settings.setValue ( "inactive", colors(*loadedPal, QPalette::Inactive) );
-      settings.setValue ( "disabled", colors(*loadedPal, QPalette::Disabled) );
-      
-      settings.endGroup();
-      settings.endGroup();
+   if (loadedPal)
+		savePalette(*loadedPal);
+}
+
+static QColor mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
+{
+   int sum = (w1+w2);
+   return QColor((w1*c1.red() + w2*c2.red())/sum,
+                 (w1*c1.green() + w2*c2.green())/sum,
+                 (w1*c1.blue() + w2*c2.blue())/sum,
+                 (w1*c1.alpha() + w2*c2.alpha())/sum);
+}
+
+#include <QtDebug>
+#if KDE_SUPPORT
+static QString string(const QColor &c) {
+   return  QString::number(c.red()) +
+   ',' + QString::number(c.green()) +
+   ',' + QString::number(c.blue());
+}
+#endif
+
+void Config::savePalette(const QPalette &pal) {
+
+	// for Qt =====================================
+	QSettings settings("Trolltech");
+	settings.beginGroup("Qt");
+	settings.beginGroup("Palette");
+
+	settings.setValue ( "active", colors(pal, QPalette::Active) );
+	settings.setValue ( "inactive", colors(pal, QPalette::Inactive) );
+	settings.setValue ( "disabled", colors(pal, QPalette::Disabled) );
+
+	settings.endGroup(); settings.endGroup();
+
+#if KDE_SUPPORT
+
+	// and KDE ==== I'm now gonna mourn a bit and not allways be prudent...:
+	//
+	// yeah - 5000 new extra colors for a style that relies on very restricted
+	// color assumptions (kstyle, plastik and thus oxygen...) - sure...
+	// and please don't sync the Qt palette, ppl. will certainly be happy to
+	// make color setting in KDE first and then in qtconfig for QApplication...
+	// SUCKERS!
+	//
+	// Ok, KDE supports extra DecorationFocus and DecorationHover
+   //                        --------------      ---------------
+	// -- we don't so we won't sync
+   //
+	// next, there's ForegroundLink and ForegroundVisited in any section
+   //               -------------      ----------------
+	// -- we just map them to QPalette::Link & QPalette::LinkVisited
+   //
+	// third, there're alternate backgroundcolors for all sections - sure:
+   //                 ------------------------        ---------
+	// my alternate button color: 1st button blue, second red, third blue...
+	// -- we'll' do what we do for normal alternate row colors and slightly shift
+	// to the foreground....
+   //
+	// there's a ForegroundActive color that is by default... PINK???
+   //          -----------------
+	// what a decent taste for asthetics... &-}
+	// -- we just leave it as it is, cause i've no idea what it shall be good for
+	// (active palette text - that's gonna be fun ;-)
+   //
+	// last there're ForegroundNegative, ForegroundNeutral and ForegroundPositive
+   //               ------------------  ----------------      -----------------
+	// what basically means: shifted to red, yellow and green...
+	// who exactly is resposible for this fucking ridiculous nonsense?
+	//
+	// oh, and of course there NEEDS to be support for speciacl chars in the
+	// KDE ini files - plenty. who could ever life without keys w/o ':' or '$'
+	// so we cannot simply use QSettings on a KDE ini file, thus we'll use our
+   // own very... slim... ini parser, ok, we just read the file group it by
+   // ^[.* entries, replace the color things and than flush the whole thing back
+   // on disk
+
+
+   QString configFile;
+   QProcess kde4_config;
+   kde4_config.start("kde4-config --path config");
+   if (kde4_config.waitForFinished()) {
+      configFile = kde4_config.readAllStandardOutput();
+      configFile = configFile.section(':', 0, 0);
    }
+   if (configFile.isEmpty())
+      return;  // kde config not found
+
+   configFile += "kdeglobals";
+
+   QFile file(configFile);
+   if (!file.open(QIODevice::ReadWrite))
+      return;
+
+   QMap<QString, QStringList> kdeglobals;
+   QMap<QString, QStringList>::iterator group = kdeglobals.end();
+   QTextStream stream(&file);
+   QString buffer;
+   do {
+      buffer = stream.readLine();
+      if (buffer.startsWith('[')) // group
+         group = kdeglobals.insert(buffer, QStringList());
+      else if (!(buffer.isEmpty() || group == kdeglobals.end()))
+         group.value() << buffer;
+   } while (!buffer.isNull());
+   
+   const QString prefix("[Colors:");
+   static const char *items[5] = {
+		"Button]", "Selection]", "Tooltip]", "View]", "Window]"
+	};
+	static const QPalette::ColorRole roles[5][2] = {
+		{QPalette::Button, QPalette::ButtonText},
+		{QPalette::Highlight, QPalette::HighlightedText},
+		{QPalette::ToolTipBase, QPalette::ToolTipText},
+		{QPalette::Base, QPalette::Text},
+		{QPalette::Window, QPalette::WindowText} };
+	
+	for (int i = 0; i < 5; ++i) {
+      group = kdeglobals.insert(prefix + items[i], QStringList());
+      group.value().append("BackgroundAlternate=" +
+                           string (mid(pal.color(QPalette::Active, roles[i][0]),
+                                        pal.color(QPalette::Active, roles[i][1]), 15, 1)));
+      group.value().append("BackgroundNormal=" + string(pal.color(QPalette::Active, roles[i][0])));
+      group.value().append("ForegroundInactive=" + string(pal.color(QPalette::Disabled, roles[i][1])));
+      group.value().append("ForegroundLink=" + string(pal.color(QPalette::Active, QPalette::Link)));
+      group.value().append("ForegroundNegative=" + string(mid(pal.color(QPalette::Active, roles[i][1]), Qt::red)));
+      group.value().append("ForegroundNeutral=" + string(mid(pal.color(QPalette::Active, roles[i][1]), Qt::yellow)));
+      group.value().append("ForegroundNormal=" + string(pal.color(QPalette::Active, roles[i][1])));
+      group.value().append("ForegroundPositive=" + string(mid(pal.color(QPalette::Active, roles[i][1]), Qt::green)));
+      group.value().append("ForegroundVisited=" + string(pal.color(QPalette::Active, QPalette::LinkVisited)));
+	}
+
+   stream.seek(0);
+   QMap<QString, QStringList>::const_iterator group2 = kdeglobals.constBegin();
+   QStringList::const_iterator entry;
+   while (group2 != kdeglobals.constEnd()) {
+      stream << group2.key() << endl;
+      entry = group2.value().constBegin();
+      while (entry != group2.value().constEnd()) {
+         stream << *entry << endl;
+         ++entry;
+      }
+      stream << endl;
+      ++group2;
+   }
+
+   stream.flush();
+   file.close();
+   
+#endif
 }
 
 /** see above, we'll present a name input dialog here */
