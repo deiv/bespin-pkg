@@ -317,6 +317,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.kwinInactiveRole, KWIN_INACTIVE_ROLE);
 
    handleSettings(ui.hackMessages, HACK_MESSAGES);
+   handleSettings(ui.hackKHtml, HACK_KHTMLVIEW);
    
    /** setContextHelp(.) attaches a context help string to a widget on your form */
    setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
