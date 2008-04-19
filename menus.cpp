@@ -19,6 +19,7 @@
 #include <QAction>
 #include <QMenuBar>
 #include "draw.h"
+#include "animator/hoverindex.h"
 
 static const bool round_ = true;
 
@@ -61,7 +62,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
 
    ROLES(menu.active);
    hover = option->state & State_Selected;
-   IndexedFadeInfo *info = 0;
+   Animator::IndexInfo *info = 0;
    QAction *action = 0, *activeAction = 0;
    int step = 0;
    if (sunken)
@@ -72,8 +73,8 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
              qobject_cast<const QMenuBar*>(widget)) {
             action = mbar->actionAt(RECT.topLeft()); // is the action for this item!
             activeAction = mbar->activeAction();
-            info = const_cast<IndexedFadeInfo *>
-               (animator->fadeInfo(widget, (long int)activeAction));
+            info = const_cast<Animator::IndexInfo*>
+               (Animator::HoverIndex::info(widget, (long int)activeAction));
          }
       if (info && (!activeAction || !activeAction->menu() ||
                   activeAction->menu()->isHidden()))

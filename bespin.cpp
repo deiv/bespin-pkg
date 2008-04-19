@@ -236,10 +236,6 @@ internalEvent_(false) {
 //    tooltipPalette.setBrush( QPalette::Background, QColor( 255, 255, 220 ) );
 //    tooltipPalette.setBrush( QPalette::Foreground, Qt::black );
    //=======================================
-   
-
-   // start being animated
-   animator = new StyleAnimator(this, config.tab.transition, config.tab.animSteps);
 }
 
 BespinStyle::~BespinStyle() {

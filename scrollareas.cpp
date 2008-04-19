@@ -19,9 +19,11 @@
 #include <Q3ScrollView>
 #include <QAbstractScrollArea>
 #include "draw.h"
+#include "animator/hover.h"
+#include "animator/hovercomplex.h"
 
 inline static bool
-scrollAreaHovered(const QWidget* slider, StyleAnimator *animator)
+scrollAreaHovered(const QWidget* slider)
 {
 //    bool scrollerActive = false;
    if (!slider) return true;
@@ -31,7 +33,7 @@ scrollAreaHovered(const QWidget* slider, StyleAnimator *animator)
    while (scrollWidget &&
           !(qobject_cast<QAbstractScrollArea*>(scrollWidget) ||
             qobject_cast<Q3ScrollView*>(scrollWidget) ||
-            animator->handlesArea(scrollWidget)))
+            Animator::Hover::managesArea(scrollWidget)))
       scrollWidget = const_cast<QWidget*>(scrollWidget->parentWidget());
    bool isActive = true;
    if (scrollWidget) {
@@ -71,8 +73,8 @@ subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBar##_E_, widget);\
 if (newScrollbar.rect.isValid()) {\
 if (!(scrollbar->activeSubControls & SC_ScrollBar##_E_))\
 newScrollbar.state &= ~(State_Sunken | State_MouseOver);\
-if (info && (info->fadeIns & SC_ScrollBar##_E_ ||\
-info->fadeOuts & SC_ScrollBar##_E_))\
+if (info && (info->fades[Animator::In] & SC_ScrollBar##_E_ ||\
+info->fades[Animator::Out] & SC_ScrollBar##_E_))\
 complexStep = info->step(SC_ScrollBar##_E_);\
 else \
 complexStep = 0; \
@@ -152,12 +154,12 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
       widgetStep = 0; scrollAreaHovered_ = true;
    }
    else {
-      widgetStep = animator->hoverStep(widget);
-      scrollAreaHovered_ = scrollAreaHovered(widget, animator);
+      widgetStep = Animator::Hover::step(widget);
+      scrollAreaHovered_ = scrollAreaHovered(widget);
    }
    SubControls hoverControls = scrollbar->activeSubControls &
       (SC_ScrollBarSubLine | SC_ScrollBarAddLine | SC_ScrollBarSlider);
-   const ComplexHoverFadeInfo *info = animator->fadeInfo(widget, hoverControls);
+   const Animator::ComplexInfo *info = Animator::HoverComplex::info(widget, hoverControls);
    // =======================================
 
    QRect groove;
@@ -199,8 +201,8 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
             newScrollbar.state &= ~(State_Sunken | State_MouseOver);
          if (scrollbar->state & State_HasFocus)
             newScrollbar.state |= (State_Sunken | State_MouseOver);
-         if (info && (info->fadeIns & SC_ScrollBarSlider ||
-                     info->fadeOuts & SC_ScrollBarSlider))
+         if (info && (info->fades[Animator::In] & SC_ScrollBarSlider ||
+                     info->fades[Animator::Out] & SC_ScrollBarSlider))
             complexStep = info->step(SC_ScrollBarSlider);
          else
             complexStep = 0;

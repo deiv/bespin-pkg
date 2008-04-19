@@ -16,8 +16,10 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include "draw.h"
 #include <QToolButton>
+#include "draw.h"
+#include "animator/hoverindex.h"
+
 
 inline static bool verticalTabs(QTabBar::Shape shape) {
    return shape == QTabBar::RoundedEast ||
@@ -177,7 +179,7 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
    animStep = 0;
    // animation stuff
    if (isEnabled && !sunken) {
-      IndexedFadeInfo *info = 0;
+      Animator::IndexInfo *info = 0;
       int index = -1, hoveredIndex = -1;
       if (widget)
          if (const QTabBar* tbar =
@@ -186,8 +188,8 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
                 index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
                 hoveredIndex = hover ? index :
                    tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
-                info = const_cast<IndexedFadeInfo *>
-                   (animator->fadeInfo(widget, hoveredIndex));
+                info = const_cast<Animator::IndexInfo*>
+                   (Animator::HoverIndex::info(widget, hoveredIndex));
              }
       if (info)
          animStep = info->step(index);

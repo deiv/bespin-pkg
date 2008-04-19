@@ -91,12 +91,16 @@ fi
 
 write_bespin_pro () {
 echo "
-HEADERS = colors.h bespin.h tileset.h debug.h eventkiller.h \\
-          visualframe.h gradients.h styleanimator.h draw.h config.h types.h\\
+HEADERS = animator/basic.h animator/aprogress.h animator/hover.h \\
+          animator/hoverindex.h animator/hovercomplex.h animator/tab.h \\
+          colors.h bespin.h tileset.h debug.h eventkiller.h \\
+          visualframe.h gradients.h draw.h config.h types.h\\
           hacks.h xproperty.h
-SOURCES = colors.cpp bespin.cpp tileset.cpp stylehint.cpp \\
+SOURCES = animator/basic.cpp animator/aprogress.cpp animator/hover.cpp \\
+          animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp \\
+          colors.cpp bespin.cpp tileset.cpp stylehint.cpp \\
           sizefromcontents.cpp qsubcmetrics.cpp \\
-          pixelmetric.cpp stdpix.cpp styleanimator.cpp \\
+          pixelmetric.cpp stdpix.cpp \\
           visualframe.cpp gradients.cpp init.cpp genpixmaps.cpp polish.cpp \\
           buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp \\
           scrollareas.cpp shapes.cpp slider.cpp tabbing.cpp toolbars.cpp \\

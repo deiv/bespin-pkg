@@ -17,6 +17,7 @@
  */
 
 #include <cmath>
+#include "animator/hovercomplex.h"
 #include "draw.h"
 
 void
@@ -203,10 +204,11 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
          step = 6;
       else {
          step = 0;
-         const ComplexHoverFadeInfo *info = animator->fadeInfo(widget,
-            slider->activeSubControls & SC_SliderHandle);
-         if (info && (info->fadeIns & SC_SliderHandle ||
-                      info->fadeOuts & SC_SliderHandle))
+         const Animator::ComplexInfo *info =
+               Animator::HoverComplex::info(widget,
+                                 slider->activeSubControls & SC_SliderHandle);
+         if (info && (info->fades[Animator::In] & SC_SliderHandle ||
+                      info->fades[Animator::Out] & SC_SliderHandle))
             step = info->step(SC_SliderHandle);
          if (hover && !step)
             step = 6;

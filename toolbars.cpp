@@ -19,6 +19,7 @@
 #include <QAbstractButton>
 #include "oxrender.h"
 #include "draw.h"
+#include "animator/hover.h"
 
 static int step;
 
@@ -67,7 +68,7 @@ BespinStyle::drawToolButton(const QStyleOptionComplex * option,
 
    QStyleOption tool(0); tool.palette = toolbutton->palette;
 
-   step = animator->hoverStep(widget);
+   step = Animator::Hover::step(widget);
 
    // frame around whole button
    if (option->state & State_On)

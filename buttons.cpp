@@ -21,6 +21,7 @@
 #include <QStyleOptionButton>
 
 #include "draw.h"
+#include "animator/hover.h"
 
 static int animStep = -1;
 static bool isCheckbox = false;
@@ -61,7 +62,7 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
    _btn->rect = oldRect;
 }
 
-#define HOVER_STEP sunken ? 6 : ((isGTK || !widget) ? 6*hover : animator->hoverStep(widget))
+#define HOVER_STEP sunken ? 6 : ((isGTK || !widget) ? 6*hover : Animator::Hover::step(widget))
 
 void
 BespinStyle::drawPushButtonBevel(const QStyleOption * option,

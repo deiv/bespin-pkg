@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>790</width>
-    <height>489</height>
+    <height>496</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -134,7 +134,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="Seite_3" >
       <property name="geometry" >
@@ -142,7 +142,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>426</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2" >
@@ -958,7 +958,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>722</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_6" >
@@ -1111,26 +1111,49 @@
           <item row="0" column="1" >
            <widget class="QLabel" name="label_2" >
             <property name="text" >
-             <string>by</string>
+             <string>@</string>
             </property>
            </widget>
           </item>
           <item row="0" column="2" >
-           <widget class="QSpinBox" name="tabAnimSteps" >
-            <property name="readOnly" >
-             <bool>false</bool>
-            </property>
-            <property name="suffix" >
-             <string>  Steps</string>
+           <widget class="QSlider" name="tabAnimDuration" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
             <property name="minimum" >
-             <number>2</number>
+             <number>150</number>
             </property>
             <property name="maximum" >
-             <number>18</number>
+             <number>4000</number>
+            </property>
+            <property name="singleStep" >
+             <number>50</number>
+            </property>
+            <property name="pageStep" >
+             <number>100</number>
             </property>
             <property name="value" >
-             <number>6</number>
+             <number>350</number>
+            </property>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3" >
+           <widget class="QLabel" name="label_5" >
+            <property name="text" >
+             <string>350</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4" >
+           <widget class="QLabel" name="label_6" >
+            <property name="text" >
+             <string>ms</string>
             </property>
            </widget>
           </item>
@@ -1194,7 +1217,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>722</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_18" >
@@ -1421,7 +1444,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>722</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_12" >
@@ -1541,7 +1564,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>722</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -1640,7 +1663,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>722</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_16" >
@@ -1719,7 +1742,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>722</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -1771,7 +1794,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>722</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_15" >
@@ -1892,7 +1915,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>722</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" >
@@ -1938,12 +1961,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>767</x>
-     <y>141</y>
+     <x>714</x>
+     <y>149</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>781</x>
-     <y>141</y>
+     <x>727</x>
+     <y>149</y>
     </hint>
    </hints>
   </connection>
@@ -1954,12 +1977,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>751</x>
-     <y>169</y>
+     <x>700</x>
+     <y>177</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>781</x>
-     <y>169</y>
+     <x>727</x>
+     <y>177</y>
     </hint>
    </hints>
   </connection>
@@ -1974,8 +1997,8 @@
      <y>79</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>807</x>
-     <y>79</y>
+     <x>753</x>
+     <y>85</y>
     </hint>
    </hints>
   </connection>
@@ -1986,12 +2009,28 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>773</x>
-     <y>279</y>
+     <x>721</x>
+     <y>258</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>795</x>
-     <y>279</y>
+     <x>741</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tabAnimDuration</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_5</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>570</x>
+     <y>301</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>649</x>
+     <y>301</y>
     </hint>
    </hints>
   </connection>

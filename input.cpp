@@ -19,6 +19,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include "draw.h"
+#include "animator/hover.h"
 
 void
 BespinStyle::drawLineEditFrame(const QStyleOption * option, QPainter * painter,
@@ -210,7 +211,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
       if (!ar.isNull()) {
          const Tile::Set &mask = masks.rect[round_];
          // ground
-         animStep = animator->hoverStep(widget);
+         animStep = Animator::Hover::step(widget);
          if (listShown) animStep = 6;
 
          c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover,

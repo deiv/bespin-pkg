@@ -1,3 +1,21 @@
+/* Bespin widget style for Qt4
+Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License version 2 as published by the Free Software Foundation.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public License
+along with this library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.
+*/
+
 #include <QApplication>
 #include <QFileDialog>
 #include <QDir>
@@ -279,10 +297,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.shadowIntensity, "ShadowIntensity", 100);
    
    handleSettings(ui.crTabBarActive, "Tab.ActiveRole", QPalette::Highlight);
-   handleSettings(ui.tabAnimSteps, "Tab.AnimSteps", 4);
+   handleSettings(ui.tabAnimDuration, TAB_DURATION);
    handleSettings(ui.gradTab, "Tab.Gradient", GradButton);
    handleSettings(ui.crTabBar, "Tab.Role", QPalette::Window);
-   handleSettings(ui.tabTransition, "Tab.Transition", 1);
+   handleSettings(ui.tabTransition, TAB_TRANSITION);
    handleSettings(ui.activeTabSunken, "Tab.ActiveTabSunken", false);
 
    handleSettings(ui.crTool, "ToolBox.ActiveRole", QPalette::Highlight);
@@ -401,9 +419,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                   You can enter any char or unicode number here.\
                   <b>Notice:</b> That not all fontsets may provide all unicode characters!");
    
-   setContextHelp(ui.tabAnimSteps, "<b>Tab Transition Steps</b><hr>\
-                  How many steps the transition has.<br><b>Notice:</b> that this has\
-                  impact on the animation speed - more steps result in a slower animation!");
+   setContextHelp(ui.tabAnimDuration, "<b>Tab Transition Duration</b><hr>\
+                  How long the transition lasts.");
    
    
    setContextHelp(ui.cushion, "<b>Cushion Mode</b><hr>\
@@ -582,7 +599,7 @@ Config::sExport(const QString &preset, const QString &filename)
    file.setValue("StoreName", preset);
    foreach (QString key, store.allKeys())
       if (key != "MacStyle" && key != "LeftHanded" &&
-          key != "Tab.AnimSteps" && key != "Tab.Transition" &&
+          key != "Tab.Duration" && key != "Tab.Transition" &&
           key != "Scroll.ShowButtons")
          file.setValue(key, store.value(key));
    store.endGroup();
@@ -760,17 +777,28 @@ void Config::savePalette(const QPalette &pal) {
    } while (!buffer.isNull());
    
    const QString prefix("[Colors:");
-   static const char *items[5] = {
-		"Button]", "Selection]", "Tooltip]", "View]", "Window]"
+#if QT_VERSION >= 0x040400
+	const int numItems = 5;
+#else
+	const int numItems = 4;
+#endif
+   static const char *items[numItems] = {
+		"Button]", "Selection]", "View]", "Window]"
+#if QT_VERSION >= 0x040400
+		, "Tooltip]"
+#endif
 	};
-	static const QPalette::ColorRole roles[5][2] = {
+	static const QPalette::ColorRole roles[numItems][2] = {
 		{QPalette::Button, QPalette::ButtonText},
 		{QPalette::Highlight, QPalette::HighlightedText},
-		{QPalette::ToolTipBase, QPalette::ToolTipText},
 		{QPalette::Base, QPalette::Text},
-		{QPalette::Window, QPalette::WindowText} };
+		{QPalette::Window, QPalette::WindowText}
+#if QT_VERSION >= 0x040400
+		, {QPalette::ToolTipBase, QPalette::ToolTipText}
+#endif
+	};
 	
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < numItems; ++i) {
       group = kdeglobals.insert(prefix + items[i], QStringList());
       group.value().append("BackgroundAlternate=" +
                            string (mid(pal.color(QPalette::Active, roles[i][0]),
@@ -862,7 +890,7 @@ void Config::store3( const QString &string, bool addItem ) {
    settings.remove("LeftHanded");
    settings.remove("MacStyle");
    settings.remove("Scroll.ShowButtons");
-   settings.remove("Tab.AnimSteps");
+   settings.remove("Tab.Duration");
    settings.remove("Tab.Transition");
    /** Now let's save colors as well */
    settings.beginGroup("QPalette");

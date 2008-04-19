@@ -25,7 +25,6 @@ class QSettings;
 #include <QStyleOption>
 
 #include "tileset.h"
-#include "styleanimator.h"
 #include "gradients.h"
 #include "types.h"
 #include "config.h"
@@ -313,9 +312,6 @@ private:
    // pixmaps
    QPixmap *_scanlines[2];
    
-   //anmiated progressbars
-   StyleAnimator *animator;
-
    // toolbar title functionality ========================
    QPoint cursorPos_;
    bool mouseButtonPressed_;

@@ -25,6 +25,7 @@
 
 #include <cmath>
 
+#include "animator/tab.h"
 #include "colors.h"
 #include "bespin.h"
 #include "visualframe.h"
@@ -234,10 +235,10 @@ BespinStyle::readSettings(const QSettings* settings)
 
    // Tabs ===========================
    readRole(tab.active, TAB_ACTIVEROLE);
-   config.tab.animSteps = CLAMP(iSettings->value(TAB_ANIMSTEPS).toUInt(), 2, 18);
+   Animator::Tab::setDuration(CLAMP(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));
    GRAD(tab) = readGrad(TAB_GRADIENT);
    readRole(tab.std, TAB_ROLE);
-   config.tab.transition = (TabAnimInfo::TabTransition) readInt(TAB_TRANSITION);
+   Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));
    config.tab.activeTabSunken = readBool(TAB_ACTIVETABSUNKEN);
    
    // ToolBoxes

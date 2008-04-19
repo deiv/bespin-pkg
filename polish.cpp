@@ -39,6 +39,11 @@
 #include "eventkiller.h"
 #include "bespin.h"
 #include "hacks.h"
+
+#include "animator/hover.h"
+#include "animator/aprogress.h"
+#include "animator/tab.h"
+
 using namespace Bespin;
 
 extern Config config;
@@ -393,7 +398,7 @@ void BespinStyle::polish( QWidget * widget ) {
          widget->setAttribute(Qt::WA_Hover);
       }
       else
-         animator->registrate(widget);
+         Animator::Hover::manage(widget);
    }
    else if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
       if (box->isEditable()) {
@@ -407,7 +412,7 @@ void BespinStyle::polish( QWidget * widget ) {
       if (widget->objectName() == "RenderFormElementWidget")
          widget->setAttribute(Qt::WA_Hover);
       else
-         animator->registrate(widget);
+         Animator::Hover::manage(widget);
    }
    
    else if (qobject_cast<QAbstractSlider *>(widget)) {
@@ -433,7 +438,7 @@ void BespinStyle::polish( QWidget * widget ) {
             }
          }
          if (area)
-            animator->addScrollArea(area);
+            Animator::Hover::manage(area, true);
       }
    }
    
@@ -443,11 +448,19 @@ void BespinStyle::polish( QWidget * widget ) {
       widget->setFont(fnt);
 //       widget->setBackgroundRole ( config.progress.role[0] );
 //       widget->setForegroundRole ( config.progress.role[1] );
-      animator->registrate(widget);
+      Animator::Progress::manage(widget);
    }
-   
-   else if (qobject_cast<QTabWidget*>(widget))
-      animator->registrate(widget);
+
+   // do NOT! apply this on tabs explicitly, as they contain a stack!
+   // theroretically we can handle all stacked widgets, but this can lead to couple of trouble
+   // 1: designer segfaulst on startup -> ignore parentWidget()->inherits("QSplitter")
+   // 2: konsole painting doesn't work (ok, that's no SOO much a problem, just appears to be slow)
+   // 3: e.g. konqueror setup dialog shows only the first entry - and i don't know why...
+   // 4: systemsettings crashes
+   // the core problem seems to be that i block events on the widgets, maybe better inject a widget, raise it paint there
+   // and leave other widgets alone
+   else if (widget->inherits("QTabWidget"))
+      Animator::Tab::manage(widget);
    
    else if (qobject_cast<QTabBar *>(widget)) {
       widget->setBackgroundRole ( config.tab.std_role[0] );
@@ -504,7 +517,7 @@ void BespinStyle::polish( QWidget * widget ) {
 
       if (qobject_cast<QAbstractScrollArea*>(frame) ||
           qobject_cast<Q3ScrollView*>(frame)) {
-         animator->registrate(frame);
+         Animator::Hover::manage(frame);
       }
 
    // map a toolbox frame to it's elements
@@ -576,7 +589,9 @@ void BespinStyle::unPolish( QWidget *widget )
       delete widget; widget = 0L; return
    }*/
    
-   animator->unregistrate(widget);
+   Animator::Hover::release(widget);
+   Animator::Progress::release(widget);
+   Animator::Tab::release(widget);
    Hacks::remove(widget);
 
    widget->removeEventFilter(this);

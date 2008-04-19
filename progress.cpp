@@ -17,6 +17,9 @@
  */
 
 #include "draw.h"
+#include "animator/aprogress.h"
+
+static int step = -1;
 
 void
 BespinStyle::drawProgressBar(const QStyleOption * option, QPainter * painter,
@@ -29,12 +32,14 @@ BespinStyle::drawProgressBar(const QStyleOption * option, QPainter * painter,
    OPT_HOVER
 
    // groove + contents ======
+   step = Animator::Progress::step(widget);
    drawProgressBarGroove(pb, painter, widget);
    drawProgressBarContents(pb, painter, widget);
    // label? =========
    if (hover && pb->textVisible) {
       drawProgressBarLabel(pb, painter, widget);
    }
+   step = -1;
 }
 
 void
@@ -60,8 +65,10 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
    }
 
    double val = 0.0;
-   if (busy)
-      val = -3.0*animator->progressStep(widget)/l;
+   if (busy) {
+      if (step < 0) step = Animator::Progress::step(widget);
+      val = -3.0 * step / l;
+   }
    else
       val = pb->progress / double(pb->maximum - pb->minimum);
 
