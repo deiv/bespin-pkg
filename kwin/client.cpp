@@ -213,6 +213,8 @@ Client::maximizeChange()
 KDecorationDefines::Position
 Client::mousePosition( const QPoint& p ) const
 {
+   if (!isResizable()) return PositionCenter;
+   
 	if (p.y() < 4) { // top
 		if (p.x() < 4) return PositionTopLeft; // corner
 		if (p.x() > width() - 4) return PositionTopRight; // corner
@@ -409,10 +411,36 @@ Client::repaint(QPainter &p)
       p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
       const QPixmap &right = Gradients::borderline(border, Gradients::Right);
       p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
-      
-      for (int i = 3; i < 16; i += 5)
-         p.drawLine(width()-i,height(),width(),height()-i);
 
+      // RESIZE indicators ======================================
+      if (!isResizable()) return; // ...
+
+      QPen pen(border, 2, Qt::CustomDashLine, Qt::FlatCap);
+      QVector<qreal> dashes; dashes << 1 << 1;
+      pen.setDashPattern(dashes);
+      p.setPen(pen);
+      QRect r(width()-16,height()-16,12,12);
+      p.drawArc(r, 270<<4, 90<<4);
+//       for (int i = 3; i < 16; i += 5)
+//          p.drawLine(width()-i,height(),width(),height()-i);
+
+#if 0
+      const int bs = (borderSize+1)/2;
+      int xl = bs, xr = width()-bs;
+      int y = height()-bs;
+      const int h = height()/3, w = width()/3;
+
+      p.setPen(Colors::mid(bg, Qt::black));
+      p.drawLine(xl, h, xl, h<<1);
+      p.drawLine(xr, h, xr, h<<1);
+      p.drawLine(w, y, w<<1, y);
+
+      p.setPen(Colors::mid(bg, Qt::white));
+      --xl; ++xr; ++y;
+      p.drawLine(xl, h, xl, h<<1);
+      p.drawLine(xr, h, xr, h<<1);
+      p.drawLine(w, y, w<<1, y);
+#endif
 #if 0
       p.setPen(Colors::mid(bg, color(ColorButtonBg, isActive()),3,1));
 //       p.setRenderHint( QPainter::Antialiasing, true );
@@ -422,17 +450,6 @@ Client::repaint(QPainter &p)
       r.moveLeft(0); p.drawArc(r, 180<<4, 90<<4);
 #endif
    }
-
-   // TODO BETTER!!! resize indicator
-//    p.setBrush(Qt::NoBrush);
-//    p.setPen(QPen(Colors::mid(bg, color(ColorButtonBg, isActive()), 4, 1),
-//              4, Qt::DotLine, Qt::RoundCap));
-//    int off = height()/3;
-//    const int bs = (borderSize+1)/2;
-//    p.drawLine(bs,off,bs,height()-off);
-//    p.drawLine(width()-bs,off,width()-bs,height()-off);
-//    off = width()/3;
-//    p.drawLine(off,height()-bs,off,height()-bs);
 }
 
 void

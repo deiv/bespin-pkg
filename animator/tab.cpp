@@ -24,7 +24,6 @@ Boston, MA 02110-1301, USA.
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QStackedWidget>
-#include <QTabWidget>
 
 #include <cmath>
 
@@ -135,7 +134,6 @@ grabWidget(QWidget * root, QPixmap *pix)
    
    foreach (QWidget *w, widgets) {
       if (w->isVisibleTo(root)) {
-         
          // solids
          if (w->autoFillBackground()) {
             const QBrush bg = w->palette().brush(w->backgroundRole());
@@ -176,19 +174,28 @@ grabWidget(QWidget * root, QPixmap *pix)
 static uint _duration = 350;
 static Transition _transition = SlideIn;
 
-TabInfo::TabInfo(QObject* parent, QWidget *current, int idx) :
-QObject(parent), progress(0.0), currentWidget(current), index(idx) {}
-
-bool
-TabInfo::eventFilter( QObject* object, QEvent* event )
+class Animator::Curtain : public QWidget
 {
-   if (event->type() != QEvent::Paint || clock.isNull())
-      return false;
-   QPainter p((QWidget*)object);
-   p.drawPixmap(0,0, tabPix[2]);
-   p.end();
-   return true;
-}
+public:
+   Curtain(TabInfo *info, QWidget *parent) : QWidget(parent), _info(info)
+   {
+      setAttribute(Qt::WA_NoSystemBackground);
+      raise();
+   }
+protected:
+   void paintEvent( QPaintEvent *  )
+   {
+      if (_info->clock.isNull()) return; // should not happen
+      QPainter p(this);
+      p.drawPixmap(0,0, _info->tabPix[2]);
+      p.end();
+   }
+private:
+   TabInfo *_info;
+};
+
+TabInfo::TabInfo(QObject* parent, QWidget *current, int idx) :
+QObject(parent), curtain(0), progress(0.0), currentWidget(current), index(idx) {}
 
 void
 TabInfo::updatePixmaps(Transition transition)
@@ -307,36 +314,35 @@ Tab::_manage (QWidget* w)
 {
    // the tabs need to be kept in a list, as currentChanged() does not allow us
    // to identify the former tab... unfortunately.
-   QTabWidget *tw = qobject_cast<QTabWidget*>(w);
-   QStackedWidget *sw; QWidget *cw = 0; int idx = -1;
-   if (tw) {
-      connect(tw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
-      cw = tw->currentWidget(); idx = tw->currentIndex();
-   }
-   else if ((sw = qobject_cast<QStackedWidget*>(w))) {
-      connect(sw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
-      cw = sw->currentWidget(); idx = sw->currentIndex();
-   }
-   else
-      return false;
-   
-   connect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release(QObject*)));
-   items.insert(w, new TabInfo(this, cw, idx));
+   QStackedWidget *sw = qobject_cast<QStackedWidget*>(w);
+   if (!sw) return false;
+   connect(sw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
+   connect(sw, SIGNAL(destroyed(QObject*)), this, SLOT(release(QObject*)));
+   items.insert(sw, new TabInfo(this, sw->currentWidget(), sw->currentIndex()));
    return true;
 }
 
 void
 Tab::_release(QWidget *w)
 {
-   if (QTabWidget *tw = qobject_cast<QTabWidget*>(w)) {
-      disconnect(tw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
-   }
-   else if (QStackedWidget *sw = qobject_cast<QStackedWidget*>(w)) {
-      disconnect(sw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
-   }
-   items.remove(w);
+   QStackedWidget *sw = qobject_cast<QStackedWidget*>(w);
+   if (!sw) return;
+
+   disconnect(sw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
+   items.remove(sw);
    if (items.isEmpty()) timer.stop();
 }
+
+class StdChildAdd : public QObject
+{
+   public:
+      bool eventFilter( QObject *, QEvent *ev) {
+         return (ev->type() == QEvent::ChildAdded ||
+                 ev->type() == QEvent::ChildRemoved);
+      }
+};
+
+static StdChildAdd stdChildAdd;
 
 void
 Tab::changed(int index)
@@ -345,21 +351,13 @@ Tab::changed(int index)
       return; // ugly nothing ;)
 
    // ensure this is a qtabwidget - we'd segfault otherwise
-   QTabWidget* tw; QStackedWidget *sw;
-   QWidget *w = 0, *cw = 0;
-   if ((tw = qobject_cast<QTabWidget*>(sender()))) {
-      w = tw; cw = tw->widget(index);
-   }
-   else if ((sw = qobject_cast<QStackedWidget*>(sender()))) {
-      w = sw; cw = sw->widget(index);
-   }
-   if (!cw) return;
-
-   qDebug() << "BESPIN:" << w << index;
+   QStackedWidget *sw = qobject_cast<QStackedWidget*>(sender());
+   if (!(sw && sw->isVisible())) return;
+   QWidget *cw = sw->widget(index);
 
    // find matching tabinfo
    TabInfo* tai;
-   Items::iterator i = items.find(w);
+   Items::iterator i = items.find(sw);
    if (i == items.end())
       return; // not handled... why ever (i.e. should not happen by default)
    tai = i.value();
@@ -367,20 +365,20 @@ Tab::changed(int index)
    tai->progress = 0.0;
 
    // update from/to indices
-   const int oldIdx = tai->index;
-   QWidget *ow = tw ? tw->widget(tai->index) : sw->widget(tai->index);
+//    const int oldIdx = tai->index; // just for debug out later on
+   QWidget *ow = sw->widget(tai->index);
    tai->currentWidget = cw;
    tai->index = index;
    if (!ow) return; // this is the first time the tab changes, nothing to blend
 
    if (ow == cw) { // this can happen on destruction etc...
       tai->clock = QTime();
-      return; // or segfault!
+      return; // or segfault!?!
    }
 
    // prepare the pixmaps we use to pretend the animation
-   tai->tabPix[0] = tai->tabPix[1] =
-      dumpBackground(w, QRect(ow->mapTo(w, QPoint(0,0)), ow->size()), qApp->style());
+   QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
+   tai->tabPix[0] = tai->tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
    grabWidget(ow, &tai->tabPix[0]);
 //    qDebug() << "BESPIN: grabbed OLD content" << tai->clock.elapsed();
    if (tai->clock.elapsed() > _duration - timeStep) {
@@ -397,26 +395,23 @@ Tab::changed(int index)
       tai->tabPix[0] = tai->tabPix[1] = tai->tabPix[2] = QPixmap();
       return; // all the effort for NOTHING! (we lost too much time here)
    }
-   // overtake widgets painting (this MUST NOT be shifted above, as we
-   // couldn't grab widgets anymore then...)
-   cw->parentWidget()->installEventFilter(tai);
-   _BLOCKEVENTS_(cw);
-   QList<QWidget*> widgets = cw->findChildren<QWidget*>();
-   foreach(QWidget *widget, widgets) {
-      _BLOCKEVENTS_(widget);
-      if (widget->autoFillBackground()) {
-         tai->autofilling.append(widget);
-         widget->setAutoFillBackground(false);
-      }
-      else if (widget->testAttribute(Qt::WA_OpaquePaintEvent)) {
-         tai->opaque.append(widget);
-         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
-      }
-   }
 
    tai->updatePixmaps(_transition);
-   // update
+
+   // make curtain and first update ----------------
+   delete tai->curtain;
+
+   // prevent w from doing freaky things with the curtain
+   // (e.g. QSplitter would add a new section...)
+   sw->installEventFilter(&stdChildAdd);
+
+   tai->curtain = new Curtain(tai, sw);
+   tai->curtain->move(contentsRect.topLeft());
+   tai->curtain->resize(contentsRect.size());
+   tai->curtain->show();
+   sw->removeEventFilter(&stdChildAdd);
    cw->repaint();
+   // -----------------------------------
    // _activeTabs is counted in the timerEvent(), so if this is the first
    // changing tab in a row, it's currently '0'
    if (!_activeTabs) timer.start(timeStep, this);
@@ -429,51 +424,29 @@ Tab::timerEvent(QTimerEvent *event)
    if (event->timerId() != timer.timerId() || items.isEmpty())
       return;
    
-   Items::iterator i;
-   _activeTabs = 0;
-   TabInfo* tai;
-   QWidget *ctw = 0, *widget = 0; QList<QWidget*> widgets;
-   int index;
+   Items::iterator i; TabInfo* tai;
+   _activeTabs = 0; // reset counter
    for (i = items.begin(); i != items.end(); i++) {
       tai = i.value();
       if (tai->clock.isNull()) // this tab is currently not animated
          continue;
-      ctw = tai->currentWidget;
 
       // check if our desired duration has exceeded and stop this in case
       if (tai->clock.elapsed() >= _duration) {
          tai->clock = QTime(); // reset clock, this is IMPORTANT!
+//          QWidget *stack = tai->curtain->parentWidget(); // bad idea - segfaults TODO why?
+//          stack->installEventFilter(&stdChildAdd);
+         delete tai->curtain; tai->curtain = 0; // get rid of curtain
+//          stack->removeEventFilter(&stdChildAdd);
          // reset pixmaps
          tai->tabPix[2] = tai->tabPix[1] = tai->tabPix[0] = QPixmap();
-         // release widget painting ---------------------
-         ctw->parentWidget()->removeEventFilter(tai);
-         _UNBLOCKEVENTS_(ctw);
-         widgets = ctw->findChildren<QWidget*>();
-//          ctw->repaint();
-         foreach(widget, widgets) {
-            index = tai->autofilling.indexOf(widget);
-            if (index != -1) {
-               tai->autofilling.removeAt(index);
-               widget->setAutoFillBackground(true);
-            }
-            index = tai->opaque.indexOf(widget);
-            if (index != -1) {
-               tai->opaque.removeAt(index);
-               widget->setAttribute(Qt::WA_OpaquePaintEvent, true);
-            }
-            _UNBLOCKEVENTS_(widget);
-            widget->update(); //if necessary
-         }
          // -----------------------
-         ctw->repaint(); //asap
-         tai->autofilling.clear();
-         tai->opaque.clear();
          continue;
       }
       // normal action
       ++_activeTabs;
       tai->updatePixmaps(_transition);
-      ctw->parentWidget()->repaint();
+      tai->curtain->repaint();
    }
    if (!_activeTabs) timer.stop();
 }

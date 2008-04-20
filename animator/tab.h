@@ -20,6 +20,8 @@ Boston, MA 02110-1301, USA.
 #include <QTime>
 #include "basic.h"
 
+class QStackedWidget;
+
 namespace Animator {
 
 enum Transition {Jump = 0, ScanlineBlend, SlideIn, SlideOut,
@@ -30,17 +32,19 @@ CloseHorizontally
 #endif
 };
 
+class Curtain;
+
 class TabInfo : public QObject {
    public:
       TabInfo(QObject* parent, QWidget *currentWidget = 0, int index = -1);
       void updatePixmaps(Transition transition);
    protected:
       friend class Tab;
-      bool eventFilter( QObject* object, QEvent* event );
+      friend class Curtain;
+      Curtain *curtain;
       float progress;
       QWidget *currentWidget;
       int index;
-      QList < QWidget* > autofilling, opaque;
       QPixmap tabPix[3];
       QTime clock;
 };
@@ -59,7 +63,7 @@ class Tab : public Basic {
       virtual bool _manage(QWidget *w);
       virtual void _release(QWidget *w);
       virtual void timerEvent(QTimerEvent * event);
-      typedef QHash<const QWidget*, TabInfo*> Items;
+      typedef QHash<const QStackedWidget*, TabInfo*> Items;
       Items items;
       int _activeTabs;
    protected slots:

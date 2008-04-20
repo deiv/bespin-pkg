@@ -39,24 +39,16 @@ scrollAreaHovered(const QWidget* slider)
    if (scrollWidget) {
 //       QAbstractScrollArea* scrollWidget = (QAbstractScrollArea*)daddy;
       QPoint tl = scrollWidget->mapToGlobal(QPoint(0,0));
-      QRegion scrollArea(tl.x(),tl.y(),
-                         scrollWidget->width(),
-                         scrollWidget->height());
-      QList<QAbstractScrollArea*> scrollChilds =
-         scrollWidget->findChildren<QAbstractScrollArea*>();
+      QRegion scrollArea(tl.x(), tl.y(), scrollWidget->width(), scrollWidget->height());
+      QList<QAbstractScrollArea*> scrollChilds = scrollWidget->findChildren<QAbstractScrollArea*>();
       for (int i = 0; i < scrollChilds.size(); ++i) {
          QPoint tl = scrollChilds[i]->mapToGlobal(QPoint(0,0));
-         scrollArea -= QRegion(tl.x(), tl.y(),
-                               scrollChilds[i]->width(),
-                               scrollChilds[i]->height());
+         scrollArea -= QRegion(tl.x(), tl.y(), scrollChilds[i]->width(), scrollChilds[i]->height());
       }
-      QList<Q3ScrollView*> scrollChilds2 =
-         scrollWidget->findChildren<Q3ScrollView*>();
+      QList<Q3ScrollView*> scrollChilds2 = scrollWidget->findChildren<Q3ScrollView*>();
       for (int i = 0; i < scrollChilds2.size(); ++i) {
-         QPoint tl = scrollChilds[i]->mapToGlobal(QPoint(0,0));
-         scrollArea -= QRegion(tl.x(), tl.y(),
-                               scrollChilds2[i]->width(),
-                               scrollChilds2[i]->height());
+         QPoint tl = scrollChilds2[i]->mapToGlobal(QPoint(0,0));
+         scrollArea -= QRegion(tl.x(), tl.y(), scrollChilds2[i]->width(), scrollChilds2[i]->height());
       }
 //       scrollerActive = scrollArea.contains(QCursor::pos());
       isActive = scrollArea.contains(QCursor::pos());

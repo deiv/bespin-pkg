@@ -185,10 +185,19 @@ void BespinStyle::polish( QPalette &pal )
    const int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
    const QColor grey(highlightGray,highlightGray,highlightGray);
    pal.setColor(QPalette::Disabled, QPalette::Highlight, grey);
-   if (false)
-      pal.setColor(QPalette::Inactive, QPalette::Highlight,
-                   Colors::mid(pal.color(QPalette::Active, QPalette::Highlight),
-                               grey,2,1));
+
+
+#if 0 // inactive palette
+   pal.setColor(QPalette::Inactive, QPalette::Highlight,
+                Colors::mid(pal.color(QPalette::Active, QPalette::Highlight),
+                            grey,2,1));
+   pal.setColor(QPalette::Inactive, QPalette::WindowText,
+                Colors::mid(pal.color(QPalette::Active, QPalette::Window),
+                            pal.color(QPalette::Active, QPalette::WindowText),1,4));
+   pal.setColor(QPalette::Inactive, QPalette::Text,
+                Colors::mid(pal.color(QPalette::Active, QPalette::Base),
+                            pal.color(QPalette::Active, QPalette::Text),1,4));
+#endif
 
    // fade disabled palette
    pal.setColor(QPalette::Disabled, QPalette::WindowText,
@@ -459,7 +468,7 @@ void BespinStyle::polish( QWidget * widget ) {
    // 4: systemsettings crashes
    // the core problem seems to be that i block events on the widgets, maybe better inject a widget, raise it paint there
    // and leave other widgets alone
-   else if (widget->inherits("QTabWidget"))
+   else if (widget->inherits("QStackedWidget"))
       Animator::Tab::manage(widget);
    
    else if (qobject_cast<QTabBar *>(widget)) {
