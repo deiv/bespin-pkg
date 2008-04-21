@@ -47,6 +47,8 @@
 
 #define HACK_MESSAGES "Hack.Messages", false
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false
+#define HACK_SIZEGRIPS "Hack.SizeGrips", false
+#define HACK_TREEVIEWS "Hack.TreeViews", false
 
 #define INPUT_PWECHOCHAR "Input.PwEchoChar", 0x26AB
 

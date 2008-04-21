@@ -37,16 +37,20 @@ class Curtain;
 class TabInfo : public QObject {
    public:
       TabInfo(QObject* parent, QWidget *currentWidget = 0, int index = -1);
-      void updatePixmaps(Transition transition);
+      bool proceed();
+      void switchTab(QStackedWidget *sw, int index);
    protected:
-      friend class Tab;
-      friend class Curtain;
       Curtain *curtain;
       float progress;
       QWidget *currentWidget;
       int index;
-      QPixmap tabPix[3];
       QTime clock;
+   protected:
+      friend class Curtain;
+      QPixmap tabPix[3];
+   private:
+      void rewind();
+      void updatePixmaps(Transition transition);
 };
 
 class Tab : public Basic {

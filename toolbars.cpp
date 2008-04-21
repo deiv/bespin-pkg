@@ -195,8 +195,8 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
       QIcon::Mode mode;
       if (!isEnabled)
          mode = QIcon::Disabled;
-      else if (hover && (option->state & State_AutoRaise))
-         mode = QIcon::Active;
+//       else if (hover && (option->state & State_AutoRaise))
+//          mode = QIcon::Active; // gamma thing looks dumb and i cannot turn it off in kde...
       else
          mode = QIcon::Normal;
 

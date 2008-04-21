@@ -176,6 +176,8 @@ BespinStyle::readSettings(const QSettings* settings)
    // Hacks ==================================
    config.hack.messages = readBool(HACK_MESSAGES);
    config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
+   config.hack.sizeGrips = readBool(HACK_SIZEGRIPS);
+   config.hack.treeViews = readBool(HACK_TREEVIEWS);
    
    // PW Echo Char ===========================
    config.input.pwEchoChar =

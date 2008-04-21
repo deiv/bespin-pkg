@@ -69,15 +69,13 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       step = 6;
    else {
       if (widget)
-         if (const QMenuBar* mbar =
-             qobject_cast<const QMenuBar*>(widget)) {
-            action = mbar->actionAt(RECT.topLeft()); // is the action for this item!
-            activeAction = mbar->activeAction();
-            info = const_cast<Animator::IndexInfo*>
-               (Animator::HoverIndex::info(widget, (long int)activeAction));
-         }
-      if (info && (!activeAction || !activeAction->menu() ||
-                  activeAction->menu()->isHidden()))
+      if (const QMenuBar* mbar = qobject_cast<const QMenuBar*>(widget)) {
+         action = mbar->actionAt(RECT.topLeft()); // is the action for this item!
+         activeAction = mbar->activeAction();
+         info = const_cast<Animator::IndexInfo*>
+            (Animator::HoverIndex::info(widget, (long int)activeAction));
+      }
+      if (info && (!activeAction || !activeAction->menu() || activeAction->menu()->isHidden()))
          step = info->step((long int)action);
    }
    QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f4);

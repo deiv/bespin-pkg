@@ -32,6 +32,7 @@ SET_DURATION(HoverComplex)
 const ComplexInfo *
 HoverComplex::info(const QWidget *widget, QStyle::SubControls active)
 {
+   if (!widget) return 0;
    if (!instance) instance = new HoverComplex;
    return instance->_info(widget, active);
 }

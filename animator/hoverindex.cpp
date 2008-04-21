@@ -55,6 +55,7 @@ HoverIndex::_setFPS(uint fps)
 const IndexInfo *
 HoverIndex::info(const QWidget *widget, long int idx)
 {
+   if (!widget) return 0;
    if (!instance) instance = new HoverIndex;
    return instance->_info(widget, idx);
 }

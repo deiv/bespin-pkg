@@ -47,7 +47,7 @@ typedef struct Config {
    } chooser;
 
    struct hack {
-      bool messages, KHTMLView;
+      bool messages, KHTMLView, treeViews, sizeGrips;
    } hack;
    
    struct input {

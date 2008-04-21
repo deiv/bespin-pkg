@@ -194,8 +194,96 @@ private:
    TabInfo *_info;
 };
 
+class StdChildAdd : public QObject
+{
+   public:
+      bool eventFilter( QObject *, QEvent *ev) {
+         return (ev->type() == QEvent::ChildAdded ||
+         ev->type() == QEvent::ChildRemoved);
+      }
+};
+
+static StdChildAdd stdChildAdd;
+
 TabInfo::TabInfo(QObject* parent, QWidget *current, int idx) :
 QObject(parent), curtain(0), progress(0.0), currentWidget(current), index(idx) {}
+
+bool
+TabInfo::proceed()
+{
+   if (clock.isNull()) // this tab is currently not animated
+      return false;
+   
+   // check if our desired duration has exceeded and stop this in case
+   if (clock.elapsed() >= (int)_duration) {
+      rewind();
+      return false;
+   }
+   
+   // normal action
+   updatePixmaps(_transition);
+   curtain->repaint();
+   return true;  // for counter
+}
+
+void
+TabInfo::rewind()
+{
+   clock = QTime(); // reset clock, this is IMPORTANT!
+   tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space
+//    QWidget *stack = tai->curtain->parentWidget(); // bad idea - segfaults TODO why?
+//    stack->installEventFilter(&stdChildAdd);
+   delete curtain; curtain = 0; // get rid of curtain, and RESHOW CONTENT!
+//    stack->removeEventFilter(&stdChildAdd);
+}
+
+void
+TabInfo::switchTab(QStackedWidget *sw, int newIdx)
+{
+   clock.restart();
+   progress = 0.0;
+   
+   // update from/to indices
+   //    const int oldIdx = tai->index; // just for debug out later on
+   QWidget *ow = sw->widget(index);
+   QWidget *cw = sw->widget(newIdx);
+   currentWidget = cw;
+   index = newIdx;
+
+
+   #define AVOID(_COND_) if (_COND_) { rewind(); return; } //
+   
+   AVOID(!ow); // this is the first time the tab changes, nothing to blend
+   AVOID(ow == cw); // this can happen on destruction etc... and thus lead to segfaults...
+
+   // prepare the pixmaps we use to pretend the animation
+   QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
+   tabPix[0] = tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
+   grabWidget(ow, &tabPix[0]);
+
+   #define TOO_SLOW clock.elapsed() > (int)(_duration - _timeStep)
+   AVOID(TOO_SLOW);
+   
+   tabPix[2] = tabPix[0];
+   grabWidget(cw, &tabPix[1]);
+   AVOID(TOO_SLOW);
+   
+   updatePixmaps(_transition);
+   
+   // make curtain and first update ----------------
+   delete curtain;
+   
+   // prevent w from doing freaky things with the curtain
+   // (e.g. QSplitter would add a new section...)
+   sw->installEventFilter(&stdChildAdd);
+   
+   curtain = new Curtain(this, sw);
+   curtain->move(contentsRect.topLeft());
+   curtain->resize(contentsRect.size());
+   curtain->show();
+   sw->removeEventFilter(&stdChildAdd);
+   //    cw->repaint(); // hähh?? should be superflous...
+}
 
 void
 TabInfo::updatePixmaps(Transition transition)
@@ -333,17 +421,6 @@ Tab::_release(QWidget *w)
    if (items.isEmpty()) timer.stop();
 }
 
-class StdChildAdd : public QObject
-{
-   public:
-      bool eventFilter( QObject *, QEvent *ev) {
-         return (ev->type() == QEvent::ChildAdded ||
-                 ev->type() == QEvent::ChildRemoved);
-      }
-};
-
-static StdChildAdd stdChildAdd;
-
 void
 Tab::changed(int index)
 {
@@ -353,65 +430,14 @@ Tab::changed(int index)
    // ensure this is a qtabwidget - we'd segfault otherwise
    QStackedWidget *sw = qobject_cast<QStackedWidget*>(sender());
    if (!(sw && sw->isVisible())) return;
-   QWidget *cw = sw->widget(index);
 
    // find matching tabinfo
-   TabInfo* tai;
    Items::iterator i = items.find(sw);
    if (i == items.end())
       return; // not handled... why ever (i.e. should not happen by default)
-   tai = i.value();
-   tai->clock.restart();
-   tai->progress = 0.0;
-
-   // update from/to indices
-//    const int oldIdx = tai->index; // just for debug out later on
-   QWidget *ow = sw->widget(tai->index);
-   tai->currentWidget = cw;
-   tai->index = index;
-   if (!ow) return; // this is the first time the tab changes, nothing to blend
-
-   if (ow == cw) { // this can happen on destruction etc...
-      tai->clock = QTime();
-      return; // or segfault!?!
-   }
-
-   // prepare the pixmaps we use to pretend the animation
-   QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
-   tai->tabPix[0] = tai->tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
-   grabWidget(ow, &tai->tabPix[0]);
-//    qDebug() << "BESPIN: grabbed OLD content" << tai->clock.elapsed();
-   if (tai->clock.elapsed() > _duration - timeStep) {
-      qWarning("BESPIN: skipped animated tab transition after grabbing OLD content!");
-      tai->tabPix[0] = tai->tabPix[1] = QPixmap();
-      return; // all the effort for NOTHING! (we lost too much time here)
-   }
+   // init transition
+   i.value()->switchTab(sw, index);
    
-   tai->tabPix[2] = tai->tabPix[0];
-   grabWidget(cw, &tai->tabPix[1]);
-//    qDebug() << "BESPIN: grabbed NEW content" << tai->clock.elapsed();
-   if (tai->clock.elapsed() > _duration - timeStep) {
-      qWarning("BESPIN: skipped animated tab transition after grabbing NEW content!");
-      tai->tabPix[0] = tai->tabPix[1] = tai->tabPix[2] = QPixmap();
-      return; // all the effort for NOTHING! (we lost too much time here)
-   }
-
-   tai->updatePixmaps(_transition);
-
-   // make curtain and first update ----------------
-   delete tai->curtain;
-
-   // prevent w from doing freaky things with the curtain
-   // (e.g. QSplitter would add a new section...)
-   sw->installEventFilter(&stdChildAdd);
-
-   tai->curtain = new Curtain(tai, sw);
-   tai->curtain->move(contentsRect.topLeft());
-   tai->curtain->resize(contentsRect.size());
-   tai->curtain->show();
-   sw->removeEventFilter(&stdChildAdd);
-   cw->repaint();
-   // -----------------------------------
    // _activeTabs is counted in the timerEvent(), so if this is the first
    // changing tab in a row, it's currently '0'
    if (!_activeTabs) timer.start(timeStep, this);
@@ -424,29 +450,11 @@ Tab::timerEvent(QTimerEvent *event)
    if (event->timerId() != timer.timerId() || items.isEmpty())
       return;
    
-   Items::iterator i; TabInfo* tai;
+   Items::iterator i;
    _activeTabs = 0; // reset counter
    for (i = items.begin(); i != items.end(); i++) {
-      tai = i.value();
-      if (tai->clock.isNull()) // this tab is currently not animated
-         continue;
-
-      // check if our desired duration has exceeded and stop this in case
-      if (tai->clock.elapsed() >= _duration) {
-         tai->clock = QTime(); // reset clock, this is IMPORTANT!
-//          QWidget *stack = tai->curtain->parentWidget(); // bad idea - segfaults TODO why?
-//          stack->installEventFilter(&stdChildAdd);
-         delete tai->curtain; tai->curtain = 0; // get rid of curtain
-//          stack->removeEventFilter(&stdChildAdd);
-         // reset pixmaps
-         tai->tabPix[2] = tai->tabPix[1] = tai->tabPix[0] = QPixmap();
-         // -----------------------
-         continue;
-      }
-      // normal action
-      ++_activeTabs;
-      tai->updatePixmaps(_transition);
-      tai->curtain->repaint();
+      if (i.value()->proceed())
+         ++_activeTabs;
    }
    if (!_activeTabs) timer.stop();
 }

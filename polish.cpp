@@ -32,6 +32,7 @@
 #include <QProgressBar>
 #include <QSplitterHandle>
 #include <QToolBar>
+#include <QTreeView>
 
 #include "colors.h"
 #include "xproperty.h"
@@ -527,6 +528,9 @@ void BespinStyle::polish( QWidget * widget ) {
       if (qobject_cast<QAbstractScrollArea*>(frame) ||
           qobject_cast<Q3ScrollView*>(frame)) {
          Animator::Hover::manage(frame);
+         if (config.hack.treeViews)
+         if (QTreeView* tv = qobject_cast<QTreeView*>(frame))
+            tv->setAnimated ( true );
       }
 
    // map a toolbox frame to it's elements
