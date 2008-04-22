@@ -205,8 +205,7 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       else {
          step = 0;
          const Animator::ComplexInfo *info =
-               Animator::HoverComplex::info(widget,
-                                 slider->activeSubControls & SC_SliderHandle);
+               Animator::HoverComplex::info(widget, slider->activeSubControls & SC_SliderHandle);
          if (info && (info->fades[Animator::In] & SC_SliderHandle ||
                       info->fades[Animator::Out] & SC_SliderHandle))
             step = info->step(SC_SliderHandle);
@@ -228,11 +227,10 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       if (config.btn.fullHover)
          bc = Colors::mid(bc, CONF_COLOR(btn.active, Bg), 6-step, step);
       const QColor fc = Colors::mid(bc, hasFocus ? FCOLOR(Highlight) :
-                                    CONF_COLOR(btn.std, Fg), 6-step, step+3);
+                                                   CONF_COLOR(btn.std, Fg), 6-step, step+3);
 
-      const QPixmap &fill =
-         Gradients::pix(bc, masks.slider.height(), Qt::Vertical,
-                        isEnabled ? GRAD(scroll) : Gradients::None);
+      const QPixmap &fill = Gradients::pix(bc, masks.slider.height(), Qt::Vertical,
+                                           isEnabled ? GRAD(scroll) : Gradients::None);
       fillWithMask(painter, xy, fill, masks.slider);
       xy += QPoint(dpi.f5, dpi.f5);
       fillWithMask(painter, xy, fc, masks.notch);
@@ -258,8 +256,7 @@ void
 BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter,
                       const QWidget *) const
 {
-   const QStyleOptionSlider *dial =
-      qstyleoption_cast<const QStyleOptionSlider *>(option);
+   const QStyleOptionSlider *dial = qstyleoption_cast<const QStyleOptionSlider *>(option);
    if (!dial) return;
 
    B_STATES
@@ -306,10 +303,8 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter,
    fnt.setPixelSize( h );
    painter->setFont(fnt);
    painter->setBrush(Qt::NoBrush);
-   painter->setPen(Colors::mid(PAL.background().color(),
-                               PAL.foreground().color(),1,2));
-   drawItemText(painter, rect,  Qt::AlignCenter, PAL, isEnabled,
-                QString::number(dial->sliderValue));
+   painter->setPen(Colors::mid(PAL.background().color(), PAL.foreground().color(),1,2));
+   drawItemText(painter, rect,  Qt::AlignCenter, PAL, isEnabled, QString::number(dial->sliderValue));
    
    // the drop
    painter->setPen(Qt::NoPen);
@@ -320,10 +315,8 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter,
    rect.adjust(dpi.f2,dpi.f1,-dpi.f2,-dpi.f2);
    painter->setPen(QPen(CONF_COLOR(btn.std, 0), dpi.f2));
    painter->setBrushOrigin(rect.topLeft());
-   const QColor c = hover ? CONF_COLOR(btn.active, 0) : hasFocus ?
-      FCOLOR(Highlight) : CONF_COLOR(btn.std, 0);
-   const QPixmap &fill =
-      Gradients::pix(c, rect.height(), Qt::Vertical, GRAD(scroll));
+   const QColor c = hover ? CONF_COLOR(btn.active, 0) : hasFocus ? FCOLOR(Highlight) : CONF_COLOR(btn.std, 0);
+   const QPixmap &fill = Gradients::pix(c, rect.height(), Qt::Vertical, GRAD(scroll));
    painter->setBrush(fill);
    painter->drawEllipse(rect);
    painter->restore();

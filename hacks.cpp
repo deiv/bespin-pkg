@@ -19,6 +19,7 @@
 #include <QEvent>
 #include <QLabel>
 #include <QLayout>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
@@ -76,7 +77,7 @@ hackMessageBox(QMessageBox* box, QEvent *e)
          inDrag = true;
          dragPos = mev->pos();
       }
-       return false;
+      return false;
    }
    case QEvent::MouseButtonRelease:
       if (static_cast<QMouseEvent*>(e)->button() == Qt::LeftButton)
@@ -150,11 +151,67 @@ hackMessageBox(QMessageBox* box, QEvent *e)
    return false;
 }
 
+#ifdef Q_WS_X11
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include "fixx11h.h"
+#include <QX11Info>
+
+static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
+#endif
+
+static bool
+isWindowDragWidget(QObject *o)
+{
+   return
+   o->inherits("QMenuBar") ||
+   o->inherits("QToolBar") ||
+   o->inherits("QDockWidget") ||
+   o->inherits("QStatusBar") ||
+   (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar")) ||
+   (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled());
+}
+
+static bool
+hackMoveWindow(QWidget* w, QEvent *e)
+{
+#ifdef Q_WS_X11
+   if (e->type() != QEvent::MouseButtonPress)
+      return false;
+   QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+   if (mev->button() != Qt::LeftButton)
+      return false;
+
+   // stolen... errr "adapted!" from QSizeGrip
+   QX11Info info;
+   XEvent xev;
+   xev.xclient.type = ClientMessage;
+   xev.xclient.message_type = netMoveResize;
+   xev.xclient.display = QX11Info::display();
+   xev.xclient.window = w->window()->winId();
+   xev.xclient.format = 32;
+   xev.xclient.data.l[0] = mev->globalPos().x();
+   xev.xclient.data.l[1] = mev->globalPos().y();
+   xev.xclient.data.l[2] = 8; // NET::Move
+   xev.xclient.data.l[3] = Button1;
+   xev.xclient.data.l[4] = 0;
+   XUngrabPointer(QX11Info::display(), QX11Info::appTime());
+   XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
+               SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+   return true;
+#endif // Q_WS_X11
+}
+
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
    if (QMessageBox* box = qobject_cast<QMessageBox*>(o))
       return hackMessageBox(box, e);
+   if (isWindowDragWidget(o)) {
+      if (QMenuBar *bar = qobject_cast<QMenuBar*>(o))
+      if (bar->activeAction()) return false;
+      return hackMoveWindow(static_cast<QWidget*>(o), e);
+   }
    return false;
 }
 
@@ -173,10 +230,19 @@ Hacks::add(QWidget *w) {
       frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
       return true;
    }
+   if (config.hack.windowMovement)
+   if (isWindowDragWidget(w)) {
+      w->removeEventFilter(bespinHacks); // just to be sure
+      w->installEventFilter(bespinHacks);
+      return true;
+   }
    return false;
 }
 
 void
 Hacks::remove(QWidget *w) {
    w->removeEventFilter(bespinHacks);
+   if (w->inherits("KHTMLView")) {
+      static_cast<QFrame*>(w)->setFrameStyle(QFrame::NoFrame);
+   }
 }

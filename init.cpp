@@ -178,6 +178,7 @@ BespinStyle::readSettings(const QSettings* settings)
    config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
    config.hack.sizeGrips = readBool(HACK_SIZEGRIPS);
    config.hack.treeViews = readBool(HACK_TREEVIEWS);
+   config.hack.windowMovement = readBool(HACK_WINDOWMOVE);
    
    // PW Echo Char ===========================
    config.input.pwEchoChar =

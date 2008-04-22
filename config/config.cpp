@@ -317,7 +317,26 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.kwinInactiveRole, KWIN_INACTIVE_ROLE);
 
    handleSettings(ui.hackMessages, HACK_MESSAGES);
+   setContextHelp(ui.btnRole, "<b>Messageboxes</b><hr>\
+                  Overwrites the painting routines of QMessageBoxes for a custom appereance.<br>\
+                  Also removes the Window decoration but allows you to drag around the window by\
+                  clicking anywhere.");
    handleSettings(ui.hackKHtml, HACK_KHTMLVIEW);
+   setContextHelp(ui.hackKHtml, "<b>Konqueror HTML window</b><hr>\
+                  By default, Konquerors HTML view has no frame around, but you may force a sunken\
+                  frame here.<br>\
+                  Notice that this may have a bad impact on scroll performance, especially if you\
+                  lack HW alpha blending.");
+   handleSettings(ui.hackWindowMove, HACK_WINDOWMOVE);
+   setContextHelp(ui.hackWindowMove, "<b>Easy Window Draging</b><hr>\
+                  Usually you'll have to hit the titlebar in order to drag around a window.<br>\
+                  This one allows you to drag the window by clicking the empty space in a menubar\
+                  or toolbars, docks, etc..");
+   handleSettings(ui.hackTreeViews, HACK_TREEVIEWS);
+   setContextHelp(ui.hackTreeViews, "<b>Animate TreeViwes</b><hr>\
+                  This is a plain vanilla Qt feature, but must be activated by developers for each\
+                  treeview in order to be used - can be cute, can be annoying: choose by yourself<br>\
+                  This way it's activated globally." );
    
    /** setContextHelp(.) attaches a context help string to a widget on your form */
    setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
@@ -480,8 +499,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                   you to activate items with a SINGLE mouseclick, rather than\
                   the M$ DOUBLEclick thing ;)<br>\
                   (Not exported from presets)");
-
-   setContextHelp(ui.hackMessages, "<b>Hack Messageboxes</b><hr>");
 
    
    /** setQSetting(.) tells BConfig to store values at

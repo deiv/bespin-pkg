@@ -67,9 +67,31 @@ PreviewWidget::paintEvent(QPaintEvent *pe)
 }
 
 Client::Client(KDecorationBridge *b, Factory *f) :
-KDecoration(b, f), retry(0), bgMode(1), _factory(f), _preview(0) {
-}
+KDecoration(b, f), retry(0),
+topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
+bgMode(1), _factory(f), _preview(0) { }
 Client::~Client(){ delete _preview; }
+
+void
+Client::activeChange()
+{
+   if (bgMode > 1) {
+      if (XProperty::get(windowId(), XProperty::topTile, topTile)) {
+         XProperty::get(windowId(), XProperty::btmTile, btmTile);
+         XProperty::get(windowId(), XProperty::cnrTile, cnrTile);
+         XProperty::get(windowId(), XProperty::lCorner, lCorner);
+         XProperty::get(windowId(), XProperty::rCorner, rCorner);
+      }
+      else {
+         topTile = btmTile = cnrTile = lCorner = rCorner = 0;
+         if ((!retry || sender()) && retry < 10) {
+            QTimer::singleShot(200, this, SLOT(activeChange()));
+            ++retry;
+         }
+      }
+   }
+   widget()->update();
+}
 
 void
 Client::addButtons(const QString& s, int &sz)
@@ -275,20 +297,11 @@ Client::repaint(QPainter &p)
    case 2: // vertical gradient
    case 3: { // horizontal gradient
 
-      uint topTile = 0, btmTile = 0, cnrTile = 0, lCorner = 0, rCorner = 0;
-      if (!XProperty::get(windowId(), XProperty::topTile, topTile)) {
-         // hmm? paint fallback, wait and try again (10x)
-         p.drawRect(left); p.drawRect(right);
-         p.drawRect(top); p.drawRect(bottom);
-         if (retry < 10)
-            QTimer::singleShot(200-16*retry, widget(), SLOT(update()));
-         ++retry;
+      if (!topTile) {
+         // hmm? paint fallback
+         p.drawRect(left); p.drawRect(right); p.drawRect(top); p.drawRect(bottom);
          break;
       }
-      XProperty::get(windowId(), XProperty::btmTile, btmTile);
-      XProperty::get(windowId(), XProperty::cnrTile, cnrTile);
-      XProperty::get(windowId(), XProperty::lCorner, lCorner);
-      XProperty::get(windowId(), XProperty::rCorner, rCorner);
       
 #define ctWidth 32
 #define ctHeight 128
@@ -529,7 +542,7 @@ Client::reset(unsigned long changed)
       }
    }
 
-   if (changed) widget()->update();
+   if (changed) activeChange(); // handles bg pixmaps in case and triggers update
    
 }
 

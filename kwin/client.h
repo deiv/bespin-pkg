@@ -54,7 +54,6 @@ class Client : public KDecoration
 public:
 	Client(KDecorationBridge *b, Factory *f);
    ~Client();
-	void activeChange() { widget()->update(); }
    void addButtons(const QString &, int &);
 	void borders( int& left, int& right, int& top, int& bottom ) const;
 	void captionChange();
@@ -81,6 +80,8 @@ public:
 	 */
 	void shadeChange();
    inline Factory *factory() {return _factory;}
+public slots:
+   void activeChange();
 signals:
    void stickyChanged(bool);
 private:
@@ -89,6 +90,7 @@ private:
 
 	Button *buttons[4];
 	int borderSize, titleSize, buttonSpace, retry;
+   uint topTile, btmTile, cnrTile, lCorner, rCorner;
    uint bgMode, gType[2];
    Factory *_factory;
    QHBoxLayout *titleBar;

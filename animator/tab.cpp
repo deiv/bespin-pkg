@@ -199,7 +199,7 @@ class StdChildAdd : public QObject
    public:
       bool eventFilter( QObject *, QEvent *ev) {
          return (ev->type() == QEvent::ChildAdded ||
-         ev->type() == QEvent::ChildRemoved);
+         ev->type() == QEvent::Resize || ev->type() == QEvent::Show);
       }
 };
 
