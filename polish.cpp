@@ -37,7 +37,6 @@
 #include "colors.h"
 #include "xproperty.h"
 #include "visualframe.h"
-#include "eventkiller.h"
 #include "bespin.h"
 #include "hacks.h"
 
@@ -462,13 +461,6 @@ void BespinStyle::polish( QWidget * widget ) {
    }
 
    // do NOT! apply this on tabs explicitly, as they contain a stack!
-   // theroretically we can handle all stacked widgets, but this can lead to couple of trouble
-   // 1: designer segfaulst on startup -> ignore parentWidget()->inherits("QSplitter")
-   // 2: konsole painting doesn't work (ok, that's no SOO much a problem, just appears to be slow)
-   // 3: e.g. konqueror setup dialog shows only the first entry - and i don't know why...
-   // 4: systemsettings crashes
-   // the core problem seems to be that i block events on the widgets, maybe better inject a widget, raise it paint there
-   // and leave other widgets alone
    else if (widget->inherits("QStackedWidget"))
       Animator::Tab::manage(widget);
    

@@ -1,4 +1,4 @@
-/* Bespin widget style for Qt4
+/* Bespin widget style configurator for Qt4
    Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
 
    This library is free software; you can redistribute it and/or
@@ -16,23 +16,29 @@
    Boston, MA 02110-1301, USA.
  */
 
-#ifndef EVENTKILLER_H
-#define EVENTKILLER_H
+#ifndef KDE_INI_H
+#define KDE_INI_H
 
-#include <QObject>
+#include <QMap>
+#include <QString>
+#include <QVariant>
 
-class EventKiller : public QObject
-{
-   Q_OBJECT
+class KdeIni {
 public:
-   bool eventFilter( QObject *, QEvent *) {
-      return true;
-   }
+   static KdeIni *open(const QString &name);
+   bool close();
+   QStringList groups() const;
+   bool setGroup(const QString &group);
+   void setValue(const QString &key, const QVariant &value);
+   QString value(const QString &key);
+private:
+   KdeIni(const QString &name);
+   typedef QMap<QString, QString> Entries;
+   typedef QMap<QString, Entries> Config;
+   Config local, global;
+   Config::iterator localGroup;
+   Config::const_iterator globalGroup;
+   QString localFile;
 };
 
-static EventKiller eventKiller;
-
-#define _BLOCKEVENTS_(obj) obj->installEventFilter(&eventKiller)
-#define _UNBLOCKEVENTS_(obj) obj->removeEventFilter(&eventKiller)
-
-#endif // EVENTKILLER_H
+#endif //KDE_INI

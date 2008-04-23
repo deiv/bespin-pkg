@@ -29,6 +29,7 @@ Boston, MA 02110-1301, USA.
 #include <QValidator>
 
 #include "../gradients.h"
+#include "kdeini.h"
 #include "../config.defaults"
 #include "config.h"
 
@@ -701,14 +702,6 @@ static QColor mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
                  (w1*c1.alpha() + w2*c2.alpha())/sum);
 }
 
-#include <QtDebug>
-#if KDE_SUPPORT
-static QString string(const QColor &c) {
-   return  QString::number(c.red()) +
-   ',' + QString::number(c.green()) +
-   ',' + QString::number(c.blue());
-}
-#endif
 
 void Config::savePalette(const QPalette &pal) {
 
@@ -722,8 +715,6 @@ void Config::savePalette(const QPalette &pal) {
 	settings.setValue ( "disabled", colors(pal, QPalette::Disabled) );
 
 	settings.endGroup(); settings.endGroup();
-
-#if KDE_SUPPORT
 
 	// and KDE ==== I'm now gonna mourn a bit and not allways be prudent...:
 	//
@@ -765,90 +756,46 @@ void Config::savePalette(const QPalette &pal) {
    // ^[.* entries, replace the color things and than flush the whole thing back
    // on disk
 
-
-   QString configFile;
-   QProcess kde4_config;
-   kde4_config.start("kde4-config --path config");
-   if (kde4_config.waitForFinished()) {
-      configFile = kde4_config.readAllStandardOutput();
-      configFile = configFile.section(':', 0, 0);
-   }
-   if (configFile.isEmpty())
-      return;  // kde config not found
-
-   configFile += "kdeglobals";
-
-   QFile file(configFile);
-   if (!file.open(QIODevice::ReadWrite))
+   KdeIni *kdeglobals = KdeIni::open("kdeglobals");
+   if (!kdeglobals)
       return;
-
-   QMap<QString, QStringList> kdeglobals;
-   QMap<QString, QStringList>::iterator group = kdeglobals.end();
-   QTextStream stream(&file);
-   QString buffer;
-   do {
-      buffer = stream.readLine();
-      if (buffer.startsWith('[')) // group
-         group = kdeglobals.insert(buffer, QStringList());
-      else if (!(buffer.isEmpty() || group == kdeglobals.end()))
-         group.value() << buffer;
-   } while (!buffer.isNull());
-   
-   const QString prefix("[Colors:");
+   const QString prefix("Colors:");
 #if QT_VERSION >= 0x040400
-	const int numItems = 5;
+   const int numItems = 5;
 #else
-	const int numItems = 4;
+   const int numItems = 4;
 #endif
    static const char *items[numItems] = {
-		"Button]", "Selection]", "View]", "Window]"
+      "Button", "Selection", "View", "Window"
 #if QT_VERSION >= 0x040400
-		, "Tooltip]"
+      , "Tooltip"
 #endif
-	};
-	static const QPalette::ColorRole roles[numItems][2] = {
-		{QPalette::Button, QPalette::ButtonText},
-		{QPalette::Highlight, QPalette::HighlightedText},
-		{QPalette::Base, QPalette::Text},
-		{QPalette::Window, QPalette::WindowText}
+   };
+   static const QPalette::ColorRole roles[numItems][2] = {
+      {QPalette::Button, QPalette::ButtonText},
+      {QPalette::Highlight, QPalette::HighlightedText},
+      {QPalette::Base, QPalette::Text},
+      {QPalette::Window, QPalette::WindowText}
 #if QT_VERSION >= 0x040400
-		, {QPalette::ToolTipBase, QPalette::ToolTipText}
+      , {QPalette::ToolTipBase, QPalette::ToolTipText}
 #endif
-	};
-	
-	for (int i = 0; i < numItems; ++i) {
-      group = kdeglobals.insert(prefix + items[i], QStringList());
-      group.value().append("BackgroundAlternate=" +
-                           string (mid(pal.color(QPalette::Active, roles[i][0]),
-                                        pal.color(QPalette::Active, roles[i][1]), 15, 1)));
-      group.value().append("BackgroundNormal=" + string(pal.color(QPalette::Active, roles[i][0])));
-      group.value().append("ForegroundInactive=" + string(pal.color(QPalette::Disabled, roles[i][1])));
-      group.value().append("ForegroundLink=" + string(pal.color(QPalette::Active, QPalette::Link)));
-      group.value().append("ForegroundNegative=" + string(mid(pal.color(QPalette::Active, roles[i][1]), Qt::red)));
-      group.value().append("ForegroundNeutral=" + string(mid(pal.color(QPalette::Active, roles[i][1]), Qt::yellow)));
-      group.value().append("ForegroundNormal=" + string(pal.color(QPalette::Active, roles[i][1])));
-      group.value().append("ForegroundPositive=" + string(mid(pal.color(QPalette::Active, roles[i][1]), Qt::green)));
-      group.value().append("ForegroundVisited=" + string(pal.color(QPalette::Active, QPalette::LinkVisited)));
-	}
-
-   stream.seek(0);
-   QMap<QString, QStringList>::const_iterator group2 = kdeglobals.constBegin();
-   QStringList::const_iterator entry;
-   while (group2 != kdeglobals.constEnd()) {
-      stream << group2.key() << endl;
-      entry = group2.value().constBegin();
-      while (entry != group2.value().constEnd()) {
-         stream << *entry << endl;
-         ++entry;
-      }
-      stream << endl;
-      ++group2;
+   };
+   for (int i = 0; i < numItems; ++i) {
+      kdeglobals->setGroup(prefix + items[i]);
+      kdeglobals->setValue("BackgroundAlternate", mid(pal.color(QPalette::Active, roles[i][0]),
+                                                      pal.color(QPalette::Active, roles[i][1]), 15, 1));
+      kdeglobals->setValue("BackgroundNormal", pal.color(QPalette::Active, roles[i][0]));
+      kdeglobals->setValue("ForegroundInactive", pal.color(QPalette::Disabled, roles[i][1]));
+      kdeglobals->setValue("ForegroundLink", pal.color(QPalette::Active, QPalette::Link));
+      kdeglobals->setValue("ForegroundNegative", mid(pal.color(QPalette::Active, roles[i][1]), Qt::red));
+      kdeglobals->setValue("ForegroundNeutral", mid(pal.color(QPalette::Active, roles[i][1]), Qt::yellow));
+      kdeglobals->setValue("ForegroundNormal", pal.color(QPalette::Active, roles[i][1]));
+      kdeglobals->setValue("ForegroundPositive", mid(pal.color(QPalette::Active, roles[i][1]), Qt::green));
+      kdeglobals->setValue("ForegroundVisited", pal.color(QPalette::Active, QPalette::LinkVisited));
    }
+   kdeglobals->close();
+   delete kdeglobals; kdeglobals = 0;
 
-   stream.flush();
-   file.close();
-   
-#endif
 }
 
 /** see above, we'll present a name input dialog here */

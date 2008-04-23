@@ -93,7 +93,7 @@ write_bespin_pro () {
 echo "
 HEADERS = animator/basic.h animator/aprogress.h animator/hover.h \\
           animator/hoverindex.h animator/hovercomplex.h animator/tab.h \\
-          colors.h bespin.h tileset.h debug.h eventkiller.h \\
+          colors.h bespin.h tileset.h debug.h \\
           visualframe.h gradients.h draw.h config.h types.h\\
           hacks.h xproperty.h
 SOURCES = animator/basic.cpp animator/aprogress.cpp animator/hover.cpp \\
@@ -146,9 +146,9 @@ fi
 write_config_qt_pro() {
 echo "
 TEMPLATE    = app
-HEADERS     = bconfig.h config.h dialog.h
+HEADERS     = bconfig.h config.h dialog.h kdeini.h
 FORMS       = config.ui uiDemo.ui
-SOURCES     = main.cpp bconfig.cpp config.cpp
+SOURCES     = main.cpp bconfig.cpp config.cpp kdeini.cpp
 RESOURCES   = config.qrc
 target.path = $PREFIX/bin
 INSTALLS = target
@@ -164,9 +164,9 @@ write_config_kde_pro() {
 echo "
 TEMPLATE    = lib
 CONFIG     += plugin
-HEADERS     = bconfig.h config.h
+HEADERS     = bconfig.h config.h kdeini.h
 FORMS       = config.ui
-SOURCES     = bconfig.cpp config.cpp
+SOURCES     = bconfig.cpp config.cpp kdeini.cpp
 RESOURCES   = config.qrc
 target.path += $KDE_DIR/lib/kde4
 target.prefix = ""

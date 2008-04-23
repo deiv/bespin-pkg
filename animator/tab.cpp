@@ -28,7 +28,6 @@ Boston, MA 02110-1301, USA.
 #include <cmath>
 
 #include "../oxrender.h"
-#include "../eventkiller.h"
 
 #define ANIMATOR_IMPL 1
 #include "tab.h"
@@ -203,8 +202,6 @@ class StdChildAdd : public QObject
       }
 };
 
-static StdChildAdd stdChildAdd;
-
 TabInfo::TabInfo(QObject* parent, QWidget *current, int idx) :
 QObject(parent), curtain(0), progress(0.0), currentWidget(current), index(idx) {}
 
@@ -240,9 +237,7 @@ TabInfo::rewind()
 void
 TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 {
-   clock.restart();
    progress = 0.0;
-   
    // update from/to indices
    //    const int oldIdx = tai->index; // just for debug out later on
    QWidget *ow = sw->widget(index);
@@ -252,37 +247,47 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 
 
    #define AVOID(_COND_) if (_COND_) { rewind(); return; } //
+   #define TOO_SLOW clock.elapsed() > (int)(_duration - _timeStep)
    
    AVOID(!ow); // this is the first time the tab changes, nothing to blend
    AVOID(ow == cw); // this can happen on destruction etc... and thus lead to segfaults...
 
    // prepare the pixmaps we use to pretend the animation
    QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
-   tabPix[0] = tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
-   grabWidget(ow, &tabPix[0]);
-
-   #define TOO_SLOW clock.elapsed() > (int)(_duration - _timeStep)
-   AVOID(TOO_SLOW);
+   tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
+   if (clock.isNull()) {
+      clock.start();
+      tabPix[0] = tabPix[1];
+      grabWidget(ow, &tabPix[0]);
+      tabPix[2] = tabPix[0];
+      AVOID(TOO_SLOW);
+   }
+   else { // humm?? very fast tab change... maybe the user changed his mind...
+      clock.restart();
+      tabPix[0] = tabPix[2];
+   }
    
-   tabPix[2] = tabPix[0];
    grabWidget(cw, &tabPix[1]);
    AVOID(TOO_SLOW);
    
    updatePixmaps(_transition);
    
    // make curtain and first update ----------------
-   delete curtain;
-   
-   // prevent w from doing freaky things with the curtain
-   // (e.g. QSplitter would add a new section...)
-   sw->installEventFilter(&stdChildAdd);
-   
-   curtain = new Curtain(this, sw);
-   curtain->move(contentsRect.topLeft());
-   curtain->resize(contentsRect.size());
-   curtain->show();
-   sw->removeEventFilter(&stdChildAdd);
-   //    cw->repaint(); // hähh?? should be superflous...
+   if (!curtain) {
+      // prevent w from doing freaky things with the curtain
+      // (e.g. QSplitter would add a new section...)
+      StdChildAdd *stdChildAdd = new StdChildAdd;
+      sw->installEventFilter(stdChildAdd);
+
+      curtain = new Curtain(this, sw);
+      curtain->move(contentsRect.topLeft());
+      curtain->resize(contentsRect.size());
+      curtain->show();
+      sw->removeEventFilter(stdChildAdd);
+      delete stdChildAdd;
+   }
+   else
+      curtain->raise();
 }
 
 void
