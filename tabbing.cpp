@@ -96,6 +96,7 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
 {
    ASSURE_OPTION(tbb, TabBarBase);
 
+   QSize winSize;
    if (widget) {
       if (widget->parentWidget() &&
           qobject_cast<QTabWidget*>(widget->parentWidget())) {
@@ -110,16 +111,26 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
       }
       else if (qobject_cast<const QTabBar*>(widget))
          return; // usually we alter the paintevent by eventfiltering
+      QWidget *win = widget->window();
+      winSize = win ? win->size() : RECT.size()+QSize(20,20);
    }
-   QRect rect = RECT.adjusted(dpi.f2, 0, -dpi.f2, -dpi.f2);
+   else
+      winSize = tbb->tabBarRect.size();
+
+   QRect rect = RECT.adjusted(0, 0, 0, -dpi.f2);
    int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
 
    if (verticalTabs(tbb->shape)) {
+      if (RECT.height() > winSize.height() - 10)
+         Tile::setShape(Tile::Left | Tile::Right | Tile::Center);
       o = Qt::Horizontal; size = RECT.width();
    }
+   else if (RECT.width() > winSize.width() - 10)
+         Tile::setShape(Tile::Top | Tile::Bottom | Tile::Center);
    masks.rect[true].render(rect, painter, GRAD(tab), o, CCOLOR(tab.std, Bg), size);
    rect.setBottom(rect.bottom()+dpi.f2);
    shadows.sunken[true][true].render(rect, painter);
+   Tile::reset();
 }
 
 static int animStep = -1;

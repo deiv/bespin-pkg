@@ -355,7 +355,7 @@ void BespinStyle::polish( QWidget * widget ) {
          if (bar4popup(menu))
             menu->installEventFilter(this); // reposition
 #if SHAPE_POPUP
-// WARNING: compmgrs like e.g. beryl/emerald deny to shadow shaped windows,
+// WARNING: compmgrs like e.g. beryl/emerald/kwin deny to shadow shaped windows,
 // if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
          if (bar4popup(menu)) {
             QAction *action = new QAction( menu->menuAction()->iconText(), menu );
@@ -427,11 +427,12 @@ void BespinStyle::polish( QWidget * widget ) {
    else if (qobject_cast<QAbstractSlider *>(widget)) {
       // NOTICE we could get slight more performance by this and cache ourselve,
       // but that's gonna add more complexity, and as the slider is usually not
-      // bound to e.g. a scrollarea surprisinlgy little CPU gain...
+      // bound to e.g. a scrollarea, surprisinlgy little CPU gain...
 //       widget->setAttribute(Qt::WA_OpaquePaintEvent);
       if (qobject_cast<QScrollBar *>(widget)) {
-         // NOTICE slows down things as it triggers a repaint of the frame
-//          widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+         // NOTICE slows down things as it triggers a repaint of the frame - but nec for khtml...
+         if (widget->objectName() == "RenderFormElementWidget")
+            widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
          // ================
          QWidget *area = 0;
          if (widget->parentWidget()) {
@@ -567,17 +568,11 @@ void BespinStyle::polish( QWidget * widget ) {
          widget->setAutoFillBackground(false);
       }
    //========================
-#define LACK_CONTRAST(_C_) Colors::contrast(pal.color(QPalette::Active, QPalette::_C_), pal.color(QPalette::Active, QPalette::_C_##Text)) < 20
-#define HARD_CONTRAST(_C_) Colors::value(pal.color(QPalette::Active, QPalette::_C_)) < 128 ? Qt::white : Qt::black
-   if (widget->objectName() == "RenderFormElementWidget")
-	{
-		QPalette pal = widget->palette();
-		if (LACK_CONTRAST(Window))
-			pal.setColor(QPalette::WindowText, HARD_CONTRAST(Window));
-		if (LACK_CONTRAST(Button))
-			pal.setColor(QPalette::ButtonText, HARD_CONTRAST(Button));
-		widget->setPalette(pal);
-	}
+   if (widget->objectName() == "RenderFormElementWidget") {
+      widget->installEventFilter(this); // check for palette updates and ensure visible foregrounds...
+      QEvent ev(QEvent::PaletteChange);
+      eventFilter(widget, &ev);
+   }
    
 }
 #undef PAL

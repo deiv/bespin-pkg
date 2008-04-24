@@ -589,11 +589,11 @@ Client::resize( const QSize& s )
    }
    int w = width();
    int h = height();
-   
+   int dh = borderSize > 5 ? 8 : 4;
    QRegion mask(4, 0, w-8, h);
-   mask += QRegion(0, 4, w, h-8);
-   mask += QRegion(2, 1, w-4, h-2);
-   mask += QRegion(1, 2, w-2, h-4);
+   mask += QRegion(0, 4, w, h-dh);
+   mask += QRegion(2, 1, w-4, h-dh/4);
+   mask += QRegion(1, 2, w-2, h-dh/2);
 
    setMask(mask);
    widget()->repaint(); // force! there're painting errors otherwise

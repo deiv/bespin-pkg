@@ -103,6 +103,7 @@ grabWidget(QWidget * root, QPixmap *pix)
       return;
    
    QPoint zero(0,0);
+   QSize sz = root->window()->size();
    
    QWidgetList widgets = root->findChildren<QWidget*>();
    
@@ -130,7 +131,7 @@ grabWidget(QWidget * root, QPixmap *pix)
    QAbstractScrollArea *scrollarea = 0;
    QPainter p; QRegion rgn;
    QPixmap *saPix = 0L;
-   
+
    foreach (QWidget *w, widgets) {
       if (w->isVisibleTo(root)) {
          // solids
@@ -197,8 +198,7 @@ class StdChildAdd : public QObject
 {
    public:
       bool eventFilter( QObject *, QEvent *ev) {
-         return (ev->type() == QEvent::ChildAdded ||
-         ev->type() == QEvent::Resize || ev->type() == QEvent::Show);
+         return (ev->type() == QEvent::ChildAdded);
       }
 };
 
@@ -255,6 +255,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
    // prepare the pixmaps we use to pretend the animation
    QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
    tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
+   
    if (clock.isNull()) {
       clock.start();
       tabPix[0] = tabPix[1];
@@ -271,23 +272,25 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
    AVOID(TOO_SLOW);
    
    updatePixmaps(_transition);
-   
+
    // make curtain and first update ----------------
    if (!curtain) {
       // prevent w from doing freaky things with the curtain
       // (e.g. QSplitter would add a new section...)
       StdChildAdd *stdChildAdd = new StdChildAdd;
       sw->installEventFilter(stdChildAdd);
-
+      
       curtain = new Curtain(this, sw);
       curtain->move(contentsRect.topLeft());
       curtain->resize(contentsRect.size());
       curtain->show();
+
       sw->removeEventFilter(stdChildAdd);
       delete stdChildAdd;
    }
    else
       curtain->raise();
+
 }
 
 void

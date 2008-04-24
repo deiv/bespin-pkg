@@ -26,6 +26,15 @@
 #include <QStyle>
 #include <QStyleOption>
 
+#ifdef Q_WS_X11
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include "fixx11h.h"
+#include <QX11Info>
+
+static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
+#endif
+
 #include <QtDebug>
 #include "colors.h"
 #include "config.h"
@@ -36,8 +45,26 @@ extern Config config;
 
 static Hacks *bespinHacks = new Hacks;
 
-static bool inDrag = false;
-static QPoint dragPos;
+static void
+triggerWMMove(const QWidget *w, const QPoint &p)
+{
+   // stolen... errr "adapted!" from QSizeGrip
+   QX11Info info;
+   XEvent xev;
+   xev.xclient.type = ClientMessage;
+   xev.xclient.message_type = netMoveResize;
+   xev.xclient.display = QX11Info::display();
+   xev.xclient.window = w->window()->winId();
+   xev.xclient.format = 32;
+   xev.xclient.data.l[0] = p.x();
+   xev.xclient.data.l[1] = p.y();
+   xev.xclient.data.l[2] = 8; // NET::Move
+   xev.xclient.data.l[3] = Button1;
+   xev.xclient.data.l[4] = 0;
+   XUngrabPointer(QX11Info::display(), QX11Info::appTime());
+   XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
+               SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+}
 
 static bool
 hackMessageBox(QMessageBox* box, QEvent *e)
@@ -73,20 +100,8 @@ hackMessageBox(QMessageBox* box, QEvent *e)
    }
    case QEvent::MouseButtonPress: {
       QMouseEvent *mev = static_cast<QMouseEvent*>(e);
-      if (mev->button() == Qt::LeftButton) {
-         inDrag = true;
-         dragPos = mev->pos();
-      }
-      return false;
-   }
-   case QEvent::MouseButtonRelease:
-      if (static_cast<QMouseEvent*>(e)->button() == Qt::LeftButton)
-         inDrag = false;
-      return false;
-   case QEvent::MouseMove: {
-      QMouseEvent *mev = static_cast<QMouseEvent*>(e);
-      if (inDrag)
-         box->move(mev->globalPos() - dragPos);
+      if (mev->button() == Qt::LeftButton)
+         triggerWMMove(box, mev->globalPos());
       return false;
    }
    case QEvent::Show: {
@@ -151,15 +166,6 @@ hackMessageBox(QMessageBox* box, QEvent *e)
    return false;
 }
 
-#ifdef Q_WS_X11
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "fixx11h.h"
-#include <QX11Info>
-
-static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
-#endif
-
 static bool
 isWindowDragWidget(QObject *o)
 {
@@ -181,23 +187,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
    QMouseEvent *mev = static_cast<QMouseEvent*>(e);
    if (mev->button() != Qt::LeftButton)
       return false;
-
-   // stolen... errr "adapted!" from QSizeGrip
-   QX11Info info;
-   XEvent xev;
-   xev.xclient.type = ClientMessage;
-   xev.xclient.message_type = netMoveResize;
-   xev.xclient.display = QX11Info::display();
-   xev.xclient.window = w->window()->winId();
-   xev.xclient.format = 32;
-   xev.xclient.data.l[0] = mev->globalPos().x();
-   xev.xclient.data.l[1] = mev->globalPos().y();
-   xev.xclient.data.l[2] = 8; // NET::Move
-   xev.xclient.data.l[3] = Button1;
-   xev.xclient.data.l[4] = 0;
-   XUngrabPointer(QX11Info::display(), QX11Info::appTime());
-   XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
-               SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+   triggerWMMove(w, mev->globalPos());
    return true;
 #endif // Q_WS_X11
 }

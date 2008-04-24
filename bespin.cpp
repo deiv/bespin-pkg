@@ -445,6 +445,8 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
          QPainter p(tabBar);
          QStyleOptionTabBarBase opt;
          opt.initFrom(tabBar);
+         if (QWidget *window = tabBar->window())
+            opt.tabBarRect = window->rect();
          drawTabBar(&opt, &p, 0L);
          p.end();
          return false;
@@ -519,16 +521,14 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             int gt[2] = { GRAD(kwin)[0], GRAD(kwin)[1] };
             if (config.bg.modal.glassy) {
                bgMode = Plain;
-               bg = bg.light(125-Colors::value(bg)/20);
+               bg = bg.light(115-Colors::value(bg)/20);
                gt[0] = 0; gt[1] = 3;
             }
             int info = XProperty::encode(bg, FCOLOR(WindowText), bgMode);
             XProperty::set(widget->winId(), XProperty::bgInfo, info);
-            info = XProperty::encode(CCOLOR(kwin.active, Bg),
-                                      CCOLOR(kwin.active, Fg), gt[1]);
+            info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), gt[1]);
             XProperty::set(widget->winId(), XProperty::actInfo, info);
-            info = XProperty::encode(CCOLOR(kwin.inactive, Bg),
-                                      CCOLOR(kwin.inactive, Fg), gt[0]);
+            info = XProperty::encode(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), gt[0]);
             XProperty::set(widget->winId(), XProperty::inactInfo, info);
             widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
             return false;
@@ -561,6 +561,27 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
       if (QWidget * widget = qobject_cast<QWidget*>(object))
       if (widget->isModal())
       if (config.bg.modal.invert) swapPalette(widget);
+      return false;
+   case QEvent::PaletteChange:
+#define LACK_CONTRAST(_C_) Colors::contrast(pal.color(QPalette::Active, QPalette::_C_), pal.color(QPalette::Active, QPalette::_C_##Text)) < 40
+#define HARD_CONTRAST(_C_) Colors::value(pal.color(QPalette::Active, QPalette::_C_)) < 128 ? Qt::white : Qt::black
+      if (QWidget * widget = qobject_cast<QWidget*>(object))
+      if (widget->objectName() == "RenderFormElementWidget") {
+         widget->removeEventFilter(this);
+         QPalette pal = widget->palette();
+         if (LACK_CONTRAST(Window))
+            pal.setColor(QPalette::WindowText, HARD_CONTRAST(Window));
+         if (LACK_CONTRAST(Button))
+            pal.setColor(QPalette::ButtonText, HARD_CONTRAST(Button));
+         if (Colors::contrast(pal.color(QPalette::Active, QPalette::Highlight),
+                              pal.color(QPalette::Active, QPalette::HighlightedText)) < 40)
+            pal.setColor(QPalette::HighlightedText, HARD_CONTRAST(Highlight));
+         if (Colors::contrast(pal.color(QPalette::Active, QPalette::Base),
+                              pal.color(QPalette::Active, QPalette::Text)) < 40)
+            pal.setColor(QPalette::Text, HARD_CONTRAST(Base));
+         widget->setPalette(pal);
+         widget->installEventFilter(this);
+      }
       return false;
    default:
       return false;
