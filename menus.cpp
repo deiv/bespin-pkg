@@ -49,7 +49,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
    const QStyleOptionMenuItem *mbi =
       qstyleoption_cast<const QStyleOptionMenuItem *>(option);
    if (!mbi) return;
-
+#if 0 // was necessary once, not anymore?!
    if (mbi->menuRect.height() > mbi->rect.height()) {
       QStyleOptionMenuItem copy = *mbi;
       copy.rect.setHeight(mbi->menuRect.height());
@@ -57,7 +57,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
    }
    else
       drawMenuBarBg(option, painter, widget);
-
+#endif
    B_STATES;
 
    ROLES(menu.active);

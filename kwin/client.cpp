@@ -400,9 +400,15 @@ Client::repaint(QPainter &p)
    }
 
    // title ==============
-   if (isActive()) {
-      p.setPen(Colors::mid(bg, Qt::black, 2, 1));
-      p.drawText ( label.translated(0,-1), Qt::AlignCenter | Qt::TextSingleLine, _caption );
+   if (isActive()) { // emboss?!
+      int d = 0;
+      if (Colors::value(bg) < 110)  { // dark bg -> dark top borderline
+         p.setPen(Colors::mid(bg, Qt::black, 2, 1)); d = -1;
+      }
+      else { // bright bg -> bright bottom borderline
+         p.setPen(Colors::mid(bg, Qt::white, 2, 1)); d = 1;
+      }
+      p.drawText ( label.translated(0,d), Qt::AlignCenter | Qt::TextSingleLine, _caption );
    }
    p.setPen(color(ColorFont, isActive()));
    p.drawText ( label, Qt::AlignCenter | Qt::TextSingleLine, _caption );
