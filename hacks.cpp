@@ -48,6 +48,7 @@ static Hacks *bespinHacks = new Hacks;
 static void
 triggerWMMove(const QWidget *w, const QPoint &p)
 {
+#ifdef Q_WS_X11
    // stolen... errr "adapted!" from QSizeGrip
    QX11Info info;
    XEvent xev;
@@ -64,6 +65,7 @@ triggerWMMove(const QWidget *w, const QPoint &p)
    XUngrabPointer(QX11Info::display(), QX11Info::appTime());
    XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
                SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+#endif // Q_WS_X11
 }
 
 static bool
@@ -181,15 +183,17 @@ isWindowDragWidget(QObject *o)
 static bool
 hackMoveWindow(QWidget* w, QEvent *e)
 {
-#ifdef Q_WS_X11
+
    if (e->type() != QEvent::MouseButtonPress)
       return false;
    QMouseEvent *mev = static_cast<QMouseEvent*>(e);
    if (mev->button() != Qt::LeftButton)
       return false;
+   if ((mev->pos().x() < 12 || mev->pos().y() < 12) &&
+       (w->inherits("QToolBar") || w->inherits("QDockWidget")))
+      return false; // preserve dock / toolbar internam move float trigger...
    triggerWMMove(w, mev->globalPos());
    return true;
-#endif // Q_WS_X11
 }
 
 bool
