@@ -7,9 +7,11 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFileDialog>
+#include <QLineEdit>
 #include <QSettings>
 #include <QSpinBox>
 #include <QTextBrowser>
+#include <QTextEdit>
 #include <QTimer>
 #include <QVBoxLayout>
 
@@ -151,6 +153,7 @@ void BConfig::checkDirty()
 //       }
    }
    emit changed(dirty);
+   if (dirty) emit changed();
 }
 
 void BConfig::reset() {
@@ -245,6 +248,10 @@ QVariant BConfig::variant(const QWidget *w) const {
       return slider->value();
    else if (const QSpinBox *spin = qobject_cast<const QSpinBox*>(w))
       return spin->value();
+   else if (const QLineEdit *lineEdit = qobject_cast<const QLineEdit*>(w))
+      return lineEdit->text();
+   else if (const QTextEdit *textEdit = qobject_cast<const QTextEdit*>(w))
+      return textEdit->toPlainText();
    
    qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
    return QVariant();
@@ -265,6 +272,10 @@ bool BConfig::setVariant(QWidget *w, const QVariant &v) const {
       slider->setValue(v.toInt());
    else if (QSpinBox *spin = qobject_cast<QSpinBox*>(w))
       spin->setValue(v.toInt());
+   else if (QLineEdit *lineEdit = qobject_cast<QLineEdit*>(w))
+      lineEdit->setText(v.toString());
+   else if (QTextEdit *textEdit = qobject_cast<QTextEdit*>(w))
+      textEdit->setPlainText(v.toString());
    else {
       qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
       return false;

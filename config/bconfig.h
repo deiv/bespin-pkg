@@ -91,6 +91,7 @@ protected:
    virtual void _save(QSettings *settings = 0, bool makeDirty = true);
 signals:
    void changed(bool);
+   void changed();
 public slots:
    virtual void save();
    virtual void defaults();

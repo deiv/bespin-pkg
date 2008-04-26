@@ -149,10 +149,17 @@ relief(int size, bool enabled)
    const float f = enabled ? 1.0 : 0.7;
    EMPTY_PIX(size, size);
    p.setBrush(Qt::NoBrush);
-   p.setPen(QPen(WHITE(int(f*70)), f1));
-   p.drawRoundRect(0,0,size,size,80,80);
    p.setPen(QPen(BLACK(int(f*70)), f1));
-   p.drawRoundRect(f1,f1,size-f2,size-f2,80,80);
+   p.drawRoundRect(f1,f1,size-f2,size-f2,99,99);
+   p.setPen(QPen(WHITE(int(f*35)), f1));
+   p.drawRoundRect(0,0,size,size,99,99);
+   // the borders cross the pixmap boundings, thus they're too weak, thus we stregth them a bit
+   const int d1 = 0.3*size, d2 = 0.7*size;
+   p.drawLine(d1, 0, d2, 0); // top
+   p.drawLine(0, d1, 0, d2); // left
+   p.drawLine(size, d1, size, d2); // right
+   p.setPen(QPen(WHITE(int(f*50)), f1));
+   p.drawLine(d1, size-1, d2, size-1); // bottom
    p.end(); return pix;
 }
 

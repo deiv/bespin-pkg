@@ -93,12 +93,13 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
 
    cPainter = painter;
    bool useCache = false, needsPaint = true;
-   
+
    // we paint the slider bg ourselves, as otherwise a frame repaint would be
    // triggered (for no sense)
-   if (!widget) // fallback ===========
+   if (!widget ) // fallback ===========
       painter->fillRect(RECT, FCOLOR(Window));
-   else {
+
+   else if (widget->testAttribute(Qt::WA_OpaquePaintEvent)) {
 
       // catch combobox dropdowns ==========
       if (widget->parentWidget() && widget->parentWidget()->parentWidget() &&

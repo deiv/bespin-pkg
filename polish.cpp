@@ -431,8 +431,16 @@ void BespinStyle::polish( QWidget * widget ) {
 //       widget->setAttribute(Qt::WA_OpaquePaintEvent);
       if (qobject_cast<QScrollBar *>(widget)) {
          // NOTICE slows down things as it triggers a repaint of the frame - but nec for khtml...
-         if (widget->objectName() == "RenderFormElementWidget")
-            widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+         QWidget *dad = widget;
+         while ((dad = dad->parentWidget())) {
+            // btw: userer väter väter väter väter...? hail to Monty Python!
+            if (dad->inherits("KHTMLView")) {
+               widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+               widget->setAutoFillBackground ( true );
+               widget->setBackgroundRole ( QPalette::Base );
+               break;
+            }
+         }
          // ================
          QWidget *area = 0;
          if (widget->parentWidget()) {

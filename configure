@@ -175,10 +175,10 @@ DEFINES += EXECUTABLE=0 KDE_SUPPORT=1
 " > config/kstyle-bespin-config.pro
 }
 
-write_kwin_pro() {
+write_kwin_client_pro() {
 echo "
-HEADERS = button.h client.h ../colors.h factory.h ../gradients.h ../xproperty.h
-SOURCES = button.cpp client.cpp ../colors.cpp factory.cpp ../gradients.cpp ../xproperty.cpp
+HEADERS = button.h client.h resizecorner.h ../colors.h factory.h ../gradients.h ../xproperty.h
+SOURCES = button.cpp client.cpp resizecorner.cpp ../colors.cpp factory.cpp ../gradients.cpp ../xproperty.cpp
 INCLUDEPATH += $KDE_DIR/include $KDE_DIR/include/KDE
 LIBS += -L$KDE_DIR/lib -lkdecorations -lkdeui
 TARGET = kwin3_bespin
@@ -191,9 +191,28 @@ DATA.files = bespin.desktop
 DATA.path += $KDE_DIR/share/apps/kwin
 INSTALLS += target DATA
 DEFINES += BESPIN_DECO
-" > kwin/kwin.pro
+" > kwin/client.pro
 }
 
+write_kwin_config_pro() {
+echo "
+TEMPLATE    = lib
+TARGET = kwin_bespin_config
+target.path += $KDE_DIR/lib/kde4/
+HEADERS     = ../config/bconfig.h config.h
+FORMS       = configdialog.ui
+SOURCES     = ../config/bconfig.cpp config.cpp
+INSTALLS += target
+" > kwin/config.pro
+}
+
+write_kwin_pro() {
+echo "
+TEMPLATE = subdirs
+SUBDIRS = client.pro config.pro " > kwin/kwin.pro
+write_kwin_client_pro
+write_kwin_config_pro
+}
 
 ui "Welcome to Bespins interactive configurator"
 
@@ -232,8 +251,10 @@ if $QT_DIR/bin/qmake qmake.pro; then
    if $CONFIG_KDE; then
       cd kwin
       rm -f Makefile
-      $QMAKE kwin.pro
-      sed -i -e "s/libkwin3_/kwin3_/g" Makefile
+      $QMAKE client.pro -o Makefile.client
+      $QMAKE config.pro -o Makefile.config
+      sed -i -e "s/libkwin3_/kwin3_/g" Makefile.client
+      sed -i -e "s/libkwin_/kwin_/g" Makefile.config
       cd ../config
       rm -f Makefile.kstyle-bespin-config
       $QMAKE kstyle-bespin-config.pro -o Makefile.kstyle-bespin-config
