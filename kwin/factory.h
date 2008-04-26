@@ -23,6 +23,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
+
 #ifndef BESPIN_H
 #define BESPIN_H
 
@@ -34,6 +35,10 @@
 namespace Bespin
 {
 
+typedef struct {
+   bool forceUserColors, trimmCaption, resizeCorner;
+} Config;
+
 class Factory: public KDecorationFactory
 {
 public:
@@ -44,6 +49,7 @@ public:
 	bool supports( Ability ability ) const;
    inline static int buttonSize() {return buttonSize_;}
    inline static int borderSize() {return borderSize_;}
+   inline static int initialized() {return initialized_;}
    QList< BorderSize > borderSizes() const {
       return QList< BorderSize >() << BorderTiny << BorderNormal <<
       BorderLarge << BorderVeryLarge << BorderHuge << BorderVeryHuge <<
@@ -51,18 +57,17 @@ public:
    }
 //    virtual void checkRequirements( KDecorationProvides* provides );
    inline static int titleSize(bool minimal = false) {return titleSize_[minimal];}
-	inline static bool initialized() { return initialized_; }
-   inline static bool forceUserColors() { return forceUserColors_; }
-   inline static bool trimmCaption() { return trimmCaption_; }
+   inline static const Config *config() { return &_config; }
    inline static Gradients::Type gradient(bool active) { return gradient_[active]; }
    inline static const QVector<Button::Type> &multiButtons() { return multiButton_; }
 private:
 	bool readConfig();
 private:
-   static bool initialized_, forceUserColors_, trimmCaption_;
+   static bool initialized_;
    static int buttonSize_, borderSize_, titleSize_[2];
    static Gradients::Type gradient_[2];
    static QVector<Button::Type> multiButton_;
+   static Config _config;
 };
 
 } //namespace

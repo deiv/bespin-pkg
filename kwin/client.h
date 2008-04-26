@@ -37,6 +37,7 @@ class QSpacerItem;
 namespace Bespin {
 
 class Button;
+class ResizeCorner;
 
 class PreviewWidget : public QWidget
 {
@@ -57,6 +58,7 @@ public:
    void addButtons(const QString &, int &);
 	void borders( int& left, int& right, int& top, int& bottom ) const;
 	void captionChange();
+   inline const Config *config() const { return _factory->config(); }
 	/**
 	 * This function is called whenever the desktop for the window changes. Use
 	 * desktop() or isOnAllDesktops() to find out the current desktop
@@ -99,6 +101,7 @@ private:
    QPainterPath bar;
    QString _caption;
    PreviewWidget *_preview;
+   ResizeCorner *corner;
 protected:
    bool eventFilter(QObject *o, QEvent *e);
 protected:

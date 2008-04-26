@@ -45,6 +45,7 @@
 #include "../colors.h"
 #include "../gradients.h"
 #include "../xproperty.h"
+#include "resizecorner.h"
 #include "client.h"
 
 using namespace Bespin;
@@ -69,8 +70,15 @@ PreviewWidget::paintEvent(QPaintEvent *pe)
 Client::Client(KDecorationBridge *b, Factory *f) :
 KDecoration(b, f), retry(0),
 topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
-bgMode(1), _factory(f), _preview(0) { }
-Client::~Client(){ delete _preview; }
+bgMode(1), _factory(f), _preview(0), corner(0) { }
+
+Client::~Client(){
+   delete corner;
+   delete _preview;
+//    delete [] buttons;
+//    delete titleBar;
+//    delete titleSpacer;
+}
 
 void
 Client::activeChange()
@@ -89,6 +97,10 @@ Client::activeChange()
             ++retry;
          }
       }
+   }
+   if (corner) {
+      corner->setColor(color(ColorTitleBlend, isActive()));
+      corner->update();
    }
    widget()->update();
 }
@@ -222,7 +234,8 @@ Client::init()
       _preview->show();
       _preview->raise();
    }
-
+   if (config()->resizeCorner && isResizable())
+      corner = new ResizeCorner(this);
    reset(63);
 }
 
@@ -406,7 +419,7 @@ Client::repaint(QPainter &p)
          p.setPen(Colors::mid(bg, Qt::black, 2, 1)); d = -1;
       }
       else { // bright bg -> bright bottom borderline
-         p.setPen(Colors::mid(bg, Qt::white, 2, 1)); d = 1;
+         p.setPen(Colors::mid(bg, Qt::white)); d = 1;
       }
       p.drawText ( label.translated(0,d), Qt::AlignCenter | Qt::TextSingleLine, _caption );
    }
@@ -488,12 +501,19 @@ Client::reset(unsigned long changed)
 
    if (changed & SettingBorder) {
       if (maximizeMode() == MaximizeFull) {
-         borderSize = options()->moveResizeMaximizedWindows() ? 4 : 0;
+         if (options()->moveResizeMaximizedWindows()) {
+            borderSize = 4;
+         }
+         else {
+            borderSize = 0;
+            if (corner) corner->hide();
+         }
          titleSize = _factory->titleSize(true);
       }
       else {
          borderSize = _factory->borderSize();
          titleSize = _factory->titleSize();
+         if (corner) corner->show();
       }
 
       bottom = QRect(0, height()-borderSize, width(), borderSize);
@@ -529,7 +549,7 @@ Client::reset(unsigned long changed)
          for (int t = 0; t < KDecorationDefines::ColorFrame; ++t)
             colors[a][t] = options()->color((KDecorationDefines::ColorType)t, a);
 
-      if (!(isPreview() || _factory->forceUserColors())) {
+      if (!(isPreview() || config()->forceUserColors)) {
       uint info;
       if (XProperty::get(windowId(), XProperty::bgInfo, info)) {
          XProperty::decode(info, colors[0][ColorTitleBlend], colors[0][ColorButtonBg], bgMode);
@@ -639,7 +659,7 @@ isBrowser(const QString &s)
 QString
 Client::trimm(const QString &string)
 {
-   if (!_factory->trimmCaption()) return string;
+   if (!config()->trimmCaption) return string;
 
    /* Ok, *some* apps have really long and nasty window captions
    this looks clutterd, so we allow to crop them a bit and remove

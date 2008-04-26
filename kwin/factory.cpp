@@ -43,8 +43,7 @@ KDE_EXPORT KDecorationFactory* create_factory()
 using namespace Bespin;
 
 bool Factory::initialized_ = false;
-bool Factory::forceUserColors_ = false;
-bool Factory::trimmCaption_ = true;
+Config Factory::_config = { false, false, false };
 int Factory::buttonSize_ = -1;
 int Factory::borderSize_ = 4;
 int Factory::titleSize_[2] = {20,20};
@@ -55,7 +54,7 @@ Factory::Factory()
 {
 	readConfig();
    Gradients::init();
-	initialized_ = true;
+   initialized_ = true;
 }
 
 Factory::~Factory() { initialized_ = false; }
@@ -73,7 +72,7 @@ bool Factory::reset(unsigned long changed)
 {
 	initialized_ = false;
 	const bool configChanged = readConfig();
-	initialized_ = true;
+   initialized_ = true;
 
 	if (configChanged ||
 		(changed & (SettingDecoration | SettingButtons | SettingBorder))) {
@@ -128,13 +127,17 @@ bool Factory::readConfig()
 	QSettings settings("Bespin", "Style");
 	settings.beginGroup("Deco");
 
-   bool forcedusercolors = forceUserColors_;
-   forceUserColors_ = settings.value("ForceUserColors", false).toBool();
-   if (forcedusercolors != forceUserColors_) ret = true;
+   bool forcedusercolors = _config.forceUserColors;
+   _config.forceUserColors = settings.value("ForceUserColors", false).toBool();
+   if (forcedusercolors != _config.forceUserColors) ret = true;
 
-   bool trimmedCaption = trimmCaption_;
-   trimmCaption_ = settings.value("TrimmCaption", true).toBool();
-   if (trimmedCaption != trimmCaption_) ret = true;
+   bool trimmedCaption = _config.trimmCaption;
+   _config.trimmCaption = settings.value("TrimmCaption", true).toBool();
+   if (trimmedCaption != _config.trimmCaption) ret = true;
+
+   bool showedResCor = _config.resizeCorner;
+   _config.resizeCorner = settings.value("ResizeCorner", false).toBool();
+   if (showedResCor != _config.resizeCorner) ret = true;
 
    Gradients::Type oldgradient = gradient_[0];
    gradient_[0] = (Gradients::Type)settings.value("InactiveGradient",
