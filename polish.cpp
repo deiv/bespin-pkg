@@ -495,6 +495,7 @@ void BespinStyle::polish( QWidget * widget ) {
        || (widget && qobject_cast<QToolBar *>(widget->parent()))
 #endif
       ) {
+         widget->setBackgroundRole(QPalette::Window);
          if (config.bg.mode == Scanlines) {
             widget->setAutoFillBackground ( true );
             QPalette pal = widget->palette();
