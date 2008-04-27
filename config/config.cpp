@@ -61,7 +61,7 @@ static const char* defInfo1 =
 </div>\
 <b>Bespin Style</b><hr>\
 <p>\
-&copy;&nbsp;2006/2007 by Thomas L&uuml;bking<br>\
+&copy;&nbsp;2006-2008 by Thomas L&uuml;bking<br>\
 Includes Design Ideas by\
 <ul type=\"disc\">\
 <li>Nuno Pinheiro</li>\
@@ -250,6 +250,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    "3" is the default value for this entry*/
    handleSettings(ui.bgMode, BG_MODE);
    handleSettings(ui.bgIntensity, BG_INTENSITY);
+   handleSettings(ui.fadeInactive, FADE_INACTIVE);
    handleSettings(ui.structure, BG_STRUCTURE);
    handleSettings(ui.modalGlas, BG_MODAL_GLASSY);
    handleSettings(ui.modalOpacity, BG_MODAL_OPACITY);

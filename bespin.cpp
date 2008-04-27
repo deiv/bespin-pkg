@@ -371,32 +371,21 @@ BespinStyle::erase(const QStyleOption *option, QPainter *painter,
    painter->restore();
 }
 
-static void swapPalette(QWidget *widget)
+static void swapPalette(QWidget *widget, BespinStyle *style)
 {
    QPalette pal(widget->palette());
-   QColor h;
-   for (int group = 0; group < 3; ++group) {
-      h = pal.color((QPalette::ColorGroup)group, QPalette::WindowText);
-      if (Colors::value(h) < 70) {
-         int hh,s,v; h.getHsv(&hh,&s,&v); h.setHsv(hh,s,70);
-      }
-      pal.setColor((QPalette::ColorGroup)group, QPalette::WindowText,
-                    pal.color((QPalette::ColorGroup)group, QPalette::Window));
-      pal.setColor((QPalette::ColorGroup)group, QPalette::Window, h);
+   QColor h = pal.color(QPalette::Active, QPalette::WindowText);
+   pal.setColor(QPalette::Active, QPalette::WindowText, pal.color(QPalette::Active, QPalette::Window));
+   pal.setColor(QPalette::Active, QPalette::Window, h);
 
-//       h = pal.color((QPalette::ColorGroup)group, QPalette::Text);
-//       if (Colors::value(h) < 70) {
-//          int hh,s,v; h.getHsv(&hh,&s,&v); h.setHsv(hh,s,70);
-//       }
-//       pal.setColor((QPalette::ColorGroup)group, QPalette::Text,
-//                     pal.color((QPalette::ColorGroup)group, QPalette::Base));
-//       pal.setColor((QPalette::ColorGroup)group, QPalette::Base, h);
+//    h = pal.color(QPalette::Active, QPalette::Text);
+//    pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::Base));
+//    pal.setColor(QPalette::Active, QPalette::Base, h);
 
-      h = pal.color((QPalette::ColorGroup)group, QPalette::Button);
-      pal.setColor((QPalette::ColorGroup)group, QPalette::Button,
-                    pal.color((QPalette::ColorGroup)group, QPalette::ButtonText));
-      pal.setColor((QPalette::ColorGroup)group, QPalette::ButtonText, h);
-   }
+   h = pal.color(QPalette::Active, QPalette::Button);
+   pal.setColor(QPalette::Active, QPalette::Button, pal.color(QPalette::Active, QPalette::ButtonText));
+   pal.setColor(QPalette::Active, QPalette::ButtonText, h);
+   style->polish(pal);
    widget->setPalette(pal);
 }
 
@@ -514,7 +503,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
    case QEvent::Show:
       if (QWidget * widget = qobject_cast<QWidget*>(object)) {
          if (widget->isModal()) {
-            if (config.bg.modal.invert) swapPalette(widget);
+            if (config.bg.modal.invert) swapPalette(widget, this);
             const QPalette &pal = widget->palette();
             BGMode bgMode = config.bg.mode;
             QColor bg = FCOLOR(Window);
@@ -560,7 +549,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
    case QEvent::Hide:
       if (QWidget * widget = qobject_cast<QWidget*>(object))
       if (widget->isModal())
-      if (config.bg.modal.invert) swapPalette(widget);
+      if (config.bg.modal.invert) swapPalette(widget, this);
       return false;
    case QEvent::PaletteChange:
 #define LACK_CONTRAST(_C_) Colors::contrast(pal.color(QPalette::Active, QPalette::_C_), pal.color(QPalette::Active, QPalette::_C_##Text)) < 40

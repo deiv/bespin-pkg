@@ -23,6 +23,7 @@
 #define SHADOW_INTENSITY "ShadowIntensity", 100
 #define LEFTHANDED "LeftHanded", false
 #define MACSTYLE "MacStyle", true
+#define FADE_INACTIVE "FadeInactive", false
 
 #define BG_MODE "Bg.Mode", Gradients::BevelV
 #define BG_MODAL_GLASSY "Bg.Modal.Glassy", true

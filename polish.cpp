@@ -187,17 +187,20 @@ void BespinStyle::polish( QPalette &pal )
    pal.setColor(QPalette::Disabled, QPalette::Highlight, grey);
 
 
-#if 0 // inactive palette
-   pal.setColor(QPalette::Inactive, QPalette::Highlight,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Highlight),
-                            grey,2,1));
-   pal.setColor(QPalette::Inactive, QPalette::WindowText,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Window),
-                            pal.color(QPalette::Active, QPalette::WindowText),1,4));
-   pal.setColor(QPalette::Inactive, QPalette::Text,
-                Colors::mid(pal.color(QPalette::Active, QPalette::Base),
-                            pal.color(QPalette::Active, QPalette::Text),1,4));
-#endif
+   // inactive palette
+   if (config.fadeInactive) { // fade out inactive foreground and highlight colors...
+      pal.setColor(QPalette::Inactive, QPalette::Highlight,
+                   Colors::mid(pal.color(QPalette::Active, QPalette::Highlight), grey, 2,1));
+      pal.setColor(QPalette::Inactive, QPalette::WindowText,
+                   Colors::mid(pal.color(QPalette::Active, QPalette::Window),
+                               pal.color(QPalette::Active, QPalette::WindowText), 1,4));
+      pal.setColor(QPalette::Inactive, QPalette::ButtonText,
+                   Colors::mid(pal.color(QPalette::Active, QPalette::Button),
+                               pal.color(QPalette::Active, QPalette::ButtonText), 1,4));
+      pal.setColor(QPalette::Inactive, QPalette::Text,
+                   Colors::mid(pal.color(QPalette::Active, QPalette::Base),
+                               pal.color(QPalette::Active, QPalette::Text), 1,4));
+   }
 
    // fade disabled palette
    pal.setColor(QPalette::Disabled, QPalette::WindowText,
@@ -288,21 +291,27 @@ inline static void polishGTK(QWidget * widget)
 }
 
 void BespinStyle::polish( QWidget * widget ) {
-   
-   if (!widget) return; // !!! protect against polishing QObject trials !
 
+   // !!! protect against polishing QObject trials ! (this REALLY happens from time to time...)
+   if (!widget) return;
+
+   // GTK-Qt gets a special handling - see above
    if (isGTK) {
-      polishGTK(widget);
-      return;
+      polishGTK(widget); return;
    }
 
+   // NONONONONO!!!!! ;)
    if (qobject_cast<VisualFramePart*>(widget)) return;
-//    qDebug() << widget;
+
+   // apply any user selected hacks
    Hacks::add(widget);
-   
+
+   //BEGIN Window handling                                                                   -
    if (widget->isWindow()) {
       QPalette pal = widget->palette();
 
+#ifdef Q_WS_X11 // XProperty actually handles the non X11 case, but we avoid overhead ;)
+      // X11 properties for the deco
       uint info = XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode);
       XProperty::set(widget->winId(), XProperty::bgInfo, info);
       info = XProperty::encode(CCOLOR(kwin.active, Bg),
@@ -312,46 +321,45 @@ void BespinStyle::polish( QWidget * widget ) {
                                      CCOLOR(kwin.inactive, Fg), 2, 1);
       info = XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]);
       XProperty::set(widget->winId(), XProperty::inactInfo, info);
-      
-      bool freakModals = config.bg.modal.invert ||
-         config.bg.modal.glassy ||
-         config.bg.modal.opacity < 100;
-      if (freakModals)
-         widget->installEventFilter(this);
+#endif
+
       if (config.bg.mode > Scanlines)
          widget->setAttribute(Qt::WA_StyledBackground);
-//       widget->setAutoFillBackground(true);
+
+      //BEGIN Popup menu handling                                                                  -
       if (QMenu *menu = qobject_cast<QMenu *>(widget)) {
+         // glass mode popups
          if (config.menu.glassy) {
             if (config.bg.mode == Scanlines) {
                QPalette pal = widget->palette();
-               pal.setBrush( QPalette::Background,
-                             pal.color(QPalette::Active, QPalette::Background) );
-               widget->setPalette(pal);
+               pal.setBrush(QPalette::Background, pal.color(QPalette::Active, QPalette::Background));
+               menu->setPalette(pal);
             }
-            widget->setAttribute(Qt::WA_StyledBackground);
+            menu->setAttribute(Qt::WA_StyledBackground);
          }
+         // apple style popups
          if (config.bg.mode == Scanlines) {
-            QPalette pal = widget->palette();
+            QPalette pal = menu->palette();
             QColor c = pal.color(QPalette::Active, QPalette::Window);
             if (!_scanlines[1]) makeStructure(&_scanlines[1], c, true);
             QBrush brush( c, *_scanlines[1] );
             pal.setBrush( QPalette::Window, brush );
-            widget->setPalette(pal);
+            menu->setPalette(pal);
          }
-         widget->setWindowOpacity( config.menu.opacity/100.0 );
-         // swap qmenu colors - in case
-         widget->setAutoFillBackground(true);
-         widget->setBackgroundRole ( config.menu.std_role[0] );
-         widget->setForegroundRole ( config.menu.std_role[1] );
+         // opacity
+         menu->setWindowOpacity( config.menu.opacity/100.0 );
+         // color swapping
+         menu->setAutoFillBackground(true);
+         menu->setBackgroundRole ( config.menu.std_role[0] );
+         menu->setForegroundRole ( config.menu.std_role[1] );
          if (config.menu.boldText) {
-            QFont tmpFont = widget->font();
+            QFont tmpFont = menu->font();
             tmpFont.setBold(true);
-            widget->setFont(tmpFont);
+            menu->setFont(tmpFont);
          }
-         if (!freakModals && widget->parentWidget() &&
-             widget->parentWidget()->inherits("QMdiSubWindow"))
-            widget->installEventFilter(this);
+         // eventfiltering to reposition MDI windows and correct distance to menubars
+         if (menu->parentWidget() && menu->parentWidget()->inherits("QMdiSubWindow"))
+            menu->installEventFilter(this);
          if (bar4popup(menu))
             menu->installEventFilter(this); // reposition
 #if SHAPE_POPUP
@@ -365,12 +373,19 @@ void BespinStyle::polish( QWidget * widget ) {
          }
 #endif
       }
+      //END Popup menu handling                                                                  -
+      // modal dialogs, the modality isn't necessarily set yet, so we catch it on QEvent::Show, see bespin.cpp
+      else if (config.bg.modal.invert || config.bg.modal.glassy || config.bg.modal.opacity < 100)
+         widget->installEventFilter(this);
+      
    }
+   //END Window handling                                                                   -
    
 #ifdef MOUSEDEBUG
    widget->installEventFilter(this);
 #endif
-   
+
+   //BEGIN Hover widgets                                                                         -
    if (false
 #ifndef QT_NO_SPINBOX
        || qobject_cast<QAbstractSpinBox *>(widget)
@@ -398,55 +413,47 @@ void BespinStyle::polish( QWidget * widget ) {
    // Enable hover effects in listview, all itemviews like in kde is pretty annoying
    if (QListView *listView = qobject_cast<QListView*>(widget) )
       listView->viewport()->setAttribute(Qt::WA_Hover);
-   
+   //END Hover widgets                                                                         -
+
+   // PUSHBUTTONS - hovering/animation
    if (qobject_cast<QAbstractButton*>(widget)) {
-      widget->setBackgroundRole ( QPalette::Window );
-      widget->setForegroundRole ( QPalette::WindowText );
       if (widget->inherits("QToolBoxButton") ||
-          widget->objectName() == "RenderFormElementWidget" ) {
+          widget->objectName() == "RenderFormElementWidget" ) { // KHtml
          widget->setAttribute(Qt::WA_Hover);
       }
       else
          Animator::Hover::manage(widget);
    }
+   // COMBOBOXES - hovering/animation
    else if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
-      if (box->isEditable()) {
-         widget->setBackgroundRole ( QPalette::Base );
-         widget->setForegroundRole ( QPalette::Text );
-      }
-      else {
-         widget->setBackgroundRole ( QPalette::Window );
-         widget->setForegroundRole ( QPalette::WindowText );
-      }
-      if (widget->objectName() == "RenderFormElementWidget")
+      if (widget->objectName() == "RenderFormElementWidget") // KHtml
          widget->setAttribute(Qt::WA_Hover);
       else
          Animator::Hover::manage(widget);
    }
    
-   else if (qobject_cast<QAbstractSlider *>(widget)) {
-      // NOTICE we could get slight more performance by this and cache ourselve,
-      // but that's gonna add more complexity, and as the slider is usually not
-      // bound to e.g. a scrollarea, surprisinlgy little CPU gain...
-//       widget->setAttribute(Qt::WA_OpaquePaintEvent);
-      if (qobject_cast<QScrollBar *>(widget)) {
-         // NOTICE slows down things as it triggers a repaint of the frame - but nec for khtml...
+   else if (qobject_cast<QScrollBar *>(widget)) {
+      // NOTICE QAbstractSlider::setAttribute(Qt::WA_OpaquePaintEvent) gains surprisinlgy little CPU
+      // as the slider is usually not bound to e.g. a scrollarea
+      // so that'd just gonna add more complexity... for literally nothing
          QWidget *dad = widget;
          while ((dad = dad->parentWidget())) {
             // btw: userer väter väter väter väter...? hail to Monty Python!
             if (dad->inherits("KHTMLView")) {
+               // NOTICE this slows down things as it triggers a repaint of the frame
+               // but it's necessary for KHtml scrollers...
                widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+               // this reenbles speed and currently does the job - how's css/khtml policy on applying colors?
                widget->setAutoFillBackground ( true );
-               widget->setBackgroundRole ( QPalette::Base );
+               widget->setBackgroundRole ( QPalette::Base ); // QPalette::Window looks wrong
                break;
             }
          }
-         // ================
+         // Scrollarea hovering
+         // QAbstractScrollArea is allready handled, but might not be the only scrollbar container!
          QWidget *area = 0;
          if (widget->parentWidget()) {
             area = widget->parentWidget();
-//             if (isSpecialFrame(area))
-//                widget->installEventFilter(this);
             if (area->parentWidget()) {
                area = area->parentWidget();
                if (qobject_cast<QAbstractScrollArea*>(area))
@@ -457,29 +464,25 @@ void BespinStyle::polish( QWidget * widget ) {
          }
          if (area)
             Animator::Hover::manage(area, true);
-      }
    }
-   
+   // PROGRESSBARS - animation and bold font
    else if (qobject_cast<QProgressBar*>(widget)) {
-      QFont fnt = widget->font();
-      fnt.setBold(true);
+      QFont fnt = widget->font(); fnt.setBold(true);
       widget->setFont(fnt);
-//       widget->setBackgroundRole ( config.progress.role[0] );
-//       widget->setForegroundRole ( config.progress.role[1] );
       Animator::Progress::manage(widget);
    }
 
-   // do NOT! apply this on tabs explicitly, as they contain a stack!
+   // Tab Transition
+   // NOTICE do NOT(!) apply this on tabs explicitly, as they contain a stack!
    else if (widget->inherits("QStackedWidget"))
       Animator::Tab::manage(widget);
-   
+   // tabbar colors (to avoid flicker)
    else if (qobject_cast<QTabBar *>(widget)) {
-      widget->setBackgroundRole ( config.tab.std_role[0] );
-      widget->setForegroundRole ( config.tab.std_role[1] );
+      // the eventfilter overtakes the widget painting to allow tabs ABOVE the tabbar
       widget->installEventFilter(this);
    }
    
-   
+   // Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
    if (false // to simplify the #ifdefs
 #ifndef QT_NO_MENUBAR
        || qobject_cast<QMenuBar *>(widget)
@@ -492,7 +495,6 @@ void BespinStyle::polish( QWidget * widget ) {
        || (widget && qobject_cast<QToolBar *>(widget->parent()))
 #endif
       ) {
-         widget->setBackgroundRole(QPalette::Window);
          if (config.bg.mode == Scanlines) {
             widget->setAutoFillBackground ( true );
             QPalette pal = widget->palette();
@@ -508,8 +510,7 @@ void BespinStyle::polish( QWidget * widget ) {
 #if 0
 #ifdef Q_WS_X11
    if (qobject_cast<QMenuBar*>(widget)) {
-      widget->setParent(widget->parentWidget(), Qt::Window | Qt::Tool |
-                        Qt::FramelessWindowHint);
+      widget->setParent(widget->parentWidget(), Qt::Window | Qt::Tool | Qt::FramelessWindowHint);
       widget->move(0,0);
       SET_WINDOW_TYPE(widget, winTypeMenu);
       if( widget->parentWidget())
@@ -518,49 +519,50 @@ void BespinStyle::polish( QWidget * widget ) {
    }
 #endif
 #endif
+   //BEGIN Frames                                                                      -
    if (!widget->isWindow())
    if (QFrame *frame = qobject_cast<QFrame *>(widget)) {
-   // kill ugly winblows frames...
-      if (frame->frameShape() == QFrame::Box ||
-            frame->frameShape() == QFrame::Panel ||
-            frame->frameShape() == QFrame::WinPanel)
+      // Kill ugly winblows frames... (qShadeBlablabla stuff)
+      if (frame->frameShape() == QFrame::Box || frame->frameShape() == QFrame::Panel ||
+                                                frame->frameShape() == QFrame::WinPanel)
          frame->setFrameShape(QFrame::StyledPanel);
 
-      if (qobject_cast<QAbstractScrollArea*>(frame) ||
-          qobject_cast<Q3ScrollView*>(frame)) {
+      // Kill ugly line look (we paint our styled v and h lines instead ;)
+      if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
+         widget->installEventFilter(this);
+
+      // scrollarea hovering
+      if (qobject_cast<QAbstractScrollArea*>(frame) || qobject_cast<Q3ScrollView*>(frame)) {
          Animator::Hover::manage(frame);
+         // allow all treeviews to be animated!
          if (config.hack.treeViews)
          if (QTreeView* tv = qobject_cast<QTreeView*>(frame))
             tv->setAnimated ( true );
       }
 
-   // map a toolbox frame to it's elements
-//       if (qobject_cast<QAbstractScrollArea*>(frame) &&
-//             frame->parentWidget() && frame->parentWidget()->inherits("QToolBox"))
-//          frame->setFrameStyle( static_cast<QFrame*>(frame->parentWidget())->frameStyle() );
-
-   // overwrite ugly lines
-      if (frame->frameShape() == QFrame::HLine ||
-            frame->frameShape() == QFrame::VLine)
-         widget->installEventFilter(this);
-
-   // toolbox handling - a shame they look that crap by default!
-      else if (widget->inherits("QToolBox")) {
+      // QToolBox handling - a shame they look that crap by default!
+      if (widget->inherits("QToolBox")) {
+         // get rid of QPalette::Button
          widget->setBackgroundRole(QPalette::Window);
          widget->setForegroundRole(QPalette::WindowText);
+         // get rid of nasty indention
          if (widget->layout()) {
             widget->layout()->setMargin ( 0 );
             widget->layout()->setSpacing ( 0 );
          }
       }
-      else if (isSpecialFrame(widget)) {
-            if (frame->lineWidth() == 1)
-               frame->setLineWidth(dpi.f4);
+
+      // "frame above content" look
+      else if (isSpecialFrame(widget)) { // QTextEdit etc. can be handled more efficiently
+         if (frame->lineWidth() == 1)
+            frame->setLineWidth(dpi.f4); // but must have enough indention
       }
       else
          VisualFrame::manage(frame);
    }
-   
+
+   // this is for QToolBox kids - they're autofilled by default - what looks crap
+   // canNOT(!) be handled above (they're just usually no frames...)
    if (widget->autoFillBackground() &&
        // dad
        widget->parentWidget() &&
@@ -570,14 +572,16 @@ void BespinStyle::polish( QWidget * widget ) {
        qobject_cast<QAbstractScrollArea*>(widget->parentWidget()->parentWidget()) &&
        // grangrampa
        widget->parentWidget()->parentWidget()->parentWidget() &&
-       widget->parentWidget()->parentWidget()->parentWidget()->inherits("QToolBox")
-      ) {
+       widget->parentWidget()->parentWidget()->parentWidget()->inherits("QToolBox") ) {
          widget->parentWidget()->setAutoFillBackground(false);
          widget->setAutoFillBackground(false);
-      }
-   //========================
+   }
+
+   // KHtml css colors can easily get messed up
+   // either because i'm unsure about what colors are set or KHtml does wrong OR (mainly) by html "designers"
+   // the eventfilter watches palette changes and ensures contrasted foregrounds...
    if (widget->objectName() == "RenderFormElementWidget") {
-      widget->installEventFilter(this); // check for palette updates and ensure visible foregrounds...
+      widget->installEventFilter(this);
       QEvent ev(QEvent::PaletteChange);
       eventFilter(widget, &ev);
    }

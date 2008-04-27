@@ -406,7 +406,7 @@ Client::repaint(QPainter &p)
       const QColor bg2 = color(ColorTitleBar, isActive());
       const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical,
                                             (Gradients::Type)gType[isActive()]);
-      p.setPen(QPen(Colors::mid(bg, Qt::white,1,2), 2)); p.setBrush(fill);
+      p.setPen(QPen(Colors::mid(bg, Qt::white), 2)); p.setBrush(fill);
       p.setRenderHint( QPainter::Antialiasing );
       p.drawPath(bar);
       p.setBrush(Qt::NoBrush);
@@ -609,7 +609,7 @@ Client::resize( const QSize& s )
    }
    int w = width();
    int h = height();
-   int dh = borderSize > 5 ? 8 : 4;
+   int dh = (isShade() || borderSize > 5) ? 8 : 4;
    QRegion mask(4, 0, w-8, h);
    mask += QRegion(0, 4, w, h-dh);
    mask += QRegion(2, 1, w-4, h-dh/4);

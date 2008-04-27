@@ -55,18 +55,17 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
    return list;
 }
 
-#define FIX_KAPP_PALETTE 1
-#if FIX_KAPP_PALETTE
-// this seems to be necessary as KDE somehow sets it's own palette after
+// this seems to be necessary as KDE sets it's own palette after
 // creating the style - god knows why...
-
-static QPalette originalPalette;
-#endif
+static QPalette *originalPalette = 0;
 void BespinStyle::fixKdePalette()
 {
-#if FIX_KAPP_PALETTE
-   qApp->setPalette(originalPalette);
-#endif
+   if (originalPalette) {
+      qApp->setPalette(*originalPalette);
+      delete originalPalette; originalPalette = 0;
+   }
+   QPalette pal = qApp->palette();
+   polish(pal);
 }
 
 
@@ -117,7 +116,8 @@ BespinStyle::readSettings(const QSettings* settings)
          else {
             delete iSettings; iSettings = 0L;
          }
-			QTimer::singleShot(0, this, SLOT(fixKdePalette()));
+         if (qApp->inherits("KApplication"))
+            originalPalette = new QPalette(qApp->palette());
       }
       if (!iSettings) {
          iSettings = new QSettings("Bespin", "Style");
@@ -172,6 +172,8 @@ BespinStyle::readSettings(const QSettings* settings)
    
    // Choosers ===========================
    GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
+
+   config.fadeInactive = readBool(FADE_INACTIVE);
 
    // Hacks ==================================
    config.hack.messages = readBool(HACK_MESSAGES);
@@ -334,9 +336,6 @@ void BespinStyle::initMetrics()
 
 void BespinStyle::init(const QSettings* settings) {
    readSettings(settings);
-#if FIX_KAPP_PALETTE
-   originalPalette = qApp->palette();
-#endif
    initMetrics();
    generatePixmaps();
    Gradients::init(config.bg.mode > Scanlines ?
@@ -352,4 +351,6 @@ void BespinStyle::init(const QSettings* settings) {
    inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
    inner.adjust(f2,f2,-f2,0); outer.adjust(-f2,-f2,f2,0);
    VisualFrame::setGeometry(QFrame::Raised, inner, outer);
+   if (qApp->inherits("KApplication"))
+      QTimer::singleShot(0, this, SLOT(fixKdePalette()));
 }

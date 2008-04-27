@@ -184,14 +184,16 @@ static bool
 hackMoveWindow(QWidget* w, QEvent *e)
 {
 
-   if (e->type() != QEvent::MouseButtonPress)
-      return false;
+//    if (e->type() != QEvent::MouseButtonPress)
+//       return false;
    QMouseEvent *mev = static_cast<QMouseEvent*>(e);
    if (mev->button() != Qt::LeftButton)
       return false;
-   if ((mev->pos().x() < 12 || mev->pos().y() < 12) &&
-       (w->inherits("QToolBar") || w->inherits("QDockWidget")))
-      return false; // preserve dock / toolbar internam move float trigger...
+   if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
+      if (bar->activeAction()) return false;
+   if (w->cursor().shape() != Qt::ArrowCursor || // preserve dock / toolbar internam move float trigger...
+      (mev->pos().y() < 12 && w->inherits("QDockWidget"))) // dock title...
+      return false;
    triggerWMMove(w, mev->globalPos());
    return true;
 }
@@ -201,9 +203,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 {
    if (QMessageBox* box = qobject_cast<QMessageBox*>(o))
       return hackMessageBox(box, e);
-   if (isWindowDragWidget(o)) {
-      if (QMenuBar *bar = qobject_cast<QMenuBar*>(o))
-      if (bar->activeAction()) return false;
+   if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o)) {
       return hackMoveWindow(static_cast<QWidget*>(o), e);
    }
    return false;

@@ -46,6 +46,8 @@ typedef struct Config {
       Gradients::Type gradient;
    } chooser;
 
+   bool fadeInactive;
+
    struct hack {
       bool messages, KHTMLView, treeViews, sizeGrips, windowMovement;
    } hack;

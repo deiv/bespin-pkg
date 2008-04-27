@@ -53,8 +53,8 @@ ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
    QPolygon triangle(3);
    triangle.putPoints(0, 3, 16,0, 16,16, 0,16);
    setMask ( triangle );
+   QTimer::singleShot(0, this, SLOT(hide()));
    QTimer::singleShot(3000, this, SLOT(raise()));
-   hide();
 }
 
 void
@@ -117,6 +117,9 @@ ResizeCorner::mousePressEvent ( QMouseEvent *mev )
       client->performWindowOperation(KDecoration::ResizeOp);
    else if (mev->button() == Qt::RightButton) {
       hide(); QTimer::singleShot(5000, this, SLOT(show()));
+   }
+   else if (mev->button() == Qt::MidButton) {
+      hide();
    }
 }
 
