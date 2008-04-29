@@ -16,6 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QCoreApplication>
 #include <QEvent>
 #include <QLabel>
 #include <QLayout>
@@ -23,6 +24,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPushButton>
 #include <QStyle>
 #include <QStyleOption>
 
@@ -44,6 +46,7 @@ using namespace Bespin;
 extern Config config;
 
 static Hacks *bespinHacks = new Hacks;
+static bool *isKRunner = 0;
 
 static void
 triggerWMMove(const QWidget *w, const QPoint &p)
@@ -141,7 +144,7 @@ hackMessageBox(QMessageBox* box, QEvent *e)
             newText.replace(QRegExp("^(<qt>)*"), head);
             if (!newText.endsWith("</qt>")) newText.append("</qt>");
             text->setText(newText);
-            text->setMargin(4);
+//             text->setMargin(4);
          }
          text->setFrameStyle ( QFrame::StyledPanel | QFrame::Sunken );
          text->setLineWidth ( 0 );
@@ -198,9 +201,30 @@ hackMoveWindow(QWidget* w, QEvent *e)
    return true;
 }
 
+static bool
+paintKrunner(QWidget *w, QPaintEvent *pe) {
+   if (w->isWindow()) {
+      QPainter p(w);
+      QStyleOption opt;
+      opt.initFrom ( w );
+      w->style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, w);
+      return true;
+   }
+   return false;
+}
+
+
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
+   if (*isKRunner) {
+      if (e->type() == QEvent::Paint)
+         return paintKrunner(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
+      if (e->type() == QEvent::Show) {
+         static_cast<QWidget*>(o)->setWindowOpacity( 80.0 );
+         return false;
+      }
+   }
    if (QMessageBox* box = qobject_cast<QMessageBox*>(o))
       return hackMessageBox(box, e);
    if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o)) {
@@ -211,6 +235,24 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 
 bool
 Hacks::add(QWidget *w) {
+   if (!isKRunner) {
+      isKRunner = new bool;
+      *isKRunner = (QCoreApplication::applicationName() == "krunner");
+   }
+   if (*isKRunner && config.hack.krunner) {
+      if (QPushButton *btn = qobject_cast<QPushButton*>(w)) {
+         btn->setFlat ( true );
+      }
+      else if (w->isWindow()) {
+         w->setAttribute(Qt::WA_MacBrushedMetal);
+//          w->setAttribute(Qt::WA_NoSystemBackground);
+         w->installEventFilter(bespinHacks);
+      }
+//       else if (w->inherits("QLineEdit")) {
+//          w->installEventFilter(bespinHacks);
+//       }
+      return true;
+   }
    if (config.hack.messages &&
        qobject_cast<QMessageBox*>(w)) {
       w->setWindowFlags ( Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint | Qt::FramelessWindowHint);
@@ -230,6 +272,12 @@ Hacks::add(QWidget *w) {
       w->installEventFilter(bespinHacks);
       return true;
    }
+//    if (config.hack.konsole)
+//    if (w->inherits("Konsole::TerminalDisplay")) {
+//       w->setAttribute(Qt::WA_StyledBackground);
+//       w->setAttribute(Qt::WA_MacBrushedMetal);
+//       return true;
+//    }
    return false;
 }
 

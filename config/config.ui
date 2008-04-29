@@ -1924,7 +1924,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>431</height>
+        <height>441</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" >
@@ -1936,27 +1936,34 @@
         </widget>
        </item>
        <item row="1" column="0" >
+        <widget class="QCheckBox" name="hackKrunner" >
+         <property name="text" >
+          <string>Override KRunner appereance</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
         <widget class="QCheckBox" name="hackKHtml" >
          <property name="text" >
           <string>Sunken KHtml view (Konqueror)</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" >
+       <item row="3" column="0" >
         <widget class="QCheckBox" name="hackWindowMove" >
          <property name="text" >
           <string>Allow Window dragging from Menubars &amp;&amp; Docks (X11 only)</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" >
+       <item row="4" column="0" >
         <widget class="QCheckBox" name="hackTreeViews" >
          <property name="text" >
           <string>Animate all treeviews</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" >
+       <item row="5" column="0" >
         <spacer name="verticalSpacer" >
          <property name="orientation" >
           <enum>Qt::Vertical</enum>

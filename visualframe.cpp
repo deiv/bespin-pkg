@@ -35,7 +35,7 @@
 #define VDebug(_STREAM_) //
 #define DEBUG //
 #endif
-
+#include <QtDebug>
 using namespace VFrame;
 
 static QRegion corner[4];
@@ -294,20 +294,13 @@ void
 VisualFrame::raise()
 {
    if (_style != QFrame::StyledPanel) return;
-   
-   QWidgetList widgets = _window->findChildren<QWidget*>();
-   QWidget *up = 0; int cnt = widgets.size()-1;
-   for (int i = 0; i < cnt; ++i)
-      if (widgets.at(i) == _frame) {
-         up = widgets.at(i+1);
-         break;
-      }
-   if (up) {
-      PARTS(stackUnder(up));
-   }
-   else {
-      qWarning("BESPIN: raising visualframe to top");
-      PARTS(raise());
+
+   const bool show = !hidden;
+   PARTS(setParent(_frame));
+   PARTS(raise()); // ensure they're right above all other frame childs
+   PARTS(setParent(_window)); // but place them back to window
+   if (show) { // MUST! be - Qt hides widgets on setParent()
+      PARTS(show());
    }
 }
 
@@ -330,7 +323,8 @@ VisualFrame::update() {
 bool
 VisualFrame::eventFilter ( QObject * o, QEvent * ev )
 {
-   if (o == top) {
+
+   if (o == top) { // "top" is the only monitored framepart!
       if (ev->type() == QEvent::ZOrderChange)
          raise();
       return false;
@@ -340,14 +334,20 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
       correctPosition();
       return false;
    }
+
+   if (ev->type() == QEvent::ZOrderChange) { // necessary for all widgets from frame to parent?!
+      raise();
+      return false;
+   }
    
    if (o != _frame) { // now we're only interested in frame events
-//       o->removeEventFilter(this);
       return false;
    }
 
    if (ev->type() == QEvent::Paint) {
-      if (_frame->frameShape() != _style) updateShape();
+      if (_frame->frameShape() != _style) {
+         updateShape();
+      }
       return false;
    }
 
@@ -370,12 +370,7 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
       update();
       return false;
    }
-   
-   if (ev->type() == QEvent::ZOrderChange) { // might be necessary for all widgets from frame to parent?
-      raise();
-      return false;
-   }
-   
+
    if (ev->type() == QEvent::Hide) {
       hide();
       return false;

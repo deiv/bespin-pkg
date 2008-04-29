@@ -30,11 +30,15 @@
 #include "../config/bconfig.h"
 #include "ui_configdialog.h"
 
+class KConfigGroup;
+
 class Config : public BConfig
 {
     Q_OBJECT
 public:
     Config(QWidget* parent);
+public slots:
+   void save(KConfigGroup&);
 private:
    Ui::Config ui;
 };

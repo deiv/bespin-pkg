@@ -57,7 +57,7 @@ Factory::Factory()
    initialized_ = true;
 }
 
-Factory::~Factory() { initialized_ = false; }
+Factory::~Factory() { initialized_ = false; Gradients::wipe(); }
 
 KDecoration* Factory::createDecoration(KDecorationBridge* b)
 {
@@ -95,7 +95,7 @@ multiVector(const QString & string, QVector<Button::Type> &vector)
          case 'H': type = Button::Help; break;
          case 'F': type = Button::Above; break;
          case 'B': type = Button::Below; break;
-//          case 'L': type = Button::Shade; // Shade button
+         case 'L': type = Button::Shade; break;// Shade button
          default: continue;
       }
       vector.append(type);
@@ -113,7 +113,7 @@ multiString(const QVector<Button::Type> &vector)
          case Button::Help: c = 'H'; break;
          case Button::Above: c = 'F'; break;
          case Button::Below: c = 'B'; break;
-         //          case 'L': type = Button::Shade; // Shade button
+         case Button::Shade: c = 'L'; break; // Shade button
          default: continue;
       }
       string.append(c);
@@ -140,13 +140,11 @@ bool Factory::readConfig()
    if (showedResCor != _config.resizeCorner) ret = true;
 
    Gradients::Type oldgradient = gradient_[0];
-   gradient_[0] = (Gradients::Type)settings.value("InactiveGradient",
-                                                   Gradients::None).toInt();
+   gradient_[0] = Gradients::fromInfo(settings.value("InactiveGradient", 0).toInt());
    if (oldgradient != gradient_[0]) ret = true;
 
    oldgradient = gradient_[1];
-   gradient_[1] = (Gradients::Type)settings.value("ActiveGradient",
-                                                   Gradients::Button).toInt();
+   gradient_[1] = Gradients::fromInfo(settings.value("ActiveGradient", 2).toInt());
    if (oldgradient != gradient_[1]) ret = true;
 
    QString oldmultiorder = multiString(multiButton_);
@@ -202,7 +200,8 @@ bool Factory::supports( Ability ability ) const
 	case AbilityButtonClose: ///< decoration supports a close button
 	case AbilityButtonAboveOthers: ///< decoration supports an above button
 	case AbilityButtonBelowOthers: ///< decoration supports a below button
-   
+   case AbilityButtonShade: ///< decoration supports a shade button
+
 	// colors
 	case AbilityColorTitleBack: ///< decoration supports titlebar background color
 	case AbilityColorTitleFore: ///< decoration supports titlebar foreground color
@@ -211,7 +210,6 @@ bool Factory::supports( Ability ability ) const
 		return true;
    case AbilityColorButtonFore: ///< decoration supports button foreground color
    case AbilityColorFrame: ///< decoration supports frame color
-   case AbilityButtonShade: ///< decoration supports a shade button
    case AbilityButtonResize: ///< decoration supports a resize button
    case AbilityColorHandle: ///< decoration supports resize handle color
 	default:

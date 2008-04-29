@@ -18,7 +18,7 @@
 
 #include <Q3ScrollView>
 #include <QAbstractButton>
-#include <QListView>
+#include <QAbstractItemView>
 #include <QAbstractScrollArea>
 #include <QAbstractSlider>
 #include <QAbstractSpinBox>
@@ -411,8 +411,9 @@ void BespinStyle::polish( QWidget * widget ) {
       widget->setAttribute(Qt::WA_Hover);
 
    // Enable hover effects in listview, all itemviews like in kde is pretty annoying
-   if (QListView *listView = qobject_cast<QListView*>(widget) )
-      listView->viewport()->setAttribute(Qt::WA_Hover);
+   if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget) )
+   if (!itemView->inherits("QTreeView")) // treeview hovering sucks, as the "tree" doesn't get an update
+      itemView->viewport()->setAttribute(Qt::WA_Hover);
    //END Hover widgets                                                                         -
 
    // PUSHBUTTONS - hovering/animation
@@ -523,13 +524,18 @@ void BespinStyle::polish( QWidget * widget ) {
    //BEGIN Frames                                                                      -
    if (!widget->isWindow())
    if (QFrame *frame = qobject_cast<QFrame *>(widget)) {
+
+      // sunken looks soo much nicer ;)
+      if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
+         frame->setFrameShadow(QFrame::Sunken);
+      
       // Kill ugly winblows frames... (qShadeBlablabla stuff)
-      if (frame->frameShape() == QFrame::Box || frame->frameShape() == QFrame::Panel ||
+      else if (frame->frameShape() == QFrame::Box || frame->frameShape() == QFrame::Panel ||
                                                 frame->frameShape() == QFrame::WinPanel)
          frame->setFrameShape(QFrame::StyledPanel);
 
       // Kill ugly line look (we paint our styled v and h lines instead ;)
-      if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
+      else if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
          widget->installEventFilter(this);
 
       // scrollarea hovering

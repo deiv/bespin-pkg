@@ -51,6 +51,26 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <item>
+        <property name="text" >
+         <string>None</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Sunken</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Button</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Glassy</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
@@ -68,6 +88,26 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <item>
+        <property name="text" >
+         <string>None</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Sunken</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Button</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Glassy</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

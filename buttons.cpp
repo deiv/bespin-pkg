@@ -23,6 +23,10 @@
 #include "draw.h"
 #include "animator/hover.h"
 
+#include <QtDebug>
+
+#define HOVER_STEP sunken ? 6 : ((isGTK || !widget) ? 6*hover : Animator::Hover::step(widget))
+
 static int animStep = -1;
 static bool isCheckbox = false;
 
@@ -31,16 +35,15 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
                             const QWidget * widget) const
 {
    ASSURE_OPTION(btn, Button);
-   OPT_SUNKEN;
+   OPT_SUNKEN OPT_HOVER;
 
    QRect oldRect = btn->rect;
    QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
    if (btn->features & QStyleOptionButton::Flat) { // more like a toolbtn
       if (option->state & State_Enabled) {
+         animStep = HOVER_STEP;
          if (option->state & State_HasFocus)
-            masks.rect[true].outline(RECT.adjusted(0,0,0,-dpi.f2), painter,
-                                       Colors::mid(FCOLOR(Window), FCOLOR(Highlight)),
-                                       dpi.f3);
+            masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), dpi.f3);
          if (sunken)
             shadows.sunken[true][true].render(RECT, painter);
          else
@@ -48,11 +51,12 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
       }
    }
    else {
-      if (sunken && !config.btn.cushion)
+      if (sunken && !config.btn.cushion) {
          if (config.btn.layer == 1)
             _btn->rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
-      else if (!config.btn.layer)
-         _btn->rect.adjust(0,dpi.f1,0,dpi.f1);
+         else if (!config.btn.layer)
+            _btn->rect.adjust(0,dpi.f1,0,dpi.f1);
+      }
       drawPushButtonBevel(btn, painter, widget);
    }
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
@@ -61,8 +65,6 @@ BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
    drawPushButtonLabel(btn, painter, widget);
    _btn->rect = oldRect;
 }
-
-#define HOVER_STEP sunken ? 6 : ((isGTK || !widget) ? 6*hover : Animator::Hover::step(widget))
 
 void
 BespinStyle::drawPushButtonBevel(const QStyleOption * option,
@@ -303,13 +305,10 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
 
    const bool flat = btn->features & QStyleOptionButton::Flat;
 
-   QColor fg;
+   const QColor fg = btnFg(PAL, isEnabled, hover, animStep, flat);
+
    if (config.btn.backLightHover)
       hover = animStep = 0;
-   if (flat)
-      fg = FCOLOR(WindowText);
-   else
-      fg = btnFg(PAL, isEnabled, hover, animStep);
 
    const QColor &bg = flat ? FCOLOR(Window) :
       (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
@@ -325,7 +324,7 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
          ir.setRight(ir.right() - ir.height()/2 - dpi.f10);
 
    painter->save();
-   if ((flat && hover ) || hasFocus) {
+   if (hasFocus) {
       QFont tmpFnt = painter->font();
       tmpFnt.setBold(true);
       QFontMetrics fm(tmpFnt);

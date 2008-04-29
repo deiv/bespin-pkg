@@ -23,8 +23,10 @@
 #include <QPainter>
 #include <QStylePlugin>
 #include <QMenu>
+#include <QMenuBar>
 #include <QMouseEvent>
 #include <QFrame>
+#include <QToolButton>
 
 /**============= System includes ==========================*/
 #ifdef Q_WS_X11
@@ -47,6 +49,8 @@
 #include "bespin.h"
 
 /**=========================================================*/
+
+#include <QtDebug>
 
 
 /**============= extern C stuff ==========================*/
@@ -266,18 +270,23 @@ BespinStyle::btnBg(const QPalette &pal, bool isEnabled, int hasFocus,
 }
 
 QColor
-BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hover, int step) const {
+BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hover, int step, bool flat) const {
    if (!isEnabled)
       return Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
 
+   QColor fg1 = CCOLOR(btn.std, Fg), fg2 = CCOLOR(btn.active, Fg);
+   if (flat) {
+      fg1 = FCOLOR(WindowText); fg2 = FCOLOR(Highlight);
+   }
+
    if (config.btn.backLightHover)
-      return CCOLOR(btn.std,Fg);
+      return fg1;
    
    if (hover && !step) step = 6;
    if (step)
-      return Colors::mid(CCOLOR(btn.std,Fg), CCOLOR(btn.active, Fg), 6 - step, step);
+      return Colors::mid(fg1, fg2, 6 - step, step);
 
-   return CCOLOR(btn.std, Fg);
+   return fg1;
 }
 
 void
@@ -389,7 +398,6 @@ static void swapPalette(QWidget *widget, BespinStyle *style)
    widget->setPalette(pal);
 }
 
-#include <QMenuBar>
 static QMenuBar *bar4popup(QMenu *menu) {
    if (!menu->menuAction())
       return 0;
@@ -400,8 +408,7 @@ static QMenuBar *bar4popup(QMenu *menu) {
          return static_cast<QMenuBar *>(w);
    return 0;
 }
-#include <QToolButton>
-#include <QtDebug>
+
 bool
 BespinStyle::eventFilter( QObject *object, QEvent *ev )
 {

@@ -50,6 +50,8 @@ client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
                 this, SLOT (clientStateChanged(bool)));
       connect (client, SIGNAL (stickyChanged(bool)),
                 this, SLOT (clientStateChanged(bool)));
+      connect (client, SIGNAL (shadeChanged(bool)),
+                this, SLOT (clientStateChanged(bool)));
       clientStateChanged(false);
    }
    else
@@ -59,17 +61,30 @@ client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
 }
 
 void
-Button::clientStateChanged(bool) {
-   if ((_type == Above && client->keepAbove()) ||
-      (_type == Below && client->keepBelow()))
-      _type = UnAboveBelow;
-   else if (_type == Stick && client->isOnAllDesktops() )
-      _type = Unstick;
-   else if ( _type == Unstick && !client->isOnAllDesktops() )
-      _type = Stick;
-   else if ( _type == UnAboveBelow &&
-      !(client->keepAbove() || client->keepBelow()) )
-      _type = client->factory()->multiButtons().at(multiIdx);
+Button::clientStateChanged(bool state) {
+   if (state) {
+      switch (_type) {
+      case Above:
+      case Below:
+         _type = UnAboveBelow; break;
+      case Stick:
+         _type = Unstick; break;
+      case Shade:
+         _type = Unshade; break;
+      default: return;
+      }
+   }
+   else {
+      switch (_type) {
+      case UnAboveBelow:
+         _type = client->factory()->multiButtons().at(multiIdx); break;
+      case Unstick:
+         _type = Stick; break;
+      case Unshade:
+         _type = Shade; break;
+      default: return;
+      }
+   }
    repaint();
 }
 
@@ -135,6 +150,11 @@ Button::init(int sz, bool leftMenu)
    shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
    shape[Help].addRect(-s3,-s4,s3,sz-(s3+s4));
    shape[Help].addRect(0,s2-s6,s4,s6);
+
+   shape[Shade].addRect(-s2,-s2,sz,s4);
+
+   shape[Unshade].addRect(-s2,-s2,sz,sz);
+   shape[Unshade].addRect(-s4,-s4,sz-s2,sz-s2);
 
 
 //    tip[Close] = i18n("Close");
@@ -246,6 +266,9 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
    case Stick:
    case Unstick:
       if (lb) client->toggleOnAllDesktops(); break;
+   case Shade:
+   case Unshade:
+      client->setShade(!client->isSetShade()); break;
    default:
       return; // invalid type
    }
@@ -321,6 +344,8 @@ Button::wheelEvent(QWheelEvent *e)
       _type = UnAboveBelow;
    else if (_type == Stick && client->isOnAllDesktops())
       _type = Unstick;
+   else if (_type == Shade && client->isSetShade())
+      _type = Unshade;
 
    //TODO: roll max/vert/hori?!
    repaint();

@@ -25,6 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "config.h"
+#include <QtDebug>
 
 class KConfig;
 
@@ -37,6 +38,7 @@ extern "C"
 
 Config::Config(QWidget* parent) : BConfig(parent)
 {
+   qDebug() << parent;
    ui.setupUi(this);
    ui.onlinehelp->setOpenExternalLinks( true ); /** i've an internet link here */
 
@@ -114,3 +116,5 @@ Config::Config(QWidget* parent) : BConfig(parent)
    You're pretty much done here - simple eh? ;) **/
 }
 
+// void Config::load(KConfigGroup) {load();}
+void Config::save(KConfigGroup&) {BConfig::save();}

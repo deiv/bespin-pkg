@@ -113,6 +113,8 @@ void BConfig::handleSettings(QWidget *w, QString entry, QVariant value) {
       connect (w, SIGNAL(currentIndexChanged(int)), this, SLOT(checkDirty()));
    else if (qobject_cast<QAbstractSlider*>(w) || qobject_cast<QSpinBox*>(w))
       connect (w, SIGNAL(valueChanged(int)), this, SLOT(checkDirty()));
+   else if (qobject_cast<QLineEdit*>(w) || qobject_cast<QTextEdit*>(w))
+      connect (w, SIGNAL(textChanged(const QString &)), this, SLOT(checkDirty()));
 }
 
 void BConfig::setDefaultContextInfo(QString info) {

@@ -142,7 +142,7 @@ protected:
 
    QColor btnBg(const QPalette &pal, bool isEnabled, int hasFocus = false,
                 int step = 0, bool fullHover = true, bool reflective = false) const;
-   QColor btnFg(const QPalette &pal, bool isEnabled, int hover, int step = 0) const;
+   QColor btnFg(const QPalette &pal, bool isEnabled, int hover, int step = 0, bool flat = false) const;
 
    // element painting routines ===============
    void skip(const QStyleOption*, QPainter*, const QWidget*) const {}

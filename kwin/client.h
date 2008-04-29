@@ -86,6 +86,7 @@ public slots:
    void activeChange();
 signals:
    void stickyChanged(bool);
+   void shadeChanged(bool);
 private:
 	void repaint(QPainter &p);
    QColor colors[2][4]; // [inactive,active][titlebg,bg,title,fg(bar,blend,font,btn)]

@@ -439,28 +439,34 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
 //    if (cg == QPalette::Normal && !(item->state & QStyle::State_Active))
 //       cg = QPalette::Inactive;
 
-   const bool round =
+   const bool selected = (item->state & QStyle::State_Selected);
+   const bool single = view && view->selectionMode() == QAbstractItemView::SingleSelection;
+   const bool round = !single && // typically list/tree - views
 #if QT_VERSION >= 0x040400
       item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
-      item->viewItemPosition == QStyleOptionViewItemV4::Invalid;
+      (widget && widget->inherits("DolphinIconsView")); // HACK, dolphin should please use the proper position flag...
 #else
-      false;
+      (widget && widget->inherits("DolphinIconsView"));
 #endif
 
-   Gradients::Type gt = hover ? Gradients::Button : Gradients::Sunken;
-   
-   if (hover || (item->state & QStyle::State_Selected)) {
-      if (widget && view && view->selectionMode() == QAbstractItemView::SingleSelection) {
-         const QPixmap &sunk = Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical, gt);
-         painter->drawTiledPixmap(RECT, sunk);
+   if (hover || selected) {
+      Gradients::Type gt = Gradients::None;
+      if (round) {
+         gt = hover ? Gradients::Button : Gradients::Sunken;
       }
-      else if (round)
-			masks.rect[true].render(RECT, painter, gt, Qt::Vertical, FCOLOR(Highlight));
-		else {
-         const QColor high =
-         hover ? Colors::mid(FCOLOR(Base), FCOLOR(Highlight),1,4) :
-         FCOLOR(Highlight);
+      else if (selected && single) {
+         gt =  Gradients::Button;
+      }
+      if (gt == Gradients::None) {
+         const QColor high = selected ? FCOLOR(Highlight) : Colors::mid(FCOLOR(Base), FCOLOR(Highlight),1,4);
          painter->fillRect(RECT, high);
+      }
+      else {
+         const QPixmap &fill = Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical, gt);
+         if (round)
+            masks.rect[true].render(RECT, painter, fill);
+         else
+            painter->drawTiledPixmap(RECT, fill);
       }
    }
 #if QT_VERSION >= 0x040400

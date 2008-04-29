@@ -40,9 +40,9 @@ class Button : public QWidget
 public:
    enum State { Normal, Hovered, Sunken };
    enum Type { Close = 0, Min, Max, Multi,
-   Menu, Help, Above, Below, Stick, Special,
+   Menu, Help, Above, Below, Stick, Shade, Special,
    //    VertMax, HoriMax,
-   Restore, Unstick, UnAboveBelow, NumTypes };
+   Restore, Unstick, UnAboveBelow, Unshade, NumTypes };
    Button(Client *parent, Type type);
    static void init(int sz, bool leftMenu = false);
    bool isEnabled() const;
