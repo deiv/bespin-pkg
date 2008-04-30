@@ -25,6 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // #include <KGlobal>
+#include <QAction>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QHBoxLayout>
@@ -406,10 +407,11 @@ Client::repaint(QPainter &p)
       const QColor bg2 = color(ColorTitleBar, isActive());
       const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical,
                                             (Gradients::Type)gType[isActive()]);
-      p.setPen(QPen(Colors::mid(bg, Qt::white), 2)); p.setBrush(fill);
+      p.setPen(QPen(Colors::mid(bg, Qt::white,3,1), 2)); p.setBrush(fill);
       p.setRenderHint( QPainter::Antialiasing );
       p.drawPath(bar);
-      p.setBrush(Qt::NoBrush);
+      p.setPen(QPen(Colors::mid(bg, Qt::black,4,1))); p.setBrush(Qt::NoBrush);
+      p.drawPath(bar);
    }
 
    // title ==============
@@ -427,6 +429,7 @@ Client::repaint(QPainter &p)
    p.drawText ( label, Qt::AlignCenter | Qt::TextSingleLine, _caption );
 
    // frame ==============
+// static bool KWindowSystem::compositingActive();
    if (borderSize) {
       p.setBrush(Qt::NoBrush);
       const QColor border = Colors::mid(bg, color(ColorButtonBg, true));
@@ -626,6 +629,14 @@ Client::shadeChange()
    emit shadeChanged(isSetShade());
 }
 
+void Client::showDesktopMenu(const QPoint &p)
+{
+   QPoint ip = p;
+   QPoint gp = widget()->mapToGlobal(QPoint(width()-60, 0));
+   if (ip.x() > gp.x()) ip.setX(gp.x());
+   _factory->showDesktopMenu(ip, this);
+}
+
 void
 Client::showWindowMenu(const QRect &r)
 {
@@ -640,6 +651,16 @@ Client::showWindowMenu(const QPoint &p)
    if (ip.x() > gp.x()) ip.setX(gp.x());
    KDecoration::showWindowMenu(ip);
 }
+
+void
+Client::throwOnDesktop() {
+   if (QAction *act = qobject_cast<QAction*>(sender())) {
+      bool ok;
+      int desktop = act->data().toInt(&ok);
+      if (ok) setDesktop(desktop);
+   }
+}
+
 
 void
 Client::toggleOnAllDesktops()

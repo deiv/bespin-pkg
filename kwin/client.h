@@ -72,6 +72,7 @@ public:
    KDecorationDefines::Position mousePosition( const QPoint& p ) const;
    void reset(unsigned long changed);
 	void resize( const QSize& s );
+   void showDesktopMenu(const QPoint &p);
    void showWindowMenu(const QPoint &p);
    void showWindowMenu(const QRect &r);
    void toggleOnAllDesktops();
@@ -84,6 +85,7 @@ public:
    inline Factory *factory() {return _factory;}
 public slots:
    void activeChange();
+   void throwOnDesktop();
 signals:
    void stickyChanged(bool);
    void shadeChanged(bool);

@@ -27,13 +27,18 @@
 #ifndef BESPIN_H
 #define BESPIN_H
 
+
 #include <QVector>
 #include <kdecorationfactory.h>
 #include "../gradients.h"
 #include "button.h"
 
+class QMenu;
+
 namespace Bespin
 {
+
+class Client;
 
 typedef struct {
    bool forceUserColors, trimmCaption, resizeCorner;
@@ -60,6 +65,7 @@ public:
    inline static const Config *config() { return &_config; }
    inline static Gradients::Type gradient(bool active) { return gradient_[active]; }
    inline static const QVector<Button::Type> &multiButtons() { return multiButton_; }
+   void showDesktopMenu(const QPoint &p, Client *client);
 private:
 	bool readConfig();
 private:
@@ -68,6 +74,7 @@ private:
    static Gradients::Type gradient_[2];
    static QVector<Button::Type> multiButton_;
    static Config _config;
+   static QMenu *desktopMenu_;
 };
 
 } //namespace

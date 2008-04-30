@@ -153,8 +153,7 @@ Button::init(int sz, bool leftMenu)
 
    shape[Shade].addRect(-s2,-s2,sz,s4);
 
-   shape[Unshade].addRect(-s2,-s2,sz,sz);
-   shape[Unshade].addRect(-s4,-s4,sz-s2,sz-s2);
+   shape[Unshade].addRect(-s2,s4,sz,s4);
 
 
 //    tip[Close] = i18n("Close");
@@ -221,6 +220,7 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
    KDecorationFactory* f = client->factory(); // needs to be saved before
 	state &= ~Sunken;
    const bool lb = (event->button() == Qt::LeftButton);
+   const bool rb = (event->button() == Qt::RightButton);
    switch (_type) {
    case Close:
       if (lb && client->isCloseable ())
@@ -249,7 +249,7 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
       break;
    case Menu:
       //TODO: prepare menu? -> icon, title, stuff
-      client->showWindowMenu (mapToGlobal(QPoint(0,height())));
+      client->showWindowMenu (mapToGlobal(rect().bottomLeft()));
       break;
    case Help:
       if (lb) client->showContextHelp(); break;
@@ -265,10 +265,11 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
       break;
    case Stick:
    case Unstick:
-      if (lb) client->toggleOnAllDesktops(); break;
+      if (lb) client->toggleOnAllDesktops();
+      else if (rb) client->showDesktopMenu(mapToGlobal(rect().topLeft())); break;
    case Shade:
    case Unshade:
-      client->setShade(!client->isSetShade()); break;
+      if (lb) client->setShade(!client->isSetShade()); break;
    default:
       return; // invalid type
    }

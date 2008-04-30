@@ -25,7 +25,13 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <QFontMetrics>
+#include <QLabel>
+#include <QMenu>
+#include <QPainter>
 #include <QSettings>
+#include <QWidgetAction>
+#include <QStyleOptionHeader>
+#include <kwindowsystem.h>
 // #include "button.h"
 #include "client.h"
 #include "factory.h"
@@ -49,6 +55,7 @@ int Factory::borderSize_ = 4;
 int Factory::titleSize_[2] = {20,20};
 Gradients::Type Factory::gradient_[2] = {Gradients::None, Gradients::Button};
 QVector<Button::Type> Factory::multiButton_(0);
+QMenu *Factory::desktopMenu_ = 0;
 
 Factory::Factory()
 {
@@ -184,7 +191,51 @@ bool Factory::readConfig()
    return ret;
 }
 
-bool Factory::supports( Ability ability ) const
+class Header : public QLabel
+{
+public:
+   Header(const QString & title, QWidget *parent = 0) : QLabel(title, parent)
+   {
+      QFont font; font.setBold(false); setFont(font);
+   }
+protected:
+   void paintEvent(QPaintEvent *pe)
+   {
+      QStyleOptionHeader opt; opt.initFrom(this);
+      opt.textAlignment = Qt::AlignCenter;
+      opt.text = text();
+      QPainter p(this);
+      style()->drawControl(QStyle::CE_Header, &opt, &p, this );
+      p.end();
+   }
+private:
+};
+
+void
+Factory::showDesktopMenu(const QPoint &p, Client *client) {
+
+//    static void KWindowSystem::setCurrentDesktop( int desktop );
+   if (!client) return;
+   if (!desktopMenu_)
+      desktopMenu_ = new QMenu();
+   else
+      desktopMenu_->clear();
+
+   QWidgetAction *headerAct = new QWidgetAction(desktopMenu_);
+   headerAct->setDefaultWidget(new Header("Throw on:"));
+   desktopMenu_->addAction(headerAct);
+
+   QAction *act = 0;
+   for (int i = 1; i <= KWindowSystem::numberOfDesktops(); ++i) {
+      act = desktopMenu_->addAction ( "Desktop #" + QString::number(i), client, SLOT(throwOnDesktop()) );
+      act->setData(i);
+      act->setDisabled(i == KWindowSystem::currentDesktop());
+   }
+   desktopMenu_->popup(p);
+}
+
+bool
+Factory::supports( Ability ability ) const
 {
 	switch( ability ) {
 	// announce
