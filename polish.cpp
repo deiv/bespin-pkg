@@ -23,7 +23,6 @@
 #include <QAbstractSlider>
 #include <QAbstractSpinBox>
 #include <QApplication>
-#include <QComboBox>
 #include <QLayout>
 #include <QMenu>
 #include <QMenuBar>
@@ -43,6 +42,12 @@
 #include "animator/hover.h"
 #include "animator/aprogress.h"
 #include "animator/tab.h"
+
+#include "makros.h"
+#undef CCOLOR
+#undef FCOLOR
+#define CCOLOR(_TYPE_, _FG_) PAL.color(QPalette::Active, config._TYPE_##_role[_FG_])
+#define FCOLOR(_TYPE_) PAL.color(QPalette::Active, QPalette::_TYPE_)
 
 using namespace Bespin;
 
@@ -156,7 +161,7 @@ void BespinStyle::polish ( QApplication * app ) {
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
 
-#include "makros.h"
+
 void BespinStyle::polish( QPalette &pal )
 {
    QColor c = pal.color(QPalette::Active, QPalette::Background);
@@ -312,13 +317,17 @@ void BespinStyle::polish( QWidget * widget ) {
 
 #ifdef Q_WS_X11 // XProperty actually handles the non X11 case, but we avoid overhead ;)
       // X11 properties for the deco
+      // the title region in the center
       uint info = XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode);
       XProperty::set(widget->winId(), XProperty::bgInfo, info);
-      info = XProperty::encode(CCOLOR(kwin.active, Bg),
-                                CCOLOR(kwin.active, Fg), GRAD(kwin)[1]);
+      // the frame and button area for active windows
+      info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]);
       XProperty::set(widget->winId(), XProperty::actInfo, info);
-      const QColor fg = Colors::mid(CCOLOR(kwin.inactive, Bg),
-                                     CCOLOR(kwin.inactive, Fg), 2, 1);
+      const QColor bg_inact = (config.kwin.active_role == config.kwin.inactive_role) ?
+                              Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :
+                              CCOLOR(kwin.inactive, Bg);
+      const QColor fg = Colors::mid(bg_inact, CCOLOR(kwin.inactive, Fg), 2, 1);
+      // the frame and button area for INactive windows
       info = XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]);
       XProperty::set(widget->winId(), XProperty::inactInfo, info);
 #endif
@@ -335,6 +344,7 @@ void BespinStyle::polish( QWidget * widget ) {
                pal.setBrush(QPalette::Background, pal.color(QPalette::Active, QPalette::Background));
                menu->setPalette(pal);
             }
+            menu->setAttribute(Qt::WA_MacBrushedMetal);
             menu->setAttribute(Qt::WA_StyledBackground);
          }
          // apple style popups
@@ -426,7 +436,7 @@ void BespinStyle::polish( QWidget * widget ) {
          Animator::Hover::manage(widget);
    }
    // COMBOBOXES - hovering/animation
-   else if (QComboBox *box = qobject_cast<QComboBox *>(widget)) {
+   else if (widget->inherits("QComboBox")) {
       if (widget->objectName() == "RenderFormElementWidget") // KHtml
          widget->setAttribute(Qt::WA_Hover);
       else
@@ -615,3 +625,5 @@ void BespinStyle::unPolish( QWidget *widget )
 
    widget->removeEventFilter(this);
 }
+#undef CCOLOR
+#undef FCOLOR

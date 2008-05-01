@@ -419,17 +419,15 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
       return false; // just for performance - they can occur really often
    case QEvent::Paint: {
       if (QFrame *frame = qobject_cast<QFrame*>(object)) {
-         if (frame->frameShape() == QFrame::HLine ||
-             frame->frameShape() == QFrame::VLine) {
-            if (frame->isVisible()) {
-               QPainter p(frame);
-               Orientation3D o3D =
-                  (frame->frameShadow() == QFrame::Sunken) ? Sunken:
-                  (frame->frameShadow() == QFrame::Raised) ? Raised : Relief;
-               const bool v = frame->frameShape() == QFrame::VLine;
-               shadows.line[v][o3D].render(frame->rect(), &p);
-               p.end();
-            }
+         if ((frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine) &&
+              frame->isVisible()) {
+            QPainter p(frame);
+            Orientation3D o3D =
+               (frame->frameShadow() == QFrame::Sunken) ? Sunken:
+               (frame->frameShadow() == QFrame::Raised) ? Raised : Relief;
+            const bool v = frame->frameShape() == QFrame::VLine;
+            shadows.line[v][o3D].render(frame->rect(), &p);
+            p.end();
             return true;
          }
          return false;
@@ -516,9 +514,13 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             QColor bg = FCOLOR(Window);
             int gt[2] = { GRAD(kwin)[0], GRAD(kwin)[1] };
             if (config.bg.modal.glassy) {
+               widget->setAttribute(Qt::WA_MacBrushedMetal);
                bgMode = Plain;
                bg = bg.light(115-Colors::value(bg)/20);
-               gt[0] = 0; gt[1] = 3;
+               gt[0] = gt[1] = 0;
+            }
+            else {
+               widget->setAttribute(Qt::WA_MacBrushedMetal, false);
             }
             int info = XProperty::encode(bg, FCOLOR(WindowText), bgMode);
             XProperty::set(widget->winId(), XProperty::bgInfo, info);

@@ -284,7 +284,7 @@ Button::color() const
    QColor c =
    client->color(KDecorationDefines::ColorButtonBg, client->isActive());
    const QColor bg =
-   client->color(KDecorationDefines::ColorTitleBlend, client->isActive());
+   client->color(KDecorationDefines::ColorFrame, client->isActive());
    if (isEnabled())
       c = Colors::mid(bg, c, 6-zoomLevel, 6);
    else

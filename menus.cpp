@@ -154,17 +154,17 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
       int dx = RECT.width()/10,
          dy = (RECT.height()-shadows.line[0][Sunken].thickness())/2;
       painter->save();
-      const QRegion rgn =
-         QRegion(RECT).subtract( painter->
-                                 boundingRect( RECT, Qt::AlignCenter, menuItem->text).
-                                 adjusted(-dpi.f4,0,dpi.f4,0));
+      const QRegion rgn = QRegion(RECT).subtract( painter->
+                                                  boundingRect( RECT, Qt::AlignCenter, menuItem->text).
+                                                  adjusted(-dpi.f4,0,dpi.f4,0));
       painter->setClipRegion(rgn, Qt::IntersectClip);
       shadows.line[0][Sunken].render(RECT.adjusted(dx,dy,-dx,-dy), painter);
       painter->restore();
       if (!menuItem->text.isEmpty()) {
+         QFont fnt = menuItem->font; fnt.setBold(true);
+         painter->setFont(fnt);
+         drawItemText(painter, RECT, Qt::AlignCenter, PAL, isEnabled, menuItem->text, ROLE[Fg]);
          painter->setFont(menuItem->font);
-         drawItemText(painter, RECT, Qt::AlignCenter, PAL, isEnabled,
-                     menuItem->text, ROLE[Fg]);
       }
       return;
    }

@@ -56,9 +56,7 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
 
    // glassy Modal dialog/Popup menu ==========
    const QColor &c = PAL.color(widget->backgroundRole());
-   if (widget->testAttribute(Qt::WA_MacBrushedMetal) ||
-      (widget->isModal() && config.bg.modal.glassy) ||
-      ((widget->windowFlags() & 0x8) && config.menu.glassy)) {
+   if (widget->testAttribute(Qt::WA_MacBrushedMetal)) { // we just kinda abuse this mac only attribute... ;P
       if (widget->size() != glasSize) {
          const QRect &wr = widget->rect();
          glasSize = widget->size();
@@ -92,9 +90,7 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
       XProperty::set(widget->winId(), XProperty::lCorner, picture);
       picture = set.rCorner.x11PictureHandle();
       XProperty::set(widget->winId(), XProperty::rCorner, picture);
-      rect.adjust(-((decoDim >> 24) & 0xff),
-                  -((decoDim >> 16) & 0xff),
-                    (decoDim >> 8) & 0xff, decoDim & 0xff);
+      rect.adjust(-((decoDim >> 24) & 0xff), -((decoDim >> 16) & 0xff), (decoDim >> 8) & 0xff, decoDim & 0xff);
    }
 #endif
 

@@ -63,8 +63,7 @@ BespinStyle::drawToolButton(const QStyleOptionComplex * option,
    if (toolbutton->activeSubControls & SC_ToolButton)
       bflags |= State_Sunken;
 
-   hover = isEnabled && (bflags & (State_Sunken | State_On |
-                                 State_Raised | State_HasFocus));
+   hover = isEnabled && (bflags & (State_Sunken | State_On | State_Raised | State_HasFocus));
 
    QStyleOption tool(0); tool.palette = toolbutton->palette;
 
@@ -165,21 +164,18 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
 
    // Arrow type always overrules and is always shown
    const bool hasArrow = toolbutton->features & QStyleOptionToolButton::Arrow;
-   const bool justText =
-      (!hasArrow && toolbutton->icon.isNull()) &&
-      !toolbutton->text.isEmpty() ||
-      toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
+   const bool justText = (!hasArrow && toolbutton->icon.isNull()) &&
+                         !toolbutton->text.isEmpty() ||
+                         toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
 
    OPT_SUNKEN
       
    if (justText) { // the most simple way
-      painter->setPen(Colors::mid(FCOLOR(WindowText),
-                                  FCOLOR(Highlight), 6-step, step));
+      painter->setPen(Colors::mid(FCOLOR(WindowText), FCOLOR(Highlight), 6-step, step));
       QFont fnt = toolbutton->font;
       if (sunken) fnt.setBold(true);
       painter->setFont(fnt);
-      drawItemText(painter, RECT, Qt::AlignCenter | Qt::TextShowMnemonic, PAL,
-                   isEnabled, toolbutton->text);
+      drawItemText(painter, RECT, Qt::AlignCenter | Qt::TextShowMnemonic, PAL, isEnabled, toolbutton->text);
       return;
    }
 
