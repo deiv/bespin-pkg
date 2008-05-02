@@ -125,9 +125,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    /** Setup the UI and geometry */
    ui.setupUi(this);
    ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
-   connect (ui.sectionSelect, SIGNAL(currentIndexChanged(int)),
+   connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
             ui.sections, SLOT(setCurrentIndex(int)));
-   
+   connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
+            ui.header, SLOT(setText(const QString &)));
    
    /** Prepare the settings store, not of interest */
    QSettings settings("Bespin", "Store");

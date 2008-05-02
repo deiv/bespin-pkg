@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>790</width>
-    <height>506</height>
+    <width>773</width>
+    <height>496</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -24,98 +24,151 @@
   <property name="windowTitle" >
    <string>Bespin Configuration</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_13" >
+  <layout class="QGridLayout" name="gridLayout_20" >
    <item rowspan="3" row="0" column="0" >
-    <widget class="QTextBrowser" name="info" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-       <horstretch>0</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
+    <widget class="QToolBox" name="toolBox" >
+     <property name="currentIndex" >
+      <number>0</number>
      </property>
-     <property name="minimumSize" >
-      <size>
-       <width>210</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="frameShape" >
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow" >
-      <enum>QFrame::Raised</enum>
-     </property>
+     <widget class="QWidget" name="page" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>193</width>
+        <height>424</height>
+       </rect>
+      </property>
+      <attribute name="label" >
+       <string>Categories</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_13" >
+       <item row="0" column="0" >
+        <widget class="QListWidget" name="sectionSelect" >
+         <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <item>
+          <property name="text" >
+           <string>Management</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>General</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Modal Dialogs</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Buttons</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Tabs</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Menus</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Views</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Silder</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Progressbars</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Misc</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>KWin Decoration</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Hacks</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_2" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>228</width>
+        <height>117</height>
+       </rect>
+      </property>
+      <attribute name="label" >
+       <string>Online Help</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_19" >
+       <item row="0" column="0" >
+        <widget class="QTextBrowser" name="info" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize" >
+          <size>
+           <width>210</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Sunken</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item row="0" column="1" >
-    <widget class="QComboBox" name="sectionSelect" >
+    <widget class="QLabel" name="header" >
      <property name="font" >
       <font>
-       <pointsize>14</pointsize>
+       <pointsize>16</pointsize>
        <weight>75</weight>
        <bold>true</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
       </font>
      </property>
-     <item>
-      <property name="text" >
-       <string>Management</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>General</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Modal Dialogs</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Buttons</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Tabs</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Menus</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Itemviews</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Slider</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Progressbars</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Misc</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>KWin Titlebar</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Hacks</string>
-      </property>
-     </item>
+     <property name="text" >
+      <string>Management</string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
    </item>
    <item row="1" column="1" >
@@ -142,7 +195,7 @@
         <x>0</x>
         <y>0</y>
         <width>556</width>
-        <height>441</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2" >
@@ -349,8 +402,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_17" >
@@ -640,8 +693,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -735,8 +788,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -960,8 +1013,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_6" >
@@ -1225,8 +1278,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_18" >
@@ -1452,8 +1505,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_12" >
@@ -1572,8 +1625,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -1671,8 +1724,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_16" >
@@ -1750,8 +1803,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -1802,8 +1855,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_15" >
@@ -1923,8 +1976,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>441</height>
+        <width>599</width>
+        <height>572</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" >
