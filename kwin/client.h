@@ -91,6 +91,7 @@ signals:
    void shadeChanged(bool);
 private:
 	void repaint(QPainter &p);
+   void updateTitleLayout( const QSize& s );
    QColor colors[2][5]; // [inactive,active][titlebg,-,title,fg,bg(bar,blend,font,btn,frame)]
 
 	Button *buttons[4];

@@ -84,6 +84,8 @@ Client::~Client(){
 void
 Client::activeChange()
 {
+   if (gType[0] != gType[1])
+      updateTitleLayout(widget()->size());
    if (bgMode > 1) {
       if (XProperty::get(windowId(), XProperty::topTile, topTile)) {
          XProperty::get(windowId(), XProperty::btmTile, btmTile);
@@ -433,12 +435,12 @@ Client::repaint(QPainter &p)
       p.setRenderHint( QPainter::Antialiasing );
       p.drawPath(bar);
       if (borderSize) {
-         shadow = Colors::mid(bg2, Qt::black,2,1);
          p.setRenderHint( QPainter::Antialiasing, false );
          p.setPen(Qt::NoPen); p.setBrush(bg2);
          p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
          // shadows
          p.setRenderHint( QPainter::Antialiasing );
+         shadow = Colors::mid(bg2, Qt::black,2,1);
          p.setPen(QPen(shadow,3));
          QPolygon poly;
          const int rgt = width()-(borderSize+1), btm = height()-borderSize;
@@ -601,32 +603,44 @@ Client::reset(unsigned long changed)
 }
 
 void
+Client::updateTitleLayout( const QSize& s )
+{
+   int w = width(), d;
+
+   if (bgMode != 1 && (gType[0] || gType[1])) {
+      d = qMax(s.width()/8, buttonSpace+4);
+      int db = d-2*titleSize;
+      int de = d+2*titleSize;
+      bar = QPainterPath(QPoint(0, -1)); //tl corner
+      bar.lineTo(w, -1); // straight to tr corner
+      bar.lineTo(w, titleSize); // straight to br corner
+      bar.lineTo(w-db, titleSize); // straight to br end
+      bar.cubicTo(w-d,titleSize, w-d,2, w-de,2); // curve to tr end
+      bar.lineTo(de, 2); // straight to tl end
+      bar.cubicTo(d,2, d,titleSize, db,titleSize); // curve to bl end
+      bar.lineTo(0, titleSize); // straight to bl corner -> Qt closes to home ;)
+   }
+   else {
+      d = buttonSpace + 8;
+   }
+   label = QRect(d, 0, w-2*d, titleSize);
+}
+
+void
 Client::resize( const QSize& s )
 {
    widget()->resize(s);
+   int w = s.width(), h = s.height();
 
    if (_preview) {
-      _preview->setGeometry(borderSize, titleSize, s.width()-2*borderSize, s.height()-(borderSize+titleSize));
+      _preview->setGeometry(borderSize, titleSize, w-2*borderSize, h-(borderSize+titleSize));
    }
+
+   updateTitleLayout( s );
    
-   top = QRect(0, 0, s.width(), titleSize);
-   int w = width(), h = titleSize;
-   int d = qMax(s.width()/8, buttonSpace);
-
-   bar = QPainterPath(QPoint(0, -1)); //tl corner
-   bar.lineTo(w, -1); // straight to tr corner
-   bar.lineTo(w, h); // straight to br corner
-   bar.lineTo(w-d+2*h, h); // straight to br end
-   bar.cubicTo(w-(d+h),h, w-d,2, w-(d+h),2); // curve to tr end
-   bar.lineTo(d+h, 2); // straight to tl end
-   bar.cubicTo(d,2, d+h,h, d-2*h,h); // curve to bl end
-   bar.lineTo(0, h); // straight to bl corner -> Qt closes to home ;)
-   d += 2*titleSize;
-   label = QRect(d, 0, w-2*d, titleSize);
-
-   h = height();
-   const int t2 = 2*titleSize/3;
+   top = QRect(0, 0, w, titleSize);
    bottom = QRect(0, h-borderSize, w, borderSize);
+   const int t2 = 2*titleSize/3;
    const int sideHeight = h - (t2 + borderSize);
    left = QRect(0, t2, borderSize, sideHeight);
    right = QRect(w-borderSize, t2, borderSize, sideHeight);
@@ -635,7 +649,7 @@ Client::resize( const QSize& s )
       return;
    }
    
-   d = (isShade() || borderSize > 5) ? 8 : 4;
+   int d = (isShade() || borderSize > 5) ? 8 : 4;
    QRegion mask(4, 0, w-8, h);
    mask += QRegion(0, 4, w, h-d);
    mask += QRegion(2, 1, w-4, h-d/4);
