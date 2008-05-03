@@ -66,6 +66,7 @@ public:
 	 */
    void desktopChange() {/*TODO what??*/}
 	inline void iconChange() {} // no icon!
+   void activeChange();
 	void init();
 	void maximizeChange();
 	QSize minimumSize() const;
@@ -77,14 +78,10 @@ public:
    void showWindowMenu(const QRect &r);
    void toggleOnAllDesktops();
    QString trimm(const QString &string);
-	/**
-	 * This function is called whenever the window is shaded or unshaded. Use
-	 * isShade() to get the current state.
-	 */
 	void shadeChange();
    inline Factory *factory() {return _factory;}
 public slots:
-   void activeChange();
+   void updateStylePixmaps();
    void throwOnDesktop();
 signals:
    void stickyChanged(bool);
@@ -92,7 +89,7 @@ signals:
 private:
 	void repaint(QPainter &p);
    void updateTitleLayout( const QSize& s );
-   QColor colors[2][5]; // [inactive,active][titlebg,-,title,fg,bg(bar,blend,font,btn,frame)]
+   QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
 
 	Button *buttons[4];
 	int borderSize, titleSize, buttonSpace, retry;

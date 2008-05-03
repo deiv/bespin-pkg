@@ -82,27 +82,34 @@ Client::~Client(){
 }
 
 void
+Client::updateStylePixmaps()
+{
+   if (XProperty::get(windowId(), XProperty::topTile, topTile)) {
+      XProperty::get(windowId(), XProperty::btmTile, btmTile);
+      XProperty::get(windowId(), XProperty::cnrTile, cnrTile);
+      XProperty::get(windowId(), XProperty::lCorner, lCorner);
+      XProperty::get(windowId(), XProperty::rCorner, rCorner);
+      widget()->update();
+   }
+   else {
+      topTile = btmTile = cnrTile = lCorner = rCorner = 0;
+      if ((!retry || sender()) && retry < 100) {
+         QTimer::singleShot(100, this, SLOT(updateStylePixmaps()));
+         ++retry;
+      }
+   }
+}
+
+void
 Client::activeChange()
 {
    if (gType[0] != gType[1])
       updateTitleLayout(widget()->size());
    if (bgMode > 1) {
-      if (XProperty::get(windowId(), XProperty::topTile, topTile)) {
-         XProperty::get(windowId(), XProperty::btmTile, btmTile);
-         XProperty::get(windowId(), XProperty::cnrTile, cnrTile);
-         XProperty::get(windowId(), XProperty::lCorner, lCorner);
-         XProperty::get(windowId(), XProperty::rCorner, rCorner);
-      }
-      else {
-         topTile = btmTile = cnrTile = lCorner = rCorner = 0;
-         if ((!retry || sender()) && retry < 10) {
-            QTimer::singleShot(200, this, SLOT(activeChange()));
-            ++retry;
-         }
-      }
+      updateStylePixmaps();
    }
    if (corner) {
-      corner->setColor(color(ColorTitleBlend, isActive()));
+      corner->setColor(color(ColorTitleBar, isActive()));
       corner->update();
    }
    widget()->update();
@@ -173,7 +180,7 @@ Client::captionChange()
 QColor
 Client::color(ColorType type, bool active) const
 {
-   if (type < ColorHandle)
+   if (type < 4)
       return colors[active][type];
    return options()->color(type, active);
 }
@@ -209,6 +216,7 @@ void
 Client::init()
 {
    createMainWidget();
+ 
    _caption = trimm(caption());
    widget()->setAutoFillBackground(false);
    widget()->setAttribute(Qt::WA_OpaquePaintEvent);
@@ -296,7 +304,7 @@ Client::repaint(QPainter &p)
 {
    if (!Factory::initialized()) return;
 
-   const QColor bg = color(ColorTitleBar, isActive());
+   QColor bg = color(ColorTitleBar, isActive());
 
    if (isShade()) { // only one "big" gradient, as we can't rely on windowId()!!
       const QPixmap &fill =
@@ -314,6 +322,8 @@ Client::repaint(QPainter &p)
       if (!topTile) {
          // hmm? paint fallback
          p.drawRect(left); p.drawRect(right); p.drawRect(top); p.drawRect(bottom);
+         // and wait for pixmaps
+         updateStylePixmaps();
          break;
       }
       
@@ -390,23 +400,22 @@ Client::repaint(QPainter &p)
    }
    default:
    case 1: { // scanlines, fallback
+      p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
+      const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, Gradients::Button);
+      const QColor shadow = Colors::mid(bg, Qt::black,6,1);
+      p.drawTiledPixmap(top, fill);
       Gradients::Type titleGradient = (Gradients::Type)gType[isActive()];
-      p.drawRect(left); p.drawRect(right);
-      p.drawRect(bottom);
-      if (titleGradient == Gradients::Sunken)
-         p.fillRect(top, bg);
-      else if (titleGradient) {
+      if (titleGradient && label.width()) {
+         p.setRenderHint( QPainter::Antialiasing );
+         bg = color(ColorTitleBlend, isActive());
          const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, titleGradient);
-         p.drawTiledPixmap(top, fill);
-      }
-      else {
-         const QColor bg = color(ColorFrame, isActive());
-         const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, Gradients::Button);
-         p.drawTiledPixmap(top, fill);
          const QColor shadow = Colors::mid(bg, Qt::black,6,1);
-         p.setPen(QPen(shadow, 2));
-         p.drawLine(0,titleSize-1,width(),titleSize-1);
+         p.setPen(QPen(shadow, 2)); p.setBrush(fill);
+         p.drawRoundRect(label.adjusted(0,4,0,-4),titleSize*99/label.width(),99);
+         p.setRenderHint( QPainter::Antialiasing, false );
       }
+      p.setPen(QPen(shadow, 2));
+      p.drawLine(0,titleSize-1,width(),titleSize-1);
       break;
    }
    }
@@ -427,8 +436,9 @@ Client::repaint(QPainter &p)
    p.drawText ( label, Qt::AlignCenter | Qt::TextSingleLine, _caption );
 
    // bar =========================
+   if (bgMode != 1) {
+   const QColor bg2 = color(ColorTitleBlend, isActive());
    if (gType[isActive()]) {
-      const QColor bg2 = color(ColorFrame, isActive());
       QColor shadow = Colors::mid(bg2, Qt::black,4,1);
       const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, (Gradients::Type)gType[isActive()]);
       p.setPen(shadow); p.setBrush(fill);
@@ -447,38 +457,38 @@ Client::repaint(QPainter &p)
          poly.putPoints(0,4, borderSize+1,titleSize+2, borderSize,btm, rgt,btm, rgt,titleSize+2);
          p.drawPolyline(poly);
       }
-//       p.drawPath(bar);
-//       p.setPen(QPen(Colors::mid(bg, Qt::black,4,1))); p.setBrush(Qt::NoBrush);
-//       p.drawPath(bar);
       p.setBrush(Qt::NoBrush);
    }
-
-
-   // frame ==============
-// static bool KWindowSystem::compositingActive();
-   else if (borderSize) {
+   else if (borderSize) { // static bool KWindowSystem::compositingActive();
       p.setBrush(Qt::NoBrush);
-      const QColor border = Colors::mid(bg, color(ColorButtonBg, true),2,1);
-      p.setPen(border);
-      p.drawLine(32+4, 0, width()-(32+5), 0);
-      p.drawLine(32+4, height()-1, width()-(32+5), height()-1);
-      p.drawLine(0, 32+4, 0, height()-(32+5));
-      p.drawLine(width()-1, 32+4, width()-1, height()-(32+5));
-      const QPixmap &top = Gradients::borderline(border, Gradients::Top);
-      p.drawPixmap(0,4,top); p.drawPixmap(width()-1,4,top);
-      const QPixmap &btm = Gradients::borderline(border, Gradients::Bottom);
-      p.drawPixmap(0,height()-(32+5),btm); p.drawPixmap(width()-1,height()-(32+5),btm);
-      const QPixmap &left = Gradients::borderline(border, Gradients::Left);
-      p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
-      const QPixmap &right = Gradients::borderline(border, Gradients::Right);
-      p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
+      if (bg2 != bg) { // outline?
+         p.setRenderHint( QPainter::Antialiasing );
+         p.setPen(QPen(bg2,3)); p.drawRect(1,1,width()-2,height()-2);
+      }
+      else { // frame ==============
+         const QColor border = Colors::mid(bg, color(ColorButtonBg, true),2,1);
+         p.setPen(border);
+         p.drawLine(32+4, 0, width()-(32+5), 0);
+         p.drawLine(32+4, height()-1, width()-(32+5), height()-1);
+         p.drawLine(0, 32+4, 0, height()-(32+5));
+         p.drawLine(width()-1, 32+4, width()-1, height()-(32+5));
+         const QPixmap &top = Gradients::borderline(border, Gradients::Top);
+         p.drawPixmap(0,4,top); p.drawPixmap(width()-1,4,top);
+         const QPixmap &btm = Gradients::borderline(border, Gradients::Bottom);
+         p.drawPixmap(0,height()-(32+5),btm); p.drawPixmap(width()-1,height()-(32+5),btm);
+         const QPixmap &left = Gradients::borderline(border, Gradients::Left);
+         p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
+         const QPixmap &right = Gradients::borderline(border, Gradients::Right);
+         p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
+      }
+   }
    }
 
    // RESIZE indicator ======================================
-   if (!borderSize && isResizable()) return; // ...
+   if (isShade() || !(borderSize && isResizable())) return; // ...
 
    p.setRenderHint( QPainter::Antialiasing );
-   const QColor handleColor = Colors::mid(color(ColorFrame, isActive()), color(ColorButtonBg, isActive()));
+   const QColor handleColor = Colors::mid(color(ColorTitleBlend, isActive()), color(ColorButtonBg, isActive()));
    QPen pen(handleColor, 2, Qt::CustomDashLine, Qt::FlatCap);
    QVector<qreal> dashes; dashes << 1 << 1;
    pen.setDashPattern(dashes);
@@ -550,7 +560,7 @@ Client::reset(unsigned long changed)
    if (changed & SettingColors) {
       // colors =====================
       for (int a = 0; a < 2; ++a)
-         for (int t = 0; t < ColorHandle; ++t)
+         for (int t = 0; t < 4; ++t)
             colors[a][t] = options()->color((ColorType)t, a);
 
       bool def = (bgMode == 1);
@@ -563,37 +573,37 @@ Client::reset(unsigned long changed)
          colors[0][ColorFont] = Colors::mid(colors[1][ColorTitleBar], colors[1][ColorFont],2,1);
       }
       if (XProperty::get(windowId(), XProperty::inactInfo, info)) {
-         XProperty::decode(info, colors[0][ColorFrame], colors[0][ColorButtonBg], gType[0]);
+         XProperty::decode(info, colors[0][ColorTitleBlend], colors[0][ColorButtonBg], gType[0]);
          gType[0] = Gradients::fromInfo(gType[0]);
       }
       if (XProperty::get(windowId(), XProperty::actInfo, info)) {
-         XProperty::decode(info, colors[1][ColorFrame], colors[1][ColorButtonBg], gType[1]);
+         XProperty::decode(info, colors[1][ColorTitleBlend], colors[1][ColorButtonBg], gType[1]);
          gType[1] = Gradients::fromInfo(gType[1]);
       }
       }
-      if (def) { // the fallback solution, buttoncolor MUST be = titlefont
+      if (def) { // the fallback solution
          for (int i = 0; i <  2; ++i) {
-            if (!gType[i]) {
-               colors[i][ColorFrame] = colors[i][ColorTitleBar];
+            if (!gType[i]) { //buttoncolor MUST be = titlefont
+               colors[i][ColorTitleBlend] = colors[i][ColorTitleBar];
                colors[i][ColorButtonBg] = colors[i][ColorFont];
             }
-            else { // swap to allow the user use titlebar/titlefont colors
-               QColor h = colors[i][ColorFrame];
-               colors[i][ColorFrame] = colors[i][ColorTitleBar];
+            // usually the window is titlebar colored and the titleblend gradient painted upon - in case
+            // but the fallback shall be fully titleblend with a titlebar color section behind the title
+            // to not have to ahndle this during the painting, we just swap the colors here
+            else {
+               QColor h = colors[i][ColorTitleBlend];
+               colors[i][ColorTitleBlend] = colors[i][ColorTitleBar];
                colors[i][ColorTitleBar] = h;
-               h = colors[i][ColorButtonBg];
-               colors[i][ColorButtonBg] = colors[i][ColorFont];
-               colors[i][ColorFont] = h;
             }
          }
       }
-      // last, clamp ColorFrame to v >= 80
+      // last, clamp ColorTitleBlend to v >= 80
       int h,s,v;
       for (int i = 0; i <  2; ++i) {
-         v = Colors::value(colors[i][ColorFrame]);
+         v = Colors::value(colors[i][ColorTitleBlend]);
          if (v < 80) {
-            colors[i][ColorFrame].getHsv(&h,&s,&v);
-            colors[i][ColorFrame].setHsv(h,s,80);
+            colors[i][ColorTitleBlend].getHsv(&h,&s,&v);
+            colors[i][ColorTitleBlend].setHsv(h,s,80);
          }
       }
    }
