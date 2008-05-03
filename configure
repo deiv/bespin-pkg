@@ -1,15 +1,18 @@
 #!/bin/sh
 
 good() {
-  echo -e "\e[0;32;40m\n$*\e[m"
+#   echo -e "\e[0;32;40m\n$*\e[m"
+   echo -e "*** $*"
 }
 
 bad() {
-   echo -e "\e[0;31;47m\nWarning: $*\e[m"
+#    echo -e "\e[0;31;47m\nWarning: $*\e[m"
+   echo -e "!!! $*"
 }
 
 ui() {
-   echo -e "\e[0;34;47m\n$*\e[m"
+# echo -e "\e[0;34;47m\n$*\e[m"
+   echo -e "### $*"
 }
 
 ask_for_qt() {
@@ -105,10 +108,6 @@ SOURCES = animator/basic.cpp animator/aprogress.cpp animator/hover.cpp \\
           buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp \\
           scrollareas.cpp shapes.cpp slider.cpp tabbing.cpp toolbars.cpp \\
           views.cpp window.cpp hacks.cpp xproperty.cpp
-unix {
-   HEADERS += oxrender.h
-   SOURCES += oxrender.cpp
-}
 TEMPLATE = lib
 PLUGIN = true
 CONFIG += qt x11 plugin
@@ -123,6 +122,13 @@ if $CONFIG_KDE; then
 echo "
 DATA.files = bespin.themerc
 DATA.path += $KDE_DIR/share/apps/kstyle/themes/
+" >> bespin.pro
+fi
+if $HAVE_RENDER; then
+echo "
+HEADERS += oxrender.h
+SOURCES += oxrender.cpp
+LIBS += -lXrender
 " >> bespin.pro
 fi
 
@@ -192,6 +198,11 @@ DATA.path += $KDE_DIR/share/apps/kwin
 INSTALLS += target DATA
 DEFINES += BESPIN_DECO
 " > kwin/client.pro
+if $HAVE_RENDER; then
+echo "
+LIBS += -lXrender
+" >> kwin/client.pro
+fi
 }
 
 write_kwin_config_pro() {
@@ -214,8 +225,53 @@ write_kwin_client_pro
 write_kwin_config_pro
 }
 
-ui "Welcome to Bespins interactive configurator"
 
+check_xrender() {
+echo "
+TEMPLATE    = app
+SOURCES     = rendertest.cpp
+" > rendertest.pro
+if $GCC64; then
+echo "QMAKE_LFLAGS_SHAPP += -shared
+" >> rendertest.pro
+fi
+
+echo "
+#include <QApplication>
+int main (int , char **) {
+#ifndef Q_WS_X11 // no x11 -> no render...
+#define QT_NO_XRENDER #
+#endif
+
+#ifndef QT_NO_XRENDER // have render
+qWarning(\"### Qt does support XRender\");
+return 0;
+#else
+qWarning(\"### Qt does NOT support XRender\");
+return 1;
+#endif
+}
+" > rendertest.cpp
+
+$QMAKE rendertest.pro -o Makefile.rendertest
+make -f Makefile.rendertest  > /dev/null 2>&1
+
+if ./rendertest; then
+   HAVE_RENDER=true
+else
+   HAVE_RENDER=false
+fi
+
+make distclean -f Makefile.rendertest > /dev/null 2>&1
+rm -f rendertest.pro rendertest.cpp
+}
+
+######### Main Code ###############################################
+echo
+ui "Welcome to Bespins interactive configurator"
+echo "================================================================"
+
+## first off and especially we need to find Qt4 make
 QMAKE="qmake"
 export CONFIG_QT=false
 
@@ -226,6 +282,16 @@ if [ "$QT_DIR" = "" ]; then
    exit 1;
 fi
 export CONFIG_QT=true
+
+## ok, next lets try to figure out whether this is a 64bit arch
+if file /usr/local/qt4/mkspecs/default | grep -E 'symbolic link.*linux-g\+\+64'; then
+   GCC64=true
+else
+   GCC64=false
+fi
+
+## next we need to check whether Qt uses Xrender, what's not mentioned in the mkspecs...
+check_xrender
 
 find_kde || ask_for_kde
 
@@ -247,7 +313,6 @@ if $CONFIG_KDE; then
 fi
 
 if $QT_DIR/bin/qmake qmake.pro; then
-   good "Configuration done, now \"make && make install\""
    if $CONFIG_KDE; then
       cd kwin
       rm -f Makefile
@@ -261,4 +326,9 @@ if $QT_DIR/bin/qmake qmake.pro; then
       sed -i -e "s/libkstyle-bespin/kstyle-bespin/g" Makefile.kstyle-bespin-config
       cd ..
    fi
+   echo "================================================================"
+   good "Configuration done, now \"make && make install\""
+   echo
+else
+   bad "Makefile generation failed!"
 fi

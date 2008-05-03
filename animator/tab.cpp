@@ -202,6 +202,7 @@ class StdChildAdd : public QObject
       }
 };
 
+
 TabInfo::TabInfo(QObject* parent, QWidget *current, int idx) :
 QObject(parent), curtain(0), progress(0.0), currentWidget(current), index(idx) {}
 
