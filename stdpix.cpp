@@ -21,8 +21,6 @@
 #include <QPainter>
 #include <QPen>
 
-#include <cmath>
-
 #include "bespin.h"
 #include "colors.h"
 
@@ -41,7 +39,9 @@ setIconFont(QPainter &painter, const QRect &rect, float f = 0.75)
    fnt.setBold(true); painter.setFont(fnt);
 }
 
-QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyleOption * option, const QWidget * widget ) const
+QPixmap
+BespinStyle::standardPixmap(StandardPixmap standardPixmap,
+                            const QStyleOption * option, const QWidget * widget ) const
 {
    bool sunken = false, isEnabled = false, hover = false;
    if (option) {
@@ -67,65 +67,51 @@ QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyl
       rect = QRect(0,0,14,14);
       pal = qApp->palette();
    }
-   const int sz = rect.width();
-   const int s2 = lround(sz/2.0), s3 = lround(sz/3.0),
-      s4 = lround(sz/4.0), s6 = lround(sz/6.0);
+   
 
    QPixmap pm(rect.size()); pm.fill(Qt::transparent);
    QPainter painter(&pm);
-   
-   bool needShape = true; QVector <QRect> shape;
-   
+   QPainterPath shape;
+   const int sz = rect.width();
+   const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
+
+
    switch (standardPixmap) {
    case SP_DockWidgetCloseButton:
    case SP_TitleBarCloseButton:
-      needShape = false;
-      shape << QRect(0,0,sz,s4) << QRect(0,sz-s4,sz,s4) <<
-         QRect(0,s4,s4,sz-2*s4) << QRect(sz-s4,s4,s4,sz-2*s4) <<
-         QRect(s3, s3, sz-2*s3, sz-2*s3);
+      shape.addRect(0,0,sz,sz); shape.addRect(s4,s4,s2,s2); shape.addRect(s3,s3,s3,s3);
+      goto paint;
    case SP_TitleBarMinButton:
-      if (needShape) {
-         needShape = false;
-         shape << QRect(0,0,s4,sz) << QRect(s4,sz-s4,sz-s4,s4) << QRect(sz-s4,0,s4,s4);
-      }
+      shape.addRect(0,0,sz,sz); shape.addRect(s4,0,sz-s4,sz-s4); shape.addRect(sz-s3,0,s3,s3);
+      goto paint;
    case SP_TitleBarMaxButton:
-      if (needShape) {
-         needShape = false;
-         shape << QRect(0,0,sz,s4) << QRect(sz-s4,s4,s4,sz-s4) << QRect(0,sz-s4,s4,s4);
-      }
+      shape.addRect(0,0,sz,sz); shape.addRect(0,s4,sz-s4,sz-s4); shape.addRect(0,sz-s3,s3,s3);
+      goto paint;
    case SP_TitleBarMenuButton:
-      if (needShape) {
-         needShape = false;
-         shape << QRect(0,0,sz,s4) << QRect(sz-s3,s4,s3,sz-s4);
-      }
+      shape.addRect(0,0,sz,sz); shape.addRect(0,s4,s2,sz-s4);
+      goto paint;
    case SP_TitleBarShadeButton:
-      if (needShape) {
-         needShape = false;
-         shape << QRect(0,0,sz,s6);
-      }
-   case SP_TitleBarNormalButton:
+      shape.addRect(0,0,sz,s4);
+      goto paint;
    case SP_TitleBarUnshadeButton:
-      if (needShape) {
-         needShape = false;
-         shape << QRect(0,0,sz,s6) << QRect(0,sz-s6,sz,s6) <<
-            QRect(0,s6,s6,sz-2*s6) << QRect(sz-s6,s6,s6,sz-2*s6);
-      }
+      shape.addRect(0,s4,sz,s4);
+      goto paint;
+   case SP_TitleBarNormalButton:
+      shape.addRect(0,0,sz,sz); shape.addRect(0,0,sz-s4,sz-s4); shape.addRect(0,0,s3,s3);
+      goto paint;
    case SP_TitleBarContextHelpButton: {
-      if (needShape)
-         shape << QRect(0,0,s2,s4) << QRect(sz-s2-s4,s4,s4,sz-2*s4-s6) <<
-            QRect(sz-s2-s4,sz-s4,s4,s4);
-      
+      shape.addRect(s2-s3,0,s3+s4,sz-s3); shape.addRect(s2-s3,s4,s3,sz-(s3+s4)); shape.addRect(s2,sz-s6,s4,s6);
+
+paint:
+
       QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
       if (widget) {
          bg = widget->backgroundRole(); fg = widget->foregroundRole();
       }
-
-      const QColor c =
-         Colors::mid(pal.color(bg), pal.color(fg), (!sunken)*(4-2*hover), 1);
-
+      const QColor c = Colors::mid(pal.color(bg), pal.color(fg), (!sunken)*(4-2*hover), 1);
+      painter.setRenderHint ( QPainter::Antialiasing );
       painter.setPen(Qt::NoPen); painter.setBrush(c);
-      for (int r = 0; r < shape.size(); ++r)
-         painter.drawRect(shape.at(r));
+      painter.drawPath(shape);
       break;
    }
    case SP_MessageBoxInformation: { //  9  The "information" icon
@@ -133,8 +119,7 @@ QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyl
       painter.setRenderHint ( QPainter::Antialiasing );
       painter.setPen(QPen(Qt::white, rect.width()/14));
       const int s = 6*rect.height()/7;
-      painter.setBrush(Gradients::pix(QColor(0,102,255), s, Qt::Vertical,
-                                      Gradients::Gloss));
+      painter.setBrush(Gradients::pix(QColor(0,102,255), s, Qt::Vertical, Gradients::Gloss));
       const int o = (rect.height()-s)/2;
       const QRect r = QRect(o,o,s,s);
       painter.drawEllipse(r);
@@ -146,8 +131,7 @@ QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyl
       setIconFont(painter, rect);
       painter.setRenderHint ( QPainter::Antialiasing );
       painter.setPen(QPen(QColor(227,173,0),rect.width()/14));
-      painter.setBrush(Gradients::pix(QColor(255,235,85), 6*rect.height()/7,
-                                       Qt::Vertical, Gradients::Gloss));
+      painter.setBrush(Gradients::pix(QColor(255,235,85), 6*rect.height()/7, Qt::Vertical, Gradients::Gloss));
       int hm = rect.x()+rect.width()/2;
       const QPoint points[3] = {
          QPoint(hm, rect.top()),
@@ -163,8 +147,7 @@ QPixmap BespinStyle::standardPixmap ( StandardPixmap standardPixmap, const QStyl
       setIconFont(painter, rect);
       painter.setRenderHint ( QPainter::Antialiasing );
       painter.setPen(QPen(QColor(226,8,0), dpi.f1));
-      painter.setBrush(Gradients::pix(QColor(156,15,15), rect.height(),
-                                      Qt::Vertical, Gradients::Gloss));
+      painter.setBrush(Gradients::pix(QColor(156,15,15), rect.height(), Qt::Vertical, Gradients::Gloss));
       painter.drawEllipse(rect);
       painter.setPen(Qt::white);
       painter.drawText(rect, Qt::AlignCenter, "X");

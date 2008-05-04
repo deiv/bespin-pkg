@@ -122,16 +122,15 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
             break;
          }
          case SC_GroupBoxCheckBox: {
-            int cbsz = pixelMetric(PM_IndicatorWidth, groupBox, widget);
-            if (groupBox->direction == Qt::LeftToRight) {
+            if (config.leftHanded) {
                ret = groupBox->rect.adjusted(dpi.f5,dpi.f5,0,0);
-               ret.setWidth(cbsz);
+               ret.setWidth(dpi.ExclusiveIndicator);
             }
             else {
                ret = groupBox->rect.adjusted(0,dpi.f5,-dpi.f5,0);
-               ret.setLeft(ret.right()-cbsz);
+               ret.setLeft(ret.right()-dpi.ExclusiveIndicator);
             }
-            ret.setHeight(cbsz);
+            ret.setHeight(dpi.ExclusiveIndicator);
             break;
          }
          case SC_GroupBoxLabel: {

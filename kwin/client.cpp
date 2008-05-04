@@ -597,6 +597,13 @@ Client::reset(unsigned long changed)
             }
          }
       }
+      else if (bgMode == 1) { // needs titlefont and button bg swapped...
+         for (int i = 0; i <  2; ++i) {
+            QColor h = colors[i][ColorButtonBg];
+            colors[i][ColorButtonBg] = colors[i][ColorFont];
+            colors[i][ColorFont] = h;
+         }
+      }
       // last, clamp ColorTitleBlend to v >= 80
       int h,s,v;
       for (int i = 0; i <  2; ++i) {

@@ -323,11 +323,12 @@ void BespinStyle::polish( QWidget * widget ) {
       // the frame and button area for active windows
       info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]);
       XProperty::set(widget->winId(), XProperty::actInfo, info);
-      const QColor bg_inact = (config.kwin.active_role == config.kwin.inactive_role) ?
+      // the frame and button area for INactive windows
+      const QColor bg_inact = (GRAD(kwin)[0] != Gradients::None &&
+                               config.kwin.active_role == config.kwin.inactive_role) ?
                               Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :
                               CCOLOR(kwin.inactive, Bg);
       const QColor fg = Colors::mid(bg_inact, CCOLOR(kwin.inactive, Fg), 2, 1);
-      // the frame and button area for INactive windows
       info = XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]);
       XProperty::set(widget->winId(), XProperty::inactInfo, info);
 #endif
@@ -410,12 +411,12 @@ void BespinStyle::polish( QWidget * widget ) {
        || qobject_cast<QProgressBar*>(widget)
        || qobject_cast<QAbstractSlider*>(widget)
        || widget->inherits("QWorkspaceTitleBar")
-       || widget->inherits("QDockWidget")
-       || widget->inherits("QToolBar")
+//        || widget->inherits("QDockWidget")
+//        || widget->inherits("QToolBar")
        || widget->inherits("QToolBarHandle")
-       || widget->inherits("QDockSeparator")
+//        || widget->inherits("QDockSeparator")
        || widget->inherits("QToolBoxButton")
-       || widget->inherits("QDockWidgetSeparator")
+//        || widget->inherits("QDockWidgetSeparator")
        || widget->inherits("Q3DockWindowResizeHandle")
       )
       widget->setAttribute(Qt::WA_Hover);

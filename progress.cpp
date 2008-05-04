@@ -42,6 +42,17 @@ BespinStyle::drawProgressBar(const QStyleOption * option, QPainter * painter,
    step = -1;
 }
 
+static inline void
+drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
+{
+   s -= 2;
+   p->setPen(QPen(QColor(0,0,0,70),2));
+   p->drawEllipse(x+1,y+2,s,s);
+   p->setBrush(Qt::NoBrush);
+   p->setPen(QPen(QColor(255,255,255,outline ? 40 : 20),1));
+   p->drawEllipse(x,y+1,s+2,s);
+}
+
 void
 BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
                                const QWidget * widget, bool content) const
@@ -99,8 +110,7 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
 
    int nn = (val < 0) ? 0 : int(n*val);
    if (content)
-      p.setBrush(Gradients::pix(CCOLOR(progress.std, Fg), ss, Qt::Vertical,
-                                GRAD(progress) ));
+      p.setBrush(Gradients::pix(CCOLOR(progress.std, Fg), ss, Qt::Vertical, GRAD(progress) ));
    else {
       if (busy)
          nn = n;
@@ -110,32 +120,24 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
       const QColor c = CCOLOR(progress.std, Bg);
       p.setBrush(Gradients::pix(c, ss, Qt::Vertical, GRAD(progress) ));
    }
-   p.setPen(Qt::NoPen);
    p.setBrushOrigin(0,1);
-   p.drawEllipse(1,1,ss,ss-1);
-   p.setBrush(Qt::NoBrush);
-   p.setPen(QColor(255,255,255,40));
-   p.drawEllipse(1,1,ss,ss);
-   p.setPen(QColor(0,0,0,70));
-   p.drawEllipse(2,2,ss-2,ss-2);
+   drawShape(&p, ss);
    p.end();
 
    if (vertical) {
       for (int i = 0; i < nn; ++i) { // x is in fact y!
-         painter->drawPixmap(y,x, renderPix);
-         x+=s;
+         painter->drawPixmap(y,x, renderPix); x+=s;
       }
    }
    else {
       for (int i = 0; i < nn; ++i) {
-         painter->drawPixmap(x,y, renderPix);
-         x+=s;
+         painter->drawPixmap(x,y, renderPix); x+=s;
       }
    }
    
    if (content) { // maybe a semicolored item
       bool b = (nn < n);
-      x+=2; y+=2; ss-=2;
+//       x+=2; y+=2; ss-=2;
       if (busy) { // busy
          b = true;
          val = -val; nn = int(n*val); x += nn*s;
@@ -151,21 +153,18 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
             painter->save();
             painter->setRenderHint(QPainter::Antialiasing);
 
-            const QColor c = Colors::mid(CCOLOR(progress.std, Bg),
-                                    CCOLOR(progress.std, Fg), 10-q, q);
-            painter->setBrush(Gradients::pix(c, ss, Qt::Vertical,
-                              GRAD(progress) ));
-            painter->setPen(Qt::NoPen);
+            const QColor c = Colors::mid(CCOLOR(progress.std, Bg), CCOLOR(progress.std, Fg), 10-q, q);
+            painter->setBrush(Gradients::pix(c, ss, Qt::Vertical, GRAD(progress) ));
 
             if (vertical) {
                painter->setBrushOrigin(0, x);
-               painter->drawEllipse(y,x,ss,ss-1);
+               drawShape(painter, ss, y, x, false);
             }
             else {
                painter->setBrushOrigin(0, y);
-               painter->drawEllipse(x,y,ss,ss-1);
+               drawShape(painter, ss, x, y, false);
             }
-         painter->restore();
+            painter->restore();
          }
       }
    }

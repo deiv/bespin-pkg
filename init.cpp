@@ -192,20 +192,12 @@ BespinStyle::readSettings(const QSettings* settings)
    config.kwin.gradient[0] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[0]);
    config.kwin.gradient[1] = readGrad(KWIN_ACTIVE_GRADIENT);
    config.kwin.gradient[1] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[1]);
-   if (config.kwin.gradient[0]) {
-      readRole(kwin.inactive, KWIN_INACTIVE_ROLE);
-   }
-   else {
-      config.kwin.inactive_role[Bg] = QPalette::Window;
+   readRole(kwin.inactive, KWIN_INACTIVE_ROLE);
+   if (!config.kwin.gradient[0])
       config.kwin.inactive_role[Fg] = QPalette::WindowText;
-   }
-   if (config.kwin.gradient[1]) {
-      readRole(kwin.active, KWIN_ACTIVE_ROLE);
-   }
-   else {
-      config.kwin.active_role[Bg] = QPalette::Window;
+   readRole(kwin.active, KWIN_ACTIVE_ROLE);
+   if (!config.kwin.gradient[1])
       config.kwin.active_role[Fg] = QPalette::WindowText;
-   }
 
    // flanders
    config.leftHanded =

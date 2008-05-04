@@ -246,12 +246,25 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
    currentWidget = cw;
    index = newIdx;
 
-
-   #define AVOID(_COND_) if (_COND_) { rewind(); return; } //
+   #define _RESET_SIZE_
+   #define AVOID(_COND_) if (_COND_) { _RESET_SIZE_ rewind(); return; } //
    #define TOO_SLOW clock.elapsed() > (int)(_duration - _timeStep)
    
    AVOID(!ow); // this is the first time the tab changes, nothing to blend
    AVOID(ow == cw); // this can happen on destruction etc... and thus lead to segfaults...
+
+// this works around a possible bug in some handcrafted scrollareas?
+// not sure, but as soon as i call window->render(.) on them, the window resizes
+// worse: this behaviour seems to be arbitrary (happens e.g. with kate/gwenview, but not everytime...)
+// for the moment we just fix the window size during the grab and release it afterards, works, but:
+// TODO: remove this once widget->render(.) does no more trigger resizes!
+#undef _RESET_SIZE_
+#define _RESET_SIZE_ window->setMinimumSize(minSz); window->setMaximumSize(maxSz);
+   // fix the window size
+   QWidget *window = sw->window();
+   QSize minSz = window->minimumSize(), maxSz = window->maximumSize();
+   window->setFixedSize(window->size());
+//-----------------------------------------------------------------
 
    // prepare the pixmaps we use to pretend the animation
    QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
@@ -291,6 +304,8 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
    }
    else
       curtain->raise();
+
+   _RESET_SIZE_
 
 }
 

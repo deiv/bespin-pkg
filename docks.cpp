@@ -23,15 +23,14 @@ void
 BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter,
                            const QWidget *) const
 {
+
    ASSURE_OPTION(dwOpt, DockWidget);
    OPT_ENABLED
 
    QRect textRect;
    int x3 = RECT.right()-7;
-   if (dwOpt->floatable)
-      x3 -= 18;
-   if (dwOpt->closable)
-      x3 -= 18;
+   if (dwOpt->floatable) x3 -= 18;
+   if (dwOpt->closable) x3 -= 18;
    int x2 = x3;
    if (!dwOpt->title.isEmpty()) {
       int itemtextopts = Qt::AlignCenter | Qt::TextShowMnemonic;
@@ -86,14 +85,12 @@ BespinStyle::drawDockHandle(const QStyleOption * option, QPainter * painter,
    const QColor &bg = FCOLOR(Window);
    const QColor &fg = hover ? FCOLOR(Highlight) : FCOLOR(WindowText);
    if (num%2) {
-      fill = &Gradients::pix(Colors::mid(bg, fg, 3, imp), f6,
-                             Qt::Vertical, Gradients::Sunken);
+      fill = &Gradients::pix(Colors::mid(bg, fg, 3, imp), f6, Qt::Vertical, Gradients::Sunken);
       fillWithMask(painter, points[cnt], *fill, masks.notch);
    }
    --num;
    for (int i = 0; i < cnt; ++i) {
-      fill = &Gradients::pix(Colors::mid(bg, fg, 3+cnt-i, imp), f6,
-                             Qt::Vertical, Gradients::Sunken);
+      fill = &Gradients::pix(Colors::mid(bg, fg, 3+cnt-i, imp), f6, Qt::Vertical, Gradients::Sunken);
       fillWithMask(painter, points[i], *fill, masks.notch);
       fillWithMask(painter, points[num-i], *fill, masks.notch);
    }

@@ -22,6 +22,8 @@
 #include "visualframe.h"
 #include "draw.h"
 
+#include "debug.h"
+
 bool
 BespinStyle::isSpecialFrame(const QWidget *w)
 {
@@ -195,7 +197,9 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
       QStyleOptionButton box;
       box.QStyleOption::operator=(*groupBox);
       box.rect = subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
-      drawCheckBox(&box, painter, widget);
+      if (groupBox->activeSubControls & SC_GroupBoxCheckBox)
+         box.state |= State_MouseOver;
+      drawRadio(&box, painter, 0L);
    }
 }
 
