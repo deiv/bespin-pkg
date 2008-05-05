@@ -324,6 +324,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                   Overwrites the painting routines of QMessageBoxes for a custom appereance.<br>\
                   Also removes the Window decoration but allows you to drag around the window by\
                   clicking anywhere.");
+
+   handleSettings(ui.hackKrunner, HACK_KRUNNER);
+   setContextHelp(ui.btnRole, "<b>KRunner</b><hr>\
+   You'll get a window colored glass look and flat buttons.<br>");
+   
    handleSettings(ui.hackKHtml, HACK_KHTMLVIEW);
    setContextHelp(ui.hackKHtml, "<b>Konqueror HTML window</b><hr>\
                   By default, Konquerors HTML view has no frame around, but you may force a sunken\
@@ -560,15 +565,31 @@ bool Config::load(const QString &preset) {
    // fallback to the default palette... ===================================
    QPalette pal;
 	store.beginGroup("QPalette");
-   updatePalette(pal, QPalette::Active,
-                 store.value("active").toStringList());
-   updatePalette(pal, QPalette::Inactive,
-                 store.value("inactive").toStringList());
-   updatePalette(pal, QPalette::Disabled,
-                 store.value("disabled").toStringList());
+   updatePalette(pal, QPalette::Active, store.value("active").toStringList());
+   updatePalette(pal, QPalette::Inactive, store.value("inactive").toStringList());
+   updatePalette(pal, QPalette::Disabled, store.value("disabled").toStringList());
 	store.endGroup(); store.endGroup();
 	savePalette(pal);
    return true;
+}
+
+static bool ignore(QString &key)
+{
+   return
+   // don't im/export hacks
+   key.startsWith("Hack.") ||
+   // or dimmed inactive wins
+   key == "FadeInactive" ||
+   // or tab trans settings
+   key == "Tab.Duration" || key == "Tab.Transition" ||
+   // or macfeeling
+   key == "MacStyle" ||
+   // or flanders mode
+   key == "LeftHanded" ||
+   // or the scrollbar look
+   key == "Scroll.ShowButtons" ||
+   // finally don't im/export storename, are forcewise written
+   key == "StoreName";
 }
 
 QString Config::sImport(const QString &filename) {
@@ -595,10 +616,7 @@ QString Config::sImport(const QString &filename) {
    
    store.beginGroup(storeName);
    foreach (QString key, file.allKeys()) {
-      if (key == "StoreName")
-         continue;
-      else
-         store.setValue(key, file.value(key));
+      if (!ignore(key)) store.setValue(key, file.value(key));
    }
    
    store.endGroup();
@@ -618,11 +636,9 @@ Config::sExport(const QString &preset, const QString &filename)
    file.beginGroup("BespinStyle");
 
    file.setValue("StoreName", preset);
-   foreach (QString key, store.allKeys())
-      if (key != "MacStyle" && key != "LeftHanded" &&
-          key != "Tab.Duration" && key != "Tab.Transition" &&
-          key != "Scroll.ShowButtons")
-         file.setValue(key, store.value(key));
+   foreach (QString key, store.allKeys()) {
+      if (!ignore(key)) file.setValue(key, store.value(key));
+   }
    store.endGroup();
    file.endGroup();
    return true;
