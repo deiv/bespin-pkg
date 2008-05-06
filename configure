@@ -297,10 +297,10 @@ find_kde || ask_for_kde
 
 if [ "$KDE_DIR" = "" ]; then
    export CONFIG_KDE=false
-   bad "KDE 4 not found - compiling without KWin deco and style config plugin"
 else
    export CONFIG_KDE=true
    export KDE_DIR
+   CONFIG_KWIN=$([ -e "$KDE_DIR/include/kdecoration.h" ])
 fi
 
 write_general_pro
@@ -309,24 +309,35 @@ write_config_pro
 write_config_qt_pro
 if $CONFIG_KDE; then
    write_config_kde_pro
-   write_kwin_pro
+   if $CONFIG_KWIN; then
+      good "Kwin can be built"
+      write_kwin_pro
+   else
+      bad "KDE 4 was found, but you lack the KWin headers\nconsider installing kdebase and kdebase-dev if you want the window decoration"
+   fi
+else
+   bad "KDE 4 not found - compiling without KWin deco and style config plugin"
 fi
 
 if $QT_DIR/bin/qmake qmake.pro; then
    if $CONFIG_KDE; then
-      cd kwin
-      rm -f Makefile
-      $QMAKE client.pro -o Makefile.client
-      $QMAKE config.pro -o Makefile.config
-      sed -i -e "s/libkwin3_/kwin3_/g" Makefile.client
-      sed -i -e "s/libkwin_/kwin_/g" Makefile.config
-      cd ../config
+      if $CONFIG_KWIN; then
+         cd kwin
+         rm -f Makefile
+         $QMAKE client.pro -o Makefile.client
+         $QMAKE config.pro -o Makefile.config
+         sed -i -e "s/libkwin3_/kwin3_/g" Makefile.client
+         sed -i -e "s/libkwin_/kwin_/g" Makefile.config
+         cd ..
+      fi
+      cd config
       rm -f Makefile.kstyle-bespin-config
       $QMAKE kstyle-bespin-config.pro -o Makefile.kstyle-bespin-config
       sed -i -e "s/libkstyle-bespin/kstyle-bespin/g" Makefile.kstyle-bespin-config
       cd ..
    fi
    echo "================================================================"
+   #    read -p "Configuration done...[Y/n] " COMPILE
    good "Configuration done, now \"make && make install\""
    echo
 else
