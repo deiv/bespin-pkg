@@ -51,7 +51,7 @@ class TabInfo : public QObject {
       QPixmap tabPix[3];
    private:
       void rewind();
-      void updatePixmaps(Transition transition);
+      void updatePixmaps(Transition transition, uint ms = 0);
 };
 
 class Tab : public Basic {

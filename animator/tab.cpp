@@ -213,13 +213,14 @@ TabInfo::proceed()
       return false;
    
    // check if our desired duration has exceeded and stop this in case
-   if (clock.elapsed() >= (int)duration) {
+   uint ms = clock.elapsed();
+   if (ms > duration - _timeStep) {
       rewind();
       return false;
    }
    
    // normal action
-   updatePixmaps(_transition);
+   updatePixmaps(_transition, ms);
    curtain->repaint();
    return true;  // for counter
 }
@@ -282,9 +283,9 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
    grabWidget(cw, &tabPix[1]);
    AVOID(TOO_SLOW);
 
-   duration = _duration - clock.elapsed();
-   clock.restart();
-   updatePixmaps(_transition);
+   duration = _duration - clock.elapsed() + _timeStep;
+   clock.restart(); clock.addMSecs(_timeStep);
+   updatePixmaps(_transition, _timeStep);
 
    // make curtain and first update ----------------
    if (!curtain) {
@@ -309,16 +310,14 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 }
 
 void
-TabInfo::updatePixmaps(Transition transition)
+TabInfo::updatePixmaps(Transition transition, uint ms)
 {
-   uint ms = clock.elapsed();
    switch (transition) {
       #ifndef QT_NO_XRENDER
       default:
-      case CrossFade: { //  TODO accelerate animation?!?
-         float quote = (float)_timeStep / (duration+_timeStep-ms);
+      case CrossFade: {
+         float quote = (float)_timeStep / (duration-ms);
          progress += quote;
-//          qDebug() << _duration << duration << duration+_timeStep-ms << quote << progress;
          OXRender::blend(tabPix[1], tabPix[2], quote);
          break;
       }
