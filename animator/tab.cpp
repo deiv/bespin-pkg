@@ -213,7 +213,7 @@ TabInfo::proceed()
       return false;
    
    // check if our desired duration has exceeded and stop this in case
-   if (clock.elapsed() >= (int)_duration) {
+   if (clock.elapsed() >= (int)duration) {
       rewind();
       return false;
    }
@@ -281,7 +281,9 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
    
    grabWidget(cw, &tabPix[1]);
    AVOID(TOO_SLOW);
-   
+
+   duration = _duration - clock.elapsed();
+   clock.restart();
    updatePixmaps(_transition);
 
    // make curtain and first update ----------------
@@ -314,9 +316,9 @@ TabInfo::updatePixmaps(Transition transition)
       #ifndef QT_NO_XRENDER
       default:
       case CrossFade: { //  TODO accelerate animation?!?
-         float quote = (float)_timeStep / (_duration+_timeStep-ms);
-//          progress += quote;
-//          qDebug() << quote << progress;
+         float quote = (float)_timeStep / (duration+_timeStep-ms);
+         progress += quote;
+//          qDebug() << _duration << duration << duration+_timeStep-ms << quote << progress;
          OXRender::blend(tabPix[1], tabPix[2], quote);
          break;
       }
@@ -325,8 +327,8 @@ TabInfo::updatePixmaps(Transition transition)
       #endif
       case ScanlineBlend: {
          QPainter p(&tabPix[2]);
-         const int numStep = _duration/_timeStep;
-         const int h = lround(_timeStep * (numStep-progress) / (_duration-ms));
+         const int numStep = duration/_timeStep;
+         const int h = lround(_timeStep * (numStep-progress) / (duration-ms));
          for (int i = (int)progress; i < tabPix[2].height(); i+=numStep)
             p.drawPixmap(0, i, tabPix[1], 0, i, tabPix[1].width(), h);
          progress += h;
@@ -335,7 +337,7 @@ TabInfo::updatePixmaps(Transition transition)
       case SlideIn: {
          //TODO handle different bar positions (currently assumes top)
          QPainter p(&tabPix[2]);
-         const int h = ms*tabPix[1].height()/_duration;
+         const int h = ms*tabPix[1].height()/duration;
          p.drawPixmap(0, 0, tabPix[1], 0, tabPix[1].height() - h, tabPix[1].width(), h);
          break;
       }
@@ -343,20 +345,20 @@ TabInfo::updatePixmaps(Transition transition)
          tabPix[2] = tabPix[1];
          //TODO handle different bar positions (currently assumes top)
          QPainter p(&tabPix[2]);
-         int off = ms*tabPix[0].height()/_duration;
+         int off = ms*tabPix[0].height()/duration;
          p.drawPixmap(0, 0, tabPix[0], 0, off, tabPix[0].width(), tabPix[0].height() - off);
          break;
       }
       case RollIn: {
          QPainter p(&tabPix[2]);
-         int h = ms*tabPix[1].height()/(2*_duration);
+         int h = ms*tabPix[1].height()/(2*duration);
          p.drawPixmap(0, 0, tabPix[1], 0, 0, tabPix[1].width(), h);
          p.drawPixmap(0, tabPix[1].height()-h, tabPix[1], 0, tabPix[1].height()-h, tabPix[1].width(), h);
          break;
       }
       case RollOut: {
          QPainter p(&tabPix[2]);
-         int h = ms*tabPix[1].height()/_duration;
+         int h = ms*tabPix[1].height()/duration;
          int y = (tabPix[1].height()-h)/2;
          p.drawPixmap(0, y, tabPix[1], 0, y, tabPix[1].width(), h);
          break;
@@ -364,7 +366,7 @@ TabInfo::updatePixmaps(Transition transition)
       case OpenVertically: {
          tabPix[2] = tabPix[1];
          QPainter p(&tabPix[2]);
-         const int off = ms*tabPix[0].height()/(2*_duration);
+         const int off = ms*tabPix[0].height()/(2*duration);
          const int h2 = tabPix[0].height()/2;
          p.drawPixmap(0,0, tabPix[0], 0,off, tabPix[0].width(),h2 - off);
          p.drawPixmap(0,h2+off, tabPix[0], 0,h2, tabPix[0].width(),tabPix[0].height()-off);
@@ -372,7 +374,7 @@ TabInfo::updatePixmaps(Transition transition)
       }
       case CloseVertically: {
          QPainter p(&tabPix[2]);
-         int h = ms*tabPix[1].height()/(2*_duration);
+         int h = ms*tabPix[1].height()/(2*duration);
          p.drawPixmap(0, 0, tabPix[1], 0, tabPix[1].height()/2-h, tabPix[1].width(), h);
          p.drawPixmap(0, tabPix[1].height()-h, tabPix[1], 0, tabPix[1].height()/2, tabPix[1].width(), h);
          break;
@@ -380,7 +382,7 @@ TabInfo::updatePixmaps(Transition transition)
       case OpenHorizontally: {
          tabPix[2] = tabPix[1];
          QPainter p(&tabPix[2]);
-         const int off = ms*tabPix[0].width()/(2*_duration);
+         const int off = ms*tabPix[0].width()/(2*duration);
          const int w2 = tabPix[0].width()/2;
          p.drawPixmap(0,0,tabPix[0],off,0, w2-off,tabPix[0].height());
          p.drawPixmap(w2+off,0,tabPix[0], w2,0,tabPix[0].width()-off,tabPix[0].height());
@@ -388,7 +390,7 @@ TabInfo::updatePixmaps(Transition transition)
       }
       case CloseHorizontally: {
          QPainter p(&tabPix[2]);
-         int w = ms*tabPix[1].width()/(2*_duration);
+         int w = ms*tabPix[1].width()/(2*duration);
          p.drawPixmap(0, 0, tabPix[1], tabPix[1].width()/2-w, 0, w, tabPix[1].height());
          p.drawPixmap(tabPix[1].width()-w, 0, tabPix[1], tabPix[1].width()/2, 0, w, tabPix[1].height());
          break;

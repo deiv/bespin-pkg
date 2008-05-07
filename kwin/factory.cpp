@@ -257,11 +257,19 @@ Factory::showWindowList(const QPoint &p, Client *client) {
    const QList<WId>& windows = KWindowSystem::windows();
 
    QAction *act = 0;
-   KWindowInfo info;
+   KWindowInfo info; QString title;
+#define NET_FLAGS NET::WMVisibleName | NET::WMWindowType | NET::WMDesktop | NET::WMState | NET::XAWMState
    foreach (WId id, windows) {
-      info = KWindowInfo(id, NET::WMVisibleName | NET::WMWindowType, 0);
+      info = KWindowInfo(id, NET_FLAGS, 0);
       if (info.windowType( NET::NormalMask | NET::DialogMask | NET::UtilityMask ) != -1) {
-         act = _windowList->addAction ( info.visibleIconName(), client, SLOT(activate()) );
+         title = info.visibleIconName();
+         if (info.isMinimized())
+            title = "( " + title + " )";
+         if (!info.isOnCurrentDesktop())
+            title = "< " + title + " >";
+         if (title.length() > 52)
+            title = title.left(22) + "..." + title.right(22);
+         act = _windowList->addAction ( title, client, SLOT(activate()) );
          act->setData((uint)id);
          act->setDisabled(id == KWindowSystem::activeWindow());
       }
@@ -269,6 +277,22 @@ Factory::showWindowList(const QPoint &p, Client *client) {
    _windowList->popup(p);
 }
 
+static QString string(const QRect &r)
+{
+   return QString("%1x%2%3%4%5%6").arg(r.width()).
+                                   arg(r.height()).
+                                   arg(r.x() < 0 ? '-' : '+').arg(r.x()).
+                                   arg(r.y() < 0 ? '-' : '+').arg(r.y());
+}
+
+static const QString wininfo("\
+WId : <b>%1</b><br/>\
+Name: <b>%2 -> %3</b><br/>\
+IconName: <b>%4 -> %5</b><hr>\
+Geometry: <b>%6 -> %7</b><br/>\
+On Desktop: <b>%8 %9</b><br/>\
+On Machine: <b>%10</b><hr>\
+");
 
 void
 Factory::showInfo(const QPoint &p, Client *client) {
@@ -282,17 +306,45 @@ Factory::showInfo(const QPoint &p, Client *client) {
       Header *header = new Header("Window Information", window);
       l->addWidget(header);
       _windowInfo = new QTextBrowser(window);
+      _windowInfo->setFontFamily ( "fixed" );
       l->addWidget(_windowInfo);
-      window->resize(640,360);
+      window->resize(360, 640);
    }
    else
       _windowInfo->clear();
 
    // fill with info
-// KWindowInfo KWindowSystem::windowInfo( WId win, unsigned long properties, unsigned long properties2 = 0 );
+   KWindowInfo info( client->windowId(),
+                     NET::WMState | NET::WMWindowType | NET::WMVisibleName | NET::WMName |
+                     NET::WMVisibleIconName | NET::WMIconName | NET::WMDesktop | NET::WMGeometry |
+                     NET::WMFrameExtents,
+                     NET::WM2TransientFor | NET::WM2GroupLeader | NET::WM2WindowClass |
+                     NET::WM2WindowRole | NET::WM2ClientMachine | NET::WM2AllowedActions );
+/*
+   unsigned long state() const;
+   NET::WindowType windowType( int supported_types ) const;
+   WId transientFor() const; //the mainwindow for this window.
+   WId groupLeader() const;
+   QByteArray windowClassClass() const; //WM_CLASS property
+   QByteArray windowClassName() const;
+   QByteArray windowRole() const;
+   bool actionSupported( NET::Action action ) const;
+*/
+   _windowInfo->setHtml( wininfo.arg(info.win()).
+                                 arg(info.name()).
+                                 arg(info.visibleName()).
+                                 arg(info.iconName()).
+                                 arg(info.visibleIconName()).
+                                 arg(string(info.geometry())).
+                                 arg(string(info.frameGeometry())).
+                                 arg(info.desktop()).
+                                 arg(info.onAllDesktops() ? "(Sticked)" :
+                                                            (info.isOnCurrentDesktop() ? "(Current)" : "")).
+                                 arg(QString(info.clientMachine()))
+);
 
    // and show up
-   QWidget win = _windowInfo->parentWidget();
+   QWidget *win = _windowInfo->parentWidget();
 //    QPoint ip = p;
 //    if (ip.x() + 640 > )
    win->move(p);

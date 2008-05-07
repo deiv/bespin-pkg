@@ -280,7 +280,7 @@ BespinStyle::drawToolBarHandle(const QStyleOption * option, QPainter * painter,
       rect.setTop(rect.top()+(rect.height()-rect.width())/2);
       rect.setHeight(rect.width());
    }
-   QColor c = FCOLOR(Window);
+   QColor c = FCOLOR(Window).dark(110);
    painter->setRenderHint(QPainter::Antialiasing);
    painter->setBrush(Gradients::pix(c, rect.height(), Qt::Vertical, Gradients::Sunken));
    painter->setPen(Qt::NoPen);

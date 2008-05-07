@@ -238,8 +238,8 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
    case Min:
       if (lb && client->isMinimizable ())
          client->minimize();
-//       else if (rb)
-//          NETRootInfo::setShowingDesktop(true);
+//       else if (rb) // TODO get dbus interface or whatever to show the Desktop
+//          client->workspace()->setShowingDesktop( true );
       break;
    case Max:
       if (client->isMaximizable ()) {

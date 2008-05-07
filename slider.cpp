@@ -199,11 +199,10 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
 
    // handle
    if (slider->subControls & SC_SliderHandle) {
-      int step;
+      int step = 0;
       if (sunken)
          step = 6;
-      else {
-         step = 0;
+      else if (isEnabled) {
          const Animator::ComplexInfo *info =
                Animator::HoverComplex::info(widget, slider->activeSubControls & SC_SliderHandle);
          if (info && (info->fades[Animator::In] & SC_SliderHandle ||
@@ -232,8 +231,10 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       const QPixmap &fill = Gradients::pix(bc, masks.slider.height(), Qt::Vertical,
                                            isEnabled ? GRAD(scroll) : Gradients::None);
       fillWithMask(painter, xy, fill, masks.slider);
-      xy += QPoint(dpi.f5, dpi.f5);
-      fillWithMask(painter, xy, fc, masks.notch);
+      if (isEnabled) {
+         xy += QPoint(dpi.f5, dpi.f5);
+         fillWithMask(painter, xy, fc, masks.notch);
+      }
 #if 0
       SAVE_PEN;
       painter->setPen(fc);

@@ -44,6 +44,7 @@ class TabInfo : public QObject {
       float progress;
       QWidget *currentWidget;
       int index;
+      uint duration;
       QTime clock;
    protected:
       friend class Curtain;
