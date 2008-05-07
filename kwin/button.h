@@ -40,7 +40,7 @@ class Button : public QWidget
 public:
    enum State { Normal, Hovered, Sunken };
    enum Type { Close = 0, Min, Max, Multi,
-   Menu, Help, Above, Below, Stick, Shade, Special,
+   Menu, Help, Above, Below, Stick, Shade, Exposee, Info, Special,
    //    VertMax, HoriMax,
    Restore, Unstick, UnAboveBelow, Unshade, NumTypes };
    Button(Client *parent, Type type);

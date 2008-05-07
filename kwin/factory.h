@@ -34,6 +34,7 @@
 #include "button.h"
 
 class QMenu;
+class QTextBrowser;
 
 namespace Bespin
 {
@@ -66,6 +67,8 @@ public:
    inline static Gradients::Type gradient(bool active) { return gradient_[active]; }
    inline static const QVector<Button::Type> &multiButtons() { return multiButton_; }
    void showDesktopMenu(const QPoint &p, Client *client);
+   void showInfo(const QPoint &p, Client *client);
+   void showWindowList(const QPoint &p, Client *client);
 private:
 	bool readConfig();
 private:
@@ -74,7 +77,8 @@ private:
    static Gradients::Type gradient_[2];
    static QVector<Button::Type> multiButton_;
    static Config _config;
-   static QMenu *desktopMenu_;
+   static QMenu *desktopMenu_, *_windowList;
+   static QTextBrowser *_windowInfo;
 };
 
 } //namespace

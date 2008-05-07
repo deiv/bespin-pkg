@@ -35,6 +35,7 @@
 #include <QtDebug>
 
 #include <kwindowinfo.h>
+#include <kwindowsystem.h>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/shape.h>
@@ -683,12 +684,31 @@ Client::shadeChange()
    emit shadeChanged(isSetShade());
 }
 
-void Client::showDesktopMenu(const QPoint &p)
+void
+Client::showDesktopMenu(const QPoint &p)
 {
    QPoint ip = p;
    QPoint gp = widget()->mapToGlobal(QPoint(width()-60, 0));
    if (ip.x() > gp.x()) ip.setX(gp.x());
    _factory->showDesktopMenu(ip, this);
+}
+
+void
+Client::showWindowList(const QPoint &p)
+{
+   QPoint ip = p;
+   QPoint gp = widget()->mapToGlobal(QPoint(width()-200, 0));
+   if (ip.x() > gp.x()) ip.setX(gp.x());
+   _factory->showWindowList(ip, this);
+}
+
+void
+Client::showInfo(const QPoint &p)
+{
+   QPoint ip = p;
+   QPoint gp = widget()->mapToGlobal(QPoint(width()-320, 0));
+   if (ip.x() > gp.x()) ip.setX(gp.x());
+   _factory->showInfo(ip, this);
 }
 
 void
@@ -704,6 +724,18 @@ Client::showWindowMenu(const QPoint &p)
    QPoint gp = widget()->mapToGlobal(QPoint(width()-200, 0));
    if (ip.x() > gp.x()) ip.setX(gp.x());
    KDecoration::showWindowMenu(ip);
+}
+
+void
+Client::activate() {
+   if (QAction *act = qobject_cast<QAction*>(sender())) {
+      bool ok; int id = act->data().toUInt(&ok);
+      if (ok) {
+         KWindowSystem::activateWindow( id );
+         return;
+      }
+   }
+   KWindowSystem::activateWindow( windowId() );
 }
 
 void

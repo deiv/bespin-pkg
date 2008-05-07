@@ -187,24 +187,14 @@ VisualFrame::updateShape()
       return;
    }
 
-   _frame->removeEventFilter(this);
+   // we start out with _window == _frame, the actual parent widget is recalculated on each show()
+   // to capture e.g. dock floats etc.
    _window = _frame;
-   while (_window->parentWidget() &&
-          !(_window->isWindow() || _window->inherits("QMdiSubWindow") ||
-            (_window != _frame && _window->inherits("QAbstractScrollArea"))))
-   {
-      _window->installEventFilter(this);
-      _window = _window->parentWidget();
-   }
-
    _window->installEventFilter(&stdChildAdd);
-//    const bool on = _window->testAttribute(Qt::WA_NoChildEventsFromChildren);
-//    _window->setAttribute(Qt::WA_NoChildEventsFromChildren, true);
    top = new VisualFramePart(_window, _frame, North);
    bottom = new VisualFramePart(_window, _frame, South);
    left = new VisualFramePart(_window, _frame, West);
    right = new VisualFramePart(_window, _frame, East);
-//    _window->setAttribute(Qt::WA_NoChildEventsFromChildren, on);
    _window->removeEventFilter(&stdChildAdd);
 
    // manage events
@@ -279,6 +269,22 @@ void
 VisualFrame::show() {
    hidden = false;
    if (_style != QFrame::StyledPanel) return;
+
+   QWidget *window = _frame;
+   while (window->parentWidget() &&
+          !(window->isWindow() || window->inherits("QMdiSubWindow") ||
+          (window != _frame && window->inherits("QAbstractScrollArea")))) {
+      window->removeEventFilter(this);
+      window->installEventFilter(this);
+      window = window->parentWidget();
+   }
+
+   if (window != _window) {
+      _window->installEventFilter(&stdChildAdd);
+      PARTS(setParent(_window));
+      _window->removeEventFilter(&stdChildAdd);
+   }
+
    correctPosition();
    PARTS(show());
 }
@@ -335,10 +341,15 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
       return false;
    }
 
-   if (ev->type() == QEvent::ZOrderChange) { // necessary for all widgets from frame to parent?!
+   if (ev->type() == QEvent::ZOrderChange) { // necessary for all widgets from frame to parent
       raise();
       return false;
    }
+
+//    if (ev->type() == QEvent::ParentChange) {
+//       qDebug() << "reparented" << o << _window << _frame->window();
+//       return false;
+//    }
    
    if (o != _frame) { // now we're only interested in frame events
       return false;

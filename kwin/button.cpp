@@ -25,6 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <QPainter>
+#include <netwm.h>
 #include <cmath>
 
 #include "../colors.h"
@@ -155,6 +156,14 @@ Button::init(int sz, bool leftMenu)
 
    shape[Unshade].addRect(-s2,s4,sz,s4);
 
+   shape[Exposee].addRect(-s2,-s2,s3,s3);
+   shape[Exposee].addRect(s2-s3,-s2,s3,s3);
+   shape[Exposee].addRect(-s2,s2-s3,s3,s3);
+   shape[Exposee].addRect(s2-s3,s2-s3,s3,s3);
+
+   shape[Info].addRect(-s6,-s2,s4,s4);
+   shape[Info].addRect(-s6,-s6,s4,s2+s3);
+
 
 //    tip[Close] = i18n("Close");
 //    tip[Min] = i18n("Minimize");
@@ -229,7 +238,8 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
    case Min:
       if (lb && client->isMinimizable ())
          client->minimize();
-      // TODO: rgt click to lower?!
+//       else if (rb)
+//          NETRootInfo::setShowingDesktop(true);
       break;
    case Max:
       if (client->isMaximizable ()) {
@@ -270,6 +280,11 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
    case Shade:
    case Unshade:
       if (lb) client->setShade(!client->isSetShade()); break;
+   case Exposee:
+//       if (rb) //TODO: toggle KWin composite exposé here on lb if available!
+         client->showWindowList(mapToGlobal(rect().topLeft())); break;
+   case Info:
+      client->showInfo(mapToGlobal(rect().topLeft())); break;
    default:
       return; // invalid type
    }

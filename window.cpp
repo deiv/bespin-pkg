@@ -166,8 +166,7 @@ BespinStyle::drawToolTip(const QStyleOption * option, QPainter * painter,
          tmpOpt.state = tb->state;\
       else\
          tmpOpt.state &= ~(State_Sunken | State_MouseOver);\
-      painter->drawPixmap(tmpOpt.rect.topLeft(), \
-            standardPixmap ( SP_TitleBar##_btn_##Button, &tmpOpt, widget ));\
+      painter->drawPixmap(tmpOpt.rect.topLeft(), standardPixmap(SP_TitleBar##_btn_##Button, &tmpOpt, widget));\
    }\
 }
 
@@ -179,7 +178,7 @@ BespinStyle::drawTitleBar(const QStyleOptionComplex * option,
       qstyleoption_cast<const QStyleOptionTitleBar *>(option);
    if (!tb) return;
 
-//    painter->fillRect(RECT, PAL.brush(QPalette::Window));
+   painter->fillRect(RECT, Qt::red);
    QRect ir;
        
    // the label

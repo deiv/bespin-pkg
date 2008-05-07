@@ -228,11 +228,8 @@ void
 TabInfo::rewind()
 {
    clock = QTime(); // reset clock, this is IMPORTANT!
-   tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space
-//    QWidget *stack = tai->curtain->parentWidget(); // bad idea - segfaults TODO why?
-//    stack->installEventFilter(&stdChildAdd);
    delete curtain; curtain = 0; // get rid of curtain, and RESHOW CONTENT!
-//    stack->removeEventFilter(&stdChildAdd);
+   tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space
 }
 
 void
@@ -316,9 +313,10 @@ TabInfo::updatePixmaps(Transition transition)
    switch (transition) {
       #ifndef QT_NO_XRENDER
       default:
-      case CrossFade: { //  TODO accelerate animation!
-         float quote = (float)_timeStep / (_duration-ms);
-         progress += quote;
+      case CrossFade: { //  TODO accelerate animation?!?
+         float quote = (float)_timeStep / (_duration+_timeStep-ms);
+//          progress += quote;
+//          qDebug() << quote << progress;
          OXRender::blend(tabPix[1], tabPix[2], quote);
          break;
       }
@@ -338,8 +336,7 @@ TabInfo::updatePixmaps(Transition transition)
          //TODO handle different bar positions (currently assumes top)
          QPainter p(&tabPix[2]);
          const int h = ms*tabPix[1].height()/_duration;
-         p.drawPixmap(0, 0, tabPix[1], 0, tabPix[1].height() - h,
-                       tabPix[1].width(), h);
+         p.drawPixmap(0, 0, tabPix[1], 0, tabPix[1].height() - h, tabPix[1].width(), h);
          break;
       }
       case SlideOut: {
@@ -347,16 +344,14 @@ TabInfo::updatePixmaps(Transition transition)
          //TODO handle different bar positions (currently assumes top)
          QPainter p(&tabPix[2]);
          int off = ms*tabPix[0].height()/_duration;
-         p.drawPixmap(0, 0, tabPix[0], 0, off,
-                       tabPix[0].width(), tabPix[0].height() - off);
+         p.drawPixmap(0, 0, tabPix[0], 0, off, tabPix[0].width(), tabPix[0].height() - off);
          break;
       }
       case RollIn: {
          QPainter p(&tabPix[2]);
          int h = ms*tabPix[1].height()/(2*_duration);
          p.drawPixmap(0, 0, tabPix[1], 0, 0, tabPix[1].width(), h);
-         p.drawPixmap(0, tabPix[1].height()-h, tabPix[1],
-                       0, tabPix[1].height()-h, tabPix[1].width(), h);
+         p.drawPixmap(0, tabPix[1].height()-h, tabPix[1], 0, tabPix[1].height()-h, tabPix[1].width(), h);
          break;
       }
       case RollOut: {
@@ -372,17 +367,14 @@ TabInfo::updatePixmaps(Transition transition)
          const int off = ms*tabPix[0].height()/(2*_duration);
          const int h2 = tabPix[0].height()/2;
          p.drawPixmap(0,0, tabPix[0], 0,off, tabPix[0].width(),h2 - off);
-         p.drawPixmap(0,h2+off, tabPix[0], 0,h2,
-                       tabPix[0].width(),tabPix[0].height()-off);
+         p.drawPixmap(0,h2+off, tabPix[0], 0,h2, tabPix[0].width(),tabPix[0].height()-off);
          break;
       }
       case CloseVertically: {
          QPainter p(&tabPix[2]);
          int h = ms*tabPix[1].height()/(2*_duration);
-         p.drawPixmap(0, 0, tabPix[1], 0, tabPix[1].height()/2-h,
-                       tabPix[1].width(), h);
-         p.drawPixmap(0, tabPix[1].height()-h, tabPix[1],
-                       0, tabPix[1].height()/2, tabPix[1].width(), h);
+         p.drawPixmap(0, 0, tabPix[1], 0, tabPix[1].height()/2-h, tabPix[1].width(), h);
+         p.drawPixmap(0, tabPix[1].height()-h, tabPix[1], 0, tabPix[1].height()/2, tabPix[1].width(), h);
          break;
       }
       case OpenHorizontally: {

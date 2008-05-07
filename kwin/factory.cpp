@@ -31,6 +31,8 @@
 #include <QSettings>
 #include <QWidgetAction>
 #include <QStyleOptionHeader>
+#include <QTextBrowser>
+#include <QVBoxLayout>
 #include <kwindowsystem.h>
 // #include "button.h"
 #include "client.h"
@@ -56,6 +58,8 @@ int Factory::titleSize_[2] = {20,20};
 Gradients::Type Factory::gradient_[2] = {Gradients::None, Gradients::Button};
 QVector<Button::Type> Factory::multiButton_(0);
 QMenu *Factory::desktopMenu_ = 0;
+QMenu *Factory::_windowList = 0;
+QTextBrowser *Factory::_windowInfo = 0;
 
 Factory::Factory()
 {
@@ -102,7 +106,9 @@ multiVector(const QString & string, QVector<Button::Type> &vector)
          case 'H': type = Button::Help; break;
          case 'F': type = Button::Above; break;
          case 'B': type = Button::Below; break;
-         case 'L': type = Button::Shade; break;// Shade button
+         case 'L': type = Button::Shade; break;
+         case 'E': type = Button::Exposee; break;
+         case '!': type = Button::Info; break;
          default: continue;
       }
       vector.append(type);
@@ -120,7 +126,9 @@ multiString(const QVector<Button::Type> &vector)
          case Button::Help: c = 'H'; break;
          case Button::Above: c = 'F'; break;
          case Button::Below: c = 'B'; break;
-         case Button::Shade: c = 'L'; break; // Shade button
+         case Button::Shade: c = 'L'; break;
+         case Button::Exposee: c = 'E'; break;
+         case Button::Info: c = '!'; break;
          default: continue;
       }
       string.append(c);
@@ -155,7 +163,7 @@ bool Factory::readConfig()
    if (oldgradient != gradient_[1]) ret = true;
 
    QString oldmultiorder = multiString(multiButton_);
-   QString newmultiorder = settings.value("MultiButtonOrder", "MHFBS").toString();
+   QString newmultiorder = settings.value("MultiButtonOrder", "MHFBSLE!").toString();
    if (oldmultiorder != newmultiorder) {
       ret = true;
       multiVector(newmultiorder, multiButton_);
@@ -232,6 +240,63 @@ Factory::showDesktopMenu(const QPoint &p, Client *client) {
       act->setDisabled(i == KWindowSystem::currentDesktop());
    }
    desktopMenu_->popup(p);
+}
+
+void
+Factory::showWindowList(const QPoint &p, Client *client) {
+
+   if (!_windowList)
+      _windowList = new QMenu();
+   else
+      _windowList->clear();
+
+   QWidgetAction *headerAct = new QWidgetAction(_windowList);
+   headerAct->setDefaultWidget(new Header("Windows"));
+   _windowList->addAction(headerAct);
+
+   const QList<WId>& windows = KWindowSystem::windows();
+
+   QAction *act = 0;
+   KWindowInfo info;
+   foreach (WId id, windows) {
+      info = KWindowInfo(id, NET::WMVisibleName | NET::WMWindowType, 0);
+      if (info.windowType( NET::NormalMask | NET::DialogMask | NET::UtilityMask ) != -1) {
+         act = _windowList->addAction ( info.visibleIconName(), client, SLOT(activate()) );
+         act->setData((uint)id);
+         act->setDisabled(id == KWindowSystem::activeWindow());
+      }
+   }
+   _windowList->popup(p);
+}
+
+
+void
+Factory::showInfo(const QPoint &p, Client *client) {
+
+   // build info widget - in case
+   if (!_windowInfo) {
+      QWidget *window = new QWidget(0, Qt::Popup);
+      QVBoxLayout *l = new QVBoxLayout(window);
+      l->setContentsMargins ( 6, 2, 6, 10 );
+      l->setSpacing(0);
+      Header *header = new Header("Window Information", window);
+      l->addWidget(header);
+      _windowInfo = new QTextBrowser(window);
+      l->addWidget(_windowInfo);
+      window->resize(640,360);
+   }
+   else
+      _windowInfo->clear();
+
+   // fill with info
+// KWindowInfo KWindowSystem::windowInfo( WId win, unsigned long properties, unsigned long properties2 = 0 );
+
+   // and show up
+   QWidget win = _windowInfo->parentWidget();
+//    QPoint ip = p;
+//    if (ip.x() + 640 > )
+   win->move(p);
+   win->show();
 }
 
 bool

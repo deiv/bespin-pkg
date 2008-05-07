@@ -74,6 +74,8 @@ public:
    void reset(unsigned long changed);
 	void resize( const QSize& s );
    void showDesktopMenu(const QPoint &p);
+   void showInfo(const QPoint &p);
+   void showWindowList(const QPoint &p);
    void showWindowMenu(const QPoint &p);
    void showWindowMenu(const QRect &r);
    void toggleOnAllDesktops();
@@ -82,6 +84,7 @@ public:
    inline Factory *factory() {return _factory;}
 public slots:
    void updateStylePixmaps();
+   void activate();
    void throwOnDesktop();
 signals:
    void stickyChanged(bool);
