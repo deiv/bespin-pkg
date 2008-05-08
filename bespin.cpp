@@ -272,7 +272,7 @@ BespinStyle::btnBg(const QPalette &pal, bool isEnabled, int hasFocus,
 QColor
 BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hover, int step, bool flat) const {
    if (!isEnabled)
-      return Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
+      return FCOLOR(WindowText); //Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
 
    QColor fg1 = CCOLOR(btn.std, Fg), fg2 = CCOLOR(btn.active, Fg);
    if (flat) {
@@ -287,6 +287,22 @@ BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hover, int step, boo
       return Colors::mid(fg1, fg2, 6 - step, step);
 
    return fg1;
+}
+
+void
+BespinStyle::drawItemText(QPainter *painter, const QRect &rect, int alignment, const QPalette &pal,
+                          bool enabled, const QString& text, QPalette::ColorRole textRole) const
+{
+    if (text.isEmpty())
+        return;
+    QPen savedPen;
+    if (textRole != QPalette::NoRole) {
+        savedPen = painter->pen();
+        painter->setPen(QPen(pal.brush(textRole), savedPen.widthF()));
+    }
+    painter->drawText(rect, alignment, text);
+    if (textRole != QPalette::NoRole)
+        painter->setPen(savedPen);
 }
 
 void

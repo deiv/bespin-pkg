@@ -178,7 +178,7 @@ BespinStyle::drawTitleBar(const QStyleOptionComplex * option,
       qstyleoption_cast<const QStyleOptionTitleBar *>(option);
    if (!tb) return;
 
-   painter->fillRect(RECT, Qt::red);
+//    painter->fillRect(RECT, Qt::red);
    QRect ir;
        
    // the label

@@ -172,27 +172,31 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
    if ((groupBox->subControls & QStyle::SC_GroupBoxLabel) &&
       !groupBox->text.isEmpty()) {
       QColor textColor = groupBox->textColor;
-      if (textColor.isValid()) painter->setPen(textColor);
+      QPalette::ColorRole role = QPalette::WindowText;
+      if (textColor.isValid()) {
+         if (!isEnabled) textColor.setAlpha(48);
+         painter->setPen(textColor);
+         role = QPalette::NoRole;
+      }
+         
       QFont tmpfnt = painter->font(); tmpfnt.setBold(true);
       painter->setFont ( tmpfnt );
       QStyleOptionGroupBox copy = *groupBox; copy.fontMetrics = QFontMetrics(tmpfnt);
       QRect textRect = subControlRect(CC_GroupBox, &copy, SC_GroupBoxLabel, widget);
-      int alignment = Qt::AlignCenter; //int(groupBox->textAlignment);
-      if (!styleHint(QStyle::SH_UnderlineShortcut, option, widget))
-         alignment |= Qt::TextHideMnemonic;
-      else
-         alignment |= Qt::TextShowMnemonic;
+      int alignment = Qt::AlignCenter | Qt::TextShowMnemonic; //int(groupBox->textAlignment);
+//       if (!styleHint(QStyle::SH_UnderlineShortcut, option, widget))
+//          alignment |= Qt::TextHideMnemonic;
+//       else
+//          alignment |= Qt::TextShowMnemonic;
 
-      drawItemText(painter, textRect,  alignment, groupBox->palette, isEnabled, groupBox->text,
-                  textColor.isValid() ? QPalette::NoRole : QPalette::Foreground);
+      drawItemText(painter, textRect,  alignment, groupBox->palette, isEnabled, groupBox->text, role);
       int x = textRect.bottom(); textRect = RECT; textRect.setTop(x);
       x = textRect.width()/4; textRect.adjust(x,0,-x,0);
       shadows.line[0][Sunken].render(textRect, painter);
    }
        
    // Checkbox
-   // TODO: sth better - maybe a round thing in the upper left corner...?
-   // also doesn't hover - yet.
+   // TODO: doesn't hover - yet.
    if (groupBox->subControls & SC_GroupBoxCheckBox) {
       QStyleOptionButton box;
       box.QStyleOption::operator=(*groupBox);

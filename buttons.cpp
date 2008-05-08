@@ -351,6 +351,7 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
    }
 
    painter->setPen(fg);
+
    drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
    painter->restore();
    animStep = -1;

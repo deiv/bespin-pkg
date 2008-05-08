@@ -225,10 +225,44 @@ write_kwin_client_pro
 write_kwin_config_pro
 }
 
+check_x64_shared() {
+echo "
+TEMPLATE    = app
+TARGET      = x64test
+SOURCES     = x64test.cpp
+QMAKE_LFLAGS_SHAPP += -shared
+" > x64test.pro
+
+echo "
+#include <QApplication>
+int main (int , char **) {
+return 0;
+}
+" > x64test.cpp
+$QMAKE x64test.pro -o Makefile.x64test
+make -f Makefile.x64test > /dev/null 2>&1
+
+if [ ! -e x64test ]; then
+   bad "Unable to compile a simple Qt4 test app, allthough Qt4 seems to be present - borked installation?"
+   exit 1
+fi
+
+if ./x64test; then
+   ui "g++64 seems to require '-shared'"
+   GCC64=true
+else
+   GCC64=false
+   ui "(the segfault above is harmless...)"
+   ui "seems no x86-64 system or at least '-shared' is NOT required by g++"
+fi
+make distclean -f Makefile.x64test > /dev/null 2>&1
+rm -f x64test.pro x64test.cpp
+}
 
 check_xrender() {
 echo "
 TEMPLATE    = app
+TARGET      = rendertest
 SOURCES     = rendertest.cpp
 " > rendertest.pro
 if $GCC64; then
@@ -254,8 +288,11 @@ return 1;
 " > rendertest.cpp
 
 $QMAKE rendertest.pro -o Makefile.rendertest
-make -f Makefile.rendertest  > /dev/null 2>&1
-
+make -f Makefile.rendertest > /dev/null 2>&1
+if [ ! -e rendertest ]; then
+   bad "Unable to compile a simple Qt4 test app, allthough Qt4 seems to be present - borked installation?"
+   exit 1
+fi
 if ./rendertest; then
    HAVE_RENDER=true
 else
@@ -264,6 +301,7 @@ fi
 
 make distclean -f Makefile.rendertest > /dev/null 2>&1
 rm -f rendertest.pro rendertest.cpp
+
 }
 
 ######### Main Code ###############################################
@@ -284,11 +322,7 @@ fi
 export CONFIG_QT=true
 
 ## ok, next lets try to figure out whether this is a 64bit arch
-if file /usr/local/qt4/mkspecs/default | grep -E 'symbolic link.*linux-g\+\+64'; then
-   GCC64=true
-else
-   GCC64=false
-fi
+check_x64_shared
 
 ## next we need to check whether Qt uses Xrender, what's not mentioned in the mkspecs...
 check_xrender

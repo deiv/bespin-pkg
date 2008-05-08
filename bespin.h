@@ -60,29 +60,25 @@ public:
    ~BespinStyle();
 
    //inheritance from QStyle
-   void drawComplexControl ( ComplexControl control,
-                             const QStyleOptionComplex * option,
-                             QPainter * painter,
-                             const QWidget * widget = 0 ) const;
+   void drawComplexControl ( ComplexControl control, const QStyleOptionComplex * option,
+                             QPainter * painter, const QWidget * widget = 0 ) const;
   
-   void drawControl ( ControlElement element,
-                      const QStyleOption * option,
-                      QPainter * painter,
+   void drawControl ( ControlElement element, const QStyleOption * option, QPainter * painter,
                       const QWidget * widget = 0 ) const;
    
-   /**what do they do?
-   virtual void drawItemPixmap ( QPainter * painter, const QRect & rect, int alignment, const QPixmap & pixmap ) const;
-   virtual void drawItemText ( QPainter * painter, const QRect & rect, int alignment, const QPalette & pal, bool enabled, const QString & text, QPalette::ColorRole textRole = QPalette::NoRole ) const;
+   /*what do they do?
+   virtual void drawItemPixmap ( QPainter * painter, const QRect & rect, int alignment, const QPixmap & pixmap ) const; 
    */
+
+   void drawItemText ( QPainter * painter, const QRect & rect, int alignment, const QPalette & pal,
+                       bool enabled, const QString & text,
+                       QPalette::ColorRole textRole = QPalette::NoRole ) const;
    
-   void drawPrimitive ( PrimitiveElement elem,
-                                const QStyleOption * option,
-                                QPainter * painter,
-                                const QWidget * widget = 0 ) const;
+   void drawPrimitive ( PrimitiveElement elem, const QStyleOption * option, QPainter * painter,
+                        const QWidget * widget = 0 ) const;
    
-   QPixmap standardPixmap ( StandardPixmap standardPixmap,
-                                    const QStyleOption * option = 0,
-                                    const QWidget * widget = 0 ) const;
+   QPixmap standardPixmap ( StandardPixmap standardPixmap, const QStyleOption * option = 0,
+                            const QWidget * widget = 0 ) const;
    
 //    what do they do? ========================================
 //    QPixmap generatedIconPixmap ( QIcon::Mode iconMode,
@@ -102,32 +98,23 @@ public:
 //                         const QString & text ) const;
 //=============================================================
    
-   int pixelMetric ( PixelMetric metric,
-                             const QStyleOption * option = 0,
-                             const QWidget * widget = 0 ) const;
+   int pixelMetric ( PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0 ) const;
    
    void polish( QWidget *w );
    void polish( QApplication * );
    void polish( QPalette &pal );
    
-   QSize sizeFromContents ( ContentsType type,
-                            const QStyleOption * option,
-                            const QSize & contentsSize,
-                            const QWidget * widget = 0 ) const;
+   QSize sizeFromContents ( ContentsType type, const QStyleOption * option,
+                            const QSize & contentsSize, const QWidget * widget = 0 ) const;
       
-   int styleHint ( StyleHint hint,
-                   const QStyleOption * option = 0,
-                   const QWidget * widget = 0,
+   int styleHint ( StyleHint hint, const QStyleOption * option = 0, const QWidget * widget = 0,
                    QStyleHintReturn * returnData = 0 ) const;
    
-   QRect subControlRect ( ComplexControl control,
-                          const QStyleOptionComplex * option,
-                          SubControl subControl,
-                          const QWidget * widget = 0 ) const;
+   QRect subControlRect ( ComplexControl control, const QStyleOptionComplex * option,
+                          SubControl subControl, const QWidget * widget = 0 ) const;
    
-   QRect subElementRect ( SubElement element,
-                                  const QStyleOption * option,
-                                  const QWidget * widget = 0 ) const;
+   QRect subElementRect ( SubElement element, const QStyleOption * option,
+                          const QWidget * widget = 0 ) const;
    
    QPalette standardPalette () const;
    
