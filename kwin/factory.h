@@ -67,7 +67,7 @@ public:
    inline static Gradients::Type gradient(bool active) { return gradient_[active]; }
    inline static const QVector<Button::Type> &multiButtons() { return multiButton_; }
    void showDesktopMenu(const QPoint &p, Client *client);
-   void showInfo(const QPoint &p, Client *client);
+   void showInfo(const QPoint &p, WId id);
    void showWindowList(const QPoint &p, Client *client);
 private:
 	bool readConfig();

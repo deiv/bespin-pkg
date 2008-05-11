@@ -82,6 +82,10 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
       else
          return (widget->height() - dpi.SliderControl);
    }
+   case QStyle::PM_DockWidgetTitleBarButtonMargin:
+      return dpi.f2;
+   case QStyle::PM_DockWidgetTitleMargin:
+      return 0;
    case PM_DockWidgetSeparatorExtent: // Width of a separator in a horizontal dock window and the height of a separator in a vertical dock window
       return dpi.f10;
    case PM_DockWidgetHandleExtent: // Width of the handle in a horizontal dock window and the height of the handle in a vertical dock window
@@ -143,8 +147,12 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
    case PM_TabBarScrollButtonWidth: //  
       return dpi.f16;
    case PM_TabBarTabShiftHorizontal: // Horizontal pixel shift when a tab is selected
-   case PM_TabBarTabShiftVertical: // Vertical pixel shift when a tab is selected
       return 0;
+   case PM_TabBarTabShiftVertical: // Vertical pixel shift when a tab is selected
+      return dpi.f4; // trying to trick KTabBar to place the close icon on a reasonable pos
+      //TODO the close icon solution looks ... debatable - find a way to hack it, or
+      // ==>> ground a general solution, convince TT to extend QStyle to allow adding new elements
+      // dynamically (creating an app wide atom) and make KDE dev use it...!
 //    case PM_ProgressBarChunkWidth: // Width of a chunk in a progress bar indicator
    case PM_SplitterWidth: // Width of a splitter
       return dpi.f9;

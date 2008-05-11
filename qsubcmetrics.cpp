@@ -122,14 +122,8 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
             break;
          }
          case SC_GroupBoxCheckBox: {
-            if (config.leftHanded) {
-               ret = groupBox->rect.adjusted(dpi.f5,dpi.f5,0,0);
-               ret.setWidth(dpi.ExclusiveIndicator);
-            }
-            else {
-               ret = groupBox->rect.adjusted(0,dpi.f5,-dpi.f5,0);
-               ret.setLeft(ret.right()-dpi.ExclusiveIndicator);
-            }
+            ret = groupBox->rect.adjusted(dpi.f7,dpi.f7,0,0);
+            ret.setWidth(dpi.ExclusiveIndicator);
             ret.setHeight(dpi.ExclusiveIndicator);
             break;
          }

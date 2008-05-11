@@ -104,7 +104,7 @@ int _CLASS_::step(const QWidget *widget)\
 static uint _timeStep = 50;\
 void _CLASS_::setFPS(uint fps)\
 {\
-   _timeStep = fps/1000;\
+   _timeStep = 1000/fps;\
    if (!instance) return;\
    instance->_setFPS(fps);\
 }

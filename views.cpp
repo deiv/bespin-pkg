@@ -264,8 +264,7 @@ void
 BespinStyle::drawTree(const QStyleOptionComplex * option, QPainter * painter,
                       const QWidget * widget) const
 {
-   const QStyleOptionQ3ListView *lv =
-      qstyleoption_cast<const QStyleOptionQ3ListView *>(option);
+   const QStyleOptionQ3ListView *lv = qstyleoption_cast<const QStyleOptionQ3ListView *>(option);
    if (!lv) return;
        
    int i;
@@ -412,8 +411,7 @@ BespinStyle::drawRubberBand(const QStyleOption * option, QPainter * painter,
 }
 #include <QtDebug>
 void
-BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
-                      const QWidget *widget) const
+BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
 
 #if QT_VERSION >= 0x040400
@@ -421,36 +419,30 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter,
 #else
 #define OPTION_VIEW_ITEM QStyleOptionViewItemV2
 #endif
-   const OPTION_VIEW_ITEM *item =
-      qstyleoption_cast<const OPTION_VIEW_ITEM *>(option);
-
+   const OPTION_VIEW_ITEM *item = qstyleoption_cast<const OPTION_VIEW_ITEM *>(option);
    if (!item) return;
-
-   const QAbstractItemView *view =
-   qobject_cast<const QAbstractItemView *>(widget);
+   const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
 
    OPT_HOVER
-   hover = hover &&
-   (!view || view->selectionMode() != QAbstractItemView::NoSelection);
+   hover = hover && (!view || view->selectionMode() != QAbstractItemView::NoSelection);
+   const bool selected = item->state & QStyle::State_Selected;
 
-   // this could just lead to cluttered listviews...?!
-//    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled
-//       ? QPalette::Normal : QPalette::Disabled;
+   // this could just leads to cluttered listviews...?!
+//    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
 //    if (cg == QPalette::Normal && !(item->state & QStyle::State_Active))
 //       cg = QPalette::Inactive;
 
-   const bool selected = (item->state & QStyle::State_Selected);
-   const bool single = view && view->selectionMode() == QAbstractItemView::SingleSelection;
-   const bool round = !single && // typically list/tree - views
+   
+   if (hover || selected) {
+      Gradients::Type gt = Gradients::None;
+      const bool single = view && view->selectionMode() == QAbstractItemView::SingleSelection;
+      const bool round = !single && // typically list/tree - views
 #if QT_VERSION >= 0x040400
-      item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
-      (widget && widget->inherits("DolphinIconsView")); // HACK, dolphin should please use the proper position flag...
+      (item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
+      (widget && widget->inherits("DolphinIconsView"))); // HACK, dolphin should please use the proper position flag...
 #else
       (widget && widget->inherits("DolphinIconsView"));
 #endif
-
-   if (hover || selected) {
-      Gradients::Type gt = Gradients::None;
       if (round) {
          gt = hover ? Gradients::Button : Gradients::Sunken;
       }

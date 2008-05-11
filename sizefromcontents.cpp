@@ -114,13 +114,12 @@ QSize BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * opti
          else {
             int w = contentsSize.width() + dpi.f20;
             if (btn->features & QStyleOptionButton::HasMenu)
-               w += contentsSize.height()/2+dpi.f10;
+               w += contentsSize.height()+dpi.f16;
             else
             if (widget)
-            if (const QAbstractButton* abn =
-                qobject_cast<const QAbstractButton*>(widget))
+            if (const QAbstractButton* abn = qobject_cast<const QAbstractButton*>(widget))
             if (abn->isCheckable())
-               w += contentsSize.height()/2+dpi.f10;
+               w += contentsSize.height()+dpi.f16;
 	         int h = contentsSize.height() + (config.btn.layer ? dpi.f4 : dpi.f6);
             if (!btn->icon.isNull()) {w += dpi.f10; h += dpi.f2;}
 	         if (config.btn.round) { w += dpi.f8; h -= dpi.f2; }

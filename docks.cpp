@@ -20,35 +20,34 @@
 #include "draw.h"
 
 void
-BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter,
-                           const QWidget *) const
+BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
 
    ASSURE_OPTION(dwOpt, DockWidget);
    OPT_ENABLED
 
-   QRect textRect;
-   int x3 = RECT.right()-7;
-   if (dwOpt->floatable) x3 -= 18;
-   if (dwOpt->closable) x3 -= 18;
-   int x2 = x3;
-   if (!dwOpt->title.isEmpty()) {
-      int itemtextopts = Qt::AlignCenter | Qt::TextShowMnemonic;
-      drawItemText(painter, RECT, itemtextopts, PAL, isEnabled, dwOpt->title, QPalette::WindowText);
-      textRect = painter->boundingRect ( RECT, itemtextopts, dwOpt->title );
-      x2 = textRect.x()-8;
-   }
+   masks.rect[true].render(RECT, painter, FCOLOR(Window));
 
-   const Tile::Line &line = shadows.line[0][Sunken];
-   textRect.setTop(textRect.top()+(textRect.height()-line.thickness())/2);
-   int x = textRect.right()+dpi.f4;
-   textRect.setRight(textRect.left()-dpi.f4);
-   textRect.setLeft(qMin(RECT.x()+RECT.width()/4,textRect.x()-(textRect.x()-RECT.x())/2));
-   line.render(textRect, painter, Tile::Left|Tile::Center);
-   textRect.setLeft(x);
-   textRect.setRight(qMax(RECT.right()-RECT.width()/4,x+(RECT.right()-x)/2));
-   line.render(textRect, painter, Tile::Right|Tile::Center);
-   //TODO: hover?
+   if (!dwOpt->title.isEmpty()) {
+      QFont fnt = painter->font(); bool noBold = fnt.bold();
+      fnt.setBold(true);
+      painter->setFont(fnt);
+      int itemtextopts = Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextHideMnemonic;
+
+      QPen pen = painter->pen();
+      if (Colors::value(FCOLOR(WindowText)) > 140) {
+         painter->setPen(Colors::mid(FCOLOR(Window), Qt::black, 1, 4));
+         drawItemText(painter, RECT.adjusted(0,-1,0,-1), itemtextopts, PAL, isEnabled, dwOpt->title);
+      }
+
+      painter->setPen(FCOLOR(WindowText));
+      drawItemText(painter, RECT, itemtextopts, PAL, isEnabled, dwOpt->title);
+      painter->setPen(pen);
+
+      if (noBold) {
+         fnt.setBold(false); painter->setFont(fnt);
+      }
+   }
 }
 
 void
@@ -81,16 +80,16 @@ BespinStyle::drawDockHandle(const QStyleOption * option, QPainter * painter,
    }
    painter->save();
    painter->setPen(Qt::NoPen);
-   const QPixmap *fill; int cnt = num/2, imp = hover ? 8 : 1;
+   const QPixmap *fill; int cnt = num/2, imp = hover ? 4 : 1;
    const QColor &bg = FCOLOR(Window);
    const QColor &fg = hover ? FCOLOR(Highlight) : FCOLOR(WindowText);
    if (num%2) {
-      fill = &Gradients::pix(Colors::mid(bg, fg, 3, imp), f6, Qt::Vertical, Gradients::Sunken);
+      fill = &Gradients::pix(Colors::mid(bg, fg, 5, imp), f6, Qt::Vertical, Gradients::Sunken);
       fillWithMask(painter, points[cnt], *fill, masks.notch);
    }
    --num;
    for (int i = 0; i < cnt; ++i) {
-      fill = &Gradients::pix(Colors::mid(bg, fg, 3+cnt-i, imp), f6, Qt::Vertical, Gradients::Sunken);
+      fill = &Gradients::pix(Colors::mid(bg, fg, 5+cnt-i, imp), f6, Qt::Vertical, Gradients::Sunken);
       fillWithMask(painter, points[i], *fill, masks.notch);
       fillWithMask(painter, points[num-i], *fill, masks.notch);
    }

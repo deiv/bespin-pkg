@@ -277,25 +277,33 @@ Factory::showWindowList(const QPoint &p, Client *client) {
    _windowList->popup(p);
 }
 
-static QString string(const QRect &r)
+
+static QString winType2string(NET::WindowType type)
 {
-   return QString("%1x%2%3%4%5%6").arg(r.width()).
-                                   arg(r.height()).
-                                   arg(r.x() < 0 ? '-' : '+').arg(r.x()).
-                                   arg(r.y() < 0 ? '-' : '+').arg(r.y());
+   switch (type) {
+   default:
+   case NET::Unknown: return "Unknown";
+   case NET::Normal: return "Normal";
+   case NET::Desktop: return "Desktop";
+   case NET::Dock: return "Dock";
+   case NET::Toolbar: return "Toolbar";
+   case NET::Menu: return "Menu";
+   case NET::Dialog: return "Dialog";
+   case NET::Override: return "Override";
+   case NET::TopMenu: return "TopMenu";
+   case NET::Utility: return "Utility";
+   case NET::Splash: return "Splash";
+   case NET::DropdownMenu: return "DropdownMenu";
+   case NET::PopupMenu: return "PopupMenu";
+   case NET::Tooltip: return "Tooltip";
+   case NET::Notification: return "Notification";
+   case NET::ComboBox: return "ComboBox";
+   case NET::DNDIcon: return "DNDIcon";
+   }
 }
 
-static const QString wininfo("\
-WId : <b>%1</b><br/>\
-Name: <b>%2 -> %3</b><br/>\
-IconName: <b>%4 -> %5</b><hr>\
-Geometry: <b>%6 -> %7</b><br/>\
-On Desktop: <b>%8 %9</b><br/>\
-On Machine: <b>%10</b><hr>\
-");
-
 void
-Factory::showInfo(const QPoint &p, Client *client) {
+Factory::showInfo(const QPoint &p, WId id) {
 
    // build info widget - in case
    if (!_windowInfo) {
@@ -306,15 +314,24 @@ Factory::showInfo(const QPoint &p, Client *client) {
       Header *header = new Header("Window Information", window);
       l->addWidget(header);
       _windowInfo = new QTextBrowser(window);
+
+      _windowInfo->viewport()->setAutoFillBackground(false);
+      _windowInfo->viewport()->setBackgroundRole(QPalette::Window);
+      _windowInfo->viewport()->setForegroundRole(QPalette::WindowText);
+      _windowInfo->setFrameStyle(QFrame::NoFrame);
+
       _windowInfo->setFontFamily ( "fixed" );
+      QString css("h1 { font-size:large; margin-top:10px; margin-bottom:4px; }");
+      _windowInfo->document()->setDefaultStyleSheet ( css );
+
       l->addWidget(_windowInfo);
-      window->resize(360, 640);
+      window->resize(255, 453);
    }
    else
       _windowInfo->clear();
 
    // fill with info
-   KWindowInfo info( client->windowId(),
+   KWindowInfo info( id,
                      NET::WMState | NET::WMWindowType | NET::WMVisibleName | NET::WMName |
                      NET::WMVisibleIconName | NET::WMIconName | NET::WMDesktop | NET::WMGeometry |
                      NET::WMFrameExtents,
@@ -322,26 +339,60 @@ Factory::showInfo(const QPoint &p, Client *client) {
                      NET::WM2WindowRole | NET::WM2ClientMachine | NET::WM2AllowedActions );
 /*
    unsigned long state() const;
-   NET::WindowType windowType( int supported_types ) const;
    WId transientFor() const; //the mainwindow for this window.
    WId groupLeader() const;
-   QByteArray windowClassClass() const; //WM_CLASS property
-   QByteArray windowClassName() const;
    QByteArray windowRole() const;
    bool actionSupported( NET::Action action ) const;
 */
-   _windowInfo->setHtml( wininfo.arg(info.win()).
-                                 arg(info.name()).
-                                 arg(info.visibleName()).
-                                 arg(info.iconName()).
-                                 arg(info.visibleIconName()).
-                                 arg(string(info.geometry())).
-                                 arg(string(info.frameGeometry())).
-                                 arg(info.desktop()).
-                                 arg(info.onAllDesktops() ? "(Sticked)" :
-                                                            (info.isOnCurrentDesktop() ? "(Current)" : "")).
-                                 arg(QString(info.clientMachine()))
-);
+   QString text("\
+<h1 align=center>Identification</h1>\
+WId      : <b>%1 %2 %3</b><br/>\
+Name     : <b>%4</b>" );
+   text = text.arg(QString::number(ulong(info.win()))).
+               arg(QString::number(long(info.win()))).
+               arg(QString::number(ulong(info.win()), 16)).
+               arg(info.name());
+
+   if (info.visibleName() != info.name())
+      text.append("<br/>Name V  : <b>%1</b>").arg(info.visibleName());
+   if (info.iconName() != info.name())
+      text.append("<br/>Iconic  : <b>%1</b>").arg(info.iconName());
+   if (info.iconName() != info.visibleIconName())
+      text.append("<br/>Iconic V: <b>%1</b>").arg(info.visibleIconName());
+
+   text.append("\
+<hr><h1 align=center>Geometry</h1>\
+    X    : <b>%1 (%5)</b><br/>\
+    Y    : <b>%2 (%6)</b><br/>\
+Width    : <b>%3 (%7)</b><br/>\
+Height   : <b>%4 (%8)</b>");
+   text = text.arg(info.geometry().x()).
+               arg(info.geometry().y()).
+               arg(info.geometry().width()).
+               arg(info.geometry().height()).
+               arg(info.frameGeometry().x()).
+               arg(info.frameGeometry().y()).
+               arg(info.frameGeometry().width()).
+               arg(info.frameGeometry().height());
+
+   text.append("\
+<hr><h1 align=center>Location</h1>\
+Desktop  : <b>%1 %2</b><br/>\
+Machine  : <b>%3</b>\
+<hr><h1 align=center>Properties</h1>\
+Type     : <b>%4 (%5)</b><br/>\
+Class    : <b>%6</b><br/>\
+ClassName: <b>%7</b><br/>\
+");
+   NET::WindowType type = info.windowType( NET::AllTypesMask );
+   text = text.arg(info.desktop()).
+               arg(info.onAllDesktops() ? "(Sticked)" : (info.isOnCurrentDesktop() ? "(Current)" : "")).
+               arg(QString(info.clientMachine())).
+               arg(winType2string(type)).arg(type).
+               arg(QString(info.windowClassClass())).
+               arg(QString(info.windowClassName()));
+
+   _windowInfo->setHtml( text );
 
    // and show up
    QWidget *win = _windowInfo->parentWidget();

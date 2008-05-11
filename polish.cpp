@@ -233,7 +233,7 @@ static QMenuBar *bar4popup(QMenu *menu) {
          return static_cast<QMenuBar *>(w);
    return 0;
 }
-#include <QtDebug>
+
 #undef PAL
 #define PAL pal
 

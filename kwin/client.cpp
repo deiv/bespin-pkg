@@ -391,6 +391,8 @@ Client::repaint(QPainter &p)
          DUMP_PICTURE(ct, cnrTile); // misleading, TOP TILE
          p.drawTiledPixmap( 0, h-(128+32), width(), 128, ctBuffer );
       }
+//       p.setPen(bg);
+//       p.drawLine(width()/4, titleSize-1, 3*width()/4, titleSize-1);
       break;
    }
    case 0: { // plain
@@ -708,7 +710,7 @@ Client::showInfo(const QPoint &p)
    QPoint ip = p;
    QPoint gp = widget()->mapToGlobal(QPoint(width()-320, 0));
    if (ip.x() > gp.x()) ip.setX(gp.x());
-   _factory->showInfo(ip, this);
+   _factory->showInfo(ip, windowId());
 }
 
 void

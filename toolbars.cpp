@@ -186,8 +186,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
    pmSize = pmSize.boundedTo(toolbutton->iconSize);
 
    if (!toolbutton->icon.isNull()) {
-      const QIcon::State state =
-         toolbutton->state & State_On ? QIcon::On : QIcon::Off;
+      const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
       QIcon::Mode mode;
       if (!isEnabled)
          mode = QIcon::Disabled;

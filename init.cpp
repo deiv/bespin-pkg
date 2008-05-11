@@ -234,6 +234,7 @@ BespinStyle::readSettings(const QSettings* settings)
    // Tabs ===========================
    readRole(tab.active, TAB_ACTIVEROLE);
    Animator::Tab::setDuration(CLAMP(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));
+   Animator::Tab::setFPS(25);
    GRAD(tab) = readGrad(TAB_GRADIENT);
    readRole(tab.std, TAB_ROLE);
    Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));

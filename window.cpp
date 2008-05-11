@@ -143,8 +143,7 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawToolTip(const QStyleOption * option, QPainter * painter,
-                         const QWidget *) const
+BespinStyle::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
    painter->save();
    painter->setBrush(Gradients::pix(FCOLOR(Window), RECT.height(),
@@ -174,13 +173,11 @@ void
 BespinStyle::drawTitleBar(const QStyleOptionComplex * option,
                           QPainter * painter, const QWidget * widget) const
 {
-   const QStyleOptionTitleBar *tb =
-      qstyleoption_cast<const QStyleOptionTitleBar *>(option);
+   const QStyleOptionTitleBar *tb = qstyleoption_cast<const QStyleOptionTitleBar *>(option);
    if (!tb) return;
 
-//    painter->fillRect(RECT, Qt::red);
    QRect ir;
-       
+
    // the label
    if (option->subControls & SC_TitleBarLabel) {
       ir = subControlRect(CC_TitleBar, tb, SC_TitleBarLabel, widget);
@@ -236,8 +233,7 @@ BespinStyle::drawTitleBar(const QStyleOptionComplex * option,
 }
 
 void
-BespinStyle::drawSizeGrip(const QStyleOption * option, QPainter * painter,
-                          const QWidget *) const
+BespinStyle::drawSizeGrip(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
    Qt::Corner corner;
    if (const QStyleOptionSizeGrip *sgOpt =

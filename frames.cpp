@@ -17,6 +17,7 @@
  */
 
 #include <QLabel>
+#include <QListView>
 #include <QTableView>
 #include <QTreeView>
 #include "visualframe.h"
@@ -24,11 +25,15 @@
 
 #include "debug.h"
 
+#include <QtDebug>
+
 bool
 BespinStyle::isSpecialFrame(const QWidget *w)
 {
-   return
-      w->inherits("QTextEdit") ||
+   if (const QListView *view = qobject_cast<const QListView*>(w)) {
+      return (view->viewMode() == QListView::IconMode);
+   }
+   return w->inherits("QTextEdit") ||
       w->objectName() == "RenderFormElementWidget" ||
       (w->parentWidget() && w->parentWidget()->inherits("KateView"));
 }
@@ -201,6 +206,7 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
       QStyleOptionButton box;
       box.QStyleOption::operator=(*groupBox);
       box.rect = subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
+//       box.state |= State_HasFocus; // focus to signal this to the user
       if (groupBox->activeSubControls & SC_GroupBoxCheckBox)
          box.state |= State_MouseOver;
       drawRadio(&box, painter, 0L);

@@ -317,7 +317,7 @@ TabInfo::updatePixmaps(Transition transition, uint ms)
       default:
       case CrossFade: {
          float quote = (float)_timeStep / (duration-ms);
-         progress += quote;
+//          progress += quote;
          OXRender::blend(tabPix[1], tabPix[2], quote);
          break;
       }

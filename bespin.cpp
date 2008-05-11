@@ -293,16 +293,33 @@ void
 BespinStyle::drawItemText(QPainter *painter, const QRect &rect, int alignment, const QPalette &pal,
                           bool enabled, const QString& text, QPalette::ColorRole textRole) const
 {
-    if (text.isEmpty())
-        return;
-    QPen savedPen;
-    if (textRole != QPalette::NoRole) {
-        savedPen = painter->pen();
-        painter->setPen(QPen(pal.brush(textRole), savedPen.widthF()));
-    }
-    painter->drawText(rect, alignment, text);
-    if (textRole != QPalette::NoRole)
-        painter->setPen(savedPen);
+   if (text.isEmpty())
+      return;
+   QPen savedPen;
+   bool penDirty = false;
+   if (textRole != QPalette::NoRole) {
+      penDirty = true;
+      savedPen = painter->pen();
+      painter->setPen(QPen(pal.brush(textRole), savedPen.widthF()));
+   }
+   if (!enabled) { // let's see if we can get some blurrage here =)
+      if (!penDirty) {
+         savedPen = painter->pen();
+         penDirty = true;
+      }
+      QColor c = painter->pen().color();
+      const int a = c.alpha();
+      c.setAlpha(3*a/5); painter->setPen(QPen(c, savedPen.widthF()));
+      QRect r = rect;
+      r.adjust(-1,-1,-1,-1);
+      painter->drawText(r, alignment, text);
+      r.adjust(2,2,2,2);
+      painter->drawText(r, alignment, text);
+      c.setAlpha(2*a/3); painter->setPen(QPen(c, savedPen.widthF()));
+   }
+   painter->drawText(rect, alignment, text);
+   if (penDirty)
+      painter->setPen(savedPen);
 }
 
 void

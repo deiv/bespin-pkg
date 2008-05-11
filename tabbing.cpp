@@ -244,8 +244,12 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
    QColor c;
    if (sunken) {
       c = CCOLOR(tab.active, Bg);
-      if (config.tab.activeTabSunken)
-         rect.adjust(f2, -f2, -f2, 0);
+      if (config.tab.activeTabSunken) {
+         if (vertical)
+            rect.adjust(0, dpi.f1, 0, -dpi.f2);
+         else
+            rect.adjust(f2, -f2, -f2, 0);
+      }
       else {
          if (vertical)
             rect.adjust(-dpi.f1, f2, dpi.f1, -f2);
@@ -314,17 +318,14 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
        
    if (!tab->icon.isNull()) {
       QSize iconSize;
-      if (const QStyleOptionTabV2 *tabV2 =
-          qstyleoption_cast<const QStyleOptionTabV2*>(tab))
+      if (const QStyleOptionTabV2 *tabV2 = qstyleoption_cast<const QStyleOptionTabV2*>(tab))
          iconSize = tabV2->iconSize;
       if (!iconSize.isValid()) {
          int iconExtent = pixelMetric(PM_SmallIconSize);
          iconSize = QSize(iconExtent, iconExtent);
       }
-      QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ?
-                                          QIcon::Normal : QIcon::Disabled);
-      painter->drawPixmap(tr.left() + dpi.f9,
-                        tr.center().y() - tabIcon.height() / 2, tabIcon);
+      QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ? QIcon::Normal : QIcon::Disabled);
+      painter->drawPixmap(tr.left() + dpi.f9, tr.center().y() - tabIcon.height() / 2, tabIcon);
       tr.setLeft(tr.left() + iconSize.width() + dpi.f12);
       alignment = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic;
    }

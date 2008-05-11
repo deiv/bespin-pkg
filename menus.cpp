@@ -114,8 +114,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       drawItemPixmap(painter,r, alignment, pix);
    else
       drawItemText(painter, r, alignment, mbi->palette, isEnabled,
-                   mbi->text, (hover || step > 2) ? ROLE[Fg] :
-                   config.menu.bar_role[Fg]);
+                   mbi->text, (hover || step > 2) ? ROLE[Fg] : config.menu.bar_role[Fg]);
 }
 
 void
@@ -177,8 +176,7 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
       Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 2,1);
 
    painter->save();
-   bool checkable =
-      (menuItem->checkType != QStyleOptionMenuItem::NotCheckable);
+   bool checkable = (menuItem->checkType != QStyleOptionMenuItem::NotCheckable);
    bool checked = checkable && menuItem->checked;
 
    // selected bg
@@ -234,14 +232,13 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
    if (!s.isEmpty()) {
       // draw text
       int t = s.indexOf('\t');
-      const int text_flags = Qt::AlignVCenter | Qt::TextShowMnemonic |
-         Qt::TextDontClip | Qt::TextSingleLine;
+      const int text_flags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
       if (t >= 0) {
-         QRect vShortcutRect = visualRect(option->direction, r,
-                                          QRect(textRect.topRight(),
-                                             QPoint(textRect.right()+tab, textRect.bottom())));
+         QRect vShortcutRect = visualRect(option->direction, r, QRect(textRect.topRight(),
+                                          QPoint(textRect.right()+tab, textRect.bottom())));
          painter->setPen(Colors::mid(bg, fg));
-         painter->drawText(vShortcutRect, text_flags | Qt::AlignRight, s.mid(t + 1));
+         drawItemText(painter, vShortcutRect, text_flags | Qt::AlignRight, PAL, isEnabled, s.mid(t + 1));
+//          painter->drawText(vShortcutRect, text_flags | Qt::AlignRight, s.mid(t + 1));
          painter->setPen(fg);
          s = s.left(t);
       }
@@ -250,7 +247,8 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
          font.setBold(true);
          painter->setFont(font);
       }
-      painter->drawText(vTextRect, text_flags | Qt::AlignLeft, s.left(t));
+      drawItemText(painter, vTextRect, text_flags | Qt::AlignLeft, PAL, isEnabled, s);
+//       painter->drawText(vTextRect, text_flags | Qt::AlignLeft, s.left(t));
    }
          
    // Arrow
@@ -261,9 +259,7 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
       int dim = 5*r.height()/12;
       xpos = r.right() - dpi.f4 - dim;
       QStyleOptionMenuItem tmpOpt = *menuItem;
-      tmpOpt.rect = visualRect(option->direction, r,
-                              QRect(xpos, r.y() +
-                                    (r.height() - dim)/2, dim, dim));
+      tmpOpt.rect = visualRect(option->direction, r, QRect(xpos, r.y() + (r.height() - dim)/2, dim, dim));
       painter->setBrush(Colors::mid(bg, fg, 1, 2));
       painter->setPen(painter->brush());
       drawArrow(dir, tmpOpt.rect, painter);
