@@ -259,7 +259,7 @@ BespinStyle::drawToolBarHandle(const QStyleOption * option, QPainter * painter,
 {
 
    OPT_HOVER
-   if (!hover) return;
+//    if (!hover) return;
    
    painter->save();
    QRect rect = RECT; bool line = false; int dx(0), dy(0);
@@ -279,7 +279,9 @@ BespinStyle::drawToolBarHandle(const QStyleOption * option, QPainter * painter,
       rect.setTop(rect.top()+(rect.height()-rect.width())/2);
       rect.setHeight(rect.width());
    }
-   QColor c = FCOLOR(Window).dark(110);
+   QColor c = FCOLOR(Window);
+   if (hover)
+      c = Colors::mid(c, FCOLOR(Highlight), 3, 1);
    painter->setRenderHint(QPainter::Antialiasing);
    painter->setBrush(Gradients::pix(c, rect.height(), Qt::Vertical, Gradients::Sunken));
    painter->setPen(Qt::NoPen);

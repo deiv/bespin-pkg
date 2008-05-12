@@ -393,7 +393,7 @@ const QPixmap
    pix->fill(Qt::transparent);
    QPoint start(0,0), stop(0,height);
    QLinearGradient lg(start, stop);
-   lg.setColorAt(0, QColor(255,255,255,116));
+   lg.setColorAt(0, QColor(255,255,255,80));
    lg.setColorAt(1, QColor(255,255,255,0));
    QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
    

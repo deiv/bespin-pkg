@@ -313,17 +313,18 @@ void
 TabInfo::updatePixmaps(Transition transition, uint ms)
 {
    switch (transition) {
-      #ifndef QT_NO_XRENDER
+#ifndef QT_NO_XRENDER
       default:
       case CrossFade: {
+         // belive it or not: linear and will end up at a fully blended pixmap, as
+         // progress = (1-quote)*progress + quote; // !
          float quote = (float)_timeStep / (duration-ms);
-//          progress += quote;
          OXRender::blend(tabPix[1], tabPix[2], quote);
          break;
       }
-      #else
+#else
       default:
-      #endif
+#endif
       case ScanlineBlend: {
          QPainter p(&tabPix[2]);
          const int numStep = duration/_timeStep;

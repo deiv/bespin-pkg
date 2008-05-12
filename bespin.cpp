@@ -416,17 +416,24 @@ BespinStyle::erase(const QStyleOption *option, QPainter *painter,
 static void swapPalette(QWidget *widget, BespinStyle *style)
 {
    QPalette pal(widget->palette());
-   QColor h = pal.color(QPalette::Active, QPalette::WindowText);
-   pal.setColor(QPalette::Active, QPalette::WindowText, pal.color(QPalette::Active, QPalette::Window));
-   pal.setColor(QPalette::Active, QPalette::Window, h);
+   QPalette::ColorGroup group = QPalette::Active;
+   while (group != QPalette::Disabled) {
+    QColor h = pal.color(group, QPalette::WindowText);
+    pal.setColor(group, QPalette::WindowText, pal.color(group, QPalette::Window));
+    pal.setColor(group, QPalette::Window, h);
 
-//    h = pal.color(QPalette::Active, QPalette::Text);
-//    pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::Base));
-//    pal.setColor(QPalette::Active, QPalette::Base, h);
+    //    h = pal.color(group, QPalette::Text);
+    //    pal.setColor(group, QPalette::Text, pal.color(group, QPalette::Base));
+    //    pal.setColor(group, QPalette::Base, h);
 
-   h = pal.color(QPalette::Active, QPalette::Button);
-   pal.setColor(QPalette::Active, QPalette::Button, pal.color(QPalette::Active, QPalette::ButtonText));
-   pal.setColor(QPalette::Active, QPalette::ButtonText, h);
+    h = pal.color(group, QPalette::Button);
+    pal.setColor(group, QPalette::Button, pal.color(group, QPalette::ButtonText));
+    pal.setColor(group, QPalette::ButtonText, h);
+    if (config.fadeInactive || group == QPalette::Inactive)
+       group = QPalette::Disabled;
+    else
+       group = QPalette::Inactive;
+   }
    style->polish(pal);
    widget->setPalette(pal);
 }
