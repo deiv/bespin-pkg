@@ -110,7 +110,7 @@ metalGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
    QLinearGradient lg(start, stop);
    QColor iC = c.light(106); lg.setColorAt(0, iC);
    iC = c.light(103); lg.setColorAt(0.45, iC);
-   iC = c.dark(103); lg.setColorAt(0.45, iC);
+   iC = c.dark(103); lg.setColorAt(0.451, iC);
    iC = c.dark(110); lg.setColorAt(1, iC);
    return lg;
 }
@@ -223,31 +223,18 @@ progressGradient(const QColor &c, int size, Qt::Orientation o) {
 //    QColor ltC = c.light(150-dc);
    
    QPoint start, stop;
-   QPixmap *dark = newPix(size, o, &start, &stop, 3*size);
-   QGradient lg1 = simpleGradient(ltC, start, stop),
-      lg2 = gl_ssGradient(dkC, start, stop, true);
-//    switch (_progressBase) {
-//    case Gradients::Button:
-//       lg1 = buttonGradient(dkC, start, stop);
-//       lg2 = buttonGradient(ltC, start, stop); break;
-//    case Gradients::Glass:
-//    default:
-//       lg1 = gl_ssGradient(dkC, start, stop, true);
-//       lg2 = gl_ssGradient(ltC, start, stop, true); break;
-//    case Gradients::Simple:
-//       lg1 = simpleGradient(dkC, start, stop);
-//       lg2 = simpleGradient(ltC, start, stop); break;
-//    case Gradients::Sunken:
-//       lg1 = sunkenGradient(dkC, start, stop);
-//       lg2 = sunkenGradient(ltC, start, stop); break;
-//    case Gradients::Gloss:
-//       lg1 = gl_ssGradient(dkC, start, stop);
-//       lg2 = gl_ssGradient(ltC, start, stop); break;
-//    }
+   QPixmap *dark = newPix(size, o, &start, &stop, 4*size);
+   QGradient   lg1 = simpleGradient(ltC, start, stop),
+               lg2 = gl_ssGradient(dkC, start, stop, true);
+
    QPainter p(dark); p.fillRect(dark->rect(), lg1); p.end();
    
    QPixmap alpha = QPixmap(dark->size());
-   QRadialGradient rg(alpha.rect().center(), 3*size/2);
+   QRadialGradient rg;
+   if (o == Qt::Horizontal)
+      rg = QRadialGradient(alpha.rect().center(), 10*size/4);
+   else
+      rg = QRadialGradient(alpha.width()/2, 5*alpha.height()/3, 10*size/4);
    rg.setColorAt(0, Qt::white);
 #ifndef QT_NO_XRENDER
    rg.setColorAt(0.9, Qt::transparent);

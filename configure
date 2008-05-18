@@ -121,7 +121,7 @@ DEFINES += SHAPE_POPUP=0
 if $CONFIG_KDE; then
 echo "
 DATA.files = bespin.themerc
-DATA.path += $KDE_DIR/share/apps/kstyle/themes/
+DATA.path += "$KDE_DATA_PATH/kstyle/themes/"
 " >> bespin.pro
 fi
 if $HAVE_RENDER; then
@@ -159,6 +159,7 @@ RESOURCES   = config.qrc
 target.path = $PREFIX/bin
 INSTALLS = target
 DEFINES += EXECUTABLE=1
+QMAKE_CXXFLAGS += -fPIC
 " > config/bespin.pro
 if $CONFIG_KDE; then
 echo "DEFINES += KDE_SUPPORT=1
@@ -194,7 +195,7 @@ CONFIG += qt x11 plugin
 VERSION       = 0.1
 target.path += $KDE_DIR/lib/kde4/
 DATA.files = bespin.desktop
-DATA.path += $KDE_DIR/share/apps/kwin
+DATA.path += "$KDE_DATA_PATH/kwin"
 INSTALLS += target DATA
 DEFINES += BESPIN_DECO
 " > kwin/client.pro
@@ -225,50 +226,13 @@ write_kwin_client_pro
 write_kwin_config_pro
 }
 
-check_x64_shared() {
-echo "
-TEMPLATE    = app
-TARGET      = x64test
-SOURCES     = x64test.cpp
-QMAKE_LFLAGS_SHAPP += -shared
-" > x64test.pro
-
-echo "
-#include <QApplication>
-int main (int , char **) {
-return 0;
-}
-" > x64test.cpp
-$QMAKE x64test.pro -o Makefile.x64test
-make -f Makefile.x64test > /dev/null 2>&1
-
-if [ ! -e x64test ]; then
-   bad "Unable to compile a simple Qt4 test app, allthough Qt4 seems to be present - borked installation?"
-   exit 1
-fi
-
-if ./x64test; then
-   ui "g++64 seems to require '-shared'"
-   GCC64=true
-else
-   GCC64=false
-   ui "(the segfault above is harmless...)"
-   ui "seems no x86-64 system or at least '-shared' is NOT required by g++"
-fi
-make distclean -f Makefile.x64test > /dev/null 2>&1
-rm -f x64test.pro x64test.cpp
-}
-
 check_xrender() {
 echo "
 TEMPLATE    = app
 TARGET      = rendertest
 SOURCES     = rendertest.cpp
+QMAKE_CXXFLAGS += -fPIC
 " > rendertest.pro
-if $GCC64; then
-echo "QMAKE_LFLAGS_SHAPP += -shared
-" >> rendertest.pro
-fi
 
 echo "
 #include <QApplication>
@@ -321,9 +285,6 @@ if [ "$QT_DIR" = "" ]; then
 fi
 export CONFIG_QT=true
 
-## ok, next lets try to figure out whether this is a 64bit arch
-check_x64_shared
-
 ## next we need to check whether Qt uses Xrender, what's not mentioned in the mkspecs...
 check_xrender
 
@@ -334,6 +295,8 @@ if [ "$KDE_DIR" = "" ]; then
 else
    export CONFIG_KDE=true
    export KDE_DIR
+   KDE_DATA_PATH="$($KDE_DIR/bin/kde4-config --path data)"
+   KDE_DATA_PATH="${KDE_DATA_PATH#*:}"
    CONFIG_KWIN=$([ -e "$KDE_DIR/include/kdecoration.h" ])
 fi
 

@@ -405,8 +405,12 @@ Client::repaint(QPainter &p)
    case 1: { // scanlines, fallback
       p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
       const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, Gradients::Button);
-      const QColor shadow = Colors::mid(bg, Qt::black,6,1);
       p.drawTiledPixmap(top, fill);
+      p.setPen(Colors::mid(bg, Qt::black,6,1));
+      p.drawLine(0,titleSize-1,width(),titleSize-1);
+//       p.setPen(Colors::mid(bg, Qt::white,6,1));
+//       p.drawLine(0,titleSize-1,width(),titleSize-1);
+      
       Gradients::Type titleGradient = (Gradients::Type)gType[isActive()];
       if (titleGradient && label.width()) {
          p.setRenderHint( QPainter::Antialiasing );
@@ -417,8 +421,6 @@ Client::repaint(QPainter &p)
          p.drawRoundRect(label.adjusted(0,4,0,-4),titleSize*99/label.width(),99);
          p.setRenderHint( QPainter::Antialiasing, false );
       }
-      p.setPen(QPen(shadow, 2));
-      p.drawLine(0,titleSize-1,width(),titleSize-1);
       break;
    }
    }

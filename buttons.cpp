@@ -105,7 +105,8 @@ BespinStyle::drawPushButtonBevel(const QStyleOption * option,
 
       painter->save();
       painter->setRenderHint(QPainter::Antialiasing);
-      QColor c = Colors::mid(CCOLOR(btn.std, Fg), CCOLOR(btn.active, Fg), 6-animStep, animStep);
+      const QColor c = config.btn.backLightHover ? CCOLOR(btn.std, Fg) :
+                       Colors::mid(CCOLOR(btn.std, Fg), CCOLOR(btn.active, Fg), 6-animStep, animStep);
       if (option->state & State_On) {
          const QPixmap &fill = Gradients::pix(c, r.height(), Qt::Vertical, GRAD(btn));
          painter->setBrush(fill);

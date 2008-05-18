@@ -279,7 +279,7 @@ BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hover, int step, boo
       fg1 = FCOLOR(WindowText); fg2 = FCOLOR(Highlight);
    }
 
-   if (config.btn.backLightHover)
+   if (!flat && config.btn.backLightHover)
       return fg1;
    
    if (hover && !step) step = 6;
@@ -309,13 +309,13 @@ BespinStyle::drawItemText(QPainter *painter, const QRect &rect, int alignment, c
       }
       QColor c = painter->pen().color();
       const int a = c.alpha();
-      c.setAlpha(3*a/5); painter->setPen(QPen(c, savedPen.widthF()));
+      c.setAlpha(a/2); painter->setPen(QPen(c, savedPen.widthF()));
       QRect r = rect;
       r.adjust(-1,-1,-1,-1);
       painter->drawText(r, alignment, text);
       r.adjust(2,2,2,2);
       painter->drawText(r, alignment, text);
-      c.setAlpha(2*a/3); painter->setPen(QPen(c, savedPen.widthF()));
+      c.setAlpha(3*a/4); painter->setPen(QPen(c, savedPen.widthF()));
    }
    painter->drawText(rect, alignment, text);
    if (penDirty)
