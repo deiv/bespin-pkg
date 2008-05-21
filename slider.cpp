@@ -225,13 +225,12 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       QColor bc = CONF_COLOR(btn.std, Bg);
       if (config.btn.fullHover)
          bc = Colors::mid(bc, CONF_COLOR(btn.active, Bg), 6-step, step);
-      const QColor fc = Colors::mid(bc, hasFocus ? FCOLOR(Highlight) :
-                                                   CONF_COLOR(btn.std, Fg), 6-step, step+3);
 
       const QPixmap &fill = Gradients::pix(bc, masks.slider.height(), Qt::Vertical,
                                            isEnabled ? GRAD(scroll) : Gradients::None);
       fillWithMask(painter, xy, fill, masks.slider);
       if (isEnabled) {
+         const QColor fc = Colors::mid(hasFocus ? FCOLOR(Highlight) : bc, CONF_COLOR(btn.std, Fg), 6-step, step+3);
          xy += QPoint(dpi.f5, dpi.f5);
          fillWithMask(painter, xy, fc, masks.notch);
       }

@@ -26,7 +26,12 @@ BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, cons
    ASSURE_OPTION(dwOpt, DockWidget);
    OPT_ENABLED
 
-   masks.rect[true].render(RECT, painter, FCOLOR(Window));
+//    masks.rect[true].render(RECT, painter, FCOLOR(Window));
+//    shadows.line[false][Sunken].render(RECT, painter, Tile::Full, false);
+   QRect r = RECT; r.setRight(r.x() + r.width()/3);
+   shadows.line[false][Sunken].render(r, painter, Tile::Center | Tile::Right, true);
+   r.setRight(RECT.right()); r.setLeft(r.right() - r.width()/3);
+   shadows.line[false][Sunken].render(r, painter, Tile::Center | Tile::Left, true);
 
    if (!dwOpt->title.isEmpty()) {
       QFont fnt = painter->font(); bool noBold = fnt.bold();
