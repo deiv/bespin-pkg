@@ -22,6 +22,7 @@ ask_for_qt() {
       read -p "Path to Qt4: " QT_DIR
       check="$($QT_DIR/bin/qmake --version 2>&1 | grep -E "Qt *version *4")"
       if [ "$check" != "" ]; then
+         QMAKE="$QT_DIR/bin/qmake"
          break;
       fi
    done
@@ -39,7 +40,7 @@ ask_for_kde() {
    done
 }
 
-QT_DIRS="/opt/qt4 /usr/local/qt4 /usr/share/qt4"
+QT_DIRS="/opt/qt4 /usr/local/qt4 /usr/share/qt4 /usr/lib/qt4"
 
 find_qt() {
    check="$(qmake --version 2>&1 | grep -E "Qt *version *4")"
