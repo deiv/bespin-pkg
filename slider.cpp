@@ -21,6 +21,36 @@
 #include "draw.h"
 
 void
+BespinStyle::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainter *painter,
+                              int step) const
+{
+   B_STATES;
+
+   // shadow
+   QPoint xy = handle.topLeft();
+   if (sunken) xy += QPoint(dpi.f1, 0);
+   painter->drawPixmap(xy, shadows.slider[isEnabled][sunken]);
+   if (hasFocus && !sunken)
+      fillWithMask(painter, xy, FCOLOR(Highlight), shadows.slider[true][false]);
+
+   // gradient
+   xy += QPoint(sunken ? dpi.f1 : dpi.f2, dpi.f1);
+
+   QColor bc = CCOLOR(btn.std, Bg);
+   if (config.btn.fullHover)
+      bc = Colors::mid(bc, CCOLOR(btn.active, Bg), 6-step, step);
+
+   const QPixmap &fill = Gradients::pix(bc, masks.slider.height(), Qt::Vertical,
+                                          isEnabled ? GRAD(scroll) : Gradients::None);
+   fillWithMask(painter, xy, fill, masks.slider);
+   if (isEnabled) {
+      const QColor fc = Colors::mid(hasFocus ? FCOLOR(Highlight) : bc, CCOLOR(btn.std, Fg), 6-step, step+3);
+      xy += QPoint(dpi.f5, dpi.f5);
+      fillWithMask(painter, xy, fc, masks.notch);
+   }
+}
+
+void
 BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
                         const QWidget * widget) const
 {
@@ -38,8 +68,8 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
          int interval = slider->tickInterval;
          if (interval < 1) interval = slider->pageStep;
          if (interval) {
-            const int thickness =
-               pixelMetric(PM_SliderControlThickness, slider, widget);
+//             const int thickness =
+//                pixelMetric(PM_SliderControlThickness, slider, widget);
             const int len =
                pixelMetric(PM_SliderLength, slider, widget);
             const int fudge = len / 2;
@@ -88,7 +118,7 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
    isEnabled = isEnabled && (slider->maximum > slider->minimum);
    hover = isEnabled && hover && (slider->activeSubControls & SC_SliderHandle);
    sunken = sunken && (slider->activeSubControls & SC_SliderHandle);
-   const int ground = 0;
+//    const int ground = 0;
 
    // groove
    if ((slider->subControls & SC_SliderGroove) && groove.isValid()) {
@@ -212,43 +242,8 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
             step = 6;
       }
 
-      // shadow
-      QPoint xy = handle.topLeft();
-      if (sunken) xy += QPoint(dpi.f1, 0);
-      painter->drawPixmap(xy, shadows.slider[isEnabled][sunken]);
-      if (hasFocus && !sunken)
-         fillWithMask(painter, xy, FCOLOR(Highlight), shadows.slider[true][false]);
+   drawSliderHandle(handle, option, painter, step);
 
-      // gradient
-      xy += QPoint(sunken ? dpi.f1 : dpi.f2, dpi.f1);
-      
-      QColor bc = CONF_COLOR(btn.std, Bg);
-      if (config.btn.fullHover)
-         bc = Colors::mid(bc, CONF_COLOR(btn.active, Bg), 6-step, step);
-
-      const QPixmap &fill = Gradients::pix(bc, masks.slider.height(), Qt::Vertical,
-                                           isEnabled ? GRAD(scroll) : Gradients::None);
-      fillWithMask(painter, xy, fill, masks.slider);
-      if (isEnabled) {
-         const QColor fc = Colors::mid(hasFocus ? FCOLOR(Highlight) : bc, CONF_COLOR(btn.std, Fg), 6-step, step+3);
-         xy += QPoint(dpi.f5, dpi.f5);
-         fillWithMask(painter, xy, fc, masks.notch);
-      }
-#if 0
-      SAVE_PEN;
-      painter->setPen(fc);
-      int x1, x2, y1, y2;
-      if (slider->orientation == Qt::Horizontal) {
-         x1 = x2 = handle.center().x();
-         y1 = handle.top()+dpi.f4; y2 = handle.bottom()-dpi.f5;
-      }
-      else {
-         x1 = handle.left()+dpi.f4; x2 = handle.right()-dpi.f4;
-         y1 = y2 = handle.center().y();
-      }
-      painter->drawLine(x1, y1, x2, y2);
-      RESTORE_PEN;
-#endif
    }
 }
 
@@ -272,30 +267,43 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter,
       rect.setHeight(rect.width());
    }
        
-   int d = qMax(rect.width()/6, dpi.f10);
-   int r = (rect.width()-d)/2;
+   int d = qMin(2*rect.width()/5, dpi.SliderThickness);
+   int r;
    // angle calculation from qcommonstyle.cpp (c) Trolltech 1992-2007, ASA.
    qreal a;
    if (dial->maximum == dial->minimum)
       a = M_PI / 2;
    else if (dial->dialWrapping)
-      a = M_PI * 3 / 2 - (dial->sliderValue - dial->minimum) * 2 * M_PI
-      / (dial->maximum - dial->minimum);
+      a = M_PI * 3 / 2 - (dial->sliderValue - dial->minimum) * 2 * M_PI /
+                                                            (dial->maximum - dial->minimum);
    else
-      a = (M_PI * 8 - (dial->sliderValue - dial->minimum) * 10 * M_PI
-         / (dial->maximum - dial->minimum)) / 6;
+      a = (M_PI * 8 - (dial->sliderValue - dial->minimum) * 10 * M_PI /
+                                                            (dial->maximum - dial->minimum)) / 6;
 
-   QPoint cp((int)(r * cos(a)), -(int)(r * sin(a)));
-   cp += rect.center();
+   QPoint cp = rect.center();
 
-   // the huge ring
-   r = d/2; rect.adjust(r,r,-r,-r);
-   painter->setPen(FCOLOR(Window).dark(115));
-   painter->setRenderHint( QPainter::Antialiasing );
-   painter->drawEllipse(rect);
-   rect.translate(0, 1);
-   painter->setPen(FCOLOR(Window).light(108));
-   painter->drawEllipse(rect);
+   bool small = false;
+   // fallback for small dials
+   if (small = (rect.width() < 5*dpi.SliderThickness/2)) {
+      painter->setRenderHint( QPainter::Antialiasing );
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(QColor(0,0,0,50));
+      painter->drawEllipse(rect);
+      rect.adjust(dpi.f2,dpi.f1,-dpi.f2,-dpi.f2);
+      painter->setBrushOrigin(rect.topLeft());
+      const QPixmap &fill = Gradients::pix(FCOLOR(Window), rect.height(), Qt::Vertical, GRAD(scroll));
+      painter->setBrush(fill);
+      painter->drawEllipse(rect);
+      QColor c = hasFocus ? FCOLOR(Highlight) : FCOLOR(WindowText);
+      if (!hover)
+         c = Colors::mid(FCOLOR(Window), c, 1, 1+isEnabled);
+      d = qMax(dpi.f3, d/4);
+      r = (rect.width()-d)/2;
+      cp += QPoint((int)(r * cos(a)), -(int)(r * sin(a)));
+      painter->setPen(QPen(c, d, Qt::SolidLine, Qt::RoundCap));
+      painter->drawPoint(cp);
+   }
+
    // the value
    QFont fnt = painter->font();
    int h = rect.height()/2;
@@ -305,19 +313,25 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter,
    painter->setBrush(Qt::NoBrush);
    painter->setPen(Colors::mid(PAL.background().color(), PAL.foreground().color(),1,2));
    drawItemText(painter, rect,  Qt::AlignCenter, PAL, isEnabled, QString::number(dial->sliderValue));
-   
+
+   if (small) return;
+
+   r = (rect.width()-d)/2;
+   cp += QPoint((int)(r * cos(a)), -(int)(r * sin(a)));
+
+   // the huge ring
+   r = d/2; rect.adjust(r,r,-r,-r);
+   painter->setPen(FCOLOR(Window).dark(115));
+   painter->setRenderHint( QPainter::Antialiasing );
+   painter->drawEllipse(rect);
+   rect.translate(0, 1);
+   painter->setPen(FCOLOR(Window).light(108));
+   painter->drawEllipse(rect);
+
    // the drop
-   painter->setPen(Qt::NoPen);
    rect = QRect(0,0,d,d);
    rect.moveCenter(cp);
-   painter->setBrush(QColor(0,0,0,50));
-   painter->drawEllipse(rect);
-   rect.adjust(dpi.f2,dpi.f1,-dpi.f2,-dpi.f2);
-   painter->setPen(QPen(CONF_COLOR(btn.std, 0), dpi.f2));
-   painter->setBrushOrigin(rect.topLeft());
-   const QColor c = hover ? CONF_COLOR(btn.active, 0) : hasFocus ? FCOLOR(Highlight) : CONF_COLOR(btn.std, 0);
-   const QPixmap &fill = Gradients::pix(c, rect.height(), Qt::Vertical, GRAD(scroll));
-   painter->setBrush(fill);
-   painter->drawEllipse(rect);
+   drawSliderHandle(rect, option, painter, hover * 6);
+
    painter->restore();
 }

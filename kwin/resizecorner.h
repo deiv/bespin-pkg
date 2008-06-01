@@ -48,8 +48,7 @@ protected:
    void paintEvent ( QPaintEvent * );
 private:
    bool eventFilter(QObject *obj, QEvent *e);
-   Client *client; QColor bg, fg;
-   QPixmap buffer;
+   Client *client; QColor fg;
 };
 
 }; // namespace

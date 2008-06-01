@@ -30,10 +30,8 @@ BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
    if (config.menu.bar_role[Bg] != QPalette::Window ||
        config.menu.barGradient != Gradients::None)
       painter->fillRect(RECT.adjusted(0,0,0,-dpi.f2),
-                        Gradients::brush(Colors::mid(FCOLOR(Window),
-                                                     CCOLOR(menu.bar, Bg),1,4),
-                                         RECT.height()-dpi.f2,
-                                         Qt::Vertical, config.menu.barGradient));
+                        Gradients::brush(Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,4),
+                                         RECT.height()-dpi.f2, Qt::Vertical, config.menu.barGradient));
    if (config.menu.barSunken) {
       Tile::setShape(Tile::Top | Tile::Bottom);
       shadows.sunken[false][false].render(RECT, painter);
@@ -46,8 +44,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
                              const QWidget * widget) const
 {
    drawMenuBarBg(option, painter, widget);
-   const QStyleOptionMenuItem *mbi =
-      qstyleoption_cast<const QStyleOptionMenuItem *>(option);
+   const QStyleOptionMenuItem *mbi = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
    if (!mbi) return;
 #if 0 // was necessary once, not anymore?!
    if (mbi->menuRect.height() > mbi->rect.height()) {
@@ -81,9 +78,8 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
    QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f4);
    if (step || hover) {
       if (!step) step = 6;
-      QColor c = (config.menu.bar_role[Bg] == QPalette::Window) ?
-         FCOLOR(Window) :
-         Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,4);
+      QColor c = (config.menu.bar_role[Bg] == QPalette::Window) ? FCOLOR(Window) :
+                                             Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,4);
       c = Colors::mid(c, COLOR(ROLE[Bg]), 9-step, step);
 //       int dy = 0;
 //       if (!sunken) {
@@ -93,8 +89,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
 //          r.adjust(dx, dy, -dx, -dy);
 //          step = 6-step;
 //       }
-      const Gradients::Type gt =
-         sunken ? Gradients::Sunken : config.menu.itemGradient;
+      const Gradients::Type gt = sunken ? Gradients::Sunken : config.menu.itemGradient;
       masks.rect[round_].render(r, painter, gt, Qt::Vertical, c, r.height()/*, QPoint(0,-dy)*/);
       if (config.menu.activeItemSunken && sunken) {
          r.setBottom(r.bottom()+dpi.f2);
@@ -104,17 +99,13 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
       else if (step == 6 && config.menu.itemSunken)
          shadows.sunken[round_][false].render(r, painter);
    }
-   QPixmap pix =
-      mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ?
-                     QIcon::Normal : QIcon::Disabled);
-   const uint alignment =
-      Qt::AlignCenter | Qt::TextShowMnemonic |
-      Qt::TextDontClip | Qt::TextSingleLine;
+   QPixmap pix = mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ? QIcon::Normal : QIcon::Disabled);
+   const uint alignment = Qt::AlignCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
    if (!pix.isNull())
       drawItemPixmap(painter,r, alignment, pix);
    else
-      drawItemText(painter, r, alignment, mbi->palette, isEnabled,
-                   mbi->text, (hover || step > 2) ? ROLE[Fg] : config.menu.bar_role[Fg]);
+      drawItemText(painter, r, alignment, mbi->palette, isEnabled, mbi->text,
+                                          (hover || step > 2) ? ROLE[Fg] : config.menu.bar_role[Fg]);
 }
 
 void

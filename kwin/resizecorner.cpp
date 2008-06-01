@@ -37,6 +37,8 @@
 #include "client.h"
 #include "resizecorner.h"
 
+#define CORNER_SIZE 12
+
 using namespace Bespin;
 
 ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
@@ -47,11 +49,11 @@ ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
    }
    client = parent;
    setCursor(QCursor(Qt::SizeFDiagCursor));
-   setFixedSize(16, 16);
-   buffer = QPixmap(16,16);
+   setFixedSize(CORNER_SIZE, CORNER_SIZE);
+//    buffer = QPixmap(16,16);
    setAttribute(Qt::WA_OpaquePaintEvent);
    QPolygon triangle(3);
-   triangle.putPoints(0, 3, 16,0, 16,16, 0,16);
+   triangle.putPoints(0, 3, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE);
    setMask ( triangle );
    QTimer::singleShot(0, this, SLOT(hide()));
    QTimer::singleShot(3000, this, SLOT(raise()));
@@ -67,7 +69,7 @@ ResizeCorner::raise()
    if (daddy)
       XReparentWindow( QX11Info::display(), winId(), daddy, 0, 0 );
    show();
-   move(client->width() - 16, client->height() - 16);
+   move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
    client->widget()->removeEventFilter(this);
    client->widget()->installEventFilter(this);
 }
@@ -75,20 +77,10 @@ ResizeCorner::raise()
 void
 ResizeCorner::setColor(const QColor &c)
 {
-   bg = c;
-   if (bg.value() > 100)
+   if (c.value() > 100)
       fg = c.dark(130);
    else
       fg = c.light(120);
-   buffer.fill(bg);
-   QPainter p(&buffer);
-   p.setBrush(fg); p.setPen(Qt::NoPen);
-   p.setRenderHint(QPainter::Antialiasing);
-   QRect r = buffer.rect();
-   r.setWidth(7*r.width()/4);
-   r.setHeight(7*r.height()/4);
-   p.drawPie(r, 90<<4, 90<<4);
-   p.end();
 }
 
 void
@@ -105,7 +97,7 @@ ResizeCorner::eventFilter(QObject *obj, QEvent *e)
    if ( obj != parent() ) return false;
 
    if ( e->type() == QEvent::Resize)
-      move(client->width() - 16, client->height() - 16);
+      move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
 
    return false;
 }
@@ -132,7 +124,7 @@ ResizeCorner::mouseReleaseEvent ( QMouseEvent * )
 void
 ResizeCorner::paintEvent ( QPaintEvent * )
 {
-   QPainter p(this);
-   p.drawPixmap(0,0,buffer);
+   QPainter p(this); p.setBrush(fg); p.setPen(Qt::NoPen);
+   p.drawRect(rect());
    p.end();
 }

@@ -2,7 +2,7 @@
 
 #ifdef QT_DEBUG
 #include <QtDebug>
-#define DEBUG qDebug() << "BESPIN: "
+#define DEBUG(_STUFF_) qDebug() << "BESPIN: " << _STUFF_
 #include <qtimer.h>
 #define _PROFILESTART_ QTime timer; int time; timer.start();
 #define _PROFILERESTART_ timer.restart();
@@ -157,7 +157,7 @@ QStyle::CC_ListView     ? "CC_ListView " : "Unknow Control");
 
 #define _COMPARECOLORS_(c1,c2) qWarning("%d/%d/%d vs. %d/%d/%d", c1.red(), c1.green(), c1.blue(), c2.red(), c2.green(), c2.blue());
 
-// #define MOUSEDEBUG
+//#define MOUSEDEBUG
 #undef MOUSEDEBUG
 
 #endif // BESPIN_DEBUG

@@ -541,7 +541,8 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
 #ifdef MOUSEDEBUG
    case QEvent::MouseButtonPress: {
       QMouseEvent *mev = (QMouseEvent*)ev;
-      DEBUG << object;
+      qDebug() << "BESPIN:" << object;
+//       DEBUG (object);
       return false;
    }
 #endif

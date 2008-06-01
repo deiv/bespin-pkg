@@ -415,7 +415,7 @@ void BespinStyle::polish( QWidget * widget ) {
 //        || widget->inherits("QToolBar")
        || widget->inherits("QToolBarHandle")
 //        || widget->inherits("QDockSeparator")
-       || widget->inherits("QToolBoxButton")
+//        || widget->inherits("QToolBoxButton")
 //        || widget->inherits("QDockWidgetSeparator")
        || widget->inherits("Q3DockWindowResizeHandle")
       )
@@ -435,6 +435,20 @@ void BespinStyle::polish( QWidget * widget ) {
       }
       else
          Animator::Hover::manage(widget);
+      if (widget->inherits("KMultiTabBarTab")) {
+         // NOTICE this works around a bug? - at least this widget uses the style to paint the bg, but hardcodes the fg...
+         // TODO: inform Joseph Wenninger <jowenn@kde.org> and really fix this
+         // (fails all styles w/ Windowcolored ToolBtn and QPalette::ButtonText != QPalette::WindowText settings)
+         QPalette pal = widget->palette();
+         pal.setColor(QPalette::Active, QPalette::Button, pal.color(QPalette::Active, QPalette::Window));
+         pal.setColor(QPalette::Inactive, QPalette::Button, pal.color(QPalette::Inactive, QPalette::Window));
+         pal.setColor(QPalette::Disabled, QPalette::Button, pal.color(QPalette::Disabled, QPalette::Window));
+
+         pal.setColor(QPalette::Active, QPalette::ButtonText, pal.color(QPalette::Active, QPalette::WindowText));
+         pal.setColor(QPalette::Inactive, QPalette::ButtonText, pal.color(QPalette::Inactive, QPalette::WindowText));
+         pal.setColor(QPalette::Disabled, QPalette::ButtonText, pal.color(QPalette::Disabled, QPalette::WindowText));
+         widget->setPalette(pal);
+      }
    }
    // COMBOBOXES - hovering/animation
    else if (widget->inherits("QComboBox")) {

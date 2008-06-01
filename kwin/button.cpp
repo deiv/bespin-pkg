@@ -296,14 +296,12 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
 QColor
 Button::color() const
 {
-   QColor c =
-   client->color(KDecorationDefines::ColorButtonBg, client->isActive());
-   const QColor bg =
-   client->color(KDecorationDefines::ColorFrame, client->isActive());
+   QColor c = client->color(KDecorationDefines::ColorButtonBg, client->isActive());
+   const QColor bg = client->color(KDecorationDefines::ColorFrame, client->isActive());
    if (isEnabled())
       c = Colors::mid(bg, c, 6-zoomLevel, 6);
    else
-      c = Colors::mid(bg, c, 4, 1);
+      c = Colors::mid(bg, c, 6, 1);
    return c;
 }
 

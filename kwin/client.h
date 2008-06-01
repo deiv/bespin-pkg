@@ -95,7 +95,7 @@ private:
    QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
 
 	Button *buttons[4];
-	int borderSize, titleSize, buttonSpace, retry;
+	int borderSize, titleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
    uint topTile, btmTile, cnrTile, lCorner, rCorner;
    uint bgMode, gType[2];
    Factory *_factory;

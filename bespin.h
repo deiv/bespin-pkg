@@ -267,7 +267,7 @@ private:
    void registerRoutines();
    static bool isSpecialFrame(const QWidget *w);
    void erase(const QStyleOption*, QPainter*, const QWidget*) const;
-   
+   void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
 private:
    typedef QHash<uint, Tile::Set> TileCache;
    struct {

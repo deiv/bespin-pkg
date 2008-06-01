@@ -89,14 +89,14 @@ BespinStyle::drawTabWidget(const QStyleOption *option, QPainter *painter,
    // the bar
    drawTabBar(&tbb, painter, widget);
 }
-
+#include <QtDebug>
 void
 BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
                         const QWidget * widget) const
 {
    ASSURE_OPTION(tbb, TabBarBase);
 
-   QSize winSize;
+   QWidget *win = 0;
    if (widget) {
       if (widget->parentWidget() &&
           qobject_cast<QTabWidget*>(widget->parentWidget())) {
@@ -111,22 +111,37 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
       }
       else if (qobject_cast<const QTabBar*>(widget))
          return; // usually we alter the paintevent by eventfiltering
-      QWidget *win = widget->window();
-      winSize = win ? win->size() : RECT.size()+QSize(20,20);
+      win = widget->window();
    }
-   else
-      winSize = tbb->tabBarRect.size();
 
    QRect rect = RECT.adjusted(0, 0, 0, -dpi.f2);
    int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
 
-   if (verticalTabs(tbb->shape)) {
-      if (RECT.height() > winSize.height() - 10)
-         Tile::setShape(Tile::Left | Tile::Right | Tile::Center);
-      o = Qt::Horizontal; size = RECT.width();
+#define MAP_RECT QRect r = RECT; r.moveTopLeft(widget->mapTo(win, r.topLeft())); r.adjust(0,0,1,1)
+
+   if (win) {
+      Tile::PosFlags pf = Tile::Full;
+      if (verticalTabs(tbb->shape)) {
+         if (RECT.height() >= win->height())
+            pf &= ~(Tile::Top | Tile::Bottom);
+         else {
+            MAP_RECT;
+            if (r.top() <= 0) pf &= ~Tile::Top;
+            if (r.bottom() >= win->height()) pf &= ~Tile::Bottom;
+         }
+         o = Qt::Horizontal; size = RECT.width();
+      }
+      else {
+         if (RECT.width() >= win->width())
+            pf &= ~(Tile::Left | Tile::Right);
+         else {
+            MAP_RECT;
+            if (r.left() <= 0) pf &= ~Tile::Left;
+            if (r.right() >= win->width()) pf &= ~Tile::Right;
+         }
+      }
+   Tile::setShape(pf);
    }
-   else if (RECT.width() > winSize.width() - 10)
-         Tile::setShape(Tile::Top | Tile::Bottom | Tile::Center);
    masks.rect[true].render(rect, painter, GRAD(tab), o, CCOLOR(tab.std, Bg), size);
    rect.setBottom(rect.bottom()+dpi.f2);
    shadows.sunken[true][true].render(rect, painter);

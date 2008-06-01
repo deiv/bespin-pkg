@@ -553,13 +553,10 @@ Client::reset(unsigned long changed)
          delete buttons[i]; buttons[i] = 0;
       }
       titleBar->removeItem(titleSpacer);
-      int sl, sr;
-//       addButtons("X_IA", sl); // as long as kwin ignores settings, we ignore kwin :P
-      addButtons(options()->titleButtonsLeft(), sl);
+      addButtons(options()->titleButtonsLeft(), buttonSpaceLeft);
       titleBar->addItem(titleSpacer);
-//       addButtons("M", sr);
-      addButtons(options()->titleButtonsRight(), sr);
-      buttonSpace = qMax(sl,sr);
+      addButtons(options()->titleButtonsRight(), buttonSpaceRight);
+      buttonSpace = qMax(buttonSpaceLeft, buttonSpaceRight);
    }
 
    if (changed & SettingColors) {
@@ -627,25 +624,24 @@ Client::reset(unsigned long changed)
 void
 Client::updateTitleLayout( const QSize& s )
 {
-   int w = width(), d;
+   int w = width();
 
    if (bgMode != 1 && (gType[0] || gType[1])) {
-      d = qMax(s.width()/8, buttonSpace+4);
-      int db = d-2*titleSize;
-      int de = d+2*titleSize;
+//       d = qMax(s.width()/8, buttonSpace+4);
+      int dl = buttonSpaceLeft + titleSize;
+      int dr = buttonSpaceRight + titleSize;
       bar = QPainterPath(QPoint(0, -1)); //tl corner
       bar.lineTo(w, -1); // straight to tr corner
       bar.lineTo(w, titleSize); // straight to br corner
-      bar.lineTo(w-db, titleSize); // straight to br end
-      bar.cubicTo(w-d,titleSize, w-d,2, w-de,2); // curve to tr end
-      bar.lineTo(de, 2); // straight to tl end
-      bar.cubicTo(d,2, d,titleSize, db,titleSize); // curve to bl end
-      bar.lineTo(0, titleSize); // straight to bl corner -> Qt closes to home ;)
+      bar.cubicTo(w-dr,titleSize+2, w-dr,2, w-(dr+titleSize),2); // curve to tr end
+      bar.lineTo(dl + titleSize, 2); // straight to tl end
+      bar.cubicTo(dl,2, dl,titleSize+2, 0,titleSize); // curve to bl end
+      label = QRect(dl, 0, w-(dl+dr), titleSize);
    }
    else {
-      d = buttonSpace + 8;
+      int d = buttonSpace + 8;
+      label = QRect(d, 0, w-2*d, titleSize);
    }
-   label = QRect(d, 0, w-2*d, titleSize);
 }
 
 void
