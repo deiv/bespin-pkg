@@ -117,31 +117,30 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
    QRect rect = RECT.adjusted(0, 0, 0, -dpi.f2);
    int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
 
-#define MAP_RECT QRect r = RECT; r.moveTopLeft(widget->mapTo(win, r.topLeft())); r.adjust(0,0,1,1)
-
+   QRect winRect;
    if (win) {
-      Tile::PosFlags pf = Tile::Full;
-      if (verticalTabs(tbb->shape)) {
-         if (RECT.height() >= win->height())
-            pf &= ~(Tile::Top | Tile::Bottom);
-         else {
-            MAP_RECT;
-            if (r.top() <= 0) pf &= ~Tile::Top;
-            if (r.bottom() >= win->height()) pf &= ~Tile::Bottom;
-         }
-         o = Qt::Horizontal; size = RECT.width();
-      }
-      else {
-         if (RECT.width() >= win->width())
-            pf &= ~(Tile::Left | Tile::Right);
-         else {
-            MAP_RECT;
-            if (r.left() <= 0) pf &= ~Tile::Left;
-            if (r.right() >= win->width()) pf &= ~Tile::Right;
-         }
-      }
-   Tile::setShape(pf);
+      winRect = win->rect();
+      winRect.moveTopLeft(widget->mapFrom(win, winRect.topLeft()));
    }
+   else
+      winRect = tbb->tabBarRect; // we set this from the eventfilter QEvent::Paint
+
+   Tile::PosFlags pf = Tile::Full;
+   if (verticalTabs(tbb->shape)) {
+      if (RECT.bottom() >= winRect.bottom())
+         pf &= ~Tile::Bottom; // we do NEVER shape away the top - assuming deco here...!
+      o = Qt::Horizontal; size = RECT.width();
+   }
+   else {
+      if (RECT.width() >= winRect.width())
+         pf &= ~(Tile::Left | Tile::Right);
+      else {
+         if (RECT.left() <= winRect.left()) pf &= ~Tile::Left;
+         if (RECT.right() >= winRect.right()) pf &= ~Tile::Right;
+      }
+   }
+   Tile::setShape(pf);
+
    masks.rect[true].render(rect, painter, GRAD(tab), o, CCOLOR(tab.std, Bg), size);
    rect.setBottom(rect.bottom()+dpi.f2);
    shadows.sunken[true][true].render(rect, painter);

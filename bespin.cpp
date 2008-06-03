@@ -479,8 +479,10 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
          QPainter p(tabBar);
          QStyleOptionTabBarBase opt;
          opt.initFrom(tabBar);
-         if (QWidget *window = tabBar->window())
+         if (QWidget *window = tabBar->window()) {
             opt.tabBarRect = window->rect();
+            opt.tabBarRect.moveTopLeft(tabBar->mapFrom(window, opt.tabBarRect.topLeft()));
+         }
          drawTabBar(&opt, &p, 0L);
          p.end();
          return false;
