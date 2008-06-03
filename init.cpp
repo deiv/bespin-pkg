@@ -159,7 +159,7 @@ BespinStyle::readSettings(const QSettings* settings)
    
    config.btn.backLightHover = readBool(BTN_BACKLIGHTHOVER);
    config.btn.layer = config.btn.backLightHover ? 0 : CLAMP(readInt(BTN_LAYER), 0, 2);
-   config.btn.fullHover = readBool(BTN_FULLHOVER);
+   config.btn.fullHover = config.btn.backLightHover || readBool(BTN_FULLHOVER);
    
    if (config.btn.layer == 2) config.btn.cushion = true;
    else if (GRAD(btn) ==  Gradients::Sunken) config.btn.cushion = false;
