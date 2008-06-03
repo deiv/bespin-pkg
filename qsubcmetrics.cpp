@@ -459,7 +459,10 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
 //    case SE_DialogButtonCustom: // Area for a dialog's custom widget area (in the button row)
    case SE_HeaderArrow: { //
       int x,y,w,h;
-      option->rect.getRect(&x,&y,&w,&h);
+      if (widget)
+         option->rect.intersected(widget->rect()).getRect(&x,&y,&w,&h);
+      else
+         option->rect.getRect(&x,&y,&w,&h);
       int margin = dpi.f2;// ;) pixelMetric(QStyle::PM_HeaderMargin, opt, widget);
       QRect r;
       if (option->state & State_Horizontal) {
