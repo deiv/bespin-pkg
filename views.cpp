@@ -113,18 +113,16 @@ BespinStyle::drawHeaderSection(const QStyleOption * option, QPainter * painter,
 
 void
 BespinStyle::drawHeaderLabel(const QStyleOption * option, QPainter * painter,
-                             const QWidget *) const
+                             const QWidget *widget) const
 {
    OPT_ENABLED
    
-   const QStyleOptionHeader* header =
-      qstyleoption_cast<const QStyleOptionHeader*>(option);
-   QRect rect = RECT;
+   const QStyleOptionHeader* header = qstyleoption_cast<const QStyleOptionHeader*>(option);
+   QRect rect = widget ? RECT.intersected(widget->rect()) : RECT;
    
    // iconos
    if ( !header->icon.isNull() ) {
-      QPixmap pixmap =
-         header->icon.pixmap( 22,22, isEnabled ? QIcon::Normal : QIcon::Disabled );
+      QPixmap pixmap = header->icon.pixmap( 22,22, isEnabled ? QIcon::Normal : QIcon::Disabled );
       int pixw = pixmap.width();
       int pixh = pixmap.height();
       // "pixh - 1" because of tricky integer division
