@@ -59,7 +59,7 @@ public:
    QList< BorderSize > borderSizes() const {
       return QList< BorderSize >() << BorderTiny << BorderNormal <<
       BorderLarge << BorderVeryLarge << BorderHuge << BorderVeryHuge <<
-      BorderOversized << BordersCount;
+      BorderOversized;
    }
 //    virtual void checkRequirements( KDecorationProvides* provides );
    inline static int titleSize(bool minimal = false) {return titleSize_[minimal];}

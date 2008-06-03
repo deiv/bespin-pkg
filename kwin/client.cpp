@@ -54,8 +54,8 @@ using namespace Bespin;
 
 PreviewWidget::PreviewWidget(QWidget *p, Qt::WindowFlags f) : QWidget(p,f)
 {
-   setAutoFillBackground(false);
-   setAttribute(Qt::WA_OpaquePaintEvent);
+   setAutoFillBackground(true);
+//    setAttribute(Qt::WA_OpaquePaintEvent);
    setAttribute(Qt::WA_PaintOnScreen, false);
 }
 
@@ -239,7 +239,7 @@ Client::init()
 
    if (isPreview()) {
       _preview = new PreviewWidget(widget());
-      _preview->setAutoFillBackground(true);
+//       _preview->setAutoFillBackground(true);
       _preview->setGeometry ( borderSize, titleSize,
                               widget()->width()-2*borderSize,
                               widget()->height()-(borderSize+titleSize));
