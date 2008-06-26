@@ -423,7 +423,7 @@ Tab::_manage (QWidget* w)
    QStackedWidget *sw = qobject_cast<QStackedWidget*>(w);
    if (!sw) return false;
    connect(sw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
-   connect(sw, SIGNAL(destroyed(QObject*)), this, SLOT(release(QObject*)));
+   connect(sw, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
    items.insert(sw, new TabInfo(this, sw->currentWidget(), sw->currentIndex()));
    return true;
 }

@@ -57,7 +57,6 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
 
 // this seems to be necessary as KDE sets it's own palette after
 // creating the style - god knows why...
-static QPalette *originalPalette = 0;
 void BespinStyle::fixKdePalette()
 {
    if (originalPalette) {

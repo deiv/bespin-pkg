@@ -172,7 +172,7 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
 
 void
 BespinStyle::drawProgressBarLabel(const QStyleOption * option,
-                                  QPainter * painter, const QWidget * widget) const
+                                  QPainter * painter, const QWidget *) const
 {
    const QStyleOptionProgressBarV2 *progress =
       qstyleoption_cast<const QStyleOptionProgressBarV2*>(option);

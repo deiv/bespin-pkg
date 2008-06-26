@@ -202,7 +202,8 @@ hackMoveWindow(QWidget* w, QEvent *e)
 }
 
 static bool
-paintKrunner(QWidget *w, QPaintEvent *pe) {
+paintKrunner(QWidget *w, QPaintEvent *) {
+   // TODO: use paintevent clipping
    if (w->isWindow()) {
       QPainter p(w);
       QStyleOption opt;

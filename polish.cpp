@@ -34,10 +34,16 @@
 #include <QTreeView>
 
 #include "colors.h"
+
+#ifdef Q_WS_X11
 #include "xproperty.h"
+#endif
+
 #include "visualframe.h"
 #include "bespin.h"
 #include "hacks.h"
+
+#include "macmenu.h"
 
 #include "animator/hover.h"
 #include "animator/aprogress.h"
@@ -191,6 +197,11 @@ void BespinStyle::polish( QPalette &pal )
    const QColor grey(highlightGray,highlightGray,highlightGray);
    pal.setColor(QPalette::Disabled, QPalette::Highlight, grey);
 
+#if QT_VERSION >= 0x040400
+   // tooltip (NOTICE not configurable by qtconfig, kde can, let's see what we're gonna do on this...)
+   pal.setColor(QPalette::ToolTipBase, pal.color(QPalette::Active, QPalette::WindowText));
+   pal.setColor(QPalette::ToolTipText, pal.color(QPalette::Active, QPalette::Window));
+#endif
 
    // inactive palette
    if (config.fadeInactive) { // fade out inactive foreground and highlight colors...
@@ -222,7 +233,7 @@ void BespinStyle::polish( QPalette &pal )
                             pal.color(QPalette::Disabled, QPalette::Text),15,1));
 }
 
-
+#if 0
 static QMenuBar *bar4popup(QMenu *menu) {
    if (!menu->menuAction())
       return 0;
@@ -233,6 +244,7 @@ static QMenuBar *bar4popup(QMenu *menu) {
          return static_cast<QMenuBar *>(w);
    return 0;
 }
+#endif
 
 #undef PAL
 #define PAL pal
@@ -312,26 +324,11 @@ void BespinStyle::polish( QWidget * widget ) {
    Hacks::add(widget);
 
    //BEGIN Window handling                                                                   -
-   if (widget->isWindow()) {
+   if (widget->isWindow() && !widget->inherits("QTipLabel")) {
       QPalette pal = widget->palette();
 
-#ifdef Q_WS_X11 // XProperty actually handles the non X11 case, but we avoid overhead ;)
-      // X11 properties for the deco
-      // the title region in the center
-      uint info = XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode);
-      XProperty::set(widget->winId(), XProperty::bgInfo, info);
-      // the frame and button area for active windows
-      info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]);
-      XProperty::set(widget->winId(), XProperty::actInfo, info);
-      // the frame and button area for INactive windows
-      const QColor bg_inact = (GRAD(kwin)[0] != Gradients::None &&
-                               config.kwin.active_role == config.kwin.inactive_role) ?
-                              Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :
-                              CCOLOR(kwin.inactive, Bg);
-      const QColor fg = Colors::mid(bg_inact, CCOLOR(kwin.inactive, Fg), 2, 1);
-      info = XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]);
-      XProperty::set(widget->winId(), XProperty::inactInfo, info);
-#endif
+      // talk to kwin about colors, gradients, etc.
+      setupDecoFor(widget);
 
       if (config.bg.mode > Scanlines)
          widget->setAttribute(Qt::WA_StyledBackground);
@@ -369,13 +366,12 @@ void BespinStyle::polish( QWidget * widget ) {
             menu->setFont(tmpFont);
          }
          // eventfiltering to reposition MDI windows and correct distance to menubars
-         if (menu->parentWidget() && menu->parentWidget()->inherits("QMdiSubWindow"))
-            menu->installEventFilter(this);
-         if (bar4popup(menu))
-            menu->installEventFilter(this); // reposition
-#if SHAPE_POPUP
-// WARNING: compmgrs like e.g. beryl/emerald/kwin deny to shadow shaped windows,
-// if we cannot find a way to get ARGB menus independent from the app settings, the compmgr must handle the round corners here
+//          if (menu->parentWidget() && menu->parentWidget()->inherits("QMdiSubWindow"))
+            menu->installEventFilter(this); // reposition / repos MDI context / shaping
+//          if (bar4popup(menu))
+//             menu->installEventFilter(this); // reposition
+#if 0
+// NOTE this was intended to be for some menu mock from nuno where the menu reaches kinda ribbon-like into the bar
          if (bar4popup(menu)) {
             QAction *action = new QAction( menu->menuAction()->iconText(), menu );
             connect (action, SIGNAL(triggered(bool)), menu, SLOT(hide()));
@@ -522,6 +518,7 @@ void BespinStyle::polish( QWidget * widget ) {
 #endif
       ) {
          widget->setBackgroundRole(QPalette::Window);
+         widget->setForegroundRole(QPalette::WindowText);
          if (config.bg.mode == Scanlines) {
             widget->setAutoFillBackground ( true );
             QPalette pal = widget->palette();
@@ -534,6 +531,9 @@ void BespinStyle::polish( QWidget * widget ) {
             widget->setPalette(pal);
          }
       }
+
+   if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
+      MacMenu::manage(mbar);
 #if 0
 #ifdef Q_WS_X11
    if (qobject_cast<QMenuBar*>(widget)) {
@@ -629,6 +629,8 @@ void BespinStyle::unPolish( QWidget *widget )
 {
    if (QFrame *frame = qobject_cast<QFrame *>(widget))
       VisualFrame::release(frame);
+   if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
+      MacMenu::release(mbar);
 /*   if (qobject_cast<VisualFramePart*>(widget)) {
       delete widget; widget = 0L; return
    }*/

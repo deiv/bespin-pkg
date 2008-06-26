@@ -252,17 +252,17 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
 void
 BespinStyle::drawPushButtonLabel(const QStyleOption * option,
                                  QPainter * painter,
-                                 const QWidget * widget) const
+                                 const QWidget *) const
 {
    OPT_ENABLED OPT_FOCUS OPT_HOVER;
    ASSURE_OPTION(btn, Button);
    
    QRect ir = btn->rect;
-   uint tf = Qt::AlignCenter;
-   if (!styleHint(SH_UnderlineShortcut, btn, widget))
-      tf |= Qt::TextHideMnemonic;
-   else
-      tf |= Qt::TextShowMnemonic;
+   uint tf = Qt::AlignCenter | BESPIN_MNEMONIC;
+//    if (!styleHint(SH_UnderlineShortcut, btn, widget))
+//       tf |= Qt::TextHideMnemonic;
+//    else
+//       tf |= Qt::TextShowMnemonic;
 
    if (!btn->icon.isNull()) {
       QIcon::Mode mode = isEnabled ? QIcon::Normal
@@ -301,8 +301,9 @@ BespinStyle::drawPushButtonLabel(const QStyleOption * option,
 
    const QColor fg = btnFg(PAL, isEnabled, hover, animStep, flat);
 
-   if (config.btn.backLightHover)
-      hover = animStep = 0;
+   if (config.btn.backLightHover) {
+      hover = 0; animStep = 0;
+   }
 
    const QColor &bg = flat ? FCOLOR(Window) :
       (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
@@ -358,7 +359,9 @@ BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
    
    if (!(sunken || (option->state & State_Off))) {
       painter->save();
-      if (config.btn.backLightHover) hover = animStep = 0;
+      if (config.btn.backLightHover) {
+         hover = 0; animStep = 0;
+      }
       const QPoint center = copy.rect.center() - QPoint(0,dpi.f1);
       painter->setBrush(btnFg(PAL, isEnabled, hover, animStep));
       const int d = dpi.f5 - (bool(config.btn.checkType) + config.btn.layer) * dpi.f1;
@@ -545,6 +548,5 @@ BespinStyle::drawCheckLabel(const QStyleOption * option, QPainter * painter,
          textRect.setLeft(textRect.left() + btn->iconSize.width() + dpi.f4);
    }
    if (!btn->text.isEmpty())
-      drawItemText(painter, textRect, alignment | Qt::TextShowMnemonic,
-                   PAL, isEnabled, btn->text, QPalette::WindowText);
+      drawItemText(painter, textRect, alignment | BESPIN_MNEMONIC, PAL, isEnabled, btn->text, QPalette::WindowText);
 }

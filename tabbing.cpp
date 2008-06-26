@@ -200,7 +200,7 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
       Tile::reset();
    }
 
-   B_STATES
+   OPT_SUNKEN OPT_ENABLED OPT_HOVER
    sunken = sunken || (option->state & State_Selected);
    animStep = 0;
    // animation stuff
@@ -229,7 +229,7 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
 
 void
 BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
-                          const QWidget * widget) const
+                          const QWidget *) const
 {
    ASSURE_OPTION(tab, Tab);
    OPT_SUNKEN
@@ -293,7 +293,7 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
                           const QWidget *) const
 {
    ASSURE_OPTION(tab, Tab);
-   B_STATES
+   OPT_SUNKEN OPT_ENABLED OPT_HOVER
    sunken = sunken || (option->state & State_Selected);
    if (sunken) hover = false;
    
@@ -304,7 +304,7 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
    bool east = false;
 
    
-   int alignment = Qt::AlignCenter | Qt::TextShowMnemonic;
+   int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
 
    switch(tab->shape) {
    case QTabBar::RoundedEast: case QTabBar::TriangularEast:
@@ -341,7 +341,7 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
       QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ? QIcon::Normal : QIcon::Disabled);
       painter->drawPixmap(tr.left() + dpi.f9, tr.center().y() - tabIcon.height() / 2, tabIcon);
       tr.setLeft(tr.left() + iconSize.width() + dpi.f12);
-      alignment = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic;
+      alignment = Qt::AlignLeft | Qt::AlignVCenter | BESPIN_MNEMONIC;
    }
        
    // color adjustment
@@ -460,12 +460,10 @@ BespinStyle::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter,
       QRect tr = RECT;
       painter->setPen(cB.dark(120));
       tr.moveTop(tr.top()-1);
-      drawItemText(painter, tr, Qt::AlignCenter | Qt::TextShowMnemonic,
-                  PAL, isEnabled, tbt->text);
+      drawItemText(painter, tr, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, tbt->text);
       tr.moveTop(tr.top()+1);
    }
    painter->setPen(cF);
-   drawItemText(painter, RECT, Qt::AlignCenter | Qt::TextShowMnemonic,
-               PAL, isEnabled, tbt->text);
+   drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, tbt->text);
    painter->restore();
 }

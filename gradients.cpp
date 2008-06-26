@@ -502,8 +502,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       stops.clear(); p.end();
       // Bottom Tile
       p.begin(&set->btmTile);
-      stops << QGradientStop(0, c) <<
-         QGradientStop(1, c.dark(_bgBevelIntesity));
+      stops << QGradientStop(0, c) << QGradientStop(1, c.dark(_bgBevelIntesity));
       lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg);
       stops.clear(); p.end();
       

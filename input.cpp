@@ -85,7 +85,7 @@ BespinStyle::drawSpinBox(const QStyleOptionComplex * option, QPainter * painter,
                          const QWidget * widget) const
 {
    ASSURE_OPTION(sb, SpinBox);
-   B_STATES
+   OPT_SUNKEN OPT_ENABLED OPT_HOVER
 
    QStyleOptionSpinBox copy = *sb;
    // this doesn't work (for the moment, i assume...)
@@ -247,7 +247,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
       const int dy = ar.height()/4;
       QRect rect = ar.adjusted(0, dy, 0, -dy);
 
-      Navi::Direction dir;
+      Navi::Direction dir = Navi::S;
       bool upDown = false;
       if (listShown)
          dir = (config.leftHanded) ? Navi::E : Navi::W;
@@ -259,8 +259,6 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
          else
             upDown = true;
       }
-      else
-         dir = Navi::S;
 
       painter->save();
       painter->setPen(Qt::NoPen);

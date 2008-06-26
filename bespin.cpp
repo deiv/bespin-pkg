@@ -28,23 +28,18 @@
 #include <QFrame>
 #include <QToolButton>
 
-/**============= System includes ==========================*/
-#ifdef Q_WS_X11
-// #include <X11/Xlib.h>
-// #include <X11/keysym.h>
-// #include <X11/extensions/XTest.h>
-// #include <fixx11h.h>
-#endif
-/**========================================================*/
-
 
 /**============= Bespin includes ==========================*/
 
+// #include "debug.h"
+
+#ifdef Q_WS_X11
 #ifndef QT_NO_XRENDER
 #include "oxrender.h"
 #endif
-// #include "debug.h"
 #include "xproperty.h"
+#endif
+
 #include "colors.h"
 #include "bespin.h"
 
@@ -229,8 +224,7 @@ BespinStyle::registerRoutines()
 }
 
 /**THE STYLE ITSELF*/
-BespinStyle::BespinStyle() : QCommonStyle(), mouseButtonPressed_(false),
-internalEvent_(false) {
+BespinStyle::BespinStyle() : QCommonStyle(), originalPalette(0) {
    _scanlines[0] = _scanlines[1] = 0L;
    init();
    registerRoutines();
@@ -413,6 +407,33 @@ BespinStyle::erase(const QStyleOption *option, QPainter *painter,
    painter->restore();
 }
 
+// X11 properties for the deco ---------------
+void
+BespinStyle::setupDecoFor(const QWidget *w)
+{
+// XProperty actually handles the non X11 case, but we avoid overhead ;)
+#ifdef Q_WS_X11
+   const QPalette &pal = originalPalette ? *originalPalette : w->palette();
+   
+   // the title region in the center
+   uint info = XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode);
+   XProperty::set(w->winId(), XProperty::bgInfo, info);
+   
+   // the frame and button area for active windows
+   info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]);
+   XProperty::set(w->winId(), XProperty::actInfo, info);
+   
+   // the frame and button area for INactive windows
+   const QColor bg_inact = (GRAD(kwin)[0] != Gradients::None &&
+   config.kwin.active_role == config.kwin.inactive_role) ?
+   Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :
+   CCOLOR(kwin.inactive, Bg);
+   const QColor fg = Colors::mid(bg_inact, CCOLOR(kwin.inactive, Fg), 2, 1);
+   info = XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]);
+   XProperty::set(w->winId(), XProperty::inactInfo, info);
+#endif
+}
+
 static void swapPalette(QWidget *widget, BespinStyle *style)
 {
    QPalette pal(widget->palette());
@@ -489,14 +510,14 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
       }
       return false;
    }
-#if 0
+
    case QEvent::Resize: {
       if (QMenu *menu = qobject_cast<QMenu*>(object)) {
          if (!menu->isWindow()) return false;
-#if SHAPE_POPUP
+#if 0
          QAction *head = menu->actions().at(0);
          QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
-         Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | Qt::TextShowMnemonic,
+         Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
          head->iconText());
          r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
          QResizeEvent *rev = (QResizeEvent*)ev;
@@ -511,7 +532,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
          br = masks.corner[3].boundingRect();
          mask -= masks.corner[3].translated(menu->width()-br.width(),
                                             menu->height()-br.height()); // br
-#else
+#endif
          const int w = menu->width();
          const int h = menu->height();
 
@@ -519,13 +540,13 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
          mask += QRegion(0, 4, w, h-8);
          mask += QRegion(2, 1, w-4, h-2);
          mask += QRegion(1, 2, w-2, h-4);
-#endif
+
          menu->setMask(mask);
          return false;
       }
       return false;
    }
-#endif
+
 //    case QEvent::MouseButtonRelease:
 //    case QEvent::MouseButtonPress:
 //       qWarning("pressed/released");
@@ -565,12 +586,14 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             else {
                widget->setAttribute(Qt::WA_MacBrushedMetal, false);
             }
+#ifdef Q_WS_X11
             int info = XProperty::encode(bg, FCOLOR(WindowText), bgMode);
             XProperty::set(widget->winId(), XProperty::bgInfo, info);
             info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), gt[1]);
             XProperty::set(widget->winId(), XProperty::actInfo, info);
             info = XProperty::encode(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), gt[0]);
             XProperty::set(widget->winId(), XProperty::inactInfo, info);
+#endif
             widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
             return false;
          }
@@ -585,7 +608,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             QMenuBar *bar = bar4popup(menu);
             if (bar)
                menu->move(menu->pos()-QPoint(0,dpi.f2));
-#if SHAPE_POPUP
+#if 0
             QMenuBar *bar = bar4popup(menu);
             if (bar) {
                QPoint pos(dpi.f1, 0);
@@ -645,18 +668,3 @@ BespinStyle::standardPalette () const
 
 #undef PAL
 
-/** eventcontrol slots*/
-#if 0
-void BespinStyle::fakeMouse()
-{
-   if (mouseButtonPressed_) // delayed mousepress for move event
-   {
-      QCursor::setPos ( cursorPos_ );
-      XTestFakeButtonEvent(QX11Info::display(),1, false, 0);
-      XTestFakeKeyEvent(QX11Info::display(),XKeysymToKeycode(QX11Info::display(), XK_Alt_L), true, 0);
-      XTestFakeButtonEvent(QX11Info::display(),1, true, 0);
-      XTestFakeKeyEvent(QX11Info::display(),XKeysymToKeycode(QX11Info::display(), XK_Alt_L), false, 0);
-      XFlush(QX11Info::display());
-   }
-}
-#endif

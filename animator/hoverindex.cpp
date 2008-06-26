@@ -113,7 +113,7 @@ HoverIndex::timerEvent(QTimerEvent * event) {
       step = info.fades[In].begin();
       while (step != info.fades[In].end()) {
          step.value() += 2;
-         if (step.value() > (maxSteps-2))
+         if ((uint)step.value() > (maxSteps-2))
             step = info.fades[In].erase(step);
          else
             ++step;

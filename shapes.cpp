@@ -106,7 +106,7 @@ BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter,
    
    // box (requires set pen for PE_IndicatorMenuCheckMark)
    painter->setBrush(Qt::NoBrush);
-   QPalette::ColorRole fg, bg;
+   QPalette::ColorRole fg = QPalette::Text, bg = QPalette::Base;
 
    if (itemview) { // itemViewCheck
       r.adjust(f2, f2, -f2, -f2);
@@ -114,9 +114,6 @@ BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter,
          copy.state |= State_On;
       if (option->state & State_Selected) {
          fg = QPalette::HighlightedText; bg = QPalette::Highlight;
-      }
-      else {
-         fg = QPalette::Text; bg = QPalette::Base;
       }
       painter->setPen(Colors::mid(COLOR(bg), COLOR(fg)));
    }
@@ -217,7 +214,7 @@ BespinStyle::drawArrow(Navi::Direction dir, const QRect &rect,
    painter->setRenderHint(QPainter::Antialiasing, false);
    bool reset_pen = false;
    if (reset_pen = (painter->pen() == Qt::NoPen))
-      painter->setPen(painter->brush());
+      painter->setPen(QPen(painter->brush(), 1));
    painter->drawPolygon(points, 3);
    if (reset_pen)
       painter->setPen(Qt::NoPen);

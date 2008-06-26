@@ -51,8 +51,8 @@ BespinStyle::standardPixmap(StandardPixmap standardPixmap,
    }
    
    QRect rect; QPalette pal;
-   const QStyleOptionTitleBar *opt =
-      qstyleoption_cast<const QStyleOptionTitleBar *>(option);
+//    const QStyleOptionTitleBar *opt =
+//       qstyleoption_cast<const QStyleOptionTitleBar *>(option);
    if (option) {
       if (option->rect.isNull())
          return QPixmap();

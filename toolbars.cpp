@@ -27,7 +27,7 @@ void
 BespinStyle::drawToolButton(const QStyleOptionComplex * option,
                             QPainter * painter, const QWidget * widget) const
 {
-   B_STATES
+   OPT_SUNKEN OPT_ENABLED OPT_HOVER
       
    // special handling for the tabbar scrollers ------------------------------
    if (widget && widget->parentWidget() &&
@@ -104,7 +104,7 @@ void
 BespinStyle::drawToolButtonShape(const QStyleOption * option,
                                  QPainter * painter, const QWidget * widget) const
 {
-   OPT_ENABLED; OPT_SUNKEN;
+   OPT_ENABLED;
       
    if (!isEnabled)
       return;
@@ -155,7 +155,7 @@ icon(QPixmap &pix, int step)
 
 void
 BespinStyle::drawToolButtonLabel(const QStyleOption * option,
-                                 QPainter * painter, const QWidget *widget) const
+                                 QPainter * painter, const QWidget *) const
 {
    const QStyleOptionToolButton *toolbutton
       = qstyleoption_cast<const QStyleOptionToolButton *>(option);
@@ -175,11 +175,11 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
       QFont fnt = toolbutton->font;
       if (sunken) fnt.setBold(true);
       painter->setFont(fnt);
-      drawItemText(painter, RECT, Qt::AlignCenter | Qt::TextShowMnemonic, PAL, isEnabled, toolbutton->text);
+      drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, toolbutton->text);
       return;
    }
 
-   OPT_HOVER
+//    OPT_HOVER
       
    QPixmap pm;
    QSize pmSize = RECT.size() - QSize(dpi.f4, dpi.f4);
@@ -217,7 +217,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
       painter->setFont(toolbutton->font);
       
       QRect pr = RECT, tr = RECT;
-      int alignment = Qt::TextShowMnemonic;
+      int alignment = BESPIN_MNEMONIC;
 
       if (toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon) {
          int fh = painter->fontMetrics().height();
@@ -255,7 +255,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
 
 void
 BespinStyle::drawToolBarHandle(const QStyleOption * option, QPainter * painter,
-                               const QWidget * widget) const
+                               const QWidget *) const
 {
 
    OPT_HOVER

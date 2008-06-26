@@ -1,20 +1,5 @@
 #!/bin/sh
 
-good() {
-#   echo -e "\e[0;32;40m\n$*\e[m"
-   echo -e "*** $*"
-}
-
-bad() {
-#    echo -e "\e[0;31;47m\nWarning: $*\e[m"
-   echo -e "!!! $*"
-}
-
-ui() {
-# echo -e "\e[0;34;47m\n$*\e[m"
-   echo -e "### $*"
-}
-
 ask_for_qt() {
    bad "Qt4 could not be found in usual locations, pass it here"
    QT_DIR="/"
@@ -23,18 +8,6 @@ ask_for_qt() {
       check="$($QT_DIR/bin/qmake --version 2>&1 | grep -E "Qt *version *4")"
       if [ "$check" != "" ]; then
          QMAKE="$QT_DIR/bin/qmake"
-         break;
-      fi
-   done
-}
-
-ask_for_kde() {
-   bad "KDE 4 could not be found in usual locations, pass it here"
-   KDE_DIR="/"
-   while [ "$KDE_DIR" != "" ]; do
-      read -p "Path to KDE 4: " KDE_DIR
-      check="$($KDE_DIR/bin/kde4-config -v 2>&1 | grep -E "KDE *4")"
-      if [ "$check" != "" ]; then
          break;
       fi
    done
@@ -50,7 +23,7 @@ find_qt() {
          if [ "$check" != "" ]; then
                QT_DIR="$DIR"
                QMAKE="$QT_DIR/bin/qmake"
-               bad "Qt4 was found in non dominant path \"$QT_DIR\""
+               echo "*** Qt4 was found in non dominant path \"$QT_DIR\""
                break
          fi
       done
@@ -58,287 +31,58 @@ find_qt() {
       QT_DIR="$(which qmake)"
       QT_DIR="${QT_DIR%/bin/qmake}"
       QMAKE="$QT_DIR/bin/qmake"
-      good "Qt4 found in\"$QT_DIR\""
+      echo "### Qt4 found in\"$QT_DIR\""
    fi
    [ "$QT_DIR" != "" ]
 }
 
-KDE_DIRS="/usr/lib/kde4 /opt/kde4 /usr/local/kde4"
-find_kde() {
-   check="$(kde4-config -v 2>&1 | grep -E "KDE *4")"
-   if [ "$check" = "" ]; then
-      for DIR in $KDE_DIRS; do
-         check="$($DIR/bin/kde4-config -v 2>&1 | grep -E "KDE *4")"
-         if [ "$check" != "" ]; then
-               KDE_DIR="$DIR"
-               bad "KDE 4 was found in non dominant path \"$KDE_DIR\""
-               break
-         fi
-      done
-   else
-      KDE_DIR="$(which kde4-config)"
-      KDE_DIR="${KDE_DIR%/bin/kde4-config}"
-      good "KDE 4 found in\"$KDE_DIR\""
-   fi
-   [ "KDE_DIR" != "" ]
-}
+## Main code here...
 
-write_general_pro() {
-echo "
-TEMPLATE = subdirs
-SUBDIRS = bespin.pro config " > qmake.pro
-if $CONFIG_KDE; then
-echo "
-SUBDIRS += kwin
-" >> qmake.pro
-fi
-}
-
-write_bespin_pro () {
-echo "
-HEADERS = animator/basic.h animator/aprogress.h animator/hover.h \\
-          animator/hoverindex.h animator/hovercomplex.h animator/tab.h \\
-          colors.h bespin.h tileset.h debug.h \\
-          visualframe.h gradients.h draw.h config.h types.h\\
-          hacks.h xproperty.h
-SOURCES = animator/basic.cpp animator/aprogress.cpp animator/hover.cpp \\
-          animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp \\
-          colors.cpp bespin.cpp tileset.cpp stylehint.cpp \\
-          sizefromcontents.cpp qsubcmetrics.cpp \\
-          pixelmetric.cpp stdpix.cpp \\
-          visualframe.cpp gradients.cpp init.cpp genpixmaps.cpp polish.cpp \\
-          buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp \\
-          scrollareas.cpp shapes.cpp slider.cpp tabbing.cpp toolbars.cpp \\
-          views.cpp window.cpp hacks.cpp xproperty.cpp
-TEMPLATE = lib
-PLUGIN = true
-CONFIG += qt x11 plugin
-QT += qt3support
-VERSION       = 0.1
-target.path += \$\$[QT_INSTALL_PLUGINS]/styles
-INSTALLS += target DATA
-DEFINES += SHAPE_POPUP=0
-" > bespin.pro
-
-if $CONFIG_KDE; then
-echo "
-DATA.files = bespin.themerc
-DATA.path += "$KDE_DATA_PATH/kstyle/themes/"
-" >> bespin.pro
-fi
-if $HAVE_RENDER; then
-echo "
-HEADERS += oxrender.h
-SOURCES += oxrender.cpp
-LIBS += -lXrender
-" >> bespin.pro
-fi
-
-}
-
-write_config_pro() {
-echo "TEMPLATE = subdirs
-" > config/config.pro
-if $CONFIG_QT; then
-echo "
-SUBDIRS += bespin.pro
-" >> config/config.pro
-fi
-if $CONFIG_KDE; then
-echo "
-SUBDIRS += kstyle-bespin-config.pro
-" >> config/config.pro
-fi
-}
-
-write_config_qt_pro() {
-echo "
-TEMPLATE    = app
-HEADERS     = bconfig.h config.h dialog.h kdeini.h
-FORMS       = config.ui uiDemo.ui
-SOURCES     = main.cpp bconfig.cpp config.cpp kdeini.cpp
-RESOURCES   = config.qrc
-target.path = $PREFIX/bin
-INSTALLS = target
-DEFINES += EXECUTABLE=1
-QMAKE_CXXFLAGS += -fPIC
-" > config/bespin.pro
-if $CONFIG_KDE; then
-echo "DEFINES += KDE_SUPPORT=1
-" >> config/bespin.pro
-fi
-}
-
-write_config_kde_pro() {
-echo "
-TEMPLATE    = lib
-CONFIG     += plugin
-HEADERS     = bconfig.h config.h kdeini.h
-FORMS       = config.ui
-SOURCES     = bconfig.cpp config.cpp kdeini.cpp
-RESOURCES   = config.qrc
-target.path += $KDE_DIR/lib/kde4
-target.prefix = ""
-INSTALLS += target
-DEFINES += EXECUTABLE=0 KDE_SUPPORT=1
-" > config/kstyle-bespin-config.pro
-}
-
-write_kwin_client_pro() {
-echo "
-HEADERS = button.h client.h resizecorner.h ../colors.h factory.h ../gradients.h ../xproperty.h
-SOURCES = button.cpp client.cpp resizecorner.cpp ../colors.cpp factory.cpp ../gradients.cpp ../xproperty.cpp
-INCLUDEPATH += $KDE_DIR/include $KDE_DIR/include/KDE
-LIBS += -L$KDE_DIR/lib -lkdecorations -lkdeui
-TARGET = kwin3_bespin
-TEMPLATE = lib
-PLUGIN = true
-CONFIG += qt x11 plugin
-VERSION       = 0.1
-target.path += $KDE_DIR/lib/kde4/
-DATA.files = bespin.desktop
-DATA.path += "$KDE_DATA_PATH/kwin"
-INSTALLS += target DATA
-DEFINES += BESPIN_DECO
-" > kwin/client.pro
-if $HAVE_RENDER; then
-echo "
-LIBS += -lXrender
-" >> kwin/client.pro
-fi
-}
-
-write_kwin_config_pro() {
-echo "
-TEMPLATE    = lib
-TARGET = kwin_bespin_config
-target.path += $KDE_DIR/lib/kde4/
-HEADERS     = ../config/bconfig.h config.h
-FORMS       = configdialog.ui
-SOURCES     = ../config/bconfig.cpp config.cpp
-INSTALLS += target
-" > kwin/config.pro
-}
-
-write_kwin_pro() {
-echo "
-TEMPLATE = subdirs
-SUBDIRS = client.pro config.pro " > kwin/kwin.pro
-write_kwin_client_pro
-write_kwin_config_pro
-}
-
-check_xrender() {
-echo "
-TEMPLATE    = app
-TARGET      = rendertest
-SOURCES     = rendertest.cpp
-QMAKE_CXXFLAGS += -fPIC
-" > rendertest.pro
-
-echo "
-#include <QApplication>
-int main (int , char **) {
-#ifndef Q_WS_X11 // no x11 -> no render...
-#define QT_NO_XRENDER #
-#endif
-
-#ifndef QT_NO_XRENDER // have render
-qWarning(\"### Qt does support XRender\");
-return 0;
-#else
-qWarning(\"### Qt does NOT support XRender\");
-return 1;
-#endif
-}
-" > rendertest.cpp
-
-$QMAKE rendertest.pro -o Makefile.rendertest
-make -f Makefile.rendertest > /dev/null 2>&1
-if [ ! -e rendertest ]; then
-   bad "Unable to compile a simple Qt4 test app, allthough Qt4 seems to be present - borked installation?"
-   exit 1
-fi
-if ./rendertest; then
-   HAVE_RENDER=true
+echo -e "\n\n==================== Bespin interactive configuration ====================\n
+In addition to the style, you can have a KWin decoration a mac-like menu plasmoid and config plugins
+IF you have KDE and cmake.\n"
+KDE=true
+read -n1 -s -p "--> Do you want to compile with KDE support? [Y/n]"
+echo ""
+if [ "$REPLY" = "n" -o "$REPLY" = "N" ]; then
+   KDE=false
+   echo "Compiling Qt/qmake only..."
 else
-   HAVE_RENDER=false
-fi
-
-make distclean -f Makefile.rendertest > /dev/null 2>&1
-rm -f rendertest.pro rendertest.cpp
-
-}
-
-######### Main Code ###############################################
-echo
-ui "Welcome to Bespins interactive configurator"
-echo "================================================================"
-
-## first off and especially we need to find Qt4 make
-QMAKE="qmake"
-export CONFIG_QT=false
-
-find_qt || ask_for_qt
-
-if [ "$QT_DIR" = "" ]; then
-   bad "Qt4 not found - exiting"
-   exit 1;
-fi
-export CONFIG_QT=true
-
-## next we need to check whether Qt uses Xrender, what's not mentioned in the mkspecs...
-check_xrender
-
-find_kde || ask_for_kde
-
-if [ "$KDE_DIR" = "" ]; then
-   export CONFIG_KDE=false
-else
-   export CONFIG_KDE=true
-   export KDE_DIR
-   KDE_DATA_PATH="$($KDE_DIR/bin/kde4-config --path data)"
-   KDE_DATA_PATH="${KDE_DATA_PATH#*:}"
-   CONFIG_KWIN=$([ -e "$KDE_DIR/include/kdecoration.h" ])
-fi
-
-write_general_pro
-write_bespin_pro
-write_config_pro
-write_config_qt_pro
-if $CONFIG_KDE; then
-   write_config_kde_pro
-   if $CONFIG_KWIN; then
-      good "Kwin can be built"
-      write_kwin_pro
-   else
-      bad "KDE 4 was found, but you lack the KWin headers\nconsider installing kdebase and kdebase-dev if you want the window decoration"
-   fi
-else
-   bad "KDE 4 not found - compiling without KWin deco and style config plugin"
-fi
-
-if $QT_DIR/bin/qmake qmake.pro; then
-   if $CONFIG_KDE; then
-      if $CONFIG_KWIN; then
-         cd kwin
-         rm -f Makefile
-         $QMAKE client.pro -o Makefile.client
-         $QMAKE config.pro -o Makefile.config
-         sed -i -e "s/libkwin3_/kwin3_/g" Makefile.client
-         sed -i -e "s/libkwin_/kwin_/g" Makefile.config
-         cd ..
-      fi
-      cd config
-      rm -f Makefile.kstyle-bespin-config
-      $QMAKE kstyle-bespin-config.pro -o Makefile.kstyle-bespin-config
-      sed -i -e "s/libkstyle-bespin/kstyle-bespin/g" Makefile.kstyle-bespin-config
+   mkdir build > /dev/null 2>&1
+   cd build
+   if ! cmake ..; then
       cd ..
+      rm -rfd build
+      echo -e "!!! CMAKE NOT FOUND! !!!
+In order to compile with KDE support you NEED cmake >= 2.4\n"
+      read -n1 -s -p "--> Do you want to compile for <q>t only or <e>xit now? [q/E]"
+      echo ""
+      if [ "$REPLY" = "e" -o "$REPLY" = "E" ]; then
+         exit 1
+      fi
+      KDE=false
    fi
-   echo "================================================================"
-   #    read -p "Configuration done...[Y/n] " COMPILE
-   good "Configuration done, now \"make && make install\""
-   echo
-else
-   bad "Makefile generation failed!"
 fi
+
+if $KDE; then
+   echo -e "\nConfiguration succeeded...\n"
+   read -n1 -s -p "--> Do you want to run ccmake to adjust configuration? [y/N]"
+   echo ""
+   if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
+      ccmake ..
+   fi
+else
+   QMAKE="qmake"
+   find_qt || ask_for_qt
+   if [ "$QT_DIR" = "" ]; then
+      echo -e ":(\nQt4 not found - exiting...\n"
+      exit 1;
+   fi
+   if ! $QMAKE qmake.pro; then
+      echo ":(\nMakefile generation failed - exiting\n"
+      exit 1;
+   fi
+fi
+
+echo -e "\n\n========================= Configuration done ============================\n
+Ok, now just \"make\" and \"sudo make install\"...\n\n"

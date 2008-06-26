@@ -1,4 +1,4 @@
-/* Bespin widget style for Qt4
+/* Bespin mac-a-like XBar KDE4
    Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
 
    This library is free software; you can redistribute it and/or
@@ -16,22 +16,20 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <QPainter>
-
-#include "colors.h"
-#include "bespin.h"
-#include "makros.h"
+#include <QApplication>
+#include <QDBusConnection>
+#include "xbar.h"
+#include "dbus.h"
 
 using namespace Bespin;
-extern Config config;
-extern Dpi dpi;
 
-#define OPT_SUNKEN bool sunken = option->state & State_Sunken;
-#define OPT_ENABLED bool isEnabled = option->state & State_Enabled;
-#define OPT_HOVER bool hover = (option->state & State_Enabled) && (option->state & State_MouseOver);
-#define OPT_FOCUS bool hasFocus = option->state & State_HasFocus;
-
-#define B_STATES OPT_SUNKEN OPT_ENABLED OPT_HOVER OPT_FOCUS
-
-#define BESPIN_MNEMONIC Qt::TextHideMnemonic
-// #define BESPIN_MNEMONIC Qt::TextShowMnemonic
+int main(int argc, char *argv[])
+{
+   QApplication app(argc, argv);
+   XBar *bar = new XBar;
+   XBarAdaptor *adapt = new XBarAdaptor(bar);
+   QDBusConnection::sessionBus().registerService("org.kde.XBar");
+   QDBusConnection::sessionBus().registerObject("/XBar", bar);
+   bar->show();
+   return app.exec();
+}

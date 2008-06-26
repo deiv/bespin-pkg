@@ -102,7 +102,7 @@ int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const 
    case SH_BlinkCursorWhenTextSelected:
       return false; // that's annoying
    case SH_RichText_FullWidthSelection:
-      return true; /// (h�hh?)
+      return true; /// (hähh?)
    case SH_GroupBox_TextLabelVerticalAlignment:
       return Qt::AlignTop; // we've no halfheight frame
    case SH_GroupBox_TextLabelColor:
@@ -132,7 +132,7 @@ int BespinStyle::styleHint ( StyleHint hint, const QStyleOption * option, const 
    case SH_SpinBox_KeyPressAutoRepeatRate:
       return 75;
    case SH_ToolTipLabel_Opacity:
-      return 160; // ~ 63%
+      return 204; // ~ 80%
    case SH_DrawMenuBarSeparator:
       return false; // NO WAY!!!
    case SH_TitleBar_ModifyNotification:

@@ -24,7 +24,7 @@ void
 BespinStyle::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainter *painter,
                               int step) const
 {
-   B_STATES;
+   OPT_SUNKEN OPT_ENABLED OPT_FOCUS
 
    // shadow
    QPoint xy = handle.topLeft();
@@ -58,7 +58,7 @@ BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter,
       qstyleoption_cast<const QStyleOptionSlider *>(option);
    if (!slider) return;
 
-   B_STATES;
+   OPT_SUNKEN OPT_ENABLED OPT_HOVER
 
    if (isEnabled && slider->subControls & SC_SliderTickmarks) {
       int ticks = slider->tickPosition;
@@ -254,7 +254,7 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter,
    const QStyleOptionSlider *dial = qstyleoption_cast<const QStyleOptionSlider *>(option);
    if (!dial) return;
 
-   B_STATES
+   OPT_ENABLED OPT_HOVER OPT_FOCUS
    
    painter->save();
    QRect rect = RECT;

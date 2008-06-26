@@ -29,8 +29,6 @@
 
 using namespace Bespin;
 
-#ifdef Q_WS_X11
-
 #include <X11/Xatom.h>
 #include <QX11Info>
 
@@ -54,16 +52,13 @@ Atom  XProperty::rCorner =
 XInternAtom(QX11Info::display(), "BESPIN_RIGHT_CORNER", False);
 
 static unsigned char *chardata = 0;
-static int info, result, de; //dead end
+static int result, de; //dead end
 static unsigned long de2;
-#else
-typedef WId uint;
-#endif
+
 
 bool
 XProperty::get(WId window, Atom atom, uint& data)
 {
-#ifdef Q_WS_X11
    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, 1L, False,
                                 XA_CARDINAL, &de2, &de, &de2, &de2, &chardata);
 
@@ -72,18 +67,13 @@ XProperty::get(WId window, Atom atom, uint& data)
 
    memcpy (&data, chardata, sizeof (int));
    return true;
-#else
-   return false;
-#endif
 }
 
 void
 XProperty::set(WId window, Atom atom, uint data)
 {
-#ifdef Q_WS_X11
    XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 32,
                     PropModeReplace, (const unsigned char*)&data, 1L);
-#endif
 }
 
 /* The below functions mangle 2 rbg (24bit) colors and a 2 bit hint into

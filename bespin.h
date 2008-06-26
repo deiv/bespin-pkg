@@ -268,15 +268,14 @@ private:
    static bool isSpecialFrame(const QWidget *w);
    void erase(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
+   void setupDecoFor(const QWidget *w);
 private:
    typedef QHash<uint, Tile::Set> TileCache;
    struct {
       Tile::Set rect[2]; // round
       QPixmap radio, radioIndicator, notch, slider;
       QPixmap winClose, winMin, winMax;
-#if SHAPE_POPUP
       QRegion corner[4];
-#endif
    } masks;
    struct {
       Tile::Set
@@ -298,12 +297,12 @@ private:
    
    // pixmaps
    QPixmap *_scanlines[2];
-   
-   // toolbar title functionality ========================
-   QPoint cursorPos_;
-   bool mouseButtonPressed_;
-   bool internalEvent_;
+
+   // gtk-qt workarounds
    bool isGTK;
+
+   // KDE palette fix..
+   QPalette *originalPalette;
 private slots:
    void fixKdePalette();
 };

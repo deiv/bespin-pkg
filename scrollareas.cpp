@@ -235,7 +235,7 @@ BespinStyle::drawScrollBarButton(const QStyleOption * option,
    if (!config.scroll.showButtons)
       return;
 
-   B_STATES
+   OPT_SUNKEN OPT_ENABLED OPT_HOVER
 
    QRect r = RECT.adjusted(dpi.f2,dpi.f2,-dpi.f2,-dpi.f2);
    bool alive = isEnabled && ((up && opt->sliderValue > opt->minimum) ||
@@ -302,7 +302,7 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
                                  QPainter * painter,
                                  const QWidget * widget) const
 {
-   B_STATES
+   OPT_SUNKEN OPT_ENABLED OPT_HOVER
    const bool horizontal = option->state & QStyle::State_Horizontal;
    
    if (isComboDropDownSlider) {

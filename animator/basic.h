@@ -27,6 +27,7 @@ namespace Animator {
 class Info {
 public:
    Info(int s = 0, bool bwd = false);
+   virtual ~Info(){}
    virtual int step(long int idx = 0) const;
    bool bwd() const;
    int & operator++ (){return ++_step;}
@@ -52,6 +53,7 @@ public:
    
 protected:
    Basic();
+   virtual ~Basic(){}
    virtual bool eventFilter( QObject *object, QEvent *event );
    virtual bool noAnimations() const;
    virtual void play(QWidget *widget, bool bwd = false);
@@ -66,7 +68,7 @@ protected:
    typedef QHash<const QWidget*, Info> Items;
    Items items;
 protected slots:
-   virtual void release(QObject*);
+   virtual void release_s(QObject*);
 //    void pause(QWidget *w);
 };
 

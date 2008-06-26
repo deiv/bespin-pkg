@@ -22,9 +22,10 @@
 #include <QDesktopWidget>
 #include <QtDebug>
 #include "draw.h"
-#include "xproperty.h"
 
-#ifndef Q_WS_X11
+#ifdef Q_WS_X11
+#include "xproperty.h"
+#else
 #define QT_NO_XRENDER #
 #endif
 
@@ -146,14 +147,27 @@ void
 BespinStyle::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
    painter->save();
-   painter->setBrush(Gradients::pix(FCOLOR(Window), RECT.height(),
-                                    Qt::Vertical, Gradients::Button));
-   painter->setPen(Qt::NoPen);
-   painter->drawRect(RECT);
+   
+#if QT_VERSION < 0x040400
+#define ToolTipBase WindowText
+#define ToolTipText Window
+#endif
+
+//    painter->setBrush(Gradients::pix(FCOLOR(ToolTipBase), RECT.height(), Qt::Vertical, Gradients::Button));
+   painter->setBrush(FCOLOR(ToolTipBase));
+//    painter->setPen(Qt::NoPen);
+//    painter->drawRect(RECT);
    const int f1 = dpi.f1;
-   QPen pen(Colors::mid(FCOLOR(Window), FCOLOR(WindowText),6,1), f1);
+//    QPen pen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),6,1), f1);
+   QPen pen(FCOLOR(ToolTipText), f1);
    painter->setPen(pen);
    painter->drawRect(RECT.adjusted(f1/2,f1/2,-f1,-f1));
+
+#if QT_VERSION < 0x040400
+#undef ToolTipBase
+#undef ToolTipText
+#endif
+
    painter->restore();
 }
 

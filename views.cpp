@@ -184,7 +184,7 @@ static const int decoration_size = 9;
 
 void
 BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
-                        const QWidget * widget) const
+                        const QWidget *) const
 {
    SAVE_PEN;
    int mid_h = RECT.x() + RECT.width() / 2;

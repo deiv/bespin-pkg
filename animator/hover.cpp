@@ -152,7 +152,7 @@ Hover::timerEvent(QTimerEvent * event)
       else { // fade out
          *step += HOVER_IN_STEP;
          widget->repaint();
-         if (*step > maxSteps-2) {
+         if ((uint)(*step) > maxSteps-2) {
 #if WOBBLE_HOVER
             if (widget->testAttribute(Qt::WA_UnderMouse))
                it.value().fadeIn = false;

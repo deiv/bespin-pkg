@@ -55,7 +55,7 @@ void
 BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
                        const QWidget * widget) const
 {
-   B_STATES
+   OPT_SUNKEN OPT_ENABLED OPT_FOCUS
    
    if (!widget) { // fallback, we cannot paint shaped frame contents
       if (sunken)
@@ -188,11 +188,7 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
       painter->setFont ( tmpfnt );
       QStyleOptionGroupBox copy = *groupBox; copy.fontMetrics = QFontMetrics(tmpfnt);
       QRect textRect = subControlRect(CC_GroupBox, &copy, SC_GroupBoxLabel, widget);
-      int alignment = Qt::AlignCenter | Qt::TextShowMnemonic; //int(groupBox->textAlignment);
-//       if (!styleHint(QStyle::SH_UnderlineShortcut, option, widget))
-//          alignment |= Qt::TextHideMnemonic;
-//       else
-//          alignment |= Qt::TextShowMnemonic;
+      int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
 
       drawItemText(painter, textRect,  alignment, groupBox->palette, isEnabled, groupBox->text, role);
       int x = textRect.bottom(); textRect = RECT; textRect.setTop(x);

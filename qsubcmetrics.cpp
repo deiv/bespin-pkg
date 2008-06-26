@@ -24,6 +24,7 @@
 #include <QStyleOptionTab>
 #include <limits.h>
 #include "bespin.h"
+#include "draw.h"
 
 using namespace Bespin;
 extern Dpi dpi;
@@ -130,7 +131,7 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
          case SC_GroupBoxLabel: {
             QFontMetrics fontMetrics = groupBox->fontMetrics;
             int h = fontMetrics.height()+dpi.f4;
-            int tw = fontMetrics.size(Qt::TextShowMnemonic, groupBox->text + QLatin1Char(' ')).width();
+            int tw = fontMetrics.size(BESPIN_MNEMONIC, groupBox->text + QLatin1Char(' ')).width();
             int marg = (groupBox->features & QStyleOptionFrameV2::Flat) ? 0 : dpi.f4;
 
             ret = groupBox->rect.adjusted(marg, dpi.f4, -marg, 0);

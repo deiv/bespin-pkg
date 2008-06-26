@@ -381,7 +381,7 @@ void BespinStyle::generatePixmaps()
             Tile::Line(tmp, i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);
       }
    }
-#if SHAPE_POPUP
+
    // ================================================================
    // ================================================================
    // Popup corners - not really pxmaps, though ;) ===================
@@ -404,6 +404,6 @@ void BespinStyle::generatePixmaps()
    masks.corner[3] = circle & QRegion(f5,f5,f5,f5); // br
    masks.corner[3].translate(-masks.corner[3].boundingRect().topLeft());
    // ================================================================
-#endif
+
 }
 #undef fillRect

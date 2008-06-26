@@ -29,12 +29,8 @@
 
 #include <QWidget>
 
-#ifdef Q_WS_X11
 #include <X11/Xlib.h>
 #include "fixx11h.h"
-#else
-typedef Atom int;
-#endif
 
 namespace Bespin {
 
@@ -42,7 +38,7 @@ class XProperty {
 public:
    static Atom bgInfo, actInfo, inactInfo, decoDim,
    topTile, btmTile, cnrTile, lCorner, rCorner;
-   
+
    static bool get(WId window, Atom atom, uint& data);
    static void set(WId window, Atom atom, uint data);
    static uint encode(const QColor &bg, const QColor &fg, uint hint);

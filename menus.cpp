@@ -27,8 +27,7 @@ void
 BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
                            const QWidget *) const
 {
-   if (config.menu.bar_role[Bg] != QPalette::Window ||
-       config.menu.barGradient != Gradients::None)
+   if (config.menu.bar_role[Bg] != QPalette::Window || config.menu.barGradient != Gradients::None)
       painter->fillRect(RECT.adjusted(0,0,0,-dpi.f2),
                         Gradients::brush(Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,4),
                                          RECT.height()-dpi.f2, Qt::Vertical, config.menu.barGradient));
@@ -55,7 +54,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
    else
       drawMenuBarBg(option, painter, widget);
 #endif
-   B_STATES;
+   OPT_SUNKEN OPT_ENABLED OPT_HOVER
 
    ROLES(menu.active);
    hover = option->state & State_Selected;
@@ -100,7 +99,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
          shadows.sunken[round_][false].render(r, painter);
    }
    QPixmap pix = mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ? QIcon::Normal : QIcon::Disabled);
-   const uint alignment = Qt::AlignCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
+   const uint alignment = Qt::AlignCenter | BESPIN_MNEMONIC | Qt::TextDontClip | Qt::TextSingleLine;
    if (!pix.isNull())
       drawItemPixmap(painter,r, alignment, pix);
    else
@@ -137,7 +136,10 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
    if (!menuItem) return;
 
    ROLES(menu.std);
-   B_STATES; if (isGTK) sunken = false;
+
+   OPT_SUNKEN OPT_ENABLED
+   if (isGTK)
+      sunken = false;
        
    // separator
    if (menuItem->menuItemType == QStyleOptionMenuItem::Separator) {
@@ -160,18 +162,17 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
    }
        
    QRect r = RECT.adjusted(0,0,-1,-1);
-   bool selected = menuItem->state & State_Selected;
+   bool selected = isEnabled && menuItem->state & State_Selected;
 
-   QColor bg = COLOR(ROLE[Bg]);
-   QColor fg = isEnabled ? COLOR(ROLE[Fg]) :
-      Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 2,1);
+   QColor bg = PAL.color(QPalette::Active, ROLE[Bg]);
+   QColor fg = isEnabled ? COLOR(ROLE[Fg]) : Colors::mid(bg, PAL.color(QPalette::Active, ROLE[Fg]), 2,1);
 
    painter->save();
    bool checkable = (menuItem->checkType != QStyleOptionMenuItem::NotCheckable);
    bool checked = checkable && menuItem->checked;
 
    // selected bg
-   if (selected && isEnabled) {
+   if (selected) {
       if (ROLE[Bg] == QPalette::Window) {
          bg = Colors::mid(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg), 1, 2);
          fg = CCOLOR(menu.active, Fg);
@@ -180,11 +181,10 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
          bg = Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 1, 2);
          fg = COLOR(ROLE[Bg]);
       }
-      masks.rect[round_].render(r, painter, sunken ? Gradients::Sunken :
-                                config.menu.itemGradient, Qt::Vertical, bg);
+      masks.rect[round_].render( r, painter, sunken ? Gradients::Sunken : config.menu.itemGradient,
+                                 Qt::Vertical, bg);
       if (config.menu.itemSunken)
          shadows.sunken[round_][false].render(r, painter);
-//             masks.tab.outline(r, painter, QColor(0,0,0,45));
    }
        
    // Text and icon, ripped from windows style
@@ -192,12 +192,12 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
    int iconCol = config.menu.showIcons*menuitem->maxIconWidth;
 
    if (config.menu.showIcons && !menuItem->icon.isNull()) {
-      QRect vCheckRect = visualRect(option->direction, r,
-                                    QRect(r.x(), r.y(), iconCol, r.height()));
-      QIcon::Mode mode = isEnabled ? (selected ? QIcon::Active :
-                                    QIcon::Normal) : QIcon::Disabled;
-      QPixmap pixmap = menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize),
-                                             mode, checked ? QIcon::On : QIcon::Off);
+      QRect vCheckRect =
+         visualRect(option->direction, r, QRect(r.x(), r.y(), iconCol, r.height()));
+      QIcon::Mode mode =
+         isEnabled ? (selected ? QIcon::Active : QIcon::Normal) : QIcon::Disabled;
+      QPixmap pixmap =
+         menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), mode, checked ? QIcon::On : QIcon::Off);
 
       QRect pmr(QPoint(0, 0), pixmap.size());
       pmr.moveCenter(vCheckRect.center());
@@ -215,15 +215,14 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
    int xm = windowsItemFrame + iconCol + windowsItemHMargin;
    int xpos = r.x() + xm;
    QRect textRect(xpos, y + windowsItemVMargin,
-                  w - xm - menuItem->menuHasCheckableItems*(cDim+dpi.f7) -
-                  windowsRightBorder - tab + 1,
+                  w - xm - menuItem->menuHasCheckableItems*(cDim+dpi.f7) - windowsRightBorder - tab + 1,
                   h - 2 * windowsItemVMargin);
    QRect vTextRect = visualRect(option->direction, r, textRect);
    QString s = menuitem->text;
    if (!s.isEmpty()) {
       // draw text
       int t = s.indexOf('\t');
-      const int text_flags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
+      const int text_flags = Qt::AlignVCenter | BESPIN_MNEMONIC | Qt::TextDontClip | Qt::TextSingleLine;
       if (t >= 0) {
          QRect vShortcutRect = visualRect(option->direction, r, QRect(textRect.topRight(),
                                           QPoint(textRect.right()+tab, textRect.bottom())));
@@ -252,7 +251,7 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
       QStyleOptionMenuItem tmpOpt = *menuItem;
       tmpOpt.rect = visualRect(option->direction, r, QRect(xpos, r.y() + (r.height() - dim)/2, dim, dim));
       painter->setBrush(Colors::mid(bg, fg, 1, 2));
-      painter->setPen(painter->brush());
+      painter->setPen(QPen(painter->brush(), painter->pen().widthF()));
       drawArrow(dir, tmpOpt.rect, painter);
    }
    else if (checkable) { // Checkmark

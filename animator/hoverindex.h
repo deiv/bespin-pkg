@@ -29,6 +29,7 @@ namespace Animator {
 class IndexInfo {
 public:
    IndexInfo(long int idx) {index = idx;}
+   virtual ~IndexInfo() {}
    virtual int step(long int idx = 0) const;
 protected:
    friend class HoverIndex;
@@ -45,6 +46,7 @@ public:
    static void setFPS(uint fps);
 protected:
    HoverIndex();
+   virtual ~HoverIndex(){}
    virtual const IndexInfo *_info(const QWidget *widget, long int index) const;
    virtual void _setFPS(uint fps);
    virtual void timerEvent(QTimerEvent * event);
@@ -57,6 +59,10 @@ protected slots:
 };
 
 };
+
+#ifndef ANIMATOR_IMPL
+#define ANIMATOR_IMPL 0
+#endif
 
 #if ANIMATOR_IMPL
 
@@ -76,6 +82,8 @@ if (instance) instance->_setFPS(fps);\
    _duration = ms;\
    if (instance) instance->maxSteps = ms/_timeStep;\
    }
+
+#undef ANIMATOR_IMPL
    
 #endif //ANIMATOR_IMPL
 

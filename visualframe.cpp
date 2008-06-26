@@ -94,7 +94,7 @@ VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect 
 class StdChildAdd : public QObject
 {
 public:
-   bool eventFilter( QObject *o, QEvent *ev) {
+   bool eventFilter( QObject *, QEvent *ev) {
       return (ev->type() == QEvent::ChildAdded);
    }
 };

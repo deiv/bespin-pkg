@@ -46,10 +46,10 @@ bool
 Basic::_manage(QWidget *w)
 {
    // just to be sure...
-   disconnect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release(QObject*)));
+   disconnect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
    w->removeEventFilter(this);
 
-   connect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release(QObject*)));
+   connect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
    if (w->isVisible()) {
       QEvent ev(QEvent::Show);
       eventFilter(w, &ev);
@@ -108,7 +108,7 @@ Basic::noAnimations() const
 }
 
 void
-Basic::release(QObject *obj)
+Basic::release_s(QObject *obj)
 {
    _release(qobject_cast<QWidget*>(obj));
 }

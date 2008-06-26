@@ -75,7 +75,7 @@ static bool isEmpty(const QPixmap &pix)
          return false;
    return true;
 }
-
+#if 0
 static QPixmap invertAlpha(const QPixmap & pix)
 {
    if (pix.isNull()) return pix;
@@ -90,7 +90,7 @@ static QPixmap invertAlpha(const QPixmap & pix)
    delete dst;
    return ret;
 }
-
+#endif
 Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round)
 {
    if (pix.isNull()) {
