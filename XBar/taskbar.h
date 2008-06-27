@@ -29,7 +29,7 @@ class TaskBar : public MenuBar
 {
    Q_OBJECT
 public:
-   TaskBar(QGraphicsItem *parent = 0, QGraphicsView *view = 0);
+   TaskBar(QGraphicsItem *parent = 0);
 private slots:
    void lock();
    void logout();

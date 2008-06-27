@@ -56,14 +56,12 @@ XBar::~XBar()
 void
 XBar::init()
 {
-   
-   
    setFocusPolicy(Qt::NoFocus);
    setAspectRatioMode(Plasma::IgnoreAspectRatio);
    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
    setMaximumSize(INT_MAX, INT_MAX);
 
-   d.taskbar = new TaskBar(this, view());
+   d.taskbar = new TaskBar(this);
    d.currentBar = d.taskbar;
 
    updatePalette();
@@ -167,8 +165,12 @@ XBar::dbusAction(const QObject *o, int idx, const QString &cmd)
    QPoint pt = mapToGlobal(mBar->actionGeometry(idx).bottomLeft() + mBar->pos());
    
    QDBusInterface interface( mBar->service(), "/XBarClient", "org.kde.XBarClient" );
-   if (interface.isValid())
-      interface.call(cmd, mBar->key(), idx-1, pt.x(), pt.y());
+   if (interface.isValid()) {
+      if (idx < 0)
+         interface.call(cmd, mBar->key());
+      else
+         interface.call(cmd, mBar->key(), idx-1, pt.x(), pt.y());
+   }
    return true;
 }
 
@@ -191,9 +193,17 @@ XBar::mapToGlobal(const QPointF &pt)
 }
 
 void
+XBar::raiseCurrentWindow()
+{
+   if (!d.currentBar || d.currentBar == d.taskbar)
+      return; // nothing to raise...
+   dbusAction(d.currentBar, -1, "raise");
+}
+
+void
 XBar::registerMenu(const QString &service, qlonglong key, const QString &title, const QStringList &entries)
 {
-   MenuBar *newBar = new MenuBar(service, key, this, view());
+   MenuBar *newBar = new MenuBar(service, key, this);
    newBar->setPalette(palette());
    connect (newBar, SIGNAL(hovered(int)), this, SLOT(hover(int)));
    connect (newBar, SIGNAL(triggered(int)), this, SLOT(trigger(int)));
@@ -303,6 +313,10 @@ void
 XBar::updateWindowlist()
 {
    d.windowList.clear();
+
+   d.windowList.addAction ( "Raise Window", this, SLOT(raiseCurrentWindow()) );
+   d.windowList.addSeparator();
+   
    const QList<WId>& windows = KWindowSystem::windows();
    QAction *act = 0;
    KWindowInfo info; QString title;
@@ -330,13 +344,13 @@ XBar::updateWindowlist()
 void
 XBar::wheelEvent(QGraphicsSceneWheelEvent *ev)
 {
-   qDebug() << "XBar, wheel!";
    if (d.menus.isEmpty())
       return;
 
    MenuMap::iterator n;
 
    if (d.currentBar == d.taskbar) {
+      hide(d.taskbar);
       if (ev->delta() < 0)
          n = d.menus.begin();
       else {
@@ -357,11 +371,11 @@ XBar::wheelEvent(QGraphicsSceneWheelEvent *ev)
                n = i-1;
          }
       }
-      if (i == d.menus.end())
-         show(d.taskbar);
-      else
-         show(n.value());
    }
+   if (n == d.menus.end())
+      show(d.taskbar);
+   else
+      show(n.value());
 }
 
 K_EXPORT_PLASMA_APPLET(xbar, XBar)

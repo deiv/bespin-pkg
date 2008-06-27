@@ -29,7 +29,7 @@ class MenuBar : public QGraphicsWidget
 {
    Q_OBJECT
 public:
-   MenuBar ( const QString &service = QString(), qlonglong key = 0, QGraphicsItem *parent = 0, QGraphicsView *view = 0 );
+   MenuBar ( const QString &service = QString(), qlonglong key = 0, QGraphicsItem *parent = 0);
    QAction *addAction(const QString & text, int idx = -1, QMenu *menu = 0);
    const QRect &actionGeometry(int idx) const;
    void removeAction(int idx);
@@ -43,6 +43,7 @@ public:
    inline const QString& service() const { return d.service; }
    inline qlonglong key() const { return d.key; }
    inline int openPopup() const { return d.openPopup; }
+   QGraphicsView *view() const;
 signals:
    void hovered(int);
    void triggered(int);
@@ -73,7 +74,6 @@ private:
       qlonglong key;
       int hoverIndex;
       int openPopup;
-      QGraphicsView *view;
    } d;
 };
 

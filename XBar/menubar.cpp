@@ -28,6 +28,8 @@ This library is distributed in the hope that it will be useful,
 #include <QStyle>
 #include <QStyleOptionMenuItem>
 
+#include <Plasma/Applet>
+
 #include "menubar.h"
 
 #include <QtDebug>
@@ -35,7 +37,7 @@ This library is distributed in the hope that it will be useful,
 static QBasicTimer mousePoll;
 static QPointF lastMousePos;
 
-MenuBar::MenuBar( const QString &service, qlonglong key, QGraphicsItem *parent, QGraphicsView *view) :
+MenuBar::MenuBar( const QString &service, qlonglong key, QGraphicsItem *parent) :
 QGraphicsWidget(parent)
 {
    setFocusPolicy(Qt::NoFocus);
@@ -44,7 +46,6 @@ QGraphicsWidget(parent)
    d.openPopup = -1;
    d.service = service;
    d.key = key;
-   d.view = view;
 //    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 //    setObjectName( "XBarMenubar" );
 }
@@ -214,17 +215,17 @@ MenuBar::hoverMoveEvent(QGraphicsSceneHoverEvent *ev)
 QPointF
 MenuBar::mapFromGlobal(const QPoint &pt)
 {
-   if (!d.view)
-      return mapFromScene(pt).toPoint();
-   return mapFromScene(d.view->mapToScene(d.view->mapFromGlobal(pt)));
+   if (QGraphicsView *v = view())
+      return mapFromScene(v->mapToScene(v->mapFromGlobal(pt)));
+   return mapFromScene(pt).toPoint();
 }
 
 QPoint
 MenuBar::mapToGlobal(const QPointF &pt)
 {
-   if (!d.view)
-      return mapToScene(pt).toPoint();
-   return d.view->mapToGlobal(d.view->mapFromScene(mapToScene(pt)));
+   if (QGraphicsView *v = view())
+      return v->mapToGlobal(v->mapFromScene(mapToScene(pt)));
+   return mapToScene(pt).toPoint();
 }
 
 void
@@ -283,7 +284,7 @@ MenuBar::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 void
 MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-   QWidget *w = widget ? widget : d.view;
+   QWidget *w = widget ? widget : view();
    
    QRegion emptyArea(rect().toRect());
 
@@ -410,4 +411,12 @@ void
 MenuBar::wheelEvent(QGraphicsSceneWheelEvent *ev)
 {
    ((QEvent*)ev)->ignore();
+}
+
+QGraphicsView *
+MenuBar::view() const
+{
+   if (Plasma::Applet *applet = dynamic_cast<Plasma::Applet*>(parentItem()))
+      return applet->view();
+   return NULL;
 }

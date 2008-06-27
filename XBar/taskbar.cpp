@@ -26,8 +26,7 @@ This library is distributed in the hope that it will be useful,
 
 #include <QtDebug>
 
-TaskBar::TaskBar(QGraphicsItem *parent, QGraphicsView *view) :
-MenuBar( QString(), 0, parent, view )
+TaskBar::TaskBar(QGraphicsItem *parent) : MenuBar( QString(), 0, parent)
 {
    
    QMenu *sm = new QMenu;

@@ -66,6 +66,7 @@ private slots:
    void activateWin();
    void callMenus();
    void byeMenus();
+   void raiseCurrentWindow();
 };
 
 #endif //XBAR_H
