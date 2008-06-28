@@ -44,6 +44,7 @@ public slots:
    Q_NOREPLY void hover(qlonglong key, int idx, int x, int y)
    { mm->hover(key, idx, x, y); }
    Q_NOREPLY void popDown(qlonglong key) { mm->popDown(key); }
+   Q_NOREPLY void raise(qlonglong key) { mm->raise(key); }
 };
 }; // namespace
 

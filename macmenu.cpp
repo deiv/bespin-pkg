@@ -300,6 +300,18 @@ MacMenu::changeAction(QMenuBar *menu, QActionEvent *ev)
    }
 }
 
+void
+MacMenu::raise(qlonglong key)
+{
+   if (QMenuBar *menu = menuBar(key)) {
+   if (QWidget *win = menu->window()) {
+      win->showNormal();
+      win->activateWindow();
+      win->raise();
+   }
+   }
+}
+
 bool
 MacMenu::eventFilter(QObject *o, QEvent *ev)
 {

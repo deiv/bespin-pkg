@@ -40,6 +40,7 @@ public:
    void popup(qlonglong key, int idx, int x, int y);
    void hover(qlonglong key, int idx,  int x, int y);
    void popDown(qlonglong key);
+   void raise(qlonglong key);
 public slots:
    void activate();
    void deactivate();

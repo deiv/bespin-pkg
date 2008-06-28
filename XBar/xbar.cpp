@@ -96,7 +96,8 @@ XBar::updatePalette()
 void
 XBar::activateWin() {
    if (QAction *act = qobject_cast<QAction*>(sender())) {
-      bool ok; int id = act->data().toUInt(&ok);
+      bool ok;
+      int id = act->data().toUInt(&ok);
       if (ok)
          KWindowSystem::activateWindow( id );
    }
@@ -158,9 +159,11 @@ XBar::dbusAction(const QObject *o, int idx, const QString &cmd)
    const MenuBar *mBar = qobject_cast<const MenuBar*>(o);
    if (!mBar)
       return false; // that's not our business!
-   QAction *act = mBar->action(idx);
-   if (!act || act->menu())
-      return false; // that's not our business!
+   if (idx > -1) {
+      QAction *act = mBar->action(idx);
+      if (!act || act->menu())
+         return false; // that's not our business!
+   }
 
    QPoint pt = mapToGlobal(mBar->actionGeometry(idx).bottomLeft() + mBar->pos());
    
