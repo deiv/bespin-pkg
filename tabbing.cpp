@@ -200,27 +200,28 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
       Tile::reset();
    }
 
-   OPT_SUNKEN OPT_ENABLED OPT_HOVER
-   sunken = sunken || (option->state & State_Selected);
-   animStep = 0;
-   // animation stuff
-   if (isEnabled && !sunken) {
-      Animator::IndexInfo *info = 0;
-      int index = -1, hoveredIndex = -1;
-      if (widget)
-      if (const QTabBar* tbar = qobject_cast<const QTabBar*>(widget)) {
-         // NOTICE: the index increment is IMPORTANT to make sure it's no "0"
-         index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
-         hoveredIndex = hover ? index :
-            tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
-         info = const_cast<Animator::IndexInfo*>
-            (Animator::HoverIndex::info(widget, hoveredIndex));
+   if (tab->position != QStyleOptionTab::OnlyOneTab) {
+      OPT_SUNKEN OPT_ENABLED OPT_HOVER
+      sunken = sunken || (option->state & State_Selected);
+      animStep = 0;
+      // animation stuff
+      if (isEnabled && !sunken) {
+         Animator::IndexInfo *info = 0;
+         int index = -1, hoveredIndex = -1;
+         if (widget)
+         if (const QTabBar* tbar = qobject_cast<const QTabBar*>(widget)) {
+            // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
+            index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
+            hoveredIndex = hover ? index :
+               tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
+            info = const_cast<Animator::IndexInfo*>
+               (Animator::HoverIndex::info(widget, hoveredIndex));
+         }
+         if (info)
+            animStep = info->step(index);
+         if (hover && !animStep) animStep = 6;
       }
-      if (info)
-         animStep = info->step(index);
-      if (hover && !animStep) animStep = 6;
    }
-   
    drawTabShape(&copy, painter, widget);
    drawTabLabel(&copy, painter, widget);
    if (needRestore)
@@ -234,7 +235,10 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
    ASSURE_OPTION(tab, Tab);
    OPT_SUNKEN
 
-   if (isGTK)
+   if (tab->position == QStyleOptionTab::OnlyOneTab) {
+      sunken = false;
+   }
+   else if (isGTK)
       sunken = option->state & State_Selected;
    else
       sunken = sunken || (option->state & State_Selected);
@@ -294,7 +298,12 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
 {
    ASSURE_OPTION(tab, Tab);
    OPT_SUNKEN OPT_ENABLED OPT_HOVER
-   sunken = sunken || (option->state & State_Selected);
+   if (tab->position == QStyleOptionTab::OnlyOneTab) {
+      sunken = false;
+      hover = false;
+   }
+   else
+      sunken = sunken || (option->state & State_Selected);
    if (sunken) hover = false;
    
    painter->save();
