@@ -131,7 +131,7 @@ grabWidget(QWidget * root, QPixmap *pix)
    QAbstractScrollArea *scrollarea = 0;
    QPainter p; QRegion rgn;
    QPixmap *saPix = 0L;
-
+                        
    foreach (QWidget *w, widgets) {
       if (w->isVisibleTo(root)) {
          // solids
@@ -246,7 +246,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 
    #define _RESET_SIZE_
    #define AVOID(_COND_) if (_COND_) { _RESET_SIZE_ rewind(); return; } //
-   #define TOO_SLOW clock.elapsed() > (int)(_duration - _timeStep)
+   #define TOO_SLOW(_T_) clock.elapsed() > qMin(_T_, (int)(_duration - _timeStep))
    
    AVOID(!ow); // this is the first time the tab changes, nothing to blend
    AVOID(ow == cw); // this can happen on destruction etc... and thus lead to segfaults...
@@ -273,7 +273,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
       tabPix[0] = tabPix[1];
       grabWidget(ow, &tabPix[0]);
       tabPix[2] = tabPix[0];
-      AVOID(TOO_SLOW);
+      AVOID(TOO_SLOW(150));
    }
    else { // humm?? very fast tab change... maybe the user changed his mind...
       clock.restart();
@@ -281,7 +281,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
    }
    
    grabWidget(cw, &tabPix[1]);
-   AVOID(TOO_SLOW);
+   AVOID(TOO_SLOW(200));
 
    duration = _duration - clock.elapsed() + _timeStep;
    clock.restart(); clock.addMSecs(_timeStep);
