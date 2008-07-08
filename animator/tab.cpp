@@ -99,13 +99,13 @@ static QPixmap dumpBackground(QWidget *target, const QRect &r, const QStyle *sty
 static void
 grabWidget(QWidget * root, QPixmap *pix)
 {
-   if (!root)
-      return;
-   
-   QPoint zero(0,0);
-   QSize sz = root->window()->size();
-   
-   QWidgetList widgets = root->findChildren<QWidget*>();
+    if (!root)
+        return;
+
+    QPoint zero(0,0);
+    QSize sz = root->window()->size();
+
+    QWidgetList widgets = root->findChildren<QWidget*>();
    
    // resizing (in case) -- NOTICE may be dropped for performance...?!
 //    if (root->testAttribute(Qt::WA_PendingResizeEvent) ||
@@ -121,54 +121,63 @@ grabWidget(QWidget * root, QPixmap *pix)
 //       }
 //    }
    
-   // painting ------------
-   QPainter::setRedirected( root, pix );
-   QPaintEvent e(QRect(zero, root->size()));
-   QCoreApplication::sendEvent(root, &e);
-   QPainter::restoreRedirected(root);
-   
-   bool hasScrollAreas = false;
-   QAbstractScrollArea *scrollarea = 0;
-   QPainter p; QRegion rgn;
-   QPixmap *saPix = 0L;
-                        
-   foreach (QWidget *w, widgets) {
-      if (w->isVisibleTo(root)) {
-         // solids
-         if (w->autoFillBackground()) {
-            const QBrush bg = w->palette().brush(w->backgroundRole());
-            p.begin(pix);
-            QRect wrect = QRect(zero, w->size()).translated(w->mapTo(root, zero));
-            if (bg.style() == Qt::TexturePattern)
-               p.drawTiledPixmap(wrect, bg.texture(),
-                                 w->mapTo(root->window(), zero));
-            else
-               p.fillRect(wrect, bg);
-            p.end();
-         }
-         
-         // scrollarea workaround
-         if ((scrollarea = qobject_cast<QAbstractScrollArea*>(w)))
-            hasScrollAreas = true;
-         if (hasScrollAreas && !qobject_cast<QScrollBar*>(w) &&
-             (scrollarea = scrollAncestor(w, root))) {
-                QRect rect = scrollarea->frameRect();
-                rect.translate(scrollarea->mapTo(root, zero));
-                if (!saPix || saPix->size() != rect.size()) {
-                   delete saPix; saPix = new QPixmap(rect.size());
-                }
-                p.begin(saPix); p.drawPixmap(zero, *pix, rect);
+    // painting ------------
+    QPainter::setRedirected( root, pix );
+    QPaintEvent e(QRect(zero, root->size()));
+    QCoreApplication::sendEvent(root, &e);
+    QPainter::restoreRedirected(root);
+
+    bool hasScrollAreas = false;
+    QAbstractScrollArea *scrollarea = 0;
+    QPainter p; QRegion rgn;
+    QPixmap *saPix = 0L;
+
+    foreach (QWidget *w, widgets) {
+        if (w->isVisibleTo(root)) {
+            // solids
+            if (w->autoFillBackground()) {
+                const QBrush bg = w->palette().brush(w->backgroundRole());
+                p.begin(pix);
+                QRect wrect = QRect(zero, w->size()).translated(w->mapTo(root, zero));
+                if (bg.style() == Qt::TexturePattern)
+                p.drawTiledPixmap(wrect, bg.texture(),
+                                    w->mapTo(root->window(), zero));
+                else
+                p.fillRect(wrect, bg);
                 p.end();
-                const QPoint &pt = scrollarea->frameRect().topLeft();
-                w->render(saPix, w->mapTo(scrollarea, pt), w->rect(), 0);
-                p.begin(pix); p.drawPixmap(rect.topLeft(), *saPix); p.end();
-             }
-         // default painting redirection
-         else
-            w->render(pix, w->mapTo(root, zero), w->rect(), 0);
-      }
-   }
-   delete saPix;
+            }
+
+            // scrollarea workaround
+            if ((scrollarea = qobject_cast<QAbstractScrollArea*>(w)))
+                hasScrollAreas = true;
+            if (hasScrollAreas && !qobject_cast<QScrollBar*>(w) &&
+                (scrollarea = scrollAncestor(w, root)))
+            {
+                QRect rect = scrollarea->frameRect();
+                if (rect.isValid())
+                {
+                    rect.translate(scrollarea->mapTo(root, zero));
+                    if (!saPix || saPix->size() != rect.size())
+                    {
+                        delete saPix;
+                        saPix = new QPixmap(rect.size());
+                    }
+                    p.begin(saPix);
+                    p.drawPixmap(zero, *pix, rect);
+                    p.end();
+                    const QPoint &pt = scrollarea->frameRect().topLeft();
+                    w->render(saPix, w->mapTo(scrollarea, pt), w->rect(), 0);
+                    p.begin(pix);
+                    p.drawPixmap(rect.topLeft(), *saPix);
+                    p.end();
+                }
+                }
+            // default painting redirection
+            else
+                w->render(pix, w->mapTo(root, zero), w->rect(), 0);
+        }
+    }
+    delete saPix;
 }
 
 static uint _duration = 350;
