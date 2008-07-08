@@ -75,8 +75,8 @@ topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
 bgMode(1), _factory(f), _preview(0), corner(0) { }
 
 Client::~Client(){
-   delete corner;
-   delete _preview;
+//    delete corner;
+//    delete _preview;
 //    delete [] buttons;
 //    delete titleBar;
 //    delete titleSpacer;
@@ -768,57 +768,61 @@ isBrowser(const QString &s)
 QString
 Client::trimm(const QString &string)
 {
-   if (!config()->trimmCaption) return string;
+    if (!config()->trimmCaption) return string;
 
-   /* Ok, *some* apps have really long and nasty window captions
-   this looks clutterd, so we allow to crop them a bit and remove
-   considered uninteresting informations ======================= */
+    /* Ok, *some* apps have really long and nasty window captions
+    this looks clutterd, so we allow to crop them a bit and remove
+    considered uninteresting informations ======================= */
 
-   QString ret = string;
+    QString ret = string;
 
-   /* 1st off: we assume the part beyond the last dash (if any) to be the
-   uninteresting one (usually it's the apps name, if there's add info, that's
-   more important to the user) ------------------------------------- */
+    /* 1st off: we assume the part beyond the last dash (if any) to be the
+    uninteresting one (usually it's the apps name, if there's add info, that's
+    more important to the user) ------------------------------------- */
 
-   // ok, here's currently some conflict
-   // in e.g. amarok, i'd like to snip "amarok" and preserver "<song> by <artist>"
-   // but for e.g. k3b, i'd like to get rid of stupid
-   // "the kde application to burn cds and dvds" ...
-   if (ret.contains(" - "))
-      ret = ret.section(" - ", 0, -2, QString::SectionSkipEmpty );
+    // ok, here's currently some conflict
+    // in e.g. amarok, i'd like to snip "amarok" and preserver "<song> by <artist>"
+    // but for e.g. k3b, i'd like to get rid of stupid
+    // "the kde application to burn cds and dvds" ...
+    if (ret.contains(" - "))
+        ret = ret.section(" - ", 0, -2, QString::SectionSkipEmpty );
 
-   KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
-   QString appName(info.windowClassName());
+    KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
+    QString appName(info.windowClassName());
 
-   /* Browsers set the title to <html><title/></html> - appname
-   Now the page titles can be ridiculously looooong, especially on news
-   pages --------------------------------- */
-   if (isBrowser(appName)) {
-      int n = qMin(2, ret.count(" - "));
-      if (n--) // select last two if 3 or more sects, prelast otherwise
-         ret = ret.section(" - ", -2, n-2, QString::SectionSkipEmpty);
-   }
+    /* Browsers set the title to <html><title/></html> - appname
+    Now the page titles can be ridiculously looooong, especially on news
+    pages --------------------------------- */
+    if (isBrowser(appName)) {
+        int n = qMin(2, ret.count(" - "));
+        if (n--) // select last two if 3 or more sects, prelast otherwise
+            ret = ret.section(" - ", -2, n-2, QString::SectionSkipEmpty);
+    }
 
-   /* next, if there're details, cut of by ": ",
-   we remove the general part as well ------------------------------*/
-   if (ret.contains(": "))
-      ret = ret.section(": ", 1, -1, QString::SectionSkipEmpty );
+    /* next, if there're details, cut of by ": ",
+    we remove the general part as well ------------------------------*/
+    if (ret.contains(": "))
+        ret = ret.section(": ", 1, -1, QString::SectionSkipEmpty );
 
-   /* if this is a url, please get rid of http:// and /file.html ------- */
-   if (ret.contains("http://"))
-      ret = ret.remove("http://", Qt::CaseInsensitive)/*.section()*/;
-   
-   /* last: if the remaining string still contains the app name, please shape
-   away additional info like compile time, version numbers etc. ------------ */
-   else {
-      // TODO maybe check with regexp and word bounds?
-      int i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
-      if (i > -1)
-         ret = ret.mid(i, appName.length());
-   }
+    /* if this is a url, please get rid of http:// and /file.html ------- */
+    if (ret.contains("http://"))
+        ret = ret.remove("http://", Qt::CaseInsensitive)/*.section()*/;
 
-   /* in general, remove leading and ending blanks... */
-   return ret.trimmed();
+    /* last: if the remaining string still contains the app name, please shape
+    away additional info like compile time, version numbers etc. ------------ */
+    else {
+        // TODO maybe check with regexp and word bounds?
+        int i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
+        if (i > -1)
+            ret = ret.mid(i, appName.length());
+    }
+
+    ret = ret.trimmed();
+    if (ret.isEmpty())
+        ret = string; // ...
+
+    /* in general, remove leading and ending blanks... */
+    return ret;
    
 //    KWindowInfo info(windowId(), NET::WMVisibleName | NET::WMName, NET::WM2WindowClass);
 //    qDebug() << "BESPIN:" << info.windowClassClass() <<  << info.name() << info.visibleName();

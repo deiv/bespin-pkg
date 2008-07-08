@@ -215,10 +215,13 @@ Button::leaveEvent(QEvent *)
 void
 Button::mousePressEvent ( QMouseEvent * event )
 {
-   if (!isEnabled()) return;
-   
-   if (event->button() == Qt::LeftButton)
-      state |= Sunken; repaint();
+    if (!isEnabled()) return;
+
+    if (event->button() == Qt::LeftButton)
+    {
+        state |= Sunken;
+        repaint();
+    }
 }
 
 void
@@ -336,21 +339,27 @@ Button::timerEvent ( QTimerEvent * )
 	repaint();
 }
 
+#define CYCLE_ON multiIdx += d;\
+if (multiIdx >= mb.size() )\
+    multiIdx = 0;\
+else if (multiIdx < 0 )\
+    multiIdx = mb.size()-1
+    
 void
 Button::wheelEvent(QWheelEvent *e)
 {
 //    if (!isEnabled()) return; // NOTICE remember Obama: "Yes we can!" ;-)
-   if (_type < Multi) return;
+    if (_type < Multi) return;
 
-   const QVector<Type> &mb = client->factory()->multiButtons();
-   int d = (e->delta() < 0) ? 1 : -1;
-   
-   multiIdx += d;
-   if (mb.at(multiIdx) == Help && !client->providesContextHelp())
+    const QVector<Type> &mb = client->factory()->multiButtons();
+    int d = (e->delta() < 0) ? 1 : -1;
+
+    CYCLE_ON;
+    if (mb.at(multiIdx) == Help && !client->providesContextHelp())
 //       || (mb.at(multiIdx) == Shade && !client->isShadeable()))
-      multiIdx += d;
-   if (multiIdx >= mb.size() ) multiIdx = 0;
-   else if (multiIdx < 0 ) multiIdx = mb.size()-1;
+    {
+        CYCLE_ON;
+    }
 
    _type = mb.at(multiIdx);
    if ((_type == Above && client->keepAbove()) ||
