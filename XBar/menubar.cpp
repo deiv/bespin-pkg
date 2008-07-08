@@ -100,22 +100,41 @@ MenuBar::actionGeometry(int idx) const
 QAction *
 MenuBar::addAction(const QString & text, int idx, QMenu *menu)
 {
-   QAction *ret;
+    QAction *ret = new QAction(text, this);
+    addAction(ret, idx);
+    ret->setMenu(menu);
+    return ret;
+}
 
-   if (idx < 0 || idx >= d.actions.count()) {
-      d.actions.append( new QAction(text, this) );
-      d.actionRects.append(QRect());
-      ret = d.actions.last();
-   }
-   else {
-      d.actions.insert( idx, new QAction(text, this) );
-      d.actionRects.insert(idx, QRect());
-      ret = d.actions.at(idx);
-   }
+void
+MenuBar::addAction(QAction *action, int idx)
+{
+    if (idx < 0 || idx >= d.actions.count()) {
+        d.actions.append( action );
+        d.actionRects.append(QRect());
+    }
+    else {
+        d.actions.insert( idx, action );
+        d.actionRects.insert(idx, QRect());
+    }
+    
+    connect (action, SIGNAL(changed()), this, SLOT(actionChanged()));
+    updateSize();
+}
 
-   ret->setMenu(menu);
-   updateSize();
-   return ret;
+void
+MenuBar::actionChanged()
+{
+   QAction *action = qobject_cast<QAction *>(sender());
+   if (!action)
+      return;
+   for (int i = 0; i < d.actions.count(); ++i) {
+      if (d.actions.at(i) == action) {
+         d.actionRects[i] = QRect();
+         updateSize();
+         break;
+      }
+   }
 }
 
 void
@@ -277,6 +296,7 @@ MenuBar::mousePressEvent(QGraphicsSceneMouseEvent *ev)
          menu->popup(pt);
          update(d.actionRects.at(idx));
       }
+      d.actions.at(idx)->trigger();
       emit triggered(idx);
    }
 }
@@ -369,6 +389,19 @@ MenuBar::setOpenPopup(int popup)
       mousePoll.stop();
    else
       mousePoll.start(50, this);
+}
+
+QAction *
+MenuBar::takeAction(int idx)
+{
+    if (idx < 0 || idx >= d.actions.count()) {
+        qWarning("XBar, cannot take action with id %d - not present", idx);
+        return NULL;
+    }
+    QAction *ret = d.actions.takeAt(idx);
+    d.actionRects.removeAt(idx);
+    updateSize();
+    return ret;
 }
 
 void

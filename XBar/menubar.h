@@ -31,8 +31,10 @@ class MenuBar : public QGraphicsWidget
 public:
    MenuBar ( const QString &service = QString(), qlonglong key = 0, QGraphicsItem *parent = 0);
    QAction *addAction(const QString & text, int idx = -1, QMenu *menu = 0);
+   void addAction(QAction *action, int idx = -1);
    const QRect &actionGeometry(int idx) const;
    void removeAction(int idx);
+   QAction *takeAction(int idx);
    void changeAction(int idx, const QString & text);
    void clear();
    QAction *action(int idx) const;
@@ -48,6 +50,7 @@ signals:
    void hovered(int);
    void triggered(int);
 protected:
+   inline QList<QAction*> &actions() { return d.actions; }
    void initStyleOption(QStyleOptionMenuItem *option, int idx = -1) const;
    void hoverEnterEvent(QGraphicsSceneHoverEvent *ev);
    void hoverLeaveEvent(QGraphicsSceneHoverEvent *ev);
@@ -55,6 +58,7 @@ protected:
    void mousePressEvent(QGraphicsSceneMouseEvent *ev);
    void wheelEvent(QGraphicsSceneWheelEvent *);
    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget = 0 );
+   inline virtual void show() { QGraphicsItem::show(); }
    void timerEvent(QTimerEvent *event);
    friend class XBar;
    void popDown();
@@ -65,6 +69,7 @@ private:
    int index(const QPoint &pos);
    void updateSize();
 private slots:
+   void actionChanged();
    void popupClosed();
 private:
    struct {

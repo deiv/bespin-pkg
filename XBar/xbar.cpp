@@ -56,27 +56,27 @@ XBar::~XBar()
 void
 XBar::init()
 {
-   setFocusPolicy(Qt::NoFocus);
-   setAspectRatioMode(Plasma::IgnoreAspectRatio);
-   setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-   setMaximumSize(INT_MAX, INT_MAX);
+    setFocusPolicy(Qt::NoFocus);
+    setAspectRatioMode(Plasma::IgnoreAspectRatio);
+    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    setMaximumSize(INT_MAX, INT_MAX);
 
-   d.taskbar = new TaskBar(this);
-   d.currentBar = d.taskbar;
+    d.taskbar = new TaskBar(this);
+    d.currentBar = d.taskbar;
 
-   updatePalette();
-   
-   show(d.taskbar);
+    updatePalette();
 
-   new XBarAdaptor(this);
-   QDBusConnection::sessionBus().registerService("org.kde.XBar");
-   QDBusConnection::sessionBus().registerObject("/XBar", this);
+    show(d.taskbar);
 
-   connect (this, SIGNAL(destroyed()), this, SLOT(byeMenus()));
-   connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(byeMenus()));
-   connect (&d.windowList, SIGNAL(aboutToShow()), this, SLOT(updateWindowlist()));
-   connect(Plasma::Theme::defaultTheme(), SIGNAL(themeChanged()), this, SLOT(updatePalette()));
-   callMenus();
+    new XBarAdaptor(this);
+    QDBusConnection::sessionBus().registerService("org.kde.XBar");
+    QDBusConnection::sessionBus().registerObject("/XBar", this);
+
+    connect (this, SIGNAL(destroyed()), this, SLOT(byeMenus()));
+    connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(byeMenus()));
+    connect (&d.windowList, SIGNAL(aboutToShow()), this, SLOT(updateWindowlist()));
+    connect(Plasma::Theme::defaultTheme(), SIGNAL(themeChanged()), this, SLOT(updatePalette()));
+    callMenus();
 }
 
 
@@ -214,7 +214,9 @@ XBar::registerMenu(const QString &service, qlonglong key, const QString &title, 
    // the windowlist entry
    QAction *act = newBar->addAction( title );
    act->setMenu(&d.windowList);
-   QFont fnt = act->font(); fnt.setWeight(QFont::Black);
+   QFont fnt = act->font();
+   fnt.setWeight(QFont::Black);
+   fnt.setPointSize(fnt.pointSize()*1.2);
    act->setFont(fnt);
 
    // the demanded menu entries
@@ -282,9 +284,9 @@ XBar::setOpenPopup(int idx)
 void
 XBar::show(MenuBar *item)
 {
-   d.currentBar = item;
-   item->setPos(contentsRect().topLeft());
-   item->show();
+    d.currentBar = item;
+    item->setPos(contentsRect().topLeft());
+    item->show();
 }
 
 

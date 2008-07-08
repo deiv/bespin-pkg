@@ -19,20 +19,47 @@ This library is distributed in the hope that it will be useful,
 #ifndef TASKBAR_H
 #define TASKBAR_H
 
+#include <QAction>
+#include <taskmanager/taskmanager.h>
 #include "menubar.h"
 
 class XBar;
 class QStyleOptionMenuItem;
 class QGraphicsView;
 
+using TaskManager::Task;
+using TaskManager::TaskDict;
+using TaskManager::TaskPtr;
+
+class TaskAction : public QAction
+{
+    Q_OBJECT
+public:
+    TaskAction(const QString &text, QObject *parent, const TaskPtr task) :
+    QAction(text, parent)
+    {
+        this->task = task;
+        isOnPopup = false;
+    }
+    TaskPtr task;
+    bool isOnPopup;
+public slots:
+    void update();
+};
+
 class TaskBar : public MenuBar
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   TaskBar(QGraphicsItem *parent = 0);
+    TaskBar(QGraphicsItem *parent = 0);
+    void show();
+private:
+    bool dirty;
 private slots:
-   void lock();
-   void logout();
+    void lock();
+    void logout();
+    void addTask(TaskPtr);
+    void removeTask(TaskPtr);
 };
 
 #endif //XBAR_H

@@ -27,6 +27,8 @@ class QGraphicsLinearLayout;
 
 #include <Plasma/Applet>
 
+class MenuBar;
+class TaskBar;
 
 class XBar : public Plasma::Applet
 {
@@ -54,7 +56,7 @@ private:
    struct {
       MenuMap menus;
       QMenu windowList;
-      MenuBar *taskbar;
+      TaskBar *taskbar;
       MenuBar *currentBar;
    } d;
 private slots:
