@@ -61,12 +61,13 @@ Basic::_manage(QWidget *w)
 void
 Basic::_release(QWidget *w)
 {
-   w->removeEventFilter(instance);
-   items.remove(w);
-   if (noAnimations()) {
-      timer.stop();
+    if (w)
+        w->removeEventFilter(instance);
+    items.remove(w);
+    if (noAnimations()) {
+        timer.stop();
 //       delete instance; instance = 0; // nope, TODO check whether the eventFilter is used at all!
-   }
+    }
 }
 
 void
@@ -96,9 +97,11 @@ Basic::_step(const QWidget *widget, long int index) const
 const Info &
 Basic::info(const QWidget *widget, long int) const
 {
-   Items::const_iterator it = items.find(widget);
-   if (it == items.end()) return defInfo;
-   return *it;
+    WidgetPtr wp(const_cast<QWidget*>(widget));
+    Items::const_iterator it = items.find(wp);
+    if (it == items.end())
+        return defInfo;
+    return *it;
 }
 
 bool
@@ -119,14 +122,18 @@ Basic::timerEvent(QTimerEvent * event)
    if (event->timerId() != timer.timerId() || noAnimations())
       return;
    //Update the registered progressbars.
-   QHash<const QWidget*, Info>::iterator iter;
-   const QWidget *w;
+   Items::iterator iter;
+   QWidget *w;
    for (iter = items.begin(); iter != items.end(); iter++) {
-      w = iter.key();
-      if (w->paintingActive() || !w->isVisible())
-         continue;
-      ++iter.value();
-      const_cast<QWidget*>(w)->repaint();
+        w = iter.key();
+        if (!w) {
+            _release(w);
+            continue;
+        }
+        if (w->paintingActive() || !w->isVisible())
+            continue;
+        ++iter.value();
+        w->repaint();
    }
 }
 

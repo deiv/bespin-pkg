@@ -16,7 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <Q3ScrollView>
+#include <Qt3Support/Q3ScrollView>
 #include <QAbstractButton>
 #include <QAbstractItemView>
 #include <QAbstractScrollArea>

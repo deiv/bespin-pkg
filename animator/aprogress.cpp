@@ -30,10 +30,10 @@ Progress::timerEvent(QTimerEvent * event)
    QProgressBar *pb;
    animationUpdate = true;
    for (iter = items.begin(); iter != items.end(); iter++) {
-      if ( !qobject_cast<const QProgressBar*>(iter.key()) )
+       pb = const_cast<QProgressBar*>(qobject_cast<const QProgressBar*>(iter.key()));
+       if (!pb)
          continue; // not a progressbar - shouldn't be in items, btw...
       
-      pb = (QProgressBar*)(iter.key());
       if (pb->maximum() != 0 || pb->minimum() != 0 ||
           pb->paintingActive() || !pb->isVisible())
          continue; // no paint necessary

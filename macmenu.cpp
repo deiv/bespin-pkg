@@ -17,9 +17,9 @@ This library is distributed in the hope that it will be useful,
  */
 
 #include <QActionEvent>
-#include <QCoreApplication>
-#include <QDBusInterface>
-#include <QDBusConnectionInterface>
+#include <QApplication>
+#include <QtDBus/QDBusInterface>
+#include <QtDBus/QDBusConnectionInterface>
 #include <QLayout>
 #include <QMenuBar>
 
@@ -84,19 +84,19 @@ MacMenu::release(QMenuBar *menu)
 void
 MacMenu::_release(QObject *o)
 {
-   QMenuBar *menu = qobject_cast<QMenuBar*>(o);
-   if (!menu) return;
+    xbar.call("unregisterMenu", (qlonglong)o);
 
-   items.removeAll(menu);
-   menu->removeEventFilter(this);
-   QWidget *dad = menu->parentWidget();
-   if (dad && dad->layout())
-      dad->layout()->setMenuBar(menu);
-   menu->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-   menu->adjustSize();
+    QMenuBar *menu = qobject_cast<QMenuBar*>(o);
+    if (!menu) return;
+
+    items.removeAll(menu);
+    menu->removeEventFilter(this);
+    QWidget *dad = menu->parentWidget();
+    if (dad && dad->layout())
+        dad->layout()->setMenuBar(menu);
+    menu->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    menu->adjustSize();
 //    menu->updateGeometry();
-   
-   xbar.call("unregisterMenu", (qlonglong)menu);
 }
 
 void

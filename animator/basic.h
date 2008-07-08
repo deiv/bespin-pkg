@@ -19,8 +19,9 @@
 #ifndef BASIC_ANIMATOR_H
 #define BASIC_ANIMATOR_H
 
-#include <QHash>
 #include <QBasicTimer>
+#include <QMap>
+#include <QPointer>
 
 namespace Animator {
 
@@ -65,7 +66,8 @@ protected:
    QBasicTimer timer;
    uint timeStep;
    uint count;
-   typedef QHash<const QWidget*, Info> Items;
+   typedef QPointer<QWidget> WidgetPtr;
+   typedef QMap<WidgetPtr, Info> Items;
    Items items;
 protected slots:
    virtual void release_s(QObject*);

@@ -57,7 +57,7 @@ else
 In order to compile with KDE support you NEED cmake >= 2.4\n"
       read -n1 -s -p "--> Do you want to compile for <q>t only or <e>xit now? [q/E]"
       echo ""
-      if [ "$REPLY" = "e" -o "$REPLY" = "E" ]; then
+      if [ "$REPLY" != "e" -a "$REPLY" != "E" ]; then
          exit 1
       fi
       KDE=false
@@ -71,6 +71,9 @@ if $KDE; then
    if [ "$REPLY" = "y" -o "$REPLY" = "Y" ]; then
       ccmake ..
    fi
+   cd ..
+   echo -e "\n\n========================= Configuration done ============================\n
+   Ok, now just \"cd build\" \"make\" and \"sudo make install\"...\n\n"
 else
    QMAKE="qmake"
    find_qt || ask_for_qt
@@ -82,7 +85,6 @@ else
       echo ":(\nMakefile generation failed - exiting\n"
       exit 1;
    fi
+   echo -e "\n\n========================= Configuration done ============================\n
+   Ok, now just \"make\" and \"sudo make install\"...\n\n"
 fi
-
-echo -e "\n\n========================= Configuration done ============================\n
-Ok, now just \"make\" and \"sudo make install\"...\n\n"

@@ -16,7 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <Q3ScrollView>
+#include <Qt3Support/Q3ScrollView>
 #include <QAbstractScrollArea>
 #include <QScrollBar>
 #include <QTimerEvent>
@@ -134,7 +134,7 @@ Hover::timerEvent(QTimerEvent * event)
    QWidget *widget = 0;
    while (it != items.end()) {
       step = &it.value()._step;
-      widget = const_cast<QWidget*>(it.key());
+      widget = it.key();
       if (it.value().backwards) { // fade out
          --(*step);
          widget->repaint();
