@@ -97,7 +97,7 @@ static QPixmap dumpBackground(QWidget *target, const QRect &r, const QStyle *sty
 // QPixmap::grabWidget(.) currently fails on the background offset,
 // so we use our own implementation
 static void
-grabWidget(QWidget * root, QPixmap *pix)
+grabWidget(QWidget * root, QPixmap &pix)
 {
     if (!root)
         return;
@@ -122,7 +122,7 @@ grabWidget(QWidget * root, QPixmap *pix)
 //    }
    
     // painting ------------
-    QPainter::setRedirected( root, pix );
+    QPainter::setRedirected( root, &pix );
     QPaintEvent e(QRect(zero, root->size()));
     QCoreApplication::sendEvent(root, &e);
     QPainter::restoreRedirected(root);
@@ -137,13 +137,12 @@ grabWidget(QWidget * root, QPixmap *pix)
             // solids
             if (w->autoFillBackground()) {
                 const QBrush bg = w->palette().brush(w->backgroundRole());
-                p.begin(pix);
+                p.begin(&pix);
                 QRect wrect = QRect(zero, w->size()).translated(w->mapTo(root, zero));
                 if (bg.style() == Qt::TexturePattern)
-                p.drawTiledPixmap(wrect, bg.texture(),
-                                    w->mapTo(root->window(), zero));
+                    p.drawTiledPixmap(wrect, bg.texture(), w->mapTo(root->window(), zero));
                 else
-                p.fillRect(wrect, bg);
+                    p.fillRect(wrect, bg);
                 p.end();
             }
 
@@ -163,18 +162,18 @@ grabWidget(QWidget * root, QPixmap *pix)
                         saPix = new QPixmap(rect.size());
                     }
                     p.begin(saPix);
-                    p.drawPixmap(zero, *pix, rect);
+                    p.drawPixmap(zero, pix, rect);
                     p.end();
                     const QPoint &pt = scrollarea->frameRect().topLeft();
                     w->render(saPix, w->mapTo(scrollarea, pt), w->rect(), 0);
-                    p.begin(pix);
+                    p.begin(&pix);
                     p.drawPixmap(rect.topLeft(), *saPix);
                     p.end();
                 }
                 }
             // default painting redirection
             else
-                w->render(pix, w->mapTo(root, zero), w->rect(), 0);
+                w->render(&pix, w->mapTo(root, zero), w->rect(), 0);
         }
     }
     delete saPix;
@@ -281,7 +280,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
    if (clock.isNull()) {
       clock.start();
       tabPix[0] = tabPix[1];
-      grabWidget(ow, &tabPix[0]);
+      grabWidget(ow, tabPix[0]);
       tabPix[2] = tabPix[0];
       AVOID(TOO_SLOW);
    }
@@ -290,7 +289,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
       tabPix[0] = tabPix[2];
    }
    
-   grabWidget(cw, &tabPix[1]);
+   grabWidget(cw, tabPix[1]);
    AVOID(TOO_SLOW);
 
    duration = _duration - clock.elapsed() + _timeStep;
