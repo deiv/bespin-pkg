@@ -17,6 +17,7 @@ This library is distributed in the hope that it will be useful,
  */
 
 #include <QDBusInterface>
+#include <QGraphicsSceneMouseEvent>
 #include <QMenu>
 
 #include <kworkspace/kworkspace.h>
@@ -24,6 +25,13 @@ This library is distributed in the hope that it will be useful,
 #include "taskbar.h"
 
 #include <QtDebug>
+
+enum TaskTask
+{
+    toggleMaximizeTask = 0, toggleMinimizeTask, moveTask, resizeTask, closeTask,
+    toggleTaskAlwaysOnTop, toggleTaskKeptBelowOthers, toggleTaskFullScreen, toggleTaskShaded,
+    taskToDesktop, taskToCurrentDesktop
+};
 
 static bool
 isBrowser(const QString &s)
@@ -101,6 +109,8 @@ TaskBar::TaskBar(QGraphicsItem *parent) : MenuBar( QString(), 0, parent), dirty(
             this, SLOT(addTask(TaskPtr)));
    connect (TaskManager::TaskManager::self(), SIGNAL(taskRemoved(TaskPtr)),
             this, SLOT(removeTask(TaskPtr)));
+
+    taskTasks = new QMenu();
 }
 
 void
@@ -165,7 +175,7 @@ TaskBar::addTask(TaskPtr task)
                 // change the label to details...
                 action->setText(entry(taskAction->task));
                 // append it to the menu...
-                if (taskAction = qobject_cast<TaskAction*>(action))
+                if ((taskAction = qobject_cast<TaskAction*>(action)))
                     taskAction->isOnPopup = true;
                 popup->addAction(action);
                 // and add an action for the popup to the bar instead!
@@ -199,6 +209,54 @@ TaskBar::addTask(TaskPtr task)
 //    void activated();
 //     void deactivated();
 //    task->isActive();
+}
+
+TaskPtr popupTask;
+
+void
+TaskBar::performTaskTask()
+{
+    if (!popupTask)
+        return;
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    bool ok;
+    int value = action->data().toUInt(&ok);
+    if (!ok)
+        return;
+    TaskTask task = (TaskTask)(value & 0xff);
+    switch (task)
+    {
+    case toggleMaximizeTask:
+        popupTask->toggleMaximized(); break;
+    case toggleMinimizeTask:
+        popupTask->toggleIconified(); break;
+
+    case moveTask:
+        popupTask->move(); break;
+    case resizeTask:
+        popupTask->resize(); break;
+    case closeTask:
+        popupTask->close(); break;
+
+    case toggleTaskAlwaysOnTop:
+        popupTask->toggleAlwaysOnTop(); break;
+    case toggleTaskKeptBelowOthers:
+        popupTask->toggleKeptBelowOthers(); break;
+
+    case toggleTaskFullScreen:
+        popupTask->toggleFullScreen(); break;
+    case toggleTaskShaded:
+        popupTask->toggleShaded(); break;
+        
+    case taskToDesktop:
+        popupTask->toDesktop(value>>8); break;
+    case taskToCurrentDesktop:
+        popupTask->toCurrentDesktop(); break;
+    default:
+        break;
+    }
 }
 
 void
@@ -250,6 +308,87 @@ TaskBar::removeTask(TaskPtr task)
         }
             
     }
+}
+
+void
+TaskBar::rightMouseButtonEvent(int idx, QGraphicsSceneMouseEvent *ev)
+{
+    ev->accept();
+    TaskAction *taskAction = qobject_cast<TaskAction*>(actions().at(idx));
+    if (!taskAction)
+        return;
+    popupTask = taskAction->task;
+
+    taskTasks->hide();
+    taskTasks->clear();
+    
+    QAction *action;
+    QMenu *sub;
+
+    // --------------------------------
+    sub = taskTasks->addMenu("To Desktop");
+    action = sub->addAction( "Current", this, SLOT(performTaskTask()));
+    action->setData(taskToCurrentDesktop);
+    action->setEnabled ( !popupTask->isOnCurrentDesktop() );
+//     action = sub->addAction( popupTask->isOnAllDesktops() ? "All", this, SLOT(performTaskTask()));
+//     action->setData(taskToCurrentDesktop);
+
+    sub->addSeparator();
+
+    for (int i = 0; i < TaskManager::TaskManager::self()->numberOfDesktops(); ++i)
+    {
+        action = sub->addAction(TaskManager::TaskManager::self()->desktopName(i), this, SLOT(performTaskTask()));
+        action->setData(taskToDesktop | (i<<8));
+        action->setEnabled ( i != popupTask->desktop() );
+    }
+
+//     bool isActive() const;
+//     bool isOnTop() const;
+//     QRect geometry() const;
+
+    
+    // ---------------------------------
+
+    sub = taskTasks->addMenu("Advanced");
+    action = sub->addAction( popupTask->isAlwaysOnTop() ? "Stack freely" : "Keep on Top",
+                             this, SLOT(performTaskTask()));
+    action->setData(toggleTaskAlwaysOnTop);
+    action = sub->addAction( popupTask->isKeptBelowOthers() ? "Stack freely" : "Keep Below",
+                             this, SLOT(performTaskTask()));
+    action->setData(toggleTaskKeptBelowOthers);
+    action = sub->addAction( popupTask->isFullScreen() ? "Windowed" : "Fullscreen",
+                             this, SLOT(performTaskTask()));
+    action->setData(toggleTaskFullScreen);
+    action = sub->addAction( popupTask->isShaded() ? "Unshade" : "Shade",
+                             this, SLOT(performTaskTask()));
+    action->setData(toggleTaskShaded);
+
+    // ---------------------------------
+
+    taskTasks->addSeparator();
+
+    action = taskTasks->addAction( popupTask->isMinimized() ? "Restore" : "Minimize",
+                                   this, SLOT(performTaskTask()));
+    action->setData(toggleMinimizeTask);
+    action = taskTasks->addAction( popupTask->isMaximized() ? "Restore" : "Maximize",
+                                   this, SLOT(performTaskTask()));
+    action->setData(toggleMaximizeTask);
+
+    taskTasks->addSeparator();
+
+    action = taskTasks->addAction( "Move", this, SLOT(performTaskTask()));
+    action->setData(moveTask);
+    action = taskTasks->addAction( "Resize", this, SLOT(performTaskTask()));
+    action->setData(resizeTask);
+
+    taskTasks->addSeparator();
+
+    action = taskTasks->addAction( "!!! Close !!!", this, SLOT(performTaskTask()));
+    action->setData(closeTask);
+
+    // ---------------------------------
+    
+    taskTasks->popup(mapToGlobal(ev->pos()));
 }
 
 void

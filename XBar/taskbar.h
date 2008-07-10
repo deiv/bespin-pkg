@@ -53,13 +53,17 @@ class TaskBar : public MenuBar
 public:
     TaskBar(QGraphicsItem *parent = 0);
     void show();
+protected:
+    void rightMouseButtonEvent(int idx, QGraphicsSceneMouseEvent *ev);
 private:
     bool dirty;
+    QMenu *taskTasks;
 private slots:
     void lock();
     void logout();
     void addTask(TaskPtr);
     void removeTask(TaskPtr);
+    void performTaskTask();
 };
 
 #endif //XBAR_H

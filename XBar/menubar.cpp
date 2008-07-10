@@ -287,18 +287,29 @@ MenuBar::mouseMoved(const QPointF &pos, const QPointF &lastPos)
 void
 MenuBar::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
-   int idx = index(ev->pos().toPoint());
-   if (idx > -1) {
-      if (QMenu* menu = d.actions.at(idx)->menu()) {
-         setOpenPopup(idx);
-         const QPoint pt = mapToGlobal(d.actionRects.at(idx).bottomLeft());
-         connect (menu, SIGNAL(aboutToHide()), this, SLOT(popupClosed()));
-         menu->popup(pt);
-         update(d.actionRects.at(idx));
-      }
-      d.actions.at(idx)->trigger();
-      emit triggered(idx);
-   }
+    ev->ignore();
+    int idx = index(ev->pos().toPoint());
+    if (idx < 0)
+        return;
+    if (ev->button() == Qt::RightButton)
+    {
+        rightMouseButtonEvent(idx, ev);
+        return;
+    }
+    if (ev->button() != Qt::LeftButton)
+        return;
+
+    ev->accept();
+    if (QMenu* menu = d.actions.at(idx)->menu())
+    {
+        setOpenPopup(idx);
+        const QPoint pt = mapToGlobal(d.actionRects.at(idx).bottomLeft());
+        connect (menu, SIGNAL(aboutToHide()), this, SLOT(popupClosed()));
+        menu->popup(pt);
+        update(d.actionRects.at(idx));
+    }
+    d.actions.at(idx)->trigger();
+    emit triggered(idx);
 }
 
 void

@@ -56,6 +56,7 @@ protected:
    void hoverLeaveEvent(QGraphicsSceneHoverEvent *ev);
    void hoverMoveEvent(QGraphicsSceneHoverEvent *ev);
    void mousePressEvent(QGraphicsSceneMouseEvent *ev);
+   virtual void rightMouseButtonEvent(int, QGraphicsSceneMouseEvent *) {}
    void wheelEvent(QGraphicsSceneWheelEvent *);
    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget = 0 );
    inline virtual void show() { QGraphicsItem::show(); }
