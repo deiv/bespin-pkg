@@ -96,47 +96,58 @@ HoverIndex::release(QObject *o)
 
 
 void
-HoverIndex::timerEvent(QTimerEvent * event) {
-   if (event->timerId() != timer.timerId() || items.isEmpty())
-      return;
+HoverIndex::timerEvent(QTimerEvent * event)
+{
+    if (event->timerId() != timer.timerId() || items.isEmpty())
+        return;
 
-   Items::iterator it;
-   IndexInfo::Fades::iterator step;
-   it = items.begin();
-   QWidget *w;
-   while (it != items.end()) {
-      IndexInfo &info = it.value();
-      if (info.fades[In].isEmpty() && info.fades[Out].isEmpty()) {
-         ++it; continue;
-      }
+    Items::iterator it;
+    IndexInfo::Fades::iterator step;
+    it = items.begin();
+    QWidget *w;
+    while (it != items.end()) {
+        if (!it.key())
+        {
+            it = items.erase(it);
+            continue;
+        }
+        w = const_cast<QWidget*>(it.key().data());
+        IndexInfo &info = it.value();
+        if (info.fades[In].isEmpty() && info.fades[Out].isEmpty())
+        {
+            ++it; continue;
+        }
 
-      step = info.fades[In].begin();
-      while (step != info.fades[In].end()) {
-         step.value() += 2;
-         if ((uint)step.value() > (maxSteps-2))
-            step = info.fades[In].erase(step);
-         else
-            ++step;
-      }
+        step = info.fades[In].begin();
+        while (step != info.fades[In].end())
+        {
+            step.value() += 2;
+            if ((uint)step.value() > (maxSteps-2))
+                step = info.fades[In].erase(step);
+            else
+                ++step;
+        }
 
-      step = info.fades[Out].begin();
-      while (step != info.fades[Out].end()) {
-         --step.value();
-         if (step.value() < 1)
-            step = info.fades[Out].erase(step);
-         else
-            ++step;
-      }
+        step = info.fades[Out].begin();
+        while (step != info.fades[Out].end())
+        {
+            --step.value();
+            if (step.value() < 1)
+                step = info.fades[Out].erase(step);
+            else
+                ++step;
+        }
 
-      w = const_cast<QWidget*>(it.key());
-      w->update();
-      
-      if (info.index == 0L && // nothing actually hovered
-         info.fades[In].isEmpty() && // no fade ins
-         info.fades[Out].isEmpty()) // no fade outs
-         it = items.erase(it); // so remove this item
-      else
-         ++it;
-   }
-   if (items.isEmpty()) timer.stop();
+        w->update();
+
+        if (info.index == 0L && // nothing actually hovered
+            info.fades[In].isEmpty() && // no fade ins
+            info.fades[Out].isEmpty()) // no fade outs
+            it = items.erase(it); // so remove this item
+        else
+            ++it;
+    }
+
+    if (items.isEmpty())
+        timer.stop();
 }

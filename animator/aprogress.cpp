@@ -28,11 +28,17 @@ Progress::timerEvent(QTimerEvent * event)
    //Update the registered progressbars.
    Items::iterator iter;
    QProgressBar *pb;
+   bool mkProper = false;
    animationUpdate = true;
    for (iter = items.begin(); iter != items.end(); iter++) {
+       if (!iter.key())
+       {
+           mkProper = true;
+           continue; // not a progressbar - shouldn't be in items, btw...
+       }
        pb = const_cast<QProgressBar*>(qobject_cast<const QProgressBar*>(iter.key()));
        if (!pb)
-         continue; // not a progressbar - shouldn't be in items, btw...
+            continue; // not a progressbar - shouldn't be in items, btw...
       
       if (pb->maximum() != 0 || pb->minimum() != 0 ||
           pb->paintingActive() || !pb->isVisible())
@@ -70,4 +76,6 @@ Progress::timerEvent(QTimerEvent * event)
          pb->repaint(x-s,y,3*s,s);
    }
    animationUpdate = false;
+   if (mkProper)
+       _release(NULL);
 }

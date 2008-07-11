@@ -21,6 +21,8 @@ Boston, MA 02110-1301, USA.
 
 #include <QBasicTimer>
 #include <QHash>
+#include <QMap>
+#include <QPointer>
 
 namespace Animator {
 
@@ -52,7 +54,8 @@ protected:
    virtual void timerEvent(QTimerEvent * event);
    QBasicTimer timer;
    uint timeStep, count, maxSteps;
-   typedef QHash<const QWidget*, IndexInfo> Items;
+   typedef QPointer<QWidget> WidgetPtr;
+   typedef QMap<WidgetPtr, IndexInfo> Items;
    Items items;
 protected slots:
    void release(QObject *o);

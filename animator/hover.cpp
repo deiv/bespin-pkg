@@ -126,45 +126,59 @@ Hover::_step(const QWidget *widget, long int) const
 void
 Hover::timerEvent(QTimerEvent * event)
 {
-   if (event->timerId() != timer.timerId() || noAnimations())
-      return;
-   
-   Items::iterator it = items.begin();
-   int *step = 0;
-   QWidget *widget = 0;
-   while (it != items.end()) {
-      step = &it.value()._step;
-      widget = it.key();
-      if (it.value().backwards) { // fade out
-         --(*step);
-         widget->repaint();
-         if (*step < 1) {
+    if (event->timerId() != timer.timerId() || noAnimations())
+        return;
+
+    Items::iterator it = items.begin();
+    int *step = 0;
+    QWidget *widget = 0;
+    bool mkProper = false;
+    while (it != items.end())
+    {
+        widget = it.key();
+        if (!widget)
+        {
+            mkProper = true;
+            ++it; continue;
+        }
+        step = &it.value()._step;
+        if (it.value().backwards)
+        { // fade out
+            --(*step);
+            widget->repaint();
+            if (*step < 1)
+            {
 #if WOBBLE_HOVER
             if (widget->testAttribute(Qt::WA_UnderMouse))
                it.value().fadeIn = true;
             else
 #endif
-               it = items.erase(it);
-         }
-         else
-            ++it;
-      }
-      else { // fade out
-         *step += HOVER_IN_STEP;
-         widget->repaint();
-         if ((uint)(*step) > maxSteps-2) {
-#if WOBBLE_HOVER
-            if (widget->testAttribute(Qt::WA_UnderMouse))
-               it.value().fadeIn = false;
+                it = items.erase(it);
+            }
             else
+                ++it;
+        }
+        else
+        { // fade out
+            *step += HOVER_IN_STEP;
+            widget->repaint();
+            if ((uint)(*step) > maxSteps-2)
+            {
+#if WOBBLE_HOVER
+                if (widget->testAttribute(Qt::WA_UnderMouse))
+                    it.value().fadeIn = false;
+                else
 #endif
-               it = items.erase(it);
-         }
-         else
-            ++it;
-      }
-   }
-   if (noAnimations()) timer.stop();
+                    it = items.erase(it);
+            }
+            else
+                ++it;
+        }
+    }
+    if (mkProper)
+        _release(NULL);
+    else if (noAnimations())
+        timer.stop();
 }
 
 #define HANDLE_SCROLL_AREA_EVENT(_DIR_) \

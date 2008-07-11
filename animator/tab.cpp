@@ -170,7 +170,7 @@ grabWidget(QWidget * root, QPixmap &pix)
                     p.drawPixmap(rect.topLeft(), *saPix);
                     p.end();
                 }
-                }
+            }
             // default painting redirection
             else
                 w->render(&pix, w->mapTo(root, zero), w->rect(), 0);
@@ -474,14 +474,24 @@ Tab::changed(int index)
 void
 Tab::timerEvent(QTimerEvent *event)
 {
-   if (event->timerId() != timer.timerId() || items.isEmpty())
-      return;
-   
-   Items::iterator i;
-   _activeTabs = 0; // reset counter
-   for (i = items.begin(); i != items.end(); i++) {
-      if (i.value()->proceed())
-         ++_activeTabs;
-   }
-   if (!_activeTabs) timer.stop();
+    if (event->timerId() != timer.timerId() || items.isEmpty())
+        return;
+
+    Items::iterator i;
+    _activeTabs = 0; // reset counter
+    bool mkProper = false;
+    for (i = items.begin(); i != items.end(); i++)
+    {
+        if (!i.key())
+        {
+            mkProper = true;
+            continue;
+        }
+        if (i.value()->proceed())
+            ++_activeTabs;
+    }
+    if (mkProper)
+        _release(NULL);
+    if (!_activeTabs)
+        timer.stop();
 }

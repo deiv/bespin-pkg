@@ -124,10 +124,12 @@ Basic::timerEvent(QTimerEvent * event)
    //Update the registered progressbars.
    Items::iterator iter;
    QWidget *w;
+   bool mkProper = false;
    for (iter = items.begin(); iter != items.end(); iter++) {
         w = iter.key();
-        if (!w) {
-            _release(w);
+        if (!w)
+        {
+            mkProper = true;
             continue;
         }
         if (w->paintingActive() || !w->isVisible())
@@ -135,6 +137,8 @@ Basic::timerEvent(QTimerEvent * event)
         ++iter.value();
         w->repaint();
    }
+   if (mkProper)
+        _release(NULL);
 }
 
 bool

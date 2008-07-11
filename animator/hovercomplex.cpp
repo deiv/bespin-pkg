@@ -76,40 +76,48 @@ HoverComplex::_info(const QWidget *widget, QStyle::SubControls active) const
 
 
 void
-HoverComplex::timerEvent(QTimerEvent * event) {
-   if (event->timerId() != timer.timerId() || items.isEmpty())
-      return;
-   
-   bool update;
-   Items::iterator it = items.begin();
-   ComplexInfo *info;
-   while (it != items.end()) {
-      info = &it.value();
-      update = false;
-      for (QStyle::SubControl control = (QStyle::SubControl)0x01;
-           control <= (QStyle::SubControl)0x80;
-           control = (QStyle::SubControl)(control<<1)) {
-              if (info->fades[In] & control) {
-                 update = true;
-                 info->steps[control] += 2;
-                 if (info->steps.value(control) > 4)
+HoverComplex::timerEvent(QTimerEvent * event)
+{
+    if (event->timerId() != timer.timerId() || items.isEmpty())
+        return;
+
+    bool update;
+    Items::iterator it = items.begin();
+    ComplexInfo *info;
+    while (it != items.end()) {
+        if (!it.key())
+        {
+            it = items.erase(it);
+            continue;
+        }
+        info = &it.value();
+        update = false;
+        for (QStyle::SubControl control = (QStyle::SubControl)0x01;
+            control <= (QStyle::SubControl)0x80;
+            control = (QStyle::SubControl)(control<<1)) {
+                if (info->fades[In] & control) {
+                    update = true;
+                    info->steps[control] += 2;
+                    if (info->steps.value(control) > 4)
                     info->fades[In] &= ~control;
-              }
-              else if (info->fades[Out] & control) {
-                 update = true;
-                 --info->steps[control];
-                 if (info->steps.value(control) < 1)
+                }
+                else if (info->fades[Out] & control) {
+                    update = true;
+                    --info->steps[control];
+                    if (info->steps.value(control) < 1)
                     info->fades[Out] &= ~control;
-              }
-           }
-      if (update)
-         it.key()->update();
-      if (info->active == QStyle::SC_None && // needed to detect changes!
-          info->fades[Out] == QStyle::SC_None &&
-          info->fades[In] == QStyle::SC_None)
-         it = items.erase(it);
-      else
-         ++it;
-   }
-   if (items.isEmpty()) timer.stop();
+                }
+            }
+        if (update)
+            it.key()->update();
+        if (info->active == QStyle::SC_None && // needed to detect changes!
+            info->fades[Out] == QStyle::SC_None &&
+            info->fades[In] == QStyle::SC_None)
+            it = items.erase(it);
+        else
+            ++it;
+    }
+
+    if (items.isEmpty())
+        timer.stop();
 }

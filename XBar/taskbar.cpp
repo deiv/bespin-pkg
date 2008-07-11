@@ -59,7 +59,7 @@ entry(TaskPtr task, bool popup = true)
         return ret.trimmed();
     }
     // see ../kwin/client.cpp for more comments
-    QString ret = task->visibleNameWithState();
+    QString ret = task->visibleName();
     QString appName = task->className();
     if (ret.contains(" - "))
         ret = ret.section(" - ", 0, -2, QString::SectionSkipEmpty );
@@ -81,14 +81,27 @@ entry(TaskPtr task, bool popup = true)
     }
     ret = ret.trimmed();
     if (ret.isEmpty())
-        ret = task->visibleNameWithState(); // ...
-    ret = "  [ " + ret + " ]  ";
+        ret = task->visibleName(); // ...
+
+    ret.replace("[modified]", "*");
+
+    if (task->isActive())
+        ret = "  >>  " + ret + "  <<  ";
+    else if (task->isMinimized())
+        ret = "  ( " + ret + " )  ";
+    else if (task->isOnCurrentDesktop())
+        ret = "  [ " + ret + " ]  ";
+    else
+        ret = "  { " + ret + " }  ";
     return ret;
 }
 
 void
 TaskAction::update()
 {
+    QFont fnt = font();
+    fnt.setBold(task->isActive());
+    setFont(fnt);
     setText(entry(task, isOnPopup));
 }
 
