@@ -31,6 +31,7 @@
 #include <QProgressBar>
 #include <QSplitterHandle>
 #include <QToolBar>
+#include <QToolTip>
 #include <QTreeView>
 
 #include "colors.h"
@@ -231,6 +232,22 @@ void BespinStyle::polish( QPalette &pal )
    pal.setColor(QPalette::Disabled, QPalette::AlternateBase,
                 Colors::mid(pal.color(QPalette::Disabled, QPalette::Base),
                             pal.color(QPalette::Disabled, QPalette::Text),15,1));
+
+    // more on tooltips... (we force some colors...)
+    QPalette toolPal = QToolTip::palette();
+    const QColor bg = pal.color(QPalette::Active, QPalette::WindowText);
+    const QColor fg = pal.color(QPalette::Active, QPalette::Window);
+    toolPal.setColor(QPalette::Window, bg);
+    toolPal.setColor(QPalette::WindowText, fg);
+    toolPal.setColor(QPalette::Base, bg);
+    toolPal.setColor(QPalette::Text, fg);
+    toolPal.setColor(QPalette::Button, bg);
+    toolPal.setColor(QPalette::ButtonText, fg);
+    toolPal.setColor(QPalette::Highlight, fg); // sic!
+    toolPal.setColor(QPalette::HighlightedText, bg); // sic!
+    toolPal.setColor(QPalette::ToolTipBase, bg);
+    toolPal.setColor(QPalette::ToolTipText, fg);
+    QToolTip::setPalette(toolPal);
 }
 
 #if 0
@@ -617,6 +634,11 @@ void BespinStyle::polish( QWidget * widget ) {
       QEvent ev(QEvent::PaletteChange);
       eventFilter(widget, &ev);
    }
+
+    // ... the widget uses daddies palette and foregroundrole, but tooltipbase for background
+    // so this is Qt bug WORKAROUND
+    if (widget->inherits("QWhatsThat"))
+        widget->setPalette(QToolTip::palette());
    
 }
 #undef PAL
