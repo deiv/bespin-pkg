@@ -172,8 +172,11 @@ grabWidget(QWidget * root, QPixmap &pix)
                 }
             }
             // default painting redirection
-            else
+            else {
+//                 if (w->objectName().contains("viewport"))
+//                     qDebug() << "BESPIN" << w << w->rect();
                 w->render(&pix, w->mapTo(root, zero), w->rect(), 0);
+            }
         }
     }
     delete saPix;

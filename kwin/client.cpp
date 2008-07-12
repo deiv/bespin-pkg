@@ -257,6 +257,8 @@ Client::maximizeChange()
    reset(SettingBorder);
 }
 
+#define PARTIAL_MOVE 0
+
 KDecorationDefines::Position
 Client::mousePosition( const QPoint& p ) const
 {
@@ -270,19 +272,31 @@ Client::mousePosition( const QPoint& p ) const
 	if (p.y() > height() - 16) { // bottom
 		if (p.x() < 16) return PositionBottomLeft; // corner
 		if (p.x() > width() - 16) return PositionBottomRight; // corner
+#if PARTIAL_MOVE
 		int off = width()/3;
 		if (p.x() > off && p.x() < width() - off) return PositionBottom;
 		else return PositionCenter; // not on outer 3rds
+#else
+        return PositionBottom;
+#endif
 	}
 	if (p.x() < 4) { // left
+#if PARTIAL_MOVE
 		int off = height()/3;
 		if (p.y() > off && p.y() < height() - off) return PositionLeft;
 		else return PositionCenter; // not on outer 3rds
+#else
+        return PositionLeft;
+#endif
 	}
 	if (p.x() > width() - 4) { // right
+#if PARTIAL_MOVE
 		int off = height()/3;
 		if (p.y() > off && p.y() < height() - off) return PositionRight;
 		else return PositionCenter; // not on outer 3rds
+#else
+        return PositionRight;
+#endif
 	}
    return PositionCenter; // to convince gcc, never reach this anyway
 }
