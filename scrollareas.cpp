@@ -268,14 +268,14 @@ BespinStyle::drawScrollBarGroove(const QStyleOption * option,
    if (isComboDropDownSlider) {
       QRect r;
       if (horizontal) {
-         const int d = RECT.height()/3;
+         const int d = 2*RECT.height()/5;
          r = RECT.adjusted(dpi.f2, d, -dpi.f2, -d);
       }
       else {
-         const int d = RECT.width()/3;
+         const int d = 2*RECT.width()/5;
          r = RECT.adjusted(d, dpi.f2, -d, -dpi.f2);
       }
-      painter->fillRect(r, Colors::mid(FCOLOR(Base), FCOLOR(Text), 20, 1));
+      painter->fillRect(r, Colors::mid(FCOLOR(Base), FCOLOR(Text), 10, 1));
       return;
    }
    const Groove::Mode gType = config.scroll.groove;
@@ -315,8 +315,14 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option,
          const int d = RECT.width()/3;
          r = RECT.adjusted(d, dpi.f2, -d, -dpi.f2);
       }
-      painter->fillRect(r, (hover || sunken) ? FCOLOR(Text) :
-                        Colors::mid(FCOLOR(Base), FCOLOR(Text), 8, 1));
+      painter->save();
+      painter->setPen(Qt::NoPen);
+      painter->setRenderHint(QPainter::Antialiasing);
+      if (sunken || (hover && !complexStep))
+        complexStep = 6;
+      painter->setBrush(Colors::mid(FCOLOR(Base), FCOLOR(Text), 6-complexStep, complexStep+1));
+      painter->drawRoundedRect(r, dpi.f4, dpi.f4);
+      painter->restore();
       return;
    }
 
