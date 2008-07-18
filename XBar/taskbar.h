@@ -40,9 +40,10 @@ public:
     {
         this->task = task;
         isOnPopup = false;
+        isSqueezed = false;
     }
     TaskPtr task;
-    bool isOnPopup;
+    bool isOnPopup, isSqueezed;
 public slots:
     void update();
 };
@@ -56,8 +57,10 @@ public:
 protected:
     void rightMouseButtonEvent(int idx, QGraphicsSceneMouseEvent *ev);
 private:
-    bool dirty;
+    bool dirty, isSqueezed;
     QMenu *taskTasks;
+private:
+    void validateSize();
 private slots:
     void lock();
     void logout();

@@ -19,6 +19,8 @@ This library is distributed in the hope that it will be useful,
 #include <QDBusInterface>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
+#include <QStyle>
+#include <QStyleOptionMenuItem>
 
 #include <kworkspace/kworkspace.h>
 
@@ -103,9 +105,10 @@ TaskAction::update()
     fnt.setBold(task->isActive());
     setFont(fnt);
     setText(entry(task, isOnPopup));
+    emit changed();
 }
 
-TaskBar::TaskBar(QGraphicsItem *parent) : MenuBar( QString(), 0, parent), dirty(true)
+TaskBar::TaskBar(QGraphicsItem *parent) : MenuBar( QString(), 0, parent), dirty(true), isSqueezed(false)
 {
    QMenu *sm = new QMenu;
    sm->addAction("Lock Screen", this, SLOT(lock()));
@@ -153,6 +156,7 @@ TaskBar::show()
         }
         dirty = false;
     }
+    validateSize();
     MenuBar::show();
 }
 
@@ -217,7 +221,9 @@ TaskBar::addTask(TaskPtr task)
         addAction(taskAction);
     }
     connect (taskAction, SIGNAL(triggered(bool)), task.data(), SLOT(activateRaiseOrIconify()));
+    connect (task.data(), SIGNAL(changed()), taskAction, SLOT(validateSize()));
     connect (task.data(), SIGNAL(changed()), taskAction, SLOT(update()));
+    validateSize();
     update();
 //    void activated();
 //     void deactivated();
@@ -289,6 +295,7 @@ TaskBar::removeTask(TaskPtr task)
             if (taskAction->task == task) // that's it
             {
                 removeAction(i);
+                validateSize();
                 update();
                 return;
             }
@@ -312,6 +319,7 @@ TaskBar::removeTask(TaskPtr task)
                             taskAction->setText(entry(taskAction->task, false));
                             taskAction->isOnPopup = false;
                             addAction(taskAction, i);
+                            validateSize();
                             update();
                         }
                     }
@@ -319,7 +327,6 @@ TaskBar::removeTask(TaskPtr task)
                 }
             }
         }
-            
     }
 }
 
@@ -402,6 +409,84 @@ TaskBar::rightMouseButtonEvent(int idx, QGraphicsSceneMouseEvent *ev)
     // ---------------------------------
     
     taskTasks->popup(mapToGlobal(ev->pos()));
+}
+
+void
+TaskBar::validateSize()
+{
+    if (actions().count() < 2) // forced, 1st is "KDE 4"
+        return;
+    
+    bool skip = true;
+    if (parentWidget() && parentWidget()->isVisible() &&
+        size().width() > parentWidget()->size().width())
+        skip = false;
+    if (isSqueezed && size().width() < parentWidget()->size().width()*0.9)
+        skip = false;
+    if (skip)
+        return;
+
+    int completeSize = parentWidget()->size().width() - actionGeometry(0).width();
+    int average = completeSize /  (actions().count() - 1);
+
+    int n = 0;
+
+    TaskAction *taskAction = 0;
+    QAction *action = 0;
+
+    // first pass, query size demands
+    for (int i = 1; i < actions().count(); ++i)
+    {
+        action = actions().at(i);
+        taskAction = qobject_cast<TaskAction*>(action);
+        if (taskAction)
+        {
+            if (taskAction->isSqueezed)
+                taskAction->setText(entry(taskAction->task, false));
+            if (actionGeometry(i).width() > average)
+            {
+                taskAction->isSqueezed = true;
+                ++n;
+            }
+            else
+            {
+                taskAction->isSqueezed = false;
+                completeSize -= actionGeometry(i).width();
+            }
+        }
+        else
+            completeSize -= actionGeometry(i).width();
+    }
+
+    isSqueezed = n;
+    if (!isSqueezed)
+        return;
+    
+    // second pass: fix text lenghts
+    average = completeSize / n;
+    
+    QStyleOptionMenuItem opt;
+    QRect r;
+    int width;
+    for (int i = 1; i < actions().count(); ++i)
+    {
+        if ((taskAction = qobject_cast<TaskAction*>(actions().at(i))))
+        {
+            if (taskAction->isSqueezed)
+            {
+                // real demand is style dependend...
+                QFontMetrics fm(action->font());
+                initStyleOption(&opt, i);
+                r = fm.boundingRect(action->text());
+                width = average * r.width();
+                width /= style()->sizeFromContents(QStyle::CT_MenuBarItem, &opt, r.size(), 0).width();
+                
+                isSqueezed = true;
+                QString string = fm.elidedText( taskAction->text(), Qt::ElideMiddle, width );
+                taskAction->setText(string);
+            }
+        }
+    }
 }
 
 void

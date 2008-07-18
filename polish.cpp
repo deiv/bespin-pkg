@@ -476,13 +476,18 @@ void BespinStyle::polish( QWidget * widget ) {
       // as the slider is usually not bound to e.g. a scrollarea
       // so that'd just gonna add more complexity... for literally nothing
          QWidget *dad = widget;
+         if (!widget->parentWidget()) {
+             // this catches e.g. plasma used graphicsproxywidgets...
+             qWarning("Bespin, transparent scrollbar!");
+             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+         }
          while ((dad = dad->parentWidget())) {
             // btw: userer väter väter väter väter...? hail to Monty Python!
             if (dad->inherits("KHTMLView")) {
                // NOTICE this slows down things as it triggers a repaint of the frame
                // but it's necessary for KHtml scrollers...
                widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
-               // this reenbles speed and currently does the job - how's css/khtml policy on applying colors?
+               // this reenbles speed and currently does the job - TODO how's css/khtml policy on applying colors?
                widget->setAutoFillBackground ( true );
                widget->setBackgroundRole ( QPalette::Base ); // QPalette::Window looks wrong
                break;

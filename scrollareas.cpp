@@ -101,7 +101,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
 
    else if (widget->testAttribute(Qt::WA_OpaquePaintEvent)) {
 
-      // catch combobox dropdowns ==========
+// catch combobox dropdowns ==========
       if (widget->parentWidget() && widget->parentWidget()->parentWidget() &&
           widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) {
          painter->fillRect(RECT, PAL.brush(QPalette::Base));

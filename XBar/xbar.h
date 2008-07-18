@@ -32,43 +32,45 @@ class TaskBar;
 
 class XBar : public Plasma::Applet
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   XBar(QObject *parent, const QVariantList &args);
-   ~XBar();
-   void init();
-   void registerMenu(const QString &service, qlonglong key, const QString &title, const QStringList &entries);
-   void unregisterMenu(qlonglong key);
-   QPoint mapToGlobal(const QPointF &pt);
-   void reparent(qlonglong oldKey, qlonglong newKey);
-   void changeEntry(qlonglong key, int idx, const QString &entry = QString(), bool add = false);
-   void setOpenPopup(int idx);
-   void requestFocus(qlonglong key);
-   void releaseFocus(qlonglong key);
+    XBar(QObject *parent, const QVariantList &args);
+    virtual ~XBar();
+    void registerMenu(const QString &service, qlonglong key, const QString &title, const QStringList &entries);
+    void unregisterMenu(qlonglong key);
+    QPoint mapToGlobal(const QPointF &pt);
+    void reparent(qlonglong oldKey, qlonglong newKey);
+    void changeEntry(qlonglong key, int idx, const QString &entry = QString(), bool add = false);
+    void setOpenPopup(int idx);
+    void requestFocus(qlonglong key);
+    void releaseFocus(qlonglong key);
+public slots:
+        void init();
 protected:
-   void wheelEvent(QGraphicsSceneWheelEvent *ev);
+    void wheelEvent(QGraphicsSceneWheelEvent *ev);
 private:
-   void hide(MenuBar *item);
-   void show(MenuBar *item);
-   bool dbusAction(const QObject *o, int idx, const QString &cmd);
+    void hide(MenuBar *item);
+    void show(MenuBar *item);
+    bool dbusAction(const QObject *o, int idx, const QString &cmd);
 private:
-   typedef QMap<qlonglong, MenuBar*> MenuMap;
-   struct {
-      MenuMap menus;
-      QMenu windowList;
-      TaskBar *taskbar;
-      MenuBar *currentBar;
-   } d;
+    typedef QMap<qlonglong, MenuBar*> MenuMap;
+    struct {
+        MenuMap menus;
+        QMenu windowList;
+        TaskBar *taskbar;
+        MenuBar *currentBar;
+    } d;
 private slots:
-   void hover(int);
-   void trigger(int);
-   void updatePalette();
-   void updateWindowlist();
-   void unregisterCurrentMenu();
-   void activateWin();
-   void callMenus();
-   void byeMenus();
-   void raiseCurrentWindow();
+    void hover(int);
+    void trigger(int);
+    void updatePalette();
+    void updateWindowlist();
+    void unregisterCurrentMenu();
+    void activateWin();
+    void callMenus();
+    void byeMenus();
+    void raiseCurrentWindow();
+    void showTaskbar();
 };
 
 #endif //XBAR_H

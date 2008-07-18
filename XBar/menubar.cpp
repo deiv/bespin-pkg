@@ -125,16 +125,19 @@ MenuBar::addAction(QAction *action, int idx)
 void
 MenuBar::actionChanged()
 {
-   QAction *action = qobject_cast<QAction *>(sender());
-   if (!action)
-      return;
-   for (int i = 0; i < d.actions.count(); ++i) {
-      if (d.actions.at(i) == action) {
-         d.actionRects[i] = QRect();
-         updateSize();
-         break;
-      }
-   }
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (!action)
+        return;
+    for (int i = 0; i < d.actions.count(); ++i)
+    {
+        if (d.actions.at(i) == action)
+        {
+            d.actionRects[i] = QRect();
+            break;
+        }
+    }
+    updateSize();
+    update();
 }
 
 void
