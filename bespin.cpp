@@ -122,9 +122,11 @@ BespinStyle::registerRoutines()
    registerCE(drawCheckLabel, CE_CheckBoxLabel);
    registerCE(drawCheckLabel, CE_RadioButtonLabel);
    // docks.cpp
+#ifdef QT3_SUPPORT
    registerPE(skip, PE_Q3DockWindowSeparator);
-   registerPE(skip, PE_FrameDockWidget);
    registerCE(skip, CE_Q3DockWindowEmptyArea);
+#endif
+   registerPE(skip, PE_FrameDockWidget);
    registerCE(drawDockTitle, CE_DockWidgetTitle);
    registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
    // frames.cpp
@@ -167,9 +169,11 @@ BespinStyle::registerRoutines()
    registerCE(drawScrollBarSlider, CE_ScrollBarSlider);
    // shapes.cpp
    registerPE(drawItemCheck, PE_IndicatorViewItemCheck);
+#ifdef QT3_SUPPORT
    registerPE(drawItemCheck, PE_Q3CheckListIndicator);
-   registerPE(drawMenuCheck, PE_IndicatorMenuCheckMark);
    registerPE(drawExclusiveCheck, PE_Q3CheckListExclusiveIndicator);
+#endif
+   registerPE(drawMenuCheck, PE_IndicatorMenuCheckMark);
    registerPE(drawSolidArrowN, PE_IndicatorArrowUp);
    registerPE(drawSolidArrowN, PE_IndicatorSpinUp);
    registerPE(drawSolidArrowN, PE_IndicatorSpinPlus);
@@ -200,14 +204,18 @@ BespinStyle::registerRoutines()
    registerCE(drawToolButtonLabel, CE_ToolButtonLabel);
    registerCE(skip, CE_ToolBar);
    registerPE(skip, PE_FrameButtonTool);
+#ifdef QT3_SUPPORT
    registerPE(skip, PE_Q3Separator);
+#endif
    registerPE(drawToolBarHandle, PE_IndicatorToolBarHandle);
    // views.cpp
    registerCE(drawHeader, CE_Header);
    registerCE(drawHeaderSection, CE_HeaderSection);
    registerCE(drawHeaderLabel, CE_HeaderLabel);
    registerPE(drawBranch, PE_IndicatorBranch);
+#ifdef QT3_SUPPORT
    registerCC(drawTree, CC_Q3ListView);
+#endif
    registerCE(drawRubberBand, CE_RubberBand);
    registerPE(drawHeaderArrow, PE_IndicatorHeaderArrow);
 #if QT_VERSION >= 0x040400

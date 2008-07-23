@@ -16,7 +16,6 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <Qt3Support/Q3ScrollView>
 #include <QAbstractButton>
 #include <QAbstractItemView>
 #include <QAbstractScrollArea>
@@ -29,6 +28,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QProgressBar>
+#include <QScrollBar>
 #include <QSplitterHandle>
 #include <QToolBar>
 #include <QToolTip>
@@ -586,7 +586,11 @@ void BespinStyle::polish( QWidget * widget ) {
          widget->installEventFilter(this);
 
       // scrollarea hovering
-      if (qobject_cast<QAbstractScrollArea*>(frame) || qobject_cast<Q3ScrollView*>(frame)) {
+      if (qobject_cast<QAbstractScrollArea*>(frame)
+#ifdef QT3_SUPPORT
+        || frame->inherits("Q3ScrollView")
+#endif
+          ) {
          Animator::Hover::manage(frame);
          // allow all treeviews to be animated!
          if (config.hack.treeViews)

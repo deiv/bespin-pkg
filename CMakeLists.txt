@@ -1,7 +1,7 @@
 project(bespin)
 cmake_minimum_required(VERSION 2.4)
 
-add_definitions( ${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} )
+add_definitions( ${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} -DQT3_SUPPORT )
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules )
 

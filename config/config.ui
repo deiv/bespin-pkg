@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>773</width>
-    <height>496</height>
+    <width>883</width>
+    <height>519</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -35,8 +35,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>193</width>
-        <height>424</height>
+        <width>274</width>
+        <height>447</height>
        </rect>
       </property>
       <attribute name="label" >
@@ -118,7 +118,7 @@
         <x>0</x>
         <y>0</y>
         <width>228</width>
-        <height>117</height>
+        <height>405</height>
        </rect>
       </property>
       <attribute name="label" >
@@ -151,7 +151,7 @@
      </widget>
     </widget>
    </item>
-   <item row="0" column="1" >
+   <item row="0" column="1" colspan="2" >
     <widget class="QLabel" name="header" >
      <property name="font" >
       <font>
@@ -171,14 +171,14 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1" >
+   <item rowspan="2" row="1" column="1" colspan="2" >
     <widget class="Line" name="line_2" >
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" >
+   <item row="2" column="2" >
     <widget class="QStackedWidget" name="sections" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
@@ -194,8 +194,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>579</width>
+        <height>457</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2" >
@@ -402,8 +402,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>556</width>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_17" >
@@ -419,6 +419,9 @@
            </property>
            <property name="text" >
             <string>Background Mode</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -460,6 +463,9 @@
            </property>
            <property name="text" >
             <string>Structure</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -638,6 +644,9 @@
          <property name="text" >
           <string>Secret Echo</string>
          </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
         </widget>
        </item>
        <item row="5" column="1" >
@@ -693,8 +702,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>556</width>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -788,8 +797,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>556</width>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -812,6 +821,9 @@
            </property>
            <property name="text" >
             <string>Gradient</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -846,6 +858,9 @@
            </property>
            <property name="text" >
             <string>Layer</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -895,6 +910,9 @@
            </property>
            <property name="text" >
             <string>Color roles</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -964,6 +982,9 @@
            <property name="text" >
             <string>Checkbox Indicator</string>
            </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
           </widget>
          </item>
          <item>
@@ -1013,8 +1034,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>556</width>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_6" >
@@ -1278,8 +1299,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>556</width>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_18" >
@@ -1505,8 +1526,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>556</width>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_12" >
@@ -1625,11 +1646,11 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>579</width>
+        <height>457</height>
        </rect>
       </property>
-      <layout class="QGridLayout" >
+      <layout class="QGridLayout" name="gridLayout_21" >
        <item row="0" column="0" >
         <layout class="QHBoxLayout" >
          <item>
@@ -1642,6 +1663,9 @@
            </property>
            <property name="text" >
             <string>Gradient</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -1658,20 +1682,20 @@
         </layout>
        </item>
        <item row="1" column="0" >
-        <widget class="QLabel" name="label_42" >
-         <property name="font" >
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text" >
-          <string>Groove</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" >
-        <layout class="QHBoxLayout" >
+        <layout class="QHBoxLayout" name="horizontalLayout_3" >
+         <item>
+          <widget class="QLabel" name="label_42" >
+           <property name="font" >
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text" >
+            <string>Groove</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QSlider" name="sliderGroove" >
            <property name="maximum" >
@@ -1697,14 +1721,14 @@
          </item>
         </layout>
        </item>
-       <item row="3" column="0" >
+       <item row="2" column="0" >
         <widget class="QCheckBox" name="showScrollButtons" >
          <property name="text" >
           <string>Show Scrollbar Buttons</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" >
+       <item row="3" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -1724,8 +1748,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>579</width>
+        <height>457</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_16" >
@@ -1741,6 +1765,9 @@
            </property>
            <property name="text" >
             <string>Gradient</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -1803,8 +1830,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>579</width>
+        <height>457</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -1820,6 +1847,9 @@
            </property>
            <property name="text" >
             <string>Combobox Gradient</string>
+           </property>
+           <property name="alignment" >
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -1855,8 +1885,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>579</width>
+        <height>457</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_15" >
@@ -1976,8 +2006,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>599</width>
-        <height>572</height>
+        <width>579</width>
+        <height>457</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" >

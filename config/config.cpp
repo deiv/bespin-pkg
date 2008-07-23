@@ -923,7 +923,7 @@ void Config::learnPwChar() {
    ushort n = unicode(ui.pwEchoChar->lineEdit()->text());
    if (ui.pwEchoChar->findData(n) != -1)
       return;
-   ui.pwEchoChar->insertItem(0, QChar(n), n);
+   ui.pwEchoChar->insertItem(0, QString(QChar(n)), QVariant(n));
    QSettings settings("Bespin", "Config");
    QStringList list = settings.value ( "UserPwChars", QStringList() ).toStringList();
    list << QString::number( n, 16 );

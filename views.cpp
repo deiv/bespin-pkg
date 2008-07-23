@@ -262,6 +262,7 @@ void
 BespinStyle::drawTree(const QStyleOptionComplex * option, QPainter * painter,
                       const QWidget * widget) const
 {
+#ifdef QT3_SUPPORT
    const QStyleOptionQ3ListView *lv = qstyleoption_cast<const QStyleOptionQ3ListView *>(option);
    if (!lv) return;
        
@@ -391,8 +392,8 @@ BespinStyle::drawTree(const QStyleOptionComplex * option, QPainter * painter,
          }
       }
    }
+#endif
 }
-
 //    case PE_Q3CheckListController: // Qt 3 compatible Controller part of a list view item.
 
 void

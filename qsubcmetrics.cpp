@@ -415,25 +415,22 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
 {
    switch (element) {
    case SE_PushButtonContents: // Area containing the label (icon with text or pixmap)
-      return visualRect(option->direction, option->rect,
-                        option->rect.adjusted(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4));
+      return visualRect(option->direction, RECT, RECT.adjusted(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4));
 //    case SE_PushButtonFocusRect: // Area for the focus rect (usually larger than the contents rect)
    case SE_CheckBoxContents:
    case SE_ViewItemCheckIndicator: // Area for a view item's check mark
    case SE_CheckBoxIndicator: { // Area for the state indicator (e.g., check mark)
       int h = dpi.Indicator;
-      QRect r = option->rect;
+      QRect r = RECT;
       if (config.btn.layer)
          r.setRect(r.x()+dpi.f1, r.y() + ((r.height() - h) / 2), h-dpi.f2, h);
       else
          r.setRect(r.x(), r.y() + ((r.height() - h) / 2), h, h);
       if (element != SE_CheckBoxContents)
-         return visualRect(option->direction, option->rect, r);
+         return visualRect(option->direction, RECT, r);
       int spacing = dpi.f5;
-      r.setRect(r.right() + spacing, option->rect.y(),
-                option->rect.width() - r.width() - spacing,
-                option->rect.height());
-      return visualRect(option->direction, option->rect, r);
+      r.setRect(r.right() + spacing, RECT.y(), RECT.width() - r.width() - spacing, RECT.height());
+      return visualRect(option->direction, RECT, r);
    }
    case SE_CheckBoxFocusRect: // Area for the focus indicator
    case SE_CheckBoxClickRect: // Clickable area, defaults to SE_CheckBoxFocusRect

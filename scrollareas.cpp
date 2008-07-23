@@ -16,7 +16,9 @@
    Boston, MA 02110-1301, USA.
  */
 
+#ifdef QT3_SUPPORT
 #include <Qt3Support/Q3ScrollView>
+#endif
 #include <QAbstractScrollArea>
 #include "draw.h"
 #include "animator/hover.h"
@@ -32,7 +34,9 @@ scrollAreaHovered(const QWidget* slider)
       return false;
    while (scrollWidget &&
           !(qobject_cast<QAbstractScrollArea*>(scrollWidget) ||
+#ifdef QT3_SUPPORT
             qobject_cast<Q3ScrollView*>(scrollWidget) ||
+#endif
             Animator::Hover::managesArea(scrollWidget)))
       scrollWidget = const_cast<QWidget*>(scrollWidget->parentWidget());
    bool isActive = true;
@@ -45,11 +49,13 @@ scrollAreaHovered(const QWidget* slider)
          QPoint tl = scrollChilds[i]->mapToGlobal(QPoint(0,0));
          scrollArea -= QRegion(tl.x(), tl.y(), scrollChilds[i]->width(), scrollChilds[i]->height());
       }
+#ifdef QT3_SUPPORT
       QList<Q3ScrollView*> scrollChilds2 = scrollWidget->findChildren<Q3ScrollView*>();
       for (int i = 0; i < scrollChilds2.size(); ++i) {
          QPoint tl = scrollChilds2[i]->mapToGlobal(QPoint(0,0));
          scrollArea -= QRegion(tl.x(), tl.y(), scrollChilds2[i]->width(), scrollChilds2[i]->height());
       }
+#endif
 //       scrollerActive = scrollArea.contains(QCursor::pos());
       isActive = scrollArea.contains(QCursor::pos());
    }

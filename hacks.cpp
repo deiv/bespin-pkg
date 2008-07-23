@@ -92,10 +92,11 @@ hackMessageBox(QMessageBox* box, QEvent *e)
       case QMessageBox::Critical:
          logo = QStyle::SP_MessageBoxCritical; break;
       }
+      QPixmap icon = box->style()->standardPixmap ( logo, &opt, box );
       QPainter p(box);
       if (logo) {
          const int y = (box->height()-s)/2 - qMax(0,(box->height()-164)/3);
-         p.drawPixmap(-s/3,y, box->style()->standardPixmap ( logo, &opt, box ));
+         p.drawPixmap(-s/3,y, icon);
       }
       p.setPen(Colors::mid(box->palette().color(QPalette::Window),
                            box->palette().color(QPalette::WindowText)));

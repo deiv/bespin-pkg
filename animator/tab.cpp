@@ -105,8 +105,6 @@ grabWidget(QWidget * root, QPixmap &pix)
     QPoint zero(0,0);
     QSize sz = root->window()->size();
 
-    QWidgetList widgets = root->findChildren<QWidget*>();
-   
    // resizing (in case) -- NOTICE may be dropped for performance...?!
 //    if (root->testAttribute(Qt::WA_PendingResizeEvent) ||
 //        !root->testAttribute(Qt::WA_WState_Created)) {
@@ -132,6 +130,7 @@ grabWidget(QWidget * root, QPixmap &pix)
     QPainter p; QRegion rgn;
     QPixmap *saPix = 0L;
 
+    QWidgetList widgets = root->findChildren<QWidget*>();
     foreach (QWidget *w, widgets) {
         if (w->isVisibleTo(root)) {
             // solids
