@@ -338,7 +338,8 @@ BespinStyle::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
          editRect.adjust(f3,0, -f3, 0);
          painter->setPen(hover ? CCOLOR(btn.active, 1) : CCOLOR(btn.std, 1));
       }
-      painter->drawText(editRect, Qt::AlignCenter, cb->currentText);
+      drawItemText(painter, editRect, Qt::AlignCenter, PAL, isEnabled, cb->currentText);
+//       painter->drawText(editRect, Qt::AlignCenter, cb->currentText);
    }
    painter->restore();
    animStep = -1;

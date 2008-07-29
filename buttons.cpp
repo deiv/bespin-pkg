@@ -129,10 +129,9 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    const QAbstractButton* btn = qobject_cast<const QAbstractButton*>(widget);
    const int f1 = dpi.f1, f2 = dpi.f2;
 //    const bool toggled = !hover && (option->state & State_On);
-   const bool round = !isCheckbox && (config.btn.round ||
-                                      (btn && btn->isCheckable()));
-   const bool fullHover =
-      config.btn.fullHover || (isCheckbox && config.btn.checkType == Check::O);
+   const bool round = !isCheckbox && (config.btn.round || (btn && btn->isCheckable()));
+   const bool fullHover = config.btn.fullHover ||
+                          (isCheckbox && (config.btn.layer || config.btn.checkType == Check::O));
 
    QRect r = RECT;
    if (animStep < 0) animStep = HOVER_STEP;
@@ -180,7 +179,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
                                      r.height(), QPoint(0,f3));
          }
          if (hasFocus) {
-            QColor fc = !sunken ? FCOLOR(Window) : c;
+            QColor fc = fullHover ? iC : CCOLOR(btn.std, Bg);
             const int contrast = Colors::contrast(fc, FCOLOR(Highlight));
             r = RECT;
             if (sunken) r.setBottom(r.bottom()-f1);
