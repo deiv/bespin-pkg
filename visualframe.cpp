@@ -177,7 +177,7 @@ VisualFrame::updateShape()
       delete bottom; bottom = 0L;
       delete left; left = 0L;
       delete right; right = 0L;
-      
+
       QWidget *runner = _frame->parentWidget();
       while (runner && runner != _window) {
          runner->removeEventFilter(this);

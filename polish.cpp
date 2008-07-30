@@ -156,14 +156,11 @@ makeStructure(QPixmap **pixp, const QColor &c, bool light)
    p.end();
 }
 
-void BespinStyle::polish ( QApplication * app ) {
-
-//    if (timer && !timer->isActive())
-//       timer->start(50);
-   QPalette pal = app->palette();
-   polish(pal);
-   app->setPalette(pal);
-//    app->installEventFilter(this);
+void BespinStyle::polish ( QApplication * app )
+{
+    QPalette pal = app->palette();
+    polish(pal);
+    app->setPalette(pal);
 }
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
@@ -556,18 +553,7 @@ void BespinStyle::polish( QWidget * widget ) {
 
    if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
       MacMenu::manage(mbar);
-#if 0
-#ifdef Q_WS_X11
-   if (qobject_cast<QMenuBar*>(widget)) {
-      widget->setParent(widget->parentWidget(), Qt::Window | Qt::Tool | Qt::FramelessWindowHint);
-      widget->move(0,0);
-      SET_WINDOW_TYPE(widget, winTypeMenu);
-      if( widget->parentWidget())
-         XSetTransientForHint( QX11Info::display(), widget->winId(),
-                               widget->parentWidget()->topLevelWidget()->winId());
-   }
-#endif
-#endif
+
    //BEGIN Frames                                                                      -
    if (!widget->isWindow())
    if (QFrame *frame = qobject_cast<QFrame *>(widget)) {

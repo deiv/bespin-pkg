@@ -38,33 +38,37 @@ extern Config config;
 extern Dpi dpi;
 static Gradients::Type _progressBase;
 
-static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list) {
-   int max = QPalette::NColorRoles;
-   if (max > list.count()) {
-      qWarning("The demanded palette seems to be incomplete!");
-      max = list.count();
-   }
-   for (int i = 0; i < max; i++)
-      pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
+static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list)
+{
+    int max = QPalette::NColorRoles;
+    if (max > list.count()) {
+        qWarning("The demanded palette seems to be incomplete!");
+        max = list.count();
+    }
+    for (int i = 0; i < max; i++)
+        pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
 }
 
-static QStringList colors(const QPalette &pal, QPalette::ColorGroup group) {
-   QStringList list;
-   for (int i = 0; i < QPalette::NColorRoles; i++)
-      list << pal.color(group, (QPalette::ColorRole) i).name();
-   return list;
+static QStringList colors(const QPalette &pal, QPalette::ColorGroup group)
+{
+    QStringList list;
+    for (int i = 0; i < QPalette::NColorRoles; i++)
+        list << pal.color(group, (QPalette::ColorRole) i).name();
+    return list;
 }
 
 // this seems to be necessary as KDE sets it's own palette after
 // creating the style - god knows why...
 void BespinStyle::fixKdePalette()
 {
-   if (originalPalette) {
-      qApp->setPalette(*originalPalette);
-      delete originalPalette; originalPalette = 0;
-   }
-   QPalette pal = qApp->palette();
-   polish(pal);
+    if (originalPalette)
+    {
+        qApp->setPalette(*originalPalette);
+        delete originalPalette;
+        originalPalette = 0;
+    }
+    QPalette pal = qApp->palette();
+    polish(pal);
 }
 
 
@@ -292,7 +296,8 @@ BespinStyle::readSettings(const QSettings* settings)
       config.view.sortingHeader_role[Bg] = QPalette::Window;
    }
    
-   if (delSettings) delete iSettings;
+   if (delSettings)
+       delete iSettings;
 }
 
 #undef readRole
@@ -328,22 +333,22 @@ void BespinStyle::initMetrics()
 #undef SCALE
 
 void BespinStyle::init(const QSettings* settings) {
-   readSettings(settings);
-   initMetrics();
-   generatePixmaps();
-   Gradients::init(config.bg.mode > Scanlines ?
-                   (Gradients::BgMode)config.bg.mode :
-                   Gradients::BevelV, _progressBase, config.bg.intensity, dpi.f8);
-   int f2 = dpi.f2, f4 = dpi.f4;
-   QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
-   inner.adjust(f4,f4,-f4,-dpi.f1); outer.adjust(0,0,0,dpi.f3);
-   VisualFrame::setGeometry(QFrame::Sunken, inner, outer);
-   inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
-   inner.adjust(f2,f2,-f2,-f2); outer.adjust(-f2,-f2,f2,f2);
-   VisualFrame::setGeometry(QFrame::Plain, inner, outer);
-   inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
-   inner.adjust(f2,f2,-f2,0); outer.adjust(-f2,-f2,f2,0);
-   VisualFrame::setGeometry(QFrame::Raised, inner, outer);
-   if (qApp->inherits("KApplication"))
-      QTimer::singleShot(0, this, SLOT(fixKdePalette()));
+    readSettings(settings);
+    initMetrics();
+    generatePixmaps();
+    Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode :
+                                                 Gradients::BevelV,
+                    _progressBase, config.bg.intensity, dpi.f8);
+    int f2 = dpi.f2, f4 = dpi.f4;
+    QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
+    inner.adjust(f4,f4,-f4,-dpi.f1); outer.adjust(0,0,0,dpi.f3);
+    VisualFrame::setGeometry(QFrame::Sunken, inner, outer);
+    inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
+    inner.adjust(f2,f2,-f2,-f2); outer.adjust(-f2,-f2,f2,f2);
+    VisualFrame::setGeometry(QFrame::Plain, inner, outer);
+    inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
+    inner.adjust(f2,f2,-f2,0); outer.adjust(-f2,-f2,f2,0);
+    VisualFrame::setGeometry(QFrame::Raised, inner, outer);
+    if (qApp->inherits("KApplication"))
+        QTimer::singleShot(0, this, SLOT(fixKdePalette()));
 }

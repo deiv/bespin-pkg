@@ -104,6 +104,7 @@ grabWidget(QWidget * root, QPixmap &pix)
 
     QPoint zero(0,0);
     QSize sz = root->window()->size();
+    QWidgetList widgets = root->findChildren<QWidget*>();
 
    // resizing (in case) -- NOTICE may be dropped for performance...?!
 //    if (root->testAttribute(Qt::WA_PendingResizeEvent) ||
@@ -130,9 +131,12 @@ grabWidget(QWidget * root, QPixmap &pix)
     QPainter p; QRegion rgn;
     QPixmap *saPix = 0L;
 
-    QWidgetList widgets = root->findChildren<QWidget*>();
+// @ franz: hier mal machen
+// qDebug() << "BESPIN" << widgets;
     foreach (QWidget *w, widgets) {
-        if (w->isVisibleTo(root)) {
+// qDebug() << "BESPIN" << w;
+        if (w->thread() == instance->thread() && w->isVisibleTo(root)) {
+// qDebug() << "BESPIN passed...";
             // solids
             if (w->autoFillBackground()) {
                 const QBrush bg = w->palette().brush(w->backgroundRole());

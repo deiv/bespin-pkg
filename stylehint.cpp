@@ -19,6 +19,7 @@
 // #include <QComboBox>
 #include <QEvent>
 #include <QFrame>
+#include <QMenuBar>
 #include <QStyleOptionComboBox>
 #include "colors.h"
 #include "bespin.h"
@@ -61,6 +62,13 @@ int BespinStyle::styleHint( StyleHint hint, const QStyleOption * option, const Q
     case SH_PrintDialog_RightAlignButtons:
         return true; // ok/cancel just belong there
     case SH_MainWindow_SpaceBelowMenuBar:
+        if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
+        if (menubar->height() == 0)
+        if (!menubar->actions().isEmpty())
+        { // we trick menubars if we use macmenus - hehehe...
+            // the final result needs to be > "0" (i.e. "1") to avoid side effects...
+            return -menubar->actionGeometry(menubar->actions().first()).height() + 1;
+        }
         return 0; // no space between menus and docks (we need padding rather than margin)
 ///    case SH_FontDialog_SelectAssociatedText: // Select the text in the line edit, or when selecting an item from the listbox, or when the line edit receives focus, as done on Windows.
 ///    case SH_Menu_AllowActiveAndDisabled: // Allows disabled menu items to be active.

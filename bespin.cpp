@@ -392,27 +392,28 @@ void
 BespinStyle::erase(const QStyleOption *option, QPainter *painter,
                    const QWidget *widget) const
 {
-   const QWidget *grampa = widget;
-   while (!(grampa->isWindow() ||
-            (grampa->autoFillBackground() &&
-             grampa->objectName() != "qt_scrollarea_viewport")))
-      grampa = grampa->parentWidget();
+    const QWidget *grampa = widget;
+    while (!(grampa->isWindow() ||
+                (grampa->autoFillBackground() &&
+                grampa->objectName() != "qt_scrollarea_viewport")))
+        grampa = grampa->parentWidget();
 
-   QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());
-   painter->save();
-   painter->setPen(Qt::NoPen);
-   painter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
-   painter->setBrushOrigin(tl);
-   painter->drawRect(option->rect);
-   if (grampa->isWindow())  { // means we need to paint the global bg as well
-      painter->setClipRect(option->rect, Qt::IntersectClip);
-      QStyleOption tmpOpt = *option;
-      tmpOpt.rect = QRect(tl, grampa->size());
-      tmpOpt.palette = grampa->palette();
-      painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
-      drawWindowBg(&tmpOpt, painter, grampa);
-   }
-   painter->restore();
+    QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());
+    painter->save();
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
+    painter->setBrushOrigin(tl);
+    painter->drawRect(option->rect);
+    if (grampa->isWindow())
+    { // means we need to paint the global bg as well
+        painter->setClipRect(option->rect, Qt::IntersectClip);
+        QStyleOption tmpOpt = *option;
+        tmpOpt.rect = QRect(tl, grampa->size());
+        tmpOpt.palette = grampa->palette();
+        painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
+        drawWindowBg(&tmpOpt, painter, grampa);
+    }
+    painter->restore();
 }
 
 // X11 properties for the deco ---------------
