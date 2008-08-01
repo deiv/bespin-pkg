@@ -32,8 +32,7 @@ scrollAreaHovered(const QWidget* slider)
    QWidget *scrollWidget = const_cast<QWidget*>(slider);
    if (!scrollWidget->isEnabled())
       return false;
-   while (scrollWidget &&
-          !(qobject_cast<QAbstractScrollArea*>(scrollWidget) ||
+   while (scrollWidget && !(qobject_cast<QAbstractScrollArea*>(scrollWidget) ||
 #ifdef QT3_SUPPORT
             qobject_cast<Q3ScrollView*>(scrollWidget) ||
 #endif
@@ -169,8 +168,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
       groove = newScrollbar.rect;
    }
    else
-      groove =
-      subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBarGroove, widget);
+      groove = subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBarGroove, widget);
    if (cPainter != painter) {
       cPainter->end(); delete cPainter; cPainter = painter;
    }

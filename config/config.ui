@@ -55,11 +55,6 @@
          </item>
          <item>
           <property name="text" >
-           <string>Quick Setup</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
            <string>Background</string>
           </property>
          </item>
@@ -122,8 +117,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>274</width>
-        <height>447</height>
+        <width>228</width>
+        <height>117</height>
        </rect>
       </property>
       <attribute name="label" >
