@@ -524,7 +524,7 @@ void BespinStyle::polish( QWidget * widget ) {
    }
    
    // Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
-   if (false // to simplify the #ifdefs
+   bool isTopContainer = false // to simplify the #ifdefs
 #ifndef QT_NO_MENUBAR
        || qobject_cast<QMenuBar *>(widget)
 #endif
@@ -533,12 +533,17 @@ void BespinStyle::polish( QWidget * widget ) {
 #endif
 #ifndef QT_NO_TOOLBAR
        || qobject_cast<QToolBar *>(widget)
-       || (widget && qobject_cast<QToolBar *>(widget->parent()))
 #endif
-      ) {
+    ;
+    if (isTopContainer
+#ifndef QT_NO_TOOLBAR
+       || qobject_cast<QToolBar *>(widget->parent())
+#endif
+      )
+      {
          widget->setBackgroundRole(QPalette::Window);
          widget->setForegroundRole(QPalette::WindowText);
-         if (config.bg.mode == Scanlines) {
+         if (isTopContainer && config.bg.mode == Scanlines) {
             widget->setAutoFillBackground ( true );
             QPalette pal = widget->palette();
             QColor c = pal.color(QPalette::Active, QPalette::Window);
