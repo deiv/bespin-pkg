@@ -35,8 +35,7 @@
 #define ROLE (*role)
 
 #define ASSURE_OPTION(_VAR_, _TYPE_) \
-const QStyleOption##_TYPE_ *_VAR_ =\
-qstyleoption_cast<const QStyleOption##_TYPE_ *>(option);\
+const QStyleOption##_TYPE_ *_VAR_ = qstyleoption_cast<const QStyleOption##_TYPE_ *>(option);\
 if (!_VAR_) return
 
 #define ASSURE_WIDGET(_VAR_, _TYPE_)\
@@ -44,5 +43,7 @@ const _TYPE_ *_VAR_ = qobject_cast<const _TYPE_*>(widget);\
 if (!_VAR_) return
 
 #define ASSURE(_VAR_) if (!_VAR_) return
+
+#define F(_I_) dpi.f##_I_
 
 #endif //OXYGEN_DEFS_H
