@@ -67,19 +67,19 @@ scrollAreaHovered(const QWidget* slider)
 #define PAINT_ELEMENT(_E_)\
 if (scrollbar->subControls & SC_ScrollBar##_E_)\
 {\
-    newScrollbar.rect = scrollbar->rect;\
-    newScrollbar.state = saveFlags;\
-    newScrollbar.rect = subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBar##_E_, widget);\
-    if (newScrollbar.rect.isValid())\
+    optCopy.rect = scrollbar->rect;\
+    optCopy.state = saveFlags;\
+    optCopy.rect = subControlRect(CC_ScrollBar, &optCopy, SC_ScrollBar##_E_, widget);\
+    if (optCopy.rect.isValid())\
     {\
         if (!(scrollbar->activeSubControls & SC_ScrollBar##_E_))\
-            newScrollbar.state &= ~(State_Sunken | State_MouseOver);\
+            optCopy.state &= ~(State_Sunken | State_MouseOver);\
         if (info && (info->fades[Animator::In] & SC_ScrollBar##_E_ ||\
                     info->fades[Animator::Out] & SC_ScrollBar##_E_))\
             complexStep = info->step(SC_ScrollBar##_E_);\
         else \
             complexStep = 0; \
-        drawScrollBar##_E_(&newScrollbar, cPainter, widget);\
+        drawScrollBar##_E_(&optCopy, cPainter, widget);\
     }\
 }//
 
@@ -152,8 +152,8 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
     OPT_ENABLED
 
     // Make a copy here and reset it for each primitive.
-    QStyleOptionSlider newScrollbar = *scrollbar;
-    State saveFlags = newScrollbar.state;
+    QStyleOptionSlider optCopy = *scrollbar;
+    State saveFlags = optCopy.state;
     if (scrollbar->minimum == scrollbar->maximum)
         saveFlags &= ~State_Enabled; // there'd be nothing to scroll anyway...
         
@@ -181,10 +181,10 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
         {
             PAINT_ELEMENT(Groove);
         }
-        groove = newScrollbar.rect;
+        groove = optCopy.rect;
     }
     else
-        groove = subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBarGroove, widget);
+        groove = subControlRect(CC_ScrollBar, &optCopy, SC_ScrollBarGroove, widget);
 
     if (cPainter != painter)
     {   // unwrap cache painter
@@ -205,19 +205,19 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
 
     if ((saveFlags & State_Enabled) && (scrollbar->subControls & SC_ScrollBarSlider))
     {
-        newScrollbar.rect = scrollbar->rect;
-        newScrollbar.state = saveFlags;
-        newScrollbar.rect = subControlRect(CC_ScrollBar, &newScrollbar, SC_ScrollBarSlider, widget);
+        optCopy.rect = scrollbar->rect;
+        optCopy.state = saveFlags;
+        optCopy.rect = subControlRect(CC_ScrollBar, &optCopy, SC_ScrollBarSlider, widget);
         if (grooveIsSunken)
-            newScrollbar.rect.adjust(-F(1),-F(1),F(1),0);
+            optCopy.rect.adjust(-F(1),-F(1),F(1),0);
 
-        if (newScrollbar.rect.isValid())
+        if (optCopy.rect.isValid())
         {
             if (!(scrollbar->activeSubControls & SC_ScrollBarSlider))
-                newScrollbar.state &= ~(State_Sunken | State_MouseOver);
+                optCopy.state &= ~(State_Sunken | State_MouseOver);
 
             if (scrollbar->state & State_HasFocus)
-                newScrollbar.state |= (State_Sunken | State_MouseOver);
+                optCopy.state |= (State_Sunken | State_MouseOver);
 
             if (info && (   (info->fades[Animator::In] & SC_ScrollBarSlider) ||
                             (info->fades[Animator::Out] & SC_ScrollBarSlider)   ))
@@ -225,7 +225,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
             else
                 complexStep = 0;
 
-            drawScrollBarSlider(&newScrollbar, cPainter, widget);
+            drawScrollBarSlider(&optCopy, cPainter, widget);
         }
     }
    

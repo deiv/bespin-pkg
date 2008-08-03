@@ -101,3 +101,34 @@ BespinStyle::drawDockHandle(const QStyleOption * option, QPainter * painter,
    painter->restore();
    delete[] points;
 }
+
+void
+BespinStyle::drawMDIControls(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
+{
+    QStyleOptionButton btnOpt;
+    btnOpt.QStyleOption::operator=(*option);
+    OPT_SUNKEN
+
+#define PAINT_MDI_BUTTON(_btn_)\
+if (option->subControls & SC_Mdi##_btn_##Button)\
+{\
+    if (sunken && option->activeSubControls & SC_Mdi##_btn_##Button)\
+    {\
+        btnOpt.state |= State_Sunken;\
+        btnOpt.state &= ~State_Raised;\
+    }\
+    else\
+    {\
+        btnOpt.state |= State_Raised;\
+        btnOpt.state &= ~State_Sunken;\
+    }\
+    btnOpt.rect = subControlRect(CC_MdiControls, option, SC_Mdi##_btn_##Button, widget);\
+    painter->drawPixmap(btnOpt.rect.topLeft(), standardPixmap(SP_TitleBar##_btn_##Button, &btnOpt, widget));\
+}//
+
+    PAINT_MDI_BUTTON(Close);
+    PAINT_MDI_BUTTON(Normal);
+    PAINT_MDI_BUTTON(Min);
+
+#undef PAINT_MDI_BUTTON
+}

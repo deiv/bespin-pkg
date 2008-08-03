@@ -146,6 +146,7 @@ protected:
    // docks.cpp
    void drawDockTitle(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawDockHandle(const QStyleOption*, QPainter*, const QWidget*) const;
+   void drawMDIControls(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
    // frames.cpp
    void drawFocusFrame(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawFrame(const QStyleOption*, QPainter*, const QWidget*) const;

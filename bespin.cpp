@@ -74,7 +74,7 @@ Dpi dpi;
 
 #define N_PE 54
 #define N_CE 50
-#define N_CC 10
+#define N_CC 12
 static void
 (BespinStyle::*primitiveRoutine[N_PE])(const QStyleOption*, QPainter*, const QWidget*) const;
 static void
@@ -128,12 +128,15 @@ BespinStyle::registerRoutines()
 #endif
    registerPE(skip, PE_FrameDockWidget);
    registerCE(drawDockTitle, CE_DockWidgetTitle);
+   registerCC(drawMDIControls, CC_MdiControls);
    registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
    // frames.cpp
    registerCE(skip, CE_FocusFrame);
-   registerPE(skip, PE_FrameStatusBar);
+   registerPE(skip, PE_PanelStatusBar);
 #if QT_VERSION >= 0x040400
    registerPE(skip, PE_FrameStatusBarItem);
+#else
+    registerPE(skip, PE_FrameStatusBar);
 #endif
    registerPE(drawFocusFrame, PE_FrameFocusRect);
    registerPE(drawFrame, PE_Frame);

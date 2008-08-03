@@ -58,6 +58,16 @@ using namespace Bespin;
 extern Config config;
 extern Dpi dpi;
 
+static bool isQtDesigner = false;
+
+static inline void
+setBoldFont(QWidget *w, bool bold = true)
+{
+    QFont fnt = w->font();
+    fnt.setBold(bold);
+    w->setFont(fnt);
+}
+
 static void
 makeStructure(QPixmap **pixp, const QColor &c, bool light)
 {
@@ -158,6 +168,7 @@ void BespinStyle::polish ( QApplication * app )
     QPalette pal = app->palette();
     polish(pal);
     app->setPalette(pal);
+    isQtDesigner = isQtDesigner || app->applicationName() == "Designer";
 }
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
@@ -398,11 +409,9 @@ BespinStyle::polish( QWidget * widget )
             menu->setAutoFillBackground(true);
             menu->setBackgroundRole ( config.menu.std_role[0] );
             menu->setForegroundRole ( config.menu.std_role[1] );
-            if (config.menu.boldText) {
-                QFont tmpFont = menu->font();
-                tmpFont.setBold(true);
-                menu->setFont(tmpFont);
-            }
+            if (config.menu.boldText)
+                setBoldFont(menu);
+            
             // eventfiltering to reposition MDI windows and correct distance to menubars
             menu->installEventFilter(this);
 #if 0
@@ -583,7 +592,7 @@ BespinStyle::polish( QWidget * widget )
     else if (widget->inherits("QProgressBar"))
     {
         widget->setAttribute(Qt::WA_Hover);
-        QFont fnt = widget->font(); fnt.setBold(true); widget->setFont(fnt);
+        setBoldFont(widget);
         Animator::Progress::manage(widget);
     }
 
@@ -597,8 +606,9 @@ BespinStyle::polish( QWidget * widget )
 
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
     QMenuBar *mbar = qobject_cast<QMenuBar *>(widget);
-    if (mbar)
-      MacMenu::manage(mbar);
+    if (mbar && !(isQtDesigner && mbar->inherits("QDesignerMenuBar")))
+        MacMenu::manage(mbar);
+
     bool isTopContainer = (mbar || qobject_cast<QToolBar *>(widget));
 #ifdef QT3_SUPPORT
     isTopContainer = isTopContainer || widget->inherits("Q3ToolBar");
@@ -655,26 +665,23 @@ BespinStyle::polish( QWidget * widget )
 void
 BespinStyle::unPolish( QApplication *app )
 {
-   app->setPalette(QPalette());
+    app->setPalette(QPalette());
 }
 
 void
 BespinStyle::unPolish( QWidget *widget )
 {
-   if (QFrame *frame = qobject_cast<QFrame *>(widget))
-      VisualFrame::release(frame);
-   if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
-      MacMenu::release(mbar);
-/*   if (qobject_cast<VisualFramePart*>(widget)) {
-      delete widget; widget = 0L; return
-   }*/
-   
-   Animator::Hover::release(widget);
-   Animator::Progress::release(widget);
-   Animator::Tab::release(widget);
-   Hacks::remove(widget);
+    if (QFrame *frame = qobject_cast<QFrame *>(widget))
+        VisualFrame::release(frame);
+    if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
+        MacMenu::release(mbar);
 
-   widget->removeEventFilter(this);
+    Animator::Hover::release(widget);
+    Animator::Progress::release(widget);
+    Animator::Tab::release(widget);
+    Hacks::remove(widget);
+
+    widget->removeEventFilter(this);
 }
 #undef CCOLOR
 #undef FCOLOR
