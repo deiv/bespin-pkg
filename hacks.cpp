@@ -47,6 +47,10 @@ extern Config config;
 
 static Hacks *bespinHacks = new Hacks;
 static bool *isKRunner = 0;
+static bool *isSMPlayer = 0;
+static bool *isDragon = 0;
+const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
+const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
 
 static void
 triggerWMMove(const QWidget *w, const QPoint &p)
@@ -175,31 +179,45 @@ hackMessageBox(QMessageBox* box, QEvent *e)
 static bool
 isWindowDragWidget(QObject *o)
 {
-   return
-   o->inherits("QMenuBar") ||
-   o->inherits("QToolBar") ||
-   o->inherits("QDockWidget") ||
-   o->inherits("QStatusBar") ||
-   (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar")) ||
-   (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled());
+    return config.hack.windowMovement && (
+        qobject_cast<QDialog*>(o) ||
+        qobject_cast<QMenuBar*>(o) ||
+        
+        (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled()) ||
+        o->inherits("QToolBar") ||
+        o->inherits("QDockWidget") ||
+        o->inherits("QMainWindow") || // this is mostly useles...
+
+        (*isSMPlayer && o->inherits(SMPlayerVideoWidget)) ||
+        (*isDragon && o->inherits(DragonVideoWidget)) ||
+
+        o->inherits("QGroupBox") ||
+        o->inherits("QStatusBar") ||
+        (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar")));
 }
 
 static bool
 hackMoveWindow(QWidget* w, QEvent *e)
 {
+    QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+    if (mev->button() != Qt::LeftButton)
+        return false;
 
-//    if (e->type() != QEvent::MouseButtonPress)
-//       return false;
-   QMouseEvent *mev = static_cast<QMouseEvent*>(e);
-   if (mev->button() != Qt::LeftButton)
-      return false;
-   if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
-      if (bar->activeAction()) return false;
-   if (w->cursor().shape() != Qt::ArrowCursor || // preserve dock / toolbar internam move float trigger...
-      (mev->pos().y() < 12 && w->inherits("QDockWidget"))) // dock title...
-      return false;
-   triggerWMMove(w, mev->globalPos());
-   return true;
+    if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
+    if (bar->activeAction())
+        return false;
+
+    // preserve dock / toolbar internal move float trigger on dock titles...
+    if (w->cursor().shape() != Qt::ArrowCursor || (mev->pos().y() < 12 && w->inherits("QDockWidget")))
+        return false;
+
+//     QMouseEvent rel(QEvent::MouseButtonRelease, mev->pos(), mev->button(),
+//                     mev->buttons(), mev->modifiers());
+//     QCoreApplication::sendEvent( w, &rel );
+    
+    triggerWMMove(w, mev->globalPos());
+//     w->setWindowState ( w->windowState() | Qt::WindowActive );
+    return true;
 }
 
 static bool
@@ -215,78 +233,96 @@ paintKrunner(QWidget *w, QPaintEvent *) {
    return false;
 }
 
-
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
-   if (*isKRunner) {
-      if (e->type() == QEvent::Paint)
-         return paintKrunner(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
-      if (e->type() == QEvent::Show) {
-         static_cast<QWidget*>(o)->setWindowOpacity( 80.0 );
-         return false;
-      }
-   }
-   if (QMessageBox* box = qobject_cast<QMessageBox*>(o))
-      return hackMessageBox(box, e);
-   if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o)) {
-      return hackMoveWindow(static_cast<QWidget*>(o), e);
-   }
-   return false;
+    if (*isKRunner)
+    {
+        if (e->type() == QEvent::Paint)
+            return paintKrunner(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
+        if (e->type() == QEvent::Show)
+        {
+            static_cast<QWidget*>(o)->setWindowOpacity( 80.0 );
+            return false;
+        }
+    }
+
+    if (QMessageBox* box = qobject_cast<QMessageBox*>(o))
+        return hackMessageBox(box, e);
+
+    if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o))
+        return hackMoveWindow(static_cast<QWidget*>(o), e);
+
+    return false;
 }
 
+#define CHECK_APP(_BOOL_, _STRING_, _FUZZY_)\
+if (!_BOOL_)\
+{\
+    _BOOL_ = new bool;\
+    if (_FUZZY_)\
+        *_BOOL_ = QCoreApplication::arguments().at(0).endsWith(_STRING_);\
+    else\
+        *_BOOL_ = (QCoreApplication::applicationName() == _STRING_);\
+}//
+
 bool
-Hacks::add(QWidget *w) {
-   if (!isKRunner) {
-      isKRunner = new bool;
-      *isKRunner = (QCoreApplication::applicationName() == "krunner");
-   }
-   if (*isKRunner && config.hack.krunner) {
-      if (QPushButton *btn = qobject_cast<QPushButton*>(w)) {
-         btn->setFlat ( true );
-      }
-      else if (w->isWindow()) {
-         w->setAttribute(Qt::WA_MacBrushedMetal);
-//          w->setAttribute(Qt::WA_NoSystemBackground);
-         w->installEventFilter(bespinHacks);
-      }
-//       else if (w->inherits("QLineEdit")) {
-//          w->installEventFilter(bespinHacks);
-//       }
-      return true;
-   }
-   if (config.hack.messages &&
-       qobject_cast<QMessageBox*>(w)) {
-      w->setWindowFlags ( Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint | Qt::FramelessWindowHint);
-      w->removeEventFilter(bespinHacks); // just to be sure
-      w->installEventFilter(bespinHacks);
-      return true;
-   }
-   if (config.hack.KHTMLView)
-   if (QFrame *frame = qobject_cast<QFrame*>(w))
-   if (frame->inherits("KHTMLView")) {
-      frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-      return true;
-   }
-   if (config.hack.windowMovement)
-   if (isWindowDragWidget(w)) {
-      w->removeEventFilter(bespinHacks); // just to be sure
-      w->installEventFilter(bespinHacks);
-      return true;
-   }
+Hacks::add(QWidget *w)
+{
+    CHECK_APP(isKRunner, "krunner", false);
+    if (!config.hack.krunner)
+        *isKRunner = false;
+    CHECK_APP(isSMPlayer, "smplayer", true);
+    CHECK_APP(isDragon, "dragonplayer", false);
+
+    if (*isKRunner)
+    {
+        if (QPushButton *btn = qobject_cast<QPushButton*>(w))
+            btn->setFlat ( true );
+        else if (w->isWindow())
+        {
+            w->setAttribute(Qt::WA_MacBrushedMetal);
+//             w->setAttribute(Qt::WA_NoSystemBackground);
+            w->installEventFilter(bespinHacks);
+        }
+        return true;
+    }
+    
+    if (config.hack.messages && qobject_cast<QMessageBox*>(w))
+    {
+        w->setWindowFlags ( Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint | Qt::FramelessWindowHint);
+        w->removeEventFilter(bespinHacks); // just to be sure
+        w->installEventFilter(bespinHacks);
+        return true;
+    }
+    
+    if (config.hack.KHTMLView)
+    if (QFrame *frame = qobject_cast<QFrame*>(w))
+    if (frame->inherits("KHTMLView"))
+    {
+        frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+        return true;
+    }
+
+    if (isWindowDragWidget(w))
+    {
+        w->removeEventFilter(bespinHacks); // just to be sure
+        w->installEventFilter(bespinHacks);
+        return true;
+    }
+
 //    if (config.hack.konsole)
 //    if (w->inherits("Konsole::TerminalDisplay")) {
 //       w->setAttribute(Qt::WA_StyledBackground);
 //       w->setAttribute(Qt::WA_MacBrushedMetal);
 //       return true;
 //    }
-   return false;
+    return false;
 }
 
 void
 Hacks::remove(QWidget *w) {
-   w->removeEventFilter(bespinHacks);
-   if (w->inherits("KHTMLView")) {
-      static_cast<QFrame*>(w)->setFrameStyle(QFrame::NoFrame);
-   }
+    w->removeEventFilter(bespinHacks);
+    if (w->inherits("KHTMLView"))
+        static_cast<QFrame*>(w)->setFrameStyle(QFrame::NoFrame);
 }

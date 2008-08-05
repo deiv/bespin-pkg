@@ -231,7 +231,6 @@ MacMenu::popup(qlonglong key, int idx, int x, int y)
                 connect (pop, SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
                 xbar.call("setOpenPopup", idx);
                 pop->popup(QPoint(x,y));
-                pop->setFocus();
             }
             else
             {
@@ -335,15 +334,15 @@ MacMenu::raise(qlonglong key)
 bool
 MacMenu::eventFilter(QObject *o, QEvent *ev)
 {
-   QMenuBar *menu = qobject_cast<QMenuBar*>(o);
-   if (!menu)
-      return false;
+    QMenuBar *menu = qobject_cast<QMenuBar*>(o);
+    if (!menu)
+        return false;
 
-   QString func;
-   switch (ev->type())
-   {
-   case QEvent::Resize:
-//       menu->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored));
+    QString func;
+    switch (ev->type())
+    {
+    case QEvent::Resize:
+//         menu->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored));
         if (menu->size() != QSize(0,0))
         {
             menu->setFixedSize(0,0);
@@ -355,9 +354,9 @@ MacMenu::eventFilter(QObject *o, QEvent *ev)
     case QEvent::ActionRemoved:
         changeAction(menu, static_cast<QActionEvent*>(ev));
         break;
-//       case QEvent::ParentChange:
-//          qDebug() << o << ev;
-//          return false;
+//     case QEvent::ParentChange:
+//         qDebug() << o << ev;
+//         return false;
     case QEvent::EnabledChange:
         if (static_cast<QWidget*>(o)->isEnabled())
             xbar.call("requestFocus", (qlonglong)menu);
@@ -365,7 +364,8 @@ MacMenu::eventFilter(QObject *o, QEvent *ev)
             xbar.call("releaseFocus", (qlonglong)menu);
         break;
 
-//    case QEvent::ApplicationActivate:
+//     case QEvent::ApplicationActivate:
+    // TODO: test whether this is the only one and show it? (e.g. what about dialogs...?!)
     case QEvent::WindowActivate:
         xbar.call("requestFocus", (qlonglong)menu);
         break;

@@ -437,6 +437,7 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
    case SE_RadioButtonFocusRect: // Area for the focus indicator
    case SE_RadioButtonClickRect: // Clickable area, defaults to SE_RadioButtonFocusRect
       return option->rect;
+      
 //    case SE_RadioButtonIndicator: // Area for the state indicator
 //    case SE_RadioButtonContents: // Area for the label
 //    case SE_ComboBoxFocusRect: // Area for the focus indicator

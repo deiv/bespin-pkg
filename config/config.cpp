@@ -338,14 +338,23 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.hackWindowMove, HACK_WINDOWMOVE);
    setContextHelp(ui.hackWindowMove, "<b>Easy Window Draging</b><hr>\
                   Usually you'll have to hit the titlebar in order to drag around a window.<br>\
-                  This one allows you to drag the window by clicking the empty space in a menubar\
-                  or toolbars, docks, etc..");
+                  This one allows you to drag the window by clicking many empty spaces.<br>\
+                  Currently supported items:<br>\
+                  - Dialogs<br>\
+                  - Menubars<br>\
+                  - Toolbars (including disabled buttons)<br>\
+                  - Docks<br>\
+                  - Groupboxers<br>\
+                  - Mainwindows<br>\
+                  - Statusbars<br>\
+                  - SMPlayer/DragonPlayer Video areas<br>");
+
    handleSettings(ui.hackTreeViews, HACK_TREEVIEWS);
    setContextHelp(ui.hackTreeViews, "<b>Animate TreeViwes</b><hr>\
                   This is a plain vanilla Qt feature, but must be activated by developers for each\
                   treeview in order to be used - can be cute, can be annoying: choose by yourself<br>\
                   This way it's activated globally." );
-   
+
    /** setContextHelp(.) attaches a context help string to a widget on your form */
    setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
                   The default and the hovered color of a button.<br>\

@@ -502,18 +502,6 @@ Client::repaint(QPainter &p)
       }
    }
    }
-
-   // RESIZE indicator ======================================
-   if (isShade() || !(borderSize && isResizable())) return; // ...
-
-   p.setRenderHint( QPainter::Antialiasing );
-   const QColor handleColor = Colors::mid(color(ColorTitleBlend, isActive()), color(ColorButtonBg, isActive()));
-   QPen pen(handleColor, 2, Qt::CustomDashLine, Qt::FlatCap);
-   QVector<qreal> dashes; dashes << 1 << 1;
-   pen.setDashPattern(dashes);
-   p.setPen(pen);
-   QRect r(width()-16,height()-16,12,12);
-   p.drawArc(r, 270<<4, 90<<4);
 }
 
 void

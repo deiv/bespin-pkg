@@ -100,11 +100,6 @@
          </item>
          <item>
           <property name="text" >
-           <string>Modal Dialogs</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
            <string>Hacks</string>
           </property>
          </item>
@@ -187,7 +182,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>1</number>
+      <number>10</number>
      </property>
      <widget class="QWidget" name="Seite_3" >
       <property name="geometry" >
@@ -406,8 +401,8 @@
         <height>454</height>
        </rect>
       </property>
-      <layout class="QGridLayout" name="gridLayout_17" >
-       <item row="0" column="0" colspan="2" >
+      <layout class="QGridLayout" name="gridLayout_22" >
+       <item row="0" column="0" >
         <layout class="QHBoxLayout" >
          <item>
           <widget class="QLabel" name="label" >
@@ -451,7 +446,7 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="0" colspan="2" >
+       <item row="1" column="0" >
         <layout class="QHBoxLayout" >
          <item>
           <widget class="QLabel" name="labelStructure" >
@@ -505,7 +500,7 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="0" colspan="2" >
+       <item row="2" column="0" >
         <layout class="QHBoxLayout" >
          <item>
           <widget class="QLabel" name="label_35" >
@@ -561,7 +556,7 @@
          </item>
         </layout>
        </item>
-       <item row="3" column="0" colspan="2" >
+       <item row="3" column="0" >
         <layout class="QHBoxLayout" >
          <item>
           <widget class="QLabel" name="label_28" >
@@ -626,7 +621,7 @@
          </item>
         </layout>
        </item>
-       <item row="4" column="0" colspan="2" >
+       <item row="4" column="0" >
         <widget class="QCheckBox" name="fadeInactive" >
          <property name="text" >
           <string>Dim inactve window foreground</string>
@@ -634,159 +629,85 @@
         </widget>
        </item>
        <item row="5" column="0" >
-        <widget class="QLabel" name="label_17" >
-         <property name="font" >
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
+        <widget class="QGroupBox" name="groupBox_7" >
+         <property name="title" >
+          <string>Modal Dialogs</string>
          </property>
-         <property name="text" >
-          <string>Secret Echo</string>
-         </property>
-         <property name="alignment" >
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_17" >
+          <item row="0" column="0" >
+           <layout class="QHBoxLayout" name="_2" >
+            <item>
+             <widget class="QLabel" name="label_34" >
+              <property name="text" >
+               <string>Opacity</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="modalOpacity" >
+              <property name="minimum" >
+               <number>40</number>
+              </property>
+              <property name="maximum" >
+               <number>100</number>
+              </property>
+              <property name="singleStep" >
+               <number>10</number>
+              </property>
+              <property name="value" >
+               <number>80</number>
+              </property>
+              <property name="orientation" >
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_32" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text" >
+               <string>80</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_33" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text" >
+               <string>%</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QCheckBox" name="modalGlas" >
+            <property name="text" >
+             <string>Glas Look</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QCheckBox" name="modalInvert" >
+            <property name="text" >
+             <string>Invert Colors</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="5" column="1" >
-        <widget class="QComboBox" name="pwEchoChar" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="editable" >
-          <bool>true</bool>
-         </property>
-         <property name="frame" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" colspan="2" >
-        <widget class="QCheckBox" name="macStyle" >
-         <property name="font" >
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text" >
-          <string>Behave rather maccish</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0" colspan="2" >
-        <widget class="QCheckBox" name="leftHanded" >
-         <property name="font" >
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text" >
-          <string>I'm a Lefty!</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0" >
-          <size>
-           <width>20</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="Seite_4" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>579</width>
-        <height>457</height>
-       </rect>
-      </property>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <layout class="QHBoxLayout" >
-         <item>
-          <widget class="QLabel" name="label_34" >
-           <property name="text" >
-            <string>Opacity</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSlider" name="modalOpacity" >
-           <property name="minimum" >
-            <number>40</number>
-           </property>
-           <property name="maximum" >
-            <number>100</number>
-           </property>
-           <property name="singleStep" >
-            <number>10</number>
-           </property>
-           <property name="value" >
-            <number>80</number>
-           </property>
-           <property name="orientation" >
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_32" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text" >
-            <string>80</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_33" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text" >
-            <string>%</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QCheckBox" name="modalGlas" >
-         <property name="text" >
-          <string>Glas Look</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" >
-        <widget class="QCheckBox" name="modalInvert" >
-         <property name="text" >
-          <string>Invert Colors</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" >
+       <item row="6" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -806,8 +727,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>556</width>
-        <height>431</height>
+        <width>585</width>
+        <height>454</height>
        </rect>
       </property>
       <layout class="QGridLayout" >
@@ -1839,12 +1760,12 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>579</width>
-        <height>457</height>
+        <width>585</width>
+        <height>454</height>
        </rect>
       </property>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
+      <layout class="QGridLayout" name="gridLayout_23" >
+       <item row="0" column="0" colspan="2" >
         <layout class="QHBoxLayout" >
          <item>
           <widget class="QLabel" name="label_12" >
@@ -1875,6 +1796,64 @@
         </layout>
        </item>
        <item row="1" column="0" >
+        <widget class="QLabel" name="label_17" >
+         <property name="font" >
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text" >
+          <string>Secret Echo</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QComboBox" name="pwEchoChar" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="editable" >
+          <bool>true</bool>
+         </property>
+         <property name="frame" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2" >
+        <widget class="QCheckBox" name="macStyle" >
+         <property name="font" >
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text" >
+          <string>Behave rather maccish</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2" >
+        <widget class="QCheckBox" name="leftHanded" >
+         <property name="font" >
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text" >
+          <string>I'm a Lefty!</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -1894,8 +1873,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>579</width>
-        <height>457</height>
+        <width>585</width>
+        <height>454</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_15" >
@@ -2015,8 +1994,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>579</width>
-        <height>457</height>
+        <width>585</width>
+        <height>454</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" >
@@ -2044,7 +2023,7 @@
        <item row="3" column="0" >
         <widget class="QCheckBox" name="hackWindowMove" >
          <property name="text" >
-          <string>Allow Window dragging from Menubars &amp;&amp; Docks (X11 only)</string>
+          <string>Allow easy window dragging by clicking empty spaces (X11 only)</string>
          </property>
         </widget>
        </item>
@@ -2105,22 +2084,6 @@
     <hint type="destinationlabel" >
      <x>727</x>
      <y>177</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>modalOpacity</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>label_32</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>394</x>
-     <y>79</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>753</x>
-     <y>85</y>
     </hint>
    </hints>
   </connection>

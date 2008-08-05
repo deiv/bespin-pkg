@@ -392,8 +392,7 @@ BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy,
 }
 
 void
-BespinStyle::erase(const QStyleOption *option, QPainter *painter,
-                   const QWidget *widget) const
+BespinStyle::erase(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     const QWidget *grampa = widget;
     while (!(grampa->isWindow() ||
@@ -446,7 +445,8 @@ BespinStyle::setupDecoFor(const QWidget *w)
 #endif
 }
 
-static void swapPalette(QWidget *widget, BespinStyle *style)
+static void
+swapPalette(QWidget *widget, BespinStyle *style)
 {
    QPalette pal(widget->palette());
    QPalette::ColorGroup group = QPalette::Active;
@@ -471,93 +471,101 @@ static void swapPalette(QWidget *widget, BespinStyle *style)
    widget->setPalette(pal);
 }
 
-static QMenuBar *bar4popup(QMenu *menu) {
-   if (!menu->menuAction())
-      return 0;
-   if (menu->menuAction()->associatedWidgets().isEmpty())
-      return 0;
-   foreach (QWidget *w, menu->menuAction()->associatedWidgets())
-      if (qobject_cast<QMenuBar*>(w))
-         return static_cast<QMenuBar *>(w);
-   return 0;
+static QMenuBar*
+bar4popup(QMenu *menu)
+{
+    if (!menu->menuAction())
+        return NULL;
+    if (menu->menuAction()->associatedWidgets().isEmpty())
+        return NULL;
+    foreach (QWidget *w, menu->menuAction()->associatedWidgets())
+        if (qobject_cast<QMenuBar*>(w))
+            return static_cast<QMenuBar *>(w);
+    return NULL;
 }
 
 bool
 BespinStyle::eventFilter( QObject *object, QEvent *ev )
 {
-   switch (ev->type()) {
-   case QEvent::MouseMove:
-   case QEvent::Timer:
-   case QEvent::Move:
-      return false; // just for performance - they can occur really often
-   case QEvent::Paint: {
-      if (QFrame *frame = qobject_cast<QFrame*>(object)) {
-         if ((frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine) &&
-              frame->isVisible()) {
-            QPainter p(frame);
-            Orientation3D o3D =
-               (frame->frameShadow() == QFrame::Sunken) ? Sunken:
-               (frame->frameShadow() == QFrame::Raised) ? Raised : Relief;
-            const bool v = frame->frameShape() == QFrame::VLine;
-            shadows.line[v][o3D].render(frame->rect(), &p);
+    switch (ev->type())
+    {
+    case QEvent::MouseMove:
+    case QEvent::Timer:
+    case QEvent::Move:
+        return false; // just for performance - they can occur really often
+    case QEvent::Paint:
+        if (QFrame *frame = qobject_cast<QFrame*>(object))
+        {
+            if ((frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine) &&
+                 frame->isVisible())
+            {
+                QPainter p(frame);
+                Orientation3D o3D = (frame->frameShadow() == QFrame::Sunken) ? Sunken :
+                                    (frame->frameShadow() == QFrame::Raised) ? Raised : Relief;
+                const bool v = frame->frameShape() == QFrame::VLine;
+                shadows.line[v][o3D].render(frame->rect(), &p);
+                p.end();
+                return true;
+            }
+            return false;
+        }
+        else if (QTabBar *tabBar = qobject_cast<QTabBar*>(object))
+        {
+            if (tabBar->parentWidget() && qobject_cast<QTabWidget*>(tabBar->parentWidget()))
+                return false; // no extra tabbar here please... ;)
+            QPainter p(tabBar);
+            QStyleOptionTabBarBase opt;
+            opt.initFrom(tabBar);
+            if (QWidget *window = tabBar->window())
+            {
+                opt.tabBarRect = window->rect();
+                opt.tabBarRect.moveTopLeft(tabBar->mapFrom(window, opt.tabBarRect.topLeft()));
+            }
+            drawTabBar(&opt, &p, NULL);
             p.end();
-            return true;
-         }
-         return false;
-      }
-      else if (QTabBar *tabBar = qobject_cast<QTabBar*>(object)) {
-         if (tabBar->parentWidget() &&
-             qobject_cast<QTabWidget*>(tabBar->parentWidget()))
-            return false; // no extra tabbar here please... ;)
-         QPainter p(tabBar);
-         QStyleOptionTabBarBase opt;
-         opt.initFrom(tabBar);
-         if (QWidget *window = tabBar->window()) {
-            opt.tabBarRect = window->rect();
-            opt.tabBarRect.moveTopLeft(tabBar->mapFrom(window, opt.tabBarRect.topLeft()));
-         }
-         drawTabBar(&opt, &p, 0L);
-         p.end();
-         return false;
-      }
-      return false;
-   }
+            return false;
+        }
+        return false;
 
-   case QEvent::Resize: {
-      if (QMenu *menu = qobject_cast<QMenu*>(object)) {
-         if (!menu->isWindow()) return false;
+    case QEvent::Resize:
+        if (QMenu *menu = qobject_cast<QMenu*>(object))
+        {
+            if (!menu->isWindow())
+                return false;
 #if 0
-         QAction *head = menu->actions().at(0);
-         QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
-         Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
-         head->iconText());
-         r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
-         QResizeEvent *rev = (QResizeEvent*)ev;
-         QRegion mask(menu->rect());
-         mask -= QRect(0,0,menu->width(),r.bottom());
-         mask += r;
-         mask -= masks.corner[0]; // tl
-         QRect br = masks.corner[1].boundingRect();
-         mask -= masks.corner[1].translated(r.right()-br.width(), 0); // tr
-         br = masks.corner[2].boundingRect();
-         mask -= masks.corner[2].translated(0, menu->height()-br.height()); // bl
-         br = masks.corner[3].boundingRect();
-         mask -= masks.corner[3].translated(menu->width()-br.width(),
-                                            menu->height()-br.height()); // br
+            QAction *head = menu->actions().at(0);
+            QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
+            Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
+            head->iconText());
+            r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
+            QResizeEvent *rev = (QResizeEvent*)ev;
+            QRegion mask(menu->rect());
+            mask -= QRect(0,0,menu->width(),r.bottom());
+            mask += r;
+            mask -= masks.corner[0]; // tl
+            QRect br = masks.corner[1].boundingRect();
+            mask -= masks.corner[1].translated(r.right()-br.width(), 0); // tr
+            br = masks.corner[2].boundingRect();
+            mask -= masks.corner[2].translated(0, menu->height()-br.height()); // bl
+            br = masks.corner[3].boundingRect();
+            mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
 #endif
-         const int w = menu->width();
-         const int h = menu->height();
+            const int w = menu->width();
+            const int h = menu->height();
+            QRegion mask(4, 0, w-8, h);
+            mask += QRegion(0, 4, w, h-8);
+            mask += QRegion(2, 1, w-4, h-2);
+            mask += QRegion(1, 2, w-2, h-4);
 
-         QRegion mask(4, 0, w-8, h);
-         mask += QRegion(0, 4, w, h-8);
-         mask += QRegion(2, 1, w-4, h-2);
-         mask += QRegion(1, 2, w-2, h-4);
+//          QRegion mask(0, 0, w, h-4);
+//          mask += QRect(1, h-4, w-2, 2);
+//          mask += QRect(2, h-2, w-4, 1);
+//          mask += QRect(4, h-1, w-8, 1);
 
-         menu->setMask(mask);
-         return false;
-      }
-      return false;
-   }
+            menu->setMask(mask);
+            return false;
+        }
+        return false;
 
 //    case QEvent::MouseButtonRelease:
 //    case QEvent::MouseButtonPress:
@@ -574,30 +582,36 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
 //       }
 //       return false;
 #ifdef MOUSEDEBUG
-   case QEvent::MouseButtonPress: {
-      QMouseEvent *mev = (QMouseEvent*)ev;
-      qDebug() << "BESPIN:" << object;
+    case QEvent::MouseButtonPress:
+    {
+        QMouseEvent *mev = (QMouseEvent*)ev;
+        qDebug() << "BESPIN:" << object;
 //       DEBUG (object);
-      return false;
-   }
+        return false;
+    }
 #endif
-   case QEvent::Show:
-      if (QWidget * widget = qobject_cast<QWidget*>(object)) {
-         if (widget->isModal()) {
+    case QEvent::Show:
+    {
+        QWidget * widget = qobject_cast<QWidget*>(object);
+        if (!widget)
+            return false;
+        
+        if (widget->isModal())
+        {
             if (config.bg.modal.invert) swapPalette(widget, this);
             const QPalette &pal = widget->palette();
             BGMode bgMode = config.bg.mode;
             QColor bg = FCOLOR(Window);
             int gt[2] = { GRAD(kwin)[0], GRAD(kwin)[1] };
-            if (config.bg.modal.glassy) {
-               widget->setAttribute(Qt::WA_MacBrushedMetal);
-               bgMode = Plain;
-               bg = bg.light(115-Colors::value(bg)/20);
-               gt[0] = gt[1] = 0;
+            if (config.bg.modal.glassy)
+            {
+                widget->setAttribute(Qt::WA_MacBrushedMetal);
+                bgMode = Plain;
+                bg = bg.light(115-Colors::value(bg)/20);
+                gt[0] = gt[1] = 0;
             }
-            else {
-               widget->setAttribute(Qt::WA_MacBrushedMetal, false);
-            }
+            else
+                widget->setAttribute(Qt::WA_MacBrushedMetal, false);
 #ifdef Q_WS_X11
             int info = XProperty::encode(bg, FCOLOR(WindowText), bgMode);
             XProperty::set(widget->winId(), XProperty::bgInfo, info);
@@ -608,60 +622,69 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
 #endif
             widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
             return false;
-         }
-         if (QMenu * menu = qobject_cast<QMenu*>(widget)) {
-            if (menu->parentWidget() &&
-               menu->parentWidget()->inherits("QMdiSubWindow")) {
-               QPoint pt = menu->parentWidget()->rect().topRight();
-               pt += QPoint(-menu->width(), pixelMetric(PM_TitleBarHeight,0,0));
-               pt = menu->parentWidget()->mapToGlobal(pt);
-               menu->move(pt);
+        }
+        if (QMenu * menu = qobject_cast<QMenu*>(widget))
+        {
+            if (menu->parentWidget() && menu->parentWidget()->inherits("QMdiSubWindow"))
+            {
+                QPoint pt = menu->parentWidget()->rect().topRight();
+                pt += QPoint(-menu->width(), pixelMetric(PM_TitleBarHeight,0,0));
+                pt = menu->parentWidget()->mapToGlobal(pt);
+                menu->move(pt);
             }
             QMenuBar *bar = bar4popup(menu);
             if (bar)
-               menu->move(menu->pos()-QPoint(0,dpi.f2));
 #if 0
-            QMenuBar *bar = bar4popup(menu);
-            if (bar) {
-               QPoint pos(dpi.f1, 0);
-               pos += bar->actionGeometry(menu->menuAction()).topLeft();
-               menu->move(bar->mapToGlobal(pos));
-               menu->setActiveAction(menu->actions().at(0));
+            {
+                QPoint pos(dpi.f1, 0);
+                pos += bar->actionGeometry(menu->menuAction()).topLeft();
+                menu->move(bar->mapToGlobal(pos));
+                menu->setActiveAction(menu->actions().at(0));
             }
-            return false;
+#else
+            menu->move(menu->pos()-QPoint(0,dpi.f2));
 #endif
-         }
-         return false;
-      }
-   case QEvent::Hide:
-      if (QWidget * widget = qobject_cast<QWidget*>(object))
-      if (widget->isModal())
-      if (config.bg.modal.invert) swapPalette(widget, this);
-      return false;
-   case QEvent::PaletteChange:
+            return false;
+        }
+        return false;
+    }
+    case QEvent::Hide:
+        if (config.bg.modal.invert)
+        if (QWidget * widget = qobject_cast<QWidget*>(object))
+        if (widget->isModal())
+            swapPalette(widget, this);
+        return false;
+        
+    case QEvent::PaletteChange:
+    {
 #define LACK_CONTRAST(_C_) Colors::contrast(pal.color(QPalette::Active, QPalette::_C_), pal.color(QPalette::Active, QPalette::_C_##Text)) < 40
 #define HARD_CONTRAST(_C_) Colors::value(pal.color(QPalette::Active, QPalette::_C_)) < 128 ? Qt::white : Qt::black
-      if (QWidget * widget = qobject_cast<QWidget*>(object))
-      if (widget->objectName() == "RenderFormElementWidget") {
-         widget->removeEventFilter(this);
-         QPalette pal = widget->palette();
-         if (LACK_CONTRAST(Window))
-            pal.setColor(QPalette::WindowText, HARD_CONTRAST(Window));
-         if (LACK_CONTRAST(Button))
-            pal.setColor(QPalette::ButtonText, HARD_CONTRAST(Button));
-         if (Colors::contrast(pal.color(QPalette::Active, QPalette::Highlight),
-                              pal.color(QPalette::Active, QPalette::HighlightedText)) < 40)
-            pal.setColor(QPalette::HighlightedText, HARD_CONTRAST(Highlight));
-         if (Colors::contrast(pal.color(QPalette::Active, QPalette::Base),
-                              pal.color(QPalette::Active, QPalette::Text)) < 40)
-            pal.setColor(QPalette::Text, HARD_CONTRAST(Base));
-         widget->setPalette(pal);
-         widget->installEventFilter(this);
-      }
-      return false;
-   default:
-      return false;
-   }
+        QWidget * widget = qobject_cast<QWidget*>(object);
+        if (!widget)
+            return false;
+        
+        if (widget->objectName() == "RenderFormElementWidget")
+        {
+            widget->removeEventFilter(this);
+            QPalette pal = widget->palette();
+            if (LACK_CONTRAST(Window))
+                pal.setColor(QPalette::WindowText, HARD_CONTRAST(Window));
+            if (LACK_CONTRAST(Button))
+                pal.setColor(QPalette::ButtonText, HARD_CONTRAST(Button));
+            if (Colors::contrast(pal.color(QPalette::Active, QPalette::Highlight),
+                                 pal.color(QPalette::Active, QPalette::HighlightedText)) < 40)
+                pal.setColor(QPalette::HighlightedText, HARD_CONTRAST(Highlight));
+            if (Colors::contrast(pal.color(QPalette::Active, QPalette::Base),
+                                 pal.color(QPalette::Active, QPalette::Text)) < 40)
+                pal.setColor(QPalette::Text, HARD_CONTRAST(Base));
+            widget->setPalette(pal);
+            widget->installEventFilter(this);
+        }
+        return false;
+    }
+    default:
+        return false;
+    }
 }
 
 

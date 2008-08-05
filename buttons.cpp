@@ -345,35 +345,38 @@ void
 BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
-   OPT_ENABLED OPT_SUNKEN OPT_HOVER;
+    OPT_ENABLED OPT_SUNKEN OPT_HOVER;
 
-   QStyleOption copy = *option;
-   if (config.btn.layer == 1)
-      copy.rect.adjust(0,dpi.f1,0,-dpi.f1); // get rect appereance again
-   else if (config.btn.layer == 0)
-      copy.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0); // get rect appereance again
-   isCheckbox = true;
-   drawButtonFrame(&copy, painter, widget);
-   isCheckbox = false;
-   
-   if (!(sunken || (option->state & State_Off))) {
-      painter->save();
-      if (config.btn.backLightHover) {
-         hover = 0; animStep = 0;
-      }
-      const QPoint center = copy.rect.center() - QPoint(0,dpi.f1);
-      painter->setBrush(btnFg(PAL, isEnabled, hover, animStep));
-      const int d = dpi.f5 - (bool(config.btn.checkType) + config.btn.layer) * dpi.f1;
-      copy.rect.adjust(d, d, -d, -d);
-      if (copy.rect.width() > copy.rect.height())
-         copy.rect.setWidth(copy.rect.height());
-      else
-         copy.rect.setHeight(copy.rect.width());
-      copy.rect.moveCenter(center);
-      drawCheckMark(&copy, painter, config.btn.checkType);
-      painter->restore();
-   }
-   animStep = -1;
+    // the button -----------------
+    QStyleOption copy = *option;
+    if (config.btn.layer == 1)
+        copy.rect.adjust(0,dpi.f1,0,-dpi.f1); // get rect appereance again
+    else if (config.btn.layer == 0)
+        copy.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0); // get rect appereance again
+    isCheckbox = true;
+    drawButtonFrame(&copy, painter, widget);
+    isCheckbox = false;
+
+    if (!(sunken || (option->state & State_Off)))
+    {   // the checkmark -----------------
+        painter->save();
+        if (config.btn.backLightHover)
+        {
+            hover = 0; animStep = 0;
+        }
+        const QPoint center = copy.rect.center() - QPoint(0,dpi.f1);
+        painter->setBrush(btnFg(PAL, isEnabled, hover, animStep));
+        const int d = dpi.f5 - (bool(config.btn.checkType) + config.btn.layer) * dpi.f1;
+        copy.rect.adjust(d, d, -d, -d);
+        if (copy.rect.width() > copy.rect.height())
+            copy.rect.setWidth(copy.rect.height());
+        else
+            copy.rect.setHeight(copy.rect.width());
+        copy.rect.moveCenter(center);
+        drawCheckMark(&copy, painter, config.btn.checkType);
+        painter->restore();
+    }
+    animStep = -1;
 }
 
 void

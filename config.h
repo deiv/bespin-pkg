@@ -49,7 +49,7 @@ typedef struct Config {
    bool fadeInactive;
 
    struct hack {
-      bool messages, KHTMLView, treeViews, sizeGrips, windowMovement, krunner;
+      bool messages, KHTMLView, treeViews, windowMovement, krunner;
    } hack;
    
    struct input {

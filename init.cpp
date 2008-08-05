@@ -182,7 +182,6 @@ BespinStyle::readSettings(const QSettings* settings)
    config.hack.messages = readBool(HACK_MESSAGES);
    config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
    config.hack.krunner= readBool(HACK_KRUNNER);
-   config.hack.sizeGrips = readBool(HACK_SIZEGRIPS);
    config.hack.treeViews = readBool(HACK_TREEVIEWS);
    config.hack.windowMovement = readBool(HACK_WINDOWMOVE);
    
