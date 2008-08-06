@@ -186,7 +186,7 @@ isWindowDragWidget(QObject *o)
         (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled()) ||
         o->inherits("QToolBar") ||
         o->inherits("QDockWidget") ||
-        o->inherits("QMainWindow") || // this is mostly useles...
+//         o->inherits("QMainWindow") || // this is mostly useles... PLUS triggers problems
 
         (*isSMPlayer && o->inherits(SMPlayerVideoWidget)) ||
         (*isDragon && o->inherits(DragonVideoWidget)) ||
@@ -214,7 +214,6 @@ hackMoveWindow(QWidget* w, QEvent *e)
 //     QMouseEvent rel(QEvent::MouseButtonRelease, mev->pos(), mev->button(),
 //                     mev->buttons(), mev->modifiers());
 //     QCoreApplication::sendEvent( w, &rel );
-    
     triggerWMMove(w, mev->globalPos());
 //     w->setWindowState ( w->windowState() | Qt::WindowActive );
     return true;

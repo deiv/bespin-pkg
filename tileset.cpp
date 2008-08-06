@@ -193,7 +193,7 @@ void Set::render(const QRect &r, QPainter *p) const
 {
 
 #ifndef QT_NO_XRENDER
-#define ADJUST_ALPHA(_PIX_) filledPix = OXRender::applyAlpha(filledPix, _PIX_); XFlush (QX11Info::display())
+#define ADJUST_ALPHA(_PIX_) filledPix = OXRender::applyAlpha(filledPix, _PIX_)
 #else
 #warning no XRender - performance will suffer!
 #define ADJUST_ALPHA(_PIX_) filledPix.setAlphaChannel(_PIX_)

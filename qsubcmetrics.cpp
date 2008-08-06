@@ -294,7 +294,7 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
           qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
          int mbi = pixelMetric(PM_MenuButtonIndicator, tb, widget);
          int fw = pixelMetric(PM_DefaultFrameWidth, tb, widget);
-         QRect ret = tb->rect.adjusted(fw,fw,-fw,0);
+         ret = tb->rect.adjusted(fw,fw,-fw,0);
          switch (subControl) {
          case SC_ToolButton:
             if ((tb->features
