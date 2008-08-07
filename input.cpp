@@ -40,44 +40,53 @@ BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
 
-   // spinboxes and combos allready have a lineedit as global frame
-   // TODO: exclude Q3Combo??
-   if (qstyleoption_cast<const QStyleOptionFrame *>(option) &&
-       static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1) {
-      if (widget && widget->parentWidget() &&
-          ( qobject_cast<QComboBox*>(widget->parentWidget()) ||
-            widget->parentWidget()->inherits("QAbstractSpinBox")))
-         return;
-      painter->fillRect(RECT, FCOLOR(Base));
-      return;
-   }
+    // spinboxes and combos allready have a lineedit as global frame
+    // TODO: exclude Q3Combo??
+    if (qstyleoption_cast<const QStyleOptionFrame *>(option) &&
+        static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1)
+    {
+        if (widget && widget->parentWidget() &&
+            ( qobject_cast<QComboBox*>(widget->parentWidget()) ||
+                widget->parentWidget()->inherits("QAbstractSpinBox")))
+            return;
+        painter->fillRect(RECT, FCOLOR(Base));
+        return;
+    }
 
-   OPT_ENABLED OPT_FOCUS
-      
-   isEnabled = isEnabled && !(option->state & State_ReadOnly);
-   QRect r = RECT;
-   if (isEnabled) {
-      const Tile::Set &mask = masks.rect[false];
-      if (hasFocus) {
-         r.adjust(0,0,0,-dpi.f2);
-         mask.render(r, painter, FCOLOR(Base).light(112));
-         r.setBottom(r.bottom()+dpi.f1);
-         QColor h = FCOLOR(Highlight); h.setAlpha(102);
-//          Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
-         mask.outline(r, painter, h, dpi.f3);
-      }
-      else {
-         r.setBottom(r.y()+r.height()/2);
-         Tile::setShape(Tile::Full & ~Tile::Bottom);
-         mask.render(r, painter, Gradients::Sunken,
-                             Qt::Vertical, FCOLOR(Base));
-         r.setTop(r.bottom()+1); r.setBottom(RECT.bottom()-dpi.f2);
-         Tile::setShape(Tile::Full & ~Tile::Top);
-         mask.render(r, painter, FCOLOR(Base).light(112));
-         Tile::reset();
-      }
-   }
-   shadows.sunken[false][isEnabled].render(RECT, painter);
+    OPT_ENABLED OPT_FOCUS
+
+    isEnabled = isEnabled && !(option->state & State_ReadOnly);
+    QRect r = RECT;
+    if (isEnabled)
+    {
+        const Tile::Set &mask = masks.rect[false];
+        if (hasFocus)
+        {
+            r.adjust(0,0,0,-dpi.f2);
+            mask.render(r, painter, FCOLOR(Base).light(112));
+            r.setBottom(r.bottom()+dpi.f1);
+            QColor h = FCOLOR(Highlight); h.setAlpha(102);
+    //          Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
+            mask.outline(r, painter, h, dpi.f3);
+        }
+        else
+        {
+            r.setBottom(r.y()+r.height()/2);
+            Tile::setShape(Tile::Full & ~Tile::Bottom);
+            mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
+            r.setTop(r.bottom()+1); r.setBottom(RECT.bottom()-dpi.f2);
+            Tile::setShape(Tile::Full & ~Tile::Top);
+            QColor bg = FCOLOR(Base);
+            int v = Colors::value(bg);
+            if (v < 80)
+            {
+                int h,s; bg.getHsv(&h, &s, &v); bg.setHsv(h,s,80);
+            }
+            mask.render(r, painter, bg.light(110));
+            Tile::reset();
+        }
+    }
+    shadows.sunken[false][isEnabled].render(RECT, painter);
 }
 
 void

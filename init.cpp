@@ -63,6 +63,7 @@ void BespinStyle::fixKdePalette()
 {
     if (originalPalette)
     {
+        polish(*originalPalette);
         qApp->setPalette(*originalPalette);
         delete originalPalette;
         originalPalette = 0;
