@@ -625,6 +625,10 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
         }
         if (QMenu * menu = qobject_cast<QMenu*>(widget))
         {
+            // seems to be necessary, somehow KToolBar context menus manages to take QPalette::Window...?!
+            // through title setting?!
+            menu->setBackgroundRole ( config.menu.std_role[Bg] );
+            menu->setForegroundRole ( config.menu.std_role[Fg] );
             if (menu->parentWidget() && menu->parentWidget()->inherits("QMdiSubWindow"))
             {
                 QPoint pt = menu->parentWidget()->rect().topRight();

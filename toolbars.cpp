@@ -155,102 +155,102 @@ icon(QPixmap &pix, int step)
 
 void
 BespinStyle::drawToolButtonLabel(const QStyleOption * option,
-                                 QPainter * painter, const QWidget *) const
+                                 QPainter * painter, const QWidget *widget) const
 {
-   const QStyleOptionToolButton *toolbutton
-      = qstyleoption_cast<const QStyleOptionToolButton *>(option);
-   if (!toolbutton) return;
-   OPT_ENABLED
+    ASSURE_OPTION(toolbutton, ToolButton);
+    OPT_ENABLED OPT_SUNKEN
 
-   // Arrow type always overrules and is always shown
-   const bool hasArrow = toolbutton->features & QStyleOptionToolButton::Arrow;
-   const bool justText = (!hasArrow && toolbutton->icon.isNull()) &&
-                         !toolbutton->text.isEmpty() ||
-                         toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
+    // Arrow type always overrules and is always shown
+    const bool hasArrow = toolbutton->features & QStyleOptionToolButton::Arrow;
+    const bool justText = (!hasArrow && toolbutton->icon.isNull()) &&
+                            !toolbutton->text.isEmpty() ||
+                            toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
 
-   OPT_SUNKEN
-      
-   if (justText) { // the most simple way
-      painter->setPen(Colors::mid(FCOLOR(WindowText), FCOLOR(Highlight), 6-step, step));
-      QFont fnt = toolbutton->font;
-      if (sunken) fnt.setBold(true);
-      painter->setFont(fnt);
-      drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, toolbutton->text);
-      return;
-   }
+    QPalette::ColorRole role = widget ? widget->foregroundRole() : QPalette::WindowText;
+    if (justText)
+    {   // the most simple way
+        painter->setPen(Colors::mid(PAL.color(role), FCOLOR(Highlight), 6-step, step));
+        QFont fnt = toolbutton->font;
+        if (sunken) fnt.setBold(true);
+        painter->setFont(fnt);
+        drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, toolbutton->text);
+        return;
+    }
 
 //    OPT_HOVER
       
-   QPixmap pm;
-   QSize pmSize = RECT.size() - QSize(dpi.f4, dpi.f4);
-   pmSize = pmSize.boundedTo(toolbutton->iconSize);
+    QPixmap pm;
+    QSize pmSize = RECT.size() - QSize(dpi.f4, dpi.f4);
+    pmSize = pmSize.boundedTo(toolbutton->iconSize);
 
-   if (!toolbutton->icon.isNull()) {
-      const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
-      QIcon::Mode mode;
-      if (!isEnabled)
-         mode = QIcon::Disabled;
+    if (!toolbutton->icon.isNull()) {
+        const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
+        QIcon::Mode mode;
+        if (!isEnabled)
+            mode = QIcon::Disabled;
 //       else if (hover && (option->state & State_AutoRaise))
 //          mode = QIcon::Active; // gamma thing looks dumb and i cannot turn it off in kde...
-      else
-         mode = QIcon::Normal;
+        else
+            mode = QIcon::Normal;
 
-      pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), mode, state);
-		if (step && !sunken && !pm.isNull())
+        pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), mode, state);
+        if (step && !sunken && !pm.isNull())
 #ifndef QT_NO_XRENDER
-         pm = icon(pm, step);
+            pm = icon(pm, step);
 #else
-         pm = icon(pm, hover);
+            pm = icon(pm, hover);
 #endif
-      pmSize = pm.size();
+        pmSize = pm.size();
    }
 
-   if (!(toolbutton->text.isEmpty() ||
-         toolbutton->toolButtonStyle == Qt::ToolButtonIconOnly)) {
-      QColor c = FCOLOR(WindowText);
-      if (pm.isNull())
-         c = Colors::mid(c, FCOLOR(Highlight), 6-step, step);
-      painter->setPen(c);
+    if (!(toolbutton->text.isEmpty() || toolbutton->toolButtonStyle == Qt::ToolButtonIconOnly))
+    {
+        QColor c = PAL.color(role);
+        if (pm.isNull())
+            c = Colors::mid(c, FCOLOR(Highlight), 6-step, step);
+        painter->setPen(c);
             
 //       QFont fnt = toolbutton->font;
 //       if (hover) fnt.setUnderline(true);
-      painter->setFont(toolbutton->font);
-      
-      QRect pr = RECT, tr = RECT;
-      int alignment = BESPIN_MNEMONIC;
+        painter->setFont(toolbutton->font);
 
-      if (toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon) {
-         int fh = painter->fontMetrics().height();
-         pr.adjust(0, 0, 0, -fh - dpi.f2);
-         tr.adjust(0, pr.bottom(), 0, -dpi.f3);
-         if (!hasArrow)
-            drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
-         else
-            drawSolidArrow(Navi::S, pr, painter);
-         alignment |= Qt::AlignCenter;
-      }
-      else {
-         pr.setWidth(toolbutton->iconSize.width() + dpi.f4);
-         
-         if (!hasArrow)
-            drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
-         else
-            drawSolidArrow(Navi::S, pr, painter);
+        QRect pr = RECT, tr = RECT;
+        int alignment = BESPIN_MNEMONIC;
 
-         tr.adjust(pr.width() + dpi.f4, 0, 0, 0);
-         alignment |= Qt::AlignLeft | Qt::AlignVCenter;
-      }
-      drawItemText(painter, tr, alignment, PAL, isEnabled, toolbutton->text);
-      return;
-   }
+        if (toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon)
+        {
+            int fh = painter->fontMetrics().height();
+            pr.adjust(0, 0, 0, -fh - dpi.f2);
+            tr.adjust(0, pr.bottom(), 0, -dpi.f3);
+            if (!hasArrow)
+                drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
+            else
+                drawSolidArrow(Navi::S, pr, painter);
+            alignment |= Qt::AlignCenter;
+        }
+        else
+        {
+            pr.setWidth(toolbutton->iconSize.width() + F(4));
 
-   if (hasArrow) {
-      const int f5 = dpi.f5;
-      drawSolidArrow(Navi::Direction(toolbutton->arrowType),
-                     RECT.adjusted(f5,f5,-f5,-f5), painter);
-   }
-   else
-      drawItemPixmap(painter, RECT, Qt::AlignCenter, pm);
+            if (!hasArrow)
+                drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
+            else
+                drawSolidArrow(Navi::S, pr, painter);
+
+            tr.adjust(pr.width() + F(4), 0, 0, 0);
+            alignment |= Qt::AlignLeft | Qt::AlignVCenter;
+        }
+        drawItemText(painter, tr, alignment, PAL, isEnabled, toolbutton->text);
+        return;
+    }
+
+    if (hasArrow)
+    {
+        const int f5 = F(5);
+        drawSolidArrow(Navi::Direction(toolbutton->arrowType), RECT.adjusted(f5,f5,-f5,-f5), painter);
+    }
+    else
+        drawItemPixmap(painter, RECT, Qt::AlignCenter, pm);
 }
 
 void

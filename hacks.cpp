@@ -199,16 +199,22 @@ isWindowDragWidget(QObject *o)
 static bool
 hackMoveWindow(QWidget* w, QEvent *e)
 {
+    // general validity ================================
     QMouseEvent *mev = static_cast<QMouseEvent*>(e);
-    if (mev->button() != Qt::LeftButton)
+    if ( w->mouseGrabber() || // someone else is more interested in this
+        (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
+        (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
+//         !w->rect().contains(w->mapFromGlobal(QCursor::pos()))) // KColorChooser etc., catched by mouseGrabber ?!
         return false;
 
+    // avoid if we click a menu action ========================================
     if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
     if (bar->activeAction())
         return false;
 
-    // preserve dock / toolbar internal move float trigger on dock titles...
-    if (w->cursor().shape() != Qt::ArrowCursor || (mev->pos().y() < 12 && w->inherits("QDockWidget")))
+    // preserve dock / toolbar internal move float trigger on dock titles =================
+    if (w->cursor().shape() != Qt::ArrowCursor ||
+        (mev->pos().y() < 12 && w->inherits("QDockWidget")))
         return false;
 
 //     QMouseEvent rel(QEvent::MouseButtonRelease, mev->pos(), mev->button(),

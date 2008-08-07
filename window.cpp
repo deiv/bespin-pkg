@@ -46,101 +46,103 @@ void
 BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
-   // cause of scrollbars - kinda optimization
-   if (config.bg.mode < BevelV) return;
-   
+    // cause of scrollbars - kinda optimization
+    if (config.bg.mode < BevelV) return;
 
-   if (!(widget && widget->isWindow()))
-      return; // can't do anything here
-   if (PAL.brush(widget->backgroundRole()).style() > 1)
-      return; // we'd cover a gradient/pixmap/whatever
 
-   // glassy Modal dialog/Popup menu ==========
-   const QColor &c = PAL.color(widget->backgroundRole());
-   if (widget->testAttribute(Qt::WA_MacBrushedMetal)) { // we just kinda abuse this mac only attribute... ;P
-      if (widget->size() != glasSize) {
-         const QRect &wr = widget->rect();
-         glasSize = widget->size();
-         glasPath = QPainterPath();
-         glasPath.moveTo(wr.topLeft());
-         glasPath.lineTo(wr.topRight());
-         glasPath.quadTo(wr.center()/2, wr.bottomLeft());
-      }
-      painter->save();
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(c.light(115-Colors::value(c)/20));
-      painter->translate(RECT.topLeft());
-      painter->drawPath(glasPath);
-      painter->restore();
-      return;
-   }
-   // ===================
-   const BgSet &set = Gradients::bgSet(c); QRect rect = RECT;
+    if (!(widget && widget->isWindow()))
+        return; // can't do anything here
+    if (PAL.brush(widget->backgroundRole()).style() > 1)
+        return; // we'd cover a gradient/pixmap/whatever
+
+    // glassy Modal dialog/Popup menu ==========
+    const QColor &c = PAL.color(widget->backgroundRole());
+    if (widget->testAttribute(Qt::WA_MacBrushedMetal))
+    {   // we just kinda abuse this mac only attribute... ;P
+        if (widget->size() != glasSize)
+        {
+            const QRect &wr = widget->rect();
+            glasSize = widget->size();
+            glasPath = QPainterPath();
+            glasPath.moveTo(wr.topLeft());
+            glasPath.lineTo(wr.topRight());
+            glasPath.quadTo(wr.center()/2, wr.bottomLeft());
+        }
+        painter->save();
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(c.light(115-Colors::value(c)/20));
+        painter->translate(RECT.topLeft());
+        painter->drawPath(glasPath);
+        painter->restore();
+        return;
+    }
+    // ===================
+    const BgSet &set = Gradients::bgSet(c); QRect rect = RECT;
 
 #ifndef QT_NO_XRENDER
-   uint decoDim = 0;
-   XProperty::get(widget->winId(), XProperty::decoDim, decoDim);
-   if (decoDim) {
-      Qt::HANDLE picture = set.topTile.x11PictureHandle();
-      XProperty::set(widget->winId(), XProperty::topTile, picture);
-      picture = set.btmTile.x11PictureHandle();
-      XProperty::set(widget->winId(), XProperty::btmTile, picture);
-      picture = set.cornerTile.x11PictureHandle();
-      XProperty::set(widget->winId(), XProperty::cnrTile, picture);
-      picture = set.lCorner.x11PictureHandle();
-      XProperty::set(widget->winId(), XProperty::lCorner, picture);
-      picture = set.rCorner.x11PictureHandle();
-      XProperty::set(widget->winId(), XProperty::rCorner, picture);
-      rect.adjust(-((decoDim >> 24) & 0xff), -((decoDim >> 16) & 0xff), (decoDim >> 8) & 0xff, decoDim & 0xff);
-   }
+    uint decoDim = 0;
+    XProperty::get(widget->winId(), XProperty::decoDim, decoDim);
+    if (decoDim)
+    {
+        Qt::HANDLE picture = set.topTile.x11PictureHandle();
+        XProperty::set(widget->winId(), XProperty::topTile, picture);
+        picture = set.btmTile.x11PictureHandle();
+        XProperty::set(widget->winId(), XProperty::btmTile, picture);
+        picture = set.cornerTile.x11PictureHandle();
+        XProperty::set(widget->winId(), XProperty::cnrTile, picture);
+        picture = set.lCorner.x11PictureHandle();
+        XProperty::set(widget->winId(), XProperty::lCorner, picture);
+        picture = set.rCorner.x11PictureHandle();
+        XProperty::set(widget->winId(), XProperty::rCorner, picture);
+        rect.adjust(-((decoDim >> 24) & 0xff), -((decoDim >> 16) & 0xff), (decoDim >> 8) & 0xff, decoDim & 0xff);
+    }
 #endif
 
-   switch (config.bg.mode) {
-   case BevelV: { // also fallback for ComplexLights
-      int s1 = set.topTile.height();
-      int s2 = qMin(s1, (rect.height()+1)/2);
-      s1 -= s2;
-      painter->drawTiledPixmap( rect.x(), rect.y(), rect.width(), s2,
-                                set.topTile, 0, s1 );
-      if (Colors::value(c) < 245) { // no sense otherwise
-         const int w = rect.width()/4 - 128;
-         if (w > 0) {
-            s2 = 128-s1;
-            painter->drawTiledPixmap( rect.x(), rect.y(), w, s2,
-                                      set.cornerTile, 0, s1 );
-            painter->drawTiledPixmap( rect.right()+1-w, rect.y(), w, s2,
-                                      set.cornerTile, 0, s1 );
-         }
-         painter->drawPixmap(rect.x()+w, rect.y(), set.lCorner, 0, s1, 128, s2);
-         painter->drawPixmap(rect.right()-w-127, rect.y(), set.rCorner, 0, s1, 128, s2);
-      }
-      s1 = set.btmTile.height();
-      s2 = qMin(s1, (rect.height())/2);
-      painter->drawTiledPixmap( rect.x(), rect.bottom() - s2,
-                                rect.width(), s2, set.btmTile );
-      break;
-   }
-   case BevelH: {
-      int s1 = set.topTile.width();
-      int s2 = qMin(s1, (rect.width()+1)/2);
-      const int h = qMin(128+32, rect.height()/8);
-      const int y = rect.y()+h;
-      painter->drawTiledPixmap( rect.x(), y, s2, rect.height()-h,
-                                set.topTile, s1-s2, 0 );
-      painter->drawPixmap(rect.x(), y-32, set.lCorner, s1-s2, 0,0,0);
-      s1 = set.btmTile.width();
-      s2 = qMin(s1, (rect.width())/2);
-      painter->drawTiledPixmap( rect.right() - s2, y , s2, rect.height()-h,
-                                set.btmTile );
-      painter->drawPixmap(rect.right() - s2, y-32, set.rCorner);
-      painter->drawTiledPixmap( rect.x(), y-(128+32), rect.width(), 128, set.cornerTile );
-      break;
-   }
+    switch (config.bg.mode)
+    {
+    case BevelV:
+    {   // also fallback for ComplexLights
+        int s1 = set.topTile.height();
+        int s2 = qMin(s1, (rect.height()+1)/2);
+        s1 -= s2;
+        painter->drawTiledPixmap( rect.x(), rect.y(), rect.width(), s2, set.topTile, 0, s1 );
+        if (Colors::value(c) < 245)
+        {   // no sense otherwise
+            const int w = rect.width()/4 - 128;
+            if (w > 0)
+            {
+                s2 = 128-s1;
+                painter->drawTiledPixmap( rect.x(), rect.y(), w, s2, set.cornerTile, 0, s1 );
+                painter->drawTiledPixmap( rect.right()+1-w, rect.y(), w, s2, set.cornerTile, 0, s1 );
+            }
+            painter->drawPixmap(rect.x()+w, rect.y(), set.lCorner, 0, s1, 128, s2);
+            painter->drawPixmap(rect.right()-w-127, rect.y(), set.rCorner, 0, s1, 128, s2);
+        }
+        s1 = set.btmTile.height();
+        s2 = qMin(s1, (rect.height())/2);
+        painter->drawTiledPixmap( rect.x(), rect.bottom() - s2, rect.width(), s2, set.btmTile );
+        break;
+    }
+    case BevelH:
+    {
+        int s1 = set.topTile.width();
+        int s2 = qMin(s1, (rect.width()+1)/2);
+        const int h = qMin(128+32, rect.height()/8);
+        const int y = rect.y()+h;
+        painter->drawTiledPixmap( rect.x(), y, s2, rect.height()-h, set.topTile, s1-s2, 0 );
+        painter->drawPixmap(rect.x(), y-32, set.lCorner, s1-s2, 0,0,0);
+        s1 = set.btmTile.width();
+        s2 = qMin(s1, (rect.width())/2);
+        painter->drawTiledPixmap( rect.right() - s2, y , s2, rect.height()-h, set.btmTile );
+        painter->drawPixmap(rect.right() - s2, y-32, set.rCorner);
+        painter->drawTiledPixmap( rect.x(), y-(128+32), rect.width(), 128, set.cornerTile );
+        break;
+    }
 //    case Plain: // should not happen anyway...
 //    case Scanlines: // --"--
-   default:
-      break;
-   }
+    default:
+        break;
+    }
 }
 
 void

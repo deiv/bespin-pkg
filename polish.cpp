@@ -407,8 +407,8 @@ BespinStyle::polish( QWidget * widget )
             menu->setWindowOpacity( config.menu.opacity/100.0 );
             // color swapping
             menu->setAutoFillBackground(true);
-            menu->setBackgroundRole ( config.menu.std_role[0] );
-            menu->setForegroundRole ( config.menu.std_role[1] );
+            menu->setBackgroundRole ( config.menu.std_role[Bg] );
+            menu->setForegroundRole ( config.menu.std_role[Fg] );
             if (config.menu.boldText)
                 setBoldFont(menu);
             

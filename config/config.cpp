@@ -241,8 +241,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    /** 1. name the info browser, you'll need it to show up context help
    Can be any QTextBrowser on your UI form */
    setInfoBrowser(ui.info);
-   /** 2. Define a context info that is displayed when no other context help is
-   demanded */
+   /** 2. Define a context info that is displayed when no other context help is demanded */
    setDefaultContextInfo(defInfo1);
 
    /** handleSettings(.) tells BConfig to take care (save/load) of a widget
@@ -539,289 +538,309 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 }
 
 
-QStringList Config::colors(const QPalette &pal, QPalette::ColorGroup group) {
-   QStringList list;
-   for (int i = 0; i < QPalette::NColorRoles; i++)
-      list << pal.color(group, (QPalette::ColorRole) i).name();
-   return list;
+QStringList
+Config::colors(const QPalette &pal, QPalette::ColorGroup group)
+{
+    QStringList list;
+    for (int i = 0; i < QPalette::NColorRoles; i++)
+        list << pal.color(group, (QPalette::ColorRole) i).name();
+    return list;
 }
 
-void Config::updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list) {
-   int max = QPalette::NColorRoles;
-   if (max > list.count()) {
-      qWarning("The demanded palette seems to be incomplete!");
-      max = list.count();
-   }
-   for (int i = 0; i < max; i++)
-      pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
+void
+Config::updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list)
+{
+    int max = QPalette::NColorRoles;
+    if (max > list.count())
+    {
+        qWarning("The demanded palette seems to be incomplete!");
+        max = list.count();
+    }
+    for (int i = 0; i < max; i++)
+        pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
 }
 
-bool Config::load(const QString &preset) {
-   QSettings store("Bespin", "Store");
-   if (!store.childGroups().contains(preset))
-      return false;
-   store.beginGroup(preset);
+bool
+Config::load(const QString &preset)
+{
+    QSettings store("Bespin", "Store");
+    if (!store.childGroups().contains(preset))
+        return false;
+    store.beginGroup(preset);
 
-   QSettings system("Bespin", "Style");
-   system.beginGroup("Style");
-   foreach (QString key, store.allKeys())
-      if (key != "QPalette")
-         system.setValue(key, store.value(key));
-   system.endGroup();
+    QSettings system("Bespin", "Style");
+    system.beginGroup("Style");
+    foreach (QString key, store.allKeys())
+        if (key != "QPalette")
+            system.setValue(key, store.value(key));
+    system.endGroup();
 
-   //NOTICE: we pass the loaded palette through ::updatePalette() to ensure
-   // we'll get a complete palette for this Qt version as otherwise Qt will
-   // fallback to the default palette... ===================================
-   QPalette pal;
-	store.beginGroup("QPalette");
-   updatePalette(pal, QPalette::Active, store.value("active").toStringList());
-   updatePalette(pal, QPalette::Inactive, store.value("inactive").toStringList());
-   updatePalette(pal, QPalette::Disabled, store.value("disabled").toStringList());
-	store.endGroup(); store.endGroup();
-	savePalette(pal);
-   return true;
+    //NOTICE: we pass the loaded palette through ::updatePalette() to ensure
+    // we'll get a complete palette for this Qt version as otherwise Qt will
+    // fallback to the default palette... ===================================
+    QPalette pal;
+    store.beginGroup("QPalette");
+    updatePalette(pal, QPalette::Active, store.value("active").toStringList());
+    updatePalette(pal, QPalette::Inactive, store.value("inactive").toStringList());
+    updatePalette(pal, QPalette::Disabled, store.value("disabled").toStringList());
+    store.endGroup(); store.endGroup();
+    savePalette(pal);
+    return true;
 }
 
-static bool ignore(QString &key)
+static bool
+blackListed(QString &key)
 {
    return
-   // don't im/export hacks
-   key.startsWith("Hack.") ||
-   // or dimmed inactive wins
-   key == "FadeInactive" ||
-   // or tab trans settings
-   key == "Tab.Duration" || key == "Tab.Transition" ||
-   // or macfeeling
-   key == "MacStyle" ||
-   // or flanders mode
-   key == "LeftHanded" ||
-   // or the scrollbar look
-   key == "Scroll.ShowButtons" ||
-   // finally don't im/export storename, are forcewise written
-   key == "StoreName";
+   key.startsWith("Hack.") || // don't im/export hacks
+   key == "FadeInactive" || // or dimmed inactive wins
+   key == "Tab.Duration" || key == "Tab.Transition" || // or tab trans settings
+   key == "MacStyle" || // or macfeeling
+   key == "Menu.Opacity" || // or menu opacity (interferes with e.g. kwin/compiz)
+   key == "LeftHanded" || // or flanders mode
+   key == "Scroll.ShowButtons" || // or the scrollbar look
+   key == "StoreName"; // finally don't im/export storename, are forcewise written
 }
 
-QString Config::sImport(const QString &filename) {
-   
-   if (!QFile::exists(filename))
-      return QString();
-   
-   QSettings file(filename, QSettings::IniFormat);
-   
-   if (!file.childGroups().contains("BespinStyle"))
-      return QString();
-   
-   file.beginGroup("BespinStyle");
-   
-   QString demandedName;
-   QString storeName = demandedName = file.value("StoreName", "Imported").toString();
-   
-   QSettings store("Bespin", "Store");
-   
-   int i = 2;
-   QStringList entries = store.childGroups();
-   while (entries.contains(storeName))
-      storeName = demandedName + '#' + QString::number(i++);
-   
-   store.beginGroup(storeName);
-   foreach (QString key, file.allKeys()) {
-      if (!ignore(key)) store.setValue(key, file.value(key));
-   }
-   
-   store.endGroup();
-   file.endGroup();
-   return storeName;
+QString
+Config::sImport(const QString &filename)
+{
+    if (!QFile::exists(filename))
+        return QString();
+
+    QSettings file(filename, QSettings::IniFormat);
+
+    if (!file.childGroups().contains("BespinStyle"))
+        return QString();
+
+    file.beginGroup("BespinStyle");
+
+    QString demandedName;
+    QString storeName = demandedName = file.value("StoreName", "Imported").toString();
+
+    QSettings store("Bespin", "Store");
+
+    int i = 2;
+    QStringList entries = store.childGroups();
+    while (entries.contains(storeName))
+        storeName = demandedName + '#' + QString::number(i++);
+
+    store.beginGroup(storeName);
+    foreach (QString key, file.allKeys())
+    {
+        if (!blackListed(key))
+            store.setValue(key, file.value(key));
+    }
+
+    store.endGroup();
+    file.endGroup();
+    return storeName;
 }
 
 bool
 Config::sExport(const QString &preset, const QString &filename)
 {
-   QSettings store("Bespin", "Store");
-   if (!store.childGroups().contains(preset))
-      return false;
-   store.beginGroup(preset);
+    QSettings store("Bespin", "Store");
+    if (!store.childGroups().contains(preset))
+        return false;
+    store.beginGroup(preset);
 
-   QSettings file(filename, QSettings::IniFormat);
-   file.beginGroup("BespinStyle");
+    QSettings file(filename, QSettings::IniFormat);
+    file.beginGroup("BespinStyle");
 
-   file.setValue("StoreName", preset);
-   foreach (QString key, store.allKeys()) {
-      if (!ignore(key)) file.setValue(key, store.value(key));
-   }
-   store.endGroup();
-   file.endGroup();
-   return true;
+    file.setValue("StoreName", preset);
+    foreach (QString key, store.allKeys())
+    {
+        if (!blackListed(key))
+            file.setValue(key, store.value(key));
+    }
+    store.endGroup();
+    file.endGroup();
+    return true;
 }
 
 /** reimplemented - i just want to extract the data from the store */
 static QString lastPath = QDir::home().path();
-void Config::saveAs() {
-   if (!ui.store->currentItem())
-      return;
-   
-   QString filename = QFileDialog::getSaveFileName(parentWidget(),
-      tr("Save Configuration"), lastPath, tr("Config Files (*.bespin *.conf *.ini)"));
-   sExport(ui.store->currentItem()->text(), filename);
+
+void Config::saveAs()
+{
+    if (!ui.store->currentItem())
+        return;
+
+    QString filename = QFileDialog::getSaveFileName(parentWidget(), tr("Save Configuration"),
+                                                    lastPath, tr("Config Files (*.bespin *.conf *.ini)"));
+    sExport(ui.store->currentItem()->text(), filename);
 }
 
 /** reimplemented - i just want to merge the data into the store */
 void
 Config::import()
 {
-   QStringList filenames = QFileDialog::getOpenFileNames(parentWidget(),
-      tr("Import Configuration"), lastPath, tr("Config Files (*.bespin *.conf *.ini)"));
+    QStringList filenames = QFileDialog::getOpenFileNames(parentWidget(),
+        tr("Import Configuration"), lastPath, tr("Config Files (*.bespin *.conf *.ini)"));
 
-   foreach(QString filename, filenames) {
-      QString storeName = sImport(filename);
-      if (!storeName.isNull()) {
-         ui.store->addItem(storeName);
-         ui.store->sortItems();
-      }
-   }
+    foreach(QString filename, filenames)
+    {
+        QString storeName = sImport(filename);
+        if (!storeName.isNull())
+        {
+            ui.store->addItem(storeName);
+            ui.store->sortItems();
+        }
+    }
 }
 
 /** addition to the import functionality
 1. we won't present a file dialog, but a listview
 2. we wanna im/export the current palette as well
 */
-void Config::restore() {
-   QListWidgetItem *item = ui.store->currentItem();
-   setQSetting("Bespin", "Store", item->text());
-   loadSettings(0, false, true);
-   setQSetting("Bespin", "Style", "Style");
-   
-   /** import the color settings as well */
-   if (!loadedPal)
-      loadedPal = new QPalette;
-   else
-      emit changed(true); // we must update cause we loded probably different colors before
-   
-   QStringList list;
-   const QPalette &pal = QApplication::palette();
-   QSettings settings("Bespin", "Store");
-   settings.beginGroup(item->text());
-   settings.beginGroup("QPalette");
-   
-   list = settings.value ( "active", colors(pal, QPalette::Active) ).toStringList();
-   updatePalette(*loadedPal, QPalette::Active, list);
-   list = settings.value ( "inactive", colors(pal, QPalette::Inactive) ).toStringList();
-   updatePalette(*loadedPal, QPalette::Inactive, list);
-   list = settings.value ( "disabled", colors(pal, QPalette::Disabled) ).toStringList();
-   updatePalette(*loadedPal, QPalette::Disabled, list);
+void
+Config::restore()
+{
+    QListWidgetItem *item = ui.store->currentItem();
+    setQSetting("Bespin", "Store", item->text());
+    loadSettings(0, false, true);
+    setQSetting("Bespin", "Style", "Style");
 
-   settings.endGroup();
-   settings.endGroup();
+    /** import the color settings as well */
+    if (!loadedPal)
+        loadedPal = new QPalette;
+    else
+        emit changed(true); // we must update cause we loded probably different colors before
+
+    QStringList list;
+    const QPalette &pal = QApplication::palette();
+    QSettings settings("Bespin", "Store");
+    settings.beginGroup(item->text());
+    settings.beginGroup("QPalette");
+
+    list = settings.value ( "active", colors(pal, QPalette::Active) ).toStringList();
+    updatePalette(*loadedPal, QPalette::Active, list);
+    list = settings.value ( "inactive", colors(pal, QPalette::Inactive) ).toStringList();
+    updatePalette(*loadedPal, QPalette::Inactive, list);
+    list = settings.value ( "disabled", colors(pal, QPalette::Disabled) ).toStringList();
+    updatePalette(*loadedPal, QPalette::Disabled, list);
+
+    settings.endGroup();
+    settings.endGroup();
 }
 
-void Config::save() {
-   BConfig::save();
-   /** save the palette loaded from store to qt configuration */
-   if (loadedPal)
-		savePalette(*loadedPal);
+void Config::save()
+{
+    BConfig::save();
+    /** save the palette loaded from store to qt configuration */
+    if (loadedPal)
+        savePalette(*loadedPal);
 }
 
 static QColor mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
 {
-   int sum = (w1+w2);
-   return QColor((w1*c1.red() + w2*c2.red())/sum,
-                 (w1*c1.green() + w2*c2.green())/sum,
-                 (w1*c1.blue() + w2*c2.blue())/sum,
-                 (w1*c1.alpha() + w2*c2.alpha())/sum);
+    int sum = (w1+w2);
+    return QColor((w1*c1.red() + w2*c2.red())/sum,
+                    (w1*c1.green() + w2*c2.green())/sum,
+                    (w1*c1.blue() + w2*c2.blue())/sum,
+                    (w1*c1.alpha() + w2*c2.alpha())/sum);
 }
 
 
-void Config::savePalette(const QPalette &pal) {
+void
+Config::savePalette(const QPalette &pal)
+{
 
-	// for Qt =====================================
-	QSettings settings("Trolltech");
-	settings.beginGroup("Qt");
-	settings.beginGroup("Palette");
+    // for Qt =====================================
+    QSettings settings("Trolltech");
+    settings.beginGroup("Qt");
+    settings.beginGroup("Palette");
 
-	settings.setValue ( "active", colors(pal, QPalette::Active) );
-	settings.setValue ( "inactive", colors(pal, QPalette::Inactive) );
-	settings.setValue ( "disabled", colors(pal, QPalette::Disabled) );
+    settings.setValue ( "active", colors(pal, QPalette::Active) );
+    settings.setValue ( "inactive", colors(pal, QPalette::Inactive) );
+    settings.setValue ( "disabled", colors(pal, QPalette::Disabled) );
 
-	settings.endGroup(); settings.endGroup();
+    settings.endGroup(); settings.endGroup();
 
-	// and KDE ==== I'm now gonna mourn a bit and not allways be prudent...:
-	//
-	// yeah - 5000 new extra colors for a style that relies on very restricted
-	// color assumptions (kstyle, plastik and thus oxygen...) - sure...
-	// and please don't sync the Qt palette, ppl. will certainly be happy to
-	// make color setting in KDE first and then in qtconfig for QApplication...
-	// SUCKERS!
-	//
-	// Ok, KDE supports extra DecorationFocus and DecorationHover
-   //                        --------------      ---------------
-	// -- we don't so we won't sync
-   //
-	// next, there's ForegroundLink and ForegroundVisited in any section
-   //               -------------      ----------------
-	// -- we just map them to QPalette::Link & QPalette::LinkVisited
-   //
-	// third, there're alternate backgroundcolors for all sections - sure:
-   //                 ------------------------        ---------
-	// my alternate button color: 1st button blue, second red, third blue...
-	// -- we'll' do what we do for normal alternate row colors and slightly shift
-	// to the foreground....
-   //
-	// there's a ForegroundActive color that is by default... PINK???
-   //          -----------------
-	// what a decent taste for asthetics... &-}
-	// -- we just leave it as it is, cause i've no idea what it shall be good for
-	// (active palette text - that's gonna be fun ;-)
-   //
-	// last there're ForegroundNegative, ForegroundNeutral and ForegroundPositive
-   //               ------------------  ----------------      -----------------
-	// what basically means: shifted to red, yellow and green...
-	// who exactly is resposible for this fucking ridiculous nonsense?
-	//
-	// oh, and of course there NEEDS to be support for speciacl chars in the
-	// KDE ini files - plenty. who could ever life without keys w/o ':' or '$'
-	// so we cannot simply use QSettings on a KDE ini file, thus we'll use our
-   // own very... slim... ini parser, ok, we just read the file group it by
-   // ^[.* entries, replace the color things and than flush the whole thing back
-   // on disk
+    // and KDE ==== I'm now gonna mourn a bit and not allways be prudent...:
+    //
+    // yeah - 5000 new extra colors for a style that relies on very restricted
+    // color assumptions (kstyle, plastik and thus oxygen...) - sure...
+    // [ UPDATE:this is meanwhile fixed... ]
+    // and please don't sync the Qt palette, ppl. will certainly be happy to
+    // make color setting in KDE first and then in qtconfig for QApplication...
+    // [ End update ]
+    //
+    // Ok, KDE supports extra DecorationFocus and DecorationHover
+    //                        --------------      ---------------
+    // -- we don't so we won't sync
+    //
+    // next, there's ForegroundLink and ForegroundVisited in any section
+    //               -------------      ----------------
+    // -- we just map them to QPalette::Link & QPalette::LinkVisited
+    //
+    // third, there're alternate backgroundcolors for all sections - sure:
+    //                 ------------------------        ---------
+    // my alternate button color: 1st button blue, second red, third blue...
+    // -- we'll' do what we do for normal alternate row colors and slightly shift
+    // to the foreground....
+    //
+    // there's a ForegroundActive color that is by default... PINK???
+    //          -----------------
+    // what a decent taste for asthetics... &-}
+    // -- we just leave it as it is, cause i've no idea what it shall be good for
+    // (active palette text - that's gonna be fun ;-)
+    //
+    // last there're ForegroundNegative, ForegroundNeutral and ForegroundPositive
+    //               ------------------  ----------------      -----------------
+    // what basically means: shifted to red, yellow and green...
+    // who exactly is resposible for this fucking ridiculous nonsense?
+    //
+    // oh, and of course there NEEDS to be support for speciacl chars in the
+    // KDE ini files - plenty. who could ever life without keys w/o ':' or '$'
+    // so we cannot simply use QSettings on a KDE ini file, thus we'll use our
+    // own very... slim... ini parser, ok, we just read the file group it by
+    // ^[.* entries, replace the color things and than flush the whole thing back
+    // on disk
 
-   KdeIni *kdeglobals = KdeIni::open("kdeglobals");
-   if (!kdeglobals)
-      return;
-   const QString prefix("Colors:");
+    KdeIni *kdeglobals = KdeIni::open("kdeglobals");
+    if (!kdeglobals)
+        return;
+    const QString prefix("Colors:");
 #if QT_VERSION >= 0x040400
-   const int numItems = 5;
+    const int numItems = 5;
 #else
-   const int numItems = 4;
+    const int numItems = 4;
 #endif
-   static const char *items[numItems] = {
-      "Button", "Selection", "View", "Window"
+    static const char *items[numItems] =
+    {
+        "Button", "Selection", "View", "Window"
 #if QT_VERSION >= 0x040400
-      , "Tooltip"
+        , "Tooltip"
 #endif
-   };
-   static const QPalette::ColorRole roles[numItems][2] = {
-      {QPalette::Button, QPalette::ButtonText},
-      {QPalette::Highlight, QPalette::HighlightedText},
-      {QPalette::Base, QPalette::Text},
-      {QPalette::Window, QPalette::WindowText}
+    };
+    static const QPalette::ColorRole roles[numItems][2] =
+    {
+        {QPalette::Button, QPalette::ButtonText},
+        {QPalette::Highlight, QPalette::HighlightedText},
+        {QPalette::Base, QPalette::Text},
+        {QPalette::Window, QPalette::WindowText}
 #if QT_VERSION >= 0x040400
-      , {QPalette::ToolTipBase, QPalette::ToolTipText}
+        , {QPalette::ToolTipBase, QPalette::ToolTipText}
 #endif
-   };
-   for (int i = 0; i < numItems; ++i) {
-      kdeglobals->setGroup(prefix + items[i]);
-      kdeglobals->setValue("BackgroundAlternate", mid(pal.color(QPalette::Active, roles[i][0]),
-                                                      pal.color(QPalette::Active, roles[i][1]), 15, 1));
-      kdeglobals->setValue("BackgroundNormal", pal.color(QPalette::Active, roles[i][0]));
-      kdeglobals->setValue("ForegroundInactive", pal.color(QPalette::Disabled, roles[i][1]));
-      kdeglobals->setValue("ForegroundLink", pal.color(QPalette::Active, QPalette::Link));
-      kdeglobals->setValue("ForegroundNegative", mid(pal.color(QPalette::Active, roles[i][1]), Qt::red));
-      kdeglobals->setValue("ForegroundNeutral", mid(pal.color(QPalette::Active, roles[i][1]), Qt::yellow));
-      kdeglobals->setValue("ForegroundNormal", pal.color(QPalette::Active, roles[i][1]));
-      kdeglobals->setValue("ForegroundPositive", mid(pal.color(QPalette::Active, roles[i][1]), Qt::green));
-      kdeglobals->setValue("ForegroundVisited", pal.color(QPalette::Active, QPalette::LinkVisited));
-   }
-   kdeglobals->close();
-   delete kdeglobals; kdeglobals = 0;
+    };
+    for (int i = 0; i < numItems; ++i)
+    {
+        kdeglobals->setGroup(prefix + items[i]);
+        kdeglobals->setValue("BackgroundAlternate", mid(pal.color(QPalette::Active, roles[i][0]),
+                                                        pal.color(QPalette::Active, roles[i][1]), 15, 1));
+        kdeglobals->setValue("BackgroundNormal", pal.color(QPalette::Active, roles[i][0]));
+        kdeglobals->setValue("ForegroundInactive", pal.color(QPalette::Disabled, roles[i][1]));
+        kdeglobals->setValue("ForegroundLink", pal.color(QPalette::Active, QPalette::Link));
+        kdeglobals->setValue("ForegroundNegative", mid(pal.color(QPalette::Active, roles[i][1]), Qt::red));
+        kdeglobals->setValue("ForegroundNeutral", mid(pal.color(QPalette::Active, roles[i][1]), Qt::yellow));
+        kdeglobals->setValue("ForegroundNormal", pal.color(QPalette::Active, roles[i][1]));
+        kdeglobals->setValue("ForegroundPositive", mid(pal.color(QPalette::Active, roles[i][1]), Qt::green));
+        kdeglobals->setValue("ForegroundVisited", pal.color(QPalette::Active, QPalette::LinkVisited));
+    }
+    kdeglobals->close();
+    delete kdeglobals; kdeglobals = 0;
 
 }
 
