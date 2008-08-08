@@ -517,7 +517,14 @@ BespinStyle::polish( QWidget * widget )
         if (widget->inherits("QToolBoxButton") || IS_HTML_WIDGET )
             widget->setAttribute(Qt::WA_Hover); // KHtml
         else
+        {
+            if (widget->inherits("QToolButton"))
+            {
+                widget->setBackgroundRole(QPalette::Window);
+                widget->setForegroundRole(QPalette::WindowText);
+            }
             Animator::Hover::manage(widget);
+        }
 
         // NOTICE WORKAROUND - this widget uses the style to paint the bg, but hardcodes the fg...
         // TODO: inform Joseph Wenninger <jowenn@kde.org> and really fix this
