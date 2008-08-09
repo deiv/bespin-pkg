@@ -343,11 +343,11 @@ MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidge
       style()->drawControl(QStyle::CE_MenuBarItem, &opt, painter, w);
    }
 
-   painter->setClipRegion(emptyArea);
-   initStyleOption(&opt, -1);
-   opt.menuItemType = QStyleOptionMenuItem::EmptyArea;
-   opt.rect = rect().toRect();
-   style()->drawControl(QStyle::CE_MenuBarEmptyArea, &opt, painter, w);
+//    painter->setClipRegion(emptyArea);
+//    initStyleOption(&opt, -1);
+//    opt.menuItemType = QStyleOptionMenuItem::EmptyArea;
+//    opt.rect = rect().toRect();
+//    style()->drawControl(QStyle::CE_MenuBarEmptyArea, &opt, painter, w);
    painter->restore();
 }
 

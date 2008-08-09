@@ -387,6 +387,7 @@ Client::repaint(QPainter &p)
 #define tbHeight 32
 #define lrcWidth 256
 #define lrcHeight 32
+         p.drawRect(top); // can be necessary for flat windows
          p.drawRect(bottom);
          int s1 = tbWidth;
          int s2 = qMin(s1, (width()+1)/2);
