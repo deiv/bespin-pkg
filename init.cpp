@@ -84,60 +84,65 @@ Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1])
 void
 BespinStyle::readSettings(const QSettings* settings)
 {
-   bool delSettings = false;
-   
-   QSettings *iSettings = const_cast<QSettings*>(settings);
-   if (!iSettings) {
-      delSettings = true;
-      isGTK = getenv("GTK_QT_ENGINE_ACTIVE");
+    bool delSettings = false;
+
+    QSettings *iSettings = const_cast<QSettings*>(settings);
+    if (!iSettings) {
+        delSettings = true;
+        isGTK = getenv("GTK_QT_ENGINE_ACTIVE");
 //       char *preset = getenv("GTK_QT_ENGINE_ACTIVE");
 //       if (isGTK = preset && !qstrcmp(preset, "1"))
-      if (isGTK)
-         qWarning("Bespin: Detected GKT+ application");
+        if (isGTK)
+            qWarning("Bespin: Detected GKT+ application");
 
-      const char *preset = getenv("BESPIN_PRESET");
-      if (preset) {
-         iSettings = new QSettings("Bespin", "Store");
-         if (iSettings->childGroups().contains(preset)) {
-            iSettings->beginGroup(preset);
-            // set custom palette!
-            QPalette pal;
-            iSettings->beginGroup("QPalette");
-            QStringList list =
-               iSettings->value ( "active", colors(pal,
-                  QPalette::Active) ).toStringList();
-            updatePalette(pal, QPalette::Active, list);
-            list = iSettings->value ( "inactive", colors(pal,
-               QPalette::Inactive) ).toStringList();
-            updatePalette(pal, QPalette::Inactive, list);
-            list = iSettings->value ( "disabled", colors(pal,
-               QPalette::Disabled) ).toStringList();
-            updatePalette(pal, QPalette::Disabled, list);
-            polish(pal);
-            qApp->setPalette(pal);
-            iSettings->endGroup();
-         }
-         else {
-            delete iSettings; iSettings = 0L;
-         }
-         if (qApp->inherits("KApplication"))
-            originalPalette = new QPalette(qApp->palette());
-      }
-      if (!iSettings) {
-         iSettings = new QSettings("Bespin", "Style");
-         iSettings->beginGroup("Style");
-      }
-   }
-   else
-      qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
-   
-   // Background ===========================
-   config.bg.mode = (BGMode) readInt(BG_MODE);
-   if (config.bg.mode > BevelH) config.bg.mode = BevelV;
-   config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
-   config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
-   config.bg.modal.invert = readBool(BG_MODAL_INVERT);
-   config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
+        const char *preset = getenv("BESPIN_PRESET");
+        if (preset)
+        {
+            iSettings = new QSettings("Bespin", "Store");
+            if (iSettings->childGroups().contains(preset))
+            {
+                iSettings->beginGroup(preset);
+                // set custom palette!
+                QPalette pal;
+                iSettings->beginGroup("QPalette");
+                QStringList list =
+                iSettings->value ( "active", colors(pal,
+                    QPalette::Active) ).toStringList();
+                updatePalette(pal, QPalette::Active, list);
+                list = iSettings->value ( "inactive", colors(pal,
+                QPalette::Inactive) ).toStringList();
+                updatePalette(pal, QPalette::Inactive, list);
+                list = iSettings->value ( "disabled", colors(pal,
+                QPalette::Disabled) ).toStringList();
+                updatePalette(pal, QPalette::Disabled, list);
+                polish(pal);
+                qApp->setPalette(pal);
+                iSettings->endGroup();
+            }
+            else
+            {
+                delete iSettings; iSettings = 0L;
+            }
+            if (qApp->inherits("KApplication"))
+                originalPalette = new QPalette(qApp->palette());
+        }
+        if (!iSettings)
+        {
+            iSettings = new QSettings("Bespin", "Style");
+            iSettings->beginGroup("Style");
+        }
+    }
+    else
+        qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
+
+    // Background ===========================
+    config.bg.mode = (BGMode) readInt(BG_MODE);
+    if (config.bg.mode > BevelH) config.bg.mode = BevelV;
+    config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
+    config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
+    config.bg.modal.invert = readBool(BG_MODAL_INVERT);
+    config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
+    readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 
 #if 0
 #ifndef QT_NO_XRENDER
@@ -150,154 +155,156 @@ BespinStyle::readSettings(const QSettings* settings)
 #endif
 #endif
 
-   if (config.bg.mode == Scanlines)
-      config.bg.structure = readInt(BG_STRUCTURE);
+    if (config.bg.mode == Scanlines)
+        config.bg.structure = readInt(BG_STRUCTURE);
+
+    // Buttons ===========================
+    config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
+    config.btn.round = readBool(BTN_ROUND);
+    GRAD(btn) = readGrad(BTN_GRADIENT);
+    _progressBase = GRAD(btn);
+    if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
+        GRAD(btn) = Gradients::None;
+
+    config.btn.backLightHover = readBool(BTN_BACKLIGHTHOVER);
+    config.btn.layer = config.btn.backLightHover ? 0 : CLAMP(readInt(BTN_LAYER), 0, 2);
+    config.btn.fullHover = config.btn.backLightHover || readBool(BTN_FULLHOVER);
+
+    if (config.btn.layer == 2) config.btn.cushion = true;
+    else if (GRAD(btn) ==  Gradients::Sunken) config.btn.cushion = false;
+    else config.btn.cushion = readBool(BTN_CUSHION);
+
+    readRole(btn.std, BTN_ROLE);
+    readRole(btn.active, BTN_ACTIVEROLE);
+    config.btn.ambientLight = readBool(BTN_AMBIENTLIGHT);
+    config.btn.bevelEnds = readBool(BTN_BEVEL_ENDS);
    
-   // Buttons ===========================
-   config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
-   config.btn.round = readBool(BTN_ROUND);
-   GRAD(btn) = readGrad(BTN_GRADIENT);
-   _progressBase = GRAD(btn);
-   if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
-      GRAD(btn) = Gradients::None;
-   
-   config.btn.backLightHover = readBool(BTN_BACKLIGHTHOVER);
-   config.btn.layer = config.btn.backLightHover ? 0 : CLAMP(readInt(BTN_LAYER), 0, 2);
-   config.btn.fullHover = config.btn.backLightHover || readBool(BTN_FULLHOVER);
-   
-   if (config.btn.layer == 2) config.btn.cushion = true;
-   else if (GRAD(btn) ==  Gradients::Sunken) config.btn.cushion = false;
-   else config.btn.cushion = readBool(BTN_CUSHION);
+    // Choosers ===========================
+    GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
 
-   readRole(btn.std, BTN_ROLE);
-   readRole(btn.active, BTN_ACTIVEROLE);
-   config.btn.ambientLight = readBool(BTN_AMBIENTLIGHT);
-   config.btn.bevelEnds = readBool(BTN_BEVEL_ENDS);
-   
-   // Choosers ===========================
-   GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
+    config.fadeInactive = readBool(FADE_INACTIVE);
 
-   config.fadeInactive = readBool(FADE_INACTIVE);
+    // Hacks ==================================
+    config.hack.messages = readBool(HACK_MESSAGES);
+    config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
+    config.hack.krunner= readBool(HACK_KRUNNER);
+    config.hack.treeViews = readBool(HACK_TREEVIEWS);
+    config.hack.windowMovement = readBool(HACK_WINDOWMOVE);
 
-   // Hacks ==================================
-   config.hack.messages = readBool(HACK_MESSAGES);
-   config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
-   config.hack.krunner= readBool(HACK_KRUNNER);
-   config.hack.treeViews = readBool(HACK_TREEVIEWS);
-   config.hack.windowMovement = readBool(HACK_WINDOWMOVE);
-   
-   // PW Echo Char ===========================
-   config.input.pwEchoChar =
-      ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
+    // PW Echo Char ===========================
+    config.input.pwEchoChar =
+        ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
 
-   // kwin - yes i let the style control the deco, iff the deco permits, though :)
-   config.kwin.gradient[0] = readGrad(KWIN_INACTIVE_GRADIENT);
-   config.kwin.gradient[0] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[0]);
-   config.kwin.gradient[1] = readGrad(KWIN_ACTIVE_GRADIENT);
-   config.kwin.gradient[1] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[1]);
-   readRole(kwin.inactive, KWIN_INACTIVE_ROLE);
-   if (!config.kwin.gradient[0])
-      config.kwin.inactive_role[Fg] = QPalette::WindowText;
-   readRole(kwin.active, KWIN_ACTIVE_ROLE);
-   if (!config.kwin.gradient[1])
-      config.kwin.active_role[Fg] = QPalette::WindowText;
+    // kwin - yes i let the style control the deco, iff the deco permits, though :)
+    config.kwin.gradient[0] = readGrad(KWIN_INACTIVE_GRADIENT);
+    config.kwin.gradient[0] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[0]);
+    config.kwin.gradient[1] = readGrad(KWIN_ACTIVE_GRADIENT);
+    config.kwin.gradient[1] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[1]);
+    readRole(kwin.inactive, KWIN_INACTIVE_ROLE);
+    if (!config.kwin.gradient[0])
+        config.kwin.inactive_role[Fg] = QPalette::WindowText;
+    readRole(kwin.active, KWIN_ACTIVE_ROLE);
+    if (!config.kwin.gradient[1])
+        config.kwin.active_role[Fg] = QPalette::WindowText;
 
-   // flanders
-   config.leftHanded =
-      readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
+    // flanders
+    config.leftHanded =
+        readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
 
-   // item single vs. double click, wizard appereance
-   config.macStyle = readBool(MACSTYLE);
-   
-   // Menus ===========================
-   config.menu.glassy = readBool(MENU_GLASSY);
-   config.menu.opacity = readInt(MENU_OPACITY);
-   config.menu.itemGradient = readGrad(MENU_ITEMGRADIENT);
-   config.menu.showIcons = readBool(MENU_SHOWICONS);
-   config.menu.shadow = readBool(MENU_SHADOW);
-   readRole(menu.active, MENU_ACTIVEROLE);
-   readRole(menu.std, MENU_ROLE);
-   readRole(menu.bar, MENU_BARROLE);
-   config.menu.barGradient = readGrad(MENU_BAR_GRADIENT);
-   config.menu.barSunken = readBool(MENU_BARSUNKEN);
-   config.menu.boldText = readBool(MENU_BOLDTEXT);
-   config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);
-   config.menu.activeItemSunken = config.menu.itemSunken || readBool(MENU_ACTIVEITEMSUNKEN);
-   
-   // Progress ===========================
-   GRAD(progress) = readGrad(PROGRESS_GRADIENT);
-   config.progress.std_role[Bg] =  (QPalette::ColorRole) readInt(PROGRESS_ROLE_BG);
-   config.progress.std_role[Fg] = (QPalette::ColorRole) readInt(PROGRESS_ROLE_FG);
+    // item single vs. double click, wizard appereance
+    config.macStyle = readBool(MACSTYLE);
 
-   // ScrollStuff ===========================
-   GRAD(scroll) = readGrad(SCROLL_GRADIENT);
-   config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
-   config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
+    // Menus ===========================
+    config.menu.glassy = readBool(MENU_GLASSY);
+    config.menu.opacity = readInt(MENU_OPACITY);
+    config.menu.itemGradient = readGrad(MENU_ITEMGRADIENT);
+    config.menu.showIcons = readBool(MENU_SHOWICONS);
+    config.menu.shadow = readBool(MENU_SHADOW);
+    readRole(menu.active, MENU_ACTIVEROLE);
+    readRole(menu.std, MENU_ROLE);
+    readRole(menu.bar, MENU_BARROLE);
+    config.menu.barGradient = readGrad(MENU_BAR_GRADIENT);
+    config.menu.barSunken = readBool(MENU_BARSUNKEN);
+    config.menu.boldText = readBool(MENU_BOLDTEXT);
+    config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);
+    config.menu.activeItemSunken = config.menu.itemSunken || readBool(MENU_ACTIVEITEMSUNKEN);
 
-   // Tabs ===========================
-   readRole(tab.active, TAB_ACTIVEROLE);
-   Animator::Tab::setDuration(CLAMP(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));
-   Animator::Tab::setFPS(25);
-   GRAD(tab) = readGrad(TAB_GRADIENT);
-   readRole(tab.std, TAB_ROLE);
-   Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));
-   config.tab.activeTabSunken = readBool(TAB_ACTIVETABSUNKEN);
-   
-   // ToolBoxes
-   readRole(toolbox.active, TOOLBOX_ACTIVEROLE);
-   GRAD(toolbox) = readGrad(TAB_ACTIVEGRADIENT);
-   
-   // Views ===========================
-   readRole(view.header, VIEW_HEADERROLE);
-   readRole(view.sortingHeader, VIEW_SORTINGHEADERROLE);
-   config.view.headerGradient = readGrad(VIEW_HEADERGRADIENT);
-   config.view.sortingHeaderGradient = readGrad(VIEW_SORTINGHEADERGRADIENT);
+    // Progress ===========================
+    GRAD(progress) = readGrad(PROGRESS_GRADIENT);
+    config.progress.std_role[Bg] =  (QPalette::ColorRole) readInt(PROGRESS_ROLE_BG);
+    config.progress.std_role[Fg] = (QPalette::ColorRole) readInt(PROGRESS_ROLE_FG);
 
-   // General ===========================
-   config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;
-   config.scale = iSettings->value(DEF_SCALE).toDouble();
-   if (config.scale != 1.0) {
-      QFont fnt = qApp->font();
-      if (fnt.pointSize() > -1) fnt.setPointSize(fnt.pointSize()*config.scale);
-      else fnt.setPixelSize(fnt.pixelSize()*config.scale);
-      qApp->setFont(fnt);
-   }
+    // ScrollStuff ===========================
+    GRAD(scroll) = readGrad(SCROLL_GRADIENT);
+    config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
+    config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
 
-   //NOTICE gtk-qt fails on several features
-   // a key problem seems to be fixed text colors
-   // also it will segfault if we hide scrollbar buttons
-   // so we adjust some settings here
-   if (isGTK) {
-      config.bg.mode = Plain;
-      config.bg.modal.glassy = false;
-      config.bg.modal.opacity = 100;
-      config.bg.modal.invert = false;
-      config.bg.intensity = 0;
-      
+    // Tabs ===========================
+    readRole(tab.active, TAB_ACTIVEROLE);
+    Animator::Tab::setDuration(CLAMP(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));
+    Animator::Tab::setFPS(25);
+    GRAD(tab) = readGrad(TAB_GRADIENT);
+    readRole(tab.std, TAB_ROLE);
+    Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));
+    config.tab.activeTabSunken = readBool(TAB_ACTIVETABSUNKEN);
+
+    // ToolBoxes
+    readRole(toolbox.active, TOOLBOX_ACTIVEROLE);
+    GRAD(toolbox) = readGrad(TAB_ACTIVEGRADIENT);
+
+    // Views ===========================
+    readRole(view.header, VIEW_HEADERROLE);
+    readRole(view.sortingHeader, VIEW_SORTINGHEADERROLE);
+    config.view.headerGradient = readGrad(VIEW_HEADERGRADIENT);
+    config.view.sortingHeaderGradient = readGrad(VIEW_SORTINGHEADERGRADIENT);
+
+    // General ===========================
+    config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;
+    config.scale = iSettings->value(DEF_SCALE).toDouble();
+    if (config.scale != 1.0)
+    {
+        QFont fnt = qApp->font();
+        if (fnt.pointSize() > -1) fnt.setPointSize(fnt.pointSize()*config.scale);
+        else fnt.setPixelSize(fnt.pixelSize()*config.scale);
+        qApp->setFont(fnt);
+    }
+
+    //NOTICE gtk-qt fails on several features
+    // a key problem seems to be fixed text colors
+    // also it will segfault if we hide scrollbar buttons
+    // so we adjust some settings here
+    if (isGTK)
+    {
+        config.bg.mode = Plain;
+        config.bg.modal.glassy = false;
+        config.bg.modal.opacity = 100;
+        config.bg.modal.invert = false;
+        config.bg.intensity = 0;
+
 //       config.btn.std_role[Bg] = QPalette::Window;
 //       config.btn.active_role[Bg] = QPalette::Highlight;
 //       config.btn.std_role[Fg] = config.btn.active_role[Fg] = QPalette::WindowText;
-      
-      config.hack.messages = false;
-      
-      config.progress.std_role[Bg] =
-         config.progress.std_role[Fg] = QPalette::Window;
+
+        config.hack.messages = false;
+
+        config.progress.std_role[Bg] =
+            config.progress.std_role[Fg] = QPalette::Window;
 
 //       config.tab.std_role[Bg] =  QPalette::Window;
-      // gtk fixes the label color... so try to ensure it will be visible
+    // gtk fixes the label color... so try to ensure it will be visible
 //       if (!Colors::haveContrast(QApplication::palette().color(QPalette::WindowText),
 //                                 QApplication::palette().color(config.tab.active_role[Bg])))
 //       {
 //          config.tab.active_role[Bg] =  QPalette::Window;
 //          config.tab.activeTabSunken = true;
 //       }
-      
-      config.view.header_role[Bg] = QPalette::Window;
-      config.view.sortingHeader_role[Bg] = QPalette::Window;
-   }
+
+        config.view.header_role[Bg] = QPalette::Window;
+        config.view.sortingHeader_role[Bg] = QPalette::Window;
+    }
    
-   if (delSettings)
-       delete iSettings;
+    if (delSettings)
+        delete iSettings;
 }
 
 #undef readRole
@@ -336,9 +343,8 @@ void BespinStyle::init(const QSettings* settings) {
     readSettings(settings);
     initMetrics();
     generatePixmaps();
-    Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode :
-                                                 Gradients::BevelV,
-                    _progressBase, config.bg.intensity, dpi.f8);
+    Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
+                    config.bg.structure, _progressBase, config.bg.intensity, dpi.f8);
     int f2 = dpi.f2, f4 = dpi.f4;
     QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
     inner.adjust(f4,f4,-f4,-dpi.f1); outer.adjust(0,0,0,dpi.f3);

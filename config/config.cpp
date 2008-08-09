@@ -156,6 +156,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    ui.storeLine->hide();
    
    /** fill some comboboxes, not of interest */
+    generateColorModes(ui.tooltipRole);
    generateColorModes(ui.crProgressBg);
    generateColorModes(ui.crProgressFg);
    generateColorModes(ui.crTabBar);
@@ -255,6 +256,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.modalGlas, BG_MODAL_GLASSY);
    handleSettings(ui.modalOpacity, BG_MODAL_OPACITY);
    handleSettings(ui.modalInvert, BG_MODAL_INVERT);
+   handleSettings(ui.tooltipRole, BG_TOOLTIP_ROLE);
 
    handleSettings(ui.sunkenButtons, "Btn.Layer", 0);
    handleSettings(ui.checkMark, "Btn.CheckType", 0);

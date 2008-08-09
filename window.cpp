@@ -47,9 +47,8 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
     // cause of scrollbars - kinda optimization
-    if (config.bg.mode < BevelV) return;
-
-
+    if (config.bg.mode == Plain)
+        return;
     if (!(widget && widget->isWindow()))
         return; // can't do anything here
     if (PAL.brush(widget->backgroundRole()).style() > 1)
@@ -71,14 +70,26 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
         painter->save();
         painter->setPen(Qt::NoPen);
         painter->setBrush(c.light(115-Colors::value(c)/20));
-        painter->translate(RECT.topLeft());
         painter->drawPath(glasPath);
         painter->restore();
         return;
     }
-    // ===================
-    const BgSet &set = Gradients::bgSet(c); QRect rect = RECT;
 
+    if (config.bg.mode == Scanlines)
+    {
+        const bool light = (widget->windowFlags() & ((Qt::Tool | Qt::Popup) & ~Qt::Window));
+        painter->save();
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(Gradients::structure(c, light));
+        painter->drawRect(RECT);
+        painter->restore();
+        return;
+    }
+
+
+    // Complex part ===================
+    const BgSet &set = Gradients::bgSet(c);
+    QRect rect = widget->rect();
 #ifndef QT_NO_XRENDER
     uint decoDim = 0;
     XProperty::get(widget->winId(), XProperty::decoDim, decoDim);

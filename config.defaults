@@ -25,12 +25,13 @@
 #define MACSTYLE "MacStyle", true
 #define FADE_INACTIVE "FadeInactive", false
 
+#define BG_INTENSITY "Bg.Intensity", 10
 #define BG_MODE "Bg.Mode", Gradients::BevelV
 #define BG_MODAL_GLASSY "Bg.Modal.Glassy", true
 #define BG_MODAL_OPACITY "Bg.Modal.Opacity", 80
 #define BG_MODAL_INVERT "Bg.Modal.Invert", true
 #define BG_STRUCTURE "Bg.Structure", 0
-#define BG_INTENSITY "Bg.Intensity", 10
+#define BG_TOOLTIP_ROLE "Bg.TooltipRole", QPalette::WindowText
 
 #define BTN_CHECKTYPE "Btn.CheckType", 0
 #define BTN_GRADIENT "Btn.Gradient", Gradients::Button

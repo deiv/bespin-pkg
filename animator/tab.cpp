@@ -56,42 +56,55 @@ scrollAncestor(QWidget *w, QWidget *root)
 
 // to get an idea about what the bg of out tabs looks like - seems as if we
 // need to paint it
-static QPixmap dumpBackground(QWidget *target, const QRect &r, const QStyle *style) {
-   if (!target) return QPixmap();
-   QPoint zero(0,0);
-   QPixmap pix(r.size());
-   QWidgetList widgets; widgets << target;
-   QWidget *w = target->parentWidget();
-   while (w) {
-      if (!w->isVisible()) { w = w->parentWidget(); continue; }
-      widgets << w;
-      if (w->isTopLevel() || w->autoFillBackground()) break;
-      w = w->parentWidget();
-   }
-   
-   QPainter p(&pix);
-   const QBrush bg = w->palette().brush(w->backgroundRole());
-   if (bg.style() == Qt::TexturePattern)
-      p.drawTiledPixmap(pix.rect(), bg.texture(), target->mapTo(w, r.topLeft()));
-   else
-      p.fillRect(pix.rect(), bg);
-   
-   if (w->isTopLevel() && w->testAttribute(Qt::WA_StyledBackground)) {
-      QStyleOption opt; opt.initFrom(w);// opt.rect = r;
-      opt.rect.translate(-target->mapTo(w, r.topLeft()));
-      style->drawPrimitive ( QStyle::PE_Widget, &opt, &p, w);
-   }
-   p.end();
-   
-   QPaintEvent e(r); int i = widgets.size();
-   while (i) {
-      w = widgets.at(--i);
-      QPainter::setRedirected( w, &pix, target->mapTo(w, r.topLeft()) );
-      e = QPaintEvent(QRect(zero, r.size()));
-      QCoreApplication::sendEvent(w, &e);
-      QPainter::restoreRedirected(w);
-   }
-   return pix;
+static QPixmap
+dumpBackground(QWidget *target, const QRect &r, const QStyle *style)
+{
+    if (!target) return QPixmap();
+    QPoint zero(0,0);
+    QPixmap pix(r.size());
+    QWidgetList widgets; widgets << target;
+    QWidget *w = target->parentWidget();
+    while (w)
+    {
+        if (!w->isVisible())
+        {
+            w = w->parentWidget();
+            continue;
+        }
+        widgets << w;
+        if (w->isTopLevel() || w->autoFillBackground())
+            break;
+        w = w->parentWidget();
+    }
+    if (!w)
+        w = target;
+    
+    QPainter p(&pix);
+    const QBrush bg = w->palette().brush(w->backgroundRole());
+    if (bg.style() == Qt::TexturePattern)
+        p.drawTiledPixmap(pix.rect(), bg.texture(), target->mapTo(w, r.topLeft()));
+    else
+        p.fillRect(pix.rect(), bg);
+
+    if (w->isTopLevel() && w->testAttribute(Qt::WA_StyledBackground))
+    {
+        QStyleOption opt; opt.initFrom(w); opt.rect = r;
+        opt.rect.translate(target->mapTo(w, r.topLeft()));
+        p.translate(-opt.rect.topLeft());
+        style->drawPrimitive ( QStyle::PE_Widget, &opt, &p, w);
+    }
+    p.end();
+
+    QPaintEvent e(r); int i = widgets.size();
+    while (i)
+    {
+        w = widgets.at(--i);
+        QPainter::setRedirected( w, &pix, target->mapTo(w, r.topLeft()) );
+        e = QPaintEvent(QRect(zero, r.size()));
+        QCoreApplication::sendEvent(w, &e);
+        QPainter::restoreRedirected(w);
+    }
+    return pix;
 }
 
 // QPixmap::grabWidget(.) currently fails on the background offset,
@@ -104,7 +117,6 @@ grabWidget(QWidget * root, QPixmap &pix)
 
     QPoint zero(0,0);
     QSize sz = root->window()->size();
-    QWidgetList widgets = root->findChildren<QWidget*>();
 
    // resizing (in case) -- NOTICE may be dropped for performance...?!
 //    if (root->testAttribute(Qt::WA_PendingResizeEvent) ||
@@ -133,12 +145,16 @@ grabWidget(QWidget * root, QPixmap &pix)
 
 // @ franz: hier mal machen
 // qDebug() << "BESPIN" << widgets;
-    foreach (QWidget *w, widgets) {
+    QWidgetList widgets = root->findChildren<QWidget*>();
+    foreach (QWidget *w, widgets)
+    {
 // qDebug() << "BESPIN" << w;
-        if (w->thread() == instance->thread() && w->isVisibleTo(root)) {
+        if (w->isVisibleTo(root))
+        {
 // qDebug() << "BESPIN passed...";
             // solids
-            if (w->autoFillBackground()) {
+            if (w->autoFillBackground())
+            {
                 const QBrush bg = w->palette().brush(w->backgroundRole());
                 p.begin(&pix);
                 QRect wrect = QRect(zero, w->size()).translated(w->mapTo(root, zero));
@@ -175,7 +191,8 @@ grabWidget(QWidget * root, QPixmap &pix)
                 }
             }
             // default painting redirection
-            else {
+            else
+            {
 //                 if (w->objectName().contains("viewport"))
 //                     qDebug() << "BESPIN" << w << w->rect();
                 w->render(&pix, w->mapTo(root, zero), w->rect(), 0);

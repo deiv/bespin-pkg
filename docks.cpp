@@ -20,6 +20,17 @@
 #include "draw.h"
 
 void
+BespinStyle::drawDockBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
+{
+    painter->save();
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Gradients::structure(FCOLOR(Window), true));
+    painter->translate(RECT.topLeft());
+    painter->drawRect(RECT);
+    painter->restore();
+}
+
+void
 BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
 

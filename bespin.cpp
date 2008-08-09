@@ -101,137 +101,143 @@ static void
 void
 BespinStyle::registerRoutines()
 {
-   for (int i = 0; i < N_PE; ++i)
-      primitiveRoutine[i] = 0;
-   for (int i = 0; i < N_CE; ++i)
-      controlRoutine[i] = 0;
-   for (int i = 0; i < N_CC; ++i)
-      complexRoutine[i] = 0;
-   
-   // buttons.cpp
-   registerPE(drawButtonFrame, PE_PanelButtonCommand);
-   registerPE(drawButtonFrame, PE_PanelButtonBevel);
-   registerPE(skip, PE_FrameDefaultButton);
-   registerCE(drawPushButton, CE_PushButton);
-   registerCE(drawPushButtonBevel, CE_PushButtonBevel);
-   registerCE(drawPushButtonLabel, CE_PushButtonLabel);
-   registerPE(drawCheckBox, PE_IndicatorCheckBox);
-   registerPE(drawRadio, PE_IndicatorRadioButton);
-   registerCE(drawCheckBoxItem, CE_CheckBox);
-   registerCE(drawRadioItem, CE_RadioButton);
-   registerCE(drawCheckLabel, CE_CheckBoxLabel);
-   registerCE(drawCheckLabel, CE_RadioButtonLabel);
-   // docks.cpp
+    for (int i = 0; i < N_PE; ++i)
+        primitiveRoutine[i] = 0;
+    for (int i = 0; i < N_CE; ++i)
+        controlRoutine[i] = 0;
+    for (int i = 0; i < N_CC; ++i)
+        complexRoutine[i] = 0;
+
+    // buttons.cpp
+    registerPE(drawButtonFrame, PE_PanelButtonCommand);
+    registerPE(drawButtonFrame, PE_PanelButtonBevel);
+    registerPE(skip, PE_FrameDefaultButton);
+    registerCE(drawPushButton, CE_PushButton);
+    registerCE(drawPushButtonBevel, CE_PushButtonBevel);
+    registerCE(drawPushButtonLabel, CE_PushButtonLabel);
+    registerPE(drawCheckBox, PE_IndicatorCheckBox);
+    registerPE(drawRadio, PE_IndicatorRadioButton);
+    registerCE(drawCheckBoxItem, CE_CheckBox);
+    registerCE(drawRadioItem, CE_RadioButton);
+    registerCE(drawCheckLabel, CE_CheckBoxLabel);
+    registerCE(drawCheckLabel, CE_RadioButtonLabel);
+    // docks.cpp
 #ifdef QT3_SUPPORT
-   registerPE(skip, PE_Q3DockWindowSeparator);
-   registerCE(skip, CE_Q3DockWindowEmptyArea);
+    registerPE(skip, PE_Q3DockWindowSeparator);
+    registerCE(skip, CE_Q3DockWindowEmptyArea);
 #endif
-   registerPE(skip, PE_FrameDockWidget);
-   registerCE(drawDockTitle, CE_DockWidgetTitle);
-   registerCC(drawMDIControls, CC_MdiControls);
-   registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
-   // frames.cpp
-   registerCE(skip, CE_FocusFrame);
-   registerPE(skip, PE_PanelStatusBar);
+    if (config.bg.mode == Scanlines)
+        registerPE(drawDockBg, PE_FrameDockWidget);
+    else
+        registerPE(skip, PE_FrameDockWidget);
+    registerCE(drawDockTitle, CE_DockWidgetTitle);
+    registerCC(drawMDIControls, CC_MdiControls);
+    registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
+    // frames.cpp
+    registerCE(skip, CE_FocusFrame);
+    registerPE(skip, PE_PanelStatusBar);
 #if QT_VERSION >= 0x040400
-   registerPE(skip, PE_FrameStatusBarItem);
+    registerPE(skip, PE_FrameStatusBarItem);
 #else
     registerPE(skip, PE_FrameStatusBar);
 #endif
-   registerPE(drawFocusFrame, PE_FrameFocusRect);
-   registerPE(drawFrame, PE_Frame);
-   registerCC(drawGroupBox, CC_GroupBox);
-   registerPE(drawGroupBoxFrame, PE_FrameGroupBox);
-   // input.cpp
-   registerPE(drawLineEditFrame, PE_FrameLineEdit);
-   registerPE(drawLineEdit, PE_PanelLineEdit);
-   registerCC(drawSpinBox, CC_SpinBox);
-   registerCC(drawComboBox, CC_ComboBox);
-   registerCE(drawComboBoxLabel, CE_ComboBoxLabel);
-   // menus.cpp
-   registerPE(drawMenuBarBg, PE_PanelMenuBar);
-   registerCE(drawMenuBarBg, CE_MenuBarEmptyArea);
-   registerCE(drawMenuBarItem, CE_MenuBarItem);
-   registerPE(drawMenuFrame, PE_FrameMenu);
-   registerCE(drawMenuItem, CE_MenuItem);
-   registerCE(drawMenuScroller, CE_MenuScroller);
-   registerCE(skip, CE_MenuEmptyArea);
-   registerCE(skip, CE_MenuHMargin);
-   registerCE(skip, CE_MenuVMargin);
-   // progress.cpp
-   registerCE(drawProgressBar, CE_ProgressBar);
-   registerCE(drawProgressBarGroove, CE_ProgressBarGroove);
-   registerCE(drawProgressBarContents, CE_ProgressBarContents);
-   registerCE(drawProgressBarLabel, CE_ProgressBarLabel);
-   // scrollareas.cpp
-   registerCC(drawScrollBar, CC_ScrollBar);
-   registerCE(drawScrollBarAddLine, CE_ScrollBarAddLine);
-   registerCE(drawScrollBarSubLine, CE_ScrollBarSubLine);
-   registerCE(drawScrollBarGroove, CE_ScrollBarSubPage);
-   registerCE(drawScrollBarGroove, CE_ScrollBarAddPage);
-   registerCE(drawScrollBarSlider, CE_ScrollBarSlider);
-   // shapes.cpp
-   registerPE(drawItemCheck, PE_IndicatorViewItemCheck);
+    registerPE(drawFocusFrame, PE_FrameFocusRect);
+    registerPE(drawFrame, PE_Frame);
+    registerCC(drawGroupBox, CC_GroupBox);
+    registerPE(drawGroupBoxFrame, PE_FrameGroupBox);
+    // input.cpp
+    registerPE(drawLineEditFrame, PE_FrameLineEdit);
+    registerPE(drawLineEdit, PE_PanelLineEdit);
+    registerCC(drawSpinBox, CC_SpinBox);
+    registerCC(drawComboBox, CC_ComboBox);
+    registerCE(drawComboBoxLabel, CE_ComboBoxLabel);
+    // menus.cpp
+    registerPE(drawMenuBarBg, PE_PanelMenuBar);
+    registerCE(drawMenuBarBg, CE_MenuBarEmptyArea);
+    registerCE(drawMenuBarItem, CE_MenuBarItem);
+    registerPE(drawMenuFrame, PE_FrameMenu);
+    registerCE(drawMenuItem, CE_MenuItem);
+    registerCE(drawMenuScroller, CE_MenuScroller);
+    registerCE(skip, CE_MenuEmptyArea);
+    registerCE(skip, CE_MenuHMargin);
+    registerCE(skip, CE_MenuVMargin);
+    // progress.cpp
+    registerCE(drawProgressBar, CE_ProgressBar);
+    registerCE(drawProgressBarGroove, CE_ProgressBarGroove);
+    registerCE(drawProgressBarContents, CE_ProgressBarContents);
+    registerCE(drawProgressBarLabel, CE_ProgressBarLabel);
+    // scrollareas.cpp
+    registerCC(drawScrollBar, CC_ScrollBar);
+    registerCE(drawScrollBarAddLine, CE_ScrollBarAddLine);
+    registerCE(drawScrollBarSubLine, CE_ScrollBarSubLine);
+    registerCE(drawScrollBarGroove, CE_ScrollBarSubPage);
+    registerCE(drawScrollBarGroove, CE_ScrollBarAddPage);
+    registerCE(drawScrollBarSlider, CE_ScrollBarSlider);
+    // shapes.cpp
+    registerPE(drawItemCheck, PE_IndicatorViewItemCheck);
 #ifdef QT3_SUPPORT
-   registerPE(drawItemCheck, PE_Q3CheckListIndicator);
-   registerPE(drawExclusiveCheck, PE_Q3CheckListExclusiveIndicator);
+    registerPE(drawItemCheck, PE_Q3CheckListIndicator);
+    registerPE(drawExclusiveCheck, PE_Q3CheckListExclusiveIndicator);
 #endif
-   registerPE(drawMenuCheck, PE_IndicatorMenuCheckMark);
-   registerPE(drawSolidArrowN, PE_IndicatorArrowUp);
-   registerPE(drawSolidArrowN, PE_IndicatorSpinUp);
-   registerPE(drawSolidArrowN, PE_IndicatorSpinPlus);
-   registerPE(drawSolidArrowS, PE_IndicatorArrowDown);
-   registerPE(drawSolidArrowS, PE_IndicatorSpinDown);
-   registerPE(drawSolidArrowS, PE_IndicatorSpinMinus);
-   registerPE(drawSolidArrowS, PE_IndicatorButtonDropDown);
-   registerPE(drawSolidArrowE, PE_IndicatorArrowRight);
-   registerPE(drawSolidArrowW, PE_IndicatorArrowLeft);
-   // slider.cpp
-   registerCC(drawSlider, CC_Slider);
-   registerCC(drawDial, CC_Dial);
-   // tabbing.cpp
-   registerPE(drawTabWidget, PE_FrameTabWidget);
-   registerPE(drawTabBar, PE_FrameTabBarBase);
-   registerCE(drawTab, CE_TabBarTab);
-   registerCE(drawTabShape, CE_TabBarTabShape);
-   registerCE(drawTabLabel, CE_TabBarTabLabel);
-   registerPE(skip, PE_IndicatorTabTear);
-   registerCE(drawToolboxTab, CE_ToolBoxTab);
-   registerCE(drawToolboxTabShape, CE_ToolBoxTabShape);
-   registerCE(drawToolboxTabLabel, CE_ToolBoxTabLabel);
-   // toolbars.cpp
-   registerCC(drawToolButton, CC_ToolButton);
-   registerPE(drawToolButtonShape, PE_PanelButtonTool);
-   registerPE(skip, PE_IndicatorToolBarSeparator);
-   registerPE(skip, PE_PanelToolBar);
-   registerCE(drawToolButtonLabel, CE_ToolButtonLabel);
-   registerCE(skip, CE_ToolBar);
-   registerPE(skip, PE_FrameButtonTool);
+    registerPE(drawMenuCheck, PE_IndicatorMenuCheckMark);
+    registerPE(drawSolidArrowN, PE_IndicatorArrowUp);
+    registerPE(drawSolidArrowN, PE_IndicatorSpinUp);
+    registerPE(drawSolidArrowN, PE_IndicatorSpinPlus);
+    registerPE(drawSolidArrowS, PE_IndicatorArrowDown);
+    registerPE(drawSolidArrowS, PE_IndicatorSpinDown);
+    registerPE(drawSolidArrowS, PE_IndicatorSpinMinus);
+    registerPE(drawSolidArrowS, PE_IndicatorButtonDropDown);
+    registerPE(drawSolidArrowE, PE_IndicatorArrowRight);
+    registerPE(drawSolidArrowW, PE_IndicatorArrowLeft);
+    // slider.cpp
+    registerCC(drawSlider, CC_Slider);
+    registerCC(drawDial, CC_Dial);
+    // tabbing.cpp
+    registerPE(drawTabWidget, PE_FrameTabWidget);
+    registerPE(drawTabBar, PE_FrameTabBarBase);
+    registerCE(drawTab, CE_TabBarTab);
+    registerCE(drawTabShape, CE_TabBarTabShape);
+    registerCE(drawTabLabel, CE_TabBarTabLabel);
+    registerPE(skip, PE_IndicatorTabTear);
+    registerCE(drawToolboxTab, CE_ToolBoxTab);
+    registerCE(drawToolboxTabShape, CE_ToolBoxTabShape);
+    registerCE(drawToolboxTabLabel, CE_ToolBoxTabLabel);
+    // toolbars.cpp
+    registerCC(drawToolButton, CC_ToolButton);
+    registerPE(drawToolButtonShape, PE_PanelButtonTool);
+    registerPE(skip, PE_IndicatorToolBarSeparator);
+    registerPE(skip, PE_PanelToolBar);
+    registerCE(drawToolButtonLabel, CE_ToolButtonLabel);
+    if (config.bg.mode == Scanlines)
+        registerCE(drawDockBg, CE_ToolBar);
+    else
+        registerCE(skip, CE_ToolBar);
+    registerPE(skip, PE_FrameButtonTool);
 #ifdef QT3_SUPPORT
-   registerPE(skip, PE_Q3Separator);
+    registerPE(skip, PE_Q3Separator);
 #endif
-   registerPE(drawToolBarHandle, PE_IndicatorToolBarHandle);
-   // views.cpp
-   registerCE(drawHeader, CE_Header);
-   registerCE(drawHeaderSection, CE_HeaderSection);
-   registerCE(drawHeaderLabel, CE_HeaderLabel);
-   registerPE(drawBranch, PE_IndicatorBranch);
+    registerPE(drawToolBarHandle, PE_IndicatorToolBarHandle);
+    // views.cpp
+    registerCE(drawHeader, CE_Header);
+    registerCE(drawHeaderSection, CE_HeaderSection);
+    registerCE(drawHeaderLabel, CE_HeaderLabel);
+    registerPE(drawBranch, PE_IndicatorBranch);
 #ifdef QT3_SUPPORT
-   registerCC(drawTree, CC_Q3ListView);
+    registerCC(drawTree, CC_Q3ListView);
 #endif
-   registerCE(drawRubberBand, CE_RubberBand);
-   registerPE(drawHeaderArrow, PE_IndicatorHeaderArrow);
+    registerCE(drawRubberBand, CE_RubberBand);
+    registerPE(drawHeaderArrow, PE_IndicatorHeaderArrow);
 #if QT_VERSION >= 0x040400
-   registerPE(drawItem, PE_PanelItemViewRow);
-   registerPE(drawItem, PE_PanelItemViewItem);
+    registerPE(drawItem, PE_PanelItemViewRow);
+    registerPE(drawItem, PE_PanelItemViewItem);
 #endif
-   // window.cpp
-   registerPE(drawWindowFrame, PE_FrameWindow);
-   registerPE(drawWindowBg, PE_Widget);
-   registerPE(drawToolTip, PE_PanelTipLabel);
-   registerCC(drawTitleBar, CC_TitleBar);
-   registerCE(drawDockHandle, CE_Splitter);
-   registerCE(drawSizeGrip, CE_SizeGrip);
+    // window.cpp
+    registerPE(drawWindowFrame, PE_FrameWindow);
+    registerPE(drawWindowBg, PE_Widget);
+    registerPE(drawToolTip, PE_PanelTipLabel);
+    registerCC(drawTitleBar, CC_TitleBar);
+    registerCE(drawDockHandle, CE_Splitter);
+    registerCE(drawSizeGrip, CE_SizeGrip);
 }
 
 /**THE STYLE ITSELF*/
@@ -413,6 +419,7 @@ BespinStyle::erase(const QStyleOption *option, QPainter *painter, const QWidget 
         tmpOpt.rect = QRect(tl, grampa->size());
         tmpOpt.palette = grampa->palette();
         painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
+        painter->translate(tl);
         drawWindowBg(&tmpOpt, painter, grampa);
     }
     painter->restore();

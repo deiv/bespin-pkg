@@ -282,7 +282,10 @@ static inline uint costs(BgSet *set) {
 typedef QCache<uint, QPixmap> PixmapCache;
 static PixmapCache gradients[2][Gradients::TypeAmount];
 #ifndef BESPIN_DECO
-static PixmapCache _btnAmbient, _tabShadow, _groupLight;
+static int _struct = 0;
+static int _bgIntensity = 110;
+static Gradients::BgMode _mode = Gradients::BevelV;
+static PixmapCache _btnAmbient, _tabShadow, _groupLight, _structure[2];
 typedef QCache<uint, BgSet> BgSetCache;
 static BgSetCache _bgSet;
 #else
@@ -367,26 +370,138 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
 #ifndef BESPIN_DECO
 
 const QPixmap
-&Gradients::light(int height) {
-   if (height <= 0) {
-      qWarning("NULL Pixmap requested, height was %d",height);
-      return nullPix;
-   }
-   QPixmap *pix = _groupLight.object(height);
-   if (pix)
-      return *pix;
-      
-   pix = new QPixmap(32, height); //golden mean relations
-   pix->fill(Qt::transparent);
-   QPoint start(0,0), stop(0,height);
-   QLinearGradient lg(start, stop);
-   lg.setColorAt(0, QColor(255,255,255,80));
-   lg.setColorAt(1, QColor(255,255,255,0));
-   QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
-   
-   // cache for later ;)
-   _groupLight.insert(height, pix, costs(pix));
-   return *pix;
+&Gradients::structure(const QColor &oc, bool light)
+{
+    QColor c = oc;
+    int v = Colors::value(c);
+    if (v < 80) {
+        int h,s;
+        c.getHsv(&h,&s,&v);
+        c.setHsv(h,s,80);
+    }
+    
+    QPixmap *pix = _structure[light].object(c.rgb());
+    if (pix)
+        return *pix;
+    
+    pix = new QPixmap(64, 64);
+
+    QPainter p(pix);
+    int i;
+    switch (_struct)
+    {
+    default:
+    case 0: // scanlines
+        pix->fill( c.light(_bgIntensity).rgb() );
+        i = 100 + (light?6:3)*(_bgIntensity - 100)/10;
+        p.setPen(c.light(i));
+        for ( i = 1; i < 64; i += 4 ) {
+            p.drawLine( 0, i, 63, i );
+            p.drawLine( 0, i+2, 63, i+2 );
+        }
+        p.setPen( c );
+        for ( i = 2; i < 63; i += 4 )
+            p.drawLine( 0, i, 63, i );
+        break;
+    case 1: //checkboard
+        p.setPen(Qt::NoPen);
+        i = 100 + 2*(_bgIntensity - 100)/10;
+        p.setBrush(c.light(i));
+        if (light) {
+            p.drawRect(0,0,16,16); p.drawRect(32,0,16,16);
+            p.drawRect(16,16,16,16); p.drawRect(48,16,16,16);
+            p.drawRect(0,32,16,16); p.drawRect(32,32,16,16);
+            p.drawRect(16,48,16,16); p.drawRect(48,48,16,16);
+        }
+        else {
+            p.drawRect(0,0,32,32);
+            p.drawRect(32,32,32,32);
+        }
+        p.setBrush(c.dark(i));
+        if (light) {
+            p.drawRect(16,0,16,16); p.drawRect(48,0,16,16);
+            p.drawRect(0,16,16,16); p.drawRect(32,16,16,16);
+            p.drawRect(16,32,16,16); p.drawRect(48,32,16,16);
+            p.drawRect(0,48,16,16); p.drawRect(32,48,16,16);
+        }
+        else {
+            p.drawRect(32,0,32,32);
+            p.drawRect(0,32,32,32);
+        }
+        break;
+    case 2:  // fat scans
+        i = (_bgIntensity - 100);
+        pix->fill( c.light(100+3*i/10).rgb() );
+        p.setPen(QPen(light ? c.light(100+i/10) : c, 3));
+        p.setBrush( c.dark(100+2*i/10) );
+        p.drawRect(-3,8,70,8);
+        p.drawRect(-3,24,70,8);
+        p.drawRect(-3,40,70,8);
+        p.drawRect(-3,56,70,8);
+        break;
+    case 3: // "blue"print
+        i = (_bgIntensity - 100);
+        pix->fill( c.dark(100+i/10).rgb() );
+        p.setPen(c.light(100+(light?4:2)*i/10));
+        for ( i = 0; i < 64; i += 16 )
+            p.drawLine( 0, i, 63, i );
+        for ( i = 0; i < 64; i += 16 )
+            p.drawLine( i, 0, i, 63 );
+        break;
+    case 4: // verticals
+        i = (_bgIntensity - 100);
+        pix->fill( c.light(100+i).rgb() );
+        p.setPen(c.light(100+(light?6:3)*i/10));
+        for ( i = 1; i < 64; i += 4 ) {
+            p.drawLine( i, 0, i, 63 );
+            p.drawLine( i+2, 0, i+2, 63 );
+        }
+        p.setPen( c );
+        for ( i = 2; i < 63; i += 4 )
+            p.drawLine( i, 0, i, 63 );
+        break;
+    case 5: // diagonals
+        i = _bgIntensity - 100;
+        pix->fill( c.light(100+i).rgb() );
+        p.setPen(QPen(c.dark(100 + i/(2*(light+1))), 11));
+        p.setRenderHint(QPainter::Antialiasing);
+        p.drawLine(-64,64,64,-64);
+        p.drawLine(0,64,64,0);
+        p.drawLine(0,128,128,0);
+        p.drawLine(32,64,64,32);
+        p.drawLine(0,32,32,0);
+        break;
+    }
+    p.end();
+
+    // cache for later ;)
+    _structure[light].insert(c.rgb(), pix, costs(pix));
+    return *pix;
+}
+
+const QPixmap
+&Gradients::light(int height)
+{
+    if (height <= 0)
+    {
+        qWarning("NULL Pixmap requested, height was %d",height);
+        return nullPix;
+    }
+    QPixmap *pix = _groupLight.object(height);
+    if (pix)
+        return *pix;
+
+    pix = new QPixmap(32, height); //golden mean relations
+    pix->fill(Qt::transparent);
+    QPoint start(0,0), stop(0,height);
+    QLinearGradient lg(start, stop);
+    lg.setColorAt(0, QColor(255,255,255,80));
+    lg.setColorAt(1, QColor(255,255,255,0));
+    QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
+
+    // cache for later ;)
+    _groupLight.insert(height, pix, costs(pix));
+    return *pix;
 }
 
 const QPixmap &Gradients::ambient(int height) {
@@ -473,9 +588,6 @@ static inline QPixmap *cornerMask(bool right = false) {
    return alpha;
 }
 
-static int _bgBevelIntesity = 110;
-static Gradients::BgMode _mode = Gradients::BevelV;
-
 const BgSet &Gradients::bgSet(const QColor &c) {
    BgSet *set = _bgSet.object(c.rgb());
    if (set)
@@ -490,7 +602,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       set->cornerTile = QPixmap(32, 128);
       set->lCorner = QPixmap(128, 128);
       set->rCorner = QPixmap(128, 128);
-      const QColor c1 = c.light(_bgBevelIntesity);
+      const QColor c1 = c.light(_bgIntensity);
       const QColor c2 = Colors::mid(c1, c);
 
       lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
@@ -502,7 +614,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       stops.clear(); p.end();
       // Bottom Tile
       p.begin(&set->btmTile);
-      stops << QGradientStop(0, c) << QGradientStop(1, c.dark(_bgBevelIntesity));
+      stops << QGradientStop(0, c) << QGradientStop(1, c.dark(_bgIntensity));
       lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg);
       stops.clear(); p.end();
       
@@ -549,7 +661,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
       
       lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
       QGradientStops stops;
-      const QColor c1 = c.dark(_bgBevelIntesity);
+      const QColor c1 = c.dark(_bgIntensity);
       
       // left
       p.begin(&set->topTile);
@@ -591,7 +703,7 @@ const BgSet &Gradients::bgSet(const QColor &c) {
          delete mask;
       }
       lg = QLinearGradient(QPoint(0,0), QPoint(0, 128));
-      lg.setColorAt(0, c.light(_bgBevelIntesity)); lg.setColorAt(1, c);
+      lg.setColorAt(0, c.light(_bgIntensity)); lg.setColorAt(1, c);
       p.begin(&set->cornerTile);
       p.fillRect(set->cornerTile.rect(), lg); p.end();
       break;
@@ -604,15 +716,17 @@ const BgSet &Gradients::bgSet(const QColor &c) {
 }
 
 void
-Gradients::init(BgMode mode, Type progress, int bgBevelIntesity, int btnBevelSize)
+Gradients::init(BgMode mode, int structure, Type progress, int bgIntesity, int btnBevelSize)
 {
    _mode = mode;
+   _struct = structure;
 //    _progressBase = progress;
-   _bgBevelIntesity = bgBevelIntesity;
+   _bgIntensity = bgIntesity;
    _bgSet.setMaxCost( 900<<10 ); // 832 should be enough - we keep some safety
    _btnAmbient.setMaxCost( 64<<10 );
    _tabShadow.setMaxCost( 64<<10 );
    _groupLight.setMaxCost( 256<<10 );
+   _structure[0].setMaxCost( 128<<10 ); _structure[1].setMaxCost( 128<<10 );
    QLinearGradient lg(0,0,btnBevelSize,0);
    QPainter p; QGradientStops stops;
    for (int i = 0; i < 2; ++i) {
@@ -675,6 +789,7 @@ void Gradients::wipe() {
    _btnAmbient.clear();
    _tabShadow.clear();
    _groupLight.clear();
+   _structure[0].clear(); _structure[1].clear();
 #else
    for (int i = 0; i < 4; ++i)
       _borderline[i].clear();

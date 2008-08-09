@@ -22,85 +22,101 @@
 #include "types.h"
 #include "gradients.h"
 
-namespace Bespin {
+namespace Bespin
+{
 
-typedef struct Config {
-   struct bg {
-      BGMode mode;
-      int structure, intensity;
-      struct {
-         bool glassy, invert;
-         int opacity;
-      } modal;
-   } bg;
+typedef struct Config
+{
+    struct bg
+    {
+        BGMode mode;
+        int structure, intensity;
+        struct
+        {
+            bool glassy, invert;
+            int opacity;
+        } modal;
+        QPalette::ColorRole tooltip_role[2];
+    } bg;
    
-   struct btn {
-      int layer;
-      Check::Type checkType;
-      bool cushion, fullHover, backLightHover, ambientLight, bevelEnds, round;
-      Gradients::Type gradient, focusGradient;
-      QPalette::ColorRole std_role[2], active_role[2];
-   } btn;
+    struct btn
+    {
+        int layer;
+        Check::Type checkType;
+        bool cushion, fullHover, backLightHover, ambientLight, bevelEnds, round;
+        Gradients::Type gradient, focusGradient;
+        QPalette::ColorRole std_role[2], active_role[2];
+    } btn;
    
-   struct chooser {
-      Gradients::Type gradient;
-   } chooser;
+    struct chooser
+    {
+        Gradients::Type gradient;
+    } chooser;
 
-   bool fadeInactive;
+    bool fadeInactive;
 
-   struct hack {
-      bool messages, KHTMLView, treeViews, windowMovement, krunner;
-   } hack;
+    struct hack
+    {
+        bool messages, KHTMLView, treeViews, windowMovement, krunner;
+    } hack;
    
-   struct input {
-      ushort pwEchoChar;
-   } input;
+    struct input
+    {
+        ushort pwEchoChar;
+    } input;
 
-   struct kwin {
-      int gradient[2]; // this is NOT Gradients::Type!!!
-      QPalette::ColorRole inactive_role[2], active_role[2];
-   } kwin;
-   Qt::LayoutDirection leftHanded;
+    struct kwin
+    {
+        int gradient[2]; // this is NOT Gradients::Type!!!
+        QPalette::ColorRole inactive_role[2], active_role[2];
+    } kwin;
+    Qt::LayoutDirection leftHanded;
 
-   bool macStyle;
-   
-   struct menu {
-      QPalette::ColorRole std_role[2], active_role[2], bar_role[2];
-      Gradients::Type itemGradient, barGradient;
-      bool showIcons, shadow, barSunken, boldText, itemSunken, activeItemSunken, glassy;
-      int opacity;
-   } menu;
-   
-   struct progress {
-      Gradients::Type gradient;
-      QPalette::ColorRole std_role[2];
-   } progress;
-   
-   float scale;
-   
-   struct scroll {
-      Gradients::Type gradient;
-      Groove::Mode groove;
-      bool showButtons;
-   } scroll;
+    bool macStyle;
 
-   float shadowIntensity;
+    struct menu
+    {
+        QPalette::ColorRole std_role[2], active_role[2], bar_role[2];
+        Gradients::Type itemGradient, barGradient;
+        bool showIcons, shadow, barSunken, boldText, itemSunken, activeItemSunken, glassy;
+        int opacity;
+    } menu;
+
+    struct progress
+    {
+        Gradients::Type gradient;
+        QPalette::ColorRole std_role[2];
+    } progress;
+
+    float scale;
    
-   struct tab {
-      QPalette::ColorRole std_role[2], active_role[2];
-      Gradients::Type gradient;
-      bool activeTabSunken;
-   } tab;
+    struct scroll
+    {
+        Gradients::Type gradient;
+        Groove::Mode groove;
+        bool showButtons;
+    } scroll;
 
-   struct toolbox {
-      QPalette::ColorRole active_role[2];
-      Gradients::Type gradient;
-   } toolbox;
+    float shadowIntensity;
 
-   struct view {
-      QPalette::ColorRole header_role[2], sortingHeader_role[2];
-      Gradients::Type headerGradient, sortingHeaderGradient;
-   } view;
+    struct tab
+    {
+        QPalette::ColorRole std_role[2], active_role[2];
+        Gradients::Type gradient;
+        bool activeTabSunken;
+    } tab;
+
+    struct toolbox
+    {
+        QPalette::ColorRole active_role[2];
+        Gradients::Type gradient;
+    } toolbox;
+
+    struct view
+    {
+        QPalette::ColorRole header_role[2], sortingHeader_role[2];
+        Gradients::Type headerGradient, sortingHeaderGradient;
+    } view;
 
 } Config;
 

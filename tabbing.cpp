@@ -153,235 +153,262 @@ void
 BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
                      const QWidget * widget) const
 {
-   ASSURE_OPTION(tab, Tab);
-   
-   // do we have to exclude the scrollers?
-   bool needRestore = false;
-   if (widget && qobject_cast<const QTabBar*>(widget)) {
-      QRegion clipRgn = painter->clipRegion();
-      if (clipRgn.isEmpty()) clipRgn = RECT;
-      QList<QToolButton*> buttons = widget->findChildren<QToolButton*>();
-      foreach (QToolButton* button, buttons) {
-         if (button->isVisible())
-            clipRgn -= QRect(button->pos(), button->size());
-      }
-      if (!clipRgn.isEmpty()) {
-         painter->save(); needRestore = true;
-         painter->setClipRegion(clipRgn);
-      }
-   }
+    ASSURE_OPTION(tab, Tab);
+
+    // do we have to exclude the scrollers?
+    bool needRestore = false;
+    if (widget && qobject_cast<const QTabBar*>(widget))
+    {
+        QRegion clipRgn = painter->clipRegion();
+        if (clipRgn.isEmpty())
+            clipRgn = RECT;
+            
+        QList<QToolButton*> buttons = widget->findChildren<QToolButton*>();
+        foreach (QToolButton* button, buttons)
+        {
+            if (button->isVisible())
+                clipRgn -= QRect(button->pos(), button->size());
+        }
+        if (!clipRgn.isEmpty())
+        {
+            painter->save();
+            needRestore = true;
+            painter->setClipRegion(clipRgn);
+        }
+    }
 
    
-   // paint shape and label
-   QStyleOptionTab copy = *tab;
-   // NOTICE: workaround for e.g. konsole,
-   // which sets the tabs bg, but not the fg color to the palette, but just
-   // presets the painter and hopes for the best... tststs
-   // TODO: bug Konsole/Konqueror authors
-   if (widget) copy.palette = widget->palette();
-   
-   copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
+    // paint shape and label
+    QStyleOptionTab copy = *tab;
+    // NOTICE: workaround for e.g. konsole,
+    // which sets the tabs bg, but not the fg color to the palette, but just
+    // presets the painter and hopes for the best... tststs
+    // TODO: bug Konsole/Konqueror authors
+    if (widget)
+        copy.palette = widget->palette();
 
-   if (isGTK) {
-      switch (tab->position) {
-      default:
-      case QStyleOptionTab::OnlyOneTab:
-         break;
-      case QStyleOptionTab::Beginning:
-         Tile::setShape(Tile::Full &~ Tile::Right); break;
-      case QStyleOptionTab::End:
-         Tile::setShape(Tile::Full &~ Tile::Left); break;
-      case QStyleOptionTab::Middle:
-         Tile::setShape(Tile::Full &~ (Tile::Left | Tile::Right)); break;
-      }
-      masks.rect[true].render(copy.rect, painter, GRAD(tab), Qt::Vertical,
-                              CCOLOR(tab.std, Bg), copy.rect.height());
-      shadows.sunken[true][true].render(RECT, painter);
-      Tile::reset();
-   }
+    copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
 
-   if (tab->position != QStyleOptionTab::OnlyOneTab) {
-      OPT_SUNKEN OPT_ENABLED OPT_HOVER
-      sunken = sunken || (option->state & State_Selected);
-      animStep = 0;
-      // animation stuff
-      if (isEnabled && !sunken) {
-         Animator::IndexInfo *info = 0;
-         int index = -1, hoveredIndex = -1;
-         if (widget)
-         if (const QTabBar* tbar = qobject_cast<const QTabBar*>(widget)) {
-            // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
-            index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
-            hoveredIndex = hover ? index :
-               tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
-            info = const_cast<Animator::IndexInfo*>
-               (Animator::HoverIndex::info(widget, hoveredIndex));
-         }
-         if (info)
-            animStep = info->step(index);
-         if (hover && !animStep) animStep = 6;
-      }
-   }
-   drawTabShape(&copy, painter, widget);
-   drawTabLabel(&copy, painter, widget);
-   if (needRestore)
-      painter->restore();
+    if (isGTK)
+    {
+        switch (tab->position)
+        {
+        default:
+        case QStyleOptionTab::OnlyOneTab:
+            break;
+        case QStyleOptionTab::Beginning:
+            Tile::setShape(Tile::Full &~ Tile::Right); break;
+        case QStyleOptionTab::End:
+            Tile::setShape(Tile::Full &~ Tile::Left); break;
+        case QStyleOptionTab::Middle:
+            Tile::setShape(Tile::Full &~ (Tile::Left | Tile::Right)); break;
+        }
+        masks.rect[true].render(copy.rect, painter, GRAD(tab), Qt::Vertical,
+                                CCOLOR(tab.std, Bg), copy.rect.height());
+        shadows.sunken[true][true].render(RECT, painter);
+        Tile::reset();
+    }
+
+    if (tab->position != QStyleOptionTab::OnlyOneTab)
+    {
+        OPT_SUNKEN OPT_ENABLED OPT_HOVER
+        sunken = sunken || (option->state & State_Selected);
+        animStep = 0;
+        // animation stuff
+        if (isEnabled && !sunken)
+        {
+            Animator::IndexInfo *info = 0;
+            int index = -1, hoveredIndex = -1;
+            if (widget)
+            if (const QTabBar* tbar = qobject_cast<const QTabBar*>(widget))
+            {
+                // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
+                index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
+                hoveredIndex = hover ? index :
+                tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
+                info = const_cast<Animator::IndexInfo*>
+                (Animator::HoverIndex::info(widget, hoveredIndex));
+            }
+            if (info)
+                animStep = info->step(index);
+            if (hover && !animStep) animStep = 6;
+        }
+        drawTabShape(&copy, painter, widget);
+    }
+    drawTabLabel(&copy, painter, widget);
+    if (needRestore)
+        painter->restore();
 }
 
 void
 BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
                           const QWidget *) const
 {
-   ASSURE_OPTION(tab, Tab);
-   OPT_SUNKEN
+    ASSURE_OPTION(tab, Tab);
+    OPT_SUNKEN
 
-   if (tab->position == QStyleOptionTab::OnlyOneTab) {
-      sunken = false;
-   }
-   else if (isGTK)
-      sunken = option->state & State_Selected;
-   else
-      sunken = sunken || (option->state & State_Selected);
-   
-   // maybe we're done here?!
-   if (!(animStep || sunken)) return;
+    if (tab->position == QStyleOptionTab::OnlyOneTab)
+        sunken = false;
+    else if (isGTK)
+        sunken = option->state & State_Selected;
+    else
+        sunken = sunken || (option->state & State_Selected);
+
+    // maybe we're done here?!
+    if (!(animStep || sunken))
+        return;
        
-   const int f2 = dpi.f2;
-   QRect rect = RECT;
-   int size = RECT.height()-f2;
-   Qt::Orientation o = Qt::Vertical;
-   const bool vertical = verticalTabs(tab->shape);
-   if (vertical) {
-      rect.adjust(dpi.f5, dpi.f1, -dpi.f5, -dpi.f1);
-      o = Qt::Horizontal;
-      size = RECT.width()-f2;
-   }
-   else
-      rect.adjust(dpi.f1, dpi.f5, -dpi.f1, -dpi.f5);
+    const int f2 = dpi.f2;
+    QRect rect = RECT;
+    int size = RECT.height()-f2;
+    Qt::Orientation o = Qt::Vertical;
+    const bool vertical = verticalTabs(tab->shape);
+    if (vertical)
+    {
+        rect.adjust(dpi.f5, dpi.f1, -dpi.f5, -dpi.f1);
+        o = Qt::Horizontal;
+        size = RECT.width()-f2;
+    }
+    else
+        rect.adjust(dpi.f1, dpi.f5, -dpi.f1, -dpi.f5);
 
-   QColor c;
-   if (sunken) {
-      c = CCOLOR(tab.active, Bg);
-      if (config.tab.activeTabSunken) {
-         if (vertical)
-            rect.adjust(0, dpi.f1, 0, -dpi.f2);
-         else
-            rect.adjust(f2, -f2, -f2, 0);
-      }
-      else {
-         if (vertical)
-            rect.adjust(-dpi.f1, f2, dpi.f1, -f2);
-         else
-            rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
-      }
-   }
-   else {
-//       c = CCOLOR(tab.std, Bg);
-//       int quota = 6 + (int) (.16 * Colors::contrast(c, CCOLOR(tab.active, 0)));
-//       c = Colors::mid(c, CCOLOR(tab.active, 0), quota, animStep);
-      c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 8-animStep, animStep);
-   }
+    QColor c;
+    if (sunken)
+    {
+        c = CCOLOR(tab.active, Bg);
+        if (config.tab.activeTabSunken)
+        {
+            if (vertical)
+                rect.adjust(0, dpi.f1, 0, -dpi.f2);
+            else
+                rect.adjust(f2, -f2, -f2, 0);
+        }
+        else
+        {
+            if (vertical)
+                rect.adjust(-dpi.f1, f2, dpi.f1, -f2);
+            else
+                rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
+        }
+    }
+    else
+    {
+    //       c = CCOLOR(tab.std, Bg);
+    //       int quota = 6 + (int) (.16 * Colors::contrast(c, CCOLOR(tab.active, 0)));
+    //       c = Colors::mid(c, CCOLOR(tab.active, 0), quota, animStep);
+        c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 8-animStep, animStep);
+    }
 
-   const Gradients::Type gt = GRAD(tab) == Gradients::Sunken ?
-      Gradients::None : GRAD(tab);
-   const QPoint off = rect.topLeft()-RECT.topLeft()-QPoint(dpi.f3,f2);
-   masks.rect[true].render(rect, painter, gt, o, c, size, off);
-   if (config.tab.activeTabSunken && sunken) {
-      rect.setBottom(rect.bottom()+f2);
-      shadows.sunken[true][true].render(rect, painter);
-   }
+    const Gradients::Type gt = GRAD(tab) == Gradients::Sunken ? Gradients::None : GRAD(tab);
+    const QPoint off = rect.topLeft()-RECT.topLeft()-QPoint(dpi.f3,f2);
+    masks.rect[true].render(rect, painter, gt, o, c, size, off);
+    if (config.tab.activeTabSunken && sunken)
+    {
+        rect.setBottom(rect.bottom()+f2);
+        shadows.sunken[true][true].render(rect, painter);
+    }
 }
 
 void
 BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
                           const QWidget *) const
 {
-   ASSURE_OPTION(tab, Tab);
-   OPT_SUNKEN OPT_ENABLED OPT_HOVER
-   if (tab->position == QStyleOptionTab::OnlyOneTab) {
-      sunken = false;
-      hover = false;
-   }
-   else
-      sunken = sunken || (option->state & State_Selected);
-   if (sunken) hover = false;
-   
-   painter->save();
-   QRect tr = RECT;
-   
-   bool verticalTabs = false;
-   bool east = false;
+    ASSURE_OPTION(tab, Tab);
+    OPT_SUNKEN OPT_ENABLED OPT_HOVER
+    if (tab->position == QStyleOptionTab::OnlyOneTab)
+    {
+        sunken = false;
+        hover = false;
+    }
+    else
+        sunken = sunken || (option->state & State_Selected);
+    if (sunken) hover = false;
 
-   
-   int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
+    painter->save();
+    QRect tr = RECT;
 
-   switch(tab->shape) {
-   case QTabBar::RoundedEast: case QTabBar::TriangularEast:
-      east = true;
-   case QTabBar::RoundedWest: case QTabBar::TriangularWest:
-      verticalTabs = true;
-      break;
-   default:
-      break;
-   }
+    bool verticalTabs = false;
+    bool east = false;
+
+
+    int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
+
+    switch(tab->shape)
+    {
+    case QTabBar::RoundedEast: case QTabBar::TriangularEast:
+        east = true;
+    case QTabBar::RoundedWest: case QTabBar::TriangularWest:
+        verticalTabs = true;
+        break;
+    default:
+        break;
+    }
+
+    if (verticalTabs)
+    {
+        int newX, newY, newRot;
+        if (east)
+        {
+            newX = tr.width(); newY = tr.y(); newRot = 90;
+        }
+        else
+        {
+            newX = 0; newY = tr.y() + tr.height(); newRot = -90;
+        }
+        tr.setRect(0, 0, tr.height(), tr.width());
+        QMatrix m; m.translate(newX, newY); m.rotate(newRot);
+        painter->setMatrix(m, true);
+    }
        
-   if (verticalTabs) {
-      int newX, newY, newRot;
-      if (east) {
-         newX = tr.width(); newY = tr.y(); newRot = 90;
-      }
-      else {
-         newX = 0; newY = tr.y() + tr.height(); newRot = -90;
-      }
-      tr.setRect(0, 0, tr.height(), tr.width());
-      QMatrix m;
-      m.translate(newX, newY); m.rotate(newRot);
-      painter->setMatrix(m, true);
-   }
-       
-   if (!tab->icon.isNull()) {
-      QSize iconSize;
-      if (const QStyleOptionTabV2 *tabV2 = qstyleoption_cast<const QStyleOptionTabV2*>(tab))
-         iconSize = tabV2->iconSize;
-      if (!iconSize.isValid()) {
-         int iconExtent = pixelMetric(PM_SmallIconSize);
-         iconSize = QSize(iconExtent, iconExtent);
-      }
-      QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ? QIcon::Normal : QIcon::Disabled);
-      painter->drawPixmap(tr.left() + dpi.f9, tr.center().y() - tabIcon.height() / 2, tabIcon);
-      tr.setLeft(tr.left() + iconSize.width() + dpi.f12);
-      alignment = Qt::AlignLeft | Qt::AlignVCenter | BESPIN_MNEMONIC;
-   }
-       
-   // color adjustment
-   QColor cF, cB;
-   if (sunken) {
-      cF = CCOLOR(tab.active, Fg);
-      cB = CCOLOR(tab.active, Bg);
-   }
-   else if (animStep) {
-      cF = cF = CCOLOR(tab.std, Fg);
-      cB = Colors::mid(CCOLOR(tab.std, Bg ), CCOLOR(tab.active, Bg), 8-animStep, animStep);
-      if (Colors::contrast(CCOLOR(tab.active, Fg), cB) > Colors::contrast(cF, cB))
-         cF = CCOLOR(tab.active, Fg);
-   }
-   else {
-      cB = Colors::mid(CCOLOR(tab.std, Bg), FCOLOR(Window), 2, 1);
-      cF = Colors::mid(cB, CCOLOR(tab.std, Fg), 1,4);
-   }
+    if (!tab->icon.isNull())
+    {
+        QSize iconSize;
+        if (const QStyleOptionTabV2 *tabV2 = qstyleoption_cast<const QStyleOptionTabV2*>(tab))
+            iconSize = tabV2->iconSize;
+        if (!iconSize.isValid())
+        {
+            int iconExtent = pixelMetric(PM_SmallIconSize);
+            iconSize = QSize(iconExtent, iconExtent);
+        }
+        QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ? QIcon::Normal : QIcon::Disabled);
+        painter->drawPixmap(tr.left() + dpi.f9, tr.center().y() - tabIcon.height() / 2, tabIcon);
+        tr.setLeft(tr.left() + iconSize.width() + dpi.f12);
+        alignment = Qt::AlignLeft | Qt::AlignVCenter | BESPIN_MNEMONIC;
+    }
 
-   // dark background, let's paint an emboss
-   if (isEnabled) {
-      painter->setPen(cB.dark(120));
-      tr.moveTop(tr.top()-1);
-      drawItemText(painter, tr, alignment, PAL, isEnabled, tab->text);
-      tr.moveTop(tr.top()+1);
-   }
-   painter->setPen(cF);
-   drawItemText(painter, tr, alignment, PAL, isEnabled, tab->text);
+    // color adjustment
+    QColor cF, cB;
+    if (sunken)
+    {
+        cF = CCOLOR(tab.active, Fg);
+        cB = CCOLOR(tab.active, Bg);
+    }
+    else if (animStep)
+    {
+        cF = cF = CCOLOR(tab.std, Fg);
+        cB = Colors::mid(CCOLOR(tab.std, Bg ), CCOLOR(tab.active, Bg), 8-animStep, animStep);
+        if (Colors::contrast(CCOLOR(tab.active, Fg), cB) > Colors::contrast(cF, cB))
+            cF = CCOLOR(tab.active, Fg);
+    }
+    else
+    {
+        cB = Colors::mid(CCOLOR(tab.std, Bg), FCOLOR(Window), 2, 1);
+        cF = Colors::mid(cB, CCOLOR(tab.std, Fg), 1,4);
+    }
 
-   painter->restore();
-   animStep = -1;
+    // dark background, let's paint an emboss
+    if (isEnabled)
+    {
+        painter->setPen(cB.dark(120));
+        tr.moveTop(tr.top()-1);
+        drawItemText(painter, tr, alignment, PAL, isEnabled, tab->text);
+        tr.moveTop(tr.top()+1);
+    }
+    painter->setPen(cF);
+    drawItemText(painter, tr, alignment, PAL, isEnabled, tab->text);
+
+    painter->restore();
+    animStep = -1;
 }
 
 void

@@ -35,3 +35,11 @@ extern Dpi dpi;
 
 #define BESPIN_MNEMONIC Qt::TextHideMnemonic
 // #define BESPIN_MNEMONIC Qt::TextShowMnemonic
+
+static inline void
+setBold(QPainter *p)
+{
+    QFont fnt = p->font();
+    fnt.setBold(true);
+    p->setFont(fnt);
+}

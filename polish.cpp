@@ -68,101 +68,6 @@ setBoldFont(QWidget *w, bool bold = true)
     w->setFont(fnt);
 }
 
-static void
-makeStructure(QPixmap **pixp, const QColor &c, bool light)
-{
-    if (!(*pixp))
-        (*pixp) = new QPixmap(64, 64);
-    QPixmap *pix = (*pixp);
-    QPainter p(pix);
-    int i;
-    switch (config.bg.structure)
-    {
-    default:
-    case 0: // scanlines
-        pix->fill( c.light(config.bg.intensity).rgb() );
-        i = 100 + (light?6:3)*(config.bg.intensity - 100)/10;
-        p.setPen(c.light(i));
-        for ( i = 1; i < 64; i += 4 ) {
-            p.drawLine( 0, i, 63, i );
-            p.drawLine( 0, i+2, 63, i+2 );
-        }
-        p.setPen( c );
-        for ( i = 2; i < 63; i += 4 )
-            p.drawLine( 0, i, 63, i );
-        break;
-    case 1: //checkboard
-        p.setPen(Qt::NoPen);
-        i = 100 + 2*(config.bg.intensity - 100)/10;
-        p.setBrush(c.light(i));
-        if (light) {
-            p.drawRect(0,0,16,16); p.drawRect(32,0,16,16);
-            p.drawRect(16,16,16,16); p.drawRect(48,16,16,16);
-            p.drawRect(0,32,16,16); p.drawRect(32,32,16,16);
-            p.drawRect(16,48,16,16); p.drawRect(48,48,16,16);
-        }
-        else {
-            p.drawRect(0,0,32,32);
-            p.drawRect(32,32,32,32);
-        }
-        p.setBrush(c.dark(i));
-        if (light) {
-            p.drawRect(16,0,16,16); p.drawRect(48,0,16,16);
-            p.drawRect(0,16,16,16); p.drawRect(32,16,16,16);
-            p.drawRect(16,32,16,16); p.drawRect(48,32,16,16);
-            p.drawRect(0,48,16,16); p.drawRect(32,48,16,16);
-        }
-        else {
-            p.drawRect(32,0,32,32);
-            p.drawRect(0,32,32,32);
-        }
-        break;
-    case 2:  // fat scans
-        i = (config.bg.intensity - 100);
-        pix->fill( c.light(100+3*i/10).rgb() );
-        p.setPen(QPen(light ? c.light(100+i/10) : c, 3));
-        p.setBrush( c.dark(100+2*i/10) );
-        p.drawRect(-3,8,70,8);
-        p.drawRect(-3,24,70,8);
-        p.drawRect(-3,40,70,8);
-        p.drawRect(-3,56,70,8);
-        break;
-    case 3: // "blue"print
-        i = (config.bg.intensity - 100);
-        pix->fill( c.dark(100+i/10).rgb() );
-        p.setPen(c.light(100+(light?4:2)*i/10));
-        for ( i = 0; i < 64; i += 16 )
-            p.drawLine( 0, i, 63, i );
-        for ( i = 0; i < 64; i += 16 )
-            p.drawLine( i, 0, i, 63 );
-        break;
-    case 4: // verticals
-        i = (config.bg.intensity - 100);
-        pix->fill( c.light(100+i).rgb() );
-        p.setPen(c.light(100+(light?6:3)*i/10));
-        for ( i = 1; i < 64; i += 4 ) {
-            p.drawLine( i, 0, i, 63 );
-            p.drawLine( i+2, 0, i+2, 63 );
-        }
-        p.setPen( c );
-        for ( i = 2; i < 63; i += 4 )
-            p.drawLine( i, 0, i, 63 );
-        break;
-    case 5: // diagonals
-        i = config.bg.intensity - 100;
-        pix->fill( c.light(100+i).rgb() );
-        p.setPen(QPen(c.dark(100 + i/(2*(light+1))), 11));
-        p.setRenderHint(QPainter::Antialiasing);
-        p.drawLine(-64,64,64,-64);
-        p.drawLine(0,64,64,0);
-        p.drawLine(0,128,128,0);
-        p.drawLine(32,64,64,32);
-        p.drawLine(0,32,32,0);
-        break;
-    }
-    p.end();
-}
-
 void BespinStyle::polish ( QApplication * app )
 {
     QPalette pal = app->palette();
@@ -177,23 +82,13 @@ void BespinStyle::polish ( QApplication * app )
 void BespinStyle::polish( QPalette &pal )
 {
     QColor c = pal.color(QPalette::Active, QPalette::Background);
-    if (config.bg.mode > Scanlines)
+    if (config.bg.mode > Plain)
     {
         int h,s,v;
         c.getHsv(&h,&s,&v);
-        if (v < 70) // very dark colors won't make nice backgrounds ;)
-            c.setHsv(h,s,70);
+        if (v < 80) // very dark colors won't make nice backgrounds ;)
+            c.setHsv(h,s,80);
         pal.setColor( QPalette::Window, c );
-    }
-    if (_scanlines[0]) delete _scanlines[0]; _scanlines[0] = 0;
-    if (_scanlines[1]) delete _scanlines[1]; _scanlines[1] = 0;
-    QLinearGradient lg; QPainter p;
-    if (config.bg.mode == Scanlines)
-    {
-        QColor c = pal.color(QPalette::Active, QPalette::Background);
-        makeStructure(&_scanlines[0], c, false);
-        QBrush brush( c, *_scanlines[0] );
-        pal.setBrush( QPalette::Background, brush );
     }
 
     // AlternateBase
@@ -215,8 +110,8 @@ void BespinStyle::polish( QPalette &pal )
 
 #if QT_VERSION >= 0x040400
     // tooltip (NOTICE not configurable by qtconfig, kde can, let's see what we're gonna do on this...)
-    pal.setColor(QPalette::ToolTipBase, pal.color(QPalette::Active, QPalette::WindowText));
-    pal.setColor(QPalette::ToolTipText, pal.color(QPalette::Active, QPalette::Window));
+    pal.setColor(QPalette::ToolTipBase, pal.color(QPalette::Active, config.bg.tooltip_role[Bg]));
+    pal.setColor(QPalette::ToolTipText, pal.color(QPalette::Active, config.bg.tooltip_role[Fg]));
 #endif
 
     // inactive palette
@@ -251,8 +146,8 @@ void BespinStyle::polish( QPalette &pal )
 
     // more on tooltips... (we force some colors...)
     QPalette toolPal = QToolTip::palette();
-    const QColor bg = pal.color(QPalette::Active, QPalette::WindowText);
-    const QColor fg = pal.color(QPalette::Active, QPalette::Window);
+    const QColor bg = pal.color(config.bg.tooltip_role[Bg]);
+    const QColor fg = pal.color(config.bg.tooltip_role[Fg]);
     toolPal.setColor(QPalette::Window, bg);
     toolPal.setColor(QPalette::WindowText, fg);
     toolPal.setColor(QPalette::Base, bg);
@@ -376,32 +271,16 @@ BespinStyle::polish( QWidget * widget )
         // talk to kwin about colors, gradients, etc.
         setupDecoFor(widget);
 
-        if (config.bg.mode > Scanlines)
+        if (config.bg.mode > Plain)
             widget->setAttribute(Qt::WA_StyledBackground);
 
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
-        { // glass mode popups
+        {
             if (config.menu.glassy)
-            {
-                if (config.bg.mode == Scanlines)
-                {
-                    QPalette pal = widget->palette();
-                    pal.setBrush(QPalette::Background, pal.color(QPalette::Active, QPalette::Background));
-                    menu->setPalette(pal);
-                }
+            {   // glass mode popups
                 menu->setAttribute(Qt::WA_MacBrushedMetal);
                 menu->setAttribute(Qt::WA_StyledBackground);
-            }
-            // apple style popups
-            if (config.bg.mode == Scanlines)
-            {
-                QPalette pal = menu->palette();
-                QColor c = pal.color(QPalette::Active, QPalette::Window);
-                if (!_scanlines[1]) makeStructure(&_scanlines[1], c, true);
-                QBrush brush( c, *_scanlines[1] );
-                pal.setBrush( QPalette::Window, brush );
-                menu->setPalette(pal);
             }
             // opacity
             menu->setWindowOpacity( config.menu.opacity/100.0 );
@@ -624,19 +503,7 @@ BespinStyle::polish( QWidget * widget )
     {
         widget->setBackgroundRole(QPalette::Window);
         widget->setForegroundRole(QPalette::WindowText);
-        if (isTopContainer && config.bg.mode == Scanlines)
-        {
-            widget->setAutoFillBackground ( true );
-            QPalette pal = widget->palette();
-            QColor c = pal.color(QPalette::Active, QPalette::Window);
-
-            if (!_scanlines[1])
-            makeStructure(&_scanlines[1], c, true);
-            QBrush brush( c, *_scanlines[1] );
-            pal.setBrush( QPalette::Window, brush );
-            widget->setPalette(pal);
-        }
-        else if (widget->inherits("QToolBarHandle"))
+        if (!isTopContainer && widget->inherits("QToolBarHandle"))
             widget->setAttribute(Qt::WA_Hover);
     }
 

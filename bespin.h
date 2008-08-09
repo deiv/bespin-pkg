@@ -144,6 +144,7 @@ protected:
    void drawRadioItem(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawCheckLabel(const QStyleOption*, QPainter*, const QWidget*) const;
    // docks.cpp
+   void drawDockBg(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawDockTitle(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawDockHandle(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawMDIControls(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
