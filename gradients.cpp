@@ -368,6 +368,24 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
 }
 
 #ifndef BESPIN_DECO
+#include <QDebug>
+static QPixmap _dither;
+
+static inline void
+createDither()
+{
+    QImage img(32,32, QImage::Format_ARGB32);
+    QRgb *pixel = (QRgb*)img.bits();
+    int a, v;
+    for (int i = 0; i < 1024; ++i) // 32*32...
+    {
+        a = rand() % 5;
+        v = (a%2)*255;
+        *pixel = qRgba(v,v,v,a);
+        ++pixel;
+    }
+    _dither = QPixmap::fromImage(img);
+}
 
 const QPixmap
 &Gradients::structure(const QColor &oc, bool light)
@@ -570,149 +588,172 @@ const QPixmap &Gradients::shadow(int height, bool bottom) {
    return *pix;
 }
 
-static inline QPixmap *cornerMask(bool right = false) {
-   QPixmap *alpha = new QPixmap(128,128);
-   QRadialGradient rg(right ? alpha->rect().topLeft() :
-                      alpha->rect().topRight(), 128);
+static inline QPixmap *
+cornerMask(bool right = false)
+{
+    QPixmap *alpha = new QPixmap(128,128);
+    QRadialGradient rg(right ? alpha->rect().topLeft() : alpha->rect().topRight(), 128);
 //    QLinearGradient rg;
 //    if (right) rg = QLinearGradient(0,0, 128,0);
 //    else rg = QLinearGradient(128,0, 0,0);
 #ifndef QT_NO_XRENDER
-   alpha->fill(Qt::transparent);
-   rg.setColorAt(0, Qt::transparent);
+    alpha->fill(Qt::transparent);
+    rg.setColorAt(0, Qt::transparent);
 #else
-   rg.setColorAt(0, Qt::black);
+    rg.setColorAt(0, Qt::black);
 #endif
-   rg.setColorAt(1, Qt::white);
-   QPainter p(alpha); p.fillRect(alpha->rect(), rg); p.end();
-   return alpha;
+    rg.setColorAt(1, Qt::white);
+    QPainter p(alpha); p.fillRect(alpha->rect(), rg); p.end();
+    return alpha;
 }
 
-const BgSet &Gradients::bgSet(const QColor &c) {
-   BgSet *set = _bgSet.object(c.rgb());
-   if (set)
-      return *set;
-   set = new BgSet;
-   QLinearGradient lg;
-   QPainter p;
-   switch (_mode) {
-   case BevelV: {
-      set->topTile = QPixmap(32, 256);
-      set->btmTile = QPixmap(32, 256);
-      set->cornerTile = QPixmap(32, 128);
-      set->lCorner = QPixmap(128, 128);
-      set->rCorner = QPixmap(128, 128);
-      const QColor c1 = c.light(_bgIntensity);
-      const QColor c2 = Colors::mid(c1, c);
+const BgSet &
+Gradients::bgSet(const QColor &c)
+{
+    BgSet *set = _bgSet.object(c.rgb());
+    if (set)
+        return *set;
+    set = new BgSet;
+    QLinearGradient lg;
+    QPainter p;
+    switch (_mode)
+    {
+    case BevelV:
+    {
+        set->topTile = QPixmap(32, 256);
+        set->btmTile = QPixmap(32, 256);
+        set->cornerTile = QPixmap(32, 128);
+        set->lCorner = QPixmap(128, 128);
+        set->rCorner = QPixmap(128, 128);
+        const QColor c1 = c.light(_bgIntensity);
+        const QColor c2 = Colors::mid(c1, c);
 
-      lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
-      QGradientStops stops;
-      // Top Tile
-      p.begin(&set->topTile);
-      stops << QGradientStop(0, c1) << QGradientStop(1, c);
-      lg.setStops(stops); p.fillRect(set->topTile.rect(), lg);
-      stops.clear(); p.end();
-      // Bottom Tile
-      p.begin(&set->btmTile);
-      stops << QGradientStop(0, c) << QGradientStop(1, c.dark(_bgIntensity));
-      lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg);
-      stops.clear(); p.end();
-      
-      if (Colors::value(c) > 244)
-         break; // would be mathematically nonsense, i.e. shoulders = 255...
+        lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
+        QGradientStops stops;
+        // Top Tile
+        p.begin(&set->topTile);
+        stops << QGradientStop(0, c1) << QGradientStop(1, c);
+        lg.setStops(stops); p.fillRect(set->topTile.rect(), lg); stops.clear();
+        p.drawTiledPixmap(set->topTile.rect(), _dither);
+        p.end();
+        // Bottom Tile
+        p.begin(&set->btmTile);
+        stops << QGradientStop(0, c) << QGradientStop(1, c.dark(_bgIntensity));
+        lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg); stops.clear();
+        p.drawTiledPixmap(set->btmTile.rect(), _dither);
+        p.end();
 
-      // Corner Tile
-      lg = QLinearGradient(QPoint(0,0), QPoint(0,128));
-      p.begin(&set->cornerTile);
-      stops << QGradientStop(0, Colors::mid(c1, c2,1,6)) << QGradientStop(1, c2);
-      lg.setStops(stops);
-      p.fillRect(set->cornerTile.rect(), c2);
-      stops.clear();
-      p.end();
-      // Left Corner, right corner
-      QPixmap *mask, *pix;
-      for (int cnr = 0; cnr < 2; ++cnr) {
-         pix = cnr ? &set->rCorner : &set->lCorner;
-         p.begin(pix);
-         p.drawTiledPixmap(pix->rect(), set->topTile);
-         p.end();
-         mask = cornerMask(cnr);
+        if (Colors::value(c) > 244)
+            break; // would be mathematically nonsense, i.e. shoulders = 255...
+
+        // Corner Tile
+        lg = QLinearGradient(QPoint(0,0), QPoint(0,128));
+        p.begin(&set->cornerTile);
+        stops << QGradientStop(0, Colors::mid(c1, c2,1,6)) << QGradientStop(1, c2);
+        lg.setStops(stops);
+        p.fillRect(set->cornerTile.rect(), c2);
+        stops.clear();
+        p.drawTiledPixmap(set->cornerTile.rect(), _dither);
+        p.end();
+        // Left Corner, right corner
+        QPixmap *mask, *pix;
+        for (int cnr = 0; cnr < 2; ++cnr)
+        {
+            pix = cnr ? &set->rCorner : &set->lCorner;
+            p.begin(pix);
+            p.drawTiledPixmap(pix->rect(), set->topTile);
+            p.end();
+            mask = cornerMask(cnr);
 #ifndef QT_NO_XRENDER
-         for (int i = 0; i < 128; i += 32)
-            OXRender::composite(set->cornerTile, mask->x11PictureHandle(),
-                                *pix, 0, 0, i, 0, i, 0, 32, 128, PictOpOver);
+            for (int i = 0; i < 128; i += 32)
+                OXRender::composite(set->cornerTile, mask->x11PictureHandle(),
+                                    *pix, 0, 0, i, 0, i, 0, 32, 128, PictOpOver);
+            p.begin(pix); p.drawTiledPixmap(pix->rect(), _dither); p.end();
 #else
-         QPixmap fill(pix->size());
-         p.begin(&fill);
-         p.drawTiledPixmap(fill.rect(), set->cornerTile); p.end();
-         fill.setAlphaChannel(*mask);
-         p.begin(pix); p.drawPixmap(0,0, fill); p.end();
+            QPixmap fill(pix->size());
+            p.begin(&fill);
+            p.drawTiledPixmap(fill.rect(), set->cornerTile); p.end();
+            fill.setAlphaChannel(*mask);
+            p.begin(pix);
+            p.drawPixmap(0,0, fill); p.drawTiledPixmap(pix->rect(), _dither);
+            p.end();
 #endif
-         delete mask;
-      }
-      break;
-   }
-   case BevelH: {
-      set->topTile = QPixmap(256, 32);
-      set->btmTile = QPixmap(256, 32);
-      set->lCorner = QPixmap(256, 32);
-      set->rCorner = QPixmap(256, 32);
-      set->cornerTile = QPixmap(32, 128);
-      
-      lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
-      QGradientStops stops;
-      const QColor c1 = c.dark(_bgIntensity);
-      
-      // left
-      p.begin(&set->topTile);
-      stops << QGradientStop(0, c1) << QGradientStop(1, c);
-      lg.setStops(stops); p.fillRect(set->topTile.rect(), lg);
-      stops.clear(); p.end();
-      // right
-      p.begin(&set->btmTile);
-      stops << QGradientStop(0, c) << QGradientStop(1, c1);
-      lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg);
-      stops.clear(); p.end();
-      // left corner right corner
-      QPixmap *mask, *pix, *blend;
-      for (int cnr = 0; cnr < 2; ++cnr) {
-         if (cnr) {
-            pix = &set->rCorner; blend = &set->btmTile;
-         }
-         else {
-            pix = &set->lCorner; blend = &set->topTile;
-         }
-         pix->fill(c);
-         mask = new QPixmap(256,32);
-         lg = QLinearGradient(0,0, 0,32);
-         lg.setColorAt(1, Qt::white);
+            delete mask;
+        }
+        break;
+    }
+    case BevelH:
+    {
+        set->topTile = QPixmap(256, 32);
+        set->btmTile = QPixmap(256, 32);
+        set->lCorner = QPixmap(256, 32);
+        set->rCorner = QPixmap(256, 32);
+        set->cornerTile = QPixmap(32, 128);
+
+        lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
+        QGradientStops stops;
+        const QColor c1 = c.dark(_bgIntensity);
+
+        // left
+        p.begin(&set->topTile);
+        stops << QGradientStop(0, c1) << QGradientStop(1, c);
+        lg.setStops(stops); p.fillRect(set->topTile.rect(), lg); stops.clear();
+        p.drawTiledPixmap(set->topTile.rect(), _dither);
+        p.end();
+        // right
+        p.begin(&set->btmTile);
+        stops << QGradientStop(0, c) << QGradientStop(1, c1);
+        lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg); stops.clear();
+        p.drawTiledPixmap(set->btmTile.rect(), _dither);
+        p.end();
+        // left corner right corner
+        QPixmap *mask, *pix, *blend;
+        for (int cnr = 0; cnr < 2; ++cnr)
+        {
+            if (cnr)
+            {
+                pix = &set->rCorner; blend = &set->btmTile;
+            }
+            else
+            {
+                pix = &set->lCorner; blend = &set->topTile;
+            }
+            pix->fill(c);
+            mask = new QPixmap(256,32);
+            lg = QLinearGradient(0,0, 0,32);
+            lg.setColorAt(1, Qt::white);
 #ifndef QT_NO_XRENDER
-         mask->fill(Qt::transparent);
-         lg.setColorAt(0, Qt::transparent);
-         p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
-         OXRender::composite(*blend, mask->x11PictureHandle(),
-                             *pix, 0, 0, 0, 0, 0, 0, 256, 32, PictOpOver);
+            mask->fill(Qt::transparent);
+            lg.setColorAt(0, Qt::transparent);
+            p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
+            OXRender::composite(*blend, mask->x11PictureHandle(),
+                                *pix, 0, 0, 0, 0, 0, 0, 256, 32, PictOpOver);
+            p.begin(pix); p.drawTiledPixmap(pix->rect(), _dither); p.end();
 #else
-         lg.setColorAt(0, Qt::black);
-         p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
-         QPixmap fill(pix->size());
-         p.begin(&fill); p.drawTiledPixmap(fill.rect(), *blend); p.end();
-         fill.setAlphaChannel(*mask);
-         p.begin(pix); p.drawPixmap(0,0, fill); p.end();
+            lg.setColorAt(0, Qt::black);
+            p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
+            QPixmap fill(pix->size());
+            p.begin(&fill); p.drawTiledPixmap(fill.rect(), *blend); p.end();
+            fill.setAlphaChannel(*mask);
+            p.begin(pix);
+            p.drawPixmap(0,0, fill); p.drawTiledPixmap(pix->rect(), _dither);
+            p.end();
 #endif
-         delete mask;
-      }
-      lg = QLinearGradient(QPoint(0,0), QPoint(0, 128));
-      lg.setColorAt(0, c.light(_bgIntensity)); lg.setColorAt(1, c);
-      p.begin(&set->cornerTile);
-      p.fillRect(set->cornerTile.rect(), lg); p.end();
-      break;
-   }
-   default:
-      break;
-   }
-   _bgSet.insert(c.rgb(), set, costs(set));
-   return *set;
+            delete mask;
+        }
+        lg = QLinearGradient(QPoint(0,0), QPoint(0, 128));
+        lg.setColorAt(0, c.light(_bgIntensity)); lg.setColorAt(1, c);
+        p.begin(&set->cornerTile);
+        p.fillRect(set->cornerTile.rect(), lg);
+        p.drawTiledPixmap(set->cornerTile.rect(), _dither);
+        p.end();
+        break;
+    }
+    default:
+        break;
+    }
+    _bgSet.insert(c.rgb(), set, costs(set));
+    return *set;
 }
 
 void
@@ -737,6 +778,7 @@ Gradients::init(BgMode mode, int structure, Type progress, int bgIntesity, int b
       _bevel[i].fill(Qt::transparent);
       p.begin(&_bevel[i]); p.fillRect(_bevel[i].rect(), lg); p.end();
    }
+   createDither();
 #else
 
 const QPixmap&

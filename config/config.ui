@@ -112,8 +112,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>274</width>
-        <height>447</height>
+        <width>228</width>
+        <height>111</height>
        </rect>
       </property>
       <attribute name="label" >
@@ -1993,12 +1993,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>714</x>
-     <y>149</y>
+     <x>833</x>
+     <y>145</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>727</x>
-     <y>149</y>
+     <x>846</x>
+     <y>145</y>
     </hint>
    </hints>
   </connection>
@@ -2009,12 +2009,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>700</x>
-     <y>177</y>
+     <x>819</x>
+     <y>173</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>727</x>
-     <y>177</y>
+     <x>846</x>
+     <y>173</y>
     </hint>
    </hints>
   </connection>
@@ -2025,12 +2025,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>721</x>
-     <y>258</y>
+     <x>388</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>741</x>
-     <y>258</y>
+     <x>388</x>
+     <y>85</y>
     </hint>
    </hints>
   </connection>
@@ -2041,12 +2041,28 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>570</x>
-     <y>301</y>
+     <x>388</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>649</x>
-     <y>301</y>
+     <x>388</x>
+     <y>85</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>modalOpacity</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_32</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>647</x>
+     <y>257</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>831</x>
+     <y>256</y>
     </hint>
    </hints>
   </connection>
