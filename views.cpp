@@ -24,35 +24,32 @@ void
 BespinStyle::drawHeader(const QStyleOption * option, QPainter * painter,
                         const QWidget * widget) const
 {
+    ASSURE_OPTION(header, Header);
 
-   const QStyleOptionHeader *header =
-      qstyleoption_cast<const QStyleOptionHeader *>(option);
-   if (!header) return;
+    if (isGTK)
+        const_cast<QStyleOption*>(option)->palette = qApp->palette();
 
-   if (isGTK)
-      const_cast<QStyleOption*>(option)->palette = qApp->palette();
-   
-   // init
-//    const QRegion clipRegion = painter->clipRegion();
-//    painter->setClipRect(RECT/*, Qt::IntersectClip*/);
-       
-   // base
-   drawHeaderSection(header, painter, widget);
+    // init
+    //    const QRegion clipRegion = painter->clipRegion();
+    //    painter->setClipRect(RECT/*, Qt::IntersectClip*/);
 
-   // label
-   drawHeaderLabel(header, painter, widget);
-       
-   // sort Indicator on sorting or (inverted) on hovered headers
-   if (header->sortIndicator != QStyleOptionHeader::None) {
-      QStyleOptionHeader subopt = *header;
-      subopt.rect = subElementRect(SE_HeaderArrow, option, widget);
-      painter->save();
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(Colors::mid(CCOLOR(view.sortingHeader, Bg),
-                                    CCOLOR(view.sortingHeader, Fg)));
-      drawHeaderArrow(&subopt, painter, widget);
-      painter->restore();
-   }
+    // base
+    drawHeaderSection(header, painter, widget);
+
+    // label
+    drawHeaderLabel(header, painter, widget);
+
+    // sort Indicator on sorting or (inverted) on hovered headers
+    if (header->sortIndicator != QStyleOptionHeader::None)
+    {
+        QStyleOptionHeader subopt = *header;
+        subopt.rect = subElementRect(SE_HeaderArrow, option, widget);
+        painter->save();
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(Colors::mid(CCOLOR(view.sortingHeader, Bg), CCOLOR(view.sortingHeader, Fg)));
+        drawHeaderArrow(&subopt, painter, widget);
+        painter->restore();
+    }
        
 //    painter->setClipRegion(clipRegion);
 }
@@ -61,138 +58,133 @@ void
 BespinStyle::drawHeaderSection(const QStyleOption * option, QPainter * painter,
                                const QWidget *) const
 {
-   OPT_SUNKEN OPT_HOVER
-   const QStyleOptionHeader *header =
-      qstyleoption_cast<const QStyleOptionHeader *>(option);
-   Qt::Orientation o = Qt::Vertical; int s = RECT.height();
-   if (header && header->orientation == Qt::Vertical) {
-      o = Qt::Horizontal;
-      s = RECT.width();
-   }
-   const QColor &c =
-      (header->sortIndicator != QStyleOptionHeader::None) ?
-      COLOR(config.view.sortingHeader_role[Bg]) :
-      COLOR(config.view.header_role[Bg]);
-   if (isGTK)
-      sunken = option->state & State_HasFocus;
-   if (sunken) {
-      const QPixmap &sunk = Gradients::pix(c, s, o, Gradients::Sunken);
-      painter->drawTiledPixmap(RECT, sunk);
-      return;
-   }
+    OPT_SUNKEN OPT_HOVER
+    const QStyleOptionHeader *header =
+        qstyleoption_cast<const QStyleOptionHeader *>(option);
+    Qt::Orientation o = Qt::Vertical; int s = RECT.height();
+    if (header && header->orientation == Qt::Vertical)
+    {
+        o = Qt::Horizontal;
+        s = RECT.width();
+    }
+    const QColor &c =   (header->sortIndicator != QStyleOptionHeader::None) ?
+                        COLOR(config.view.sortingHeader_role[Bg]) :
+                        COLOR(config.view.header_role[Bg]);
+    if (isGTK)
+        sunken = option->state & State_HasFocus;
+    if (sunken)
+    {
+        const QPixmap &sunk = Gradients::pix(c, s, o, Gradients::Sunken);
+        painter->drawTiledPixmap(RECT, sunk);
+        return;
+    }
 
-   const Gradients::Type gt =
-      (header->sortIndicator != QStyleOptionHeader::None) ?
-      config.view.sortingHeaderGradient :
-      config.view.headerGradient;
-   QRect r = RECT;
-   if (o == Qt::Vertical)
-      r.setBottom(r.bottom()-1);
-   if (hover) {
-      const bool sort =
-         (header->sortIndicator != QStyleOptionHeader::None);
-      QColor bg =
-         Colors::mid(c, sort ?
-                     CCOLOR(view.sortingHeader, Fg) :
-                     CCOLOR(view.header, Fg),10,1);
-      painter->drawTiledPixmap(r, Gradients::pix(bg, s, o, gt));
-   }
-   else
-      painter->drawTiledPixmap(r, Gradients::pix(c, s, o, gt));
+    const Gradients::Type gt =  (header->sortIndicator != QStyleOptionHeader::None) ?
+                                config.view.sortingHeaderGradient : config.view.headerGradient;
+    QRect r = RECT;
+    if (o == Qt::Vertical)
+        r.setBottom(r.bottom()-1);
+    if (hover)
+    {
+        const bool sort = (header->sortIndicator != QStyleOptionHeader::None);
+        QColor bg = Colors::mid(c, sort ? CCOLOR(view.sortingHeader, Fg) : CCOLOR(view.header, Fg),10,1);
+        painter->drawTiledPixmap(r, Gradients::pix(bg, s, o, gt));
+    }
+    else
+        painter->drawTiledPixmap(r, Gradients::pix(c, s, o, gt));
 
-   if (o == Qt::Vertical) {
-      r.setLeft(r.right() - dpi.f1);
-      painter->drawTiledPixmap(r, Gradients::pix(c, s, o,
-         Gradients::Sunken));
-      painter->save();
-      painter->setPen(Colors::mid(FCOLOR(Base), Qt::black, 8, 1));
-      painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
-      painter->restore();
-   }
+    if (o == Qt::Vertical)
+    {
+        r.setLeft(r.right() - dpi.f1);
+        painter->drawTiledPixmap(r, Gradients::pix(c, s, o, Gradients::Sunken));
+        painter->save();
+        painter->setPen(Colors::mid(FCOLOR(Base), Qt::black, 8, 1));
+        painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
+        painter->restore();
+    }
 }
 
 void
-BespinStyle::drawHeaderLabel(const QStyleOption * option, QPainter * painter,
-                             const QWidget *widget) const
+BespinStyle::drawHeaderLabel(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
-   OPT_ENABLED
-   
-   const QStyleOptionHeader* header = qstyleoption_cast<const QStyleOptionHeader*>(option);
-   QRect rect = widget ? RECT.intersected(widget->rect()) : RECT;
-   
-   // iconos
-   if ( !header->icon.isNull() ) {
-      QPixmap pixmap = header->icon.pixmap( 22,22, isEnabled ? QIcon::Normal : QIcon::Disabled );
-      int pixw = pixmap.width();
-      int pixh = pixmap.height();
-      // "pixh - 1" because of tricky integer division
-      rect.setY( rect.center().y() - (pixh - 1) / 2 );
-      drawItemPixmap ( painter, rect, Qt::AlignCenter, pixmap );
-      rect = RECT; rect.setLeft( rect.left() + pixw + 2 );
-   }
-   
-   if (header->text.isEmpty())
-      return;
+    OPT_ENABLED
 
-   // textos ;)
-   painter->save();
-   
-   // this works around a possible Qt bug?!?
-   QFont tmpFnt = painter->font(); tmpFnt.setBold(option->state & State_On);
-   const QColor *bg, *fg;
-   if (header->sortIndicator != QStyleOptionHeader::None) {
-      tmpFnt.setBold(true);
-      bg = &CCOLOR(view.sortingHeader, Bg);
-      fg = &CCOLOR(view.sortingHeader, Fg);
-   }
-   else {
-      bg = &CCOLOR(view.header, Bg);
-      fg = &CCOLOR(view.header, Fg);
-   }
-   painter->setFont(tmpFnt);
+    const QStyleOptionHeader* header = qstyleoption_cast<const QStyleOptionHeader*>(option);
+    QRect rect = widget ? RECT.intersected(widget->rect()) : RECT;
 
-   if (isEnabled) { // dark background, let's paint an emboss
-      rect.moveTop(rect.top()-1);
-      painter->setPen(bg->dark(120));
-      drawItemText ( painter, rect, Qt::AlignCenter,
-                     PAL, isEnabled, header->text);
-      rect.moveTop(rect.top()+1);
-   }
+    // iconos
+    if ( !header->icon.isNull() )
+    {
+        QPixmap pixmap = header->icon.pixmap( 22,22, isEnabled ? QIcon::Normal : QIcon::Disabled );
+        int pixw = pixmap.width();
+        int pixh = pixmap.height();
+        // "pixh - 1" because of tricky integer division
+        rect.setY( rect.center().y() - (pixh - 1) / 2 );
+        drawItemPixmap ( painter, rect, Qt::AlignCenter, pixmap );
+        rect = RECT; rect.setLeft( rect.left() + pixw + 2 );
+    }
 
-   painter->setPen(*fg);
-   drawItemText ( painter, rect, Qt::AlignCenter,
-                  PAL, isEnabled, header->text);
-   painter->restore();
+    if (header->text.isEmpty())
+        return;
+
+    // textos ;)
+    painter->save();
+
+    // this works around a possible Qt bug?!?
+    QFont tmpFnt = painter->font(); tmpFnt.setBold(option->state & State_On);
+    const QColor *bg, *fg;
+    if (header->sortIndicator != QStyleOptionHeader::None)
+    {
+        tmpFnt.setBold(true);
+        bg = &CCOLOR(view.sortingHeader, Bg);
+        fg = &CCOLOR(view.sortingHeader, Fg);
+    }
+    else
+    {
+        bg = &CCOLOR(view.header, Bg);
+        fg = &CCOLOR(view.header, Fg);
+    }
+    painter->setFont(tmpFnt);
+
+    if (isEnabled)
+    {   // dark background, let's paint an emboss
+        rect.moveTop(rect.top()-1);
+        painter->setPen(bg->dark(120));
+        drawItemText ( painter, rect, Qt::AlignCenter, PAL, isEnabled, header->text);
+        rect.moveTop(rect.top()+1);
+    }
+
+    painter->setPen(*fg);
+    drawItemText ( painter, rect, Qt::AlignCenter, PAL, isEnabled, header->text);
+    painter->restore();
 }
 
 void
-BespinStyle::drawHeaderArrow(const QStyleOption * option, QPainter * painter,
-                             const QWidget *) const
+BespinStyle::drawHeaderArrow(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
-   Navi::Direction dir = Navi::S;
-   if (const QStyleOptionHeader* hopt =
-       qstyleoption_cast<const QStyleOptionHeader*>(option)) {
-          if (hopt->sortIndicator == QStyleOptionHeader::None)
-             return;
-          if (hopt->sortIndicator == QStyleOptionHeader::SortUp)
-             dir = Navi::N;
-       }
-   drawArrow(dir, option->rect, painter);
+    Navi::Direction dir = Navi::S;
+    if (const QStyleOptionHeader* hopt = qstyleoption_cast<const QStyleOptionHeader*>(option))
+    {
+        if (hopt->sortIndicator == QStyleOptionHeader::None)
+            return;
+        if (hopt->sortIndicator == QStyleOptionHeader::SortUp)
+            dir = Navi::N;
+    }
+    drawArrow(dir, option->rect, painter);
 }
 
 static const int decoration_size = 9;
 
 void
-BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
-                        const QWidget *) const
+BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
-   SAVE_PEN;
-   int mid_h = RECT.x() + RECT.width() / 2;
-   int mid_v = RECT.y() + RECT.height() / 2;
-   int bef_h = mid_h;
-   int bef_v = mid_v;
-   int aft_h = mid_h;
-   int aft_v = mid_v;
+    SAVE_PEN;
+    int mid_h = RECT.x() + RECT.width() / 2;
+    int mid_v = RECT.y() + RECT.height() / 2;
+    int bef_h = mid_h;
+    int bef_v = mid_v;
+    int aft_h = mid_h;
+    int aft_v = mid_v;
 
 //    const QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
 //    if (widget) {
@@ -200,62 +192,67 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter,
 //       fg = widget->foregroundRole();
 //    }
 
-   const bool firstCol = (RECT.x() ==  -1);
-   
-   if (option->state & State_Children) {
-      SAVE_BRUSH
-      int delta = decoration_size / 2 + 2;
-      bef_h -= delta;
-      bef_v -= delta;
-      aft_h += delta;
-      aft_v += delta;
-      painter->setPen(Qt::NoPen);
-      QRect rect = QRect(bef_h+2, bef_v+2, decoration_size, decoration_size);
-      if (firstCol)
-         rect.moveRight(RECT.right()-dpi.f1);
-      if (option->state & State_Open) {
-         if (option->state & State_Selected)
-            painter->setBrush(FCOLOR(HighlightedText));
-         else
-            painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text)));
-         rect.translate(0,-decoration_size/6);
-         if (option->direction == Qt::RightToLeft)
-            drawSolidArrow(Navi::SW, rect, painter);
-         else
-            drawSolidArrow(Navi::SE, rect, painter);
-      }
-      else {
-         if (option->state & State_Selected)
-            painter->setBrush(FCOLOR(HighlightedText));
-         else
-            painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text), 6, 1));
-         if (option->direction == Qt::RightToLeft)
-            drawArrow(Navi::W, rect, painter);
-         else
-            drawArrow(Navi::E, rect, painter);
-      }
-      RESTORE_BRUSH
-   }
-   
-   // no line on the first column!
-   if (firstCol) {
-      RESTORE_PEN;
-      return;
-   }
+    const bool firstCol = (RECT.x() ==  -1);
 
-   painter->setPen(Colors::mid( FCOLOR(Base), FCOLOR(Text), 40, 1));
-   
-   if (option->state & (State_Item | State_Sibling))
-      painter->drawLine(mid_h, RECT.y(), mid_h, bef_v);
-   if (option->state & State_Sibling)
-      painter->drawLine(mid_h, aft_v, mid_h, RECT.bottom());
-   if (option->state & State_Item) {
-      if (option->direction == Qt::RightToLeft)
-         painter->drawLine(RECT.left(), mid_v, bef_h, mid_v);
-      else
-         painter->drawLine(aft_h, mid_v, RECT.right(), mid_v);
-   }
-   RESTORE_PEN;
+    if (option->state & State_Children)
+    {
+        SAVE_BRUSH
+        int delta = decoration_size / 2 + 2;
+        bef_h -= delta;
+        bef_v -= delta;
+        aft_h += delta;
+        aft_v += delta;
+        painter->setPen(Qt::NoPen);
+        QRect rect = QRect(bef_h+2, bef_v+2, decoration_size, decoration_size);
+        if (firstCol)
+            rect.moveRight(RECT.right()-dpi.f1);
+        if (option->state & State_Open)
+        {
+            if (option->state & State_Selected)
+                painter->setBrush(FCOLOR(HighlightedText));
+            else
+                painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text)));
+            rect.translate(0,-decoration_size/6);
+            if (option->direction == Qt::RightToLeft)
+                drawSolidArrow(Navi::SW, rect, painter);
+            else
+                drawSolidArrow(Navi::SE, rect, painter);
+        }
+        else
+        {
+            if (option->state & State_Selected)
+                painter->setBrush(FCOLOR(HighlightedText));
+            else
+                painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text), 6, 1));
+            if (option->direction == Qt::RightToLeft)
+                drawArrow(Navi::W, rect, painter);
+            else
+                drawArrow(Navi::E, rect, painter);
+        }
+        RESTORE_BRUSH
+    }
+
+    // no line on the first column!
+    if (firstCol)
+    {
+        RESTORE_PEN;
+        return;
+    }
+
+    painter->setPen(Colors::mid( FCOLOR(Base), FCOLOR(Text), 40, 1));
+
+    if (option->state & (State_Item | State_Sibling))
+        painter->drawLine(mid_h, RECT.y(), mid_h, bef_v);
+    if (option->state & State_Sibling)
+        painter->drawLine(mid_h, aft_v, mid_h, RECT.bottom());
+    if (option->state & State_Item)
+    {
+        if (option->direction == Qt::RightToLeft)
+            painter->drawLine(RECT.left(), mid_v, bef_h, mid_v);
+        else
+            painter->drawLine(aft_h, mid_v, RECT.right(), mid_v);
+    }
+    RESTORE_PEN;
 }
 
 void
@@ -279,8 +276,8 @@ BespinStyle::drawTree(const QStyleOptionComplex * option, QPainter * painter,
    int c;
    int dotoffset = 0;
    QPolygon dotlines;
-   if ((lv->activeSubControls & SC_All) &&
-       (lv->subControls & SC_Q3ListViewExpand)) {
+   if ((lv->activeSubControls & SC_All) && (lv->subControls & SC_Q3ListViewExpand))
+   {
       c = 2;
       dotlines.resize(2);
       dotlines[0] = QPoint(lv->rect.right(), lv->rect.top());
@@ -418,13 +415,13 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWi
 #else
 #define OPTION_VIEW_ITEM QStyleOptionViewItemV2
 #endif
-   const OPTION_VIEW_ITEM *item = qstyleoption_cast<const OPTION_VIEW_ITEM *>(option);
-   if (!item) return;
-   const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
+    const OPTION_VIEW_ITEM *item = qstyleoption_cast<const OPTION_VIEW_ITEM *>(option);
+    if (!item) return;
+    const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
 
-   OPT_HOVER
-   hover = hover && (!view || view->selectionMode() != QAbstractItemView::NoSelection);
-   const bool selected = item->state & QStyle::State_Selected;
+    OPT_HOVER
+    hover = hover && (!view || view->selectionMode() != QAbstractItemView::NoSelection);
+    const bool selected = item->state & QStyle::State_Selected;
 
    // this could just leads to cluttered listviews...?!
 //    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
@@ -432,43 +429,48 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWi
 //       cg = QPalette::Inactive;
 
    
-   if (hover || selected) {
-      Gradients::Type gt = Gradients::None;
-      const bool single = view && view->selectionMode() == QAbstractItemView::SingleSelection;
-      const bool round = !single && // typically list/tree - views
+   if (hover || selected)
+   {
+        Gradients::Type gt = Gradients::None;
+        const bool single = view && view->selectionMode() == QAbstractItemView::SingleSelection;
+        const bool round = !single && // typically list/tree - views
 #if QT_VERSION >= 0x040400
-      (item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
-      (widget && widget->inherits("DolphinIconsView"))); // HACK, dolphin should please use the proper position flag...
+        (item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
+        (widget && widget->inherits("DolphinIconsView"))); // HACK, dolphin should please use the proper position flag...
 #else
-      (widget && widget->inherits("DolphinIconsView"));
+        (widget && widget->inherits("DolphinIconsView"));
 #endif
-      if (round) {
-         gt = hover ? Gradients::Button : Gradients::Sunken;
-      }
-      else if (selected && single) {
-         gt =  Gradients::Button;
-      }
-      if (gt == Gradients::None) {
-         const QColor high = selected ? FCOLOR(Highlight) : Colors::mid(FCOLOR(Base), FCOLOR(Highlight),1,4);
-         painter->fillRect(RECT, high);
-      }
-      else {
-         const QPixmap &fill = Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical, gt);
-         if (round)
-            masks.rect[true].render(RECT, painter, fill);
-         else
-            painter->drawTiledPixmap(RECT, fill);
-      }
-   }
+        if (round)
+            gt = hover ? Gradients::Button : Gradients::Sunken;
+        else if (selected && single)
+            gt =  Gradients::Button;
+
+        if (gt == Gradients::None)
+        {
+            const QColor high = selected ? FCOLOR(Highlight) :
+                                Colors::mid(FCOLOR(Base), FCOLOR(Highlight),
+                                100/Colors::contrast(FCOLOR(Highlight), FCOLOR(Text)), 4);
+            painter->fillRect(RECT, high);
+        }
+        else
+        {
+            const QPixmap &fill = Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical, gt);
+            if (round)
+                masks.rect[true].render(RECT, painter, fill);
+            else
+                painter->drawTiledPixmap(RECT, fill);
+        }
+    }
 #if QT_VERSION >= 0x040400
 #warning Compiling with Qt4.4 - do NOT use with lower versions
-   else if (item->backgroundBrush.style() != Qt::NoBrush) {
-      QPoint oldBO = painter->brushOrigin();
-      painter->setBrushOrigin(item->rect.topLeft());
-      painter->fillRect(item->rect, item->backgroundBrush);
-      painter->setBrushOrigin(oldBO);
-   }
+    else if (item->backgroundBrush.style() != Qt::NoBrush)
+    {
+        QPoint oldBO = painter->brushOrigin();
+        painter->setBrushOrigin(item->rect.topLeft());
+        painter->fillRect(item->rect, item->backgroundBrush);
+        painter->setBrushOrigin(oldBO);
+    }
 #endif
-   else if (item->features & QStyleOptionViewItemV2::Alternate)
-      painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
+    else if (item->features & QStyleOptionViewItemV2::Alternate)
+        painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
 }

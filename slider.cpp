@@ -25,6 +25,7 @@ BespinStyle::drawSliderHandle(const QRect &handle, const QStyleOption *option, Q
                               int step) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_FOCUS
+    bool fullHover = config.btn.fullHover && !config.btn.backLightHover;
 
     // shadow
     QPoint xy = handle.topLeft();
@@ -33,12 +34,14 @@ BespinStyle::drawSliderHandle(const QRect &handle, const QStyleOption *option, Q
     painter->drawPixmap(xy, shadows.slider[isEnabled][sunken]);
     if (hasFocus && !sunken)
         fillWithMask(painter, xy, FCOLOR(Highlight), shadows.slider[true][false]);
+    else if (step && config.btn.backLightHover)
+        fillWithMask(painter, xy, Colors::mid(FCOLOR(Window), CCOLOR(btn.active, Bg), 6-step, step), shadows.slider[true][false]);
 
     // gradient
     xy += QPoint(sunken ? dpi.f1 : dpi.f2, dpi.f1);
 
     QColor bc = CCOLOR(btn.std, Bg);
-    if (config.btn.fullHover)
+    if (fullHover)
         bc = Colors::mid(bc, CCOLOR(btn.active, Bg), 6-step, step);
 
     const QPixmap &fill = Gradients::pix(bc, masks.slider.height(), Qt::Vertical,

@@ -299,7 +299,15 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
         c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 8-animStep, animStep);
     }
 
-    const Gradients::Type gt = GRAD(tab) == Gradients::Sunken ? Gradients::None : GRAD(tab);
+    Gradients::Type gt = GRAD(tab);
+    if (sunken && !config.tab.activeTabSunken &&
+        config.tab.active_role[Bg] == config.tab.std_role[Bg])
+    {   // active tab has same color as inactive one, we must do sth. on the gradient...
+        if (gt == Gradients::Sunken)
+            gt = Gradients::Simple;
+        else
+            gt = Gradients::Sunken;
+    }
     const QPoint off = rect.topLeft()-RECT.topLeft()-QPoint(dpi.f3,f2);
     masks.rect[true].render(rect, painter, gt, o, c, size, off);
     if (config.tab.activeTabSunken && sunken)
@@ -415,63 +423,61 @@ void
 BespinStyle::drawToolboxTab(const QStyleOption *option, QPainter *painter,
                             const QWidget * widget) const
 {
-   ASSURE_OPTION(tbt, ToolBox);
+    ASSURE_OPTION(tbt, ToolBox);
 
-   // color fix...
-   if (widget && widget->parentWidget())
-      const_cast<QStyleOption*>(option)->palette =
-      widget->parentWidget()->palette();
+    // color fix...
+    if (widget && widget->parentWidget())
+        const_cast<QStyleOption*>(option)->palette = widget->parentWidget()->palette();
 
-   drawToolboxTabShape(tbt, painter, widget);
-   QStyleOptionToolBox copy = *tbt;
-   copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
-   drawToolboxTabLabel(&copy, painter, widget);
+    drawToolboxTabShape(tbt, painter, widget);
+    QStyleOptionToolBox copy = *tbt;
+    copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
+    drawToolboxTabLabel(&copy, painter, widget);
 }
 
 void
-BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter,
-                                 const QWidget *) const
+BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
-   OPT_HOVER; OPT_SUNKEN;
-      
-   QRect r = RECT; Tile::PosFlags pf = Tile::Full;
-   if (const QStyleOptionToolBoxV2* tbt =
-       qstyleoption_cast<const QStyleOptionToolBoxV2*>(option)) {
-      switch (tbt->position) {
-      case QStyleOptionToolBoxV2::Beginning:
-         pf &= ~Tile::Bottom;
-         break;
-      case QStyleOptionToolBoxV2::Middle:
-         pf &= ~(Tile::Top | Tile::Bottom);
-         break;
-      case QStyleOptionToolBoxV2::End:
-         pf &= ~Tile::Top;
-      default:
-         r.setBottom(r.bottom()-dpi.f2);
-      }
-      if (option->state & State_Selected) {
-         pf |= Tile::Bottom;
-         r.setBottom(RECT.bottom()-dpi.f2);
-      }
-      else if (tbt->selectedPosition == // means we touch the displayed box bottom
-               QStyleOptionToolBoxV2::PreviousIsSelected)
-         pf |= Tile::Top;
-   }
+    OPT_HOVER; OPT_SUNKEN;
 
-   const bool selected = option->state & State_Selected;
-   Tile::setShape(pf);
-   if (selected || hover || sunken) {
-      const QColor &c = selected ?
-         CCOLOR(toolbox.active, Bg) : FCOLOR(Window);
-      Gradients::Type gt = selected ? GRAD(toolbox) :
-         (sunken ? Gradients::Sunken : Gradients::Button);
-      masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
-   }
-   else
-      masks.rect[true].render(r, painter, FCOLOR(Window).dark(108));
-   Tile::setShape(pf & ~Tile::Center);
-   shadows.sunken[true][true].render(RECT, painter);
-   Tile::reset();
+    QRect r = RECT; Tile::PosFlags pf = Tile::Full;
+    if (const QStyleOptionToolBoxV2* tbt = qstyleoption_cast<const QStyleOptionToolBoxV2*>(option))
+    {
+        switch (tbt->position)
+        {
+        case QStyleOptionToolBoxV2::Beginning:
+            pf &= ~Tile::Bottom;
+            break;
+        case QStyleOptionToolBoxV2::Middle:
+            pf &= ~(Tile::Top | Tile::Bottom);
+            break;
+        case QStyleOptionToolBoxV2::End:
+            pf &= ~Tile::Top;
+        default:
+            r.setBottom(r.bottom()-dpi.f2);
+        }
+        if (option->state & State_Selected) {
+            pf |= Tile::Bottom;
+            r.setBottom(RECT.bottom()-dpi.f2);
+        }
+        else if (tbt->selectedPosition == // means we touch the displayed box bottom
+                QStyleOptionToolBoxV2::PreviousIsSelected)
+            pf |= Tile::Top;
+    }
+
+    const bool selected = option->state & State_Selected;
+    Tile::setShape(pf);
+    if (selected || hover || sunken)
+    {
+        const QColor &c = selected ? CCOLOR(toolbox.active, Bg) : FCOLOR(Window);
+        Gradients::Type gt = selected ? GRAD(toolbox) : (sunken ? Gradients::Sunken : Gradients::Button);
+        masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
+    }
+    else
+        masks.rect[true].render(r, painter, FCOLOR(Window).dark(108));
+    Tile::setShape(pf & ~Tile::Center);
+    shadows.sunken[true][true].render(RECT, painter);
+    Tile::reset();
 }
 
 void

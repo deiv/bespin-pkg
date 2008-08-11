@@ -78,6 +78,16 @@ void BespinStyle::polish ( QApplication * app )
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
 
+static QColor
+mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
+{
+    int sum = (w1+w2);
+    return QColor(((w1*c1.red() + w2*c2.red())/sum) & 0xff,
+                 ((w1*c1.green() + w2*c2.green())/sum) & 0xff,
+                 ((w1*c1.blue() + w2*c2.blue())/sum) & 0xff,
+                 ((w1*c1.alpha() + w2*c2.alpha())/sum) & 0xff);
+}
+
 
 void BespinStyle::polish( QPalette &pal )
 {
@@ -92,10 +102,8 @@ void BespinStyle::polish( QPalette &pal )
     }
 
     // AlternateBase
-    pal.setColor(QPalette::AlternateBase,
-                    Colors::mid(pal.color(QPalette::Active, QPalette::Base),
-                                pal.color(QPalette::Active, QPalette::Text),15,1));
-
+    pal.setColor(QPalette::AlternateBase, mid(pal.color(QPalette::Active, QPalette::Base),
+                                              pal.color(QPalette::Active, QPalette::Text),15,1));
     // highlight colors
     const int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
     const QColor grey(highlightGray,highlightGray,highlightGray);
@@ -118,31 +126,24 @@ void BespinStyle::polish( QPalette &pal )
     if (config.fadeInactive)
     { // fade out inactive foreground and highlight colors...
         pal.setColor(QPalette::Inactive, QPalette::Highlight,
-                    Colors::mid(pal.color(QPalette::Active, QPalette::Highlight), grey, 2,1));
+                    mid(pal.color(QPalette::Active, QPalette::Highlight), grey, 2,1));
         pal.setColor(QPalette::Inactive, QPalette::WindowText,
-                    Colors::mid(pal.color(QPalette::Active, QPalette::Window),
-                                pal.color(QPalette::Active, QPalette::WindowText), 1,4));
+                    mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::WindowText), 1,4));
         pal.setColor(QPalette::Inactive, QPalette::ButtonText,
-                    Colors::mid(pal.color(QPalette::Active, QPalette::Button),
-                                pal.color(QPalette::Active, QPalette::ButtonText), 1,4));
+                    mid(pal.color(QPalette::Active, QPalette::Button), pal.color(QPalette::Active, QPalette::ButtonText), 1,4));
         pal.setColor(QPalette::Inactive, QPalette::Text,
-                    Colors::mid(pal.color(QPalette::Active, QPalette::Base),
-                                pal.color(QPalette::Active, QPalette::Text), 1,4));
+                    mid(pal.color(QPalette::Active, QPalette::Base), pal.color(QPalette::Active, QPalette::Text), 1,4));
     }
 
     // fade disabled palette
     pal.setColor(QPalette::Disabled, QPalette::WindowText,
-                    Colors::mid(pal.color(QPalette::Active, QPalette::Window),
-                                pal.color(QPalette::Active, QPalette::WindowText),2,1));
+                 mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::WindowText),2,1));
     pal.setColor(QPalette::Disabled, QPalette::Base,
-                    Colors::mid(pal.color(QPalette::Active, QPalette::Window),
-                                pal.color(QPalette::Active, QPalette::Base),1,2));
+                 mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::Base),1,2));
     pal.setColor(QPalette::Disabled, QPalette::Text,
-                    Colors::mid(pal.color(QPalette::Active, QPalette::Base),
-                                pal.color(QPalette::Active, QPalette::Text)));
+                 mid(pal.color(QPalette::Active, QPalette::Base), pal.color(QPalette::Active, QPalette::Text)));
     pal.setColor(QPalette::Disabled, QPalette::AlternateBase,
-                    Colors::mid(pal.color(QPalette::Disabled, QPalette::Base),
-                                pal.color(QPalette::Disabled, QPalette::Text),15,1));
+                 mid(pal.color(QPalette::Disabled, QPalette::Base), pal.color(QPalette::Disabled, QPalette::Text),15,1));
 
     // more on tooltips... (we force some colors...)
     QPalette toolPal = QToolTip::palette();
