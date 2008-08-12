@@ -177,18 +177,21 @@ QColor
 Colors::mid(const QColor &oc1, const QColor &c2, int w1, int w2)
 {
     int sum = (w1+w2);
-//    if (!sum) return Qt::black;
+    if (!sum)
+       return Qt::black;
     QColor c1 = oc1;
-    int h,s, v = value(c1);
+    int v = value(c1);
     if (v < 70)
     {
+        int h,s;
         c1.getHsv(&h,&s,&v);
         c1.setHsv(h,s,70);
     }
-    return QColor(((w1*c1.red() + w2*c2.red())/sum) & 0xff,
-                 ((w1*c1.green() + w2*c2.green())/sum) & 0xff,
-                 ((w1*c1.blue() + w2*c2.blue())/sum) & 0xff,
-                 ((w1*c1.alpha() + w2*c2.alpha())/sum) & 0xff);
+    int r = (w1*c1.red() + w2*c2.red())/sum; r = CLAMP(r,0,255);
+    int g = (w1*c1.green() + w2*c2.green())/sum; g = CLAMP(g,0,255);
+    int b = (w1*c1.blue() + w2*c2.blue())/sum; b = CLAMP(b,0,255);
+    int a = (w1*c1.alpha() + w2*c2.alpha())/sum; a = CLAMP(a,0,255);
+    return QColor(r,g,b,a);
 }
 
 int Colors::value(const QColor &c) {

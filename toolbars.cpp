@@ -21,78 +21,75 @@
 #include "draw.h"
 #include "animator/hover.h"
 
-static int step;
+static int step = 0;
 
 void
 BespinStyle::drawToolButton(const QStyleOptionComplex * option,
                             QPainter * painter, const QWidget * widget) const
 {
-   OPT_SUNKEN OPT_ENABLED OPT_HOVER
-      
-   // special handling for the tabbar scrollers ------------------------------
-   if (widget && widget->parentWidget() &&
-      qobject_cast<QTabBar*>(widget->parent())) {
-      QColor c = widget->parentWidget()->palette().color(config.tab.std_role[0]);
-      QColor c2 = widget->parentWidget()->palette().color(config.tab.std_role[1]);
-      if (sunken) {
-         int dy = (RECT.height()-RECT.width())/2;
-         QRect r = RECT.adjusted(dpi.f2,dy,-dpi.f2,-dy);
-         masks.rect[true].render(r, painter, Gradients::Sunken, Qt::Vertical, c);
-      }
-      painter->save();
-      painter->setPen( isEnabled ? c2 : Colors::mid(c, c2) );
-      drawToolButtonLabel(option, painter, widget);
-      painter->restore();
-      return;
-   } // --------------------------------------------------------------------
+    OPT_SUNKEN OPT_ENABLED OPT_HOVER
 
-   const QStyleOptionToolButton *toolbutton
-      = qstyleoption_cast<const QStyleOptionToolButton *>(option);
-   if (!toolbutton) return;
+    if (widget && widget->parentWidget() && qobject_cast<QTabBar*>(widget->parent()))
+    {   // special handling for the tabbar scrollers ------------------------------
+        QColor c = widget->parentWidget()->palette().color(config.tab.std_role[0]);
+        QColor c2 = widget->parentWidget()->palette().color(config.tab.std_role[1]);
+        if (sunken)
+        {
+            int dy = (RECT.height()-RECT.width())/2;
+            QRect r = RECT.adjusted(dpi.f2,dy,-dpi.f2,-dy);
+            masks.rect[true].render(r, painter, Gradients::Sunken, Qt::Vertical, c);
+        }
+        painter->save();
+        painter->setPen( isEnabled ? c2 : Colors::mid(c, c2) );
+        drawToolButtonLabel(option, painter, widget);
+        painter->restore();
+        return;
+    } // --------------------------------------------------------------------
 
+    ASSURE_OPTION(toolbutton, ToolButton);
 
-   QRect menuarea = subControlRect(CC_ToolButton, toolbutton, SC_ToolButtonMenu, widget);
-   QRect button = subControlRect(CC_ToolButton, toolbutton, SC_ToolButton, widget);
-   State bflags = toolbutton->state;
+    QRect button = subControlRect(CC_ToolButton, toolbutton, SC_ToolButton, widget);
+    State bflags = toolbutton->state;
 
-   if ((bflags & State_AutoRaise) && !hover)
-      bflags &= ~State_Raised;
+    if ((bflags & State_AutoRaise) && !hover)
+        bflags &= ~State_Raised;
 
-   State mflags = bflags;
+    State mflags = bflags;
 
-   if (toolbutton->activeSubControls & SC_ToolButton)
-      bflags |= State_Sunken;
+    if (toolbutton->activeSubControls & SC_ToolButton)
+        bflags |= State_Sunken;
 
-   hover = isEnabled && (bflags & (State_Sunken | State_On | State_Raised | State_HasFocus));
+    hover = isEnabled && (bflags & (State_Sunken | State_On | State_Raised | State_HasFocus));
 
-   QStyleOption tool(0); tool.palette = toolbutton->palette;
+    step = Animator::Hover::step(widget);
 
-   step = Animator::Hover::step(widget);
+    // frame around whole button
+    if (option->state & State_On)
+    {
+        QStyleOption tool(0);
+        tool.palette = toolbutton->palette;
+        tool.rect = RECT;
+        tool.state = bflags;
+        drawToolButtonShape(&tool, painter, widget);
+    }
 
-   // frame around whole button
-   if (option->state & State_On)
-   {
-      tool.rect = RECT; tool.state = bflags;
-      drawToolButtonShape(&tool, painter, widget);
-   }
-
-   // don't paint a dropdown arrow iff the button's really pressed
-   if (!(bflags & State_Sunken) &&
-      (toolbutton->subControls & SC_ToolButtonMenu)) {
-         if (toolbutton->activeSubControls & SC_ToolButtonMenu)
-            painter->drawTiledPixmap(menuarea, Gradients::pix(FCOLOR(Window),
-               menuarea.height(), Qt::Vertical,
-               Gradients::Sunken));
-         QPen oldPen = painter->pen();
-         painter->setPen(Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 2, 1));
+    if ((toolbutton->subControls & SC_ToolButtonMenu) &&
+        !(bflags & State_Sunken)) // don't paint a dropdown arrow iff the real button is pressed
+    {
+        QRect menuarea = subControlRect(CC_ToolButton, toolbutton, SC_ToolButtonMenu, widget);
+//         if (toolbutton->activeSubControls & SC_ToolButtonMenu) // pressed
+//             painter->drawTiledPixmap(menuarea, Gradients::pix(FCOLOR(Window), menuarea.height(), Qt::Vertical, Gradients::Sunken));
+        QPen oldPen = painter->pen();
+        painter->setPen(Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 8-step, step+3));
 //          tool.rect = menuarea; tool.state = mflags;
-         drawSolidArrow(Navi::S, menuarea, painter);
-         painter->setPen(oldPen);
-         if (hover) {
-            menuarea.setLeft(button.right()-shadows.line[1][Sunken].thickness()/2);
-            shadows.line[1][Sunken].render(menuarea, painter);
-         }
-      }
+        drawSolidArrow(Navi::S, menuarea, painter);
+        painter->setPen(oldPen);
+//         if (hover)
+//         {
+//             menuarea.setLeft(button.right()-shadows.line[1][Sunken].thickness()/2);
+//             shadows.line[1][Sunken].render(menuarea, painter);
+//         }
+    }
 
    // label in the toolbutton area
    QStyleOptionToolButton label = *toolbutton;

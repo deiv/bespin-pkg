@@ -289,29 +289,23 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
       }
       break;
       
-   case CC_ToolButton: // A tool button, like QToolButton
-      if (const QStyleOptionToolButton *tb =
-          qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
-         int mbi = pixelMetric(PM_MenuButtonIndicator, tb, widget);
-         int fw = pixelMetric(PM_DefaultFrameWidth, tb, widget);
-         ret = tb->rect.adjusted(fw,fw,-fw,0);
-         switch (subControl) {
-         case SC_ToolButton:
-            if ((tb->features
-               & (QStyleOptionToolButton::Menu | QStyleOptionToolButton::PopupDelay))
-               == QStyleOptionToolButton::Menu)
-               ret.adjust(0, 0, -(mbi+fw), 0);
-            break;
-         case SC_ToolButtonMenu:
-            if ((tb->features
-               & (QStyleOptionToolButton::Menu | QStyleOptionToolButton::PopupDelay))
-               == QStyleOptionToolButton::Menu)
-               ret.adjust(ret.width() - mbi, 0, 0, 0);
-            break;
-         default:
-            break;
-         }
-         return visualRect(tb->direction, tb->rect, ret);
+    case CC_ToolButton: // A tool button, like QToolButton
+        if HAVE_OPTION(tb, ToolButton)
+        {
+//             int fw = pixelMetric(PM_DefaultFrameWidth, tb, widget);
+//             ret = tb->rect.adjusted(fw,fw,-fw,0);
+            ret = tb->rect;
+            if ((tb->features & // has an arrow
+                (QStyleOptionToolButton::Menu | QStyleOptionToolButton::PopupDelay)) ==
+                QStyleOptionToolButton::Menu)
+            {
+                int x = ret.right() - pixelMetric(PM_MenuButtonIndicator, tb, widget);
+                if (subControl == SC_ToolButton)
+                    ret.setRight(x);
+                else if (subControl == SC_ToolButtonMenu)
+                    ret.setLeft(x);
+            }
+            return visualRect(tb->direction, tb->rect, ret);
         }
         break;
    case CC_TitleBar: // A Title bar, like what is used in Q3Workspace

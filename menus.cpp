@@ -29,7 +29,7 @@ BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
 {
     if (config.menu.bar_role[Bg] != QPalette::Window || config.menu.barGradient != Gradients::None)
         painter->fillRect(RECT.adjusted(0,0,0,-dpi.f2),
-                          Gradients::brush(Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,4),
+                          Gradients::brush(Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6),
                           RECT.height()-dpi.f2, Qt::Vertical, config.menu.barGradient));
     else if (config.bg.mode == Scanlines)
         painter->fillRect(RECT, Gradients::structure(FCOLOR(Window), true));
@@ -58,8 +58,8 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
         drawMenuBarBg(option, painter, widget);
 #endif
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
-
     ROLES(menu.active);
+
     hover = option->state & State_Selected;
     Animator::IndexInfo *info = 0;
     QAction *action = 0, *activeAction = 0;
@@ -67,7 +67,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
     if (sunken)
         step = 6;
     else
-    {
+    {   // check for hover animation ==========================
         if (widget)
         if (const QMenuBar* mbar = qobject_cast<const QMenuBar*>(widget))
         {
@@ -77,14 +77,17 @@ BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
         }
         if (info && (!activeAction || !activeAction->menu() || activeAction->menu()->isHidden()))
             step = info->step((long int)action);
+        // ================================================
     }
+    
     QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f4);
     if (step || hover)
     {
-        if (!step) step = 6;
+        if (!step)
+            step = 6;
         QColor c = (config.menu.bar_role[Bg] == QPalette::Window) ? FCOLOR(Window) :
-                    Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,4);
-        c = Colors::mid(c, COLOR(ROLE[Bg]), 9-step, step);
+                    Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6);
+        c = Colors::mid(c, COLOR(ROLE[Bg]), 8-step, step);
 //       int dy = 0;
 //       if (!sunken) {
 //          step = 6-step;
@@ -137,13 +140,10 @@ void
 BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
-    const QStyleOptionMenuItem *menuItem =
-        qstyleoption_cast<const QStyleOptionMenuItem *>(option);
-    if (!menuItem) return;
-
+    ASSURE_OPTION(menuItem, MenuItem);
     ROLES(menu.std);
-
     OPT_SUNKEN OPT_ENABLED
+
     if (isGTK)
         sunken = false;
 
@@ -180,10 +180,10 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
     // selected bg
     if (selected)
     {
-        if (ROLE[Bg] == QPalette::Window ||
-            Colors::contrast(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg)) > 8) // unreadable, but enough here
+        if (config.menu.itemGradient != Gradients::None || config.menu.bar_role[Bg] == ROLE[Bg] ||
+            Colors::contrast(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg)) > 8) // enough to indicate hover
         {
-            bg = Colors::mid(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg), 1, 2);
+            bg = Colors::mid(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg), 1, 6);
             fg = CCOLOR(menu.active, Fg);
         }
         else

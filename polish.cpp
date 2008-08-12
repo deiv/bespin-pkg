@@ -351,7 +351,7 @@ BespinStyle::polish( QWidget * widget )
             {
                 if (QTreeView* tv = qobject_cast<QTreeView*>(frame))
                 {   // allow all treeviews to be animated!
-                    if (config.hack.treeViews)
+                    if (config.hack.treeViews && tv->viewport() && tv->viewport()->autoFillBackground())
                         tv->setAnimated ( true );
                 }
                 else // treeview hovering sucks, as the "tree" doesn't get an update

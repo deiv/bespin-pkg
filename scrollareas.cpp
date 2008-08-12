@@ -399,11 +399,11 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option, QPainter * painter
     {
         r.adjust(f1, f1, -f1, -f1);
         shadows.raised[round_][true][true].render(r, painter);
-        r.adjust(f1, f1, -f1, horizontal && grooveIsSunken ? -f1 : -f2 );
+        r.adjust(f1, f1, -f1, -f2 );
     }
     else
     {
-        if (config.btn.backLightHover && complexStep)
+        if (!sunken && config.btn.backLightHover && complexStep)
         {
             QColor blh = Colors::mid(c, CCOLOR(btn.active, Bg), 6-complexStep, complexStep);
             lights.rect[round_].render(r, painter, blh); // backlight
@@ -427,7 +427,7 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option, QPainter * painter
 
     const QColor &bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
     masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size);
-    if (Gradients::isReflective(GRAD(scroll)))
+    if (!sunken && Gradients::isReflective(GRAD(scroll)))
         masks.rect[round_].outline(r, painter, Colors::mid(bc,Qt::white,2,1));
 
     /// the hover indicator (in case...)

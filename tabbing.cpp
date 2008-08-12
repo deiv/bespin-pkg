@@ -300,8 +300,7 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
     }
 
     Gradients::Type gt = GRAD(tab);
-    if (sunken && !config.tab.activeTabSunken &&
-        config.tab.active_role[Bg] == config.tab.std_role[Bg])
+    if (sunken && config.tab.active_role[Bg] == config.tab.std_role[Bg])
     {   // active tab has same color as inactive one, we must do sth. on the gradient...
         if (gt == Gradients::Sunken)
             gt = Gradients::Simple;

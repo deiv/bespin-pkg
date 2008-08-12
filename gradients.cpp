@@ -599,8 +599,10 @@ cornerMask(bool right = false)
 #ifndef QT_NO_XRENDER
     alpha->fill(Qt::transparent);
     rg.setColorAt(0, Qt::transparent);
+    rg.setColorAt(0.5, Qt::transparent);
 #else
     rg.setColorAt(0, Qt::black);
+    rg.setColorAt(0.5, Qt::black);
 #endif
     rg.setColorAt(1, Qt::white);
     QPainter p(alpha); p.fillRect(alpha->rect(), rg); p.end();
@@ -651,7 +653,7 @@ Gradients::bgSet(const QColor &c)
         p.begin(&set->cornerTile);
         stops << QGradientStop(0, Colors::mid(c1, c2,1,6)) << QGradientStop(1, c2);
         lg.setStops(stops);
-        p.fillRect(set->cornerTile.rect(), c2);
+        p.fillRect(set->cornerTile.rect(), lg);
         stops.clear();
         p.drawTiledPixmap(set->cornerTile.rect(), _dither);
         p.end();
@@ -659,9 +661,10 @@ Gradients::bgSet(const QColor &c)
         QPixmap *mask, *pix;
         for (int cnr = 0; cnr < 2; ++cnr)
         {
-            pix = cnr ? &set->rCorner : &set->lCorner;
+            pix = (cnr ? &set->rCorner : &set->lCorner);
             p.begin(pix);
             p.drawTiledPixmap(pix->rect(), set->topTile);
+//             p.fillRect(pix->rect(), Qt::red);
             p.end();
             mask = cornerMask(cnr);
 #ifndef QT_NO_XRENDER
