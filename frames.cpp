@@ -159,77 +159,80 @@ void
 BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
                           QPainter * painter, const QWidget * widget) const
 {
-   ASSURE_OPTION(groupBox, GroupBox);
-   OPT_ENABLED
-      
-   // Frame
-   if (groupBox->subControls & QStyle::SC_GroupBoxFrame) {
-      QStyleOptionFrameV2 frame;
-      frame.QStyleOption::operator=(*groupBox);
-      frame.features = groupBox->features;
-      frame.lineWidth = groupBox->lineWidth;
-      frame.midLineWidth = groupBox->midLineWidth;
-      frame.rect = subControlRect(CC_GroupBox, option, SC_GroupBoxFrame, widget);
-      drawGroupBoxFrame(&frame, painter, widget);
-   }
+    ASSURE_OPTION(groupBox, GroupBox);
+    OPT_ENABLED
 
-   // Title
-   if ((groupBox->subControls & QStyle::SC_GroupBoxLabel) &&
-      !groupBox->text.isEmpty()) {
-      QColor textColor = groupBox->textColor;
-      QPalette::ColorRole role = QPalette::WindowText;
-      if (textColor.isValid()) {
-         if (!isEnabled) textColor.setAlpha(48);
-         painter->setPen(textColor);
-         role = QPalette::NoRole;
-      }
-         
-      QFont tmpfnt = painter->font(); tmpfnt.setBold(true);
-      painter->setFont ( tmpfnt );
-      QStyleOptionGroupBox copy = *groupBox; copy.fontMetrics = QFontMetrics(tmpfnt);
-      QRect textRect = subControlRect(CC_GroupBox, &copy, SC_GroupBoxLabel, widget);
-      int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
+    // Frame
+    if (groupBox->subControls & QStyle::SC_GroupBoxFrame)
+    {
+        QStyleOptionFrameV2 frame;
+        frame.QStyleOption::operator=(*groupBox);
+        frame.features = groupBox->features;
+        frame.lineWidth = groupBox->lineWidth;
+        frame.midLineWidth = groupBox->midLineWidth;
+        frame.rect = subControlRect(CC_GroupBox, option, SC_GroupBoxFrame, widget);
+        drawGroupBoxFrame(&frame, painter, widget);
+    }
 
-      drawItemText(painter, textRect,  alignment, groupBox->palette, isEnabled, groupBox->text, role);
-      int x = textRect.bottom(); textRect = RECT; textRect.setTop(x);
-      x = textRect.width()/4; textRect.adjust(x,0,-x,0);
-      shadows.line[0][Sunken].render(textRect, painter);
-   }
+    // Title
+    if ((groupBox->subControls & QStyle::SC_GroupBoxLabel) && !groupBox->text.isEmpty())
+    {
+        QColor textColor = groupBox->textColor;
+        QPalette::ColorRole role = QPalette::WindowText;
+        if (textColor.isValid())
+        {
+            if (!isEnabled)
+                textColor.setAlpha(48);
+            painter->setPen(textColor);
+            role = QPalette::NoRole;
+        }
+        setBold(painter);
+        QStyleOptionGroupBox copy = *groupBox;
+        copy.fontMetrics = QFontMetrics(painter->font());
+        QRect textRect = subControlRect(CC_GroupBox, &copy, SC_GroupBoxLabel, widget);
+        int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
+        drawItemText(painter, textRect,  alignment, groupBox->palette, isEnabled, groupBox->text, role);
+        int x = textRect.bottom(); textRect = RECT; textRect.setTop(x);
+        x = textRect.width()/4; textRect.adjust(x,0,-x,0);
+        shadows.line[0][Sunken].render(textRect, painter);
+    }
        
-   // Checkbox
-   // TODO: doesn't hover - yet.
-   if (groupBox->subControls & SC_GroupBoxCheckBox) {
-      QStyleOptionButton box;
-      box.QStyleOption::operator=(*groupBox);
-      box.rect = subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
+    // Checkbox
+    // TODO: doesn't hover - yet.
+    if (groupBox->subControls & SC_GroupBoxCheckBox)
+    {
+        QStyleOptionButton box;
+        box.QStyleOption::operator=(*groupBox);
+        box.rect = subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
 //       box.state |= State_HasFocus; // focus to signal this to the user
-      if (groupBox->activeSubControls & SC_GroupBoxCheckBox)
-         box.state |= State_MouseOver;
-      drawRadio(&box, painter, 0L);
-   }
+        if (groupBox->activeSubControls & SC_GroupBoxCheckBox)
+            box.state |= State_MouseOver;
+        drawRadio(&box, painter, 0L);
+    }
 }
 
 void
 BespinStyle::drawGroupBoxFrame(const QStyleOption * option, QPainter * painter,
                                const QWidget *) const
 {
-   const QStyleOptionFrameV2 *groupBox =
-      qstyleoption_cast<const QStyleOptionFrameV2 *>(option);
-   
-   if (groupBox && groupBox->features == QStyleOptionFrameV2::Flat) {
-      Tile::setShape(Tile::Bottom);
-      shadows.relief[true][false].render(RECT, painter);
-      Tile::reset();
-      return;
-   }
-   QRect rect = RECT.adjusted(dpi.f4,dpi.f2,-dpi.f4,0);
-   rect.setHeight(qMin(2*dpi.f32, RECT.height()));
-   Tile::setShape(Tile::Full & ~Tile::Bottom);
-   masks.rect[false].render(rect, painter, Gradients::light(rect.height()));
-   rect.setBottom(RECT.bottom()-dpi.f32);
-   Tile::setShape(Tile::Full);
-   shadows.group.render(RECT, painter);
+    const QStyleOptionFrameV2 *groupBox =
+        qstyleoption_cast<const QStyleOptionFrameV2 *>(option);
+
+    if (groupBox && groupBox->features == QStyleOptionFrameV2::Flat)
+    {
+        Tile::setShape(Tile::Bottom);
+        shadows.relief[true][false].render(RECT, painter);
+        Tile::reset();
+        return;
+    }
+    QRect rect = RECT.adjusted(dpi.f4,dpi.f2,-dpi.f4,0);
+    rect.setHeight(qMin(2*dpi.f32, RECT.height()));
+    Tile::setShape(Tile::Full & ~Tile::Bottom);
+    masks.rect[false].render(rect, painter, Gradients::light(rect.height()));
+    rect.setBottom(RECT.bottom()-dpi.f32);
+    Tile::setShape(Tile::Full);
+    shadows.group.render(RECT, painter);
 //       Tile::setShape(Tile::Full & ~Tile::Bottom);
 //       masks.button.outline(rect, painter, FCOLOR(Window).light(120));
-   Tile::reset();
+    Tile::reset();
 }

@@ -78,15 +78,15 @@ static int f1, f2, f3, f4;
 static QPixmap
 shadow(int size, bool opaque, bool sunken, float factor = 1.0)
 {
-   EMPTY_PIX(size, size);
-   float d = size/2.0;
-   QRadialGradient rg(d, d, d);
-   const int alpha =
-      (int) (config.shadowIntensity * factor * (sunken ? 70 : (opaque ? 48 : 20)));
-   rg.setColorAt(0.7, BLACK(CLAMP(alpha,0,255)));
-   rg.setColorAt(1.0, BLACK(0));
-   p.fillRect(pix.rect(), rg); p.end();
-   return pix;
+    EMPTY_PIX(size, size);
+    float d = size/2.0;
+    QRadialGradient rg(d, d, d);
+    const int alpha = (int) (config.shadowIntensity * factor * (sunken ? 70 : (opaque ? 48 : 20)));
+    rg.setColorAt(0.7, BLACK(CLAMP(alpha,0,255)));
+    rg.setColorAt(1.0, BLACK(0));
+    p.fillRect(pix.rect(), rg);
+    p.end();
+    return pix;
 }
 
 static QPixmap
@@ -214,196 +214,214 @@ renderLightLine(Tile::Line &line)
    delete pix;
 }
 #endif
+
 void BespinStyle::generatePixmaps()
 {
+    f1 = dpi.f1; f2 = dpi.f2; f3 = dpi.f3; f4 = dpi.f4;
+    const int f9 = dpi.f9; const int f11 = SCALE(11);
+    const int f13 = SCALE(13); const int f17 = SCALE(17);
+    const int f49 = SCALE(49);
 
-   f1 = dpi.f1; f2 = dpi.f2; f3 = dpi.f3; f4 = dpi.f4;
-   const int f9 = dpi.f9; const int f11 = SCALE(11);
-   const int f13 = SCALE(13); const int f17 = SCALE(17);
-   const int f49 = SCALE(49);
+    // MASKS =======================================
+    for (int i = 0; i < 2; ++i)
+    {
+        int s,r;
+        if (i)
+            { s = f13; r = 99; }
+        else
+            { s = f9; r = 70; }
+        masks.rect[i] = Tile::Set(roundedMask(s, r),s/2,s/2,1,1, r);
+        masks.rect[i].setClipOffsets(0,0,0,0);
+    }
 
-   // MASKS =======================================
-   for (int i = 0; i < 2; ++i) {
-      int s,r;
-      if (i) {s = f13; r = 99;} else {s = f9; r = 70;}
-      masks.rect[i] = Tile::Set(roundedMask(s, r),s/2,s/2,1,1, r);
-      masks.rect[i].setClipOffsets(0,0,0,0);
-   }
-   
-   // SHADOWS ===============================
-   // sunken
-   for (int r = 0; r < 2; ++r) {
-      int s = r ? f17 : f9;
-      for (int i = 0; i < 2; ++i) {
-         shadows.sunken[r][i] = Tile::Set(sunkenShadow(s, i), s/2,s/2,1,1);
-         shadows.sunken[r][i].setDefaultShape(Tile::Ring);
-      }
-   }
+    // SHADOWS ===============================
+    // sunken
+    for (int r = 0; r < 2; ++r)
+    {
+        int s = r ? f17 : f9;
+        for (int i = 0; i < 2; ++i)
+        {
+            shadows.sunken[r][i] = Tile::Set(sunkenShadow(s, i), s/2,s/2,1,1);
+            shadows.sunken[r][i].setDefaultShape(Tile::Ring);
+        }
+    }
 
-   // relief
-   for (int r = 0; r < 2; ++r) {
-      int s = r ? f17 : f11;
-      for (int i = 0; i < 2; ++i) {
-         shadows.relief[r][i] = Tile::Set(relief(s, i), s/2,s/2,1,1);
-         shadows.relief[r][i].setDefaultShape(Tile::Ring);
-      }
-   }
-   
-   // raised
-   for (int r = 0; r < 2; ++r) {
-      int s;  float f;
-      if (r) {s = f17; f = 0.8;} else {s = f9; f = .8;}
-      for (int i = 0; i < 2; ++i) // opaque?
-         for (int j = 0; j < 2; ++j) { // sunken?
-            shadows.raised[r][i][j] = Tile::Set(shadow(s,i,j,f), s/2, s/2, 1, 1);
-            shadows.raised[r][i][j].setDefaultShape(Tile::Ring);
-         }
-   }
+    // relief
+    for (int r = 0; r < 2; ++r)
+    {
+        int s = r ? f17 : f11;
+        for (int i = 0; i < 2; ++i)
+        {
+            shadows.relief[r][i] = Tile::Set(relief(s, i), s/2,s/2,1,1);
+            shadows.relief[r][i].setDefaultShape(Tile::Ring);
+        }
+    }
 
-   // fallback ( sunken ) // TODO: raised
-   int f6 = dpi.f6;
-   QPixmap tmp = QPixmap(f9,f9); tmp.fill(Qt::transparent);
-   QPainter p;
-   p.begin(&tmp);
-   p.fillRect(f1,0,f9-f2,f1, QColor(0,0,0,10));
-   p.fillRect(f2,f1,f9-f4,f1, QColor(0,0,0,20));
-   p.fillRect(f2,f2,f9-f4,f1, QColor(0,0,0,40));
-   p.fillRect(f3,f3,f9-f6,f1, QColor(0,0,0,80));
-   
-   p.fillRect(f1,f9-f1,f9-f2,f1, QColor(255,255,255,10));
-   p.fillRect(f2,f9-f2,f9-f4,f1, QColor(255,255,255,20));
-   p.fillRect(f2,f9-f3,f9-f4,f1, QColor(255,255,255,40));
-   p.fillRect(f3,f9-f4,f9-f6,f1, QColor(255,255,255,80));
-   
-   p.fillRect(0,f1,f1,f9-f2, QColor(128,128,128,10));
-   p.fillRect(f1,f2,f1,f9-f4, QColor(128,128,128,20));
-   p.fillRect(f2,f2,f1,f9-f4, QColor(128,128,128,40));
-   p.fillRect(f3,f3,f1,f9-f6, QColor(128,128,128,80));
-   
-   p.fillRect(f9-f1,f1,f1,f9-f2, QColor(128,128,128,10));
-   p.fillRect(f9-f2,f2,f1,f9-f4, QColor(128,128,128,20));
-   p.fillRect(f9-f3,f2,f1,f9-f4, QColor(128,128,128,40));
-   p.fillRect(f9-f4,f3,f1,f9-f6, QColor(128,128,128,80));
-   
-   p.end();
-   shadows.fallback = Tile::Set(tmp,f9/2,f9/2,1,1);
-   shadows.fallback.setDefaultShape(Tile::Ring);
-   // ================================================================
+    // raised
+    for (int r = 0; r < 2; ++r)
+    {
+        int s;  float f = .8;
+        s =  r ? f17 : f9;
+        for (int i = 0; i < 2; ++i) // opaque?
+            for (int j = 0; j < 2; ++j)
+            {   // sunken?
+                shadows.raised[r][i][j] = Tile::Set(shadow(s,i,j,f), s/2, s/2, 1, 1);
+                shadows.raised[r][i][j].setDefaultShape(Tile::Ring);
+            }
+    }
 
-   // LIGHTS ==================================
-   for (int r = 0; r < 2; ++r) {
-      int s = r ? f17 : f11;
-      lights.rect[r] = Tile::Set(shadow(s, true, false, 3.0), s/2,s/2,1,1);
-      lights.rect[r].setClipOffsets(f3,f3,f3,f3);
-      lights.rect[r].setDefaultShape(Tile::Ring);
-   }
+    // fallback ( sunken ) // TODO: raised
+    int f6 = dpi.f6;
+    QPixmap tmp = QPixmap(f9,f9); tmp.fill(Qt::transparent);
+    QPainter p;
+    p.begin(&tmp);
+    p.fillRect(f1,0,f9-f2,f1, QColor(0,0,0,10));
+    p.fillRect(f2,f1,f9-f4,f1, QColor(0,0,0,20));
+    p.fillRect(f2,f2,f9-f4,f1, QColor(0,0,0,40));
+    p.fillRect(f3,f3,f9-f6,f1, QColor(0,0,0,80));
+
+    p.fillRect(f1,f9-f1,f9-f2,f1, QColor(255,255,255,10));
+    p.fillRect(f2,f9-f2,f9-f4,f1, QColor(255,255,255,20));
+    p.fillRect(f2,f9-f3,f9-f4,f1, QColor(255,255,255,40));
+    p.fillRect(f3,f9-f4,f9-f6,f1, QColor(255,255,255,80));
+
+    p.fillRect(0,f1,f1,f9-f2, QColor(128,128,128,10));
+    p.fillRect(f1,f2,f1,f9-f4, QColor(128,128,128,20));
+    p.fillRect(f2,f2,f1,f9-f4, QColor(128,128,128,40));
+    p.fillRect(f3,f3,f1,f9-f6, QColor(128,128,128,80));
+
+    p.fillRect(f9-f1,f1,f1,f9-f2, QColor(128,128,128,10));
+    p.fillRect(f9-f2,f2,f1,f9-f4, QColor(128,128,128,20));
+    p.fillRect(f9-f3,f2,f1,f9-f4, QColor(128,128,128,40));
+    p.fillRect(f9-f4,f3,f1,f9-f6, QColor(128,128,128,80));
+
+    p.end();
+    shadows.fallback = Tile::Set(tmp,f9/2,f9/2,1,1);
+    shadows.fallback.setDefaultShape(Tile::Ring);
+    // ================================================================
+
+    // LIGHTS ==================================
+    for (int r = 0; r < 2; ++r)
+    {
+        int s = r ? f17 : f11;
+        lights.rect[r] = Tile::Set(shadow(s, true, false, 3.0), s/2,s/2,1,1);
+        lights.rect[r].setClipOffsets(f3,f3,f3,f3);
+        lights.rect[r].setDefaultShape(Tile::Ring);
+    }
 
    // toplight -- UNUSED!
 //    renderLightLine(lights.top);
    
-   // ================================================================
+    // ================================================================
    
-   // SLIDER =====================================
-   // shadow
-   for (int i = 0; i < 2; ++i) { // opaque?
-         shadows.slider[i][false] = shadow(dpi.SliderControl, i,false);
-         shadows.slider[i][true] = shadow(dpi.SliderControl-f2, i,true);
-   }
-   masks.slider = roundMask(dpi.SliderControl-f4);
-   // ================================================================
+    // SLIDER =====================================
+    // shadow
+    for (int i = 0; i < 2; ++i)
+    {   // opaque?
+        shadows.slider[i][false] = shadow(dpi.SliderControl, i,false);
+        shadows.slider[i][true] = shadow(dpi.SliderControl-f2, i,true);
+    }
+    masks.slider = roundMask(dpi.SliderControl-f4);
+    // ================================================================
 
-   // RADIOUTTON =====================================
-   // shadow
-   for (int i = 0; i < 2; ++i) { // opaque?
-      shadows.radio[i][false] = shadow(dpi.ExclusiveIndicator, i,false);
-      shadows.radio[i][true] = shadow(dpi.ExclusiveIndicator-f2, i,true);
-   }
-   // mask
-   masks.radio = roundMask(dpi.ExclusiveIndicator-f4);
-   // mask fill
+    // RADIOUTTON =====================================
+    // shadow
+    for (int i = 0; i < 2; ++i)
+    {   // opaque?
+        shadows.radio[i][false] = shadow(dpi.ExclusiveIndicator, i,false);
+        shadows.radio[i][true] = shadow(dpi.ExclusiveIndicator-f2, i,true);
+    }
+    // mask
+    masks.radio = roundMask(dpi.ExclusiveIndicator-f4);
+    // mask fill
 #if 0
-   masks.radioIndicator =
-      roundMask(dpi.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
+    masks.radioIndicator = roundMask(dpi.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
 #else
-	int s = (dpi.ExclusiveIndicator)/4; s *= 2; // cause of int div...
-	s += f2; // cause sunken frame "outer" part covers f2 pixels
-	masks.radioIndicator = roundMask(dpi.ExclusiveIndicator - s);
+    int s = (dpi.ExclusiveIndicator)/4; s *= 2; // cause of int div...
+    s += f2; // cause sunken frame "outer" part covers f2 pixels
+    masks.radioIndicator = roundMask(dpi.ExclusiveIndicator - s);
 #endif
-   // ================================================================
+    // ================================================================
    
-   // NOTCH =====================================
-   masks.notch = roundMask(dpi.f6);
-   // ================================================================
-   
-   // GROUPBOX =====================================
-   // shadow
-   int f12 = dpi.f12;
-   shadows.group = Tile::Set(groupShadow(f49),f12,f12,f49-2*f12,f1);
-   shadows.group.setDefaultShape(Tile::Ring);
-   // ================================================================
-   
-   // LINES =============================================
-   int f49_2 = (f49-1)/2;
-   QLinearGradient lg; QGradientStops stops;
-   int w,h,c1,c2;
-   for (int i = 0; i < 2; ++i) { // orientarion
-      if (i) {
-         w = f2; h = f49;
-         lg = QLinearGradient(0,0,0,f49);
-      }
-      else {
-         w = f49; h = f2;
-         lg = QLinearGradient(0,0,f49,0);
-      }
-      tmp = QPixmap(w,h);
-      for (int j = 0; j < 3; ++j) { // direction
-         c1 = (j > 0) ? 255 : 111; c2 = (j > 0) ? 111 : 255;
-         tmp.fill(Qt::transparent); p.begin(&tmp);
+    // NOTCH =====================================
+    masks.notch = roundMask(dpi.f6);
+    // ================================================================
+    
+    // GROUPBOX =====================================
+    // shadow
+    int f12 = dpi.f12;
+    shadows.group = Tile::Set(groupShadow(f49),f12,f12,f49-2*f12,f1);
+    shadows.group.setDefaultShape(Tile::Ring);
+    // ================================================================
+    
+    // LINES =============================================
+    int f49_2 = (f49-1)/2;
+    QLinearGradient lg; QGradientStops stops;
+    int w,h,c1,c2;
+    for (int i = 0; i < 2; ++i)
+    {   // orientarion
+        if (i)
+        {
+            w = f2; h = f49;
+            lg = QLinearGradient(0,0,0,f49);
+        }
+        else
+        {
+            w = f49; h = f2;
+            lg = QLinearGradient(0,0,f49,0);
+        }
+        tmp = QPixmap(w,h);
+        for (int j = 0; j < 3; ++j)
+        {   // direction
+            c1 = (j > 0) ? 255 : 111; c2 = (j > 0) ? 111 : 255;
+            tmp.fill(Qt::transparent); p.begin(&tmp);
 
-         stops << QGradientStop( 0, QColor(c1,c1,c1,0) )
-            << QGradientStop( 0.5, QColor(c1,c1,c1,71) )
-            << QGradientStop( 1, QColor(c1,c1,c1,0) );
-         lg.setStops(stops);
-         if (i) { p.fillRect(0,0,f1,f49,lg); }
-         else {p.fillRect(0,0,f49,f1,lg);}
-         stops.clear();
-         
-         stops << QGradientStop( 0, QColor(c2,c2,c2,0) )
-            << QGradientStop( 0.5, QColor(c2,c2,c2,74) )
-            << QGradientStop( 1, QColor(c2,c2,c2,0) );
-         lg.setStops(stops);
-         if (i) {p.fillRect(f1,0,f2-f1,f49,lg);}
-         else {p.fillRect(0,f1,f49,f2-f1,lg);}
-         stops.clear();
+            stops   << QGradientStop( 0, QColor(c1,c1,c1,0) )
+                    << QGradientStop( 0.5, QColor(c1,c1,c1,71) )
+                    << QGradientStop( 1, QColor(c1,c1,c1,0) );
+            lg.setStops(stops);
+            if (i)
+                { p.fillRect(0,0,f1,f49,lg); }
+            else
+                { p.fillRect(0,0,f49,f1,lg); }
+            stops.clear();
 
-         p.end();
-         shadows.line[i][j] =
-            Tile::Line(tmp, i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);
-      }
-   }
+            stops   << QGradientStop( 0, QColor(c2,c2,c2,0) )
+                    << QGradientStop( 0.5, QColor(c2,c2,c2,74) )
+                    << QGradientStop( 1, QColor(c2,c2,c2,0) );
+            lg.setStops(stops);
+            if (i)
+                { p.fillRect(f1,0,f2-f1,f49,lg); }
+            else
+                { p.fillRect(0,f1,f49,f2-f1,lg); }
+            stops.clear();
 
-   // ================================================================
-   // ================================================================
-   // Popup corners - not really pxmaps, though ;) ===================
-   // they at least break beryl's popup shadows...
-   // see bespin.cpp#BespinStyle::eventfilter as well
-   int f5 = 4;
-   QBitmap bm(2*f5, 2*f5);
-   bm.fill(Qt::black);
-   p.begin(&bm);
-   p.setPen(Qt::NoPen);
-   p.setBrush(Qt::white);
-   p.drawEllipse(0,0,2*f5,2*f5);
-   p.end();
-   QRegion circle(bm);
-   masks.corner[0] = circle & QRegion(0,0,f5,f5); // tl
-   masks.corner[1] = circle & QRegion(f5,0,f5,f5); // tr
-   masks.corner[1].translate(-masks.corner[1].boundingRect().left(), 0);
-   masks.corner[2] = circle & QRegion(0,f5,f5,f5); // bl
-   masks.corner[2].translate(0, -masks.corner[2].boundingRect().top());
-   masks.corner[3] = circle & QRegion(f5,f5,f5,f5); // br
-   masks.corner[3].translate(-masks.corner[3].boundingRect().topLeft());
-   // ================================================================
-
+            p.end();
+            shadows.line[i][j] = Tile::Line(tmp, i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);
+        }
+    }
+    // ================================================================
+    
+    // ================================================================
+    // Popup corners - not really pxmaps, though ;) ===================
+    // they at least break beryl's popup shadows...
+    // see bespin.cpp#BespinStyle::eventfilter as well
+    int f5 = 4;
+    QBitmap bm(2*f5, 2*f5);
+    bm.fill(Qt::black);
+    p.begin(&bm);
+    p.setPen(Qt::NoPen);
+    p.setBrush(Qt::white);
+    p.drawEllipse(0,0,2*f5,2*f5);
+    p.end();
+    QRegion circle(bm);
+    masks.corner[0] = circle & QRegion(0,0,f5,f5); // tl
+    masks.corner[1] = circle & QRegion(f5,0,f5,f5); // tr
+    masks.corner[1].translate(-masks.corner[1].boundingRect().left(), 0);
+    masks.corner[2] = circle & QRegion(0,f5,f5,f5); // bl
+    masks.corner[2].translate(0, -masks.corner[2].boundingRect().top());
+    masks.corner[3] = circle & QRegion(f5,f5,f5,f5); // br
+    masks.corner[3].translate(-masks.corner[3].boundingRect().topLeft());
+    // ================================================================
 }
 #undef fillRect

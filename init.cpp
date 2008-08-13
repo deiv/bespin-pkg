@@ -349,7 +349,9 @@ void BespinStyle::initMetrics()
 
 #undef SCALE
 
-void BespinStyle::init(const QSettings* settings) {
+void
+BespinStyle::init(const QSettings* settings)
+{
     readSettings(settings);
     initMetrics();
     generatePixmaps();

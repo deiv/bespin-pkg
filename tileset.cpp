@@ -32,7 +32,6 @@
 using namespace Tile;
 
 // some static elements (benders)
-
 static QPixmap nullPix;
 static PosFlags _shape = 0;
 static const QPixmap *_texPix = 0;
@@ -42,38 +41,28 @@ static const QPoint *_offset = 0;
 static bool _preferClip = true;
 
 // static functions
-PosFlags Tile::shape() {
-   return _shape;
-}
-
-void Tile::setPreferClip(bool b) {
-   _preferClip = b;
-}
-
-void Tile::setSolidBackground(const QColor &c) {
-   _bgColor = &c;
-}
-
-void Tile::setShape(PosFlags pf) {
-   _shape = pf;
-}
-
-void Tile::reset() {
-   _shape = 0;
-   _bgColor = 0;
-   _preferClip = true;
+PosFlags Tile::shape() { return _shape; }
+void Tile::setPreferClip(bool b) { _preferClip = b; }
+void Tile::setSolidBackground(const QColor &c) { _bgColor = &c; }
+void Tile::setShape(PosFlags pf) { _shape = pf; }
+void Tile::reset()
+{
+    _shape = 0;
+    _bgColor = 0;
+    _preferClip = true;
 }
 
 static bool isEmpty(const QPixmap &pix)
 {
-   if (!pix.hasAlpha()) return false;
-   QImage img =  pix.toImage();
-   uint *data = ( uint * ) img.bits();
-   int total = img.width() * img.height();
-   for ( int current = 0 ; current < total ; ++current )
-      if (qAlpha(data[ current ]))
-         return false;
-   return true;
+    if (!pix.hasAlpha())
+        return false;
+    QImage img =  pix.toImage();
+    uint *data = ( uint * ) img.bits();
+    int total = img.width() * img.height();
+    for ( int current = 0 ; current < total ; ++current )
+        if (qAlpha(data[ current ]))
+            return false;
+    return true;
 }
 #if 0
 static QPixmap invertAlpha(const QPixmap & pix)
@@ -91,102 +80,107 @@ static QPixmap invertAlpha(const QPixmap & pix)
    return ret;
 }
 #endif
+
 Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round)
 {
-   if (pix.isNull()) {
-      _isBitmap = false;
-      return;
-   }
-   _isBitmap = pix.isQBitmap();
-   int w = qMax(1, width), h = qMax(1, height);
-   
-   int i = xOff*2*round/100;
-   rndRect = QRect(i, i, i, i);
+    if (pix.isNull())
+    {
+        _isBitmap = false;
+        return;
+    }
+    _isBitmap = pix.isQBitmap();
+    int w = qMax(1, width),
+        h = qMax(1, height);
 
-   int rOff = pix.width() - xOff - w;
-   int bOff = pix.height() - yOff - h;
-   int amount = 32/w+1;
-   int amount2 = 32/h+1;
-   
-   QPainter p;
-   
+    int i = xOff*2*round/100;
+    rndRect = QRect(i, i, i, i);
+
+    int rOff = pix.width() - xOff - w;
+    int bOff = pix.height() - yOff - h;
+    int amount = 32/w+1;
+    int amount2 = 32/h+1;
+
+    QPainter p;
+
 #define initPixmap(_SECTION_,_WIDTH_,_HEIGHT_)\
-   pixmap[_SECTION_] = QPixmap(_WIDTH_, _HEIGHT_);\
-   pixmap[_SECTION_].fill(Qt::transparent); p.begin(&pixmap[_SECTION_])
-      
+pixmap[_SECTION_] = QPixmap(_WIDTH_, _HEIGHT_);\
+pixmap[_SECTION_].fill(Qt::transparent); p.begin(&pixmap[_SECTION_])
+
 #define finishPixmap(_SECTION_)\
-   p.end();\
-   if (isEmpty(pixmap[_SECTION_]))\
-      pixmap[_SECTION_] = QPixmap()
-   
-   initPixmap(TopLeft, xOff, yOff);
-   p.drawPixmap(0, 0, pix, 0, 0, xOff, yOff);
-   finishPixmap(TopLeft);
-   
-   initPixmap(TopMid, amount*w, yOff);
-   for (i = 0; i < amount; i++)
-      p.drawPixmap(i*w, 0, pix, xOff, 0, w, yOff);
-   finishPixmap(TopMid);
-   
-   initPixmap(TopRight, rOff, yOff);
-   p.drawPixmap(0, 0, pix, xOff+w, 0, rOff, yOff);
-   finishPixmap(TopRight);
-   
-   //----------------------------------
-   initPixmap(MidLeft, xOff, amount2*h);
-   for (i = 0; i < amount2; i++)
-      p.drawPixmap(0, i*h, pix, 0, yOff, xOff, h);
-   finishPixmap(MidLeft);
-   
-   initPixmap(MidMid, amount*w, amount2*h);
-   for (i = 0; i < amount; i++)
-      for (int j = 0; j < amount2; j++)
-         p.drawPixmap(i*w, j*h, pix, xOff, yOff, w, h);
-   finishPixmap(MidMid);
-   
-   initPixmap(MidRight, rOff, amount2*h);
-   for (i = 0; i < amount2; i++)
-      p.drawPixmap(0, i*h, pix, xOff+w, yOff, rOff, h);
-   finishPixmap(MidRight);
-   
-   //----------------------------------
-   
-   initPixmap(BtmLeft, xOff, bOff);
-   p.drawPixmap(0, 0, pix, 0, yOff+h, xOff, bOff);
-   finishPixmap(BtmLeft);
-   
-   initPixmap(BtmMid, amount*w, bOff);
-   for (i = 0; i < amount; i++)
-      p.drawPixmap(i*w, 0, pix, xOff, yOff+h, w, bOff);
-   finishPixmap(BtmMid);
-   
-   initPixmap(BtmRight, rOff, bOff);
-   p.drawPixmap(0, 0, pix, xOff+w, yOff+h, rOff, bOff);
-   finishPixmap(BtmRight);
-   
-   _clipOffset[0] = _clipOffset[2] =
-      _clipOffset[1] = _clipOffset[3] = 0;
-   _hasCorners = !pix.isNull();
-   _defShape = Full;
-   
+p.end();\
+if (isEmpty(pixmap[_SECTION_]))\
+    pixmap[_SECTION_] = QPixmap()
+
+    initPixmap(TopLeft, xOff, yOff);
+    p.drawPixmap(0, 0, pix, 0, 0, xOff, yOff);
+    finishPixmap(TopLeft);
+
+    initPixmap(TopMid, amount*w, yOff);
+    for (i = 0; i < amount; i++)
+        p.drawPixmap(i*w, 0, pix, xOff, 0, w, yOff);
+    finishPixmap(TopMid);
+
+    initPixmap(TopRight, rOff, yOff);
+    p.drawPixmap(0, 0, pix, xOff+w, 0, rOff, yOff);
+    finishPixmap(TopRight);
+
+    //----------------------------------
+    initPixmap(MidLeft, xOff, amount2*h);
+    for (i = 0; i < amount2; i++)
+        p.drawPixmap(0, i*h, pix, 0, yOff, xOff, h);
+    finishPixmap(MidLeft);
+
+    initPixmap(MidMid, amount*w, amount2*h);
+    for (i = 0; i < amount; i++)
+    for (int j = 0; j < amount2; j++)
+        p.drawPixmap(i*w, j*h, pix, xOff, yOff, w, h);
+    finishPixmap(MidMid);
+
+    initPixmap(MidRight, rOff, amount2*h);
+    for (i = 0; i < amount2; i++)
+        p.drawPixmap(0, i*h, pix, xOff+w, yOff, rOff, h);
+    finishPixmap(MidRight);
+    //----------------------------------
+
+    initPixmap(BtmLeft, xOff, bOff);
+    p.drawPixmap(0, 0, pix, 0, yOff+h, xOff, bOff);
+    finishPixmap(BtmLeft);
+
+    initPixmap(BtmMid, amount*w, bOff);
+    for (i = 0; i < amount; i++)
+        p.drawPixmap(i*w, 0, pix, xOff, yOff+h, w, bOff);
+    finishPixmap(BtmMid);
+
+    initPixmap(BtmRight, rOff, bOff);
+    p.drawPixmap(0, 0, pix, xOff+w, yOff+h, rOff, bOff);
+    finishPixmap(BtmRight);
+
+    _clipOffset[0] = _clipOffset[2] = _clipOffset[1] = _clipOffset[3] = 0;
+    _hasCorners = !pix.isNull();
+    _defShape = Full;
 #undef initPixmap
 #undef finishPixmap
 }
 
-QRect Set::rect(const QRect &rect, PosFlags pf) const
+QRect
+Set::rect(const QRect &rect, PosFlags pf) const
 {
-   QRect ret = rect;
-   if (pf == Center)
-      ret.adjust(width(MidLeft),height(TopMid),-width(TopMid),-height(BtmMid));
-   else if (pf == Left)
-      ret.setRight(ret.left()+width(MidLeft));
-   else if (pf == Top)
-      ret.setBottom(ret.top()+height(TopMid));
-   else if (pf == Right)
-      ret.setLeft(ret.right()-width(MidRight));
-   else if (pf == Bottom)
-      ret.setTop(ret.bottom()-height(BtmMid));
-   return ret;
+    QRect ret = rect;
+    switch (pf)
+    {
+    case Center:
+        ret.adjust(width(MidLeft),height(TopMid),-width(TopMid),-height(BtmMid)); break;
+    case Left:
+        ret.setRight(ret.left()+width(MidLeft)); break;
+    case Top:
+        ret.setBottom(ret.top()+height(TopMid)); break;
+    case Right:
+        ret.setLeft(ret.right()-width(MidRight)); break;
+    case Bottom:
+        ret.setTop(ret.bottom()-height(BtmMid)); break;
+    default: break;
+    }
+    return ret;
 }
 
 void Set::render(const QRect &r, QPainter *p) const

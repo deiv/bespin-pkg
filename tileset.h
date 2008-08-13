@@ -61,64 +61,69 @@ inline static bool matches(PosFlags This, PosFlags That){return (This & That) ==
 class Set
 {
 public:
-   Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round = 99);
-   Set(){
-      setDefaultShape(Ring);
-      _clipOffset[0] = _clipOffset[1] = _clipOffset[2] = _clipOffset[3] = 0;
-      _hasCorners = false;
-   }
+    Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round = 99);
+    Set()
+    {
+        setDefaultShape(Ring);
+        _clipOffset[0] = _clipOffset[1] = _clipOffset[2] = _clipOffset[3] = 0;
+        _hasCorners = false;
+    }
 
-   QRect bounds(const QRect &rect, PosFlags pf = Full) const;
-   
-   QRegion clipRegion(const QRect &rect, PosFlags pf = Ring) const;
-   
-   const QPixmap &corner(PosFlags pf) const;
-   
-   inline bool hasCorners() const {return _hasCorners;}
+    QRect bounds(const QRect &rect, PosFlags pf = Full) const;
 
-   inline int height(Section sect) const {return pixmap[sect].height();}
+    QRegion clipRegion(const QRect &rect, PosFlags pf = Ring) const;
 
-   inline bool isQBitmap() const {return _isBitmap;}
+    const QPixmap &corner(PosFlags pf) const;
 
-   void outline(const QRect &rect, QPainter *p, QColor c, int size = 1) const;
+    inline bool
+    hasCorners() const {return _hasCorners;}
+
+    inline int
+    height(Section sect) const {return pixmap[sect].height();}
+
+    inline bool
+    isQBitmap() const {return _isBitmap;}
+
+    void outline(const QRect &rect, QPainter *p, QColor c, int size = 1) const;
+
+    QRect rect(const QRect &rect, PosFlags pf) const;
+
+    void render(const QRect &rect, QPainter *p) const;
+
+    void render(const QRect &rect, QPainter *p, const QColor &c) const;
+
+    void render(const QRect &rect, QPainter *p,
+                const QPixmap &pix, const QPoint &offset = QPoint()) const;
    
-   QRect rect(const QRect &rect, PosFlags pf) const;
+    inline void
+    render( const QRect &rect, QPainter *p, Bespin::Gradients::Type type, Qt::Orientation o,
+            const QColor &c, int size = -1, const QPoint &offset = QPoint()) const
+    {
+        if (type == Bespin::Gradients::None)
+            render(rect, p, c);
+        else
+        {
+            const int s = (size > 0) ? size : (o == Qt::Vertical) ? rect.height() : rect.width();
+            render(rect, p, Bespin::Gradients::pix(c, s, o, type), offset);
+        }
+    }
    
-   void render(const QRect &rect, QPainter *p) const;
+    inline void
+    render(const QRect &rect, QPainter *p, const QBrush &brush, const QPoint &offset = QPoint()) const
+    {
+        if (brush.style() == Qt::TexturePattern)
+            render(rect, p, brush.texture(), offset);
+        else
+            render(rect, p, brush.color());
+    }
 
-   void render(const QRect &rect, QPainter *p, const QColor &c) const;
-   
-   void render(const QRect &rect, QPainter *p,
-               const QPixmap &pix, const QPoint &offset = QPoint()) const;
-   
-   inline void render(const QRect &rect, QPainter *p,
-                      Bespin::Gradients::Type type, Qt::Orientation o,
-                      const QColor &c, int size = -1,
-                      const QPoint &offset = QPoint()) const {
-      if (type == Bespin::Gradients::None)
-         render(rect, p, c);
-      else {
-         const int s = (size > 0) ? size :
-            (o == Qt::Vertical) ? rect.height() :
-            rect.width();
-         render(rect, p, Bespin::Gradients::pix(c, s, o, type), offset);
-      }
-   }
-   
-   inline void render(const QRect &rect, QPainter *p,
-                      const QBrush &brush,
-                      const QPoint &offset = QPoint()) const {
-      if (brush.style() == Qt::TexturePattern)
-         render(rect, p, brush.texture(), offset);
-      else
-         render(rect, p, brush.color());
-   }
+    inline int
+    width(Section sect) const { return pixmap[sect].width(); }
 
-   inline int width(Section sect) const {return pixmap[sect].width();}
+    void setClipOffsets(uint left, uint top, uint right, uint bottom);
 
-   void setClipOffsets(uint left, uint top, uint right, uint bottom);
-
-   inline void setDefaultShape(PosFlags pf) {_defShape = pf;}
+    inline void
+    setDefaultShape(PosFlags pf) { _defShape = pf; }
 
 protected:
    QPixmap pixmap[9];
