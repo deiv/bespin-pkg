@@ -97,14 +97,16 @@ Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int roun
 
     int rOff = pix.width() - xOff - w;
     int bOff = pix.height() - yOff - h;
-    int amount = 32/w+1;
-    int amount2 = 32/h+1;
+    int tileWidth = qMax(32, width);
+    int tileHeight = qMax(32, height);
 
     QPainter p;
+    QPixmap dump;
+    QPixmap transSrc(qMax(32, pix.width()), qMax(32, pix.height()));
+    transSrc.fill(Qt::transparent);
 
 #define initPixmap(_SECTION_,_WIDTH_,_HEIGHT_)\
-pixmap[_SECTION_] = QPixmap(_WIDTH_, _HEIGHT_);\
-pixmap[_SECTION_].fill(Qt::transparent); p.begin(&pixmap[_SECTION_])
+pixmap[_SECTION_] = transSrc.copy(0,0,_WIDTH_, _HEIGHT_); p.begin(&pixmap[_SECTION_])
 
 #define finishPixmap(_SECTION_)\
 p.end();\
@@ -115,9 +117,9 @@ if (isEmpty(pixmap[_SECTION_]))\
     p.drawPixmap(0, 0, pix, 0, 0, xOff, yOff);
     finishPixmap(TopLeft);
 
-    initPixmap(TopMid, amount*w, yOff);
-    for (i = 0; i < amount; i++)
-        p.drawPixmap(i*w, 0, pix, xOff, 0, w, yOff);
+    initPixmap(TopMid, tileWidth, yOff);
+    dump = pix.copy(xOff, 0, w, yOff);
+    p.drawTiledPixmap(pixmap[TopMid].rect(), dump);
     finishPixmap(TopMid);
 
     initPixmap(TopRight, rOff, yOff);
@@ -125,20 +127,19 @@ if (isEmpty(pixmap[_SECTION_]))\
     finishPixmap(TopRight);
 
     //----------------------------------
-    initPixmap(MidLeft, xOff, amount2*h);
-    for (i = 0; i < amount2; i++)
-        p.drawPixmap(0, i*h, pix, 0, yOff, xOff, h);
+    initPixmap(MidLeft, xOff, tileHeight);
+    dump = pix.copy(0, yOff, xOff, h);
+    p.drawTiledPixmap(pixmap[MidLeft].rect(), dump);
     finishPixmap(MidLeft);
 
-    initPixmap(MidMid, amount*w, amount2*h);
-    for (i = 0; i < amount; i++)
-    for (int j = 0; j < amount2; j++)
-        p.drawPixmap(i*w, j*h, pix, xOff, yOff, w, h);
+    initPixmap(MidMid, tileWidth, tileHeight);
+    dump = pix.copy(xOff, yOff, w, h);
+    p.drawTiledPixmap(pixmap[MidMid].rect(), dump);
     finishPixmap(MidMid);
 
-    initPixmap(MidRight, rOff, amount2*h);
-    for (i = 0; i < amount2; i++)
-        p.drawPixmap(0, i*h, pix, xOff+w, yOff, rOff, h);
+    initPixmap(MidRight, rOff, tileHeight);
+    dump = pix.copy(xOff+w, yOff, rOff, h);
+    p.drawTiledPixmap(pixmap[MidRight].rect(), dump);
     finishPixmap(MidRight);
     //----------------------------------
 
@@ -146,9 +147,9 @@ if (isEmpty(pixmap[_SECTION_]))\
     p.drawPixmap(0, 0, pix, 0, yOff+h, xOff, bOff);
     finishPixmap(BtmLeft);
 
-    initPixmap(BtmMid, amount*w, bOff);
-    for (i = 0; i < amount; i++)
-        p.drawPixmap(i*w, 0, pix, xOff, yOff+h, w, bOff);
+    initPixmap(BtmMid, tileWidth, bOff);
+    dump = pix.copy(xOff, yOff+h, w, bOff);
+    p.drawTiledPixmap(pixmap[BtmMid].rect(), dump);
     finishPixmap(BtmMid);
 
     initPixmap(BtmRight, rOff, bOff);

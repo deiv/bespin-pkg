@@ -204,6 +204,7 @@ MacMenu::registerMenu(QMenuBar *menu)
     foreach (QAction* action, menu->actions())
         entries << action->text();
 
+    // TODO: this is too slow - needs async procedure!
     xbar.call("registerMenu", service, (qlonglong)menu, title, entries);
     if (menu->isActiveWindow())
         xbar.call("requestFocus", (qlonglong)menu);

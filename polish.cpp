@@ -269,9 +269,6 @@ BespinStyle::polish( QWidget * widget )
     {
         QPalette pal = widget->palette();
 
-        // talk to kwin about colors, gradients, etc.
-        setupDecoFor(widget);
-
         if (config.bg.mode > Plain)
             widget->setAttribute(Qt::WA_StyledBackground);
 
@@ -312,11 +309,19 @@ BespinStyle::polish( QWidget * widget )
         else if (widget->inherits("QWhatsThat"))
             widget->setPalette(QToolTip::palette()); // so this is Qt bug WORKAROUND
     
-        /// modal dialogs
-        else if (config.bg.modal.invert || config.bg.modal.glassy || config.bg.modal.opacity < 100)
+        else
+        {   /// modal dialogs
+            if (config.bg.modal.invert || config.bg.modal.glassy || config.bg.modal.opacity < 100)
             // the modality isn't necessarily set yet, so we catch it on QEvent::Show
-            widget->installEventFilter(this);
-            
+                widget->installEventFilter(this);
+
+            // talk to kwin about colors, gradients, etc.
+            Qt::WindowFlags ignore =    Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::ToolTip |
+                                        Qt::SplashScreen | Qt::Desktop |
+                                        Qt::X11BypassWindowManagerHint;// | Qt::FramelessWindowHint; <- could easily change mind...?!
+            if ((widget->windowFlags() & ignore) == Qt::Window)
+                setupDecoFor(widget); // this can be expensive, so avoid for popups, combodrops etc.
+        }
 
     }
     //END Window handling                                                                          -
@@ -533,7 +538,6 @@ BespinStyle::polish( QWidget * widget )
         QEvent ev(QEvent::PaletteChange);
         eventFilter(widget, &ev);
     }
-   
 }
 #undef PAL
 
