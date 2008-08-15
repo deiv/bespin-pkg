@@ -356,17 +356,18 @@ MenuBar::popDown()
 {
 //    if (d.openPopup > -1) {
 
-      QDBusInterface interface( d.service, "/XBarClient", "org.kde.XBarClient" );
-      if (interface.isValid())
-         interface.call("popDown", d.key);
+    QDBusInterface interface( d.service, "/XBarClient", "org.kde.XBarClient" );
+    if (interface.isValid())
+        interface.call(QDBus::NoBlock, "popDown", d.key);
 
-      foreach (QAction *action, d.actions) {
-         if (action->menu())
-            action->menu()->close();
-      }
+    foreach (QAction *action, d.actions)
+    {
+        if (action->menu())
+        action->menu()->close();
+    }
 //    }
    // yes - to stop timer in case!
-   setOpenPopup(-1);
+    setOpenPopup(-1);
 }
 
 void

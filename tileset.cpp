@@ -105,56 +105,43 @@ Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int roun
     QPixmap transSrc(qMax(32, pix.width()), qMax(32, pix.height()));
     transSrc.fill(Qt::transparent);
 
-#define initPixmap(_SECTION_,_WIDTH_,_HEIGHT_)\
-pixmap[_SECTION_] = transSrc.copy(0,0,_WIDTH_, _HEIGHT_); p.begin(&pixmap[_SECTION_])
+#define DUMP(_SECTION_, _WIDTH_, _HEIGHT_, _X_, _Y_, _W_, _H_)\
+dump = pix.copy(_X_, _Y_, _W_, _H_);\
+if (isEmpty(dump))\
+    pixmap[_SECTION_] = QPixmap();\
+else\
+{\
+    pixmap[_SECTION_] = transSrc.copy(0,0,_WIDTH_, _HEIGHT_);\
+    p.begin(&pixmap[_SECTION_]);\
+    p.drawTiledPixmap(pixmap[_SECTION_].rect(), dump);\
+    p.end();\
+}//
 
-#define finishPixmap(_SECTION_)\
-p.end();\
+#define VALIDATE(_SECTION_)\
 if (isEmpty(pixmap[_SECTION_]))\
     pixmap[_SECTION_] = QPixmap()
 
-    initPixmap(TopLeft, xOff, yOff);
-    p.drawPixmap(0, 0, pix, 0, 0, xOff, yOff);
-    finishPixmap(TopLeft);
+    pixmap[TopLeft] = pix.copy(0, 0, xOff, yOff);
+    VALIDATE(TopLeft);
 
-    initPixmap(TopMid, tileWidth, yOff);
-    dump = pix.copy(xOff, 0, w, yOff);
-    p.drawTiledPixmap(pixmap[TopMid].rect(), dump);
-    finishPixmap(TopMid);
+    DUMP(TopMid,   tileWidth, yOff,   xOff, 0, w, yOff);
 
-    initPixmap(TopRight, rOff, yOff);
-    p.drawPixmap(0, 0, pix, xOff+w, 0, rOff, yOff);
-    finishPixmap(TopRight);
+    pixmap[TopRight] = pix.copy(xOff+w, 0, rOff, yOff);
+    VALIDATE(TopRight);
 
     //----------------------------------
-    initPixmap(MidLeft, xOff, tileHeight);
-    dump = pix.copy(0, yOff, xOff, h);
-    p.drawTiledPixmap(pixmap[MidLeft].rect(), dump);
-    finishPixmap(MidLeft);
-
-    initPixmap(MidMid, tileWidth, tileHeight);
-    dump = pix.copy(xOff, yOff, w, h);
-    p.drawTiledPixmap(pixmap[MidMid].rect(), dump);
-    finishPixmap(MidMid);
-
-    initPixmap(MidRight, rOff, tileHeight);
-    dump = pix.copy(xOff+w, yOff, rOff, h);
-    p.drawTiledPixmap(pixmap[MidRight].rect(), dump);
-    finishPixmap(MidRight);
+    DUMP(MidLeft,   xOff, tileHeight,   0, yOff, xOff, h);
+    DUMP(MidMid,   tileWidth, tileHeight,   xOff, yOff, w, h);
+    DUMP(MidRight,   rOff, tileHeight,   xOff+w, yOff, rOff, h);
     //----------------------------------
 
-    initPixmap(BtmLeft, xOff, bOff);
-    p.drawPixmap(0, 0, pix, 0, yOff+h, xOff, bOff);
-    finishPixmap(BtmLeft);
+    pixmap[BtmLeft] = pix.copy(0, yOff+h, xOff, bOff);
+    VALIDATE(BtmLeft);
 
-    initPixmap(BtmMid, tileWidth, bOff);
-    dump = pix.copy(xOff, yOff+h, w, bOff);
-    p.drawTiledPixmap(pixmap[BtmMid].rect(), dump);
-    finishPixmap(BtmMid);
+    DUMP(BtmMid,   tileWidth, bOff,   xOff, yOff+h, w, bOff);
 
-    initPixmap(BtmRight, rOff, bOff);
-    p.drawPixmap(0, 0, pix, xOff+w, yOff+h, rOff, bOff);
-    finishPixmap(BtmRight);
+    pixmap[BtmRight] = pix.copy(xOff+w, yOff+h, rOff, bOff);
+    VALIDATE(BtmRight);
 
     _clipOffset[0] = _clipOffset[2] = _clipOffset[1] = _clipOffset[3] = 0;
     _hasCorners = !pix.isNull();

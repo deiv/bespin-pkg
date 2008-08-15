@@ -85,7 +85,7 @@ MacMenu::release(QMenuBar *menu)
 void
 MacMenu::_release(QObject *o)
 {
-    xbar.call("unregisterMenu", (qlonglong)o);
+    xbar.call(QDBus::NoBlock, "unregisterMenu", (qlonglong)o);
 
     QMenuBar *menu = qobject_cast<QMenuBar*>(o);
     if (!menu) return;
@@ -204,10 +204,10 @@ MacMenu::registerMenu(QMenuBar *menu)
     foreach (QAction* action, menu->actions())
         entries << action->text();
 
-    // TODO: this is too slow - needs async procedure!
-    xbar.call("registerMenu", service, (qlonglong)menu, title, entries);
-    if (menu->isActiveWindow())
-        xbar.call("requestFocus", (qlonglong)menu);
+    xbar.call(QDBus::NoBlock, "registerMenu", service, (qlonglong)menu, title, entries);
+    // TODO cause of now async call, the following should - maybe - attached to the above?!!
+//     if (menu->isActiveWindow())
+//         xbar.call("requestFocus", (qlonglong)menu);
 
     // take care of several widget events!
     menu->installEventFilter(this);
@@ -230,12 +230,12 @@ MacMenu::popup(qlonglong key, int idx, int x, int y)
             if (!pop->isVisible())
             {
                 connect (pop, SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
-                xbar.call("setOpenPopup", idx);
+                xbar.call(QDBus::NoBlock, "setOpenPopup", idx);
                 pop->popup(QPoint(x,y));
             }
             else
             {
-                xbar.call("setOpenPopup", -1000);
+                xbar.call(QDBus::NoBlock, "setOpenPopup", -1000);
                 pop->hide();
             }
         }
@@ -290,7 +290,7 @@ MacMenu::menuClosed()
     disconnect (sender(), SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
     if (!inHover)
     {
-        xbar.call("setOpenPopup", -500);
+        xbar.call(QDBus::NoBlock, "setOpenPopup", -500);
     }
 }
 
@@ -301,20 +301,20 @@ MacMenu::changeAction(QMenuBar *menu, QActionEvent *ev)
     if (ev->type() == QEvent::ActionAdded)
     {
         idx = ev->before() ? menu->actions().indexOf(ev->before())-1 : -1;
-        xbar.call("addEntry", (qlonglong)menu, idx, ev->action()->text());
+        xbar.call(QDBus::NoBlock, "addEntry", (qlonglong)menu, idx, ev->action()->text());
         actions[menu].insert(idx, ev->action());
         return;
     }
     if (ev->type() == QEvent::ActionChanged)
     {
         idx = menu->actions().indexOf(ev->action());
-        xbar.call("changeEntry", (qlonglong)menu, idx, ev->action()->text());
+        xbar.call(QDBus::NoBlock, "changeEntry", (qlonglong)menu, idx, ev->action()->text());
     }
     else
     { // remove
         idx = actions[menu].indexOf(ev->action());
         actions[menu].removeAt(idx);
-        xbar.call("removeEntry", (qlonglong)menu, idx);
+        xbar.call(QDBus::NoBlock, "removeEntry", (qlonglong)menu, idx);
     }
 }
 
@@ -360,21 +360,21 @@ MacMenu::eventFilter(QObject *o, QEvent *ev)
 //         return false;
     case QEvent::EnabledChange:
         if (static_cast<QWidget*>(o)->isEnabled())
-            xbar.call("requestFocus", (qlonglong)menu);
+            xbar.call(QDBus::NoBlock, "requestFocus", (qlonglong)menu);
         else
-            xbar.call("releaseFocus", (qlonglong)menu);
+            xbar.call(QDBus::NoBlock, "releaseFocus", (qlonglong)menu);
         break;
 
 //     case QEvent::ApplicationActivate:
     // TODO: test whether this is the only one and show it? (e.g. what about dialogs...?!)
     case QEvent::WindowActivate:
-        xbar.call("requestFocus", (qlonglong)menu);
+        xbar.call(QDBus::NoBlock, "requestFocus", (qlonglong)menu);
         break;
 
     case QEvent::WindowBlocked:
     case QEvent::WindowDeactivate:
     case QEvent::ApplicationDeactivate:
-        xbar.call("releaseFocus", (qlonglong)menu);
+        xbar.call(QDBus::NoBlock, "releaseFocus", (qlonglong)menu);
         break;
     default:
         return false;

@@ -42,7 +42,7 @@ p.setRenderHint(QPainter::Antialiasing);\
 p.setPen(Qt::NoPen)
 
 #define EMPTY_PIX(_W_, _H_) \
-QPixmap pix(size, size); pix.fill(Qt::transparent);\
+QPixmap pix = transSrc->copy(0,0,_W_,_H_);\
 QPainter p(&pix); p.setRenderHint(QPainter::Antialiasing);\
 p.setPen(Qt::NoPen)
 
@@ -74,6 +74,7 @@ renderButtonLight(Tile::Set &set)
 #define BLACK(_A_) QColor(0,0,0, _A_)
 
 static int f1, f2, f3, f4;
+static QPixmap *transSrc = 0;
 
 static QPixmap
 shadow(int size, bool opaque, bool sunken, float factor = 1.0)
@@ -221,6 +222,9 @@ void BespinStyle::generatePixmaps()
     const int f9 = dpi.f9; const int f11 = SCALE(11);
     const int f13 = SCALE(13); const int f17 = SCALE(17);
     const int f49 = SCALE(49);
+
+    transSrc = new QPixmap(f17, f17);
+    transSrc->fill(Qt::transparent);
 
     // MASKS =======================================
     for (int i = 0; i < 2; ++i)
