@@ -319,7 +319,7 @@ void
 MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
    QWidget *w = widget ? widget : view();
-   
+
    QRegion emptyArea(rect().toRect());
 
    //draw the items

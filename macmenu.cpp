@@ -206,8 +206,8 @@ MacMenu::registerMenu(QMenuBar *menu)
 
     xbar.call(QDBus::NoBlock, "registerMenu", service, (qlonglong)menu, title, entries);
     // TODO cause of now async call, the following should - maybe - attached to the above?!!
-//     if (menu->isActiveWindow())
-//         xbar.call("requestFocus", (qlonglong)menu);
+    if (menu->isActiveWindow())
+        xbar.call(QDBus::NoBlock, "requestFocus", (qlonglong)menu);
 
     // take care of several widget events!
     menu->installEventFilter(this);

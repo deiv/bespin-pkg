@@ -17,15 +17,18 @@ extern Config config;
 #ifdef QT_NO_XRENDER
 // simply sets the pixmaps alpha value to all rgb (i.e. grey) channels
 // TODO: maybe adjust rgb to psychovisual values? (qGrey() inversion)
-static QPixmap rgbFromAlpha(const QPixmap &pix) {
-   QImage img = pix.toImage();
-   unsigned int *data = ( unsigned int * ) img.bits();
-   int total = img.width() * img.height(), alpha;
-   for ( int i = 0 ; i < total ; ++i ) {
-      alpha = qAlpha(data[i]);
-      data[i] = qRgba( alpha, alpha, alpha, 255 );
-   }
-   return QPixmap::fromImage(img);
+static QPixmap
+rgbFromAlpha(const QPixmap &pix)
+{
+    QImage img = pix.toImage();
+    unsigned int *data = ( unsigned int * ) img.bits();
+    int total = img.width() * img.height(), alpha;
+    for ( int i = 0 ; i < total ; ++i )
+    {
+        alpha = qAlpha(data[i]);
+        data[i] = qRgba( alpha, alpha, alpha, 255 );
+    }
+    return QPixmap::fromImage(img);
 }
 #define UPDATE_COLORS(_PIX_) _PIX_ = rgbFromAlpha(_PIX_);
 #else
@@ -93,109 +96,111 @@ shadow(int size, bool opaque, bool sunken, float factor = 1.0)
 static QPixmap
 roundMask(int size)
 {
-   EMPTY_PIX(size, size); p.setBrush(Qt::black);
-   p.drawEllipse(pix.rect()); p.end();
-   UPDATE_COLORS(pix);
-   return pix;
+    EMPTY_PIX(size, size); p.setBrush(Qt::black);
+    p.drawEllipse(pix.rect()); p.end();
+    UPDATE_COLORS(pix);
+    return pix;
 }
 
 static QPixmap
 roundedMask(int size, int factor)
 {
-   EMPTY_PIX(size, size); p.setBrush(Qt::black);
-   p.drawRoundRect(pix.rect(),factor,factor); p.end();
-   UPDATE_COLORS(pix);
-   return pix;
+    EMPTY_PIX(size, size); p.setBrush(Qt::black);
+    p.drawRoundRect(pix.rect(),factor,factor); p.end();
+    UPDATE_COLORS(pix);
+    return pix;
 }
 
 static QPixmap
 sunkenShadow(int size, bool enabled)
 {
-   QImage *tmpImg = new QImage(size,size, QImage::Format_ARGB32);
-   tmpImg->fill(Qt::transparent); QPainter p(tmpImg);
-   p.setRenderHint(QPainter::Antialiasing); p.setPen(Qt::NoPen);
+    QImage *tmpImg = new QImage(size,size, QImage::Format_ARGB32);
+    tmpImg->fill(Qt::transparent); QPainter p(tmpImg);
+    p.setRenderHint(QPainter::Antialiasing); p.setPen(Qt::NoPen);
 
-   int add = enabled*30;
-   const int add2 = lround(80./f4);
-   const int rAdd = lround(25./f4);
+    int add = enabled*30;
+    const int add2 = lround(80./f4);
+    const int rAdd = lround(25./f4);
 
-   // draw a flat shadow
-   SET_ALPHA(55+add);
-   p.drawRoundRect(0,0,size,size-f2,80,80);
+    // draw a flat shadow
+    SET_ALPHA(55+add);
+    p.drawRoundRect(0,0,size,size-f2,80,80);
 
-   // subtract light
-   p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
-   add = 100 + 30 - add; int xOff;
-   for (int i = 1; i <= f4; ++i) {
-      xOff = qMax(i-f2,0); SET_ALPHA(add+i*add2);
-      p.drawRoundRect(xOff,i,size-2*xOff,size-(f2+i), 75+rAdd, 75+rAdd);
-   }
+    // subtract light
+    p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
+    add = 100 + 30 - add; int xOff;
+    for (int i = 1; i <= f4; ++i)
+    {
+        xOff = qMax(i-f2,0);
+        SET_ALPHA(add+i*add2);
+        p.drawRoundRect(xOff,i,size-2*xOff,size-(f2+i), 75+rAdd, 75+rAdd);
+    }
 
-   // add bottom highlight
-   p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-   p.fillRect(f3,size-f2,size-2*f3,f1, BLACK(10));
-   int w = size/f3;
-   p.fillRect(w,size-f1,size-2*w,f1, WHITE(30));
-   
-   p.end();
+    // add bottom highlight
+    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
+    p.fillRect(f3,size-f2,size-2*f3,f1, BLACK(10));
+    int w = size/f3;
+    p.fillRect(w,size-f1,size-2*w,f1, WHITE(30));
 
-   // create pixmap from image
-   QPixmap ret = QPixmap::fromImage(*tmpImg);
-   delete tmpImg; return ret;
+    p.end();
+
+    // create pixmap from image
+    QPixmap ret = QPixmap::fromImage(*tmpImg);
+    delete tmpImg; return ret;
 }
 
 static QPixmap
 relief(int size, bool enabled)
 {
-   const float f = enabled ? 1.0 : 0.7;
-   EMPTY_PIX(size, size);
-   p.setBrush(Qt::NoBrush);
-   p.setPen(QPen(BLACK(int(f*70)), f1));
-   p.drawRoundRect(f1,f1,size-f2,size-f2,99,99);
-   p.setPen(QPen(WHITE(int(f*35)), f1));
-   p.drawRoundRect(0,0,size,size,99,99);
-   // the borders cross the pixmap boundings, thus they're too weak, thus we stregth them a bit
-   const int d1 = 0.3*size, d2 = 0.7*size;
-   p.drawLine(d1, 0, d2, 0); // top
-   p.drawLine(0, d1, 0, d2); // left
-   p.drawLine(size, d1, size, d2); // right
-   p.setPen(QPen(WHITE(int(f*50)), f1));
-   p.drawLine(d1, size-1, d2, size-1); // bottom
-   p.end(); return pix;
+    const float f = enabled ? 1.0 : 0.7;
+    EMPTY_PIX(size, size);
+    p.setBrush(Qt::NoBrush);
+    p.setPen(QPen(BLACK(int(f*70)), f1));
+    p.drawRoundRect(f1,f1,size-f2,size-f2,99,99);
+    p.setPen(QPen(WHITE(int(f*35)), f1));
+    p.drawRoundRect(0,0,size,size,99,99);
+    // the borders cross the pixmap boundings, thus they're too weak, thus we stregth them a bit
+    const int d1 = 0.3*size, d2 = 0.7*size;
+    p.drawLine(d1, 0, d2, 0); // top
+    p.drawLine(0, d1, 0, d2); // left
+    p.drawLine(size, d1, size, d2); // right
+    p.setPen(QPen(WHITE(int(f*50)), f1));
+    p.drawLine(d1, size-1, d2, size-1); // bottom
+    p.end(); return pix;
 }
 
 static QPixmap
 groupShadow(int size)
 {
-   QImage *tmpImg = new QImage(size,size, QImage::Format_ARGB32);
-   tmpImg->fill(Qt::transparent); QPainter p(tmpImg);
-   p.setRenderHint(QPainter::Antialiasing); p.setPen(Qt::NoPen);
+    QImage *tmpImg = new QImage(size,size, QImage::Format_ARGB32);
+    tmpImg->fill(Qt::transparent); QPainter p(tmpImg);
+    p.setRenderHint(QPainter::Antialiasing); p.setPen(Qt::NoPen);
 
-   int ss = 2*size;
+    int ss = 2*size;
 
-   p.setBrush(QColor(0,0,0,5)); p.drawRoundRect(0,0,size,ss,14,7);
-   p.setBrush(QColor(0,0,0,9)); p.drawRoundRect(f1,f1,size-f2,ss,13,7);
-   p.setBrush(QColor(0,0,0,11)); p.drawRoundRect(f2,f2,size-f4,ss,12,6);
-   p.setBrush(QColor(0,0,0,13)); p.drawRoundRect(f3,f3,size-dpi.f6,ss,48,24);
-   p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
-   p.setBrush(QColor(0,0,0,0)); p.drawRoundRect(f4,f2,size-dpi.f8,ss,11,6);
+    p.setBrush(QColor(0,0,0,5)); p.drawRoundRect(0,0,size,ss,14,7);
+    p.setBrush(QColor(0,0,0,9)); p.drawRoundRect(f1,f1,size-f2,ss,13,7);
+    p.setBrush(QColor(0,0,0,11)); p.drawRoundRect(f2,f2,size-f4,ss,12,6);
+    p.setBrush(QColor(0,0,0,13)); p.drawRoundRect(f3,f3,size-dpi.f6,ss,48,24);
+    p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
+    p.setBrush(QColor(0,0,0,0)); p.drawRoundRect(f4,f2,size-dpi.f8,ss,11,6);
 //    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
 //    p.setPen(QColor(255,255,255,200)); p.setBrush(Qt::NoBrush);
 //    p.drawRoundRect(dpi.f4,dpi.f2,f49-dpi.f8,2*f49,11,6);
-   p.setRenderHint(QPainter::Antialiasing, false);
+    p.setRenderHint(QPainter::Antialiasing, false);
 //    p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
-   int f33 = SCALE(33);
-   for (int i = 1; i < f33; ++i) {
-      p.setPen(QColor(0,0,0,CLAMP(i*lround(255.0/dpi.f32),0,255)));
-      p.drawLine(0, size-i, size, size-i);
-   }
-   p.end();
+    int f33 = SCALE(33);
+    for (int i = 1; i < f33; ++i)
+    {
+        p.setPen(QColor(0,0,0,CLAMP(i*lround(255.0/dpi.f32),0,255)));
+        p.drawLine(0, size-i, size, size-i);
+    }
+    p.end();
 
-   // create pixmap from image
-   QPixmap ret = QPixmap::fromImage(*tmpImg);
-   delete tmpImg; return ret;
+    // create pixmap from image
+    QPixmap ret = QPixmap::fromImage(*tmpImg);
+    delete tmpImg; return ret;
 }
-
 
 #if 0
 static void
@@ -216,14 +221,17 @@ renderLightLine(Tile::Line &line)
 }
 #endif
 
-void BespinStyle::generatePixmaps()
+void
+BespinStyle::generatePixmaps()
 {
     f1 = dpi.f1; f2 = dpi.f2; f3 = dpi.f3; f4 = dpi.f4;
     const int f9 = dpi.f9; const int f11 = SCALE(11);
     const int f13 = SCALE(13); const int f17 = SCALE(17);
     const int f49 = SCALE(49);
 
-    transSrc = new QPixmap(f17, f17);
+    // NOTICE!!! dpi.SliderControl is currently the biggest item using the transpix,
+    // increase this in case we need it for bigger things...
+    transSrc = new QPixmap(dpi.SliderControl, dpi.SliderControl);
     transSrc->fill(Qt::transparent);
 
     // MASKS =======================================
@@ -274,6 +282,7 @@ void BespinStyle::generatePixmaps()
             }
     }
 
+    
     // fallback ( sunken ) // TODO: raised
     int f6 = dpi.f6;
     QPixmap tmp = QPixmap(f9,f9); tmp.fill(Qt::transparent);
@@ -346,18 +355,18 @@ void BespinStyle::generatePixmaps()
     masks.radioIndicator = roundMask(dpi.ExclusiveIndicator - s);
 #endif
     // ================================================================
-   
     // NOTCH =====================================
     masks.notch = roundMask(dpi.f6);
     // ================================================================
-    
-    // GROUPBOX =====================================
+
+
+// GROUPBOX =====================================
     // shadow
     int f12 = dpi.f12;
     shadows.group = Tile::Set(groupShadow(f49),f12,f12,f49-2*f12,f1);
     shadows.group.setDefaultShape(Tile::Ring);
     // ================================================================
-    
+
     // LINES =============================================
     int f49_2 = (f49-1)/2;
     QLinearGradient lg; QGradientStops stops;
@@ -427,5 +436,7 @@ void BespinStyle::generatePixmaps()
     masks.corner[3] = circle & QRegion(f5,f5,f5,f5); // br
     masks.corner[3].translate(-masks.corner[3].boundingRect().topLeft());
     // ================================================================
+
+    delete transSrc;
 }
 #undef fillRect

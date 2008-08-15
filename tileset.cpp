@@ -520,53 +520,40 @@ void Set::render(const QRect &rect, QPainter *p,
    _texPix = 0L; _offset = 0L;
 }
 
-Line::Line(const QPixmap &pix, Qt::Orientation o, int d1, int d2) {
-   _o = o;
-   QPainter p;
-   if (o == Qt::Horizontal) {
-      _thickness = pix.height();
-      pixmap[0] = QPixmap(d1,pix.height());
-      pixmap[0].fill(Qt::transparent);
-      p.begin(&pixmap[0]);
-      p.drawPixmap(0,0,pix,0,0,d1,pix.height());
-      p.end();
-      
-      int d = pix.width()-d1+d2;
-      pixmap[1] = QPixmap(MAX(32,d),pix.height());
-      pixmap[1].fill(Qt::transparent);
-      p.begin(&pixmap[1]);
-      for (int i = 0; i+d <= width(1); i+=d)
-         p.drawPixmap(i,0,pix,d1,0,MIN(d,width(1)-i),pix.height());
-      p.end();
-      
-      pixmap[2] = QPixmap(-d2,pix.height());
-      pixmap[2].fill(Qt::transparent);
-      p.begin(&pixmap[2]);
-      p.drawPixmap(0,0,pix,pix.width()+d2,0,-d2,pix.height());
-      p.end();
-   }
-   else {
-      _thickness = pix.width();
-      pixmap[0] = QPixmap(pix.width(),d1);
-      pixmap[0].fill(Qt::transparent);
-      p.begin(&pixmap[0]);
-      p.drawPixmap(0,0,pix,0,0,pix.width(),d1);
-      p.end();
-      
-      int d = pix.height()-d1+d2;
-      pixmap[1] = QPixmap(pix.width(), MAX(32,d));
-      pixmap[1].fill(Qt::transparent);
-      p.begin(&pixmap[1]);
-      for (int i = 0; i+d <= height(1); i+=d)
-         p.drawPixmap(0,i,pix,0,d1,pix.width(),MIN(d,height(1)-i));
-      p.end();
-      
-      pixmap[2] = QPixmap(pix.width(),-d2);
-      pixmap[2].fill(Qt::transparent);
-      p.begin(&pixmap[2]);
-      p.drawPixmap(0,0,pix,0,pix.height()+d2,pix.width(),-d2);
-      p.end();
-   }
+Line::Line(const QPixmap &pix, Qt::Orientation o, int d1, int d2)
+{
+    _o = o;
+    QPainter p;
+    if (o == Qt::Horizontal)
+    {
+        _thickness = pix.height();
+        pixmap[0] = pix.copy(0, 0, d1, pix.height());
+
+        int d = qMax(1, pix.width()-d1+d2);
+        QPixmap dump = pix.copy(d1, 0, d, pix.height());
+        pixmap[1] = QPixmap(qMax(32 , d), pix.height());
+        pixmap[1].fill(Qt::transparent);
+        p.begin(&pixmap[1]);
+        p.drawTiledPixmap(pixmap[1].rect(), dump);
+        p.end();
+
+        pixmap[2] = pix.copy(pix.width()+d2, 0, -d2, pix.height());
+    }
+    else
+    {
+        _thickness = pix.width();
+        pixmap[0] = pix.copy(0, 0, pix.width(), d1);
+
+        int d = qMax(1, pix.height()-d1+d2);
+        QPixmap dump = pix.copy(0, d1, pix.width(), d);
+        pixmap[1] = QPixmap(pix.width(), qMax(32, d));
+        pixmap[1].fill(Qt::transparent);
+        p.begin(&pixmap[1]);
+        p.drawTiledPixmap(pixmap[1].rect(), dump);
+        p.end();
+
+        pixmap[2] = pix.copy(0, pix.height()+d2, pix.width(), -d2);
+    }
 }
 
 void Line::render(const QRect &rect, QPainter *p, PosFlags pf, bool btmRight) const {
