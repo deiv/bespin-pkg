@@ -264,42 +264,44 @@ BespinStyle::~BespinStyle()
 #define PAL pal
 
 QColor
-BespinStyle::btnBg(const QPalette &pal, bool isEnabled, int hasFocus,
-                   int step, bool fullHover, bool reflective) const {
+BespinStyle::btnBg( const QPalette &pal, bool isEnabled, int hasFocus, int step, bool fullHover,
+                    bool reflective) const
+{
 
-   if (!isEnabled)
-      return Colors::mid(Qt::black, FCOLOR(Window),5,100);
-   
-   QColor c = CCOLOR(btn.std, Bg);
-   if (hasFocus)
-      c = Colors::mid(FCOLOR(Highlight), c,
-                      1, 10 + Colors::contrast(FCOLOR(Highlight), c));
+    if (!isEnabled)
+        return Colors::mid(Qt::black, FCOLOR(Window),5,100);
 
-   if (fullHover && step)
-      c = Colors::mid(c, CCOLOR(btn.active, Bg),
-                      (config.btn.backLightHover ? (80-32*reflective) : 6) - step, step);
+    QColor c = CCOLOR(btn.std, Bg);
+    if (hasFocus)
+        if (config.btn.layer == 2)
+            c = FCOLOR(Highlight);
+        else
+            c = Colors::mid(FCOLOR(Highlight), c, 1, 10 + Colors::contrast(FCOLOR(Highlight), c));
 
-   return c;
+    if (fullHover && step)
+        c = Colors::mid(c, CCOLOR(btn.active, Bg), (config.btn.backLightHover ? (80-32*reflective) : 6) - step, step);
+
+    return c;
 }
 
 QColor
-BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hover, int step, bool flat) const {
-   if (!isEnabled)
-      return FCOLOR(WindowText); //Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
+BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hasFocus, int step, bool flat) const
+{
+    if (!isEnabled)
+        return FCOLOR(WindowText); //Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
 
-   QColor fg1 = CCOLOR(btn.std, Fg), fg2 = CCOLOR(btn.active, Fg);
-   if (flat) {
-      fg1 = FCOLOR(WindowText); fg2 = FCOLOR(Highlight);
-   }
+    QColor  fg1 = (config.btn.layer == 2 && hasFocus) ? FCOLOR(HighlightedText) : CCOLOR(btn.std, Fg),
+            fg2 = CCOLOR(btn.active, Fg);
+    if (flat)
+        { fg1 = FCOLOR(WindowText); fg2 = FCOLOR(Highlight); }
 
-   if (!flat && config.btn.backLightHover)
-      return fg1;
-   
-   if (hover && !step) step = 6;
-   if (step)
-      return Colors::mid(fg1, fg2, 6 - step, step);
+    if (!flat && config.btn.backLightHover)
+        return fg1;
 
-   return fg1;
+    if (step)
+        return Colors::mid(fg1, fg2, 6 - step, step);
+
+    return fg1;
 }
 
 void
