@@ -319,7 +319,8 @@ BespinStyle::polish( QWidget * widget )
             Qt::WindowFlags ignore =    Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::ToolTip |
                                         Qt::SplashScreen | Qt::Desktop |
                                         Qt::X11BypassWindowManagerHint;// | Qt::FramelessWindowHint; <- could easily change mind...?!
-            if ((widget->windowFlags() & ignore) == Qt::Window)
+            ignore &= ~Qt::Dialog; // erase dialog, it's in drawer et al. - takes away window as well
+            if (!(widget->windowFlags() & ignore))
                 setupDecoFor(widget); // this can be expensive, so avoid for popups, combodrops etc.
         }
 

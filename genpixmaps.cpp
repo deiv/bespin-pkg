@@ -37,13 +37,6 @@ rgbFromAlpha(const QPixmap &pix)
 
 #define SCALE(_N_) lround(_N_*config.scale)
 
-#define NEW_EMPTY_PIX(_W_, _H_) \
-QPixmap *pix = new QPixmap(_W_, _H_);\
-pix->fill(Qt::transparent);\
-QPainter p(pix);\
-p.setRenderHint(QPainter::Antialiasing);\
-p.setPen(Qt::NoPen)
-
 #define EMPTY_PIX(_W_, _H_) \
 QPixmap pix = transSrc->copy(0,0,_W_,_H_);\
 QPainter p(&pix); p.setRenderHint(QPainter::Antialiasing);\
@@ -285,7 +278,7 @@ BespinStyle::generatePixmaps()
     
     // fallback ( sunken ) // TODO: raised
     int f6 = dpi.f6;
-    QPixmap tmp = QPixmap(f9,f9); tmp.fill(Qt::transparent);
+    QPixmap tmp = transSrc->copy(0, 0, f9, f9);
     QPainter p;
     p.begin(&tmp);
     p.fillRect(f1,0,f9-f2,f1, QColor(0,0,0,10));

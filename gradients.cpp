@@ -83,17 +83,20 @@ hash(int size, const QColor &c, int *sloppyAdd) {
 }
 
 static QPixmap*
-newPix(int size, Qt::Orientation o, QPoint *start, QPoint *stop, int other = 32) {
-   QPixmap *pix;
-   if (o == Qt::Horizontal) {
-      pix = new QPixmap(size, other);
-      *start = QPoint(0, other); *stop = QPoint(pix->width(), other);
-   }
-   else {
-      pix = new QPixmap(other, size);
-      *start = QPoint(other, 0); *stop = QPoint(other, pix->height());
-   }
-   return pix;
+newPix(int size, Qt::Orientation o, QPoint *start, QPoint *stop, int other = 32)
+{
+    QPixmap *pix;
+    if (o == Qt::Horizontal)
+    {
+        pix = new QPixmap(size, other);
+        *start = QPoint(0, other); *stop = QPoint(pix->width(), other);
+    }
+    else
+    {
+        pix = new QPixmap(other, size);
+        *start = QPoint(other, 0); *stop = QPoint(other, pix->height());
+    }
+    return pix;
 }
 
 
@@ -509,7 +512,7 @@ const QPixmap
     if (pix)
         return *pix;
 
-    pix = new QPixmap(32, height); //golden mean relations
+    pix = new QPixmap(32, height);
     pix->fill(Qt::transparent);
     QPoint start(0,0), stop(0,height);
     QLinearGradient lg(start, stop);
@@ -522,28 +525,31 @@ const QPixmap
     return *pix;
 }
 
-const QPixmap &Gradients::ambient(int height) {
-   if (height <= 0) {
-      qWarning("NULL Pixmap requested, height was %d",height);
-      return nullPix;
-   }
+const
+QPixmap &Gradients::ambient(int height)
+{
+    if (height <= 0)
+    {
+        qWarning("NULL Pixmap requested, height was %d",height);
+        return nullPix;
+    }
 
-   QPixmap *pix = _btnAmbient.object(height);
-   if (pix)
-      return *pix;
+    QPixmap *pix = _btnAmbient.object(height);
+    if (pix)
+        return *pix;
 
-   pix = new QPixmap(16*height/9,height); //golden mean relations
-   pix->fill(Qt::transparent);
-   QLinearGradient lg(QPoint(pix->width(), pix->height()),
-                      QPoint(pix->width()/2,pix->height()/2));
-   lg.setColorAt(0, QColor(255,255,255,0));
-   lg.setColorAt(0.2, QColor(255,255,255,100));
-   lg.setColorAt(1, QColor(255,255,255,0));
-   QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
+    pix = new QPixmap(16*height/9,height); //golden mean relations
+    pix->fill(Qt::transparent);
+    QLinearGradient lg( QPoint(pix->width(), pix->height()),
+                        QPoint(pix->width()/2,pix->height()/2) );
+    lg.setColorAt(0, QColor(255,255,255,0));
+    lg.setColorAt(0.2, QColor(255,255,255,100));
+    lg.setColorAt(1, QColor(255,255,255,0));
+    QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
 
-   // cache for later ;)
-   _btnAmbient.insert(height, pix, costs(pix));
-   return *pix;
+    // cache for later ;)
+    _btnAmbient.insert(height, pix, costs(pix));
+    return *pix;
 }
 
 static QPixmap _bevel[2];
@@ -552,40 +558,46 @@ const QPixmap &Gradients::bevel(bool ltr) {
    return _bevel[ltr];
 }
 
-const QPixmap &Gradients::shadow(int height, bool bottom) {
-   if (height <= 0) {
-      qWarning("NULL Pixmap requested, height was %d",height);
-      return nullPix;
-   }
-   uint val = height + bottom*0x80000000;
-   QPixmap *pix = _tabShadow.object(val);
-   if (pix)
-      return *pix;
-      
-   pix = new QPixmap(height/3,height);
-   pix->fill(Qt::transparent);
-   
-   float hypo = sqrt(pow(pix->width(),2)+pow(pix->height(),2));
-   float cosalpha = (float)(pix->height())/hypo;
-   QPoint p1, p2;
-   if (bottom) {
-      p1 = QPoint(0, 0);
-      p2 = QPoint((int)(pix->width()*pow(cosalpha, 2)),
-                  (int)(pow(pix->width(), 2)*cosalpha/hypo));
-   }
-   else {
-      p1 = QPoint(0, pix->height());
-      p2 = QPoint((int)(pix->width()*pow(cosalpha, 2)),
-                  (int)pix->height() - (int)(pow(pix->width(), 2)*cosalpha/hypo));
-   }
-   QLinearGradient lg(p1, p2);
-   lg.setColorAt(0, QColor(0,0,0,75));
-   lg.setColorAt(1, QColor(0,0,0,0));
-   QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
-   
-   // cache for later ;)
-   _tabShadow.insert(val, pix, costs(pix));
-   return *pix;
+const QPixmap &
+Gradients::shadow(int height, bool bottom)
+{
+    if (height <= 0)
+    {
+        qWarning("NULL Pixmap requested, height was %d",height);
+        return nullPix;
+    }
+    
+    uint val = height + bottom*0x80000000;
+    QPixmap *pix = _tabShadow.object(val);
+    if (pix)
+        return *pix;
+
+    pix = new QPixmap(height/3,height);
+    pix->fill(Qt::transparent);
+
+    float hypo = sqrt(pow(pix->width(),2)+pow(pix->height(),2));
+    float cosalpha = (float)(pix->height())/hypo;
+    QPoint p1, p2;
+    if (bottom)
+    {
+        p1 = QPoint(0, 0);
+        p2 = QPoint((int)(pix->width()*pow(cosalpha, 2)),
+                    (int)(pow(pix->width(), 2)*cosalpha/hypo));
+    }
+    else
+    {
+        p1 = QPoint(0, pix->height());
+        p2 = QPoint((int)(pix->width()*pow(cosalpha, 2)),
+                    (int)pix->height() - (int)(pow(pix->width(), 2)*cosalpha/hypo));
+    }
+    QLinearGradient lg(p1, p2);
+    lg.setColorAt(0, QColor(0,0,0,75));
+    lg.setColorAt(1, QColor(0,0,0,0));
+    QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
+
+    // cache for later ;)
+    _tabShadow.insert(val, pix, costs(pix));
+    return *pix;
 }
 
 static inline QPixmap *
@@ -710,7 +722,8 @@ Gradients::bgSet(const QColor &c)
         p.drawTiledPixmap(set->btmTile.rect(), _dither);
         p.end();
         // left corner right corner
-        QPixmap *mask, *pix, *blend;
+        QPixmap *pix, *blend;
+        QPixmap *mask = new QPixmap(256,32);
         for (int cnr = 0; cnr < 2; ++cnr)
         {
             if (cnr)
@@ -722,7 +735,6 @@ Gradients::bgSet(const QColor &c)
                 pix = &set->lCorner; blend = &set->topTile;
             }
             pix->fill(c);
-            mask = new QPixmap(256,32);
             lg = QLinearGradient(0,0, 0,32);
             lg.setColorAt(1, Qt::white);
 #ifndef QT_NO_XRENDER
@@ -742,8 +754,8 @@ Gradients::bgSet(const QColor &c)
             p.drawPixmap(0,0, fill); p.drawTiledPixmap(pix->rect(), _dither);
             p.end();
 #endif
-            delete mask;
         }
+        delete mask;
         lg = QLinearGradient(QPoint(0,0), QPoint(0, 128));
         lg.setColorAt(0, c.light(_bgIntensity)); lg.setColorAt(1, c);
         p.begin(&set->cornerTile);
@@ -762,56 +774,57 @@ Gradients::bgSet(const QColor &c)
 void
 Gradients::init(BgMode mode, int structure, Type progress, int bgIntesity, int btnBevelSize)
 {
-   _mode = mode;
-   _struct = structure;
+    _mode = mode;
+    _struct = structure;
 //    _progressBase = progress;
-   _bgIntensity = bgIntesity;
-   _bgSet.setMaxCost( 900<<10 ); // 832 should be enough - we keep some safety
-   _btnAmbient.setMaxCost( 64<<10 );
-   _tabShadow.setMaxCost( 64<<10 );
-   _groupLight.setMaxCost( 256<<10 );
-   _structure[0].setMaxCost( 128<<10 ); _structure[1].setMaxCost( 128<<10 );
-   QLinearGradient lg(0,0,btnBevelSize,0);
-   QPainter p; QGradientStops stops;
-   for (int i = 0; i < 2; ++i) {
-      _bevel[i] = QPixmap(btnBevelSize, 32);
-      stops << QGradientStop(0, QColor(0,0,0,i?20:0)) <<
-         QGradientStop(1, QColor(0,0,0,i?0:20));
-      lg.setStops(stops); stops.clear();
-      _bevel[i].fill(Qt::transparent);
-      p.begin(&_bevel[i]); p.fillRect(_bevel[i].rect(), lg); p.end();
-   }
-   createDither();
+    _bgIntensity = bgIntesity;
+    _bgSet.setMaxCost( 900<<10 ); // 832 should be enough - we keep some safety
+    _btnAmbient.setMaxCost( 64<<10 );
+    _tabShadow.setMaxCost( 64<<10 );
+    _groupLight.setMaxCost( 256<<10 );
+    _structure[0].setMaxCost( 128<<10 ); _structure[1].setMaxCost( 128<<10 );
+    QLinearGradient lg(0,0,btnBevelSize,0);
+    QPainter p; QGradientStops stops;
+    for (int i = 0; i < 2; ++i)
+    {
+        _bevel[i] = i ? _bevel[0].copy() : QPixmap(btnBevelSize, 32);
+        _bevel[i].fill(Qt::transparent);
+        stops << QGradientStop(0, QColor(0,0,0,i?20:0)) << QGradientStop(1, QColor(0,0,0,i?0:20));
+        lg.setStops(stops);
+        stops.clear();
+        p.begin(&_bevel[i]); p.fillRect(_bevel[i].rect(), lg); p.end();
+    }
+    createDither();
 #else
 
 const QPixmap&
 Gradients::borderline(const QColor &c, Position pos)
 {
-   QPixmap *pix = _borderline[pos].object(c.rgba());
-   if (pix)
-      return *pix;
-   
-   QColor c1 = c, c2 = c;
-   c1.setAlpha(c.alpha()*0.7); c2.setAlpha(0);
-   
-   QPoint start(0,0), stop;
-   if (pos > Bottom) {
-      pix = new QPixmap(32, 1); stop = QPoint(32,0); }
-   else {
-      pix = new QPixmap(1, 32); stop = QPoint(0,32); }
-   pix->fill(Qt::transparent);
-         
-   QLinearGradient lg(start, stop);
-   if (pos % 2) { // Bottom, right
-      lg.setColorAt(0, c1); lg.setColorAt(1, c2); }
-   else {
-      lg.setColorAt(0, c2); lg.setColorAt(1, c1); }
+    QPixmap *pix = _borderline[pos].object(c.rgba());
+    if (pix)
+        return *pix;
 
-   QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
+    QColor c1 = c, c2 = c;
+    c1.setAlpha(c.alpha()*0.7); c2.setAlpha(0);
 
-   // cache for later ;)
-   _borderline[pos].insert(c.rgba(), pix, costs(pix));
-   return *pix;
+    QPoint start(0,0), stop;
+    if (pos > Bottom)
+        { pix = new QPixmap(32, 1); stop = QPoint(32,0); }
+    else
+        { pix = new QPixmap(1, 32); stop = QPoint(0,32); }
+    pix->fill(Qt::transparent);
+
+    QLinearGradient lg(start, stop);
+    if (pos % 2) // Bottom, right
+        { lg.setColorAt(0, c1); lg.setColorAt(1, c2); }
+    else
+        { lg.setColorAt(0, c2); lg.setColorAt(1, c1); }
+
+    QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
+
+    // cache for later ;)
+    _borderline[pos].insert(c.rgba(), pix, costs(pix));
+    return *pix;
 }
 
 

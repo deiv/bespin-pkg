@@ -59,10 +59,10 @@ namespace OXRender {
                       const QPixmap &fromThisPix,
                       const QRect &rect = QRect(),
                       const QRect &alphaRect = QRect());
-   QPixmap applyAlpha(const QPixmap &toThisPix,
-                      const OXPicture &fromThisPict,
-                      const QRect &rect = QRect(),
-                      const QRect &alphaRect = QRect());
+//    QPixmap applyAlpha(const QPixmap &toThisPix,
+//                       const OXPicture &fromThisPict,
+//                       const QRect &rect = QRect(),
+//                       const QRect &alphaRect = QRect());
 #if 0
 // -- couple of XRender versions don't know + others are broken, so we'll leave it for the moment
    void setGradient(XLinearGradient &lg, QPoint p1, QPoint p2);
