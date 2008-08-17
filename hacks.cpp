@@ -18,6 +18,7 @@
 
 #include <QCoreApplication>
 #include <QEvent>
+#include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
 #include <QMenuBar>
@@ -27,6 +28,7 @@
 #include <QPushButton>
 #include <QStyle>
 #include <QStyleOption>
+#include <QStyleOptionGroupBox>
 
 #ifdef Q_WS_X11
 #include <X11/Xlib.h>
@@ -182,6 +184,7 @@ isWindowDragWidget(QObject *o)
     return config.hack.windowMovement && (
         qobject_cast<QDialog*>(o) ||
         qobject_cast<QMenuBar*>(o) ||
+        qobject_cast<QGroupBox*>(o) ||
         
         (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled()) ||
         o->inherits("QToolBar") ||
@@ -191,7 +194,6 @@ isWindowDragWidget(QObject *o)
         (*isSMPlayer && o->inherits(SMPlayerVideoWidget)) ||
         (*isDragon && o->inherits(DragonVideoWidget)) ||
 
-        o->inherits("QGroupBox") ||
         o->inherits("QStatusBar") ||
         (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar")));
 }
@@ -211,6 +213,30 @@ hackMoveWindow(QWidget* w, QEvent *e)
     if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
     if (bar->activeAction())
         return false;
+
+    // avoid if we try to (un)check a groupbx ==============================
+    if (QGroupBox *gb = qobject_cast<QGroupBox*>(w))
+    if (gb->isCheckable())
+    {
+        // gather options, fucking protected functions... :-(
+        QStyleOptionGroupBox opt;
+        opt.initFrom(gb);
+        if (gb->isFlat())
+            opt.features |= QStyleOptionFrameV2::Flat;
+        opt.lineWidth = 1; opt.midLineWidth = 0;
+        
+        opt.text = gb->title();
+        opt.textAlignment = gb->alignment();
+
+        opt.subControls = (QStyle::SC_GroupBoxFrame | QStyle::SC_GroupBoxCheckBox);
+        if (!gb->title().isEmpty())
+            opt.subControls |= QStyle::SC_GroupBoxLabel;
+
+        opt.state |= (gb->isChecked() ? QStyle::State_On : QStyle::State_Off);
+        
+        if (gb->style()->subControlRect(QStyle::CC_GroupBox, &opt, QStyle::SC_GroupBoxCheckBox, gb).contains(mev->pos()))
+            return false;
+    }
 
     // preserve dock / toolbar internal move float trigger on dock titles =================
     if (w->cursor().shape() != Qt::ArrowCursor ||

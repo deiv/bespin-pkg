@@ -532,7 +532,7 @@ BespinStyle::polish( QWidget * widget )
         }
 
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors
-    // are set or KHtml does wrong OR (mainly) by html "designers"
+    /// are set or KHtml does wrong OR (mainly) by html "designers"
     if (IS_HTML_WIDGET)
     {   // the eventfilter watches palette changes and ensures contrasted foregrounds...
         widget->installEventFilter(this);

@@ -30,12 +30,12 @@
 bool
 BespinStyle::isSpecialFrame(const QWidget *w)
 {
-   if (const QListView *view = qobject_cast<const QListView*>(w)) {
-      return (view->viewMode() == QListView::IconMode);
-   }
-   return w->inherits("QTextEdit") ||
-      w->objectName() == "RenderFormElementWidget" ||
-      (w->parentWidget() && w->parentWidget()->inherits("KateView"));
+    if (const QListView *view = qobject_cast<const QListView*>(w))
+    {
+        return (view->viewMode() == QListView::IconMode);
+    }
+    return  w->inherits("QTextEdit") || w->objectName() == "RenderFormElementWidget" ||
+            (w->parentWidget() && w->parentWidget()->inherits("KateView"));
 }
 
 void
@@ -212,8 +212,7 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
 }
 
 void
-BespinStyle::drawGroupBoxFrame(const QStyleOption * option, QPainter * painter,
-                               const QWidget *) const
+BespinStyle::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
     const QStyleOptionFrameV2 *groupBox =
         qstyleoption_cast<const QStyleOptionFrameV2 *>(option);
@@ -225,6 +224,11 @@ BespinStyle::drawGroupBoxFrame(const QStyleOption * option, QPainter * painter,
         Tile::reset();
         return;
     }
+#if 0
+    masks.rect[false].render(RECT.adjusted(0,0,0,-F(2)), painter, FCOLOR(Window).darker(105));
+    shadows.sunken[false][true].render(RECT, painter);
+    return;
+#endif
     QRect rect = RECT.adjusted(dpi.f4,dpi.f2,-dpi.f4,0);
     rect.setHeight(qMin(2*dpi.f32, RECT.height()));
     Tile::setShape(Tile::Full & ~Tile::Bottom);

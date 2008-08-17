@@ -260,7 +260,8 @@ if (!tile->isNull()) {\
    // painting
     const QPixmap *tile;
     QRect checkRect;
-#define UNCLIPPED (!p->hasClipping() || p->clipRegion().isEmpty() || p->clipRegion().intersects(checkRect))
+    const bool unclipped = !p->hasClipping() || p->clipRegion().isEmpty();
+#define UNCLIPPED (unclipped || p->clipRegion().intersects(checkRect))
    
     if (pf & Top)
     {

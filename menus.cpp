@@ -191,9 +191,12 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
             bg = Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 1, 2);
             fg = COLOR(ROLE[Bg]);
         }
+        if (config.menu.itemGradient != Gradients::None)
+            Tile::setShape(Tile::Top|Tile::Bottom|Tile::Center);
         masks.rect[round_].render( r, painter, sunken ? Gradients::Sunken : config.menu.itemGradient, Qt::Vertical, bg);
-        if (config.menu.itemSunken)
+        if (sunken && config.menu.itemSunken)
             shadows.sunken[round_][false].render(r, painter);
+        Tile::reset();
     }
        
     // Text and icon, ripped from windows style

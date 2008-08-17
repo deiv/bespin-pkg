@@ -28,8 +28,8 @@
 #define CONF_COLOR(_TYPE_, _FG_) PAL.color(config._TYPE_##_role[_FG_])
 #define CCOLOR(_TYPE_, _FG_) PAL.color(config._TYPE_##_role[_FG_])
 #define FCOLOR(_TYPE_) PAL.color(QPalette::_TYPE_)
-#define BGCOLOR PAL.background().color()
-#define FGCOLOR PAL.foreground().color()
+#define BGCOLOR (widget ? COLOR(widget->backgroundRole()) : FCOLOR(Window))
+#define FGCOLOR (widget ? COLOR(widget->foregroundRole()) : FCOLOR(WindowText))
 #define GRAD(_TYPE_) config._TYPE_.gradient
 #define ROLES(_TYPE_) QPalette::ColorRole (*role)[2] = &config._TYPE_##_role
 #define ROLE (*role)

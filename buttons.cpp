@@ -392,7 +392,7 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
 {
     B_STATES
 
-    const int f2 = dpi.f2;
+    const int f1 = F(1);
     bool isOn = option->state & State_On;
     if (isOn)
         hover = false;
@@ -490,23 +490,26 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
    }
 #else
 //     painter->fillRect(RECT, Qt::red);
-    QRect r = RECT.adjusted(f2,F(1),-f2,-F(1));
+    QRect r = RECT.adjusted(f1,f1,-f1,-f1);
     masks.rect[true].render(r, painter, GRAD(chooser), Qt::Vertical, CCOLOR(btn.std, Bg));
+
     r.setBottom(RECT.bottom());
     shadows.sunken[true][isEnabled].render(r, painter);
+
     animStep = isOn ? 12 : HOVER_STEP;
     if (animStep)
     {   // the drop ============================
         QColor c = Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg), 12-animStep, animStep);
-        const int off = (dpi.ExclusiveIndicator/4) - F(1);
+        const int off = dpi.ExclusiveIndicator/4;
         QPoint xy = r.topLeft() + QPoint(off, off);
 //         const Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
         fillWithMask(painter, xy, c, masks.radioIndicator);
     }
+
     if (hasFocus)
     {
-        r = RECT.adjusted(0,0,0,-F(1));
-        masks.rect[true].outline(r, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
+        r = RECT; r.setTop(r.top()+F(2));
+        masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
     }
 #endif
    animStep = -1;
