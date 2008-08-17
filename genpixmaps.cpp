@@ -327,6 +327,7 @@ BespinStyle::generatePixmaps()
         shadows.slider[i][false] = shadow(dpi.SliderControl, i,false);
         shadows.slider[i][true] = shadow(dpi.SliderControl-f2, i,true);
     }
+    lights.slider = shadow(dpi.SliderControl, true, false, 3.0);
     masks.slider = roundMask(dpi.SliderControl-f4);
     // ================================================================
 

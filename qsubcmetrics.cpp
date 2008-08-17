@@ -26,60 +26,70 @@
 #include "bespin.h"
 #include "draw.h"
 
+#define ASSURE_OPTION(_VAR_, _TYPE_) \
+const QStyleOption##_TYPE_ *_VAR_ = qstyleoption_cast<const QStyleOption##_TYPE_ *>(option);\
+if (!_VAR_) return ret;
+
 using namespace Bespin;
 extern Dpi dpi;
 extern Config config;
 
-inline static bool verticalTabs(QTabBar::Shape shape) {
-   return shape == QTabBar::RoundedEast ||
-         shape == QTabBar::TriangularEast ||
-         shape == QTabBar::RoundedWest ||
-         shape == QTabBar::TriangularWest;
+inline static bool
+verticalTabs(QTabBar::Shape shape)
+{
+    return  shape == QTabBar::RoundedEast || shape == QTabBar::TriangularEast ||
+            shape == QTabBar::RoundedWest || shape == QTabBar::TriangularWest;
 }
 
-QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionComplex * option, SubControl subControl, const QWidget * widget) const
+QRect
+BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComplex * option,
+                                SubControl subControl, const QWidget * widget) const
 {
-   QRect ret;
-   switch (control) {
-   case CC_SpinBox: // A spinbox, like QSpinBox
-      if (const QStyleOptionSpinBox *spinbox =
-          qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
-         int w = spinbox->rect.width(), h = spinbox->rect.height();
-         h /= 2;
-         // 1.6 -approximate golden mean
-         w = qMax(dpi.f18, qMin(h, w / 4));
+    QRect ret;
+    switch (control)
+    {
+    case CC_SpinBox:
+    {   // A spinbox, like QSpinBox
+        ASSURE_OPTION(spinbox, SpinBox);
+
+        int w = spinbox->rect.width(), h = spinbox->rect.height();
+        h /= 2;
+        // 1.6 -approximate golden mean
+        w = qMax(dpi.f18, qMin(h, w / 4));
 //          bs = bs.expandedTo(QApplication::globalStrut());
-         int x = spinbox->rect.width() - w;
-         switch (subControl) {
-         case SC_SpinBoxUp:
+        int x = spinbox->rect.width() - w;
+        switch (subControl)
+        {
+        case SC_SpinBoxUp:
             ret = QRect(x, 0, w, h);
             break;
-         case SC_SpinBoxDown:
+        case SC_SpinBoxDown:
             ret = QRect(x, spinbox->rect.bottom()-h, w, h);
             break;
-         case SC_SpinBoxEditField:
+        case SC_SpinBoxEditField:
             w = h = 0; // becomes framesizes
-            if (spinbox->frame) {
-               w = dpi.f4; h = dpi.f1;
-            }
+            if (spinbox->frame)
+                { w = dpi.f4; h = dpi.f1; }
             ret = QRect(w, h, x-dpi.f1, spinbox->rect.height() - 2*h);
             break;
-         case SC_SpinBoxFrame:
+        case SC_SpinBoxFrame:
             ret = spinbox->rect;
-         default:
+        default:
             break;
-         }
-         ret = visualRect(config.leftHanded, spinbox->rect, ret);
-      }
-   case CC_ComboBox: // A combobox, like QComboBox
-      if (const QStyleOptionComboBox *cb =
-          qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-         int x,y,wi,he;
-         cb->rect.getRect(&x,&y,&wi,&he);
-         int margin = cb->editable ? 1 : config.btn.fullHover ? dpi.f2 : dpi.f4;
+        }
+        ret = visualRect(config.leftHanded, spinbox->rect, ret);
+        break;
+    }
+    case CC_ComboBox:
+    {   // A combobox, like QComboBox
+        ASSURE_OPTION(cb, ComboBox);
+        int x,y,wi,he;
+        cb->rect.getRect(&x,&y,&wi,&he);
+        int margin = cb->editable ? 1 : config.btn.fullHover ? dpi.f2 : dpi.f4;
 
-         switch (subControl) {
-         case SC_ComboBoxFrame:
+        switch (subControl)
+        {
+        case SC_ComboBoxFrame:
             ret = cb->rect;
             break;
          case SC_ComboBoxArrow:
@@ -91,61 +101,83 @@ QRect BespinStyle::subControlRect ( ComplexControl control, const QStyleOptionCo
             y += (cb->rect.height()-he)/2;
             ret.setRect(x, y, wi, he);
             break;
-         case SC_ComboBoxEditField:
+        case SC_ComboBoxEditField:
             wi -= (int)((he - 2*margin)/1.1) + 3*margin;
             ret.setRect(x+margin, y+margin, wi, he - 2*margin);
             break;
-         case SC_ComboBoxListBoxPopup:
+        case SC_ComboBoxListBoxPopup:
             ret = cb->rect;
-            if (!cb->editable) { // shorten for the arrow
-               wi -= (int)((he - 2*margin)/1.1) + 3*margin;
-               ret.setRect(x+margin, y, wi, he);
+            if (!cb->editable)
+            { // shorten for the arrow
+                wi -= (int)((he - 2*margin)/1.1) + 3*margin;
+                ret.setRect(x+margin, y, wi, he);
             }
             break;
-         default:
+        default:
             break;
-         }
-         ret = visualRect(config.leftHanded, cb->rect, ret);
-      }
+        }
+        ret = visualRect(config.leftHanded, cb->rect, ret);
       break;
-   case CC_GroupBox:
-      if (const QStyleOptionGroupBox *groupBox =
-          qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
-         switch (subControl) {
-         case SC_GroupBoxFrame:
+    }
+    case CC_GroupBox:
+    {
+        ASSURE_OPTION(groupBox, GroupBox);
+
+        switch (subControl)
+        {
+        case SC_GroupBoxFrame:
             ret = groupBox->rect;
+            if (config.sunkenGroups && !groupBox->text.isEmpty())
+                ret.setTop(ret.top() + groupBox->fontMetrics.height());
             break;
-         case SC_GroupBoxContents: {
-            int top = dpi.f6;
+        case SC_GroupBoxContents:
+        {
+            int top = F(6);
             if (!groupBox->text.isEmpty())
-               top += groupBox->fontMetrics.height();
-            ret = groupBox->rect.adjusted(dpi.f3,top,-dpi.f3,-dpi.f7);
+                top += groupBox->fontMetrics.height();
+            ret = groupBox->rect.adjusted(F(3), top, -F(3), -F(7));
             break;
-         }
-         case SC_GroupBoxCheckBox: {
-            ret = groupBox->rect.adjusted(dpi.f7,dpi.f7,0,0);
+        }
+        case SC_GroupBoxCheckBox:
+        {
+            if (!config.sunkenGroups)
+                ret = groupBox->rect.adjusted(F(7), F(7), 0, 0);
             ret.setWidth(dpi.ExclusiveIndicator);
             ret.setHeight(dpi.ExclusiveIndicator);
             break;
-         }
-         case SC_GroupBoxLabel: {
+        }
+        case SC_GroupBoxLabel:
+        {
             QFontMetrics fontMetrics = groupBox->fontMetrics;
-            int h = fontMetrics.height()+dpi.f4;
+            int h = fontMetrics.height() + dpi.f4;
             int tw = fontMetrics.size(BESPIN_MNEMONIC, groupBox->text + QLatin1Char(' ')).width();
-            int marg = (groupBox->features & QStyleOptionFrameV2::Flat) ? 0 : dpi.f4;
-
-            ret = groupBox->rect.adjusted(marg, dpi.f4, -marg, 0);
+            int marg = (groupBox->features & QStyleOptionFrameV2::Flat) ? 0 : F(4);
+            Qt::Alignment align;
+        
+            if (config.sunkenGroups)
+            {
+                int left = marg;
+                if (groupBox->subControls & SC_GroupBoxCheckBox)
+                    left += dpi.ExclusiveIndicator;
+                ret = groupBox->rect.adjusted(left, 0, -marg, 0);
+                align = Qt::AlignLeft | Qt::AlignVCenter;
+            }
+            else
+            {
+                ret = groupBox->rect.adjusted(marg, F(4), -marg, 0);
+                align = Qt::AlignCenter;
+            }
             ret.setHeight(h);
 
             // Adjusted rect for label + indicatorWidth + indicatorSpace
-            ret = alignedRect(groupBox->direction, Qt::AlignHCenter, QSize(tw, h), ret);
+            ret = alignedRect(groupBox->direction, align, QSize(tw, h), ret);
             break;
-         }
-         default:
+        }
+        default:
             break;
-         }
-      }
-      break;
+        }
+        break;
+    }
    case CC_ScrollBar: // A scroll bar, like QScrollBar
       if (const QStyleOptionSlider *scrollbar =
           qstyleoption_cast<const QStyleOptionSlider *>(option)) {

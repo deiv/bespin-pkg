@@ -141,94 +141,92 @@ BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter,
    painter->restore();
 }
 
-void
-BespinStyle::drawExclusiveCheck(const QStyleOption * option, QPainter * painter,
-                                const QWidget *) const
+/**static!*/ void
+BespinStyle::drawExclusiveCheck(const QStyleOption * option, QPainter * painter, const QWidget *)
 {
-   painter->save();
-   painter->setBrush(Qt::NoBrush);
-   painter->setRenderHint ( QPainter::Antialiasing );
-   painter->drawEllipse ( RECT );
-   if (option->state & State_On) {
-      painter->setBrush ( painter->pen().color() );
-      const int dx = 3*RECT.width()/8, dy = 3*RECT.height()/8;
-      painter->drawEllipse ( RECT.adjusted(dx, dy, -dx, -dy) );
-   }
-   painter->restore();
+    painter->save();
+    painter->setBrush(Qt::NoBrush);
+    painter->setRenderHint ( QPainter::Antialiasing );
+    painter->drawEllipse ( RECT );
+    if (option->state & State_On)
+    {
+        painter->setBrush ( painter->pen().color() );
+        const int dx = 3*RECT.width()/8, dy = 3*RECT.height()/8;
+        painter->drawEllipse ( RECT.adjusted(dx, dy, -dx, -dy) );
+    }
+    painter->restore();
 }
 
 #define SET_POINTS(_P1_, _P2_, _P3_)\
 points[0] = _P1_; points[1] = _P2_; points[2] = _P3_;
 
-void
-BespinStyle::drawArrow(Navi::Direction dir, const QRect &rect,
-                       QPainter *painter) const
+/**static!*/ void
+BespinStyle::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter)
 {
-   // create an appropriate rect and move it to center of desired rect
-   int s = qMin(rect.width(), rect.height());
-   QRect r;
-   if (!(s%2)) s -= 1; // shall be odd!
-   if (dir > Navi::E) { // diagonal
-      s = int(s/1.4142135623); // sqrt(2)...
-      r.setRect ( 0, 0, s, s );
-   }
-   else if (dir < Navi::W) // North/South
-      r.setRect ( 0, 0, s, s/2+1 );
-   else // East/West
-      r.setRect ( 0, 0, s/2+1, s );
-   r.moveCenter(rect.center());
+    // create an appropriate rect and move it to center of desired rect
+    int s = qMin(rect.width(), rect.height());
+    QRect r;
+    if (!(s%2)) s -= 1; // shall be odd!
+    if (dir > Navi::E)
+    {   // diagonal
+        s = int(s/1.4142135623); // sqrt(2)...
+        r.setRect ( 0, 0, s, s );
+    }
+    else if (dir < Navi::W) // North/South
+        r.setRect ( 0, 0, s, s/2+1 );
+    else // East/West
+        r.setRect ( 0, 0, s/2+1, s );
+    r.moveCenter(rect.center());
 
-   QPoint points[3];
-   switch (dir) {
-   case Navi::N:
-//       r.adjust(0,0,1,1);
-      SET_POINTS(QPoint(r.center().x(), r.top()),
-                 r.bottomRight(), r.bottomLeft());
-      break;
-   case Navi::E:
-      SET_POINTS(r.topLeft(), QPoint(r.right(), r.center().y()), r.bottomLeft());
-      break;
-   case Navi::S:
-//       r.adjust(0,0,1,1);
-      SET_POINTS(r.topRight(), r.topLeft(), QPoint(r.center().x(), r.bottom()));
-      break;
-   case Navi::W:
-      SET_POINTS(QPoint(r.left(), r.center().y()),
-                 r.topRight(), r.bottomRight());
-      break;
-   case Navi::NW:
-      SET_POINTS(r.topLeft(), r.topRight(), r.bottomLeft());
-      break;
-   case Navi::NE:
-      SET_POINTS(r.topLeft(), r.topRight(), r.bottomRight());
-      break;
-   case Navi::SE:
-      SET_POINTS(r.topRight(), r.bottomRight(), r.bottomLeft());
-      break;
-   case Navi::SW:
-      SET_POINTS(r.topLeft(), r.bottomRight(), r.bottomLeft());
-      break;
-   }
-   // don't need antialiasing, our triangles are PERFECT ;)
-   SAVE_ANTIALIAS
-   painter->setRenderHint(QPainter::Antialiasing, false);
-   bool reset_pen = false;
-   if (reset_pen = (painter->pen() == Qt::NoPen))
-      painter->setPen(QPen(painter->brush(), 1));
-   painter->drawPolygon(points, 3);
-   if (reset_pen)
-      painter->setPen(Qt::NoPen);
-   RESTORE_ANTIALIAS
+    QPoint points[3];
+    switch (dir)
+    {
+    case Navi::N:
+    //       r.adjust(0,0,1,1);
+        SET_POINTS(QPoint(r.center().x(), r.top()), r.bottomRight(), r.bottomLeft());
+        break;
+    case Navi::E:
+        SET_POINTS(r.topLeft(), QPoint(r.right(), r.center().y()), r.bottomLeft());
+        break;
+    case Navi::S:
+    //       r.adjust(0,0,1,1);
+        SET_POINTS(r.topRight(), r.topLeft(), QPoint(r.center().x(), r.bottom()));
+        break;
+    case Navi::W:
+        SET_POINTS(QPoint(r.left(), r.center().y()), r.topRight(), r.bottomRight());
+        break;
+    case Navi::NW:
+        SET_POINTS(r.topLeft(), r.topRight(), r.bottomLeft());
+        break;
+    case Navi::NE:
+        SET_POINTS(r.topLeft(), r.topRight(), r.bottomRight());
+        break;
+    case Navi::SE:
+        SET_POINTS(r.topRight(), r.bottomRight(), r.bottomLeft());
+        break;
+    case Navi::SW:
+        SET_POINTS(r.topLeft(), r.bottomRight(), r.bottomLeft());
+        break;
+    }
+    // don't need antialiasing, our triangles are PERFECT ;)
+    SAVE_ANTIALIAS
+    painter->setRenderHint(QPainter::Antialiasing, false);
+    bool reset_pen = false;
+    if (reset_pen = (painter->pen() == Qt::NoPen))
+        painter->setPen(QPen(painter->brush(), 1));
+    painter->drawPolygon(points, 3);
+    if (reset_pen)
+        painter->setPen(Qt::NoPen);
+    RESTORE_ANTIALIAS
 }
 
-void
-BespinStyle::drawSolidArrow(Navi::Direction dir, const QRect &rect,
-                            QPainter *painter) const
+/**static!*/ void
+BespinStyle::drawSolidArrow(Navi::Direction dir, const QRect &rect, QPainter *painter)
 {
-   bool hadNoBrush = painter->brush() == Qt::NoBrush;
-   if (hadNoBrush)
-      painter->setBrush(painter->pen().brush());
-   drawArrow(dir, rect, painter);
-   if (hadNoBrush)
-      painter->setBrush(Qt::NoBrush);
+    bool hadNoBrush = painter->brush() == Qt::NoBrush;
+    if (hadNoBrush)
+        painter->setBrush(painter->pen().brush());
+    drawArrow(dir, rect, painter);
+    if (hadNoBrush)
+        painter->setBrush(Qt::NoBrush);
 }

@@ -45,7 +45,28 @@
       <layout class="QGridLayout" name="gridLayout_13" >
        <item row="0" column="0" >
         <widget class="QListWidget" name="sectionSelect" >
+         <property name="minimumSize" >
+          <size>
+           <width>0</width>
+           <height>429</height>
+          </size>
+         </property>
+         <property name="font" >
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <property name="spacing" >
+          <number>3</number>
+         </property>
+         <property name="viewMode" >
+          <enum>QListView::ListMode</enum>
+         </property>
+         <property name="uniformItemSizes" >
           <bool>true</bool>
          </property>
          <item>
@@ -55,7 +76,7 @@
          </item>
          <item>
           <property name="text" >
-           <string>Background</string>
+           <string>General</string>
           </property>
          </item>
          <item>
@@ -106,14 +127,16 @@
         </widget>
        </item>
       </layout>
+      <zorder>sectionSelect</zorder>
+      <zorder>sections</zorder>
      </widget>
      <widget class="QWidget" name="page_2" >
       <property name="geometry" >
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>228</width>
-        <height>111</height>
+        <width>274</width>
+        <height>447</height>
        </rect>
       </property>
       <attribute name="label" >
@@ -606,13 +629,20 @@
         </layout>
        </item>
        <item row="4" column="0" colspan="2" >
+        <widget class="QCheckBox" name="sunkenGroups" >
+         <property name="text" >
+          <string>Sunken Groupboxes... (Ye know... the Apple thing...)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2" >
         <widget class="QCheckBox" name="fadeInactive" >
          <property name="text" >
           <string>Dim inactve window foreground</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="2" >
+       <item row="6" column="0" colspan="2" >
         <widget class="QGroupBox" name="groupBox_7" >
          <property name="title" >
           <string>Modal Dialogs</string>
@@ -689,9 +719,11 @@
            </widget>
           </item>
          </layout>
+         <zorder>modalGlas</zorder>
+         <zorder>modalInvert</zorder>
         </widget>
        </item>
-       <item row="6" column="0" >
+       <item row="7" column="0" >
         <widget class="QLabel" name="label_7" >
          <property name="font" >
           <font>
@@ -707,10 +739,10 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1" >
+       <item row="7" column="1" >
         <widget class="QComboBox" name="tooltipRole" />
        </item>
-       <item row="7" column="0" >
+       <item row="8" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>

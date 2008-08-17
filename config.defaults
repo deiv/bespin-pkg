@@ -24,6 +24,7 @@
 #define LEFTHANDED "LeftHanded", false
 #define MACSTYLE "MacStyle", true
 #define FADE_INACTIVE "FadeInactive", false
+#define SUNKEN_GROUPS "SunkenGroups", false
 
 #define BG_INTENSITY "Bg.Intensity", 10
 #define BG_MODE "Bg.Mode", Gradients::BevelV

@@ -278,6 +278,7 @@ BespinStyle::readSettings(const QSettings* settings)
         else fnt.setPixelSize(fnt.pixelSize()*config.scale);
         qApp->setFont(fnt);
     }
+    config.sunkenGroups = readBool(SUNKEN_GROUPS);
 
     //NOTICE gtk-qt fails on several features
     // a key problem seems to be fixed text colors

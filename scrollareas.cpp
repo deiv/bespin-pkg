@@ -303,7 +303,7 @@ BespinStyle::drawScrollBarGroove(const QStyleOption * option, QPainter * painter
         return;
     }
     const Groove::Mode gType = config.scroll.groove;
-    const QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1 + gType*gType, 1);
+    QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1 + gType*gType*gType, 1);
     if (gType)
         masks.rect[true].render(RECT, painter, Gradients::Sunken,
                                 horizontal ? Qt::Vertical : Qt::Horizontal, bg);

@@ -491,7 +491,13 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
 #else
 //     painter->fillRect(RECT, Qt::red);
     QRect r = RECT.adjusted(f1,f1,-f1,-f1);
-    masks.rect[true].render(r, painter, GRAD(chooser), Qt::Vertical, CCOLOR(btn.std, Bg));
+    QColor bg = isEnabled ? CCOLOR(btn.std, Bg) : FCOLOR(Window);
+    if (hasFocus)
+    {
+        const int contrast = Colors::contrast(bg, FCOLOR(Highlight));
+        bg = Colors::mid(bg, FCOLOR(Highlight), contrast/5, 1);
+    }
+    masks.rect[true].render(r, painter, GRAD(chooser), Qt::Vertical, bg);
 
     r.setBottom(RECT.bottom());
     shadows.sunken[true][isEnabled].render(r, painter);
@@ -506,11 +512,11 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
         fillWithMask(painter, xy, c, masks.radioIndicator);
     }
 
-    if (hasFocus)
-    {
-        r = RECT; r.setTop(r.top()+F(2));
-        masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
-    }
+//     if (hasFocus)
+//     {
+//         r = RECT; r.setTop(r.top()+F(2));
+//         masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
+//     }
 #endif
    animStep = -1;
 }

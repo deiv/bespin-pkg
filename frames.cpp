@@ -55,104 +55,111 @@ void
 BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
                        const QWidget * widget) const
 {
-   OPT_SUNKEN OPT_ENABLED OPT_FOCUS
-   
-   if (!widget) { // fallback, we cannot paint shaped frame contents
-      if (sunken)
-         shadows.fallback.render(RECT,painter);
-      else if (option->state & State_Raised) //TODO!
-         shadows.fallback.render(RECT,painter);
+    OPT_SUNKEN OPT_ENABLED OPT_FOCUS
+
+    if (!widget)
+    {   // fallback, we cannot paint shaped frame contents
+        if (sunken)
+            shadows.fallback.render(RECT,painter);
+        else if (option->state & State_Raised)
+            shadows.fallback.render(RECT,painter);
+            // TODO !
 //          shadows.raised.render(RECT,painter);
-      else {
-         //horizontal
-         shadows.line[false][Sunken].render(RECT, painter, Tile::Full, false);
-         shadows.line[false][Sunken].render(RECT, painter, Tile::Full, true);
-         //vertical
-         shadows.line[true][Sunken].render(RECT, painter, Tile::Full, false);
-         shadows.line[true][Sunken].render(RECT, painter, Tile::Full, true);
-      }
-      return;
-   }
+        else
+        {
+            //horizontal
+            shadows.line[false][Sunken].render(RECT, painter, Tile::Full, false);
+            shadows.line[false][Sunken].render(RECT, painter, Tile::Full, true);
+            //vertical
+            shadows.line[true][Sunken].render(RECT, painter, Tile::Full, false);
+            shadows.line[true][Sunken].render(RECT, painter, Tile::Full, true);
+        }
+        return;
+    }
 
-   const QColor *brush = 0;
-   if (qobject_cast<const QFrame*>(widget)) { // frame, can be killed unless...
-      if (isSpecialFrame(widget)) { // ...TextEdit, KateView, ...
-         brush = &PAL.color(QPalette::Base);
-      }
-      else {
-         // maybe we need to corect a textlabels margin
-//          if (const QLabel* label = qobject_cast<const QLabel*>(widget)) {
-//             if (label->text() != QString() && label->margin() < dpi.f3)
-//                const_cast<QLabel*>(label)->setMargin(dpi.f3);
-//          }
-         // or paint a decent combobox dropdown frame...
-         if (widget->inherits("QComboBoxPrivateContainer")) {
-            // combo dropdowns
-            SAVE_PEN;
-            painter->setPen(Colors::mid(FCOLOR(Base),FCOLOR(Text),4,1));
-            painter->drawRect(RECT.adjusted(0,0,-1,-1));
-            RESTORE_PEN;
-         }
-         return; // painted on visual frame
-      }
-   }
+    const QColor *brush = 0;
+    QRect rect = RECT;
+    if (qobject_cast<const QFrame*>(widget))
+    {   // frame, can be killed unless...
+        if (isSpecialFrame(widget))
+        {   // ...TextEdit, KateView, ...
+            brush = &PAL.color(QPalette::Base);
+            if (sunken)
+                rect.setBottom(rect.bottom() + F(2));
+        }
+        else
+        {   // usually painted on visual frame, but...
+            if (widget->inherits("QComboBoxPrivateContainer"))
+            {   // a decent combobox dropdown frame...
+                SAVE_PEN;
+                painter->setPen(Colors::mid(FCOLOR(Base),FCOLOR(Text),4,1));
+                painter->drawRect(RECT.adjusted(0,0,-1,-1));
+                RESTORE_PEN;
+            }
+            return;
+        }
+    }
 
-   QRect rect = RECT;
-   if (sunken)
-      rect.adjust(0,0,0,-dpi.f2);
-   else if (option->state & State_Raised)
-      rect.adjust(dpi.f2,dpi.f1,-dpi.f2,-dpi.f4);
-   else
-      rect.adjust(dpi.f2,dpi.f2,-dpi.f2,-dpi.f2);
-   
-   const Tile::Set *mask = &masks.rect[false], *shadow = 0L;
-   if (sunken)
-      shadow = &shadows.sunken[false][isEnabled];
-   else if (option->state & State_Raised)
-      shadow = &shadows.group;
-   
-   if (brush)
-      mask->render(rect, painter, *brush);
-   if (shadow) {
-//       if (brush)
+    if (sunken)
+        rect.setBottom(rect.bottom() - F(2));
+    else if (option->state & State_Raised)
+        rect.adjust(F(2), F(1), -F(2), -F(4));
+    else
+        rect.adjust(F(2), F(2), -F(2), -F(2));
+
+    const Tile::Set *mask = &masks.rect[false], *shadow = 0L;
+    if (sunken)
+        shadow = &shadows.sunken[false][isEnabled];
+    else if (option->state & State_Raised)
+        shadow = &shadows.group;
+
+    if (brush)
+        mask->render(rect, painter, *brush);
+    if (shadow)
+    {
+//       if (brush) // nahhh - didn't work too good...
 //          Tile::setSolidBackground(*brush);
-      shadow->render(RECT, painter);
+        shadow->render(RECT, painter);
 //       Tile::reset();
-   }
-   else { // plain frame
-         //horizontal
-      shadows.line[false][Sunken].render(RECT, painter, Tile::Full, false);
-      shadows.line[false][Sunken].render(RECT, painter, Tile::Full, true);
-         //vertical
-      shadows.line[true][Sunken].render(RECT, painter, Tile::Full, false);
-      shadows.line[true][Sunken].render(RECT, painter, Tile::Full, true);
-   }
-   if (hasFocus) {
-      QColor h = FCOLOR(Highlight); h.setAlpha(128);
-      if (const VisualFramePart* vfp =
-          qobject_cast<const VisualFramePart*>(widget)) {
-         Tile::setShape(Tile::Ring);
-         QWidget *vHeader = 0, *hHeader = 0;
-         if (const QTreeView* tv =
-             qobject_cast<const QTreeView*>(vfp->frame()))
-            hHeader = (QWidget*)tv->header();
-         else if (const QTableView* table =
-                  qobject_cast<const QTableView*>(vfp->frame())) {
-            hHeader = (QWidget*)table->horizontalHeader();
-            vHeader = (QWidget*)table->verticalHeader();
-         }
-         if (vHeader && vHeader->isVisible()) {
-            Tile::setShape(Tile::shape() & ~Tile::Left);
-            rect.setLeft(rect.left()+vHeader->width());
-         }
-         if (hHeader && hHeader->isVisible()) {
-            Tile::setShape(Tile::shape() & ~Tile::Top);
-            rect.setTop(rect.top()+hHeader->height());
-         }
-      }
-      mask->outline(rect, painter, h, dpi.f3);
-      Tile::reset();
-   }
+    }
+    else
+    {   // plain frame
+        //horizontal
+        shadows.line[false][Sunken].render(RECT, painter, Tile::Full, false);
+        shadows.line[false][Sunken].render(RECT, painter, Tile::Full, true);
+        //vertical
+        shadows.line[true][Sunken].render(RECT, painter, Tile::Full, false);
+        shadows.line[true][Sunken].render(RECT, painter, Tile::Full, true);
+    }
+    if (hasFocus)
+    {
+        QColor h = FCOLOR(Highlight); h.setAlpha(128);
+        if (const VisualFramePart* vfp = qobject_cast<const VisualFramePart*>(widget))
+        {   // Looks somehow dull if a views header get's surrounded by the focus, ...but it
+            // still should inside the frame: don't dare!
+            Tile::setShape(Tile::Ring);
+            QWidget *vHeader = 0, *hHeader = 0;
+            if (const QTreeView* tv = qobject_cast<const QTreeView*>(vfp->frame()))
+                hHeader = (QWidget*)tv->header();
+            else if (const QTableView* table = qobject_cast<const QTableView*>(vfp->frame()))
+            {
+                hHeader = (QWidget*)table->horizontalHeader();
+                vHeader = (QWidget*)table->verticalHeader();
+            }
+            if (vHeader && vHeader->isVisible())
+            {
+                Tile::setShape(Tile::shape() & ~Tile::Left);
+                rect.setLeft(rect.left() + vHeader->width());
+            }
+            if (hHeader && hHeader->isVisible())
+            {
+                Tile::setShape(Tile::shape() & ~Tile::Top);
+                rect.setTop(rect.top() + hHeader->height());
+            }
+        }
+        mask->outline(rect, painter, h, F(3));
+        Tile::reset();
+    }
 }
 
 void
@@ -190,11 +197,20 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
         QStyleOptionGroupBox copy = *groupBox;
         copy.fontMetrics = QFontMetrics(painter->font());
         QRect textRect = subControlRect(CC_GroupBox, &copy, SC_GroupBoxLabel, widget);
-        int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
+        int alignment = Qt::AlignVCenter | BESPIN_MNEMONIC;
+        if (config.sunkenGroups)
+            alignment |= Qt::AlignLeft;
+        else
+            alignment |= Qt::AlignHCenter;
         drawItemText(painter, textRect,  alignment, groupBox->palette, isEnabled, groupBox->text, role);
-        int x = textRect.bottom(); textRect = RECT; textRect.setTop(x);
-        x = textRect.width()/4; textRect.adjust(x,0,-x,0);
-        shadows.line[0][Sunken].render(textRect, painter);
+        if (!config.sunkenGroups)
+        {
+            int x = textRect.bottom();
+            textRect = RECT; textRect.setTop(x);
+            x = textRect.width()/4;
+            textRect.adjust(x,0,-x,0);
+            shadows.line[0][Sunken].render(textRect, painter);
+        }
     }
        
     // Checkbox
@@ -212,10 +228,9 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
 }
 
 void
-BespinStyle::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QWidget*) const
+BespinStyle::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-    const QStyleOptionFrameV2 *groupBox =
-        qstyleoption_cast<const QStyleOptionFrameV2 *>(option);
+    const QStyleOptionFrameV2 *groupBox = qstyleoption_cast<const QStyleOptionFrameV2 *>(option);
 
     if (groupBox && groupBox->features == QStyleOptionFrameV2::Flat)
     {
@@ -224,19 +239,28 @@ BespinStyle::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, co
         Tile::reset();
         return;
     }
-#if 0
-    masks.rect[false].render(RECT.adjusted(0,0,0,-F(2)), painter, FCOLOR(Window).darker(105));
-    shadows.sunken[false][true].render(RECT, painter);
-    return;
-#endif
-    QRect rect = RECT.adjusted(dpi.f4,dpi.f2,-dpi.f4,0);
-    rect.setHeight(qMin(2*dpi.f32, RECT.height()));
-    Tile::setShape(Tile::Full & ~Tile::Bottom);
-    masks.rect[false].render(rect, painter, Gradients::light(rect.height()));
-    rect.setBottom(RECT.bottom()-dpi.f32);
-    Tile::setShape(Tile::Full);
-    shadows.group.render(RECT, painter);
-//       Tile::setShape(Tile::Full & ~Tile::Bottom);
-//       masks.button.outline(rect, painter, FCOLOR(Window).light(120));
-    Tile::reset();
+    if (config.sunkenGroups)
+    {
+        if (config.bg.mode == Scanlines)
+            masks.rect[false].render(   RECT.adjusted(0,0,0,-F(2)), painter,
+                                        Gradients::structure(FCOLOR(Window).darker(108)),
+                                        widget ? widget->mapTo(widget->window(), RECT.topLeft()) :
+                                        QPoint() );
+        else
+            masks.rect[false].render(RECT.adjusted(0,0,0,-F(2)), painter, FCOLOR(Window).darker(105));
+        shadows.sunken[false][true].render(RECT, painter);
+    }
+    else
+    {
+        QRect rect = RECT.adjusted(F(4), F(2), -F(4), 0);
+        rect.setHeight(qMin(2*F(32), RECT.height()));
+        Tile::setShape(Tile::Full & ~Tile::Bottom);
+        masks.rect[false].render(rect, painter, Gradients::light(rect.height()));
+        rect.setBottom(RECT.bottom()-F(32));
+        Tile::setShape(Tile::Full);
+        shadows.group.render(RECT, painter);
+    //       Tile::setShape(Tile::Full & ~Tile::Bottom);
+    //       masks.button.outline(rect, painter, FCOLOR(Window).light(120));
+        Tile::reset();
+    }
 }

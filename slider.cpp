@@ -29,13 +29,13 @@ BespinStyle::drawSliderHandle(const QRect &handle, const QStyleOption *option, Q
 
     // shadow
     QPoint xy = handle.topLeft();
+    if (hasFocus && !sunken)
+        fillWithMask(painter, xy, FCOLOR(Highlight), lights.slider);
+    else if (step && config.btn.backLightHover)
+        fillWithMask(painter, xy, Colors::mid(FCOLOR(Window), CCOLOR(btn.active, Bg), 6-step, step), lights.slider);
     if (sunken)
         xy += QPoint(dpi.f1, 0);
     painter->drawPixmap(xy, shadows.slider[isEnabled][sunken]);
-    if (hasFocus && !sunken)
-        fillWithMask(painter, xy, FCOLOR(Highlight), shadows.slider[true][false]);
-    else if (step && config.btn.backLightHover)
-        fillWithMask(painter, xy, Colors::mid(FCOLOR(Window), CCOLOR(btn.active, Bg), 6-step, step), shadows.slider[true][false]);
 
     // gradient
     xy += QPoint(sunken ? dpi.f1 : dpi.f2, dpi.f1);

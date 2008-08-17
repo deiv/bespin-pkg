@@ -177,7 +177,7 @@ BespinStyle::registerRoutines()
     registerPE(drawItemCheck, PE_IndicatorViewItemCheck);
 #ifdef QT3_SUPPORT
     registerPE(drawItemCheck, PE_Q3CheckListIndicator);
-    registerPE(drawExclusiveCheck, PE_Q3CheckListExclusiveIndicator);
+    registerPE(drawExclusiveCheck_p, PE_Q3CheckListExclusiveIndicator);
 #endif
     registerPE(drawMenuCheck, PE_IndicatorMenuCheckMark);
     registerPE(drawSolidArrowN, PE_IndicatorArrowUp);

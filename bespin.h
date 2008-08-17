@@ -124,6 +124,11 @@ public:
    // from QObject
    bool eventFilter( QObject *object, QEvent *event );
 
+    // STATICS
+    static void drawExclusiveCheck(const QStyleOption*, QPainter*, const QWidget*);
+    static void drawArrow(Navi::Direction, const QRect&, QPainter*);
+    static void drawSolidArrow(Navi::Direction, const QRect&, QPainter*);
+
 protected:
    virtual void init(const QSettings *settings = 0L);
 
@@ -196,28 +201,33 @@ protected:
    }
    void drawScrollBarGroove(const QStyleOption*, QPainter*, const QWidget*) const;
    void drawScrollBarSlider(const QStyleOption*, QPainter*, const QWidget*) const;
-   // shapes.cpp
-   void drawCheckMark(const QStyleOption*, QPainter*, Check::Type = Check::V) const;
-   void drawCheck(const QStyleOption*, QPainter*, const QWidget*, bool) const;
-   inline void drawItemCheck(const QStyleOption * option, QPainter * painter,
-                             const QWidget * widget) const {
-      drawCheck(option, painter, widget, true);
-   }
-   inline void drawMenuCheck(const QStyleOption * option, QPainter * painter,
-                             const QWidget * widget) const {
-      drawCheck(option, painter, widget, false);
-   }
-   void drawExclusiveCheck(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawArrow(Navi::Direction, const QRect&, QPainter*) const;
-   void drawSolidArrow(Navi::Direction, const QRect&, QPainter*) const;
+
+    // shapes.cpp
+    void drawCheck(const QStyleOption*, QPainter*, const QWidget*, bool) const;
+    void drawCheckMark(const QStyleOption*, QPainter*, Check::Type = Check::V) const;
+
 #define INDI_ARROW(_D_)\
-   inline void drawSolidArrow##_D_(const QStyleOption * option,\
-                                         QPainter * painter, const QWidget *) const {\
-      const int dx = option->rect.width()/8, dy = option->rect.height()/8;\
-      drawSolidArrow(Navi::_D_, option->rect.adjusted(dx,dy,-dx,-dy), painter);\
-}
-   INDI_ARROW(N) INDI_ARROW(S) INDI_ARROW(E) INDI_ARROW(W)
+    inline void\
+    drawSolidArrow##_D_(const QStyleOption * option, QPainter * painter, const QWidget *) const\
+    {\
+        const int dx = option->rect.width()/8, dy = option->rect.height()/8;\
+        drawSolidArrow(Navi::_D_, option->rect.adjusted(dx,dy,-dx,-dy), painter);\
+    }
+    INDI_ARROW(N) INDI_ARROW(S) INDI_ARROW(E) INDI_ARROW(W)
 #undef INDI_ARROW
+
+    inline void
+    drawExclusiveCheck_p(const QStyleOption *o, QPainter *p, const QWidget *w) const
+    { drawExclusiveCheck(o,p,w); }
+
+    inline void
+    drawItemCheck(const QStyleOption * option, QPainter * painter, const QWidget * widget) const
+    { drawCheck(option, painter, widget, true); }
+
+    inline void
+    drawMenuCheck(const QStyleOption * option, QPainter * painter, const QWidget * widget) const
+    { drawCheck(option, painter, widget, false); }
+
    // slider.cpp
    void drawSlider(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
    void drawDial(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
@@ -293,6 +303,7 @@ private:
    
    struct {
       Tile::Line top;
+      QPixmap slider;
 //       QPixmap slider[4];
       Tile::Set rect[2];
    } lights;
@@ -308,6 +319,7 @@ private:
 private slots:
    void fixKdePalette();
 };
+
 
 } // namespace Bespin
 #endif //BESPIN_STYLE_H

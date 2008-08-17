@@ -257,6 +257,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    handleSettings(ui.modalOpacity, BG_MODAL_OPACITY);
    handleSettings(ui.modalInvert, BG_MODAL_INVERT);
    handleSettings(ui.tooltipRole, BG_TOOLTIP_ROLE);
+   handleSettings(ui.sunkenGroups, SUNKEN_GROUPS);
 
    handleSettings(ui.sunkenButtons, "Btn.Layer", 0);
    handleSettings(ui.checkMark, "Btn.CheckType", 0);

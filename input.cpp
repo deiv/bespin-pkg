@@ -89,96 +89,83 @@ BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
     shadows.sunken[false][isEnabled].render(RECT, painter);
 }
 
+static void
+drawSBArrow(QStyle::SubControl sc, QPainter *painter, QStyleOptionSpinBox *option,
+            const QWidget *widget, const QStyle *style)
+{
+    if (option->subControls & sc)
+    {
+        const int f2 = F(2);
+
+        option->subControls = sc;
+        RECT = style->subControlRect(QStyle::CC_SpinBox, option, sc, widget);
+
+        Navi::Direction dir = Navi::N;
+        QAbstractSpinBox::StepEnabledFlag sef = QAbstractSpinBox::StepUpEnabled;
+        if (sc == QStyle::SC_SpinBoxUp)
+            RECT.setTop(RECT.bottom() - 2*RECT.height()/3);
+        else
+        {
+            dir = Navi::S; sef = QAbstractSpinBox::StepDownEnabled;
+            RECT.setBottom(RECT.top() + 2*RECT.height()/3);
+        }
+
+        bool isEnabled = option->stepEnabled & sef;
+        bool hover = isEnabled && (option->activeSubControls == sc);
+        bool sunken = hover && (option->state & QStyle::State_Sunken);
+        
+
+        if (!sunken)
+        {
+            painter->setBrush(FCOLOR(Base).dark(108));
+            RECT.translate(0, f2);
+            BespinStyle::drawArrow(dir, RECT, painter);
+            RECT.translate(0, -f2);
+        }
+
+        QColor c;
+        if (hover)
+            c = FCOLOR(Highlight);
+        else if (isEnabled)
+            c = Colors::mid(FCOLOR(Base), FCOLOR(Text));
+        else
+            c = Colors::mid(FCOLOR(Base), PAL.color(QPalette::Disabled, QPalette::Text));
+
+        painter->setBrush(c);
+        BespinStyle::drawArrow(dir, RECT, painter);
+    }
+}
+
 void
 BespinStyle::drawSpinBox(const QStyleOptionComplex * option, QPainter * painter,
                          const QWidget * widget) const
 {
-   ASSURE_OPTION(sb, SpinBox);
-   OPT_SUNKEN OPT_ENABLED OPT_HOVER
+    ASSURE_OPTION(sb, SpinBox);
+    OPT_ENABLED
 
-   QStyleOptionSpinBox copy = *sb;
+    QStyleOptionSpinBox copy = *sb;
+
    // this doesn't work (for the moment, i assume...)
-//    isEnabled = isEnabled && !(option->state & State_ReadOnly);
-   if (isEnabled)
-   if (widget)
-   if (const QAbstractSpinBox *box =
-         qobject_cast<const QAbstractSpinBox*>(widget)) {
-      isEnabled = isEnabled && !box->isReadOnly();
-      if (!isEnabled)
-         copy.state &= ~State_Enabled;
-   }
+    //    isEnabled = isEnabled && !(option->state & State_ReadOnly);
+    if (isEnabled)
+    if (const QAbstractSpinBox *box = qobject_cast<const QAbstractSpinBox*>(widget))
+    {
+        isEnabled = isEnabled && !box->isReadOnly();
+        if (!isEnabled)
+            copy.state &= ~State_Enabled;
+    }
 
-   if (sb->frame && (sb->subControls & SC_SpinBoxFrame))
-      drawLineEdit(&copy, painter, widget);
+    if (sb->frame && (sb->subControls & SC_SpinBoxFrame))
+        drawLineEdit(&copy, painter, widget);
 
-   if (!isEnabled)
-      return; // why bother the user with elements he can't use... ;)
+    if (!isEnabled)
+        return; // why bother the user with elements he can't use... ;)
 
-   const int f2 = dpi.f2;
-
-   int arrowHeight = -1;
-   painter->setPen(Qt::NoPen);
-
-   if (sb->subControls & SC_SpinBoxUp) {
-      copy.subControls = SC_SpinBoxUp;
-      copy.rect = subControlRect(CC_SpinBox, sb, SC_SpinBoxUp, widget);
-
-      isEnabled = sb->stepEnabled & QAbstractSpinBox::StepUpEnabled;
-      hover = isEnabled && (sb->activeSubControls == SC_SpinBoxUp);
-      sunken = sunken && (sb->activeSubControls == SC_SpinBoxUp);
-
-      arrowHeight = 2*copy.rect.height()/3;
-      copy.rect.setTop(copy.rect.bottom()-arrowHeight);
-
-      if (!sunken) {
-         painter->setBrush(FCOLOR(Base).dark(108));
-         copy.rect.translate(0, f2);
-         drawArrow(Navi::N, copy.rect, painter);
-         copy.rect.translate(0, -f2);
-      }
-
-      QColor c;
-      if (hover)
-         c = FCOLOR(Highlight);
-      else if (isEnabled)
-         c = Colors::mid(FCOLOR(Base), FCOLOR(Text));
-      else
-         c = Colors::mid(FCOLOR(Base), PAL.color(QPalette::Disabled, QPalette::Text));
-
-      painter->setBrush(c);
-      drawArrow(Navi::N, copy.rect, painter);
-   }
-
-   if (sb->subControls & SC_SpinBoxDown) {
-      copy.subControls = SC_SpinBoxDown;
-      copy.rect = subControlRect(CC_SpinBox, sb, SC_SpinBoxDown, widget);
-
-      isEnabled = sb->stepEnabled & QAbstractSpinBox::StepDownEnabled;
-      hover = isEnabled && (sb->activeSubControls == SC_SpinBoxDown);
-      sunken = sunken && (sb->activeSubControls == SC_SpinBoxDown);
-
-      if (arrowHeight < 0)
-         arrowHeight = 2*copy.rect.height()/3;
-      copy.rect.setBottom(copy.rect.top()+arrowHeight);
-
-      if (!sunken) {
-         painter->setBrush(FCOLOR(Base).dark(105));
-         copy.rect.translate(0, f2);
-         drawArrow(Navi::S, copy.rect, painter);
-         copy.rect.translate(0, -f2);
-      }
-
-      QColor c;
-      if (hover)
-         c = FCOLOR(Highlight);
-      else if (isEnabled)
-         c = Colors::mid(FCOLOR(Base), FCOLOR(Text));
-      else
-         c = Colors::mid(FCOLOR(Base), PAL.color(QPalette::Disabled, QPalette::Text));
-
-      painter->setBrush(c);
-      drawArrow(Navi::S, copy.rect, painter);
-   }
+    painter->setPen(Qt::NoPen);
+    drawSBArrow(SC_SpinBoxUp, painter, &copy, widget, this);
+    copy.rect = RECT;
+    copy.subControls = sb->subControls;
+    drawSBArrow(SC_SpinBoxDown, painter, &copy, widget, this);
 }
 
 static int animStep = -1;
@@ -188,168 +175,184 @@ void
 BespinStyle::drawComboBox(const QStyleOptionComplex * option,
                           QPainter * painter, const QWidget * widget) const
 {
-   ASSURE_OPTION(cmb, ComboBox);
-   B_STATES
-   
-   const int f2 = dpi.f2, f3 = dpi.f3;
-   QRect ar, r = RECT; r.setBottom(r.bottom()-f2);
-   const QComboBox* combo = widget ?
-      qobject_cast<const QComboBox*>(widget) : 0;
-   const bool listShown = combo && combo->view() &&
-      ((QWidget*)(combo->view()))->isVisible();
-   QColor c = CONF_COLOR(btn.std, Bg);
+    ASSURE_OPTION(cmb, ComboBox);
+    B_STATES
 
-   if (listShown) { // this messes up hover
-      hover = hover || QRect(widget->mapToGlobal(RECT.topLeft()),
-                              RECT.size()).contains(QCursor::pos());
-   }
+    const int f2 = F(2), f3 = F(3);
+    QRect ar, r = RECT; r.setBottom(r.bottom()-f2);
+    const QComboBox* combo = widget ? qobject_cast<const QComboBox*>(widget) : 0;
+    const bool listShown = combo && combo->view() && ((QWidget*)(combo->view()))->isVisible();
+    QColor c = CONF_COLOR(btn.std, Bg);
 
-   // do we have an arrow?
-   if (isEnabled &&
-      (cmb->subControls & SC_ComboBoxArrow) &&
-      (!combo || combo->count() > 0)) {
-         ar = subControlRect(CC_ComboBox, cmb, SC_ComboBoxArrow, widget);
-         ar.setBottom(ar.bottom()-f2);
-   }
+    if (listShown)
+    {   // this messes up hover
+        hover = hover || QRect(widget->mapToGlobal(RECT.topLeft()), RECT.size()).contains(QCursor::pos());
+    }
 
-   // the frame
-   if ((cmb->subControls & SC_ComboBoxFrame) && cmb->frame) {
-   if (cmb->editable)
-      drawLineEdit(option, painter, widget);
-   else {
-      if (!ar.isNull()) {
-         const Tile::Set &mask = masks.rect[round_];
-         // ground
-         animStep = Animator::Hover::step(widget);
-         if (listShown) animStep = 6;
+    if (isEnabled && (cmb->subControls & SC_ComboBoxArrow) && (!combo || combo->count() > 0))
+    {   // do we have an arrow?
+        ar = subControlRect(CC_ComboBox, cmb, SC_ComboBoxArrow, widget);
+        ar.setBottom(ar.bottom()-f2);
+    }
 
-         c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover,
-                   Gradients::isReflective(GRAD(chooser)));
-         if (hasFocus) {
-            const int contrast = Colors::contrast(c, FCOLOR(Highlight));
-            c = Colors::mid(c, FCOLOR(Highlight), contrast/5, 1);
-         }
-         
-         mask.render(r, painter, GRAD(chooser), Qt::Vertical, c);
+    // the frame
+    if ((cmb->subControls & SC_ComboBoxFrame) && cmb->frame)
+    {
+        if (cmb->editable)
+            drawLineEdit(option, painter, widget);
+        else
+        {
+            if (!ar.isNull())
+            {
+                const Tile::Set &mask = masks.rect[round_];
+                // ground
+                animStep = Animator::Hover::step(widget);
+                if (listShown)
+                    animStep = 6;
 
-//          if (hasFocus) {
-//             const int contrast = Colors::contrast(c, FCOLOR(Highlight));
-//             const QColor fc = Colors::mid(c, FCOLOR(Highlight), contrast/10, 1);
-//             mask.outline(r, painter, fc, f3);
-//          }
+                c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover,
+                                                        Gradients::isReflective(GRAD(chooser)));
+                if (hasFocus)
+                {
+                    const int contrast = Colors::contrast(c, FCOLOR(Highlight));
+                    c = Colors::mid(c, FCOLOR(Highlight), contrast/5, 1);
+                }
 
-         // maybe hover indicator?
-         if (!config.btn.fullHover && animStep) { // jupp ;)
-            r.adjust(f3, f3, -f3, -f3);
+                mask.render(r, painter, GRAD(chooser), Qt::Vertical, c);
+
+        //          if (hasFocus) {
+        //             const int contrast = Colors::contrast(c, FCOLOR(Highlight));
+        //             const QColor fc = Colors::mid(c, FCOLOR(Highlight), contrast/10, 1);
+        //             mask.outline(r, painter, fc, f3);
+        //          }
+
+                if (!config.btn.fullHover && animStep)
+                {   // maybe hover indicator?
+                    r.adjust(f3, f3, -f3, -f3);
+                    c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
+                    mask.render(r, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0,f3));
+                }
+            }
+            shadows.sunken[round_][isEnabled].render(RECT, painter);
+        }
+    }
+
+    // the arrow
+    if (!ar.isNull())
+    {
+        if (!(ar.width()%2) )
+            ar.setWidth(ar.width()-1);
+        const int dy = ar.height()/4;
+        QRect rect = ar.adjusted(0, dy, 0, -dy);
+
+        Navi::Direction dir = Navi::S;
+        bool upDown = false;
+        if (listShown)
+            dir = (config.leftHanded) ? Navi::E : Navi::W;
+        else if (combo)
+        {
+            if (combo->currentIndex() == 0)
+                dir = Navi::S;
+            else if (combo->currentIndex() == combo->count()-1)
+                dir = Navi::N;
+            else
+                upDown = true;
+        }
+
+        painter->save();
+        painter->setPen(Qt::NoPen);
+        if (cmb->editable)
+        {
+            if (upDown || dir == Navi::N)
+                dir = Navi::S;
+            upDown = false; // shall never look like spinbox!
+            hover = hover && (cmb->activeSubControls == SC_ComboBoxArrow);
+            if (!sunken)
+            {
+                painter->setBrush(FCOLOR(Base).dark(105));
+                rect.translate(0, f2);
+                drawArrow(dir, rect, painter);
+                rect.translate(0, -f2);
+            }
+            if (hover || listShown)
+                painter->setBrush(FCOLOR(Highlight));
+            else
+                painter->setBrush( Colors::mid(FCOLOR(Base), FCOLOR(Text)) );
+        }
+        else
+        {
+            c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-            mask.render(r, painter, GRAD(chooser), Qt::Vertical, c,
-                        RECT.height()-f2, QPoint(0,f3));
-         }
-      }
-      shadows.sunken[round_][isEnabled].render(RECT, painter);
-   }
-   }
-
-   // the arrow
-   if (!ar.isNull()) {
-      if (!(ar.width()%2)) ar.setWidth(ar.width()-1);
-      const int dy = ar.height()/4;
-      QRect rect = ar.adjusted(0, dy, 0, -dy);
-
-      Navi::Direction dir = Navi::S;
-      bool upDown = false;
-      if (listShown)
-         dir = (config.leftHanded) ? Navi::E : Navi::W;
-      else if (combo) {
-         if (combo->currentIndex() == 0)
-            dir = Navi::S;
-         else if (combo->currentIndex() == combo->count()-1)
-            dir = Navi::N;
-         else
-            upDown = true;
-      }
-
-      painter->save();
-      painter->setPen(Qt::NoPen);
-      if (cmb->editable) {
-         if (upDown || dir == Navi::N) dir = Navi::S;
-         upDown = false; // shall never look like spinbox!
-         hover = hover && (cmb->activeSubControls == SC_ComboBoxArrow);
-         if (!sunken) {
-            painter->setBrush(FCOLOR(Base).dark(105));
-            rect.translate(0, f2);
-            drawArrow(dir, rect, painter);
-            rect.translate(0, -f2);
-         }
-         if (hover || listShown)
-            painter->setBrush(FCOLOR(Highlight));
-         else
-            painter->setBrush( Colors::mid(FCOLOR(Base), FCOLOR(Text)) );
-      }
-      else {
-         c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
-         c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
 //          ar.adjust(f2, f3, -f2, -f3);
-         masks.rect[round_].render(ar, painter, GRAD(chooser), Qt::Vertical, c,
-                                 RECT.height()-f2, QPoint(0,dpi.f4));
-         painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
-      }
-      if (upDown) {
-         rect.setBottom(rect.y() + rect.height()/2);
-         rect.translate(0, -1);
-         drawArrow(Navi::N, rect, painter);
-         rect.translate(0, rect.height());
-         drawArrow(Navi::S, rect, painter);
-      }
-      else
-         drawArrow(dir, rect, painter);
-      painter->restore();
-   }
+            masks.rect[round_].render(ar, painter, GRAD(chooser), Qt::Vertical, c,
+                                    RECT.height()-f2, QPoint(0,dpi.f4));
+            painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
+        }
+        if (upDown)
+        {
+            rect.setBottom(rect.y() + rect.height()/2);
+            rect.translate(0, -1);
+            drawArrow(Navi::N, rect, painter);
+            rect.translate(0, rect.height());
+            drawArrow(Navi::S, rect, painter);
+        }
+        else
+            drawArrow(dir, rect, painter);
+        painter->restore();
+    }
 }
+
 
 void
 BespinStyle::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
                                const QWidget * widget) const
 {
-   ASSURE_OPTION(cb, ComboBox);
-   OPT_ENABLED OPT_HOVER
+    ASSURE_OPTION(cb, ComboBox);
+    OPT_ENABLED
 
-   QRect editRect = subControlRect(CC_ComboBox, cb, SC_ComboBoxEditField, widget);
-   painter->save();
-   painter->setClipRect(editRect);
-   // icon
-   if (!cb->currentIcon.isNull()) {
-      QIcon::Mode mode = isEnabled ? QIcon::Normal : QIcon::Disabled;
-      QPixmap pixmap = cb->currentIcon.pixmap(cb->iconSize, mode);
-      QRect iconRect(editRect);
-      iconRect.setWidth(cb->iconSize.width() + 4);
-      iconRect = alignedRect(QApplication::layoutDirection(),
-                             Qt::AlignLeft | Qt::AlignVCenter,
-                             iconRect.size(), editRect);
+    QRect editRect = subControlRect(CC_ComboBox, cb, SC_ComboBoxEditField, widget);
+    painter->save();
+    painter->setClipRect(editRect);
+
+    if (!cb->currentIcon.isNull())
+    {   // icon ===============================================
+        QIcon::Mode mode = isEnabled ? QIcon::Normal : QIcon::Disabled;
+        QPixmap pixmap = cb->currentIcon.pixmap(cb->iconSize, mode);
+        QRect iconRect(editRect);
+        iconRect.setWidth(cb->iconSize.width() + 4);
+        iconRect = alignedRect( QApplication::layoutDirection(), Qt::AlignLeft | Qt::AlignVCenter,
+                                iconRect.size(), editRect);
 //       if (cb->editable)
 //          painter->fillRect(iconRect, opt->palette.brush(QPalette::Base));
-      drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
+        drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
 
-      if (cb->direction == Qt::RightToLeft)
-         editRect.translate(-4 - cb->iconSize.width(), 0);
-      else
-         editRect.translate(cb->iconSize.width() + 4, 0);
-   }
-   // text
-   if (!cb->currentText.isEmpty() && !cb->editable) {
-      if (cb->frame) {
-         const QComboBox* combo = widget ?
-            qobject_cast<const QComboBox*>(widget) : 0;
-         hover = !config.btn.backLightHover &&
-            (hover || animStep > 2 || ( combo && combo->view() &&
-                                        ((QWidget*)(combo->view()))->isVisible()));
-         int f3 = dpi.f3;
-         editRect.adjust(f3,0, -f3, 0);
-         painter->setPen(hover ? CCOLOR(btn.active, 1) : CCOLOR(btn.std, 1));
-      }
-      drawItemText(painter, editRect, Qt::AlignCenter, PAL, isEnabled, cb->currentText);
-//       painter->drawText(editRect, Qt::AlignCenter, cb->currentText);
-   }
-   painter->restore();
-   animStep = -1;
+        if (cb->direction == Qt::RightToLeft)
+            editRect.translate(-4 - cb->iconSize.width(), 0);
+        else
+            editRect.translate(cb->iconSize.width() + 4, 0);
+    }
+    
+    if (!cb->currentText.isEmpty() && !cb->editable)
+    {   // text ==================================================
+        if (cb->frame)
+        {
+            OPT_FOCUS
+            if (animStep < 0)
+            {
+                OPT_HOVER
+                animStep = hover ? 6 : 0;
+            }
+            else
+            {
+                if (const QComboBox* combo = qobject_cast<const QComboBox*>(widget))
+                if (combo->view() && ((QWidget*)(combo->view()))->isVisible())
+                    animStep = 6;
+            }
+            editRect.adjust(F(3),0, -F(3), 0);
+            painter->setPen(btnFg(PAL, isEnabled, hasFocus, animStep));
+        }
+        drawItemText(painter, editRect, Qt::AlignCenter, PAL, isEnabled, cb->currentText);
+    }
+    painter->restore();
+    animStep = -1;
 }
