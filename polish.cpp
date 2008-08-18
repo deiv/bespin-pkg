@@ -51,14 +51,10 @@
 #define CCOLOR(_TYPE_, _FG_) PAL.color(QPalette::Active, config._TYPE_##_role[_FG_])
 #define FCOLOR(_TYPE_) PAL.color(QPalette::Active, QPalette::_TYPE_)
 
-#define IS_HTML_WIDGET (widget->objectName() == "RenderFormElementWidget")
-
 using namespace Bespin;
 
 extern Config config;
 extern Dpi dpi;
-
-static bool isQtDesigner = false;
 
 static inline void
 setBoldFont(QWidget *w, bool bold = true)
@@ -73,7 +69,6 @@ void BespinStyle::polish ( QApplication * app )
     QPalette pal = app->palette();
     polish(pal);
     app->setPalette(pal);
-    isQtDesigner = isQtDesigner || app->applicationName() == "Designer";
 }
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
@@ -243,7 +238,7 @@ void
 BespinStyle::polish( QWidget * widget )
 {
     // GTK-Qt gets a special handling - see above
-    if (isGTK)
+    if (appType == GTK)
     {
         polishGTK(widget);
         return;
@@ -499,7 +494,7 @@ BespinStyle::polish( QWidget * widget )
 
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
     QMenuBar *mbar = qobject_cast<QMenuBar *>(widget);
-    if (mbar && !(isQtDesigner && mbar->inherits("QDesignerMenuBar")))
+    if (mbar && !((appType == QtDesigner) && mbar->inherits("QDesignerMenuBar")))
         MacMenu::manage(mbar);
 
     bool isTopContainer = (mbar || qobject_cast<QToolBar *>(widget));

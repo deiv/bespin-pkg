@@ -25,45 +25,49 @@
 
 #include <QtDebug>
 
-#define HOVER_STEP sunken ? 6 : ((isGTK || !widget) ? 6*hover : Animator::Hover::step(widget))
+#define HOVER_STEP sunken ? 6 : ((appType == GTK || !widget) ? 6*hover : Animator::Hover::step(widget))
 
 static int animStep = -1;
 static bool isCheckbox = false;
 
 void
-BespinStyle::drawPushButton(const QStyleOption * option, QPainter * painter,
-                            const QWidget * widget) const
+BespinStyle::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-   ASSURE_OPTION(btn, Button);
-   OPT_SUNKEN OPT_HOVER;
+    ASSURE_OPTION(btn, Button);
+    OPT_SUNKEN OPT_HOVER;
 
-   QRect oldRect = btn->rect;
-   QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
-   if (btn->features & QStyleOptionButton::Flat) { // more like a toolbtn
-      if (option->state & State_Enabled) {
-         animStep = HOVER_STEP;
-         if (option->state & State_HasFocus)
-            masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), dpi.f3);
-         if (sunken)
-            shadows.sunken[true][true].render(RECT, painter);
-         else
-            shadows.relief[true][true].render(RECT, painter);
-      }
-   }
-   else {
-      if (sunken && !config.btn.cushion) {
-         if (config.btn.layer == 1)
-            _btn->rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
-         else if (!config.btn.layer)
-            _btn->rect.adjust(0,dpi.f1,0,dpi.f1);
-      }
-      drawPushButtonBevel(btn, painter, widget);
-   }
+    QRect oldRect = btn->rect;
+    QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
+    if (btn->features & QStyleOptionButton::Flat)
+    {   // more like a toolbtn
+        if (option->state & State_Enabled)
+        {
+            animStep = HOVER_STEP;
+            if (option->state & State_HasFocus)
+                masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), dpi.f3);
+            if (sunken)
+                shadows.sunken[true][true].render(RECT, painter);
+            else
+                shadows.relief[true][true].render(RECT, painter);
+        }
+    }
+    else
+    {
+        if (sunken && !config.btn.cushion)
+        {
+            if (config.btn.layer == 1)
+                _btn->rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
+            else if (!config.btn.layer)
+                _btn->rect.adjust(0,dpi.f1,0,dpi.f1);
+        }
+        drawPushButtonBevel(btn, painter, widget);
+    }
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
-   if (isGTK) return; // GTK paints the label itself
-   _btn->rect.adjust(dpi.f6,dpi.f4,-dpi.f6,-dpi.f4);
-   drawPushButtonLabel(btn, painter, widget);
-   _btn->rect = oldRect;
+    if (appType == GTK)
+        return; // GTK paints the label itself
+    _btn->rect.adjust(dpi.f6,dpi.f4,-dpi.f6,-dpi.f4);
+    drawPushButtonLabel(btn, painter, widget);
+    _btn->rect = oldRect;
 }
 
 void
@@ -157,7 +161,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
             iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
 
       // gtk HATES color inversion on labels, so we invert the nonlabled part...
-//       if (isGTK && !isCheckbox &&
+//       if (appType == GTK && !isCheckbox &&
 //           !Colors::haveContrast(FCOLOR(WindowText), CCOLOR(btn.active, Bg))) {
 //          QColor h = c; c = iC; iC = h;
 //       }
@@ -256,9 +260,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
 }
 
 void
-BespinStyle::drawPushButtonLabel(const QStyleOption * option,
-                                 QPainter * painter,
-                                 const QWidget *) const
+BespinStyle::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
    OPT_ENABLED OPT_FOCUS OPT_HOVER;
    ASSURE_OPTION(btn, Button);
@@ -387,8 +389,7 @@ BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
-                             const QWidget * widget) const
+BespinStyle::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     B_STATES
 
@@ -495,7 +496,10 @@ BespinStyle::drawRadio(const QStyleOption * option, QPainter * painter,
     if (hasFocus)
     {
         const int contrast = Colors::contrast(bg, FCOLOR(Highlight));
-        bg = Colors::mid(bg, FCOLOR(Highlight), contrast/5, 1);
+        if (contrast > 10) {
+            masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
+            bg = Colors::mid(bg, FCOLOR(Highlight), contrast/5, 1);
+        }
     }
     masks.rect[true].render(r, painter, GRAD(chooser), Qt::Vertical, bg);
 

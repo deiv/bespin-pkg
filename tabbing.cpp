@@ -21,73 +21,76 @@
 #include "animator/hoverindex.h"
 
 
-inline static bool verticalTabs(QTabBar::Shape shape) {
-   return shape == QTabBar::RoundedEast ||
-      shape == QTabBar::TriangularEast ||
-      shape == QTabBar::RoundedWest ||
-      shape == QTabBar::TriangularWest;
+inline static bool
+verticalTabs(QTabBar::Shape shape)
+{
+    return  shape == QTabBar::RoundedEast ||
+            shape == QTabBar::TriangularEast ||
+            shape == QTabBar::RoundedWest ||
+            shape == QTabBar::TriangularWest;
 }
 
 
 void
-BespinStyle::drawTabWidget(const QStyleOption *option, QPainter *painter,
-                           const QWidget * widget) const
+BespinStyle::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidget * widget) const
 {
-   if (isGTK) {
-      shadows.sunken[true][true].render(RECT, painter);
-      return;
-   }
+    if (appType == GTK)
+    {
+        shadows.sunken[true][true].render(RECT, painter);
+        return;
+    }
    
-   ASSURE_OPTION(twf, TabWidgetFrame);
+    ASSURE_OPTION(twf, TabWidgetFrame);
 
-   QLine line[2];
-   QStyleOptionTabBarBase tbb; tbb.initFrom(widget);
-   tbb.shape = twf->shape; tbb.rect = twf->rect;
+    QLine line[2];
+    QStyleOptionTabBarBase tbb; tbb.initFrom(widget);
+    tbb.shape = twf->shape; tbb.rect = twf->rect;
 
 #define SET_BASE_HEIGHT(_o_) \
-      baseHeight = twf->tabBarSize._o_(); \
-      if (baseHeight < 0) \
-      baseHeight = pixelMetric( PM_TabBarBaseHeight, option, widget )
+baseHeight = twf->tabBarSize._o_(); \
+if (baseHeight < 0) \
+    baseHeight = pixelMetric( PM_TabBarBaseHeight, option, widget )
          
-   int baseHeight;
-   switch (twf->shape) {
-   case QTabBar::RoundedNorth: case QTabBar::TriangularNorth:
-      SET_BASE_HEIGHT(height);
-      tbb.rect.setHeight(baseHeight);
-      line[0] = line[1] = QLine(RECT.bottomLeft(), RECT.bottomRight());
-      line[0].translate(0,-1);
-      break;
-   case QTabBar::RoundedSouth: case QTabBar::TriangularSouth:
-      SET_BASE_HEIGHT(height);
-      tbb.rect.setTop(tbb.rect.bottom()-baseHeight);
-      line[0] = line[1] = QLine(RECT.topLeft(), RECT.topRight());
-      line[1].translate(0,1);
-      break;
-   case QTabBar::RoundedEast: case QTabBar::TriangularEast:
-      SET_BASE_HEIGHT(width);
-      tbb.rect.setLeft(tbb.rect.right()-baseHeight);
-      line[0] = line[1] = QLine(RECT.topLeft(), RECT.bottomLeft());
-      line[1].translate(1,0);
-      break;
-   case QTabBar::RoundedWest: case QTabBar::TriangularWest:
-      SET_BASE_HEIGHT(width);
-      tbb.rect.setWidth(baseHeight);
-      line[0] = line[1] = QLine(RECT.topRight(), RECT.bottomRight());
-      line[0].translate(-1,0);
-      break;
-   }
+    int baseHeight;
+    switch (twf->shape)
+    {
+    case QTabBar::RoundedNorth: case QTabBar::TriangularNorth:
+        SET_BASE_HEIGHT(height);
+        tbb.rect.setHeight(baseHeight);
+        line[0] = line[1] = QLine(RECT.bottomLeft(), RECT.bottomRight());
+        line[0].translate(0,-1);
+        break;
+    case QTabBar::RoundedSouth: case QTabBar::TriangularSouth:
+        SET_BASE_HEIGHT(height);
+        tbb.rect.setTop(tbb.rect.bottom()-baseHeight);
+        line[0] = line[1] = QLine(RECT.topLeft(), RECT.topRight());
+        line[1].translate(0,1);
+        break;
+    case QTabBar::RoundedEast: case QTabBar::TriangularEast:
+        SET_BASE_HEIGHT(width);
+        tbb.rect.setLeft(tbb.rect.right()-baseHeight);
+        line[0] = line[1] = QLine(RECT.topLeft(), RECT.bottomLeft());
+        line[1].translate(1,0);
+        break;
+    case QTabBar::RoundedWest: case QTabBar::TriangularWest:
+        SET_BASE_HEIGHT(width);
+        tbb.rect.setWidth(baseHeight);
+        line[0] = line[1] = QLine(RECT.topRight(), RECT.bottomRight());
+        line[0].translate(-1,0);
+        break;
+    }
 #undef SET_BASE_HEIGHT
    
-   // the "frame"
-   painter->save();
-   painter->setPen(FCOLOR(Window).dark(120));
-   painter->drawLine(line[0]);
-   painter->setPen(FCOLOR(Window).light(114));
-   painter->drawLine(line[1]);
-   painter->restore();
+    // the "frame"
+    painter->save();
+    painter->setPen(FCOLOR(Window).dark(120));
+    painter->drawLine(line[0]);
+    painter->setPen(FCOLOR(Window).light(114));
+    painter->drawLine(line[1]);
+    painter->restore();
 
-   // the bar
-   drawTabBar(&tbb, painter, widget);
+    // the bar
+    drawTabBar(&tbb, painter, widget);
 }
 #include <QtDebug>
 void
@@ -189,7 +192,7 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
 
     copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
 
-    if (isGTK)
+    if (appType == GTK)
     {
         switch (tab->position)
         {
@@ -249,7 +252,7 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
 
     if (tab->position == QStyleOptionTab::OnlyOneTab)
         sunken = false;
-    else if (isGTK)
+    else if (appType == GTK)
         sunken = option->state & State_Selected;
     else
         sunken = sunken || (option->state & State_Selected);

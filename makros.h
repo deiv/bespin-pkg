@@ -49,4 +49,6 @@ if (!_VAR_) return
 
 #define F(_I_) dpi.f##_I_
 
+#define IS_HTML_WIDGET (widget->objectName() == "RenderFormElementWidget")
+
 #endif //OXYGEN_DEFS_H

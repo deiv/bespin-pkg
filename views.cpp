@@ -26,7 +26,7 @@ BespinStyle::drawHeader(const QStyleOption * option, QPainter * painter,
 {
     ASSURE_OPTION(header, Header);
 
-    if (isGTK)
+    if (appType == GTK)
         const_cast<QStyleOption*>(option)->palette = qApp->palette();
 
     // init
@@ -70,7 +70,7 @@ BespinStyle::drawHeaderSection(const QStyleOption * option, QPainter * painter,
     const QColor &c =   (header->sortIndicator != QStyleOptionHeader::None) ?
                         COLOR(config.view.sortingHeader_role[Bg]) :
                         COLOR(config.view.header_role[Bg]);
-    if (isGTK)
+    if (appType == GTK)
         sunken = option->state & State_HasFocus;
     if (sunken)
     {

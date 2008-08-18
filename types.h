@@ -4,7 +4,7 @@
 namespace Bespin {
 
 namespace Check {
-enum Type {X = 0, V, O};
+    enum Type {X = 0, V, O};
 };
 
 namespace Navi {
@@ -18,6 +18,11 @@ enum Direction {
 enum BGMode { Plain = 0, Scanlines, BevelV, BevelH };
 
 enum Orientation3D {Sunken = 0, Relief, Raised};
+
+enum AppType
+{
+    Unknown, GTK, QtDesigner, Plasma
+};
 
 namespace Groove {
 enum Mode { Line = 0, Groove, Sunken, SunkenGroove };

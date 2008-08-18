@@ -89,12 +89,6 @@ BespinStyle::readSettings(const QSettings* settings)
     QSettings *iSettings = const_cast<QSettings*>(settings);
     if (!iSettings) {
         delSettings = true;
-        isGTK = getenv("GTK_QT_ENGINE_ACTIVE");
-//       char *preset = getenv("GTK_QT_ENGINE_ACTIVE");
-//       if (isGTK = preset && !qstrcmp(preset, "1"))
-        if (isGTK)
-            qWarning("Bespin: Detected GKT+ application");
-
         const char *preset = getenv("BESPIN_PRESET");
         if (preset)
         {
@@ -284,7 +278,7 @@ BespinStyle::readSettings(const QSettings* settings)
     // a key problem seems to be fixed text colors
     // also it will segfault if we hide scrollbar buttons
     // so we adjust some settings here
-    if (isGTK)
+    if (appType == GTK)
     {
         config.bg.mode = Plain;
         config.bg.modal.glassy = false;
@@ -353,6 +347,18 @@ void BespinStyle::initMetrics()
 void
 BespinStyle::init(const QSettings* settings)
 {
+    // various workarounds... ==========================
+    if (getenv("GTK_QT_ENGINE_ACTIVE"))
+    {
+        appType = GTK;
+        qWarning("Bespin: Detected GKT+ application");
+    }
+    if (QCoreApplication::applicationName() == "Plasma")
+        appType == Plasma;
+    else if (QCoreApplication::applicationName() == "Designer")
+        appType == QtDesigner;
+    // ==========================
+    
     readSettings(settings);
     initMetrics();
     generatePixmaps();

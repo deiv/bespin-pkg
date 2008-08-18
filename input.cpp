@@ -178,16 +178,15 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
     ASSURE_OPTION(cmb, ComboBox);
     B_STATES
 
-    const int f2 = F(2), f3 = F(3);
-    QRect ar, r = RECT; r.setBottom(r.bottom()-f2);
+    const int f1 = F(1), f2 = F(2), f3 = F(3);
+    QRect ar, r = RECT.adjusted(f1, f1, -f1, -f2);
     const QComboBox* combo = widget ? qobject_cast<const QComboBox*>(widget) : 0;
     const bool listShown = combo && combo->view() && ((QWidget*)(combo->view()))->isVisible();
     QColor c = CONF_COLOR(btn.std, Bg);
 
-    if (listShown)
-    {   // this messes up hover
-        hover = hover || QRect(widget->mapToGlobal(RECT.topLeft()), RECT.size()).contains(QCursor::pos());
-    }
+    if (listShown) // this messes up hover
+        hover = hover ||
+                QRect(widget->mapToGlobal(RECT.topLeft()), RECT.size()).contains(QCursor::pos());
 
     if (isEnabled && (cmb->subControls & SC_ComboBoxArrow) && (!combo || combo->count() > 0))
     {   // do we have an arrow?
@@ -215,25 +214,24 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
                 if (hasFocus)
                 {
                     const int contrast = Colors::contrast(c, FCOLOR(Highlight));
-                    c = Colors::mid(c, FCOLOR(Highlight), contrast/5, 1);
+                    if (contrast > 10) {
+                        mask.outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), f3);
+                        c = Colors::mid(c, FCOLOR(Highlight), contrast/4, 1);
+                    }
                 }
 
                 mask.render(r, painter, GRAD(chooser), Qt::Vertical, c);
-
-        //          if (hasFocus) {
-        //             const int contrast = Colors::contrast(c, FCOLOR(Highlight));
-        //             const QColor fc = Colors::mid(c, FCOLOR(Highlight), contrast/10, 1);
-        //             mask.outline(r, painter, fc, f3);
-        //          }
 
                 if (!config.btn.fullHover && animStep)
                 {   // maybe hover indicator?
                     r.adjust(f3, f3, -f3, -f3);
                     c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
                     mask.render(r, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0,f3));
+                    r = RECT.adjusted(f1, f1, -f1, -f2); // RESET 'r' !!!
                 }
             }
-            shadows.sunken[round_][isEnabled].render(RECT, painter);
+            r.setBottom(RECT.bottom());
+            shadows.sunken[round_][isEnabled].render(r, painter);
         }
     }
 

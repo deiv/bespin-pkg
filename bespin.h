@@ -312,7 +312,7 @@ private:
    QPixmap *_scanlines[2];
 
    // gtk-qt workarounds
-   bool isGTK;
+   AppType appType;
 
    // KDE palette fix..
    QPalette *originalPalette;

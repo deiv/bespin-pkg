@@ -247,11 +247,6 @@ BespinStyle::BespinStyle() : QCommonStyle(), originalPalette(0)
    _scanlines[0] = _scanlines[1] = 0L;
    init();
    registerRoutines();
-   //====== TOOLTIP ======================
-//    tooltipPalette = qApp->palette();
-//    tooltipPalette.setBrush( QPalette::Background, QColor( 255, 255, 220 ) );
-//    tooltipPalette.setBrush( QPalette::Foreground, Qt::black );
-   //=======================================
 }
 
 BespinStyle::~BespinStyle()

@@ -24,14 +24,13 @@
 static const bool round_ = true;
 
 void
-BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
-                           const QWidget *) const
+BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
     if (config.menu.bar_role[Bg] != QPalette::Window || config.menu.barGradient != Gradients::None)
         painter->fillRect(RECT.adjusted(0,0,0,-dpi.f2),
                           Gradients::brush(Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6),
                           RECT.height()-dpi.f2, Qt::Vertical, config.menu.barGradient));
-    else if (config.bg.mode == Scanlines)
+    else if (config.bg.mode == Scanlines && (appType != Plasma))
         painter->fillRect(RECT, Gradients::structure(FCOLOR(Window), true));
     if (config.menu.barSunken)
     {
@@ -42,8 +41,7 @@ BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawMenuBarItem(const QStyleOption * option, QPainter * painter,
-                             const QWidget * widget) const
+BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(mbi, MenuItem);
     drawMenuBarBg(option, painter, widget);
@@ -144,7 +142,7 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
     ROLES(menu.std);
     OPT_SUNKEN OPT_ENABLED
 
-    if (isGTK)
+    if (appType == GTK)
         sunken = false;
 
     if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
