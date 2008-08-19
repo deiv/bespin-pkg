@@ -21,6 +21,7 @@ Boston, MA 02110-1301, USA.
 #include <QApplication>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QStackedWidget>
@@ -144,12 +145,16 @@ grabWidget(QWidget * root, QPixmap &pix)
     QPixmap *saPix = 0L;
 
 // @ franz: hier mal machen
-// qDebug() << "BESPIN" << widgets;
     QWidgetList widgets = root->findChildren<QWidget*>();
+//     qDebug() << "BESPIN" << widgets;
+    // make a save copy to protecd agains foreign thread deletions - this is still not 100% deterministic...
+    QList< QPointer<QWidget> > widgets2;
     foreach (QWidget *w, widgets)
+        widgets2.append(QPointer<QWidget>(w));
+    foreach (QWidget *w, widgets2)
     {
 // qDebug() << "BESPIN" << w;
-        if (w->isVisibleTo(root))
+        if (w && w->isVisibleTo(root))
         {
 // qDebug() << "BESPIN passed...";
             // solids

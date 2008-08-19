@@ -90,28 +90,36 @@ Just trust and don't touch ;) (Yes future Thomas, this means YOU!)
 uint
 XProperty::encode(const QColor &bg, const QColor &fg, uint hint)
 {
-   int r,g,b; bg.getRgb(&r,&g,&b);
-   int d = r%8 + g%8 + b%8;
-   if (d > 10) { r = qMin(r+8,255); g = qMin(g+8,255); b = qMin(b+8,255); }
-   uint info = (((r >> 3) & 0x1f) << 27) | (((g >> 3) & 0x1f) << 22) |
-   (((b >> 3) & 0x1f) << 17);
+    int r,g,b; bg.getRgb(&r,&g,&b);
+    int d = r%8 + g%8 + b%8;
+    if (d > 10)
+    {
+        r = qMin(r+8, 255);
+        g = qMin(g+8, 255);
+        b = qMin(b+8, 255);
+    }
+    uint info = (((r >> 3) & 0x1f) << 27) | (((g >> 3) & 0x1f) << 22) | (((b >> 3) & 0x1f) << 17);
 
-   fg.getRgb(&r,&g,&b);
-   d = r%8 + g%8 + b%8;
-   if (d > 10) { r = qMin(r+8,255); g = qMin(g+8,255); b = qMin(b+8,255); }
-   info |= (((r >> 3) & 0x1f) << 12) | (((g >> 3) & 0x1f) << 7) |
-   (((b >> 3) & 0x1f) << 2) | hint & 3;
-   return info;
+    fg.getRgb(&r,&g,&b);
+    d = r%8 + g%8 + b%8;
+    if (d > 10)
+    {
+        r = qMin(r+8, 255);
+        g = qMin(g+8, 255);
+        b = qMin(b+8, 255);
+    }
+    info |= (((r >> 3) & 0x1f) << 12) | (((g >> 3) & 0x1f) << 7) | (((b >> 3) & 0x1f) << 2) | hint & 3;
+    return info;
 }
 
 void
 XProperty::decode(uint info, QColor &bg, QColor &fg, uint &hint)
 {
-   bg.setRgb( ((info >> 27) & 0x1f) << 3,
-              ((info >> 22) & 0x1f) << 3,
-              ((info >> 17) & 0x1f) << 3 );
-   fg.setRgb( ((info >> 12) & 0x1f) << 3,
-               ((info >> 7) & 0x1f) << 3,
-               ((info >> 2) & 0x1f) << 3 );
-   hint = info & 3;
+    bg.setRgb(  ((info >> 27) & 0x1f) << 3,
+                ((info >> 22) & 0x1f) << 3,
+                ((info >> 17) & 0x1f) << 3 );
+    fg.setRgb(  ((info >> 12) & 0x1f) << 3,
+                ((info >> 7) & 0x1f) << 3,
+                ((info >> 2) & 0x1f) << 3 );
+    hint = info & 3;
 }

@@ -349,14 +349,11 @@ BespinStyle::init(const QSettings* settings)
 {
     // various workarounds... ==========================
     if (getenv("GTK_QT_ENGINE_ACTIVE"))
-    {
-        appType = GTK;
-        qWarning("Bespin: Detected GKT+ application");
-    }
-    if (QCoreApplication::applicationName() == "Plasma")
-        appType == Plasma;
+        { appType = GTK; qWarning("Bespin: Detected GKT+ application"); }
+    else if (QCoreApplication::applicationName() == "plasma")
+        appType = Plasma;
     else if (QCoreApplication::applicationName() == "Designer")
-        appType == QtDesigner;
+        appType = QtDesigner;
     // ==========================
     
     readSettings(settings);

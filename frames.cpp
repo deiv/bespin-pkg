@@ -31,33 +31,30 @@ bool
 BespinStyle::isSpecialFrame(const QWidget *w)
 {
     if (const QListView *view = qobject_cast<const QListView*>(w))
-    {
         return (view->viewMode() == QListView::IconMode);
-    }
+        
     return  w->inherits("QTextEdit") || w->objectName() == "RenderFormElementWidget" ||
             (w->parentWidget() && w->parentWidget()->inherits("KateView"));
 }
 
 void
-BespinStyle::drawFocusFrame(const QStyleOption * option, QPainter * painter,
-                            const QWidget *) const
+BespinStyle::drawFocusFrame(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
-   if (option->state & State_Selected || option->state & State_MouseOver)
-      return; // looks crap...
-   painter->save();
-   painter->setBrush(Qt::NoBrush);
-   painter->setPen(FCOLOR(Highlight));
-   painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
-   painter->restore();
+    if (option->state & State_Selected || option->state & State_MouseOver)
+        return; // looks crap...
+    painter->save();
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(FCOLOR(Highlight));
+    painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
+    painter->restore();
 }
 
 void
-BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
-                       const QWidget * widget) const
+BespinStyle::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_FOCUS
 
-    if (!widget)
+    if (!widget || (appType == GTK))
     {   // fallback, we cannot paint shaped frame contents
         if (sunken)
             shadows.fallback.render(RECT,painter);
@@ -163,8 +160,7 @@ BespinStyle::drawFrame(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
-                          QPainter * painter, const QWidget * widget) const
+BespinStyle::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(groupBox, GroupBox);
     OPT_ENABLED
@@ -186,7 +182,11 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex * option,
     {
         QColor textColor = groupBox->textColor;
         QPalette::ColorRole role = QPalette::WindowText;
-        if (textColor.isValid())
+        // NOTICE, WORKAROUND: groupBox->textColor is black by def. and should be invalid - but it's not
+        // so assuming everything is optimized for a black on white world, we assume the
+        // CUSTOM groupBox->textColor to be only valid if it's != Qt::black
+        // THIS IS A HACK!
+        if (textColor.isValid() && textColor != Qt::black)
         {
             if (!isEnabled)
                 textColor.setAlpha(48);

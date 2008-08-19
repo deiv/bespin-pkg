@@ -22,22 +22,29 @@
 #include "animator/hover.h"
 
 void
-BespinStyle::drawLineEditFrame(const QStyleOption * option, QPainter * painter,
-                               const QWidget *) const
+BespinStyle::drawLineEditFrame(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
-   OPT_ENABLED OPT_FOCUS
-      
-   QRect r = RECT.adjusted(0,0,0,-dpi.f2);
-   if (hasFocus) {
-      QColor h = FCOLOR(Highlight); h.setAlpha(128);
-      masks.rect[false].outline(r, painter, h, dpi.f3);
-   }
-   shadows.sunken[false][isEnabled].render(r, painter);
+    // WARNING this is NOT used to draw lineedits - just the frame, see below!!
+    OPT_ENABLED OPT_FOCUS
+
+    QRect r = RECT;
+    if (appType != GTK)
+    {
+        r.setBottom(r.bottom() - F(2));
+        shadows.sunken[false][isEnabled].render(r, painter);
+    }
+    else
+        shadows.fallback.render(RECT,painter);
+
+    if (hasFocus)
+    {
+        QColor h = FCOLOR(Highlight); h.setAlpha(128);
+        masks.rect[false].outline(r, painter, h, dpi.f3);
+    }
 }
 
 void
-BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
-                          const QWidget * widget) const
+BespinStyle::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
 
     // spinboxes and combos allready have a lineedit as global frame
@@ -45,9 +52,8 @@ BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
     if (qstyleoption_cast<const QStyleOptionFrame *>(option) &&
         static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1)
     {
-        if (widget && widget->parentWidget() &&
-            ( qobject_cast<QComboBox*>(widget->parentWidget()) ||
-                widget->parentWidget()->inherits("QAbstractSpinBox")))
+        if (widget && widget->parentWidget() && ( qobject_cast<QComboBox*>(widget->parentWidget()) ||
+            widget->parentWidget()->inherits("QAbstractSpinBox")))
             return;
         painter->fillRect(RECT, FCOLOR(Base));
         return;
@@ -62,16 +68,16 @@ BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
         const Tile::Set &mask = masks.rect[false];
         if (hasFocus)
         {
-            r.adjust(0,0,0,-dpi.f2);
+            r.setBottom(r.bottom() - F(2));
             mask.render(r, painter, FCOLOR(Base).light(112));
-            r.setBottom(r.bottom()+dpi.f1);
+            r.setBottom(r.bottom() + F(1));
             QColor h = FCOLOR(Highlight); h.setAlpha(102);
-    //          Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
-            mask.outline(r, painter, h, dpi.f3);
+//          Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
+            mask.outline(r, painter, h, F(3));
         }
         else
         {
-            r.setBottom(r.y()+r.height()/2);
+            r.setBottom(r.y() + r.height()/2);
             Tile::setShape(Tile::Full & ~Tile::Bottom);
             mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
             r.setTop(r.bottom()+1); r.setBottom(RECT.bottom()-dpi.f2);
@@ -79,14 +85,15 @@ BespinStyle::drawLineEdit(const QStyleOption * option, QPainter * painter,
             QColor bg = FCOLOR(Base);
             int v = Colors::value(bg);
             if (v < 80)
-            {
-                int h,s; bg.getHsv(&h, &s, &v); bg.setHsv(h,s,80);
-            }
+                { int h,s; bg.getHsv(&h, &s, &v); bg.setHsv(h,s,80); }
             mask.render(r, painter, bg.light(110));
             Tile::reset();
         }
     }
-    shadows.sunken[false][isEnabled].render(RECT, painter);
+    if (appType == GTK)
+        shadows.fallback.render(RECT,painter);
+    else
+        shadows.sunken[false][isEnabled].render(RECT, painter);
 }
 
 static void
@@ -181,9 +188,9 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
     const int f1 = F(1), f2 = F(2), f3 = F(3);
     QRect ar, r = RECT.adjusted(f1, f1, -f1, -f2);
     const QComboBox* combo = widget ? qobject_cast<const QComboBox*>(widget) : 0;
-    const bool listShown = combo && combo->view() && ((QWidget*)(combo->view()))->isVisible();
     QColor c = CONF_COLOR(btn.std, Bg);
 
+    const bool listShown = combo && combo->view() && ((QWidget*)(combo->view()))->isVisible();
     if (listShown) // this messes up hover
         hover = hover ||
                 QRect(widget->mapToGlobal(RECT.topLeft()), RECT.size()).contains(QCursor::pos());
@@ -209,12 +216,15 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
                 if (listShown)
                     animStep = 6;
 
-                c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover,
-                                                        Gradients::isReflective(GRAD(chooser)));
+                const bool reflective = Gradients::isReflective(GRAD(chooser));
+                c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover, reflective);
                 if (hasFocus)
                 {
-                    const int contrast = Colors::contrast(c, FCOLOR(Highlight));
-                    if (contrast > 10) {
+                    const int contrast = (config.btn.fullHover && animStep) ?
+                    Colors::contrast(btnBg(PAL, isEnabled, hasFocus, 0, true, reflective), FCOLOR(Highlight)):
+                    Colors::contrast(c, FCOLOR(Highlight));
+                    if (contrast > 10)
+                    {
                         mask.outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), f3);
                         c = Colors::mid(c, FCOLOR(Highlight), contrast/4, 1);
                     }

@@ -213,13 +213,13 @@ progressGradient(const QColor &c, int size, Qt::Orientation o) {
    int h,s,v;
    c.getHsv(&h,&s,&v);
    QColor dkC = c, ltC = c;
-   int dv = 4*(v-80)/35; // v == 80 -> dv = 0, v = 255 -> dv = 20
+   int dv = 4*(v-80)/45; // v == 80 -> dv = 0, v = 255 -> dv = 12
 //    int th = h + 400;
    int dh = qAbs((h % 120)-60)/6;
    dkC.setHsv(h+dh, s, v - dv);
    h -=dh; if (h < 0) h = 400 + h;
-   dv = 20 - dv;
-   ltC.setHsv(h-5,s, v + dv);
+   dv = 12 - dv; // NOTICE 12 from above...
+   ltC.setHsv(h-5,s, qMin(v + dv,255));
    
 //    int dc = Colors::value(c)/5; // how much darken/lighten we will
 //    QColor dkC = c.dark(100+sqrt(2*dc));
@@ -227,7 +227,7 @@ progressGradient(const QColor &c, int size, Qt::Orientation o) {
    
    QPoint start, stop;
    QPixmap *dark = newPix(size, o, &start, &stop, 4*size);
-   QGradient   lg1 = simpleGradient(ltC, start, stop),
+   QGradient   lg1 = gl_ssGradient(ltC, start, stop, true),
                lg2 = gl_ssGradient(dkC, start, stop, true);
 
    QPainter p(dark); p.fillRect(dark->rect(), lg1); p.end();

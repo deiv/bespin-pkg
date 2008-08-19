@@ -54,9 +54,9 @@ using namespace Bespin;
 
 PreviewWidget::PreviewWidget(QWidget *p, Qt::WindowFlags f) : QWidget(p,f)
 {
-   setAutoFillBackground(true);
+    setAutoFillBackground(true);
 //    setAttribute(Qt::WA_OpaquePaintEvent);
-   setAttribute(Qt::WA_PaintOnScreen, false);
+    setAttribute(Qt::WA_PaintOnScreen, false);
 }
 
 PreviewWidget::~PreviewWidget(){}
@@ -64,9 +64,9 @@ PreviewWidget::~PreviewWidget(){}
 void
 PreviewWidget::paintEvent(QPaintEvent *pe)
 {
-   QPainter p(this);
-   p.fillRect(rect(), Qt::red);
-   p.end();
+    QPainter p(this);
+    p.fillRect(rect(), Qt::red);
+    p.end();
 }
 
 Client::Client(KDecorationBridge *b, Factory *f) :
@@ -85,176 +85,190 @@ Client::~Client(){
 void
 Client::updateStylePixmaps()
 {
-   if (XProperty::get(windowId(), XProperty::topTile, topTile)) {
-      XProperty::get(windowId(), XProperty::btmTile, btmTile);
-      XProperty::get(windowId(), XProperty::cnrTile, cnrTile);
-      XProperty::get(windowId(), XProperty::lCorner, lCorner);
-      XProperty::get(windowId(), XProperty::rCorner, rCorner);
-      widget()->update();
-   }
-   else {
-      topTile = btmTile = cnrTile = lCorner = rCorner = 0;
-      if ((!retry || sender()) && retry < 100) {
-         QTimer::singleShot(100, this, SLOT(updateStylePixmaps()));
-         ++retry;
-      }
-   }
+    if (XProperty::get(windowId(), XProperty::topTile, topTile))
+    {
+        XProperty::get(windowId(), XProperty::btmTile, btmTile);
+        XProperty::get(windowId(), XProperty::cnrTile, cnrTile);
+        XProperty::get(windowId(), XProperty::lCorner, lCorner);
+        XProperty::get(windowId(), XProperty::rCorner, rCorner);
+        widget()->update();
+    }
+    else
+    {
+        topTile = btmTile = cnrTile = lCorner = rCorner = 0;
+        if ((!retry || sender()) && retry < 100)
+        {
+            QTimer::singleShot(100, this, SLOT(updateStylePixmaps()));
+            ++retry;
+        }
+    }
 }
 
 void
 Client::activeChange()
 {
-   if (gType[0] != gType[1])
-      updateTitleLayout(widget()->size());
-   if (bgMode > 1) {
-      updateStylePixmaps();
-   }
-   if (corner) {
-      corner->setColor(color(ColorTitleBar, isActive()));
-      corner->update();
-   }
-   widget()->update();
+    if (gType[0] != gType[1])
+        updateTitleLayout(widget()->size());
+    if (bgMode > 1)
+    {
+        updateStylePixmaps();
+    }
+    if (corner)
+    {
+        corner->setColor(color(ColorTitleBar, isActive()));
+        corner->update();
+    }
+    widget()->update();
 }
 
 void
 Client::addButtons(const QString& s, int &sz)
 {
-   sz = 4;
-   if (!s.length() > 0) return;
-   Button::Type type;
-   for (int n=0; n < s.length(); ++n) {
-      switch (s[n].toAscii()) {
-         // i'm no way a friend of cluttering your titlebar with buttons =P
-         case 'M': // Menu
-         case 'S': // Sticky
-         case 'H': // Help
-         case 'F': // Keep Above
-         case 'B': // Keep Below
-         case 'L': // Shade button
+    sz = 4;
+    if (!s.length() > 0) return;
+    Button::Type type;
+    for (int n=0; n < s.length(); ++n)
+    {
+        switch (s[n].toAscii())
+        {
+        // i'm no way a friend of cluttering your titlebar with buttons =P
+        case 'M': // Menu
+        case 'S': // Sticky
+        case 'H': // Help
+        case 'F': // Keep Above
+        case 'B': // Keep Below
+        case 'L': // Shade button
             type = Button::Multi; break;
-         case 'I': // Minimize
+        case 'I': // Minimize
             type = Button::Min; break;
-         case 'A': // Maximize
+        case 'A': // Maximize
             type = Button::Max; break;
-         case 'X': // Close button
+        case 'X': // Close button
             type = Button::Close; break;
-         case '_': // Spacer
+        case '_': // Spacer
             titleBar->addSpacing(5);
             sz += 7;
-         default:
+        default:
             continue;
-      }
-      if (!buttons[type]) { // will be d'played d'abled in case
-         buttons[type] = new Button(this, type);
-         titleBar->addWidget(buttons[type], 0, Qt::AlignVCenter);
-         sz += (buttonSize()+2);
-      }
-   }
+        }
+        if (!buttons[type])
+        {   // will be d'played d'abled in case
+            buttons[type] = new Button(this, type);
+            titleBar->addWidget(buttons[type], 0, Qt::AlignVCenter);
+            sz += (buttonSize()+2);
+        }
+    }
 }
 
 void
 Client::borders( int& left, int& right, int& top, int& bottom ) const
 {
-   // KWin seems to call borders() before maximizeChange() in case
-   // this may be abug but is annoying at least - TODO: kwin bug report?
-   if (maximizeMode() == MaximizeFull) {
-      left = right = bottom = options()->moveResizeMaximizedWindows() ? 4 : 0;
-      top = _factory->titleSize(true);
-   }
-   else {
-      left = right = bottom =  _factory->borderSize();
-      top = _factory->titleSize();
-      if (isShade()) bottom = 8;
-   }
-//    left = right = bottom = borderSize;
-//    top = titleSize;
+    // KWin seems to call borders() before maximizeChange() in case
+    // this may be a bug but is annoying at least - TODO: kwin bug report?
+    if (maximizeMode() == MaximizeFull)
+    {
+        left = right = bottom = options()->moveResizeMaximizedWindows() ? 4 : 0;
+        top = _factory->titleSize(true);
+    }
+    else
+    {
+        left = right = bottom =  _factory->borderSize();
+        top = _factory->titleSize();
+        if (isShade()) bottom = 8;
+    }
+    //    left = right = bottom = borderSize;
+    //    top = titleSize;
 }
 
 void
 Client::captionChange()
 {
-   // TODO caption filtering needs config option
-   _caption = trimm(caption());
-   widget()->update();
+    _caption = trimm(caption());
+    widget()->update();
 }
 
 QColor
 Client::color(ColorType type, bool active) const
 {
-   if (type < 4)
-      return colors[active][type];
-   return options()->color(type, active);
+    if (type < 4)
+        return colors[active][type];
+    return options()->color(type, active);
 }
 
 bool
 Client::eventFilter(QObject *o, QEvent *e)
 {
-   if (o != widget()) return false;
-   switch (e->type()) {
-      case QEvent::Paint: {
-         QPainter p(widget());
-         p.setClipRect(static_cast<QPaintEvent*>(e)->rect());
-         repaint(p);
-         p.end();
-         return true;
-      }
-      case QEvent::MouseButtonDblClick:
-         titlebarDblClickOperation();
-         return true;
-      case QEvent::MouseButtonPress:
-         processMousePressEvent(static_cast<QMouseEvent*>(e));
-         return true;
-      case QEvent::Wheel:
-         titlebarMouseWheelOperation(static_cast<QWheelEvent*>(e)->delta());
-         return true;
-         //       case QEvent::MouseButtonRelease:
-      default: return false;
-   }
-   return false;
+    if (o != widget())
+        return false;
+    switch (e->type())
+    {
+    case QEvent::Paint:
+    {
+        QPainter p(widget());
+        p.setClipRect(static_cast<QPaintEvent*>(e)->rect());
+        repaint(p);
+        p.end();
+        return true;
+    }
+    case QEvent::MouseButtonDblClick:
+        titlebarDblClickOperation();
+        return true;
+    case QEvent::MouseButtonPress:
+        processMousePressEvent(static_cast<QMouseEvent*>(e));
+        return true;
+    case QEvent::Wheel:
+        titlebarMouseWheelOperation(static_cast<QWheelEvent*>(e)->delta());
+        return true;
+        //       case QEvent::MouseButtonRelease:
+    default:
+        return false;
+    }
+    return false;
 }
 
 void
 Client::init()
 {
-   createMainWidget();
- 
-   _caption = trimm(caption());
-   widget()->setAutoFillBackground(false);
-   widget()->setAttribute(Qt::WA_OpaquePaintEvent);
-   widget()->setAttribute(Qt::WA_NoSystemBackground);
-   widget()->setAttribute(Qt::WA_PaintOnScreen, false);
-   widget()->installEventFilter(this);
+    createMainWidget();
 
-   titleBar = new QHBoxLayout();
-   titleBar->setSpacing(2); titleBar->setContentsMargins(4,0,4,0);
-   titleSpacer = new QSpacerItem( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
-   QVBoxLayout *layout = new QVBoxLayout(widget());
-   layout->setSpacing(0); layout->setContentsMargins(0,0,0,0);
-   layout->addLayout(titleBar);
-   layout->addStretch(1000);
+    _caption = trimm(caption());
+    widget()->setAutoFillBackground(false);
+    widget()->setAttribute(Qt::WA_OpaquePaintEvent);
+    widget()->setAttribute(Qt::WA_NoSystemBackground);
+    widget()->setAttribute(Qt::WA_PaintOnScreen, false);
+    widget()->installEventFilter(this);
 
-   for (int i = 0; i < 4; ++i) buttons[i] = 0;
-   gType[0] = Gradients::None;
-   gType[1] = Gradients::Button;
+    titleBar = new QHBoxLayout();
+    titleBar->setSpacing(2); titleBar->setContentsMargins(4,0,4,0);
+    titleSpacer = new QSpacerItem( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    QVBoxLayout *layout = new QVBoxLayout(widget());
+    layout->setSpacing(0); layout->setContentsMargins(0,0,0,0);
+    layout->addLayout(titleBar);
+    layout->addStretch(1000);
 
-   if (isPreview()) {
-      _preview = new PreviewWidget(widget());
+    for (int i = 0; i < 4; ++i) buttons[i] = 0;
+    gType[0] = Gradients::None;
+    gType[1] = Gradients::Button;
+
+    if (isPreview())
+    {
+        _preview = new PreviewWidget(widget());
 //       _preview->setAutoFillBackground(true);
-      _preview->setGeometry ( borderSize, titleSize,
-                              widget()->width()-2*borderSize,
-                              widget()->height()-(borderSize+titleSize));
-      _preview->show();
-      _preview->raise();
-   }
-   if (config()->resizeCorner && isResizable())
-      corner = new ResizeCorner(this);
-   reset(63);
+        _preview->setGeometry ( borderSize, titleSize,
+                                widget()->width()-2*borderSize,
+                                widget()->height()-(borderSize+titleSize));
+        _preview->show();
+        _preview->raise();
+    }
+    if (config()->resizeCorner && isResizable())
+        corner = new ResizeCorner(this);
+    reset(63);
 }
 
 void
 Client::maximizeChange()
 {
-   reset(SettingBorder);
+    reset(SettingBorder);
 }
 
 #define PARTIAL_MOVE 0
@@ -262,49 +276,54 @@ Client::maximizeChange()
 KDecorationDefines::Position
 Client::mousePosition( const QPoint& p ) const
 {
-   if (!isResizable()) return PositionCenter;
+    if (!isResizable())
+        return PositionCenter;
    
-	if (p.y() < 4) { // top
-		if (p.x() < 4) return PositionTopLeft; // corner
-		if (p.x() > width() - 4) return PositionTopRight; // corner
-		return PositionTop;
-	}
-	if (p.y() > height() - 16) { // bottom
-		if (p.x() < 16) return PositionBottomLeft; // corner
-		if (p.x() > width() - 16) return PositionBottomRight; // corner
+    if (p.y() < 4)
+    {   // top
+        if (p.x() < 4) return PositionTopLeft; // corner
+        if (p.x() > width() - 4) return PositionTopRight; // corner
+        return PositionTop;
+    }
+    if (p.y() > height() - 16)
+    {   // bottom
+        if (p.x() < 16) return PositionBottomLeft; // corner
+        if (p.x() > width() - 16) return PositionBottomRight; // corner
 #if PARTIAL_MOVE
-		int off = width()/3;
-		if (p.x() > off && p.x() < width() - off) return PositionBottom;
-		else return PositionCenter; // not on outer 3rds
+        int off = width()/3;
+        if (p.x() > off && p.x() < width() - off) return PositionBottom;
+        return PositionCenter; // not on outer 3rds
 #else
         return PositionBottom;
 #endif
-	}
-	if (p.x() < 4) { // left
+    }
+    if (p.x() < 4)
+    {   // left
 #if PARTIAL_MOVE
-		int off = height()/3;
-		if (p.y() > off && p.y() < height() - off) return PositionLeft;
-		else return PositionCenter; // not on outer 3rds
+        int off = height()/3;
+        if (p.y() > off && p.y() < height() - off) return PositionLeft;
+        return PositionCenter; // not on outer 3rds
 #else
         return PositionLeft;
 #endif
-	}
-	if (p.x() > width() - 4) { // right
+    }
+    if (p.x() > width() - 4)
+    {   // right
 #if PARTIAL_MOVE
-		int off = height()/3;
-		if (p.y() > off && p.y() < height() - off) return PositionRight;
-		else return PositionCenter; // not on outer 3rds
+        int off = height()/3;
+        if (p.y() > off && p.y() < height() - off) return PositionRight;
+        return PositionCenter; // not on outer 3rds
 #else
         return PositionRight;
 #endif
-	}
-   return PositionCenter; // to convince gcc, never reach this anyway
+    }
+    return PositionCenter; // to convince gcc, never reach this anyway
 }
 
 QSize
 Client::minimumSize() const
 {
-	return QSize(2*buttonSpace+6*titleSize, titleSize + borderSize);
+    return QSize(2*buttonSpace+6*titleSize, titleSize + borderSize);
 }
 
 int format, result; unsigned long de; //dead end
@@ -317,192 +336,204 @@ XRenderComposite(QX11Info::display(), PictOpSrc, _PICT_, 0, _PREF_##Buffer.x11Pi
 void
 Client::repaint(QPainter &p)
 {
-   if (!Factory::initialized()) return;
+    if (!Factory::initialized())
+        return;
 
-   QColor bg = color(ColorTitleBar, isActive());
-
-   if (isShade()) { // only one "big" gradient, as we can't rely on windowId()!!
-      const QPixmap &fill =
-      Gradients::pix(bg, height(), Qt::Vertical, Gradients::Button);
-      p.drawTiledPixmap(0,0,width(),height(), fill);
-   }
-   else {
-   
-   // window ================
-   p.setBrush(bg); p.setPen(Qt::NoPen);
-   switch (bgMode) {
-   case 2: // vertical gradient
-   case 3: { // horizontal gradient
-
-      if (!topTile) {
-         // hmm? paint fallback
-         p.drawRect(left); p.drawRect(right); p.drawRect(top); p.drawRect(bottom);
-         // and wait for pixmaps
-         updateStylePixmaps();
-         break;
-      }
-      
+    QColor bg = color(ColorTitleBar, isActive());
+    if (isShade())
+    { // only one "big" gradient, as we can't rely on windowId()!!
+        const QPixmap &fill = Gradients::pix(bg, height(), Qt::Vertical, Gradients::Button);
+        p.drawTiledPixmap(0,0,width(),height(), fill);
+    }
+    else
+    {   // window ================
+        p.setBrush(bg); p.setPen(Qt::NoPen);
+        switch (bgMode)
+        {
+        case 2: // vertical gradient
+        case 3:
+        {   // horizontal gradient
+            if (!topTile)
+            {   // hmm? paint fallback
+                p.drawRect(left); p.drawRect(right); p.drawRect(top); p.drawRect(bottom);
+                // and wait for pixmaps
+                updateStylePixmaps();
+                break;
+            }
+            
 #define ctWidth 32
 #define ctHeight 128
-
-      if (bgMode == 2) {
-         p.drawRect(left); p.drawRect(right);
+            if (bgMode == 2)
+            {
+                p.drawRect(left); p.drawRect(right);
+                
 #define tbWidth 32
 #define tbHeight 256
 #define lrcWidth 128
 #define lrcHeight 128
-         QPixmap tbBuffer(tbWidth, tbHeight);
-         int s1 = tbHeight;
-         int s2 = qMin(s1, (height()+1)/2);
-         s1 -= s2;
-         DUMP_PICTURE(tb, topTile);
-         p.drawTiledPixmap( 0, 0, width(), s2, tbBuffer, 0, s1 );
-         if (Colors::value(bg) < 245) { // no sense otherwise
-            const int w = width()/4 - 128;
-            if (w > 0) {
-               s2 = 128-s1;
-               QPixmap ctBuffer(ctWidth, ctHeight);
-               DUMP_PICTURE(ct, cnrTile);
-               p.drawTiledPixmap( 0, 0, w, s2, ctBuffer, 0, s1 );
-               p.drawTiledPixmap( width()-w, 0, w, s2, ctBuffer, 0, s1 );
-            }
-            QPixmap lrcBuffer(lrcWidth, lrcHeight);
-            DUMP_PICTURE(lrc, lCorner);
-            p.drawPixmap(w, 0, lrcBuffer, 0, s1, 128, s2);
-            DUMP_PICTURE(lrc, rCorner);
-            p.drawPixmap(width()-w-128, 0, lrcBuffer, 0, s1, 128, s2);
-         }
-         if (!borderSize) break;
-         s1 = tbHeight;
-         s2 = qMin(s1, height()/2);
-         DUMP_PICTURE(tb, btmTile);
-         p.drawTiledPixmap( 0, height()-s2, width(), s2, tbBuffer );
+                QPixmap tbBuffer(tbWidth, tbHeight);
+                int s1 = tbHeight;
+                int s2 = qMin(s1, (height()+1)/2);
+                s1 -= s2;
+                DUMP_PICTURE(tb, topTile);
+                p.drawTiledPixmap( 0, 0, width(), s2, tbBuffer, 0, s1 );
+                if (Colors::value(bg) < 245)
+                {   // no sense otherwise
+                    const int w = width()/4 - 128;
+                    if (w > 0)
+                    {
+                        s2 = 128-s1;
+                        QPixmap ctBuffer(ctWidth, ctHeight);
+                        DUMP_PICTURE(ct, cnrTile);
+                        p.drawTiledPixmap( 0, 0, w, s2, ctBuffer, 0, s1 );
+                        p.drawTiledPixmap( width()-w, 0, w, s2, ctBuffer, 0, s1 );
+                    }
+                    QPixmap lrcBuffer(lrcWidth, lrcHeight);
+                    DUMP_PICTURE(lrc, lCorner);
+                    p.drawPixmap(w, 0, lrcBuffer, 0, s1, 128, s2);
+                    DUMP_PICTURE(lrc, rCorner);
+                    p.drawPixmap(width()-w-128, 0, lrcBuffer, 0, s1, 128, s2);
+                }
+                if (!borderSize) break;
+                s1 = tbHeight;
+                s2 = qMin(s1, height()/2);
+                DUMP_PICTURE(tb, btmTile);
+                p.drawTiledPixmap( 0, height()-s2, width(), s2, tbBuffer );
 #undef tbWidth
 #undef tbHeight
 #undef lrcWidth
 #undef lrcHeight
-      }
-      else {
+
+            }
+            else
+            {
 #define tbWidth 256
 #define tbHeight 32
 #define lrcWidth 256
 #define lrcHeight 32
-         p.drawRect(top); // can be necessary for flat windows
-         p.drawRect(bottom);
-         int s1 = tbWidth;
-         int s2 = qMin(s1, (width()+1)/2);
-         const int h = qMin(128+32, height()/8);
-         QPixmap tbBuffer(tbWidth, tbHeight);
-         QPixmap lrcBuffer(lrcWidth, lrcHeight);
-         QPixmap ctBuffer(ctWidth, ctHeight);
-         DUMP_PICTURE(tb, topTile); // misleading, this is the LEFT column
-         p.drawTiledPixmap( 0, h, s2, height()-h, tbBuffer, s1-s2, 0 );
-         DUMP_PICTURE(lrc, lCorner); // left bottom shine
-         p.drawPixmap(0, h-32, lrcBuffer, s1-s2, 0,0,0);
-         DUMP_PICTURE(tb, btmTile); // misleading, this is the RIGHT column
-         p.drawTiledPixmap( width() - s2, h, s2, height()-h, tbBuffer );
-         DUMP_PICTURE(lrc, rCorner); // right bottom shine
-         p.drawPixmap(width() - s2, h-32, lrcBuffer);
-         DUMP_PICTURE(ct, cnrTile); // misleading, TOP TILE
-         p.drawTiledPixmap( 0, h-(128+32), width(), 128, ctBuffer );
-      }
+                p.drawRect(top); // can be necessary for flat windows
+                p.drawRect(bottom);
+                int s1 = tbWidth;
+                int s2 = qMin(s1, (width()+1)/2);
+                const int h = qMin(128+32, height()/8);
+                QPixmap tbBuffer(tbWidth, tbHeight);
+                QPixmap lrcBuffer(lrcWidth, lrcHeight);
+                QPixmap ctBuffer(ctWidth, ctHeight);
+                DUMP_PICTURE(tb, topTile); // misleading, this is the LEFT column
+                p.drawTiledPixmap( 0, h, s2, height()-h, tbBuffer, s1-s2, 0 );
+                DUMP_PICTURE(lrc, lCorner); // left bottom shine
+                p.drawPixmap(0, h-32, lrcBuffer, s1-s2, 0,0,0);
+                DUMP_PICTURE(tb, btmTile); // misleading, this is the RIGHT column
+                p.drawTiledPixmap( width() - s2, h, s2, height()-h, tbBuffer );
+                DUMP_PICTURE(lrc, rCorner); // right bottom shine
+                p.drawPixmap(width() - s2, h-32, lrcBuffer);
+                DUMP_PICTURE(ct, cnrTile); // misleading, TOP TILE
+                p.drawTiledPixmap( 0, h-(128+32), width(), 128, ctBuffer );
+            }
 //       p.setPen(bg);
 //       p.drawLine(width()/4, titleSize-1, 3*width()/4, titleSize-1);
-      break;
-   }
-   case 0: { // plain
-      p.setBrush(bg); p.setPen(Qt::NoPen);
-      p.drawRect(left); p.drawRect(right);
-      p.drawRect(top); p.drawRect(bottom);
-      break;
-   }
-   default:
-   case 1: { // scanlines, fallback
-      p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
-      const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, Gradients::Button);
-      p.drawTiledPixmap(top, fill);
-      p.setPen(Colors::mid(bg, Qt::black,6,1));
-      p.drawLine(0,titleSize-1,width(),titleSize-1);
+            break;
+        }
+        case 0:
+        {   // plain
+            p.setBrush(bg); p.setPen(Qt::NoPen);
+            p.drawRect(left); p.drawRect(right);
+            p.drawRect(top); p.drawRect(bottom);
+            break;
+        }
+        default:
+        case 1:
+        {   // scanlines, fallback
+            p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
+            const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, Gradients::Button);
+            p.drawTiledPixmap(top, fill);
+            p.setPen(Colors::mid(bg, Qt::black,6,1));
+            p.drawLine(0,titleSize-1,width(),titleSize-1);
 //       p.setPen(Colors::mid(bg, Qt::white,6,1));
 //       p.drawLine(0,titleSize-1,width(),titleSize-1);
-      
-      Gradients::Type titleGradient = (Gradients::Type)gType[isActive()];
-      if (titleGradient && label.width()) {
-         p.setRenderHint( QPainter::Antialiasing );
-         bg = color(ColorTitleBlend, isActive());
-         const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, titleGradient);
-         const QColor shadow = Colors::mid(bg, Qt::black,6,1);
-         p.setPen(QPen(shadow, 2)); p.setBrush(fill);
-         p.drawRoundRect(label.adjusted(0,4,0,-4),titleSize*99/label.width(),99);
-         p.setRenderHint( QPainter::Antialiasing, false );
-      }
-      break;
-   }
-   }
-   }
 
-   // title ==============
-   if (isActive()) { // emboss?!
-      int d = 0;
-      if (Colors::value(bg) < 110)  { // dark bg -> dark top borderline
-         p.setPen(Colors::mid(bg, Qt::black, 2, 1)); d = -1;
-      }
-      else { // bright bg -> bright bottom borderline
-         p.setPen(Colors::mid(bg, Qt::white)); d = 1;
-      }
-      p.drawText ( label.translated(0,d), Qt::AlignCenter | Qt::TextSingleLine, _caption );
-   }
-   p.setPen(color(ColorFont, isActive()));
-   p.drawText ( label, Qt::AlignCenter | Qt::TextSingleLine, _caption );
+            Gradients::Type titleGradient = (Gradients::Type)gType[isActive()];
+            if (titleGradient && label.width())
+            {   // nice deco
+                p.setRenderHint( QPainter::Antialiasing );
+                bg = color(ColorTitleBlend, isActive());
+                const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, titleGradient);
+                const QColor shadow = Colors::mid(bg, Qt::black,6,1);
+                p.setPen(QPen(shadow, 2)); p.setBrush(fill);
+                p.drawRoundRect(label.adjusted(0,4,0,-4),titleSize*99/label.width(),99);
+                p.setRenderHint( QPainter::Antialiasing, false );
+            }
+            break;
+        }
+        }
+    }
 
-   // bar =========================
-   if (bgMode != 1) {
-   const QColor bg2 = color(ColorTitleBlend, isActive());
-   if (gType[isActive()]) {
-      QColor shadow = Colors::mid(bg2, Qt::black,4,1);
-      const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, (Gradients::Type)gType[isActive()]);
-      p.setPen(shadow); p.setBrush(fill);
-      p.setRenderHint( QPainter::Antialiasing );
-      p.drawPath(bar);
-      if (borderSize) {
-         p.setRenderHint( QPainter::Antialiasing, false );
-         p.setPen(Qt::NoPen); p.setBrush(bg2);
-         p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
-         // shadows
-         p.setRenderHint( QPainter::Antialiasing );
-         shadow = Colors::mid(bg2, Qt::black,2,1);
-         p.setPen(QPen(shadow,3));
-         QPolygon poly;
-         const int rgt = width()-(borderSize+1), btm = height()-borderSize;
-         poly.putPoints(0,4, borderSize+1,titleSize+2, borderSize,btm, rgt,btm, rgt,titleSize+2);
-         p.drawPolyline(poly);
-      }
-      p.setBrush(Qt::NoBrush);
-   }
-   else if (borderSize) { // static bool KWindowSystem::compositingActive();
-      p.setBrush(Qt::NoBrush);
-      if (bg2 != bg) { // outline?
-         p.setRenderHint( QPainter::Antialiasing );
-         p.setPen(QPen(bg2,3)); p.drawRect(1,1,width()-2,height()-2);
-      }
-      else { // frame ==============
-         const QColor border = Colors::mid(bg, color(ColorButtonBg, true),2,1);
-         p.setPen(border);
-         p.drawLine(32+4, 0, width()-(32+5), 0);
-         p.drawLine(32+4, height()-1, width()-(32+5), height()-1);
-         p.drawLine(0, 32+4, 0, height()-(32+5));
-         p.drawLine(width()-1, 32+4, width()-1, height()-(32+5));
-         const QPixmap &top = Gradients::borderline(border, Gradients::Top);
-         p.drawPixmap(0,4,top); p.drawPixmap(width()-1,4,top);
-         const QPixmap &btm = Gradients::borderline(border, Gradients::Bottom);
-         p.drawPixmap(0,height()-(32+5),btm); p.drawPixmap(width()-1,height()-(32+5),btm);
-         const QPixmap &left = Gradients::borderline(border, Gradients::Left);
-         p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
-         const QPixmap &right = Gradients::borderline(border, Gradients::Right);
-         p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
-      }
-   }
-   }
+    // title ==============
+    if (isActive())
+    {   // emboss?!
+        int d = 0;
+        if (Colors::value(bg) < 110) // dark bg -> dark top borderline
+            { p.setPen(Colors::mid(bg, Qt::black, 2, 1)); d = -1; }
+        else // bright bg -> bright bottom borderline
+            { p.setPen(Colors::mid(bg, Qt::white)); d = 1; }
+        p.drawText ( label.translated(0,d), Qt::AlignCenter | Qt::TextSingleLine, _caption );
+    }
+    p.setPen(color(isShade() ? ColorButtonBg : ColorFont, isActive()));
+    p.drawText ( label, Qt::AlignCenter | Qt::TextSingleLine, _caption );
+
+    // bar =========================
+    if (bgMode != 1)
+    {
+        const QColor bg2 = color(ColorTitleBlend, isActive());
+        if (gType[isActive()])
+        {
+            QColor shadow = Colors::mid(bg2, Qt::black,4,1);
+            const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, (Gradients::Type)gType[isActive()]);
+            p.setPen(shadow); p.setBrush(fill); p.setRenderHint( QPainter::Antialiasing );
+            p.drawPath(bar);
+            if (borderSize)
+            {
+                p.setRenderHint( QPainter::Antialiasing, false );
+                p.setPen(Qt::NoPen); p.setBrush(bg2);
+                p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
+                // shadows
+                p.setRenderHint( QPainter::Antialiasing );
+                shadow = Colors::mid(bg2, Qt::black,2,1);
+                p.setPen(QPen(shadow,3));
+                QPolygon poly;
+                const int rgt = width()-(borderSize+1), btm = height()-borderSize;
+                poly.putPoints(0,4, borderSize+1,titleSize+2, borderSize,btm, rgt,btm, rgt,titleSize+2);
+                p.drawPolyline(poly);
+            }
+            p.setBrush(Qt::NoBrush);
+        }
+        else if (borderSize)
+        {   // static bool KWindowSystem::compositingActive();
+            p.setBrush(Qt::NoBrush);
+            if (bg2 != bg)
+            {   // outline
+                p.setRenderHint( QPainter::Antialiasing );
+                p.setPen(QPen(bg2,3)); p.drawRect(1,1,width()-2,height()-2);
+            }
+            else
+            {   // frame ==============
+                const QColor border = Colors::mid(bg, color(ColorButtonBg, true),2,1);
+                p.setPen(border);
+                p.drawLine(32+4, 0, width()-(32+5), 0);
+                p.drawLine(32+4, height()-1, width()-(32+5), height()-1);
+                p.drawLine(0, 32+4, 0, height()-(32+5));
+                p.drawLine(width()-1, 32+4, width()-1, height()-(32+5));
+                const QPixmap &top = Gradients::borderline(border, Gradients::Top);
+                p.drawPixmap(0,4,top); p.drawPixmap(width()-1,4,top);
+                const QPixmap &btm = Gradients::borderline(border, Gradients::Bottom);
+                p.drawPixmap(0,height()-(32+5),btm); p.drawPixmap(width()-1,height()-(32+5),btm);
+                const QPixmap &left = Gradients::borderline(border, Gradients::Left);
+                p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
+                const QPixmap &right = Gradients::borderline(border, Gradients::Right);
+                p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
+            }
+        }
+    }
 }
 
 void

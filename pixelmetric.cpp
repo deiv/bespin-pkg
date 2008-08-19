@@ -23,6 +23,7 @@
 #include <QTabBar>
 #include <QTabWidget>
 #include "bespin.h"
+#include "makros.h"
 
 using namespace Bespin;
 
@@ -30,147 +31,142 @@ extern Dpi dpi;
 
 int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWidget * widget ) const
 {
-#if 1
-   switch ( pm )
-   {
-   case PM_ButtonMargin: // Amount of whitespace between push button labels and the frame
-      return dpi.f4;
-   case PM_ButtonDefaultIndicator: // Width of the default-button indicator frame
-      return dpi.f2;
-   case PM_MenuButtonIndicator: // Width of the menu button indicator proportional to the widget height
-      return dpi.f7;
-   case PM_ButtonShiftHorizontal: // Horizontal contents shift of a button when the button is down
-   case PM_ButtonShiftVertical: // Vertical contents shift of a button when the button is down
-      return 0;
-   case PM_DefaultFrameWidth: // 2
-      if (widget && widget->inherits("QComboBoxPrivateContainer"))
-         return 1;
-      if (!(widget && qobject_cast<const QFrame*>(widget) &&
-          static_cast<const QFrame*>(widget)->frameShape() ==
-            QFrame::StyledPanel))
-         return dpi.f1;
-      if (isSpecialFrame(widget))
-         return dpi.f4;
-      return 0;
-   case PM_SpinBoxFrameWidth: // Frame width of a spin box, defaults to PM_DefaultFrameWidth
-      return dpi.f1;
-   case PM_ComboBoxFrameWidth: // Frame width of a combo box, defaults to PM_DefaultFrameWidth.
-      return dpi.f2;
-//    case PM_MDIFrameWidth: // Frame width of an MDI window
-//    case PM_MDIMinimizedWidth: // Width of a minimized MDI window
-   case PM_MaximumDragDistance: // Some feels require the scroll bar or other sliders to jump back to the original position when the mouse pointer is too far away while dragging; a value of -1 disables this behavior
-      return -1;
-   case PM_ScrollBarExtent: // Width of a vertical scroll bar and the height of a horizontal scroll bar
-      return (widget && widget->parentWidget() &&
-              widget->parentWidget()->parentWidget() &&
-              widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) ?
-         dpi.f16 : dpi.ScrollBarExtent;
-   case PM_ScrollBarSliderMin: // The minimum height of a vertical scroll bar's slider and the minimum width of a horizontal scroll bar's slider
-      return dpi.ScrollBarSliderMin;
-   case PM_SliderThickness: // Total slider thickness
-   case PM_SliderControlThickness: // Thickness of the slider handle
-      return dpi.SliderThickness;
-   case PM_SliderLength: // Length of the slider
-      return dpi.SliderControl;
+    switch ( pm )
+    {
+    case PM_ButtonMargin: // Amount of whitespace between push button labels and the frame
+        return F(4);
+    case PM_ButtonDefaultIndicator: // Width of the default-button indicator frame
+        return F(2);
+    case PM_MenuButtonIndicator: // Width of the menu button indicator proportional to the widget height
+        return F(7);
+    case PM_ButtonShiftHorizontal: // Horizontal contents shift of a button when the button is down
+    case PM_ButtonShiftVertical: // Vertical contents shift of a button when the button is down
+        return 0;
+    case PM_DefaultFrameWidth: // 2
+        if (appType == GTK)
+            return F(2);
+        if (widget && widget->inherits("QComboBoxPrivateContainer"))
+            return 1;
+        if (!(widget && qobject_cast<const QFrame*>(widget) &&
+            static_cast<const QFrame*>(widget)->frameShape() == QFrame::StyledPanel))
+            return F(1);
+        if (isSpecialFrame(widget))
+            return F(4);
+        return 0;
+    case PM_SpinBoxFrameWidth: // Frame width of a spin box, defaults to PM_DefaultFrameWidth
+        return F(1);
+    case PM_ComboBoxFrameWidth: // Frame width of a combo box, defaults to PM_DefaultFrameWidth.
+        return F(2);
+    //    case PM_MDIFrameWidth: // Frame width of an MDI window
+    //    case PM_MDIMinimizedWidth: // Width of a minimized MDI window
+    case PM_MaximumDragDistance: // Some feels require the scroll bar or other sliders to jump back to the original position when the mouse pointer is too far away while dragging; a value of -1 disables this behavior
+        return -1;
+    case PM_ScrollBarExtent: // Width of a vertical scroll bar and the height of a horizontal scroll bar
+        return (widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+                widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) ?
+                dpi.f16 : dpi.ScrollBarExtent;
+    case PM_ScrollBarSliderMin: // The minimum height of a vertical scroll bar's slider and the minimum width of a horizontal scroll bar's slider
+        return dpi.ScrollBarSliderMin;
+    case PM_SliderThickness: // Total slider thickness
+    case PM_SliderControlThickness: // Thickness of the slider handle
+        return dpi.SliderThickness;
+    case PM_SliderLength: // Length of the slider
+        return dpi.SliderControl;
 //    case PM_SliderTickmarkOffset: // The offset between the tickmarks and the slider
-   case PM_SliderSpaceAvailable: { // The available space for the slider to move
-      if (!widget)
-         return 0;
-      if ( const QSlider *slider = qobject_cast<const QSlider*>(widget))
-      if (slider->orientation() == Qt::Horizontal)
-         return (widget->width() - dpi.SliderControl);
-      else
-         return (widget->height() - dpi.SliderControl);
-   }
-   case QStyle::PM_DockWidgetTitleBarButtonMargin:
-      return dpi.f2;
-   case QStyle::PM_DockWidgetTitleMargin:
-      return 0;
-   case PM_DockWidgetSeparatorExtent: // Width of a separator in a horizontal dock window and the height of a separator in a vertical dock window
-      return dpi.f10;
-   case PM_DockWidgetHandleExtent: // Width of the handle in a horizontal dock window and the height of the handle in a vertical dock window
-      return dpi.f6;
-   case PM_DockWidgetFrameWidth: // Frame width of a dock window
-      return dpi.f1;
-   case PM_MenuBarPanelWidth: // Frame width of a menubar, defaults to PM_DefaultFrameWidth
-      return 0;
-   case PM_MenuBarItemSpacing: // Spacing between menubar items
-      return dpi.f6;
-   case PM_MenuBarHMargin: // Spacing between menubar items and left/right of bar
-      return dpi.f6;
-   case PM_MenuBarVMargin: // Spacing between menubar items and top/bottom of bar
-      return 0;
-   case PM_ToolBarFrameWidth: // Width of the frame around toolbars
-      return dpi.f1;//f4;
-   case PM_ToolBarHandleExtent: // Width of a toolbar handle in a horizontal toolbar and the height of the handle in a vertical toolbar
-      return dpi.f6;
-   case PM_ToolBarItemMargin: // Spacing between the toolbar frame and the items
-      return dpi.f1;//f4
-   case PM_ToolBarItemSpacing: // Spacing between toolbar items
-      return dpi.f2;
-   case PM_ToolBarSeparatorExtent: // Width of a toolbar separator in a horizontal toolbar and the height of a separator in a vertical toolbar
-      return dpi.f2;
-   case PM_ToolBarExtensionExtent: // Width of a toolbar extension button in a horizontal toolbar and the height of the button in a vertical toolbar
-      return dpi.f16;
-   case PM_TabBarTabOverlap: // Number of pixels the tabs should overlap
-      return 0;
-   case PM_TabBarTabHSpace: // Extra space added to the tab width
-      return dpi.f12;
-   case PM_TabBarTabVSpace: // Extra space added to the tab height
-      return dpi.f10;
-   case PM_TabBarBaseHeight: // Height of the area between the tab bar and the tab pages
-   case PM_TabBarBaseOverlap: { // Number of pixels the tab bar overlaps the tab bar base
-      if (!widget)
-         return dpi.f16;
-      const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget);
-      if (qobject_cast<const QTabWidget*>(widget) &&
-          !widget->children().isEmpty()) {
-         foreach(QObject *obj, widget->children()) {
-            if (qobject_cast<QTabBar*>(obj)) {
-               tabBar = (QTabBar*)obj;
-               break;
-            }
-         }
-      }
-      if (!tabBar || !tabBar->isVisible())
-         return dpi.f16;
-      if (const QStyleOptionTabWidgetFrame *twf =
-            qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option)) {
-         if (twf->shape == QTabBar::RoundedEast ||
-               twf->shape == QTabBar::TriangularEast ||
-               twf->shape == QTabBar::RoundedWest ||
-               twf->shape == QTabBar::TriangularWest)
-            return tabBar->width();
-      }
-      return tabBar->height();
-   }
-   case PM_TabBarScrollButtonWidth: //  
-      return dpi.f16;
-   case PM_TabBarTabShiftHorizontal: // Horizontal pixel shift when a tab is selected
-      return 0;
-   case PM_TabBarTabShiftVertical: // Vertical pixel shift when a tab is selected
-      return dpi.f4; // trying to trick KTabBar to place the close icon on a reasonable pos
-      //TODO the close icon solution looks ... debatable - find a way to hack it, or
-      // ==>> ground a general solution, convince TT to extend QStyle to allow adding new elements
-      // dynamically (creating an app wide atom) and make KDE dev use it...!
+    case PM_SliderSpaceAvailable:
+    {   // The available space for the slider to move
+        if (!widget)
+            return 0;
+        if ( const QSlider *slider = qobject_cast<const QSlider*>(widget))
+        if (slider->orientation() == Qt::Horizontal)
+            return (widget->width() - dpi.SliderControl);
+        else
+            return (widget->height() - dpi.SliderControl);
+    }
+    case QStyle::PM_DockWidgetTitleBarButtonMargin:
+        return F(2);
+    case QStyle::PM_DockWidgetTitleMargin:
+        return 0;
+    case PM_DockWidgetSeparatorExtent: // Width of a separator in a horizontal dock window and the height of a separator in a vertical dock window
+        return F(10);
+    case PM_DockWidgetHandleExtent: // Width of the handle in a horizontal dock window and the height of the handle in a vertical dock window
+        return F(6);
+    case PM_DockWidgetFrameWidth: // Frame width of a dock window
+        return F(1);
+    case PM_MenuBarPanelWidth: // Frame width of a menubar, defaults to PM_DefaultFrameWidth
+        return 0;
+    case PM_MenuBarItemSpacing: // Spacing between menubar items
+        return F(6);
+    case PM_MenuBarHMargin: // Spacing between menubar items and left/right of bar
+        return F(6);
+    case PM_MenuBarVMargin: // Spacing between menubar items and top/bottom of bar
+        return 0;
+    case PM_ToolBarFrameWidth: // Width of the frame around toolbars
+        return F(1);//f4;
+    case PM_ToolBarHandleExtent: // Width of a toolbar handle in a horizontal toolbar and the height of the handle in a vertical toolbar
+        return F(6);
+    case PM_ToolBarItemMargin: // Spacing between the toolbar frame and the items
+        return F(1);//f4
+    case PM_ToolBarItemSpacing: // Spacing between toolbar items
+        return F(2);
+    case PM_ToolBarSeparatorExtent: // Width of a toolbar separator in a horizontal toolbar and the height of a separator in a vertical toolbar
+        return F(2);
+    case PM_ToolBarExtensionExtent: // Width of a toolbar extension button in a horizontal toolbar and the height of the button in a vertical toolbar
+        return F(16);
+    case PM_TabBarTabOverlap: // Number of pixels the tabs should overlap
+        return 0;
+    case PM_TabBarTabHSpace: // Extra space added to the tab width
+        return F(12);
+    case PM_TabBarTabVSpace: // Extra space added to the tab height
+        return F(10);
+    case PM_TabBarBaseHeight: // Height of the area between the tab bar and the tab pages
+    case PM_TabBarBaseOverlap: { // Number of pixels the tab bar overlaps the tab bar base
+        if (!widget)
+            return F(16);
+        const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget);
+        if (qobject_cast<const QTabWidget*>(widget) && !widget->children().isEmpty())
+        {
+            foreach(QObject *obj, widget->children())
+                if (qobject_cast<QTabBar*>(obj))
+                    { tabBar = (QTabBar*)obj; break; }
+        }
+        if (!tabBar || !tabBar->isVisible())
+            return F(16);
+        if (const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
+        {
+            if (twf->shape == QTabBar::RoundedEast || twf->shape == QTabBar::TriangularEast ||
+                twf->shape == QTabBar::RoundedWest || twf->shape == QTabBar::TriangularWest)
+                return tabBar->width();
+        }
+        return tabBar->height();
+    }
+    case PM_TabBarScrollButtonWidth: //
+        return F(16);
+    case PM_TabBarTabShiftHorizontal: // Horizontal pixel shift when a tab is selected
+        return 0;
+    case PM_TabBarTabShiftVertical: // Vertical pixel shift when a tab is selected
+        return F(4); // trying to trick KTabBar to place the close icon on a reasonable pos
+        //TODO the close icon solution looks ... debatable - find a way to hack it, or
+        // ==>> ground a general solution, convince TT to extend QStyle to allow adding new elements
+        // dynamically (creating an app wide atom) and make KDE dev use it...!
 //    case PM_ProgressBarChunkWidth: // Width of a chunk in a progress bar indicator
-   case PM_SplitterWidth: // Width of a splitter
-      return dpi.f9;
-   case PM_TitleBarHeight: // Height of the title bar
-   case PM_IndicatorWidth: // Width of a check box indicator
-   case PM_IndicatorHeight: // Height of a checkbox indicator
-      return dpi.Indicator;
-   case PM_ExclusiveIndicatorWidth: // Width of a radio button indicator
-   case PM_ExclusiveIndicatorHeight: // Height of a radio button indicator
-      return dpi.ExclusiveIndicator;
-   case PM_MenuPanelWidth: // Border width (applied on all sides) for a QMenu
-      return 1; // cosmetic, qt hates 0 sized popupframes
-   case PM_MenuHMargin: // Additional border (used on left and right) for a QMenu
-   case PM_MenuVMargin: // Additional border (used for bottom and top) for a QMenu
-      return dpi.f1;
+    case PM_SplitterWidth: // Width of a splitter
+        return F(9);
+    case PM_TitleBarHeight: // Height of the title bar
+    case PM_IndicatorWidth: // Width of a check box indicator
+    case PM_IndicatorHeight: // Height of a checkbox indicator
+        return dpi.Indicator;
+    case PM_ExclusiveIndicatorWidth: // Width of a radio button indicator
+    case PM_ExclusiveIndicatorHeight: // Height of a radio button indicator
+        return dpi.ExclusiveIndicator;
+    case PM_MenuPanelWidth: // Border width (applied on all sides) for a QMenu
+        return 1; // cosmetic, qt hates 0 sized popupframes
+    case PM_MenuHMargin: // Additional border (used on left and right) for a QMenu
+    case PM_MenuVMargin: // Additional border (used for bottom and top) for a QMenu
+        return F(1);
 //    case PM_MenuScrollerHeight: // Height of the scroller area in a QMenu
 //    case PM_MenuTearoffHeight: // Height of a tear off area in a QMenu
-//    case PM_MenuDesktopFrameWidth: //  
+//    case PM_MenuDesktopFrameWidth: //
 //    case PM_CheckListButtonSize: // Area (width/height) of the checkbox/radio button in a Q3CheckListItem
 //    case PM_CheckListControllerSize: // Area (width/height) of the controller in a Q3CheckListItem
 //       if (option) return option->rect.height()-dpi.f4;
@@ -178,34 +174,33 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
 //    case PM_DialogButtonsSeparator: // Distance between buttons in a dialog buttons widget
 //    case PM_DialogButtonsButtonWidth: // Minimum width of a button in a dialog buttons widget
 //    case PM_DialogButtonsButtonHeight: // Minimum height of a button in a dialog buttons widget
-//    case PM_HeaderMarkSize: //  
-//    case PM_HeaderGripMargin: //  
-   case PM_HeaderMargin: //  
-      return dpi.f2;
-   case PM_SpinBoxSliderHeight: // The height of the optional spin box slider
-      return dpi.f4;
-//    case PM_DefaultTopLevelMargin: //  
-//    case PM_DefaultChildMargin: //  
-//    case PM_DefaultLayoutSpacing: //  
-   case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize
-      return 22;
-   case PM_SmallIconSize: // Default small icon size
-      return 16;
-   case PM_LargeIconSize: // Default large icon size
-      return 32;
-   case PM_FocusFrameHMargin: // Horizontal margin that the focus frame will outset the widget by.
-      return dpi.f4;
-   case PM_FocusFrameVMargin: // Vertical margin that the focus frame will outset the widget by.
-      return dpi.f2;
-//    case PM_IconViewIconSize: //  
+//    case PM_HeaderMarkSize: //
+//    case PM_HeaderGripMargin: //
+    case PM_HeaderMargin: //
+        return F(2);
+    case PM_SpinBoxSliderHeight: // The height of the optional spin box slider
+        return F(4);
+//    case PM_DefaultTopLevelMargin: //
+//    case PM_DefaultChildMargin: //
+//    case PM_DefaultLayoutSpacing: //
+    case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize
+        return 22;
+    case PM_SmallIconSize: // Default small icon size
+        return 16;
+    case PM_LargeIconSize: // Default large icon size
+        return 32;
+    case PM_FocusFrameHMargin: // Horizontal margin that the focus frame will outset the widget by.
+        return F(4);
+    case PM_FocusFrameVMargin: // Vertical margin that the focus frame will outset the widget by.
+        return F(2);
+//    case PM_IconViewIconSize: //
 //    case PM_ListViewIconSize: //
 //       return 10;
 //       if (option) return option->rect.height()-dpi.f4;
 //       return dpi.f16;
-   case PM_ToolTipLabelFrameWidth: //
-      return dpi.f4; // they're so tiny ;)
-   default:
-#endif
-      return QCommonStyle::pixelMetric( pm, option, widget );
-   } // switch
+    case PM_ToolTipLabelFrameWidth: //
+        return F(4); // they're so tiny ;)
+    default:
+        return QCommonStyle::pixelMetric( pm, option, widget );
+    } // switch
 }
