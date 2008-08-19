@@ -19,126 +19,140 @@
 #include "draw.h"
 
 void
-BespinStyle::drawCheckMark(const QStyleOption *option, QPainter *painter,
-                           Check::Type type) const
+BespinStyle::drawCheckMark(const QStyleOption *option, QPainter *painter, Check::Type type) const
 {
-   // the checkmark (using brush)
-   painter->setPen(Qt::NoPen);
-   painter->setRenderHint(QPainter::Antialiasing);
-   bool isOn = option->state & QStyle::State_On;
-   switch (type) {
-   case Check::X: {
-      const int d = RECT.height()/8, c = RECT.height()/2, s = RECT.width(),
-         x = RECT.x(), y = RECT.y();
-      if (isOn) {
-         const QPoint points[8] = {
-            QPoint(x+c,y+c-d), QPoint(x,y),
-               QPoint(x+c-d,y+c), QPoint(x,y+s),
-               QPoint(x+c,y+c+d), QPoint(x+s,y+s),
-               QPoint(x+c+d,y+c), QPoint(x+s,y)
-         };
-         painter->drawPolygon(points, 8);
-      }
-      else { // tristate
-         const QPoint points[5] = {
-            QPoint(x+c,y+c-d), QPoint(x,y), QPoint(x+c-d,y+c),
-               QPoint(x+s,y+s), QPoint(x+c+d,y+c),
-         };
-         painter->drawPolygon(points, 5);
-      }
-      break;
-   }
-   default:
-   case Check::V: {
-      if (isOn) {
-         const QPoint points[4] = {
-            QPoint(RECT.right(), RECT.top()),
-               QPoint(RECT.x()+RECT.width()/4, RECT.bottom()),
-               QPoint(RECT.x(), RECT.bottom()-RECT.height()/2),
-               QPoint(RECT.x()+RECT.width()/4, RECT.bottom()-RECT.height()/4)
-         };
-         painter->drawPolygon(points, 4);
-      }
-      else { // tristate
-         const int d = 2*RECT.height()/5;
-         QRect r = RECT.adjusted(dpi.f2,d,-dpi.f2,-d);
-         painter->drawRect(r);
-      }
-      break;
-   }
-   case Check::O: {
-      const int d = RECT.height()/8;
-      QRect r = RECT.adjusted(d,d,-d,-d);
-      if (!isOn)
-         r.adjust(0,r.height()/4,0,-r.height()/4);
-      painter->drawRoundRect(r,70,70);
-   }
-   }
+    // the checkmark (using brush)
+    painter->setPen(Qt::NoPen);
+    painter->setRenderHint(QPainter::Antialiasing);
+    bool isOn = option->state & QStyle::State_On;
+    switch (type)
+    {
+    case Check::X:
+    {
+        const int   d = RECT.height()/8,
+                    c = RECT.height()/2,
+                    s = RECT.width(),
+                    x = RECT.x(), y = RECT.y();
+        if (isOn)
+        {
+            const QPoint points[8] =
+            {
+                QPoint(x+c,y+c-d), QPoint(x,y),
+                QPoint(x+c-d,y+c), QPoint(x,y+s),
+                QPoint(x+c,y+c+d), QPoint(x+s,y+s),
+                QPoint(x+c+d,y+c), QPoint(x+s,y)
+            };
+            painter->drawPolygon(points, 8);
+        }
+        else
+        {   // tristate
+            const QPoint points[5] =
+            {
+                QPoint(x+c,y+c-d), QPoint(x,y), QPoint(x+c-d,y+c),
+                QPoint(x+s,y+s), QPoint(x+c+d,y+c),
+            };
+            painter->drawPolygon(points, 5);
+        }
+        break;
+    }
+    default:
+    case Check::V:
+    {
+        if (isOn)
+        {
+            const QPoint points[4] =
+            {
+                QPoint(RECT.right(), RECT.top()),
+                QPoint(RECT.x()+RECT.width()/4, RECT.bottom()),
+                QPoint(RECT.x(), RECT.bottom()-RECT.height()/2),
+                QPoint(RECT.x()+RECT.width()/4, RECT.bottom()-RECT.height()/4)
+            };
+            painter->drawPolygon(points, 4);
+        }
+        else
+        {   // tristate
+            const int d = 2*RECT.height()/5;
+            QRect r = RECT.adjusted(dpi.f2,d,-dpi.f2,-d);
+            painter->drawRect(r);
+        }
+        break;
+    }
+    case Check::O:
+    {
+        const int d = RECT.height()/8;
+        QRect r = RECT.adjusted(d,d,-d,-d);
+        if (!isOn)
+            r.adjust(0,r.height()/4,0,-r.height()/4);
+        painter->drawRoundRect(r,70,70);
+    }
+    }
 }
 
 void
-BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter,
-                       const QWidget *, bool itemview) const
+BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter, const QWidget*, bool itemview) const
 {
 #if QT_VERSION >= 0x040400
-   if (const QStyleOptionViewItemV2 *item =
-       qstyleoption_cast<const QStyleOptionViewItemV2 *>(option))
-   if (!(item->features & QStyleOptionViewItemV2::HasCheckIndicator))
-      return;
+    if (const QStyleOptionViewItemV2 *item = qstyleoption_cast<const QStyleOptionViewItemV2 *>(option))
+    if (!(item->features & QStyleOptionViewItemV2::HasCheckIndicator))
+        return;
 #endif
 //       if (option->state & State_NoChange)
 //          break;
-   QStyleOption copy = *option;
-   
-   const int f2 = dpi.f2;
+    QStyleOption copy = *option;
 
-   // storage
-   painter->save();
-   QBrush oldBrush = painter->brush();
-   painter->setRenderHint(QPainter::Antialiasing);
-   
-   // rect -> square
-   QRect r = RECT;
-   if (r.width() > r.height())
-      r.setWidth(r.height());
-   else
-      r.setHeight(r.width());
-   
-   // box (requires set pen for PE_IndicatorMenuCheckMark)
-   painter->setBrush(Qt::NoBrush);
-   QPalette::ColorRole fg = QPalette::Text, bg = QPalette::Base;
+    const int f2 = dpi.f2;
 
-   if (itemview) { // itemViewCheck
-      r.adjust(f2, f2, -f2, -f2);
-      if (!(option->state & State_Off))
-         copy.state |= State_On;
-      if (option->state & State_Selected) {
-         fg = QPalette::HighlightedText; bg = QPalette::Highlight;
-      }
-      painter->setPen(Colors::mid(COLOR(bg), COLOR(fg)));
-   }
+    // storage
+    painter->save();
+    QBrush oldBrush = painter->brush();
+    painter->setRenderHint(QPainter::Antialiasing);
 
-   if (painter->pen() != Qt::NoPen) {
-      r.adjust(f2, f2, -f2, -f2);
-      painter->drawRoundRect(r);
-   }
-   
-   if (option->state & State_Off) {
-      // not checked, get out
-      painter->restore();
-      return;
-   }
-   
-   // checkmark
-   if (itemview)
-      painter->setBrush(COLOR(fg));
-   else {
-      painter->setBrush(oldBrush);
-      painter->setBrushOrigin(r.topLeft());
-   }
-   copy.rect.adjust(dpi.f3,0,0,-dpi.f3);
-   drawCheckMark(&copy, painter, Check::V);
-   painter->restore();
+    // rect -> square
+    QRect r = RECT;
+    if (r.width() > r.height())
+        r.setWidth(r.height());
+    else
+        r.setHeight(r.width());
+
+    // box (requires set pen for PE_IndicatorMenuCheckMark)
+    painter->setBrush(Qt::NoBrush);
+    QPalette::ColorRole fg = QPalette::Text, bg = QPalette::Base;
+
+    if (itemview)
+    {   // itemViewCheck
+        r.adjust(f2, f2, -f2, -f2);
+        if (!(option->state & State_Off))
+            copy.state |= State_On;
+        if (option->state & State_Selected)
+        { fg = QPalette::HighlightedText; bg = QPalette::Highlight; }
+        painter->setPen(Colors::mid(COLOR(bg), COLOR(fg)));
+    }
+
+    if (appType != GTK)
+    {
+        if (painter->pen() != Qt::NoPen)
+            { r.adjust(f2, f2, -f2, -f2); painter->drawRoundRect(r); }
+
+        if (option->state & State_Off) // not checked, get out
+            { painter->restore(); return; }
+    }
+    else
+    {
+        oldBrush = painter->pen().brush();
+        copy.state |= State_On;
+    }
+
+    // checkmark
+    if (itemview)
+        painter->setBrush(COLOR(fg));
+    else
+    {
+        painter->setBrush(oldBrush);
+        painter->setBrushOrigin(r.topLeft());
+    }
+    copy.rect.adjust(dpi.f3,0,0,-dpi.f3);
+    drawCheckMark(&copy, painter, Check::V);
+    painter->restore();
 }
 
 /**static!*/ void

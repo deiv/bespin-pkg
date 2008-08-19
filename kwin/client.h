@@ -101,6 +101,7 @@ private:
     int borderSize, titleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
     uint topTile, btmTile, cnrTile, lCorner, rCorner;
     uint bgMode, gType[2];
+    bool _small;
     Factory *_factory;
     QHBoxLayout *titleBar;
     QSpacerItem *titleSpacer;

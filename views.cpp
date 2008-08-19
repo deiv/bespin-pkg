@@ -18,11 +18,11 @@
 
 #include <QApplication>
 #include <QAbstractItemView>
+#include <QTreeView>
 #include "draw.h"
 
 void
-BespinStyle::drawHeader(const QStyleOption * option, QPainter * painter,
-                        const QWidget * widget) const
+BespinStyle::drawHeader(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(header, Header);
 
@@ -256,170 +256,173 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const Q
 }
 
 void
-BespinStyle::drawTree(const QStyleOptionComplex * option, QPainter * painter,
-                      const QWidget * widget) const
+BespinStyle::drawTree(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
 #ifdef QT3_SUPPORT
-   const QStyleOptionQ3ListView *lv = qstyleoption_cast<const QStyleOptionQ3ListView *>(option);
-   if (!lv) return;
-       
-   int i;
-   if (lv->subControls & SC_Q3ListView)
-      QCommonStyle::drawComplexControl(CC_Q3ListView, lv, painter, widget);
-   if (!(lv->subControls & (SC_Q3ListViewBranch | SC_Q3ListViewExpand)))
-      return;
-      
-   if (lv->items.isEmpty())
-      return;
-   QStyleOptionQ3ListViewItem item = lv->items.at(0);
-   int y = lv->rect.y();
-   int c;
-   int dotoffset = 0;
-   QPolygon dotlines;
-   if ((lv->activeSubControls & SC_All) && (lv->subControls & SC_Q3ListViewExpand))
-   {
-      c = 2;
-      dotlines.resize(2);
-      dotlines[0] = QPoint(lv->rect.right(), lv->rect.top());
-      dotlines[1] = QPoint(lv->rect.right(), lv->rect.bottom());
-   }
-   else {
-      int linetop = 0, linebot = 0;
-      // each branch needs at most two lines, ie. four end points
-      dotoffset = (item.itemY + item.height - y) % 2;
-      dotlines.resize(item.childCount * 4);
-      c = 0;
+    ASSURE_OPTION(lv, Q3ListView);
 
-         // skip the stuff above the exposed rectangle
-      for (i = 1; i < lv->items.size(); ++i) {
-         QStyleOptionQ3ListViewItem child = lv->items.at(i);
-         if (child.height + y > 0)
-            break;
-         y += child.totalHeight;
-      }
-      int bx = lv->rect.width() / 2;
+    int i;
+    if (lv->subControls & SC_Q3ListView)
+        QCommonStyle::drawComplexControl(CC_Q3ListView, lv, painter, widget);
+    if (!(lv->subControls & (SC_Q3ListViewBranch | SC_Q3ListViewExpand)))
+        return;
 
-         // paint stuff in the magical area
-      while (i < lv->items.size() && y < lv->rect.height()) {
-         QStyleOptionQ3ListViewItem child = lv->items.at(i);
-         if (child.features & QStyleOptionQ3ListViewItem::Visible) {
-            int lh;
-            if (!(item.features & QStyleOptionQ3ListViewItem::MultiLine))
-               lh = child.height;
-            else
-               lh = painter->fontMetrics().height() + 2 * lv->itemMargin;
-            lh = qMax(lh, QApplication::globalStrut().height());
-            if (lh % 2 > 0)
-               ++lh;
-            linebot = y + lh / 2;
-            if (child.features & QStyleOptionQ3ListViewItem::Expandable
-               || child.childCount > 0 && child.height > 0) {
-               // needs a box
-               painter->setPen(lv->palette.mid().color());
-               painter->drawRect(bx - 4, linebot - 4, 8, 8);
-                  // plus or minus
-               painter->setPen(lv->palette.text().color());
-               painter->drawLine(bx - 2, linebot, bx + 2, linebot);
-               if (!(child.state & State_Open))
-                  painter->drawLine(bx, linebot - 2, bx, linebot + 2);
-                  // dotlinery
-               painter->setPen(lv->palette.mid().color());
-               dotlines[c++] = QPoint(bx, linetop);
-               dotlines[c++] = QPoint(bx, linebot - 4);
-               dotlines[c++] = QPoint(bx + 5, linebot);
-               dotlines[c++] = QPoint(lv->rect.width(), linebot);
-               linetop = linebot + 5;
-            }
-            else {
-               // just dotlinery
-               dotlines[c++] = QPoint(bx+1, linebot -1);
-               dotlines[c++] = QPoint(lv->rect.width(), linebot -1);
-            }
+    if (lv->items.isEmpty())
+        return;
+    QStyleOptionQ3ListViewItem item = lv->items.at(0);
+    int y = lv->rect.y();
+    int c;
+    int dotoffset = 0;
+    QPolygon dotlines;
+    if ((lv->activeSubControls & SC_All) && (lv->subControls & SC_Q3ListViewExpand))
+    {
+        c = 2;
+        dotlines.resize(2);
+        dotlines[0] = QPoint(lv->rect.right(), lv->rect.top());
+        dotlines[1] = QPoint(lv->rect.right(), lv->rect.bottom());
+    }
+    else
+    {
+        int linetop = 0, linebot = 0;
+        // each branch needs at most two lines, ie. four end points
+        dotoffset = (item.itemY + item.height - y) % 2;
+        dotlines.resize(item.childCount * 4);
+        c = 0;
+
+        // skip the stuff above the exposed rectangle
+        for (i = 1; i < lv->items.size(); ++i)
+        {
+            QStyleOptionQ3ListViewItem child = lv->items.at(i);
+            if (child.height + y > 0)
+                break;
             y += child.totalHeight;
-         }
-         ++i;
-      }
-      // Expand line height to edge of rectangle if there's any
-      // visible child below
-      while (i < lv->items.size() && lv->items.at(i).height <= 0)
-         ++i;
-      if (i < lv->items.size())
-         linebot = lv->rect.height();
+        }
+        int bx = lv->rect.width() / 2;
 
-      if (linetop < linebot) {
-         dotlines[c++] = QPoint(bx, linetop);
-         dotlines[c++] = QPoint(bx, linebot);
-      }
-   }
-   painter->setPen(lv->palette.text().color());
-
-   int line; // index into dotlines
-   if (lv->subControls & SC_Q3ListViewBranch) {
-      for(line = 0; line < c; line += 2) {
-         // assumptions here: lines are horizontal or vertical.
-         // lines always start with the numerically lowest
-         // coordinate.
-
-         // point ... relevant coordinate of current point
-         // end ..... same coordinate of the end of the current line
-         // other ... the other coordinate of the current point/line
-         if (dotlines[line].y() == dotlines[line+1].y()) {
-            int end = dotlines[line + 1].x();
-            int point = dotlines[line].x();
-            int other = dotlines[line].y();
-            while (point < end) {
-               int i = 128;
-               if (i + point > end)
-                  i = end-point;
-               painter->drawLine(point, other, point+i, other);
-               point += i;
+        while (i < lv->items.size() && y < lv->rect.height())
+        {   // paint stuff in the magical area
+            QStyleOptionQ3ListViewItem child = lv->items.at(i);
+            if (child.features & QStyleOptionQ3ListViewItem::Visible)
+            {
+                int lh;
+                if (!(item.features & QStyleOptionQ3ListViewItem::MultiLine))
+                    lh = child.height;
+                else
+                    lh = painter->fontMetrics().height() + 2 * lv->itemMargin;
+                    lh = qMax(lh, QApplication::globalStrut().height());
+                if (lh % 2 > 0)
+                    ++lh;
+                linebot = y + lh / 2;
+                if (child.features & QStyleOptionQ3ListViewItem::Expandable ||
+                    child.childCount > 0 && child.height > 0)
+                {   // needs a box
+                    painter->setPen(lv->palette.mid().color());
+                    painter->drawRect(bx - 4, linebot - 4, 8, 8);
+                    // plus or minus
+                    painter->setPen(lv->palette.text().color());
+                    painter->drawLine(bx - 2, linebot, bx + 2, linebot);
+                    if (!(child.state & State_Open))
+                        painter->drawLine(bx, linebot - 2, bx, linebot + 2);
+                    // dotlinery
+                    painter->setPen(lv->palette.mid().color());
+                    dotlines[c++] = QPoint(bx, linetop);
+                    dotlines[c++] = QPoint(bx, linebot - 4);
+                    dotlines[c++] = QPoint(bx + 5, linebot);
+                    dotlines[c++] = QPoint(lv->rect.width(), linebot);
+                    linetop = linebot + 5;
+                }
+                else
+                {   // just dotlinery
+                    dotlines[c++] = QPoint(bx+1, linebot -1);
+                    dotlines[c++] = QPoint(lv->rect.width(), linebot -1);
+                }
+                y += child.totalHeight;
             }
-         }
-         else {
-            int end = dotlines[line + 1].y();
-            int point = dotlines[line].y();
-            int other = dotlines[line].x();
-            while(point < end) {
-               int i = 128;
-               if (i + point > end)
-                  i = end-point;
-               painter->drawLine(other, point, other, point+i);
-               point += i;
+            ++i;
+        }
+        // Expand line height to edge of rectangle if there's any
+        // visible child below
+        while (i < lv->items.size() && lv->items.at(i).height <= 0)
+            ++i;
+        if (i < lv->items.size())
+            linebot = lv->rect.height();
+
+        if (linetop < linebot) {
+            dotlines[c++] = QPoint(bx, linetop);
+            dotlines[c++] = QPoint(bx, linebot);
+        }
+    }
+    painter->setPen(lv->palette.text().color());
+
+    int line; // index into dotlines
+    if (lv->subControls & SC_Q3ListViewBranch)
+    {
+        for (line = 0; line < c; line += 2)
+        {
+            // assumptions here: lines are horizontal or vertical.
+            // lines always start with the numerically lowest
+            // coordinate.
+
+            // point ... relevant coordinate of current point
+            // end ..... same coordinate of the end of the current line
+            // other ... the other coordinate of the current point/line
+            if (dotlines[line].y() == dotlines[line+1].y())
+            {
+                int end = dotlines[line + 1].x(), point = dotlines[line].x(), other = dotlines[line].y();
+                int i;
+                while (point < end)
+                {
+                    i = 128;
+                    if (i + point > end)
+                        i = end - point;
+                    painter->drawLine(point, other, point+i, other);
+                    point += i;
+                }
             }
-         }
-      }
-   }
+            else
+            {
+                int end = dotlines[line + 1].y(), point = dotlines[line].y(), other = dotlines[line].x();
+                int i;
+                while(point < end)
+                {
+                    i = 128;
+                    if (i + point > end)
+                        i = end - point;
+                    painter->drawLine(other, point, other, point+i);
+                    point += i;
+                }
+            }
+        }
+    }
 #endif
 }
 //    case PE_Q3CheckListController: // Qt 3 compatible Controller part of a list view item.
 
 void
-BespinStyle::drawRubberBand(const QStyleOption * option, QPainter * painter,
-                            const QWidget *) const
+BespinStyle::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
-   painter->save();
-   QColor c = FCOLOR(Highlight);
-   painter->setPen(c);
-   c.setAlpha(100);
-   painter->setBrush(c);
-   painter->drawRect(RECT.adjusted(0,0,-1,-1));
-   painter->restore();
+    painter->save();
+    QColor c = FCOLOR(Highlight);
+    painter->setPen(c);
+    c.setAlpha(100);
+    painter->setBrush(c);
+    painter->drawRect(RECT.adjusted(0,0,-1,-1));
+    painter->restore();
 }
+
 #include <QtDebug>
 void
 BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
 
 #if QT_VERSION >= 0x040400
-#define OPTION_VIEW_ITEM QStyleOptionViewItemV4
+    ASSURE_OPTION(item, ViewItemV4);
 #else
-#define OPTION_VIEW_ITEM QStyleOptionViewItemV2
+    ASSURE_OPTION(item, ViewItemV2);
 #endif
-    const OPTION_VIEW_ITEM *item = qstyleoption_cast<const OPTION_VIEW_ITEM *>(option);
-    if (!item) return;
-    const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
-
     OPT_HOVER
+
+    const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
     hover = hover && (!view || view->selectionMode() != QAbstractItemView::NoSelection);
     const bool selected = item->state & QStyle::State_Selected;
 
@@ -429,17 +432,18 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWi
 //       cg = QPalette::Inactive;
 
    
-   if (hover || selected)
-   {
-        Gradients::Type gt = Gradients::None;
-        const bool single = view && view->selectionMode() == QAbstractItemView::SingleSelection;
-        const bool round = !single && // typically list/tree - views
+    if (hover || selected)
+    {
+        // NOTE: single list/treeviews are typically single selected - but amarok doesn't set this..
+        const bool single = qobject_cast<const QTreeView*>(view) ||
+                            view && view->selectionMode() == QAbstractItemView::SingleSelection;
+        const bool round =  !single && (
 #if QT_VERSION >= 0x040400
-        (item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
-        (widget && widget->inherits("DolphinIconsView"))); // HACK, dolphin should please use the proper position flag...
-#else
-        (widget && widget->inherits("DolphinIconsView"));
+                            item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
 #endif
+                            // HACK, dolphin should please use the proper position flag...
+                            (widget && widget->inherits("DolphinIconsView")));
+        Gradients::Type gt = Gradients::None;
         if (round)
             gt = hover ? Gradients::Button : Gradients::Sunken;
         else if (selected && single)
@@ -449,7 +453,7 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWi
         {
             const QColor high = selected ? FCOLOR(Highlight) :
                                 Colors::mid(FCOLOR(Base), FCOLOR(Highlight),
-                                100/Colors::contrast(FCOLOR(Highlight), FCOLOR(Text)), 4);
+                                            100/Colors::contrast(FCOLOR(Highlight), FCOLOR(Text)), 4);
             painter->fillRect(RECT, high);
         }
         else

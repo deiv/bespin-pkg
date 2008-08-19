@@ -54,7 +54,7 @@ bool Factory::initialized_ = false;
 Config Factory::_config = { false, false, false };
 int Factory::buttonSize_ = -1;
 int Factory::borderSize_ = 4;
-int Factory::titleSize_[2] = {20,20};
+int Factory::titleSize_[2] = {18,16};
 Gradients::Type Factory::gradient_[2] = {Gradients::None, Gradients::Button};
 QVector<Button::Type> Factory::multiButton_(0);
 QMenu *Factory::desktopMenu_ = 0;
@@ -184,14 +184,14 @@ bool Factory::readConfig()
 
    int oldtitlesize = titleSize_[1];
    QFontMetrics fm(options()->font());
-   titleSize_[1] = fm.height() + 4;
+   titleSize_[1] = fm.height() + 2;
    if (oldtitlesize != titleSize_[1]) ret = true;
    oldtitlesize = titleSize_[0];
-   titleSize_[0] = qMax(titleSize_[1], borderSize_);
+   titleSize_[0] = qMax(titleSize_[1] + 2, borderSize_);
    if (oldtitlesize != titleSize_[0]) ret = true;
 
    if (buttonSize_ != titleSize_[1]) {
-      buttonSize_ = titleSize_[1]-8; // for the moment
+      buttonSize_ = titleSize_[1]-4; // for the moment
       Button::init(buttonSize_, options()->titleButtonsLeft().
       contains(QRegExp("(M|S|H|F|B|L)")));
    }

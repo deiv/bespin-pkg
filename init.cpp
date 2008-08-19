@@ -186,8 +186,7 @@ BespinStyle::readSettings(const QSettings* settings)
     config.hack.windowMovement = readBool(HACK_WINDOWMOVE);
 
     // PW Echo Char ===========================
-    config.input.pwEchoChar =
-        ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
+    config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
 
     // kwin - yes i let the style control the deco, iff the deco permits, though :)
     config.kwin.gradient[0] = readGrad(KWIN_INACTIVE_GRADIENT);
@@ -202,20 +201,30 @@ BespinStyle::readSettings(const QSettings* settings)
         config.kwin.active_role[Fg] = QPalette::WindowText;
 
     // flanders
-    config.leftHanded =
-        readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
+    config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
 
     // item single vs. double click, wizard appereance
     config.macStyle = readBool(MACSTYLE);
 
     // Menus ===========================
-    config.menu.glassy = readBool(MENU_GLASSY);
     config.menu.opacity = readInt(MENU_OPACITY);
     config.menu.itemGradient = readGrad(MENU_ITEMGRADIENT);
     config.menu.showIcons = readBool(MENU_SHOWICONS);
     config.menu.shadow = readBool(MENU_SHADOW);
-    readRole(menu.active, MENU_ACTIVEROLE);
-    readRole(menu.std, MENU_ROLE);
+    if (appType == GTK)
+    {
+        config.menu.glassy = false;
+        config.menu.std_role[Bg] = QPalette::Window;
+        config.menu.std_role[Fg] = QPalette::WindowText;
+        config.menu.active_role[Bg] = QPalette::Highlight;
+        config.menu.active_role[Fg] = QPalette::HighlightedText;
+    }
+    else
+    {
+        config.menu.glassy = readBool(MENU_GLASSY);
+        readRole(menu.active, MENU_ACTIVEROLE);
+        readRole(menu.std, MENU_ROLE);
+    }
     if (QCoreApplication::applicationName() == "plasma")
     {   // that's probably XBar, and we don't want a bg there...
         config.menu.bar_role[Bg] = QPalette::Window;
@@ -349,7 +358,7 @@ BespinStyle::init(const QSettings* settings)
 {
     // various workarounds... ==========================
     if (getenv("GTK_QT_ENGINE_ACTIVE"))
-        { appType = GTK; qWarning("Bespin: Detected GKT+ application"); }
+        { appType = GTK; qWarning("BESPIN: Detected GKT+ application"); }
     else if (QCoreApplication::applicationName() == "plasma")
         appType = Plasma;
     else if (QCoreApplication::applicationName() == "Designer")

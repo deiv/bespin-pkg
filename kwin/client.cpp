@@ -173,7 +173,7 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     else
     {
         left = right = bottom =  _factory->borderSize();
-        top = _factory->titleSize();
+        top = _factory->titleSize(_small);
         if (isShade()) bottom = 8;
     }
     //    left = right = bottom = borderSize;
@@ -230,6 +230,11 @@ void
 Client::init()
 {
     createMainWidget();
+    const unsigned long supported_types = NET::NormalMask | NET::DesktopMask | NET::DockMask |
+    NET::ToolbarMask | NET::MenuMask | NET::DialogMask | NET::OverrideMask | NET::TopMenuMask |
+    NET::UtilityMask | NET::SplashMask;
+    NET::WindowType type = windowType( supported_types );
+    _small = type == NET::Utility || type == NET::Menu || type == NET::Toolbar;
 
     _caption = trimm(caption());
     widget()->setAutoFillBackground(false);
@@ -542,7 +547,7 @@ Client::reset(unsigned long changed)
    delete _preview; _preview = 0;
    
    if (changed & SettingFont) {
-      titleSize = _factory->titleSize();
+      titleSize = _factory->titleSize(_small);
       titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
    }
 
@@ -565,7 +570,7 @@ Client::reset(unsigned long changed)
       }
       else {
          borderSize = _factory->borderSize();
-         titleSize = _factory->titleSize();
+         titleSize = _factory->titleSize(_small);
          if (corner) corner->show();
       }
 

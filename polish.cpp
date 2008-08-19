@@ -110,6 +110,11 @@ void BespinStyle::polish( QPalette &pal )
     pal.setColor(QPalette::Midlight, QColor(220,220,220));
     pal.setColor(QPalette::Light, QColor(240,240,240));
 
+    // Link colors can not be set through qtconfig - and the colors suck
+    pal.setColor(QPalette::Link, mid(pal.color(QPalette::Active, QPalette::Text),
+                                     pal.color(QPalette::Active, QPalette::Highlight), 1, 8));
+    pal.setColor(QPalette::LinkVisited, mid(pal.color(QPalette::Active, QPalette::Text),
+                                            pal.color(QPalette::Active, QPalette::Highlight), 1, 4));
 
 #if QT_VERSION >= 0x040400
     // tooltip (NOTICE not configurable by qtconfig, kde can, let's see what we're gonna do on this...)

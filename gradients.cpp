@@ -382,7 +382,7 @@ createDither()
     int a, v;
     for (int i = 0; i < 1024; ++i) // 32*32...
     {
-        a = rand() % 5;
+        a = (rand() % 6)/2;
         v = (a%2)*255;
         *pixel = qRgba(v,v,v,a);
         ++pixel;
