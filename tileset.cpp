@@ -176,21 +176,29 @@ Set::render(const QRect &r, QPainter *p) const
 
 #define MAKE_FILL(_OFF_)\
 if (!tile->isNull()) {\
-    if (_texPix || _texColor) {\
+    if (_texPix || _texColor)\
+    {\
         if (filledPix.size() != tile->size())\
             filledPix = QPixmap(tile->size());\
-        filledPix.fill(Qt::transparent);\
-        if (_texPix) {\
+        filledPix.fill(Qt::transparent); \
+        if (_texPix)\
+        {\
             pixPainter.begin(&filledPix);\
             pixPainter.drawTiledPixmap(filledPix.rect(), *_texPix, _OFF_-off);\
             pixPainter.end();\
         }\
         else\
-            filledPix.fill(*_texColor);\
+        {\
+            pixPainter.begin(&filledPix);\
+            pixPainter.setPen(Qt::NoPen); pixPainter.setBrush(*_texColor);\
+            pixPainter.drawRect(filledPix.rect());\
+            pixPainter.end();\
+        }\
         ADJUST_ALPHA(*tile);\
         tile = &filledPix;\
     }\
-    if (solidBg) {\
+    if (solidBg)\
+    {\
         if (solidPix.size() != tile->size())\
             solidPix = QPixmap(tile->size());\
         solidPix.fill(*solidBg);\
@@ -585,37 +593,42 @@ Line::Line(const QPixmap &pix, Qt::Orientation o, int d1, int d2)
     }
 }
 
-void Line::render(const QRect &rect, QPainter *p, PosFlags pf, bool btmRight) const {
-   int d0,d2;
-   if (_o == Qt::Horizontal) {
-      int y = btmRight?rect.bottom()-_thickness+1:rect.y();
-      d0 = (pf & Left) ? width(0) : 0;
-      d2 = (pf & Right) ? width(2) : 0;
-      if ((pf & Center) && rect.width() >= d0+d2)
-         p->drawTiledPixmap(rect.x()+d0,y, rect.width()-d0-d2, height(1), pixmap[1]);
-      else if (d0 || d2) {
-         d0 = qMin(d0,d0*rect.width()/(d0+d2));
-         d2 = qMin(d2,rect.width()-d0);
-      }
-      if (pf & Left)
-         p->drawPixmap(rect.x(),y, pixmap[0],0,0,d0,height(0));
-      if (pf & Right)
-         p->drawPixmap(rect.right()+1-d2,y, pixmap[2], width(2)-d2,0,d2,height(2));
-   }
-   else {
-      int x = btmRight?rect.right()-_thickness+1:rect.x();
-      d0 = (pf & Top) ? height(0) : 0;
-      d2 = (pf & Bottom) ? height(2) : 0;
-      if ((pf & Center) && rect.height() >= d0+d2) {
-         p->drawTiledPixmap(x,rect.y()+d0, width(1), rect.height()-d0-d2, pixmap[1]);
-      }
-      else if (d0 || d2) {
-         d0 = qMin(d0,d0*rect.height()/(d0+d2));
-         d2 = qMin(d2,rect.height()-d0);
-      }
-      if (pf & Top)
-         p->drawPixmap(x,rect.y(),pixmap[0],0,0,width(0),d0);
-      if (pf & Bottom)
-         p->drawPixmap(x, rect.bottom()+1-d2,pixmap[2],0,height(2)-d2,width(2),d2);
-   }
+void
+Line::render(const QRect &rect, QPainter *p, PosFlags pf, bool btmRight) const
+{
+    int d0,d2;
+    if (_o == Qt::Horizontal)
+    {
+        int y = btmRight ? (rect.bottom() - _thickness + 1) : rect.y();
+        d0 = (pf & Left) ? width(0) : 0;
+        d2 = (pf & Right) ? width(2) : 0;
+        if ((pf & Center) && rect.width() >= d0+d2)
+            p->drawTiledPixmap(rect.x() + d0, y, rect.width() - (d0 + d2), height(1), pixmap[1]);
+        else if (d0 || d2)
+        {
+            d0 = qMin(d0, d0*rect.width()/(d0+d2));
+            d2 = qMin(d2, rect.width() - d0);
+        }
+        if (pf & Left)
+            p->drawPixmap(rect.x(), y, pixmap[0], 0, 0, d0, height(0));
+        if (pf & Right)
+            p->drawPixmap(rect.right() + 1 - d2, y, pixmap[2], width(2) - d2, 0, d2, height(2));
+    }
+    else
+    {
+        int x = btmRight ? (rect.right() - _thickness + 1) : rect.x();
+        d0 = (pf & Top) ? height(0) : 0;
+        d2 = (pf & Bottom) ? height(2) : 0;
+        if ((pf & Center) && rect.height() >= d0+d2)
+            p->drawTiledPixmap(x, rect.y() + d0, width(1), rect.height() - (d0 + d2), pixmap[1]);
+        else if (d0 || d2)
+        {
+            d0 = qMin(d0, d0*rect.height()/(d0 + d2));
+            d2 = qMin(d2, rect.height() - d0);
+        }
+        if (pf & Top)
+            p->drawPixmap(x, rect.y(), pixmap[0], 0, 0, width(0), d0);
+        if (pf & Bottom)
+            p->drawPixmap(x, rect.bottom() + 1 - d2, pixmap[2], 0, height(2) - d2, width(2), d2);
+    }
 }

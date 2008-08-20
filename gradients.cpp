@@ -543,7 +543,7 @@ QPixmap &Gradients::ambient(int height)
     QLinearGradient lg( QPoint(pix->width(), pix->height()),
                         QPoint(pix->width()/2,pix->height()/2) );
     lg.setColorAt(0, QColor(255,255,255,0));
-    lg.setColorAt(0.2, QColor(255,255,255,100));
+    lg.setColorAt(0.2, QColor(255,255,255,38));
     lg.setColorAt(1, QColor(255,255,255,0));
     QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
 
@@ -554,7 +554,9 @@ QPixmap &Gradients::ambient(int height)
 
 static QPixmap _bevel[2];
 
-const QPixmap &Gradients::bevel(bool ltr) {
+const QPixmap&
+Gradients::bevel(bool ltr)
+{
    return _bevel[ltr];
 }
 

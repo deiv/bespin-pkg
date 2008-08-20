@@ -357,7 +357,8 @@ BespinStyle::polish( QWidget * widget )
             {
                 if (QTreeView* tv = qobject_cast<QTreeView*>(frame))
                 {   // allow all treeviews to be animated!
-                    if (config.hack.treeViews && tv->viewport() && tv->viewport()->autoFillBackground())
+                    if (config.hack.treeViews && tv->viewport() &&
+                        tv->viewport()->autoFillBackground())
                         tv->setAnimated ( true );
                 }
                 else // treeview hovering sucks, as the "tree" doesn't get an update
@@ -397,7 +398,7 @@ BespinStyle::polish( QWidget * widget )
     }
     //END FRAMES                                                                                   -
 
-    /// PUSHBUTTONS - hovering/animation ===========================================================
+    //BEGIN PUSHBUTTONS - hovering/animation                                                       -
     else if (widget->inherits("QAbstractButton"))
     {
         if (widget->inherits("QToolBoxButton") || IS_HTML_WIDGET )
@@ -427,9 +428,17 @@ BespinStyle::polish( QWidget * widget )
             pal.setColor(QPalette::Disabled, QPalette::ButtonText, pal.color(QPalette::Disabled, QPalette::WindowText));
             widget->setPalette(pal);
         }
+        // NOTICE WORKAROUND - this widget paints no bg, uses foregroundcolor() to paint the text...
+        // and has - of course - foregroundRole() == QPalette::ButtonText
+        // TODO: inform Peter Penz <peter.penz@gmx.at> or *cough* Aaron J. Seigo <aseigo@kde.org> and really fix this
+        if (widget->inherits("KUrlButton"))
+        {
+            widget->setBackgroundRole(QPalette::Window);
+            widget->setForegroundRole(QPalette::WindowText);
+        }
     }
     
-    /// COMBOBOXES - hovering/animation ============================================================
+    //BEGIN COMBOBOXES - hovering/animation                                                        -
     else if (widget->inherits("QComboBox"))
     {
         if (IS_HTML_WIDGET)
@@ -437,7 +446,7 @@ BespinStyle::polish( QWidget * widget )
         else
             Animator::Hover::manage(widget);
     }
-    /// SLIDERS / SCROLLBARS / SCROLLAREAS - hovering/animation ====================================
+    //BEGIN SLIDERS / SCROLLBARS / SCROLLAREAS - hovering/animation                                -
     else if (qobject_cast<QAbstractSlider*>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
@@ -481,7 +490,7 @@ BespinStyle::polish( QWidget * widget )
         }
     }
 
-    /// PROGRESSBARS - hover/animation and bold font ===============================
+    //BEGIN PROGRESSBARS - hover/animation and bold font                                           -
     else if (widget->inherits("QProgressBar"))
     {
         widget->setAttribute(Qt::WA_Hover);
@@ -489,7 +498,7 @@ BespinStyle::polish( QWidget * widget )
         Animator::Progress::manage(widget);
     }
 
-    /// Tab animation, painting override
+    //BEGIN Tab animation, painting override                                                       -
     else if (qobject_cast<QTabBar *>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
