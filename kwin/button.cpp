@@ -35,6 +35,9 @@
 
 using namespace Bespin;
 
+QPainterPath Button::shape[NumTypes];
+bool Button::fixedColors = false;
+
 Button::Button(Client *parent, Type type) : QWidget(parent->widget()),
 client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
 {
@@ -102,67 +105,66 @@ Button::isEnabled() const {
    return true;
 }
 
-QPainterPath Button::shape[NumTypes];
-
 void
-Button::init(int sz, bool leftMenu)
+Button::init(int sz, bool leftMenu, bool fColors)
 {
-   for (int t = 0; t < NumTypes; ++t)
-      shape[t] = QPainterPath();
+    fixedColors = fColors;
+    for (int t = 0; t < NumTypes; ++t)
+        shape[t] = QPainterPath();
    
-   const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
+    const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
 
-   shape[Close].addRect(-s2,-s2,sz,sz);
-   shape[Close].addRect(-s4,-s4,s2,s2);
-   shape[Close].addRect(s3-s2,s3-s2,s3,s3);
-   
-   shape[Min].addRect(-s2,-s2,sz,sz);
-   shape[Min].addRect(-s4,-s2,sz-s4,sz-s4);
-   shape[Min].addRect(s2-s3,-s2,s3,s3);
+    shape[Close].addRect(-s2,-s2,sz,sz);
+    shape[Close].addRect(-s4,-s4,s2,s2);
+    shape[Close].addRect(s3-s2,s3-s2,s3,s3);
 
-   shape[Max].addRect(-s2,-s2,sz,sz);
-   shape[Max].addRect(-s2,-s4,sz-s4,sz-s4);
-   shape[Max].addRect(-s2,s2-s3,s3,s3);
-   
-   shape[Restore].addRect(-s2,-s2,sz,sz);
-   shape[Restore].addRect(-s2,-s2,sz-s4,sz-s4);
-   shape[Restore].addRect(-s2,-s2,s3,s3);
-   
-   shape[Stick].addRect(s6-s2,s6-s2,sz-s3,sz-s3);
-   shape[Unstick].addRect(s3-s2,s3-s2,s3,s3);
-   
-   shape[Above].addRect(-s4,-s2,s2,s3);
-   shape[Above].addRect(-s2,s2-s3,s3,s3);
-   shape[Above].addRect(s2-s3,s2-s3,s3,s3);
+    shape[Min].addRect(-s2,-s2,sz,sz);
+    shape[Min].addRect(-s4,-s2,sz-s4,sz-s4);
+    shape[Min].addRect(s2-s3,-s2,s3,s3);
 
-   shape[Below].addRect(-s4,s2-s3,s2,s3);
-   shape[Below].addRect(-s2,-s2,s3,s3);
-   shape[Below].addRect(s2-s3,-s2,s3,s3);
-   
-   shape[UnAboveBelow].addRect(-s2,-s4,s3,s2);
-   shape[UnAboveBelow].addRect(s2-s3,-s4,s3,s2);
-   
-   shape[Menu].addRect(-s2,-s2,sz,sz);
-   if (leftMenu)
-      shape[Menu].addRect(0,-s4,s2,sz-s4);
-   else
-      shape[Menu].addRect(-s2,-s4,s2,sz-s4);
-   
-   shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
-   shape[Help].addRect(-s3,-s4,s3,sz-(s3+s4));
-   shape[Help].addRect(0,s2-s6,s4,s6);
+    shape[Max].addRect(-s2,-s2,sz,sz);
+    shape[Max].addRect(-s2,-s4,sz-s4,sz-s4);
+    shape[Max].addRect(-s2,s2-s3,s3,s3);
 
-   shape[Shade].addRect(-s2,-s2,sz,s4);
+    shape[Restore].addRect(-s2,-s2,sz,sz);
+    shape[Restore].addRect(-s2,-s2,sz-s4,sz-s4);
+    shape[Restore].addRect(-s2,-s2,s3,s3);
 
-   shape[Unshade].addRect(-s2,s4,sz,s4);
+    shape[Stick].addRect(s6-s2,s6-s2,sz-s3,sz-s3);
+    shape[Unstick].addRect(s3-s2,s3-s2,s3,s3);
 
-   shape[Exposee].addRect(-s2,-s2,s3,s3);
-   shape[Exposee].addRect(s2-s3,-s2,s3,s3);
-   shape[Exposee].addRect(-s2,s2-s3,s3,s3);
-   shape[Exposee].addRect(s2-s3,s2-s3,s3,s3);
+    shape[Above].addRect(-s4,-s2,s2,s3);
+    shape[Above].addRect(-s2,s2-s3,s3,s3);
+    shape[Above].addRect(s2-s3,s2-s3,s3,s3);
 
-   shape[Info].addRect(-s6,-s2,s4,s4);
-   shape[Info].addRect(-s6,-s6,s4,s2+s3);
+    shape[Below].addRect(-s4,s2-s3,s2,s3);
+    shape[Below].addRect(-s2,-s2,s3,s3);
+    shape[Below].addRect(s2-s3,-s2,s3,s3);
+
+    shape[UnAboveBelow].addRect(-s2,-s4,s3,s2);
+    shape[UnAboveBelow].addRect(s2-s3,-s4,s3,s2);
+
+    shape[Menu].addRect(-s2,-s2,sz,sz);
+    if (leftMenu)
+        shape[Menu].addRect(0,-s4,s2,sz-s4);
+    else
+        shape[Menu].addRect(-s2,-s4,s2,sz-s4);
+
+    shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
+    shape[Help].addRect(-s3,-s4,s3,sz-(s3+s4));
+    shape[Help].addRect(0,s2-s6,s4,s6);
+
+    shape[Shade].addRect(-s2,-s2,sz,s4);
+
+    shape[Unshade].addRect(-s2,s4,sz,s4);
+
+    shape[Exposee].addRect(-s2,-s2,s3,s3);
+    shape[Exposee].addRect(s2-s3,-s2,s3,s3);
+    shape[Exposee].addRect(-s2,s2-s3,s3,s3);
+    shape[Exposee].addRect(s2-s3,s2-s3,s3,s3);
+
+    shape[Info].addRect(-s6,-s2,s4,s4);
+    shape[Info].addRect(-s6,-s6,s4,s2+s3);
 
 
 //    tip[Close] = i18n("Close");
@@ -177,7 +179,7 @@ Button::init(int sz, bool leftMenu)
 //    tip[Stick] = i18n("All Desktops");
 //    tip[Unstick] = i18n("This Desktops only");
 }
-#include <QtDebug>
+
 void
 Button::enterEvent(QEvent *)
 {
@@ -227,85 +229,97 @@ Button::mousePressEvent ( QMouseEvent * event )
 void
 Button::mouseReleaseEvent ( QMouseEvent * event )
 {
-   if (!isEnabled() || !underMouse()) return;
+    state &= ~Sunken;
+    if (!isEnabled() || !QRect(mapToGlobal(QPoint(0,0)), size()).contains(QCursor::pos()))
+    {
+        repaint();
+        return;
+    }
    
-   KDecorationFactory* f = client->factory(); // needs to be saved before
-	state &= ~Sunken;
-   const bool lb = (event->button() == Qt::LeftButton);
-   const bool rb = (event->button() == Qt::RightButton);
-   switch (_type) {
-   case Close:
-      if (lb && client->isCloseable ())
-         client->closeWindow();
-      break;
-   case Min:
-      if (lb && client->isMinimizable ())
-         client->minimize();
-//       else if (rb) // TODO get dbus interface or whatever to show the Desktop
-//          client->workspace()->setShowingDesktop( true );
-      break;
-   case Max:
-      if (client->isMaximizable ()) {
-         _type = Restore;
-         //TODO support alt/ctrl click?!
-//          KDecorationDefines::MaximizeMode mode;
-//          MaximizeRestore    The window is not maximized in any direction.
-//          MaximizeVertical    The window is maximized vertically.
-//          MaximizeHorizontal    The window is maximized horizontally.
-//          MaximizeFull 
-         client->maximize(event->button());
-      }
-      break;
-   case Restore:
-      _type = Max;
-      client->maximize(event->button());
-      break;
-   case Menu:
-      //TODO: prepare menu? -> icon, title, stuff
-      client->showWindowMenu (mapToGlobal(rect().bottomLeft()));
-      break;
-   case Help:
-      if (lb) client->showContextHelp(); break;
-   case Above:
-      if (lb) client->setKeepAbove (!client->keepAbove()); break;
-   case Below:
-      if (lb) client->setKeepBelow (!client->keepBelow()); break;
-   case UnAboveBelow:
-      if (lb) {
-         client->setKeepAbove(false);
-         client->setKeepBelow(false);
-      }
-      break;
-   case Stick:
-   case Unstick:
-      if (lb) client->toggleOnAllDesktops();
-      else if (rb) client->showDesktopMenu(mapToGlobal(rect().topLeft())); break;
-   case Shade:
-   case Unshade:
-      if (lb) client->setShade(!client->isSetShade()); break;
-   case Exposee:
-//       if (rb) //TODO: toggle KWin composite exposé here on lb if available!
-         client->showWindowList(mapToGlobal(rect().topLeft())); break;
-   case Info:
-      client->showInfo(mapToGlobal(rect().topLeft())); break;
-   default:
-      return; // invalid type
-   }
-   if( !f->exists( client )) // destroyed, return immediately
-      return;
-   repaint();
+    KDecorationFactory* f = client->factory(); // needs to be saved before
+
+    const bool lb = (event->button() == Qt::LeftButton);
+    const bool rb = (event->button() == Qt::RightButton);
+    switch (_type)
+    {
+    case Close:
+        if (lb && client->isCloseable ())
+            client->closeWindow();
+        break;
+    case Min:
+        if (lb && client->isMinimizable ())
+            client->minimize();
+    //       else if (rb) // TODO get dbus interface or whatever to show the Desktop
+    //          client->workspace()->setShowingDesktop( true );
+        break;
+    case Max:
+        if (client->isMaximizable ())
+        {
+            _type = Restore;
+            //TODO support alt/ctrl click?!
+    //          KDecorationDefines::MaximizeMode mode;
+    //          MaximizeRestore    The window is not maximized in any direction.
+    //          MaximizeVertical    The window is maximized vertically.
+    //          MaximizeHorizontal    The window is maximized horizontally.
+    //          MaximizeFull
+            client->maximize(event->button());
+        }
+        break;
+    case Restore:
+        _type = Max;
+        client->maximize(event->button());
+        break;
+    case Menu:
+        //TODO: prepare menu? -> icon, title, stuff
+        client->showWindowMenu (mapToGlobal(rect().bottomLeft()));
+        break;
+    case Help:
+        if (lb) client->showContextHelp(); break;
+    case Above:
+        if (lb) client->setKeepAbove (!client->keepAbove()); break;
+    case Below:
+        if (lb) client->setKeepBelow (!client->keepBelow()); break;
+    case UnAboveBelow:
+        if (lb)
+        {
+            client->setKeepAbove(false);
+            client->setKeepBelow(false);
+        }
+        break;
+    case Stick:
+    case Unstick:
+        if (lb) client->toggleOnAllDesktops();
+        else if (rb) client->showDesktopMenu(mapToGlobal(rect().topLeft())); break;
+    case Shade:
+    case Unshade:
+        if (lb) client->setShade(!client->isSetShade()); break;
+    case Exposee:
+    //       if (rb) //TODO: toggle KWin composite exposé here on lb if available!
+            client->showWindowList(mapToGlobal(rect().topLeft())); break;
+    case Info:
+        client->showInfo(mapToGlobal(rect().topLeft())); break;
+    default:
+        return; // invalid type
+    }
+    if( !f->exists( client )) // destroyed, return immediately
+        return;
+    repaint();
 }
+
+static uint fcolors[3] = {0xFFBF0303, 0xFFF3C300, 0xFF00892B};
 
 QColor
 Button::color() const
 {
-   QColor c = client->color(KDecorationDefines::ColorButtonBg, client->isActive());
-   const QColor bg = client->color(KDecorationDefines::ColorFrame, client->isActive());
-   if (isEnabled())
-      c = Colors::mid(bg, c, 6-zoomLevel, 6);
-   else
-      c = Colors::mid(bg, c, 6, 1);
-   return c;
+    QColor c = client->color(KDecorationDefines::ColorButtonBg, client->isActive());
+    if (fixedColors && _type < Multi)
+        c = Colors::mid(c, QColor(fcolors[_type]), 6-zoomLevel, zoomLevel);
+    const QColor bg = client->color(KDecorationDefines::ColorFrame, client->isActive());
+    if (isEnabled())
+        c = Colors::mid(bg, c, 6-zoomLevel, 6);
+    else
+        c = Colors::mid(bg, c, 6, 1);
+    return c;
 }
 
 void
@@ -313,8 +327,10 @@ Button::paintEvent(QPaintEvent *)
 {
    QPainter p(this);
    p.setRenderHint(QPainter::Antialiasing);
-   const float t = height()/2.0; p.translate( QPoint(t,t) );
-   const float f = (18 + zoomLevel)/24.0; p.scale ( f, f );
+   const float t = height()/2.0;
+   p.translate( QPoint(t,t) );
+   const float f = (18 + (!(state & Sunken))*zoomLevel)/24.0;
+   p.scale ( f, f );
    p.setPen(Qt::NoPen);
    p.setBrush(color());
    p.drawPath(shape[_type]);

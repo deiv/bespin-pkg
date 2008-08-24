@@ -37,7 +37,7 @@ namespace Bespin {
 class XProperty {
 public:
    static Atom bgInfo, actInfo, inactInfo, decoDim,
-   topTile, btmTile, cnrTile, lCorner, rCorner;
+   topTile, btmTile, cnrTile, lCorner, rCorner, pid;
 
    static bool get(WId window, Atom atom, uint& data);
    static void set(WId window, Atom atom, uint data);

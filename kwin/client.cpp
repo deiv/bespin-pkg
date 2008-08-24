@@ -226,13 +226,15 @@ Client::eventFilter(QObject *o, QEvent *e)
     return false;
 }
 
+static const unsigned long
+supported_types =   NET::NormalMask | NET::DesktopMask | NET::DockMask | NET::ToolbarMask |
+                    NET::MenuMask | NET::DialogMask | NET::OverrideMask | NET::TopMenuMask |
+                    NET::UtilityMask | NET::SplashMask;
+
 void
 Client::init()
 {
     createMainWidget();
-    const unsigned long supported_types = NET::NormalMask | NET::DesktopMask | NET::DockMask |
-    NET::ToolbarMask | NET::MenuMask | NET::DialogMask | NET::OverrideMask | NET::TopMenuMask |
-    NET::UtilityMask | NET::SplashMask;
     NET::WindowType type = windowType( supported_types );
     _small = type == NET::Utility || type == NET::Menu || type == NET::Toolbar;
 
@@ -251,7 +253,8 @@ Client::init()
     layout->addLayout(titleBar);
     layout->addStretch(1000);
 
-    for (int i = 0; i < 4; ++i) buttons[i] = 0;
+    for (int i = 0; i < 4; ++i)
+        buttons[i] = 0;
     gType[0] = Gradients::None;
     gType[1] = Gradients::Button;
 
@@ -259,8 +262,7 @@ Client::init()
     {
         _preview = new PreviewWidget(widget());
 //       _preview->setAutoFillBackground(true);
-        _preview->setGeometry ( borderSize, titleSize,
-                                widget()->width()-2*borderSize,
+        _preview->setGeometry(  borderSize, titleSize, widget()->width()-2*borderSize,
                                 widget()->height()-(borderSize+titleSize));
         _preview->show();
         _preview->raise();
@@ -544,119 +546,160 @@ Client::repaint(QPainter &p)
 void
 Client::reset(unsigned long changed)
 {
-   delete _preview; _preview = 0;
-   
-   if (changed & SettingFont) {
-      titleSize = _factory->titleSize(_small);
-      titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
-   }
+    delete _preview; _preview = 0;
 
-   if (changed & SettingDecoration) {
-      gType[0] = _factory->gradient(0);
-      gType[1] = _factory->gradient(1);
-      changed |= SettingColors;
-   }
+    if (changed & SettingFont)
+    {
+        titleSize = _factory->titleSize(_small);
+        titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
 
-   if (changed & SettingBorder) {
-      if (maximizeMode() == MaximizeFull) {
-         if (options()->moveResizeMaximizedWindows()) {
-            borderSize = 4;
-         }
-         else {
-            borderSize = 0;
-            if (corner) corner->hide();
-         }
-         titleSize = _factory->titleSize(true);
-      }
-      else {
-         borderSize = _factory->borderSize();
-         titleSize = _factory->titleSize(_small);
-         if (corner) corner->show();
-      }
+    if (changed & SettingDecoration)
+    {
+        gType[0] = _factory->gradient(0);
+        gType[1] = _factory->gradient(1);
+        changed |= SettingColors;
+    }
 
-      bottom = QRect(0, height()-borderSize, width(), borderSize);
-      const int sideHeight = height() - (titleSize + borderSize);
-      left = QRect(0, titleSize, borderSize, sideHeight);
-      right = QRect(width()-borderSize, titleSize, borderSize, sideHeight);
+    if (changed & SettingBorder)
+    {
+        if (maximizeMode() == MaximizeFull)
+        {
+            if (options()->moveResizeMaximizedWindows())
+                borderSize = 4;
+            else
+            {
+                borderSize = 0;
+                if (corner)
+                    corner->hide();
+            }
+            titleSize = _factory->titleSize(true);
+        }
+        else
+        {
+            borderSize = _factory->borderSize();
+            titleSize = _factory->titleSize(_small);
+            if (corner)
+                corner->show();
+        }
 
-      int decoDim =
-      ((borderSize & 0xff) << 24) | ((titleSize &0xff) << 16) |
-      ((borderSize &0xff) << 8) | (borderSize & 0xff);
-      XProperty::set(windowId(), XProperty::decoDim, decoDim);
-      titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
-   }
+        bottom = QRect(0, height()-borderSize, width(), borderSize);
+        const int sideHeight = height() - (titleSize + borderSize);
+        left = QRect(0, titleSize, borderSize, sideHeight);
+        right = QRect(width()-borderSize, titleSize, borderSize, sideHeight);
 
-   if (changed & SettingButtons)
-   {
-      for (int i = 0; i < 4; ++i) {
-         delete buttons[i]; buttons[i] = 0;
-      }
-      titleBar->removeItem(titleSpacer);
-      addButtons(options()->titleButtonsLeft(), buttonSpaceLeft);
-      titleBar->addItem(titleSpacer);
-      addButtons(options()->titleButtonsRight(), buttonSpaceRight);
-      buttonSpace = qMax(buttonSpaceLeft, buttonSpaceRight);
-   }
+        int decoDim =   ((borderSize & 0xff) << 24) | ((titleSize &0xff) << 16) |
+                        ((borderSize &0xff) << 8) | (borderSize & 0xff);
+        XProperty::set(windowId(), XProperty::decoDim, decoDim);
+        titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
 
-   if (changed & SettingColors) {
-      // colors =====================
-      for (int a = 0; a < 2; ++a)
-         for (int t = 0; t < 4; ++t)
+    if (changed & SettingButtons)
+    {
+        for (int i = 0; i < 4; ++i)
+            { delete buttons[i]; buttons[i] = 0; }
+        titleBar->removeItem(titleSpacer);
+        addButtons(options()->titleButtonsLeft(), buttonSpaceLeft);
+        titleBar->addItem(titleSpacer);
+        addButtons(options()->titleButtonsRight(), buttonSpaceRight);
+        buttonSpace = qMax(buttonSpaceLeft, buttonSpaceRight);
+    }
+
+    if (changed & SettingColors)
+    {   // colors =====================
+        for (int a = 0; a < 2; ++a)
+        for (int t = 0; t < 4; ++t)
             colors[a][t] = options()->color((ColorType)t, a);
 
-      bool def = (bgMode == 1);
-      if (!(isPreview() || config()->forceUserColors)) {
-      uint info;
-      if (XProperty::get(windowId(), XProperty::bgInfo, info)) {
-         def = false;
-         XProperty::decode(info, colors[1][ColorTitleBar], colors[1][ColorFont], bgMode);
-         colors[0][ColorTitleBar] = colors[1][ColorTitleBar];
-         colors[0][ColorFont] = Colors::mid(colors[1][ColorTitleBar], colors[1][ColorFont],2,1);
-      }
-      if (XProperty::get(windowId(), XProperty::inactInfo, info)) {
-         XProperty::decode(info, colors[0][ColorTitleBlend], colors[0][ColorButtonBg], gType[0]);
-         gType[0] = Gradients::fromInfo(gType[0]);
-      }
-      if (XProperty::get(windowId(), XProperty::actInfo, info)) {
-         XProperty::decode(info, colors[1][ColorTitleBlend], colors[1][ColorButtonBg], gType[1]);
-         gType[1] = Gradients::fromInfo(gType[1]);
-      }
-      }
-      if (def) { // the fallback solution
-         for (int i = 0; i <  2; ++i) {
-            if (!gType[i]) { //buttoncolor MUST be = titlefont
-               colors[i][ColorTitleBlend] = colors[i][ColorTitleBar];
-               colors[i][ColorButtonBg] = colors[i][ColorFont];
+        bool def = (bgMode == 1);
+        if (!(isPreview() || config()->forceUserColors))
+        {
+            KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
+            if (info.windowClassClass() == "Wine")
+            {   // this is a Wine window, make ungly win grey (everything 'bout win is ugly... ;-)
+                QColor winGrey(192,192,192);
+                colors[0][ColorTitleBlend] = colors[0][ColorTitleBar] = winGrey;
+                colors[1][ColorTitleBlend] = colors[1][ColorTitleBar] = Qt::black;
+                colors[0][ColorButtonBg] = colors[0][ColorFont] = Colors::mid(winGrey, QColor(0,0,0));
+                colors[1][ColorButtonBg] = colors[1][ColorFont] = Qt::white;
+                bgMode = 1;
             }
-            // usually the window is titlebar colored and the titleblend gradient painted upon - in case
-            // but the fallback shall be fully titleblend with a titlebar color section behind the title
-            // to not have to ahndle this during the painting, we just swap the colors here
-            else {
-               QColor h = colors[i][ColorTitleBlend];
-               colors[i][ColorTitleBlend] = colors[i][ColorTitleBar];
-               colors[i][ColorTitleBar] = h;
+            else
+            {   // nope, but maybe stylecontrolled
+                uint bgColors, actColors, inactColors, pid;
+                bool b1 = false, b2 = false, b3 = false;
+                if (XProperty::get(windowId(), XProperty::pid, pid) &&
+                    factory()->hasDecoInfo(pid, bgColors, actColors, inactColors))
+                    { b1 = b2 = b3 = true; }
+                else
+                {
+                    b1 = XProperty::get(windowId(), XProperty::bgInfo, bgColors);
+                    b2 = XProperty::get(windowId(), XProperty::actInfo, actColors);
+                    b3 = XProperty::get(windowId(), XProperty::inactInfo, inactColors);
+                }
+                if (b1)
+                {
+                    def = false;
+                    XProperty::decode(bgColors, colors[1][ColorTitleBar], colors[1][ColorFont], bgMode);
+                    colors[0][ColorTitleBar] = colors[1][ColorTitleBar];
+                    colors[0][ColorFont] = Colors::mid(colors[1][ColorTitleBar], colors[1][ColorFont],2,1);
+                }
+                if (b2)
+                {
+                    XProperty::decode(actColors, colors[1][ColorTitleBlend], colors[1][ColorButtonBg], gType[1]);
+                    gType[1] = Gradients::fromInfo(gType[1]);
+                }
+                if (b3)
+                {
+                    XProperty::decode(inactColors, colors[0][ColorTitleBlend], colors[0][ColorButtonBg], gType[0]);
+                    gType[0] = Gradients::fromInfo(gType[0]);
+                }
             }
-         }
-      }
-      else if (bgMode == 1) { // needs titlefont and button bg swapped...
-         for (int i = 0; i <  2; ++i) {
-            QColor h = colors[i][ColorButtonBg];
-            colors[i][ColorButtonBg] = colors[i][ColorFont];
-            colors[i][ColorFont] = h;
-         }
-      }
-      // last, clamp ColorTitleBlend to v >= 80
-      int h,s,v;
-      for (int i = 0; i <  2; ++i) {
-         v = Colors::value(colors[i][ColorTitleBlend]);
-         if (v < 80) {
-            colors[i][ColorTitleBlend].getHsv(&h,&s,&v);
-            colors[i][ColorTitleBlend].setHsv(h,s,80);
-         }
-      }
-   }
+        }
+        if (def)
+        {   // the fallback solution
+            for (int i = 0; i <  2; ++i)
+            {
+                if (!gType[i])
+                {   //buttoncolor MUST be = titlefont
+                    colors[i][ColorTitleBlend] = colors[i][ColorTitleBar];
+                    colors[i][ColorButtonBg] = colors[i][ColorFont];
+                }
+                // usually the window is titlebar colored and the titleblend gradient painted upon - in case
+                // but the fallback shall be fully titleblend with a titlebar color section behind the title
+                // to not have to ahndle this during the painting, we just swap the colors here
+                else
+                {
+                    QColor h = colors[i][ColorTitleBlend];
+                    colors[i][ColorTitleBlend] = colors[i][ColorTitleBar];
+                    colors[i][ColorTitleBar] = h;
+                }
+            }
+        }
+        else if (bgMode == 1)
+        {   // needs titlefont and button bg swapped...
+            for (int i = 0; i <  2; ++i)
+            {
+                QColor h = colors[i][ColorButtonBg];
+                colors[i][ColorButtonBg] = colors[i][ColorFont];
+                colors[i][ColorFont] = h;
+            }
+        }
+        // last, clamp ColorTitleBlend to v >= 80
+        int h,s,v;
+        for (int i = 0; i <  2; ++i)
+        {
+            v = Colors::value(colors[i][ColorTitleBlend]);
+            if (v < 80)
+            {
+                colors[i][ColorTitleBlend].getHsv(&h,&s,&v);
+                colors[i][ColorTitleBlend].setHsv(h,s,80);
+            }
+        }
+    }
 
-   if (changed) activeChange(); // handles bg pixmaps in case and triggers update
+   if (changed)
+       activeChange(); // handles bg pixmaps in case and triggers update
    
 }
 
@@ -832,7 +875,8 @@ Client::trimm(const QString &string)
     /* Browsers set the title to <html><title/></html> - appname
     Now the page titles can be ridiculously looooong, especially on news
     pages --------------------------------- */
-    if (isBrowser(appName)) {
+    if (isBrowser(appName))
+    {
         int n = qMin(2, ret.count(" - "));
         if (n--) // select last two if 3 or more sects, prelast otherwise
             ret = ret.section(" - ", -2, n-2, QString::SectionSkipEmpty);

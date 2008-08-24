@@ -36,35 +36,39 @@ class Client;
 
 class Button : public QWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   enum State { Normal, Hovered, Sunken };
-   enum Type { Close = 0, Min, Max, Multi,
-   Menu, Help, Above, Below, Stick, Shade, Exposee, Info, Special,
-   //    VertMax, HoriMax,
-   Restore, Unstick, UnAboveBelow, Unshade, NumTypes };
-   Button(Client *parent, Type type);
-   static void init(int sz, bool leftMenu = false);
-   bool isEnabled() const;
-   inline bool type() {return _type;}
+    enum State { Normal, Hovered, Sunken };
+    enum Type
+    {
+        Close = 0, Min, Max, Multi,
+        Menu, Help, Above, Below, Stick, Shade, Exposee, Info, Special,
+        // VertMax, HoriMax,
+        Restore, Unstick, UnAboveBelow, Unshade, NumTypes
+    };
+    Button(Client *parent, Type type);
+    static void init(int sz, bool leftMenu = false, bool fixedColors = false);
+    bool isEnabled() const;
+    inline bool type() {return _type;}
 protected:
-	void enterEvent(QEvent *e);
-	void leaveEvent(QEvent *e);
-	void mousePressEvent ( QMouseEvent * event );
-	void mouseReleaseEvent ( QMouseEvent * event );
-	void paintEvent(QPaintEvent *e);
-	void timerEvent ( QTimerEvent * event );
-	void wheelEvent(QWheelEvent * event);
+    void enterEvent(QEvent *e);
+    void leaveEvent(QEvent *e);
+    void mousePressEvent ( QMouseEvent * event );
+    void mouseReleaseEvent ( QMouseEvent * event );
+    void paintEvent(QPaintEvent *e);
+    void timerEvent ( QTimerEvent * event );
+    void wheelEvent(QWheelEvent * event);
 private:
-   QColor color() const;
-	bool zoomOut;
-	Client *client;
-	Type _type;
-   int state, multiIdx, zoomTimer, zoomLevel;
-   static QPainterPath shape[NumTypes];
-   static QString tip[NumTypes];
+    QColor color() const;
+    bool zoomOut;
+    Client *client;
+    Type _type;
+    int state, multiIdx, zoomTimer, zoomLevel;
+    static QPainterPath shape[NumTypes];
+    static QString tip[NumTypes];
+    static bool fixedColors;
 private slots:
-   void clientStateChanged(bool);
+    void clientStateChanged(bool);
 };
 
 } //namespace

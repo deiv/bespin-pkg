@@ -50,6 +50,7 @@ Atom  XProperty::lCorner =
 XInternAtom(QX11Info::display(), "BESPIN_LEFT_CORNER", False);
 Atom  XProperty::rCorner =
 XInternAtom(QX11Info::display(), "BESPIN_RIGHT_CORNER", False);
+Atom  XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
 
 static unsigned char *chardata = 0;
 static int result, de; //dead end

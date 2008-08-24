@@ -28,6 +28,7 @@
 #include <QToolBar>
 #include <QToolTip>
 #include <QTreeView>
+#include <QtDBus/QDBusInterface>
 
 #include "colors.h"
 
@@ -83,6 +84,10 @@ mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
                  ((w1*c1.alpha() + w2*c2.alpha())/sum) & 0xff);
 }
 
+static QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco");
+
+#undef PAL
+#define PAL pal
 
 void BespinStyle::polish( QPalette &pal )
 {
@@ -160,6 +165,17 @@ void BespinStyle::polish( QPalette &pal )
     toolPal.setColor(QPalette::ToolTipBase, bg);
     toolPal.setColor(QPalette::ToolTipText, fg);
     QToolTip::setPalette(toolPal);
+
+
+#ifdef Q_WS_X11
+    if (appType == GTK)
+    {
+        bespinDeco.call(QDBus::NoBlock, "styleByPid", QCoreApplication::applicationPid(),
+                        XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode),
+                        XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]),
+                        XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]));
+    }
+#endif
 }
 
 #if 0
@@ -177,8 +193,6 @@ bar4popup(QMenu *menu)
 }
 #endif
 
-#undef PAL
-#define PAL pal
 
 inline static void
 polishGTK(QWidget * widget)

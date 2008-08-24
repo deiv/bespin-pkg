@@ -24,6 +24,7 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QDBusConnection>
 #include <QFontMetrics>
 #include <QLabel>
 #include <QMenu>
@@ -37,6 +38,7 @@
 // #include "button.h"
 #include "client.h"
 #include "factory.h"
+#include "dbus.h"
 
 #include <QtDebug>
 
@@ -61,18 +63,21 @@ QMenu *Factory::desktopMenu_ = 0;
 QMenu *Factory::_windowList = 0;
 QTextBrowser *Factory::_windowInfo = 0;
 
-Factory::Factory()
+Factory::Factory() : QObject()
 {
-	readConfig();
-   Gradients::init();
-   initialized_ = true;
+    readConfig();
+    Gradients::init();
+    initialized_ = true;
+    new BespinDecoAdaptor(this);
+//     QDBusConnection::sessionBus().registerService("org.kde.XBar");
+    QDBusConnection::sessionBus().registerObject("/BespinDeco", this);
 }
 
 Factory::~Factory() { initialized_ = false; Gradients::wipe(); }
 
 KDecoration* Factory::createDecoration(KDecorationBridge* b)
 {
-	return new Client(b, this);
+    return new Client(b, this);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -192,8 +197,8 @@ bool Factory::readConfig()
 
    if (buttonSize_ != titleSize_[1]) {
       buttonSize_ = titleSize_[1]-4; // for the moment
-      Button::init(buttonSize_, options()->titleButtonsLeft().
-      contains(QRegExp("(M|S|H|F|B|L)")));
+      Button::init( buttonSize_, options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
+                    settings.value("IAmMyLittleSister", false).toBool());
    }
 
    return ret;
@@ -435,3 +440,39 @@ Factory::supports( Ability ability ) const
 		return false;
 	};
 }
+
+void
+Factory::learn(qint64 pid, uint bgColors, uint activeColors, uint inactiveColors)
+{
+    forget(pid);
+    DecoInfo *info = new DecoInfo;
+    info->bgColors = bgColors;
+    info->activeColors = activeColors;
+    info->inactiveColors = inactiveColors;
+    _decoInfos.insert(pid, info);
+}
+
+void
+Factory::forget(qint64 pid)
+{
+    QMap<qint64, DecoInfo*>::iterator i = _decoInfos.find(pid);
+    if (i == _decoInfos.end())
+        return;
+    
+    delete i.value(); i.value() = 0;
+    _decoInfos.erase(i);
+}
+
+bool
+Factory::hasDecoInfo(qint64 pid, uint &bgColors, uint &activeColors, uint &inactiveColors)
+{
+    QMap<qint64, DecoInfo*>::iterator i = _decoInfos.find(pid);
+    if (i == _decoInfos.end())
+        return false;
+    bgColors = i.value()->bgColors;
+    activeColors = i.value()->activeColors;
+    inactiveColors = i.value()->inactiveColors;
+    return true;
+}
+
+#include "dbus.moc"

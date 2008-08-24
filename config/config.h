@@ -24,43 +24,45 @@
 
 class Config : public BConfig /** <-- inherit BConfig */
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   /** The constructor... */
-   Config(QWidget *parent = 0L);
-   static QString sImport(const QString &file);
-   static bool sExport(const QString &preset, const QString &file);
-   static QStringList colors(const QPalette &pal, QPalette::ColorGroup group);
-   static bool load(const QString&);
-   static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list);
+    /** The constructor... */
+    Config(QWidget *parent = 0L);
+    static QString sImport(const QString &file);
+    static bool sExport(const QString &preset, const QString &file);
+    static QStringList colors(const QPalette &pal, QPalette::ColorGroup group);
+    static bool load(const QString&);
+    static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list);
 public slots:
-   /** We'll reimplement the im/export functions to handle color settings as well*/
-   void store();
-   void restore();
-   void save(); // to store colors to qt configuration - in case
-   void import();
-   void saveAs();
+    /** We'll reimplement the im/export functions to handle color settings as well*/
+    void store();
+    void restore();
+    void restore(QTreeWidgetItem*, int);
+    void save(); // to store colors to qt configuration - in case
+    void import();
+    void saveAs();
 private:
-   /** This is the UI created with Qt Designer and included by ui_config.h */
-   Ui::Config ui;
-   
-   /** Just some functions to fill the comboboxes, not really of interest */
-   void generateColorModes(QComboBox *box);
-   void generateGradientTypes(QComboBox *box);
-   
-   QPalette *loadedPal;
-   bool infoIsManage;
-   void store3(const QString &, bool);
-	static void savePalette(const QPalette &pal);
+    /** This is the UI created with Qt Designer and included by ui_config.h */
+    Ui::Config ui;
+
+    /** Just some functions to fill the comboboxes, not really of interest */
+    void generateColorModes(QComboBox *box);
+    void generateGradientTypes(QComboBox *box);
+
+    QPalette *loadedPal;
+    bool infoIsManage;
+    void store3(const QString &, bool);
+    static void savePalette(const QPalette &pal);
 private slots:
-   void storedSettigSelected(QListWidgetItem *);
-   void store2a();
-   void store2b(QListWidgetItem *);
-   void remove();
-   void handleBgMode(int);
-   void handleGrooveMode(int);
-   void learnPwChar();
-   void filterPresets(const QString & text);
+    void storedSettigSelected(QTreeWidgetItem *);
+    void store2a();
+    void store2b(QTreeWidgetItem *);
+    void remove();
+    void handleBgMode(int);
+    void handleGrooveMode(int);
+    void learnPwChar();
+    void filterPresets(const QString & text);
+    void presetAppsChanged(QTreeWidgetItem *, int);
 };
 
 #endif

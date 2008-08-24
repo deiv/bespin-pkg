@@ -91,7 +91,7 @@ int BespinStyle::styleHint( StyleHint hint, const QStyleOption * option, const Q
     case SH_Menu_FillScreenWithScroll:
         return false; // don't trash the desktop
     case SH_ItemView_ChangeHighlightOnFocus:
-        return true; // Gray out selected items when losing focus.
+        return config.fadeInactive; // Gray out selected items when losing focus.
 ///    case SH_Widget_ShareActivation: // Turn on sharing activation with floating modeless dialogs.
     case SH_TabBar_SelectMouseType:
         return QEvent::MouseButtonRelease; // QEvent::MouseButtonPress?

@@ -58,7 +58,7 @@
           </font>
          </property>
          <property name="alternatingRowColors" >
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="spacing" >
           <number>3</number>
@@ -127,8 +127,6 @@
         </widget>
        </item>
       </layout>
-      <zorder>sectionSelect</zorder>
-      <zorder>sections</zorder>
      </widget>
      <widget class="QWidget" name="page_2" >
       <property name="geometry" >
@@ -205,7 +203,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="Seite_3" >
       <layout class="QGridLayout" name="gridLayout_2" >
@@ -240,25 +238,50 @@
         </layout>
        </item>
        <item row="1" column="0" >
-        <widget class="QListWidget" name="store" >
+        <widget class="QTreeWidget" name="store" >
          <property name="alternatingRowColors" >
           <bool>true</bool>
          </property>
-         <property name="selectionBehavior" >
-          <enum>QAbstractItemView::SelectItems</enum>
+         <property name="verticalScrollMode" >
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
          </property>
-         <property name="resizeMode" >
-          <enum>QListView::Adjust</enum>
+         <property name="horizontalScrollMode" >
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
          </property>
-         <property name="uniformItemSizes" >
-          <bool>true</bool>
+         <property name="autoExpandDelay" >
+          <number>-1</number>
          </property>
-         <property name="selectionRectVisible" >
-          <bool>true</bool>
+         <property name="indentation" >
+          <number>0</number>
          </property>
-         <property name="sortingEnabled" >
+         <property name="rootIsDecorated" >
           <bool>false</bool>
          </property>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
+         </property>
+         <property name="itemsExpandable" >
+          <bool>false</bool>
+         </property>
+         <property name="animated" >
+          <bool>false</bool>
+         </property>
+         <property name="allColumnsShowFocus" >
+          <bool>true</bool>
+         </property>
+         <property name="expandsOnDoubleClick" >
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Presets</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Bound Applications</string>
+          </property>
+         </column>
         </widget>
        </item>
        <item row="2" column="0" >
@@ -719,8 +742,6 @@
            </widget>
           </item>
          </layout>
-         <zorder>modalGlas</zorder>
-         <zorder>modalInvert</zorder>
         </widget>
        </item>
        <item row="7" column="0" >

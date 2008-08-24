@@ -87,27 +87,39 @@ BespinStyle::readSettings(const QSettings* settings)
     bool delSettings = false;
 
     QSettings *iSettings = const_cast<QSettings*>(settings);
-    if (!iSettings) {
+    if (!iSettings)
+    {
         delSettings = true;
         const char *preset = getenv("BESPIN_PRESET");
+        QString qPreset;
         if (preset)
+            qPreset = preset;
+        else
+        {   // maybe there's a preset config'd for this app...
+            iSettings = new QSettings("Bespin", "Style");
+            iSettings->beginGroup("PresetApps");
+            QString cmd = QCoreApplication::applicationName();
+            if (cmd.isEmpty() && !QCoreApplication::arguments().isEmpty())
+                cmd = QCoreApplication::arguments().at(0).section('/', -1);
+            qPreset = iSettings->value(cmd, QString()).toString();
+            iSettings->endGroup();
+            iSettings->beginGroup("Style");
+        }
+        if (!qPreset.isEmpty())
         {
+            delete iSettings;
             iSettings = new QSettings("Bespin", "Store");
-            if (iSettings->childGroups().contains(preset))
+            if (iSettings->childGroups().contains(qPreset))
             {
-                iSettings->beginGroup(preset);
+                iSettings->beginGroup(qPreset);
                 // set custom palette!
                 QPalette pal;
                 iSettings->beginGroup("QPalette");
-                QStringList list =
-                iSettings->value ( "active", colors(pal,
-                    QPalette::Active) ).toStringList();
+                QStringList list = iSettings->value("active", colors(pal, QPalette::Active)).toStringList();
                 updatePalette(pal, QPalette::Active, list);
-                list = iSettings->value ( "inactive", colors(pal,
-                QPalette::Inactive) ).toStringList();
+                list = iSettings->value("inactive", colors(pal, QPalette::Inactive)).toStringList();
                 updatePalette(pal, QPalette::Inactive, list);
-                list = iSettings->value ( "disabled", colors(pal,
-                QPalette::Disabled) ).toStringList();
+                list = iSettings->value("disabled", colors(pal, QPalette::Disabled)).toStringList();
                 updatePalette(pal, QPalette::Disabled, list);
                 polish(pal);
                 qApp->setPalette(pal);
