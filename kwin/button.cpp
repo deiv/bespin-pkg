@@ -331,6 +331,7 @@ Button::paintEvent(QPaintEvent *)
    p.translate( QPoint(t,t) );
    const float f = (18 + (!(state & Sunken))*zoomLevel)/24.0;
    p.scale ( f, f );
+//    p.rotate(60*zoomLevel);
    p.setPen(Qt::NoPen);
    p.setBrush(color());
    p.drawPath(shape[_type]);
