@@ -46,10 +46,13 @@ public:
         // VertMax, HoriMax,
         Restore, Unstick, UnAboveBelow, Unshade, NumTypes
     };
-    Button(Client *parent, Type type);
+    Button(Client *parent, Type type, bool left = false);
     static void init(int sz, bool leftMenu = false, bool fixedColors = false);
     bool isEnabled() const;
     inline bool type() {return _type;}
+protected:
+    friend class Client;
+    bool isOnTitleBar;
 protected:
     void enterEvent(QEvent *e);
     void leaveEvent(QEvent *e);

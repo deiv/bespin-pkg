@@ -38,71 +38,81 @@ using namespace Bespin;
 QPainterPath Button::shape[NumTypes];
 bool Button::fixedColors = false;
 
-Button::Button(Client *parent, Type type) : QWidget(parent->widget()),
+Button::Button(Client *parent, Type type, bool isOnTitleBar) : QWidget(parent->widget()),
 client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
 {
-   setAutoFillBackground(false);
-   setAttribute(Qt::WA_OpaquePaintEvent, false);
-   setFixedSize(parent->buttonSize(), parent->buttonSize());
-   setCursor(Qt::ArrowCursor);
-   
-   if (type == Multi) {
-      _type = client->factory()->multiButtons().at(0);
-      connect (client, SIGNAL (keepAboveChanged(bool)),
-                this, SLOT (clientStateChanged(bool)));
-      connect (client, SIGNAL (keepBelowChanged(bool)),
-                this, SLOT (clientStateChanged(bool)));
-      connect (client, SIGNAL (stickyChanged(bool)),
-                this, SLOT (clientStateChanged(bool)));
-      connect (client, SIGNAL (shadeChanged(bool)),
-                this, SLOT (clientStateChanged(bool)));
-      clientStateChanged(false);
-   }
-   else
-      _type = type;
+    setAutoFillBackground(false);
+    setAttribute(Qt::WA_OpaquePaintEvent, false);
+    setFixedSize(parent->buttonSize(), parent->buttonSize());
+    setCursor(Qt::ArrowCursor);
+    this->isOnTitleBar = isOnTitleBar;
+
+    if (type == Multi)
+    {
+        _type = client->factory()->multiButtons().at(0);
+        connect (client, SIGNAL (keepAboveChanged(bool)),
+                    this, SLOT (clientStateChanged(bool)));
+        connect (client, SIGNAL (keepBelowChanged(bool)),
+                    this, SLOT (clientStateChanged(bool)));
+        connect (client, SIGNAL (stickyChanged(bool)),
+                    this, SLOT (clientStateChanged(bool)));
+        connect (client, SIGNAL (shadeChanged(bool)),
+                    this, SLOT (clientStateChanged(bool)));
+        clientStateChanged(false);
+    }
+    else
+        _type = type;
 
 // 	setToolTip(tip);
 }
 
 void
-Button::clientStateChanged(bool state) {
-   if (state) {
-      switch (_type) {
-      case Above:
-      case Below:
-         _type = UnAboveBelow; break;
-      case Stick:
-         _type = Unstick; break;
-      case Shade:
-         _type = Unshade; break;
-      default: return;
-      }
-   }
-   else {
-      switch (_type) {
-      case UnAboveBelow:
-         _type = client->factory()->multiButtons().at(multiIdx); break;
-      case Unstick:
-         _type = Stick; break;
-      case Unshade:
-         _type = Shade; break;
-      default: return;
-      }
-   }
-   repaint();
+Button::clientStateChanged(bool state)
+{
+    if (state)
+    {
+        switch (_type)
+        {
+        case Above:
+        case Below:
+            _type = UnAboveBelow; break;
+        case Stick:
+            _type = Unstick; break;
+        case Shade:
+            _type = Unshade; break;
+        default:
+            return;
+        }
+    }
+    else {
+        switch (_type)
+        {
+        case UnAboveBelow:
+            _type = client->factory()->multiButtons().at(multiIdx); break;
+        case Unstick:
+            _type = Stick; break;
+        case Unshade:
+            _type = Shade; break;
+        default:
+            return;
+        }
+    }
+    repaint();
 }
 
 bool
-Button::isEnabled() const {
-   if (!QWidget::isEnabled())
-      return false;
-   switch (_type) {
-      case Close: return client->isCloseable();
-      case Min: return client->isMinimizable();
-      case Max: return client->isMaximizable();
-      default: break;
-   }
-   return true;
+Button::isEnabled() const
+{
+    if (!QWidget::isEnabled())
+        return false;
+    switch (_type)
+    {
+        case Close: return client->isCloseable();
+        case Min: return client->isMinimizable();
+        case Max: return client->isMaximizable();
+        default: break;
+    }
+    return true;
 }
 
 void
@@ -311,10 +321,17 @@ static uint fcolors[3] = {0xFFBF0303, 0xFFF3C300, 0xFF00892B};
 QColor
 Button::color() const
 {
-    QColor c = client->color(KDecorationDefines::ColorButtonBg, client->isActive());
+    KDecorationDefines::ColorType   fgt = KDecorationDefines::ColorButtonBg,
+                                    bgt = KDecorationDefines::ColorFrame;
+    if (isOnTitleBar)
+    {
+        fgt = KDecorationDefines::ColorFont;
+        bgt = KDecorationDefines::ColorTitleBar;
+    }
+    QColor c = client->color(fgt, client->isActive());
     if (fixedColors && _type < Multi)
         c = Colors::mid(c, QColor(fcolors[_type]), 6-zoomLevel, zoomLevel);
-    const QColor bg = client->color(KDecorationDefines::ColorFrame, client->isActive());
+    const QColor bg = client->color(bgt, client->isActive());
     if (isEnabled())
         c = Colors::mid(bg, c, 6-zoomLevel, 6);
     else

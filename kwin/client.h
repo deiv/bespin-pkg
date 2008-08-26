@@ -56,7 +56,7 @@ class Client : public KDecoration
 public:
     Client(KDecorationBridge *b, Factory *f);
     ~Client();
-    void addButtons(const QString &, int &);
+    void addButtons(const QString &, int &, bool);
     void borders( int& left, int& right, int& top, int& bottom ) const;
     void captionChange();
     inline const Config* config() const { return _factory->config(); }
@@ -95,6 +95,7 @@ protected:
 private:
     void repaint(QPainter &p);
     void updateTitleLayout( const QSize& s );
+    void updateButtonCorner(bool right = false);
     
     QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
     Button *buttons[4];
@@ -106,7 +107,7 @@ private:
     QHBoxLayout *titleBar;
     QSpacerItem *titleSpacer;
     QRect top, bottom, left, right, label;
-    QPainterPath bar;
+    QPainterPath buttonCorner;
     QString _caption;
     PreviewWidget *_preview;
     ResizeCorner *corner;

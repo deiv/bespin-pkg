@@ -207,83 +207,87 @@ bool Factory::readConfig()
 class Header : public QLabel
 {
 public:
-   Header(const QString & title, QWidget *parent = 0) : QLabel(title, parent)
-   {
-      QFont font; font.setBold(false); setFont(font);
-   }
+    Header(const QString & title, QWidget *parent = 0) : QLabel(title, parent)
+    {
+        QFont font; font.setBold(false); setFont(font);
+    }
 protected:
-   void paintEvent(QPaintEvent *pe)
-   {
-      QStyleOptionHeader opt; opt.initFrom(this);
-      opt.textAlignment = Qt::AlignCenter;
-      opt.text = text();
-      QPainter p(this);
-      style()->drawControl(QStyle::CE_Header, &opt, &p, this );
-      p.end();
-   }
+    void paintEvent(QPaintEvent *pe)
+    {
+        QStyleOptionHeader opt; opt.initFrom(this);
+        opt.textAlignment = Qt::AlignCenter;
+        opt.text = text();
+        QPainter p(this);
+        style()->drawControl(QStyle::CE_Header, &opt, &p, this );
+        p.end();
+    }
 private:
 };
 
 void
-Factory::showDesktopMenu(const QPoint &p, Client *client) {
-
+Factory::showDesktopMenu(const QPoint &p, Client *client)
+{
 //    static void KWindowSystem::setCurrentDesktop( int desktop );
-   if (!client) return;
-   if (!desktopMenu_)
-      desktopMenu_ = new QMenu();
-   else
-      desktopMenu_->clear();
+    if (!client) return;
+    if (!desktopMenu_)
+        desktopMenu_ = new QMenu();
+    else
+        desktopMenu_->clear();
 
-   QWidgetAction *headerAct = new QWidgetAction(desktopMenu_);
-   headerAct->setDefaultWidget(new Header("Throw on:"));
-   desktopMenu_->addAction(headerAct);
+    QWidgetAction *headerAct = new QWidgetAction(desktopMenu_);
+    headerAct->setDefaultWidget(new Header("Throw on:"));
+    desktopMenu_->addAction(headerAct);
 
-   QAction *act = 0;
-   for (int i = 1; i <= KWindowSystem::numberOfDesktops(); ++i) {
-      act = desktopMenu_->addAction ( "Desktop #" + QString::number(i), client, SLOT(throwOnDesktop()) );
-      act->setData(i);
-      act->setDisabled(i == KWindowSystem::currentDesktop());
-   }
-   desktopMenu_->popup(p);
+    QAction *act = 0;
+    for (int i = 1; i <= KWindowSystem::numberOfDesktops(); ++i)
+    {
+        act = desktopMenu_->addAction ( "Desktop #" + QString::number(i), client, SLOT(throwOnDesktop()) );
+        act->setData(i);
+        act->setDisabled(i == KWindowSystem::currentDesktop());
+    }
+    desktopMenu_->popup(p);
 }
 
 void
-Factory::showWindowList(const QPoint &p, Client *client) {
+Factory::showWindowList(const QPoint &p, Client *client)
+{
+    if (!_windowList)
+        _windowList = new QMenu();
+    else
+        _windowList->clear();
 
-   if (!_windowList)
-      _windowList = new QMenu();
-   else
-      _windowList->clear();
+    QWidgetAction *headerAct = new QWidgetAction(_windowList);
+    headerAct->setDefaultWidget(new Header("Windows"));
+    _windowList->addAction(headerAct);
 
-   QWidgetAction *headerAct = new QWidgetAction(_windowList);
-   headerAct->setDefaultWidget(new Header("Windows"));
-   _windowList->addAction(headerAct);
+    const QList<WId>& windows = KWindowSystem::windows();
 
-   const QList<WId>& windows = KWindowSystem::windows();
-
-   QAction *act = 0;
-   KWindowInfo info; QString title;
+    QAction *act = 0;
+    KWindowInfo info; QString title;
 #define NET_FLAGS NET::WMVisibleName | NET::WMWindowType | NET::WMDesktop | NET::WMState | NET::XAWMState
-   foreach (WId id, windows) {
-      info = KWindowInfo(id, NET_FLAGS, 0);
-      if (info.windowType( NET::NormalMask | NET::DialogMask | NET::UtilityMask ) != -1) {
-         title = info.visibleIconName();
-         if (info.isMinimized())
-            title = "( " + title + " )";
-         if (!info.isOnCurrentDesktop())
-            title = "< " + title + " >";
-         if (title.length() > 52)
-            title = title.left(22) + "..." + title.right(22);
-         act = _windowList->addAction ( title, client, SLOT(activate()) );
-         act->setData((uint)id);
-         act->setDisabled(id == KWindowSystem::activeWindow());
-      }
-   }
-   _windowList->popup(p);
+    foreach (WId id, windows)
+    {
+        info = KWindowInfo(id, NET_FLAGS, 0);
+        if (info.windowType( NET::NormalMask | NET::DialogMask | NET::UtilityMask ) != -1)
+        {
+            title = info.visibleIconName();
+            if (info.isMinimized())
+                title = "( " + title + " )";
+            if (!info.isOnCurrentDesktop())
+                title = "< " + title + " >";
+            if (title.length() > 52)
+                title = title.left(22) + "..." + title.right(22);
+            act = _windowList->addAction ( title, client, SLOT(activate()) );
+            act->setData((uint)id);
+            act->setDisabled(id == KWindowSystem::activeWindow());
+        }
+    }
+    _windowList->popup(p);
 }
 
 
-static QString winType2string(NET::WindowType type)
+static QString
+winType2string(NET::WindowType type)
 {
    switch (type) {
    default:

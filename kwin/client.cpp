@@ -122,7 +122,7 @@ Client::activeChange()
 }
 
 void
-Client::addButtons(const QString& s, int &sz)
+Client::addButtons(const QString& s, int &sz, bool left)
 {
     sz = 4;
     if (!s.length() > 0) return;
@@ -153,7 +153,7 @@ Client::addButtons(const QString& s, int &sz)
         }
         if (!buttons[type])
         {   // will be d'played d'abled in case
-            buttons[type] = new Button(this, type);
+            buttons[type] = new Button(this, type, left);
             titleBar->addWidget(buttons[type], 0, Qt::AlignVCenter);
             sz += (buttonSize()+2);
         }
@@ -492,53 +492,43 @@ Client::repaint(QPainter &p)
     if (bgMode != 1)
     {
         const QColor bg2 = color(ColorTitleBlend, isActive());
-        if (gType[isActive()])
-        {
-            QColor shadow = Colors::mid(bg2, Qt::black,4,1);
-            const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, (Gradients::Type)gType[isActive()]);
-            p.setPen(shadow); p.setBrush(fill); p.setRenderHint( QPainter::Antialiasing );
-            p.drawPath(bar);
-            if (borderSize)
-            {
-                p.setRenderHint( QPainter::Antialiasing, false );
-                p.setPen(Qt::NoPen); p.setBrush(bg2);
-                p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
-                // shadows
-                p.setRenderHint( QPainter::Antialiasing );
-                shadow = Colors::mid(bg2, Qt::black,2,1);
-                p.setPen(QPen(shadow,3));
-                QPolygon poly;
-                const int rgt = width()-(borderSize+1), btm = height()-borderSize;
-                poly.putPoints(0,4, borderSize+1,titleSize+2, borderSize,btm, rgt,btm, rgt,titleSize+2);
-                p.drawPolyline(poly);
-            }
+        if (bg2 != bg)
+        {   // outline
             p.setBrush(Qt::NoBrush);
+            p.setRenderHint( QPainter::Antialiasing );
+            p.setPen(QPen(bg2,3));
+            if (borderSize)
+                p.drawRect(1,1,width()-2,height()-2);
+            else
+                p.drawLine(0,1,width(),1);
         }
         else if (borderSize)
         {   // static bool KWindowSystem::compositingActive();
-            p.setBrush(Qt::NoBrush);
-            if (bg2 != bg)
-            {   // outline
-                p.setRenderHint( QPainter::Antialiasing );
-                p.setPen(QPen(bg2,3)); p.drawRect(1,1,width()-2,height()-2);
-            }
-            else
-            {   // frame ==============
-                const QColor border = Colors::mid(bg, color(ColorButtonBg, true),2,1);
-                p.setPen(border);
-                p.drawLine(32+4, 0, width()-(32+5), 0);
-                p.drawLine(32+4, height()-1, width()-(32+5), height()-1);
-                p.drawLine(0, 32+4, 0, height()-(32+5));
-                p.drawLine(width()-1, 32+4, width()-1, height()-(32+5));
-                const QPixmap &top = Gradients::borderline(border, Gradients::Top);
-                p.drawPixmap(0,4,top); p.drawPixmap(width()-1,4,top);
-                const QPixmap &btm = Gradients::borderline(border, Gradients::Bottom);
-                p.drawPixmap(0,height()-(32+5),btm); p.drawPixmap(width()-1,height()-(32+5),btm);
-                const QPixmap &left = Gradients::borderline(border, Gradients::Left);
-                p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
-                const QPixmap &right = Gradients::borderline(border, Gradients::Right);
-                p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
-            }
+            // frame ==============
+            const QColor border = Colors::mid(bg, color(ColorButtonBg, true),2,1);
+            p.setPen(border);
+            p.drawLine(32+4, 0, width()-(32+5), 0);
+            p.drawLine(32+4, height()-1, width()-(32+5), height()-1);
+            p.drawLine(0, 32+4, 0, height()-(32+5));
+            p.drawLine(width()-1, 32+4, width()-1, height()-(32+5));
+            const QPixmap &top = Gradients::borderline(border, Gradients::Top);
+            p.drawPixmap(0,4,top); p.drawPixmap(width()-1,4,top);
+            const QPixmap &btm = Gradients::borderline(border, Gradients::Bottom);
+            p.drawPixmap(0,height()-(32+5),btm); p.drawPixmap(width()-1,height()-(32+5),btm);
+            const QPixmap &left = Gradients::borderline(border, Gradients::Left);
+            p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
+            const QPixmap &right = Gradients::borderline(border, Gradients::Right);
+            p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
+        }
+        
+        if (gType[isActive()])
+        {   // button corner
+            QColor shadow = Colors::mid(bg2, Qt::black,4,1);
+            const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, (Gradients::Type)gType[isActive()]);
+            p.setPen(shadow);
+            p.setBrush(fill);
+            p.setRenderHint( QPainter::Antialiasing );
+            p.drawPath(buttonCorner);
         }
     }
 }
@@ -599,11 +589,14 @@ Client::reset(unsigned long changed)
         for (int i = 0; i < 4; ++i)
             { delete buttons[i]; buttons[i] = 0; }
         titleBar->removeItem(titleSpacer);
-        addButtons(options()->titleButtonsLeft(), buttonSpaceLeft);
+        addButtons(options()->titleButtonsLeft(), buttonSpaceLeft, true);
         titleBar->addItem(titleSpacer);
-        addButtons(options()->titleButtonsRight(), buttonSpaceRight);
+        addButtons(options()->titleButtonsRight(), buttonSpaceRight, false);
         buttonSpace = qMax(buttonSpaceLeft, buttonSpaceRight);
     }
+
+    if ((changed & (SettingButtons | SettingFont)) && (buttonSpaceLeft >= buttonSpaceRight))
+        updateButtonCorner(false);
 
     if (changed & SettingColors)
     {   // colors =====================
@@ -698,65 +691,91 @@ Client::reset(unsigned long changed)
         }
     }
 
-   if (changed)
-       activeChange(); // handles bg pixmaps in case and triggers update
+    if ((changed & (SettingColors | SettingButtons)) && (gType[true] || gType[false]))
+    {
+        // buttons[i]->isOnTitleBar att indicates a left side button
+        for (int i = 0; i < 4; ++i)
+            buttons[i]->isOnTitleBar =
+                            (!buttons[i]->isOnTitleBar && buttonSpaceLeft >= buttonSpaceRight) ||
+                            (buttons[i]->isOnTitleBar && buttonSpaceLeft < buttonSpaceRight);
+    }
+
+    if (changed)
+        activeChange(); // handles bg pixmaps in case and triggers update
    
 }
 
 void
-Client::updateTitleLayout( const QSize& s )
+Client::updateButtonCorner(bool right)
 {
-   int w = width();
+    const int ts = titleSize;
+    if (right)
+    {
+        const int w = width();
+        const int dr = buttonSpaceRight + titleSize;
+        const int bs = buttonSpaceRight;
+        buttonCorner = QPainterPath(QPoint(w, -1)); //tl corner
+        buttonCorner.lineTo(w, ts); // straight to br corner
+        buttonCorner.lineTo(w - bs + ts/2, ts); // straight to tl offset
+        buttonCorner.cubicTo(w - dr + ts/2, ts+2,   w-bs, 0,   w-dr, 2); // curve to tr offset
+    }
+    else
+    {
+        const int dl = buttonSpaceLeft + titleSize;
+        const int bs = buttonSpaceLeft;
+        buttonCorner = QPainterPath(QPoint(0, -1)); //tl corner
+        buttonCorner.lineTo(dl, 2); // straight to tl end
+        buttonCorner.cubicTo(bs, 0,   dl - titleSize/2, ts+2,   bs - ts/2, ts); // curve to bl offset
+        buttonCorner.lineTo(0, ts); // straight to bl end
+    }
+}
 
-   if (bgMode != 1 && (gType[0] || gType[1])) {
-//       d = qMax(s.width()/8, buttonSpace+4);
-      int dl = buttonSpaceLeft + titleSize;
-      int dr = buttonSpaceRight + titleSize;
-      bar = QPainterPath(QPoint(0, -1)); //tl corner
-      bar.lineTo(w, -1); // straight to tr corner
-      bar.lineTo(w, titleSize); // straight to br corner
-      bar.cubicTo(w-dr,titleSize+2, w-dr,2, w-(dr+titleSize),2); // curve to tr end
-      bar.lineTo(dl + titleSize, 2); // straight to tl end
-      bar.cubicTo(dl,2, dl,titleSize+2, 0,titleSize); // curve to bl end
-      label = QRect(dl, 0, w-(dl+dr), titleSize);
-   }
-   else {
-      int d = buttonSpace + 8;
-      label = QRect(d, 0, w-2*d, titleSize);
-   }
+
+void
+Client::updateTitleLayout( const QSize& )
+{
+    if (bgMode != 1 && (gType[0] || gType[1]))
+    {
+        if (buttonSpaceLeft <= buttonSpaceRight)
+            updateButtonCorner(true);
+        label.setRect(buttonSpaceLeft + titleSize, 0, width()-(buttonSpace+2*titleSize), titleSize);
+    }
+    else
+    {
+        int d = buttonSpace + 8;
+        label = QRect(d, 0, width()-2*d, titleSize);
+    }
 }
 
 void
 Client::resize( const QSize& s )
 {
-   widget()->resize(s);
-   int w = s.width(), h = s.height();
+    widget()->resize(s);
+    int w = s.width(), h = s.height();
 
-   if (_preview) {
-      _preview->setGeometry(borderSize, titleSize, w-2*borderSize, h-(borderSize+titleSize));
-   }
+    if (_preview)
+        _preview->setGeometry(borderSize, titleSize, w-2*borderSize, h-(borderSize+titleSize));
 
-   updateTitleLayout( s );
-   
-   top = QRect(0, 0, w, titleSize);
-   bottom = QRect(0, h-borderSize, w, borderSize);
-   const int t2 = 2*titleSize/3;
-   const int sideHeight = h - (t2 + borderSize);
-   left = QRect(0, t2, borderSize, sideHeight);
-   right = QRect(w-borderSize, t2, borderSize, sideHeight);
-   if (maximizeMode() == MaximizeFull) {
-      clearMask(); //repaint();
-      return;
-   }
-   
-   int d = (isShade() || borderSize > 5) ? 8 : 4;
-   QRegion mask(4, 0, w-8, h);
-   mask += QRegion(0, 4, w, h-d);
-   mask += QRegion(2, 1, w-4, h-d/4);
-   mask += QRegion(1, 2, w-2, h-d/2);
+    updateTitleLayout( s );
 
-   setMask(mask);
-   widget()->repaint(); // force! there're painting errors otherwise
+    top = QRect(0, 0, w, titleSize);
+    bottom = QRect(0, h-borderSize, w, borderSize);
+    const int t2 = 2*titleSize/3;
+    const int sideHeight = h - borderSize;
+    left = QRect(0, t2, borderSize, sideHeight);
+    right = QRect(w-borderSize, t2, borderSize, sideHeight);
+
+    if (maximizeMode() == MaximizeFull)
+        { clearMask(); /*repaint();*/ return; }
+
+    int d = (isShade() || borderSize > 5) ? 8 : 4;
+    QRegion mask(4, 0, w-8, h);
+    mask += QRegion(0, 4, w, h-d);
+    mask += QRegion(2, 1, w-4, h-d/4);
+    mask += QRegion(1, 2, w-2, h-d/2);
+
+    setMask(mask);
+    widget()->repaint(); // force! there're painting errors otherwise
 }
 
 void
