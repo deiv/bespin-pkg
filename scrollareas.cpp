@@ -121,28 +121,25 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
         {   /// default scrollbar ===============
             isComboDropDownSlider = false;
 
-            if (widget->testAttribute(Qt::WA_OpaquePaintEvent))
-            {   // opaque fill (default)
-                if (option->state & State_Sunken)
-                { /// use caching for sliding scrollers to gain speed
-                    useCache = true;
-                    if (widget != cachedScroller)
-                    {   // update cache
-                        cachedScroller = widget;
-                        delete scrollBgCache; scrollBgCache = 0L;
-                    }
-                    if (!scrollBgCache || scrollBgCache->size() != RECT.size())
-                    {   // we need a new cache pixmap
-                        delete scrollBgCache;
-                        scrollBgCache = new QPixmap(RECT.size());
-                        cPainter = new QPainter(scrollBgCache);
-                    }
-                    else
-                        needsPaint = false;
+            if (option->state & State_Sunken)
+            {   /// use caching for sliding scrollers to gain speed
+                useCache = true;
+                if (widget != cachedScroller)
+                {   // update cache
+                    cachedScroller = widget;
+                    delete scrollBgCache; scrollBgCache = 0L;
                 }
-                if (needsPaint)
-                    erase(option, cPainter, widget);
+                if (!scrollBgCache || scrollBgCache->size() != RECT.size())
+                {   // we need a new cache pixmap
+                    delete scrollBgCache;
+                    scrollBgCache = new QPixmap(RECT.size());
+                    cPainter = new QPainter(scrollBgCache);
+                }
+                else
+                    needsPaint = false;
             }
+            if (needsPaint)
+                erase(option, cPainter, widget);
         }
     }
     // =================
@@ -159,9 +156,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
         
     /// hover animation =================
     if (scrollbar->activeSubControls & SC_ScrollBarSlider)
-    {
-        widgetStep = 0; scrollAreaHovered_ = true;
-    }
+        { widgetStep = 0; scrollAreaHovered_ = true; }
     else
     {
         widgetStep = Animator::Hover::step(widget);
@@ -178,18 +173,14 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
     {   // NOTICE the scrollbar bg is cached for sliding scrollers to gain speed
         // the cache also includes the groove
         if (config.scroll.groove != Groove::Sunken)
-        {
-            PAINT_ELEMENT(Groove);
-        }
+            { PAINT_ELEMENT(Groove); } // leave brackts, MACRO!
         groove = optCopy.rect;
     }
     else
         groove = subControlRect(CC_ScrollBar, &optCopy, SC_ScrollBarGroove, widget);
 
-    if (cPainter != painter)
-    {   // unwrap cache painter
-        cPainter->end(); delete cPainter; cPainter = painter;
-    }
+    if (cPainter != painter) // unwrap cache painter
+        { cPainter->end(); delete cPainter; cPainter = painter; }
    
     /// Background and groove have been painted
     if (useCache)  //flush the cache

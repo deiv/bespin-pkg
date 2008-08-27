@@ -123,7 +123,7 @@ Button::init(int sz, bool leftMenu, bool fColors)
         shape[t] = QPainterPath();
    
     const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
-
+#if 1
     shape[Close].addRect(-s2,-s2,sz,sz);
     shape[Close].addRect(-s4,-s4,s2,s2);
     shape[Close].addRect(s3-s2,s3-s2,s3,s3);
@@ -142,40 +142,94 @@ Button::init(int sz, bool leftMenu, bool fColors)
 
     shape[Stick].addRect(s6-s2,s6-s2,sz-s3,sz-s3);
     shape[Unstick].addRect(s3-s2,s3-s2,s3,s3);
-
+    
     shape[Above].addRect(-s4,-s2,s2,s3);
     shape[Above].addRect(-s2,s2-s3,s3,s3);
     shape[Above].addRect(s2-s3,s2-s3,s3,s3);
-
+    
     shape[Below].addRect(-s4,s2-s3,s2,s3);
     shape[Below].addRect(-s2,-s2,s3,s3);
     shape[Below].addRect(s2-s3,-s2,s3,s3);
-
+    
     shape[UnAboveBelow].addRect(-s2,-s4,s3,s2);
     shape[UnAboveBelow].addRect(s2-s3,-s4,s3,s2);
 
     shape[Menu].addRect(-s2,-s2,sz,sz);
-    if (leftMenu)
-        shape[Menu].addRect(0,-s4,s2,sz-s4);
-    else
-        shape[Menu].addRect(-s2,-s4,s2,sz-s4);
+    shape[Menu].addRect(leftMenu?0:-s2,-s4,s2,sz-s4);
 
     shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
     shape[Help].addRect(-s3,-s4,s3,sz-(s3+s4));
     shape[Help].addRect(0,s2-s6,s4,s6);
-
+    
     shape[Shade].addRect(-s2,-s2,sz,s4);
-
+    
     shape[Unshade].addRect(-s2,s4,sz,s4);
-
+    
     shape[Exposee].addRect(-s2,-s2,s3,s3);
     shape[Exposee].addRect(s2-s3,-s2,s3,s3);
     shape[Exposee].addRect(-s2,s2-s3,s3,s3);
     shape[Exposee].addRect(s2-s3,s2-s3,s3,s3);
-
+    
     shape[Info].addRect(-s6,-s2,s4,s4);
     shape[Info].addRect(-s6,-s6,s4,s2+s3);
+#else
+    QPainterPath rubber;
+    shape[Close].addEllipse(-s2,-s2,sz,sz);
+    shape[Close].addEllipse(-s4,-s4,s2,s2);
+    shape[Close].addEllipse(s3-s2,s3-s2,s3,s3);
+    
+    shape[Min].addEllipse(-s2,-s2,sz,sz);
+    rubber.addEllipse(-s4,-s2,sz-s4+1,sz-s4+1);
+    shape[Min] = shape[Min].subtracted(rubber);
+    rubber = QPainterPath();
+    shape[Min].addEllipse(s2-s3,-s2,s3,s3);
+    
+    shape[Max].addEllipse(-s2,-s2,sz,sz);
+    rubber.addEllipse(-s2,-(s4+1),sz-s4+1,sz-s4+1);
+    shape[Max] = shape[Max].subtracted(rubber);
+    rubber = QPainterPath();
+    shape[Max].addEllipse(-s2,s2-s3,s3,s3);
+    
+    shape[Restore].addEllipse(-s2,-s2,sz,sz);
+    rubber.addEllipse(-s2,-s2,sz-s4,sz-s4);
+    shape[Restore] = shape[Restore].subtracted(rubber);
+    rubber = QPainterPath();
+    shape[Restore].addEllipse(-s2,-s2,s3,s3);
 
+    shape[Stick].addEllipse(s6-s2,s6-s2,sz-s3,sz-s3);
+    shape[Unstick].addEllipse(s3-s2,s3-s2,s3,s3);
+    
+    shape[Above].addEllipse(-s4,-s2,s2,s3);
+    shape[Above].addEllipse(-s2,s2-s3,s3,s3);
+    shape[Above].addEllipse(s2-s3,s2-s3,s3,s3);
+    
+    shape[Below].addEllipse(-s4,s2-s3,s2,s3);
+    shape[Below].addEllipse(-s2,-s2,s3,s3);
+    shape[Below].addEllipse(s2-s3,-s2,s3,s3);
+    
+    shape[UnAboveBelow].addEllipse(-s2,-s4,s3,s2);
+    shape[UnAboveBelow].addEllipse(s2-s3,-s4,s3,s2);
+
+    shape[Menu].addRoundedRect(-s2,-s2,sz,sz,50,50,Qt::RelativeSize);
+    rubber.addEllipse(leftMenu?0:-sz,-s4,1.2*sz,1.5*sz);
+    shape[Menu] = shape[Menu].subtracted(rubber);
+    rubber = QPainterPath();
+
+    shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
+    shape[Help].addRect(-s3,-s4,s3,sz-(s3+s4));
+    shape[Help].addRect(0,s2-s6,s4,s6);
+    
+    shape[Shade].addEllipse(-s2,-s2,sz,s4);
+    shape[Unshade].addEllipse(-s2,s4,sz,s4);
+    
+    shape[Exposee].addEllipse(-s2,-s2,s3,s3);
+    shape[Exposee].addEllipse(s2-s3,-s2,s3,s3);
+    shape[Exposee].addEllipse(-s2,s2-s3,s3,s3);
+    shape[Exposee].addEllipse(s2-s3,s2-s3,s3,s3);
+    
+    shape[Info].addEllipse(-s6,-s2,s4,s4);
+    shape[Info].addEllipse(-s6,-s6,s4,s2+s3);
+#endif
 
 //    tip[Close] = i18n("Close");
 //    tip[Min] = i18n("Minimize");

@@ -371,8 +371,10 @@ BespinStyle::polish( QWidget * widget )
             {
                 if (QTreeView* tv = qobject_cast<QTreeView*>(frame))
                 {   // allow all treeviews to be animated!
-                    if (config.hack.treeViews && tv->viewport() &&
-                        tv->viewport()->autoFillBackground())
+                    // NOTICE: WORKAROUND for amarok, but should work in general
+                    // tv->viewport()->autoFillBackground() does NOT work
+                    // maybe GraphicsView issue?!?
+                    if (config.hack.treeViews && !tv->inherits("CollectionTreeView"))
                         tv->setAnimated ( true );
                 }
                 else // treeview hovering sucks, as the "tree" doesn't get an update

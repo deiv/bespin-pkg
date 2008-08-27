@@ -40,6 +40,7 @@ BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter, cons
     }
 }
 
+
 void
 BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -60,21 +61,27 @@ BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, cons
 
     hover = option->state & State_Selected;
     Animator::IndexInfo *info = 0;
-    QAction *action = 0, *activeAction = 0;
     int step = 0;
     if (sunken)
         step = 6;
     else
     {   // check for hover animation ==========================
-        if (widget)
         if (const QMenuBar* mbar = qobject_cast<const QMenuBar*>(widget))
         {
-            action = mbar->actionAt(RECT.topLeft()); // is the action for this item!
-            activeAction = mbar->activeAction();
+            QAction *action = mbar->actionAt(RECT.topLeft()); // is the action for this item!
+            QAction *activeAction = mbar->activeAction();
             info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, (long int)activeAction));
+            if (info && (!(activeAction && activeAction->menu()) || activeAction->menu()->isHidden()))
+                step = info->step((long int)action);
         }
-        if (info && (!activeAction || !activeAction->menu() || activeAction->menu()->isHidden()))
-            step = info->step((long int)action);
+        else if (appType == Plasma && widget)
+        {
+            int action = (mbi->menuItemType & 0xffff);
+            int activeAction = ((mbi->menuItemType >> 16) & 0xffff);
+            info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, activeAction));
+            if (info)
+                step = info->step(action);
+        }
         // ================================================
     }
     
@@ -83,9 +90,19 @@ BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, cons
     {
         if (!step)
             step = 6;
-        QColor c = (config.menu.bar_role[Bg] == QPalette::Window) ? FCOLOR(Window) :
-                    Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6);
-        c = Colors::mid(c, COLOR(ROLE[Bg]), 8-step, step);
+        QColor c;
+        if (appType == Plasma)
+        {   // NOTICE: opaque Colors::mid() are too flickerious with several plasma bgs...
+            COLOR(ROLE[Bg]);
+            c.setAlpha(step*255/8);
+        }
+        else
+        {   // ... but usually less performance killing... ;-P (it's not that much a problem n'owerdays)
+            c = (config.menu.bar_role[Bg] == QPalette::Window) ? FCOLOR(Window) :
+                                            Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6);
+            c = Colors::mid(c, COLOR(ROLE[Bg]), 8-step, step);
+        }
+        // NOTICE: scale code - currently unused
 //       int dy = 0;
 //       if (!sunken) {
 //          step = 6-step;
@@ -111,7 +128,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, cons
         drawItemPixmap(painter,r, alignment, pix);
     else
         drawItemText(painter, r, alignment, mbi->palette, isEnabled, mbi->text,
-                     (hover || step > 2) ? ROLE[Fg] : config.menu.bar_role[Fg]);
+                     (hover || step > 3) ? ROLE[Fg] : config.menu.bar_role[Fg]);
 }
 
 void

@@ -400,19 +400,26 @@ void
 BespinStyle::erase(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     const QWidget *grampa = widget;
-    while (!(grampa->isWindow() ||
-                (grampa->autoFillBackground() &&
-                grampa->objectName() != "qt_scrollarea_viewport")))
+    while ( !(grampa->isWindow() ||
+            (grampa->autoFillBackground() && grampa->objectName() != "qt_scrollarea_viewport")))
         grampa = grampa->parentWidget();
 
     QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());
     painter->save();
     painter->setPen(Qt::NoPen);
+    
+    if (!grampa->isWindow())
+    {   // we may encounter apps that have semi or *cough* fully *cough* amarok *cough*
+        // transparent backgrounds instead of none... ;-)
+        painter->setBrush(grampa->window()->palette().color(QPalette::Window));
+        painter->drawRect(option->rect);
+    } // (semi) catched! (for about 98% of all cases...)
     painter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
     painter->setBrushOrigin(tl);
     painter->drawRect(option->rect);
+
     if (grampa->isWindow())
-    { // means we need to paint the global bg as well
+    {   // means we need to paint the global bg as well
         painter->setClipRect(option->rect, Qt::IntersectClip);
         QStyleOption tmpOpt = *option;
         tmpOpt.rect = QRect(tl, grampa->size());

@@ -27,60 +27,62 @@ class QGraphicsView;
 
 class MenuBar : public QGraphicsWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   MenuBar ( const QString &service = QString(), qlonglong key = 0, QGraphicsItem *parent = 0);
-   QAction *addAction(const QString & text, int idx = -1, QMenu *menu = 0);
-   void addAction(QAction *action, int idx = -1);
-   const QRect &actionGeometry(int idx) const;
-   void removeAction(int idx);
-   QAction *takeAction(int idx);
-   void changeAction(int idx, const QString & text);
-   void clear();
-   QAction *action(int idx) const;
+    MenuBar ( const QString &service = QString(), qlonglong key = 0, QGraphicsItem *parent = 0);
+    QAction *addAction(const QString & text, int idx = -1, QMenu *menu = 0);
+    void addAction(QAction *action, int idx = -1);
+    const QRect &actionGeometry(int idx) const;
+    void removeAction(int idx);
+    QAction *takeAction(int idx);
+    void changeAction(int idx, const QString & text);
+    void clear();
+    QAction *action(int idx) const;
 //    void show();
-   void hide();
-   QPointF mapFromGlobal(const QPoint &pt);
-   QPoint mapToGlobal(const QPointF &pt);
-   inline const QString& service() const { return d.service; }
-   inline qlonglong key() const { return d.key; }
-   inline int openPopup() const { return d.openPopup; }
-   QGraphicsView *view() const;
+    void hide();
+    QPointF mapFromGlobal(const QPoint &pt);
+    QPoint mapToGlobal(const QPointF &pt);
+    inline const QString& service() const { return d.service; }
+    inline qlonglong key() const { return d.key; }
+    inline int openPopup() const { return d.openPopup; }
+    QGraphicsView *view() const;
 signals:
-   void hovered(int);
-   void triggered(int);
+    void hovered(int);
+    void triggered(int);
 protected:
-   inline QList<QAction*> &actions() { return d.actions; }
-   void initStyleOption(QStyleOptionMenuItem *option, int idx = -1) const;
-   void hoverEnterEvent(QGraphicsSceneHoverEvent *ev);
-   void hoverLeaveEvent(QGraphicsSceneHoverEvent *ev);
-   void hoverMoveEvent(QGraphicsSceneHoverEvent *ev);
-   void mousePressEvent(QGraphicsSceneMouseEvent *ev);
-   virtual void rightMouseButtonEvent(int, QGraphicsSceneMouseEvent *) {}
-   void wheelEvent(QGraphicsSceneWheelEvent *);
-   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget = 0 );
-   inline virtual void show() { QGraphicsItem::show(); }
-   void timerEvent(QTimerEvent *event);
-   friend class XBar;
-   void popDown();
-   void setOpenPopup(int popup);
+    inline QList<QAction*> &actions() { return d.actions; }
+    void initStyleOption(QStyleOptionMenuItem *option, int idx = -1) const;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *ev);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *ev);
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *ev);
+    void mousePressEvent(QGraphicsSceneMouseEvent *ev);
+    virtual void rightMouseButtonEvent(int, QGraphicsSceneMouseEvent *) {}
+    void wheelEvent(QGraphicsSceneWheelEvent *);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget = 0 );
+    inline virtual void show() { QGraphicsItem::show(); }
+    void timerEvent(QTimerEvent *event);
+friend class XBar;
+    void popDown();
+    void setOpenPopup(int popup);
+friend class DummyQMenuBar;
+    QAction *action(const QPoint &pos) const;
 private:
-   QAction *action(const QPoint &pos) const;
-   void mouseMoved(const QPointF &pos, const QPointF &lastPos);
-   int index(const QPoint &pos);
-   void updateSize();
+    void mouseMoved(const QPointF &pos, const QPointF &lastPos);
+    int index(const QPoint &pos);
+    void updateSize();
 private slots:
-   void actionChanged();
-   void popupClosed();
+    void actionChanged();
+    void popupClosed();
 private:
-   struct {
-      QList<QAction*> actions;
-      QList<QRect> actionRects;
-      QString service;
-      qlonglong key;
-      int hoverIndex;
-      int openPopup;
-   } d;
+    struct
+    {
+        QList<QAction*> actions;
+        QList<QRect> actionRects;
+        QString service;
+        qlonglong key;
+        int hoverIndex;
+        int openPopup;
+    } d;
 };
 
 #endif //XBAR_H
