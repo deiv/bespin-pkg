@@ -492,7 +492,18 @@ Client::repaint(QPainter &p)
     if (bgMode != 1)
     {
         const QColor bg2 = color(ColorTitleBlend, isActive());
-        if (bg2 != bg)
+
+        if (gType[isActive()])
+        {   // button corner
+            QColor shadow = Colors::mid(bg2, Qt::black,4,1);
+            const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, (Gradients::Type)gType[isActive()]);
+            p.setPen(shadow);
+            p.setBrush(fill);
+            p.setRenderHint( QPainter::Antialiasing );
+            p.drawPath(buttonCorner);
+        }
+        
+        if ((bg2 != bg) && (borderSize || gType[isActive()]))
         {   // outline
             p.setBrush(Qt::NoBrush);
             p.setRenderHint( QPainter::Antialiasing );
@@ -519,16 +530,6 @@ Client::repaint(QPainter &p)
             p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
             const QPixmap &right = Gradients::borderline(border, Gradients::Right);
             p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
-        }
-        
-        if (gType[isActive()])
-        {   // button corner
-            QColor shadow = Colors::mid(bg2, Qt::black,4,1);
-            const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, (Gradients::Type)gType[isActive()]);
-            p.setPen(shadow);
-            p.setBrush(fill);
-            p.setRenderHint( QPainter::Antialiasing );
-            p.drawPath(buttonCorner);
         }
     }
 }
@@ -716,15 +717,15 @@ Client::updateButtonCorner(bool right)
         const int bs = buttonSpaceRight;
         buttonCorner = QPainterPath(QPoint(w, -1)); //tl corner
         buttonCorner.lineTo(w, ts); // straight to br corner
-        buttonCorner.lineTo(w - bs + ts/2, ts); // straight to tl offset
-        buttonCorner.cubicTo(w - dr + ts/2, ts+2,   w-bs, 0,   w-dr, 2); // curve to tr offset
+        buttonCorner.lineTo(w - bs + ts/2, ts); // straight to bl offset
+        buttonCorner.cubicTo(w - dr + ts/2, ts+2,   w-bs, 0,   w-dr, -1); // curve to tr offset
     }
     else
     {
         const int dl = buttonSpaceLeft + titleSize;
         const int bs = buttonSpaceLeft;
         buttonCorner = QPainterPath(QPoint(0, -1)); //tl corner
-        buttonCorner.lineTo(dl, 2); // straight to tl end
+        buttonCorner.lineTo(dl, -1); // straight to tl end
         buttonCorner.cubicTo(bs, 0,   dl - titleSize/2, ts+2,   bs - ts/2, ts); // curve to bl offset
         buttonCorner.lineTo(0, ts); // straight to bl end
     }
