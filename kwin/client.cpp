@@ -174,7 +174,8 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     {
         left = right = bottom =  _factory->borderSize();
         top = _factory->titleSize(_small);
-        if (isShade()) bottom = 8;
+        if (isShade())
+            bottom = 8;
     }
     //    left = right = bottom = borderSize;
     //    top = titleSize;
@@ -475,6 +476,16 @@ Client::repaint(QPainter &p)
         }
     }
 
+    
+    if (isShade())
+    {   // splitter
+        QColor bg2 = color(ColorTitleBlend, isActive());
+        p.setPen(Colors::mid(bg, Qt::black,4,1));
+        p.drawLine(8, titleSize, width()-8, titleSize);
+        p.setPen(Colors::mid(bg, Qt::white,2,1));
+        p.drawLine(8, titleSize+1, width()-8, titleSize+1);
+    }
+
     // title ==============
     if (isActive())
     {   // emboss?!
@@ -485,7 +496,7 @@ Client::repaint(QPainter &p)
             { p.setPen(Colors::mid(bg, Qt::white)); d = 1; }
         p.drawText ( label.translated(0,d), Qt::AlignCenter | Qt::TextSingleLine, _caption );
     }
-    p.setPen(color(isShade() ? ColorButtonBg : ColorFont, isActive()));
+    p.setPen(color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive()));
     p.drawText ( label, Qt::AlignCenter | Qt::TextSingleLine, _caption );
 
     // bar =========================

@@ -47,10 +47,10 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 using namespace Bespin;
 extern Config config;
 
+enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM };
+
 static Hacks *bespinHacks = new Hacks;
-static bool *isKRunner = 0;
-static bool *isSMPlayer = 0;
-static bool *isDragon = 0;
+static HackAppType *appType = 0;
 const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
 
@@ -191,8 +191,8 @@ isWindowDragWidget(QObject *o)
         o->inherits("QDockWidget") ||
 //         o->inherits("QMainWindow") || // this is mostly useles... PLUS triggers problems
 
-        (*isSMPlayer && o->inherits(SMPlayerVideoWidget)) ||
-        (*isDragon && o->inherits(DragonVideoWidget)) ||
+        ((*appType == SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
+        ((*appType == Dragon) && o->inherits(DragonVideoWidget)) ||
 
         o->inherits("QStatusBar") ||
         (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar")));
@@ -252,22 +252,46 @@ hackMoveWindow(QWidget* w, QEvent *e)
 }
 
 static bool
-paintKrunner(QWidget *w, QPaintEvent *) {
-   // TODO: use paintevent clipping
-   if (w->isWindow()) {
-      QPainter p(w);
-      QStyleOption opt;
-      opt.initFrom ( w );
-      w->style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, w);
-      return true;
-   }
-   return false;
+paintKrunner(QWidget *w, QPaintEvent *)
+{
+    // TODO: use paintevent clipping
+    if (w->isWindow()) {
+        QPainter p(w);
+        QStyleOption opt;
+        opt.initFrom ( w );
+        w->style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, w);
+        return true;
+    }
+    return false;
+}
+
+static const QStyle::PrimitiveElement pe_capacityBar = (QStyle::PrimitiveElement)0xff00001;
+
+static bool
+hackCapacityBar(QWidget *w, QEvent *e)
+{
+    if (e->type() == QEvent::Paint)
+    {
+        QPainter p(w);
+        QStyleOptionProgressBar opt;
+        opt.initFrom(w);
+        opt.minimum = 0;
+        opt.maximum = 100;
+        opt.progress = 66;
+        opt.text = "ereslibre@kde.org";
+        opt.textAlignment = Qt::AlignCenter;
+        opt.textVisible = true;
+        w->style()->drawPrimitive(pe_capacityBar, &opt, &p, w);
+        p.end();
+        return true;
+    }
+    return false;
 }
 
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
-    if (*isKRunner)
+    if ((*appType == KRunner))
     {
         if (e->type() == QEvent::Paint)
             return paintKrunner(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
@@ -284,29 +308,29 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o))
         return hackMoveWindow(static_cast<QWidget*>(o), e);
 
+    if (o->inherits("KCapacityBar") || o->inherits("StatusBarSpaceInfo"))
+        return hackCapacityBar(static_cast<QWidget*>(o), e);
+
     return false;
 }
-
-#define CHECK_APP(_BOOL_, _STRING_, _FUZZY_)\
-if (!_BOOL_)\
-{\
-    _BOOL_ = new bool;\
-    if (_FUZZY_)\
-        *_BOOL_ = QCoreApplication::arguments().at(0).endsWith(_STRING_);\
-    else\
-        *_BOOL_ = (QCoreApplication::applicationName() == _STRING_);\
-}//
 
 bool
 Hacks::add(QWidget *w)
 {
-    CHECK_APP(isKRunner, "krunner", false);
-    if (!config.hack.krunner)
-        *isKRunner = false;
-    CHECK_APP(isSMPlayer, "smplayer", true);
-    CHECK_APP(isDragon, "dragonplayer", false);
+    if (!appType)
+    {
+        appType = new HackAppType((HackAppType)Unknown);
+        if (qApp->inherits("GreeterApp")) // KDM segfaults on QCoreApplication::arguments()...
+            *appType = KDM;
+        else if (config.hack.krunner && QCoreApplication::applicationName() == "krunner")
+            *appType = KRunner;
+        else if (QCoreApplication::applicationName() == "dragonplayer")
+            *appType = Dragon;
+        else if (QCoreApplication::arguments().at(0).endsWith("smplayer"))
+            *appType = SMPlayer;
+    }
 
-    if (*isKRunner)
+    if (*appType == KRunner)
     {
         if (QPushButton *btn = qobject_cast<QPushButton*>(w))
             btn->setFlat ( true );
@@ -336,6 +360,13 @@ Hacks::add(QWidget *w)
     }
 
     if (isWindowDragWidget(w))
+    {
+        w->removeEventFilter(bespinHacks); // just to be sure
+        w->installEventFilter(bespinHacks);
+        return true;
+    }
+
+    if (false && (w->inherits("KCapacityBar") || w->inherits("StatusBarSpaceInfo")))
     {
         w->removeEventFilter(bespinHacks); // just to be sure
         w->installEventFilter(bespinHacks);

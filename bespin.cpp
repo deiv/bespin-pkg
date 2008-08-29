@@ -301,51 +301,60 @@ BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hasFocus, int step, 
 
 void
 BespinStyle::drawItemText(QPainter *painter, const QRect &rect, int alignment, const QPalette &pal,
-                          bool enabled, const QString& text, QPalette::ColorRole textRole) const
+                          bool enabled, const QString& text, QPalette::ColorRole textRole, QRect *boundingRect) const
 {
-   if (text.isEmpty())
-      return;
-   QPen savedPen;
-   bool penDirty = false;
-   if (textRole != QPalette::NoRole) {
-      penDirty = true;
-      savedPen = painter->pen();
-      painter->setPen(QPen(pal.brush(textRole), savedPen.widthF()));
-   }
-   if (!enabled) { // let's see if we can get some blurrage here =)
-      if (!penDirty) {
-         savedPen = painter->pen();
-         penDirty = true;
-      }
-      QColor c = painter->pen().color();
-      const int a = c.alpha();
-      c.setAlpha(a/2); painter->setPen(QPen(c, savedPen.widthF()));
-      QRect r = rect;
-      r.adjust(-1,-1,-1,-1);
-      painter->drawText(r, alignment, text);
-      r.adjust(2,2,2,2);
-      painter->drawText(r, alignment, text);
-      c.setAlpha(3*a/4); painter->setPen(QPen(c, savedPen.widthF()));
-   }
-   painter->drawText(rect, alignment, text);
-   if (penDirty)
-      painter->setPen(savedPen);
+    if (text.isEmpty())
+        return;
+    QPen savedPen;
+    bool penDirty = false;
+    if (textRole != QPalette::NoRole)
+    {
+        penDirty = true;
+        savedPen = painter->pen();
+        painter->setPen(QPen(pal.brush(textRole), savedPen.widthF()));
+    }
+    if (!enabled)
+    {   // let's see if we can get some blurrage here =)
+        if (!penDirty)
+        {
+            savedPen = painter->pen();
+            penDirty = true;
+        }
+        QColor c = painter->pen().color();
+        const int a = c.alpha();
+        c.setAlpha(a/2); painter->setPen(QPen(c, savedPen.widthF()));
+        QRect r = rect;
+        r.adjust(-1,-1,-1,-1);
+        painter->drawText(r, alignment, text);
+        r.adjust(2,2,2,2);
+        painter->drawText(r, alignment, text);
+        c.setAlpha(3*a/4); painter->setPen(QPen(c, savedPen.widthF()));
+    }
+    painter->drawText(rect, alignment, text, boundingRect);
+    if (penDirty)
+        painter->setPen(savedPen);
 }
 
 void
 BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
 {
-   Q_ASSERT(option);
-   Q_ASSERT(painter);
+    Q_ASSERT(option);
+    Q_ASSERT(painter);
 //    if (pe == PE_IndicatorItemViewItemDrop)
 // An indicator that is drawn to show where an item in an item view is about to
 // be dropped during a drag-and-drop operation in an item view.
 //       qWarning("IndicatorItemViewItemDrop, %d", pe);
-   if (pe < N_PE && primitiveRoutine[pe])
-      (this->*primitiveRoutine[pe])(option, painter, widget);
-   else
-      QCommonStyle::drawPrimitive( pe, option, painter, widget );
+    if (pe < N_PE && primitiveRoutine[pe])
+        (this->*primitiveRoutine[pe])(option, painter, widget);
+    else if (pe > 0xff00000)
+        switch (pe)
+        {
+        case 0xff00001: drawCapacityBar(option, painter, widget); break;
+        default: break;
+        }
+    else
+        QCommonStyle::drawPrimitive( pe, option, painter, widget );
 }
 
 void

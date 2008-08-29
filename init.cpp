@@ -99,7 +99,8 @@ BespinStyle::readSettings(const QSettings* settings)
             iSettings = new QSettings("Bespin", "Style");
             iSettings->beginGroup("PresetApps");
             QString cmd = QCoreApplication::applicationName();
-            if (cmd.isEmpty() && !QCoreApplication::arguments().isEmpty())
+            if (cmd.isEmpty() && !qApp->inherits("GreeterApp") && // KDM segfaults on QCoreApplication::arguments()...
+                !QCoreApplication::arguments().isEmpty())
                 cmd = QCoreApplication::arguments().at(0).section('/', -1);
             qPreset = iSettings->value(cmd, QString()).toString();
             iSettings->endGroup();

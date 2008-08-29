@@ -72,7 +72,7 @@ public:
 
    void drawItemText ( QPainter * painter, const QRect & rect, int alignment, const QPalette & pal,
                        bool enabled, const QString & text,
-                       QPalette::ColorRole textRole = QPalette::NoRole ) const;
+                       QPalette::ColorRole textRole = QPalette::NoRole, QRect *boundingRect = 0 ) const;
    
    void drawPrimitive ( PrimitiveElement elem, const QStyleOption * option, QPainter * painter,
                         const QWidget * widget = 0 ) const;
@@ -130,77 +130,70 @@ public:
     static void drawSolidArrow(Navi::Direction, const QRect&, QPainter*);
 
 protected:
-   virtual void init(const QSettings *settings = 0L);
+    virtual void init(const QSettings *settings = 0L);
 
-   QColor btnBg(const QPalette &pal, bool isEnabled, int hasFocus = false,
-                int step = 0, bool fullHover = true, bool reflective = false) const;
-   QColor btnFg(const QPalette &pal, bool isEnabled, int hasFocus = false, int step = 0, bool flat = false) const;
+    QColor btnBg(   const QPalette &pal, bool isEnabled, int hasFocus = false, int step = 0,
+                    bool fullHover = true, bool reflective = false) const;
+    QColor btnFg(const QPalette &pal, bool isEnabled, int hasFocus = false, int step = 0, bool flat = false) const;
 
-   // element painting routines ===============
-   void skip(const QStyleOption*, QPainter*, const QWidget*) const {}
-   // buttons.cpp
-   void drawButtonFrame(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawPushButton(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawPushButtonBevel(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawPushButtonLabel(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawCheckBox(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawRadio(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawCheckBoxItem(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawRadioItem(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawCheckLabel(const QStyleOption*, QPainter*, const QWidget*) const;
-   // docks.cpp
-   void drawDockBg(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawDockTitle(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawDockHandle(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawMDIControls(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   // frames.cpp
-   void drawFocusFrame(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawFrame(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawGroupBox(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   void drawGroupBoxFrame(const QStyleOption*, QPainter*, const QWidget*) const;
-   // input.cpp
-   void drawLineEditFrame(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawLineEdit(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawSpinBox(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   void drawComboBox(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   void drawComboBoxLabel(const QStyleOption*, QPainter*, const QWidget*) const;
-   // menus.cpp
-   void drawMenuBarBg(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawMenuBarItem(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawMenuFrame(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawMenuItem(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawMenuScroller(const QStyleOption*, QPainter*, const QWidget*) const;
-   // progress.cpp
-   void drawProgressBar(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawProgressBarGC(const QStyleOption*, QPainter*, const QWidget*, bool) const;
-   inline void drawProgressBarGroove(const QStyleOption * option,
-                                     QPainter * painter,
-                                     const QWidget * widget) const {
-      drawProgressBarGC(option, painter, widget, false);
-   }
-   inline void drawProgressBarContents(const QStyleOption * option,
-                                       QPainter * painter,
-                                       const QWidget * widget) const {
-      drawProgressBarGC(option, painter, widget, true);
-   }
+    // element painting routines ===============
+    void skip(const QStyleOption*, QPainter*, const QWidget*) const {}
+    // buttons.cpp
+    void drawButtonFrame(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawPushButton(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawPushButtonBevel(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawPushButtonLabel(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawCheckBox(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawRadio(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawCheckBoxItem(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawRadioItem(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawCheckLabel(const QStyleOption*, QPainter*, const QWidget*) const;
+    // docks.cpp
+    void drawDockBg(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawDockTitle(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawDockHandle(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawMDIControls(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    // frames.cpp
+    void drawFocusFrame(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawFrame(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawGroupBox(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    void drawGroupBoxFrame(const QStyleOption*, QPainter*, const QWidget*) const;
+    // input.cpp
+    void drawLineEditFrame(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawLineEdit(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawSpinBox(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    void drawComboBox(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    void drawComboBoxLabel(const QStyleOption*, QPainter*, const QWidget*) const;
+    // menus.cpp
+    void drawMenuBarBg(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawMenuBarItem(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawMenuFrame(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawMenuItem(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawMenuScroller(const QStyleOption*, QPainter*, const QWidget*) const;
+    // progress.cpp
+    void drawCapacityBar(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawProgressBar(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawProgressBarGC(const QStyleOption*, QPainter*, const QWidget*, bool) const;
+    inline void
+    drawProgressBarGroove(const QStyleOption * option, QPainter * painter, const QWidget * widget) const
+    { drawProgressBarGC(option, painter, widget, false); }
+    inline void
+    drawProgressBarContents(const QStyleOption * option, QPainter * painter, const QWidget * widget) const
+    { drawProgressBarGC(option, painter, widget, true); }
 
-   void drawProgressBarLabel(const QStyleOption*, QPainter*, const QWidget*) const;
-   // scrollareas.cpp
-   void drawScrollBar(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   void drawScrollBarButton(const QStyleOption*, QPainter*, const QWidget* , bool) const;
-   inline void drawScrollBarAddLine(const QStyleOption * option,
-                                    QPainter * painter,
-                                    const QWidget * widget) const {
-      drawScrollBarButton(option, painter, widget, false);
-   }
-   
-   inline void drawScrollBarSubLine(const QStyleOption * option,
-                                    QPainter * painter,
-                                    const QWidget * widget) const {
-      drawScrollBarButton(option, painter, widget, true);
-   }
-   void drawScrollBarGroove(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawScrollBarSlider(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawProgressBarLabel(const QStyleOption*, QPainter*, const QWidget*) const;
+    // scrollareas.cpp
+    void drawScrollBar(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    void drawScrollBarButton(const QStyleOption*, QPainter*, const QWidget* , bool) const;
+    inline void
+    drawScrollBarAddLine(const QStyleOption * option, QPainter * painter, const QWidget * widget) const
+    { drawScrollBarButton(option, painter, widget, false); }
+
+    inline void
+    drawScrollBarSubLine(const QStyleOption * option, QPainter * painter, const QWidget * widget) const
+    { drawScrollBarButton(option, painter, widget, true); }
+    void drawScrollBarGroove(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawScrollBarSlider(const QStyleOption*, QPainter*, const QWidget*) const;
 
     // shapes.cpp
     void drawCheck(const QStyleOption*, QPainter*, const QWidget*, bool) const;
