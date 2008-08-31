@@ -99,7 +99,7 @@ static QPixmap
 roundedMask(int size, int factor)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
-    p.drawRoundRect(pix.rect(),factor,factor); p.end();
+    p.drawRoundedRect(pix.rect(),factor,factor,Qt::RelativeSize); p.end();
     UPDATE_COLORS(pix);
     return pix;
 }
@@ -117,7 +117,7 @@ sunkenShadow(int size, bool enabled)
 
     // draw a flat shadow
     SET_ALPHA(55+add);
-    p.drawRoundRect(0,0,size,size-f2,80,80);
+    p.drawRoundedRect(0,0,size,size-f2,80,80,Qt::RelativeSize);
 
     // subtract light
     p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
@@ -126,7 +126,7 @@ sunkenShadow(int size, bool enabled)
     {
         xOff = qMax(i-f2,0);
         SET_ALPHA(add+i*add2);
-        p.drawRoundRect(xOff,i,size-2*xOff,size-(f2+i), 75+rAdd, 75+rAdd);
+        p.drawRoundedRect(xOff,i,size-2*xOff,size-(f2+i), 75+rAdd, 75+rAdd,Qt::RelativeSize);
     }
 
     // add bottom highlight
@@ -149,9 +149,9 @@ relief(int size, bool enabled)
     EMPTY_PIX(size, size);
     p.setBrush(Qt::NoBrush);
     p.setPen(QPen(BLACK(int(f*70)), f1));
-    p.drawRoundRect(f1,f1,size-f2,size-f2,99,99);
+    p.drawRoundedRect(f1,f1,size-f2,size-f2,99,99,Qt::RelativeSize);
     p.setPen(QPen(WHITE(int(f*35)), f1));
-    p.drawRoundRect(0,0,size,size,99,99);
+    p.drawRoundedRect(0,0,size,size,99,99,Qt::RelativeSize);
     // the borders cross the pixmap boundings, thus they're too weak, thus we stregth them a bit
     const int d1 = 0.3*size, d2 = 0.7*size;
     p.drawLine(d1, 0, d2, 0); // top
@@ -162,26 +162,33 @@ relief(int size, bool enabled)
     p.end(); return pix;
 }
 
+#define DRAW_ROUND_ALPHA_RECT(_A_, _X_, _Y_, _W_,_R_)\
+p.setBrush(QColor(0,0,0,_A_)); p.drawRoundedRect(_X_,_Y_,_W_,ss,(_R_+1)/2,_R_,Qt::RelativeSize)
+
 static QPixmap
 groupShadow(int size)
 {
+    const int ss = 2*size;
     QImage *tmpImg = new QImage(size,size, QImage::Format_ARGB32);
-    tmpImg->fill(Qt::transparent); QPainter p(tmpImg);
-    p.setRenderHint(QPainter::Antialiasing); p.setPen(Qt::NoPen);
+    tmpImg->fill(Qt::transparent);
+    QPainter p(tmpImg);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setPen(Qt::NoPen);
 
-    int ss = 2*size;
-
-    p.setBrush(QColor(0,0,0,5)); p.drawRoundRect(0,0,size,ss,14,7);
-    p.setBrush(QColor(0,0,0,9)); p.drawRoundRect(f1,f1,size-f2,ss,13,7);
-    p.setBrush(QColor(0,0,0,11)); p.drawRoundRect(f2,f2,size-f4,ss,12,6);
-    p.setBrush(QColor(0,0,0,13)); p.drawRoundRect(f3,f3,size-dpi.f6,ss,48,24);
+    DRAW_ROUND_ALPHA_RECT(5, 0, 0, size, 14);
+    DRAW_ROUND_ALPHA_RECT(9, f1, f1, size-f2, 13);
+    DRAW_ROUND_ALPHA_RECT(11, f2, f2, size-f4, 12);
+    DRAW_ROUND_ALPHA_RECT(13, f3, f3, size-F(6), 48);
+    
     p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
-    p.setBrush(QColor(0,0,0,0)); p.drawRoundRect(f4,f2,size-dpi.f8,ss,11,6);
-//    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-//    p.setPen(QColor(255,255,255,200)); p.setBrush(Qt::NoBrush);
-//    p.drawRoundRect(dpi.f4,dpi.f2,f49-dpi.f8,2*f49,11,6);
+    p.setBrush(QColor(0,0,0,0)); p.drawRoundedRect(f4,f2,size-dpi.f8,ss,6,11,Qt::RelativeSize);
+
+    p.setCompositionMode( QPainter::CompositionMode_SourceOver );
+    p.setPen(QColor(255,255,255,60));
+    p.setBrush(Qt::NoBrush);
+    p.drawRoundedRect(f4,f2,size-dpi.f8,ss,6,11,Qt::RelativeSize);
     p.setRenderHint(QPainter::Antialiasing, false);
-//    p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
+    p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
     int f33 = SCALE(33);
     for (int i = 1; i < f33; ++i)
     {

@@ -41,6 +41,8 @@ scrollAreaHovered(const QWidget* slider)
     bool isActive = true;
     if (scrollWidget)
     {
+        if (!scrollWidget->underMouse())
+            return false;
 //         QAbstractScrollArea* scrollWidget = (QAbstractScrollArea*)daddy;
         QPoint tl = scrollWidget->mapToGlobal(QPoint(0,0));
         QRegion scrollArea(tl.x(), tl.y(), scrollWidget->width(), scrollWidget->height());
