@@ -75,53 +75,56 @@ BespinStyle::drawPushButtonBevel(const QStyleOption * option,
                                  QPainter * painter,
                                  const QWidget * widget) const
 {
-   ASSURE_OPTION(btn, Button);
-   OPT_SUNKEN OPT_HOVER
-      
-   animStep = HOVER_STEP;
-   
-   drawButtonFrame(option, painter, widget);
-   if (btn->features & QStyleOptionButton::HasMenu) {
-      int sz = (RECT.height()-dpi.f6)/2;
-      QRect rect = RECT;
-      rect.setLeft(RECT.right() - (dpi.f10+sz));
-      shadows.line[1][Plain].render(rect, painter);
-      rect.setLeft(rect.left() + dpi.f4);
-      rect.setWidth(sz);
-      painter->save();
-      const QColor c =  Colors::mid(Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg)),
-                        Colors::mid(CCOLOR(btn.active, Bg), CCOLOR(btn.active, Fg)),
-                        6-animStep, animStep);
-      painter->setPen(c); painter->setBrush(c);
-      drawArrow(Navi::S, rect, painter);
-      painter->restore();
-   }
-   // toggle indicator
-   ASSURE(widget);
-   ASSURE_WIDGET(b, QAbstractButton);
+    ASSURE_OPTION(btn, Button);
+    OPT_SUNKEN OPT_HOVER
 
-   if (b->isCheckable()) {
-      QRect r = RECT;
-      const int h = r.height()/3;
-      r.setTop(r.top() + h);
-      r.setLeft(r.x() + dpi.f10);
-      r.setWidth(h); r.setHeight(h);
+    animStep = HOVER_STEP;
 
-      painter->save();
-      painter->setRenderHint(QPainter::Antialiasing);
-      const QColor c = config.btn.backLightHover ? CCOLOR(btn.std, Fg) :
-                       Colors::mid(CCOLOR(btn.std, Fg), CCOLOR(btn.active, Fg), 6-animStep, animStep);
-      if (option->state & State_On) {
-         const QPixmap &fill = Gradients::pix(c, r.height(), Qt::Vertical, GRAD(btn));
-         painter->setBrush(fill);
-         painter->setBrushOrigin(r.topLeft());
-      }
-      else
-         painter->setBrush(Qt::NoBrush);
-      painter->setPen(c);
-      painter->drawEllipse(r);
-      painter->restore();
-   }
+    drawButtonFrame(option, painter, widget);
+    if (btn->features & QStyleOptionButton::HasMenu)
+    {
+        int sz = (RECT.height()-dpi.f6)/2;
+        QRect rect = RECT;
+        rect.setLeft(RECT.right() - (dpi.f10+sz));
+        shadows.line[1][Plain].render(rect, painter);
+        rect.setLeft(rect.left() + dpi.f4);
+        rect.setWidth(sz);
+        painter->save();
+        const QColor c = Colors::mid(Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg)),
+                                     Colors::mid(CCOLOR(btn.active, Bg), CCOLOR(btn.active, Fg)),
+                                     6-animStep, animStep);
+        painter->setPen(c); painter->setBrush(c);
+        drawArrow(Navi::S, rect, painter);
+        painter->restore();
+    }
+    // toggle indicator
+    ASSURE(widget);
+    ASSURE_WIDGET(b, QAbstractButton);
+
+    if (b->isCheckable())
+    {
+        QRect r = RECT;
+        const int h = r.height()/3;
+        r.setTop(r.top() + h);
+        r.setLeft(r.x() + dpi.f10);
+        r.setWidth(h); r.setHeight(h);
+
+        painter->save();
+        painter->setRenderHint(QPainter::Antialiasing);
+        const QColor c = config.btn.backLightHover ? CCOLOR(btn.std, Fg) :
+                        Colors::mid(CCOLOR(btn.std, Fg), CCOLOR(btn.active, Fg), 6-animStep, animStep);
+        if (option->state & State_On)
+        {
+            const QPixmap &fill = Gradients::pix(c, r.height(), Qt::Vertical, GRAD(btn));
+            painter->setBrush(fill);
+            painter->setBrushOrigin(r.topLeft());
+        }
+        else
+            painter->setBrush(Qt::NoBrush);
+        painter->setPen(c);
+        painter->drawEllipse(r);
+        painter->restore();
+    }
 }
 
 void
@@ -262,92 +265,87 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
 void
 BespinStyle::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
-   OPT_ENABLED OPT_FOCUS OPT_HOVER;
-   ASSURE_OPTION(btn, Button);
-   
-   QRect ir = btn->rect;
-   uint tf = Qt::AlignCenter | BESPIN_MNEMONIC;
-//    if (!styleHint(SH_UnderlineShortcut, btn, widget))
-//       tf |= Qt::TextHideMnemonic;
-//    else
-//       tf |= Qt::TextShowMnemonic;
+    OPT_ENABLED OPT_FOCUS OPT_HOVER;
+    ASSURE_OPTION(btn, Button);
 
-   if (!btn->icon.isNull()) {
-      QIcon::Mode mode = isEnabled ? QIcon::Normal
-         : QIcon::Disabled;
-      if (mode == QIcon::Normal && hasFocus)
-         mode = QIcon::Active;
-      QIcon::State state = QIcon::Off;
-      if (btn->state & State_On)
-         state = QIcon::On;
-      QPixmap pixmap = btn->icon.pixmap(btn->iconSize, mode, state);
-      int pixw = pixmap.width();
-      int pixh = pixmap.height();
+    QRect ir = btn->rect;
+    uint tf = Qt::AlignCenter | BESPIN_MNEMONIC;
 
-      //Center the icon if there is no text
-      QPoint point;
-      if (btn->text.isEmpty())
-         point = QPoint(ir.x() + ir.width() / 2 - pixw / 2, ir.y() + ir.height() / 2 - pixh / 2);
-      else
-         point = QPoint(ir.x() + 2, ir.y() + ir.height() / 2 - pixh / 2);
+    if (!btn->icon.isNull())
+    {   // The ICON ================================================
+        QIcon::Mode mode = isEnabled ? QIcon::Normal : QIcon::Disabled;
+        if (mode == QIcon::Normal && hasFocus)
+            mode = QIcon::Active;
+        QIcon::State state = QIcon::Off;
+        if (btn->state & State_On)
+            state = QIcon::On;
+        QPixmap pixmap = btn->icon.pixmap(btn->iconSize, mode, state);
+        int pixw = pixmap.width();
+        int pixh = pixmap.height();
 
-      if (btn->direction == Qt::RightToLeft)
-         point.rx() += pixw/2;
+        //Center the icon if there is no text
+        QPoint point;
+        if (btn->text.isEmpty())
+            point = QPoint(ir.x() + ir.width() / 2 - pixw / 2, ir.y() + ir.height() / 2 - pixh / 2);
+        else
+            point = QPoint(ir.x() + 2, ir.y() + ir.height() / 2 - pixh / 2);
 
-      painter->drawPixmap(visualPos(btn->direction, btn->rect, point), pixmap);
+        if (btn->direction == Qt::RightToLeft)
+            point.rx() += pixw/2;
 
-      if (btn->direction == Qt::LeftToRight)
-         ir.setLeft(ir.left() + pixw + dpi.f4);
-      else
-         ir.setWidth(ir.width() - (pixw + dpi.f4));
-   }
+        painter->drawPixmap(visualPos(btn->direction, btn->rect, point), pixmap);
 
-   if (btn->text.isEmpty())
-      return;
+        if (btn->direction == Qt::LeftToRight)
+            ir.setLeft(ir.left() + pixw + dpi.f4);
+        else
+            ir.setWidth(ir.width() - (pixw + dpi.f4));
+    }
 
-   const bool flat = btn->features & QStyleOptionButton::Flat;
+    if (btn->text.isEmpty())
+        return;
 
-   const QColor fg = btnFg(PAL, isEnabled, hasFocus, animStep, flat);
+    // The TEXT ============================================
+    const bool flat = btn->features & QStyleOptionButton::Flat;
+    const QColor fg = btnFg(PAL, isEnabled, hasFocus, animStep, flat);
+    if (config.btn.backLightHover)
+        { hover = 0; animStep = 0; }
 
-   if (config.btn.backLightHover) {
-      hover = 0; animStep = 0;
-   }
+    const QColor &bg = flat ? FCOLOR(Window) : (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
 
-   const QColor &bg = flat ? FCOLOR(Window) :
-      (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
+    painter->save();
+    if (hasFocus || (btn->features & QStyleOptionButton::DefaultButton))
+    {
+        QFont tmpFnt = painter->font();
+        tmpFnt.setBold(true);
+        QFontMetrics fm(tmpFnt);
+        QRect tr = fm.boundingRect ( btn->text );
+        if (!tr.isValid())
+            { painter->restore(); return; }
+        while (tr.width() > ir.width())
+        {
+            if (tmpFnt.pointSize() > -1)
+                tmpFnt.setPointSize(tmpFnt.pointSize()*ir.width()/tr.width());
+            else
+                tmpFnt.setPixelSize(tmpFnt.pixelSize()*ir.width()/tr.width());
+            fm = QFontMetrics(tmpFnt);
+            tr = fm.boundingRect ( btn->text );
+        }
+        painter->setFont(tmpFnt);
+    }
 
-   painter->save();
-   if (hasFocus) {
-      QFont tmpFnt = painter->font();
-      tmpFnt.setBold(true);
-      QFontMetrics fm(tmpFnt);
-      QRect tr = fm.boundingRect ( btn->text );
-      if (!tr.isValid()) {
-         painter->restore(); return;
-      }
-      while (tr.width() > ir.width()) {
-         if (tmpFnt.pointSize() > -1)
-            tmpFnt.setPointSize(tmpFnt.pointSize()*ir.width()/tr.width());
-         else
-            tmpFnt.setPixelSize(tmpFnt.pixelSize()*ir.width()/tr.width());
-         fm = QFontMetrics(tmpFnt);
-         tr = fm.boundingRect ( btn->text );
-      }
-      painter->setFont(tmpFnt);
-   }
+    if (!flat && isEnabled)
+    {
+        painter->setPen(bg.dark(120));
+        ir.translate(0,-1);
+        drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
+        ir.translate(0,1);
+    }
 
-   if (!flat && isEnabled) {
-      painter->setPen(bg.dark(120));
-      ir.translate(0,-1);
-      drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
-      ir.translate(0,1);
-   }
+    painter->setPen(fg);
 
-   painter->setPen(fg);
-
-   drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
-   painter->restore();
-   animStep = -1;
+    drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
+    painter->restore();
+    animStep = -1;
 }
 
 void

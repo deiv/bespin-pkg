@@ -127,11 +127,14 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    
     /** Setup the UI and geometry */
     ui.setupUi(this);
+    ui.logo->setPixmap(QPixmap(":/bespin.png"));
     ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
+    ui.info->viewport()->setAutoFillBackground(false);
+    ui.sectionSelect->viewport()->setAutoFillBackground(false);
     connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
                 ui.sections, SLOT(setCurrentIndex(int)));
     connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
-                ui.header, SLOT(setText(const QString &)));
+                this, SLOT(setHeader(const QString &)));
 
     /** Prepare the settings store, not of interest */
     StringMap presetMap;
@@ -267,7 +270,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Can be any QTextBrowser on your UI form */
     setInfoBrowser(ui.info);
     /** 2. Define a context info that is displayed when no other context help is demanded */
-    setDefaultContextInfo(defInfo1);
 
     /** handleSettings(.) tells BConfig to take care (save/load) of a widget
     In this case "ui.bgMode" is the widget on the form,
@@ -933,6 +935,8 @@ Config::savePalette(const QPalette &pal)
 void
 Config::store()
 {
+    ui.presetLabel->hide();
+    ui.presetFilter->hide();
     ui.storeLine->setText("Enter a name or select an item above");
     ui.storeLine->selectAll();
     ui.storeLine->show();
@@ -958,6 +962,8 @@ Config::store2a()
     disconnect (ui.storeLine, SIGNAL(returnPressed()), this, SLOT(store2a()));
     disconnect (ui.store, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(store2b(QTreeWidgetItem *)));
     ui.storeLine->hide();
+    ui.presetLabel->show();
+    ui.presetFilter->show();
     store3( string, true );
 }
 
@@ -967,6 +973,8 @@ Config::store2b(QTreeWidgetItem* item)
     disconnect (ui.storeLine, SIGNAL(returnPressed()), this, SLOT(store2a()));
     disconnect (ui.store, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(store2b(QTreeWidgetItem *)));
     ui.storeLine->hide();
+    ui.presetLabel->show();
+    ui.presetFilter->show();
     store3( item->text(0), false );
 }
 
@@ -1031,7 +1039,6 @@ void
 Config::handleBgMode(int idx)
 {
     ui.structure->setEnabled(idx == 1);
-    ui.labelStructure->setEnabled(idx == 1);
 }
 
 static const char *grooveModes[4] = {"Line", "Groove", "Inlay", "Sunken"};
@@ -1129,4 +1136,13 @@ Config::generateGradientTypes(QComboBox *box)
     box->addItem("Glass");
     box->addItem("Metal");
     box->addItem("Cloudy");
+}
+
+
+void
+Config::setHeader(const QString &title)
+{
+    setDefaultContextInfo("<qt><center><h1>" + title + "</h1></center></qt>");
+    ui.info->setHtml("<qt><center><h1>" + title + "</h1></center></qt>"); // must force
+    resetInfo();
 }

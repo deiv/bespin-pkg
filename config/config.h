@@ -54,6 +54,7 @@ private:
     void store3(const QString &, bool);
     static void savePalette(const QPalette &pal);
 private slots:
+    void setHeader(const QString&);
     void storedSettigSelected(QTreeWidgetItem *);
     void store2a();
     void store2b(QTreeWidgetItem *);

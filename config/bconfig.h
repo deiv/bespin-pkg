@@ -100,8 +100,8 @@ public slots:
    virtual void saveAs();
 protected slots:
    void checkDirty();
-private slots:
    void resetInfo();
+private slots:
    void setComboListInfo(int index);
 private:
    QVariant variant(const QWidget *w) const;
