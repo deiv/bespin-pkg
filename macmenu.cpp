@@ -22,6 +22,7 @@ This library is distributed in the hope that it will be useful,
 #include <QtDBus/QDBusConnectionInterface>
 #include <QLayout>
 #include <QMenuBar>
+#include <QWindowStateChangeEvent>
 
 #include "macmenu.h"
 #include "macmenu-dbus.h"
@@ -32,6 +33,21 @@ using namespace Bespin;
 
 static MacMenu *instance = 0;
 static QDBusInterface xbar( "org.kde.XBar", "/XBar", "org.kde.XBar" );
+
+bool
+FullscreenWatcher::eventFilter(QObject *o, QEvent *ev)
+{
+    QWidget *window = qobject_cast<QWidget*>(o);
+    if (!(window && ev->type() == QEvent::WindowStateChange))
+        return false;
+    if (window->windowState() & Qt::WindowFullScreen)
+        instance->deactivate(window);
+    else
+        instance->activate(window);
+    return false;
+}
+
+static FullscreenWatcher *fullscreenWatcher = 0;
 
 MacMenu::MacMenu() : QObject()
 {
@@ -62,12 +78,13 @@ MacMenu::manage(QMenuBar *menu)
     {
         instance = new MacMenu;
         /*MacMenuAdaptor *adapt = */new MacMenuAdaptor(instance);
+        fullscreenWatcher = new FullscreenWatcher;
     }
     else if (instance->items.contains(menu))
         return; // no double adds please!
 
     if (instance->usingMacMenu)
-        instance->registerMenu(menu);
+        instance->activate(menu);
 
     connect (menu, SIGNAL(destroyed(QObject *)), instance, SLOT(_release(QObject *)));
 
@@ -107,17 +124,77 @@ MacMenu::activate()
     while (menu != items.end())
     {
         if (*menu)
+            { activate(*menu); ++menu; }
+        else
+            { actions.remove(*menu); menu = items.erase(menu); }
+    }
+    usingMacMenu = true;
+}
+
+void
+MacMenu::activate(QMenuBar *menu)
+{
+    menu->removeEventFilter(this);
+    
+    // and WOWWWW - no more per window menubars...
+    menu->setFixedSize(0,0);
+    //NOTICE i used to set the menu's parent->layout()->setMenuBar(0) to get rid of the free space
+    // but this leeds to side effects (e.g. kcalc won't come up anymore...)
+    // so now the stylehint for the free space below checks the menubar height and returns
+    // a negative value so that final result will be 1 px heigh...
+    menu->updateGeometry();
+    
+    // we need to hold a copy of this list to handle action removes
+    // (as we get the event after the action has been removed from the widget...)
+    actions[menu] = menu->actions();
+    
+    // find a nice header
+    QString title = menu->window()->windowTitle();
+    QString name = QCoreApplication::arguments().at(0).section('/', -1);
+    if (title.isEmpty())
+        title = name;
+    else
+    {
+        int i = title.indexOf(name, 0, Qt::CaseInsensitive);
+        if (i > -1)
+            title = title.mid(i, name.length());
+    }
+    title = title.section(" - ", -1);
+    
+    // register the menu via dbus
+    QStringList entries;
+    foreach (QAction* action, menu->actions())
+        entries << action->text();
+    
+    xbar.call(QDBus::NoBlock, "registerMenu", service, (qlonglong)menu, title, entries);
+    // TODO cause of now async call, the following should - maybe - attached to the above?!!
+    if (menu->isActiveWindow())
+        xbar.call(QDBus::NoBlock, "requestFocus", (qlonglong)menu);
+    
+    // take care of several widget events!
+    menu->installEventFilter(this);
+    if (menu->window())
+    {
+        menu->window()->removeEventFilter(fullscreenWatcher);
+        menu->window()->installEventFilter(fullscreenWatcher);
+    }
+}
+
+void
+MacMenu::activate(QWidget *window)
+{
+    MenuList::iterator menu = items.begin();
+    while (menu != items.end())
+    {
+        if (*menu)
         {
-            registerMenu(*menu);
+            if ((*menu)->window() == window)
+                { activate(*menu); return; }
             ++menu;
         }
         else
-        {
-            actions.remove(*menu);
-            menu = items.erase(menu);
-        }
+            { actions.remove(*menu); menu = items.erase(menu); }
     }
-    usingMacMenu = true;
 }
 
 void
@@ -132,17 +209,40 @@ MacMenu::deactivate()
         actions.remove(*i);
         if ((menu = *i))
         {
-            menu->removeEventFilter(this);
-            QWidget *dad = menu->parentWidget();
-            if (dad && dad->layout())
-                dad->layout()->setMenuBar(menu);
-            menu->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-            menu->adjustSize();
-//             menu->updateGeometry();
-        ++i;
+            deactivate(menu);
+            ++i;
         }
         else
             i = items.erase(i);
+    }
+}
+
+void
+MacMenu::deactivate(QMenuBar *menu)
+{
+    menu->removeEventFilter(this);
+    QWidget *dad = menu->parentWidget();
+    if (dad && dad->layout())
+        dad->layout()->setMenuBar(menu);
+    menu->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    menu->adjustSize();
+    //             menu->updateGeometry();
+}
+
+void
+MacMenu::deactivate(QWidget *window)
+{
+    MenuList::iterator menu = items.begin();
+    while (menu != items.end())
+    {
+        if (*menu)
+        {
+            if ((*menu)->window() == window)
+                { deactivate(*menu); return; }
+            ++menu;
+        }
+        else
+        { actions.remove(*menu); menu = items.erase(menu); }
     }
 }
 
@@ -168,51 +268,6 @@ MacMenu::menuBar(qlonglong key)
     }
     return NULL;
 }
-
-void
-MacMenu::registerMenu(QMenuBar *menu)
-{
-    menu->removeEventFilter(this);
-
-    // and WOWWWW - no more per window menubars...
-    menu->setFixedSize(0,0);
-    //NOTICE i used to set the menu's parent->layout()->setMenuBar(0) to get rid of the free space
-    // but this leeds to side effects (e.g. kcalc won't come up anymore...)
-    // so now the stylehint for the free space below checks the menubar height and returns
-    // a negative value so that final result will be 1 px heigh...
-    menu->updateGeometry();
-
-    // we need to hold a copy of this list to handle action removes
-    // (as we get the event after the action has been removed from the widget...)
-    actions[menu] = menu->actions();
-
-    // find a nice header
-    QString title = menu->window()->windowTitle();
-    QString name = QCoreApplication::arguments().at(0).section('/', -1);
-    if (title.isEmpty())
-        title = name;
-    else
-    {
-        int i = title.indexOf(name, 0, Qt::CaseInsensitive);
-        if (i > -1)
-            title = title.mid(i, name.length());
-    }
-    title = title.section(" - ", -1);
-
-    // register the menu via dbus
-    QStringList entries;
-    foreach (QAction* action, menu->actions())
-        entries << action->text();
-
-    xbar.call(QDBus::NoBlock, "registerMenu", service, (qlonglong)menu, title, entries);
-    // TODO cause of now async call, the following should - maybe - attached to the above?!!
-    if (menu->isActiveWindow())
-        xbar.call(QDBus::NoBlock, "requestFocus", (qlonglong)menu);
-
-    // take care of several widget events!
-    menu->installEventFilter(this);
-}
-
 
 void
 MacMenu::popup(qlonglong key, int idx, int x, int y)
@@ -337,6 +392,9 @@ MacMenu::eventFilter(QObject *o, QEvent *ev)
 {
     QMenuBar *menu = qobject_cast<QMenuBar*>(o);
     if (!menu)
+        return false;
+
+    if (!usingMacMenu)
         return false;
 
     QString func;

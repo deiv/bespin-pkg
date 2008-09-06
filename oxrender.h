@@ -36,29 +36,30 @@ typedef QVector<QColor> ColorArray;
 typedef Picture OXPicture;
 typedef Pixmap OXPixmap;
 
-namespace OXRender {
-   void composite(OXPicture src, OXPicture mask, OXPicture dst,
-                  int sx, int sy, int mx, int my, int dx, int dy,
-                  uint w, uint h, int op = PictOpSrc);
-   void composite(OXPicture src, OXPicture mask, const QPixmap &dst,
-                  int sx, int sy, int mx, int my, int dx, int dy,
-                  uint w, uint h, int op = PictOpSrc);
-   void composite(const QPixmap &src, OXPicture mask, const QPixmap &dst,
-                  int sx, int sy, int mx, int my, int dx, int dy,
-                  uint w, uint h, int op = PictOpSrc);
-   
-   void setColor(XRenderColor &xc, double r, double g, double b, double a = 1);
-   void setColor(XRenderColor &xc, QColor qc);
+namespace OXRender
+{
+    void composite( OXPicture src, OXPicture mask, OXPicture dst,
+                    int sx, int sy, int mx, int my, int dx, int dy,
+                    uint w, uint h, int op = PictOpSrc);
+    void composite( OXPicture src, OXPicture mask, const QPixmap &dst,
+                    int sx, int sy, int mx, int my, int dx, int dy,
+                    uint w, uint h, int op = PictOpSrc);
+    void composite( const QPixmap &src, OXPicture mask, const QPixmap &dst,
+                    int sx, int sy, int mx, int my, int dx, int dy,
+                    uint w, uint h, int op = PictOpSrc);
 
-   bool blend(const QPixmap &upper, QPixmap &lower,
-              double opacity = 0.5, int x = 0, int y = 0);
-   QPixmap fade(const QPixmap &pix, double percent);
+    void setColor(XRenderColor &xc, double r, double g, double b, double a = 1);
+    void setColor(XRenderColor &xc, QColor qc);
+
+    bool blend(const QPixmap &upper, QPixmap &lower, double opacity = 0.5, int x = 0, int y = 0);
+    QPixmap fade(const QPixmap &pix, double percent);
+    QPixmap tint(const QPixmap &mask, const QColor &color);
    
-   void setAlpha(QPixmap &pix, const OXPicture &mask);
-   QPixmap applyAlpha(const QPixmap &toThisPix,
-                      const QPixmap &fromThisPix,
-                      const QRect &rect = QRect(),
-                      const QRect &alphaRect = QRect());
+    void setAlpha(QPixmap &pix, const OXPicture &mask);
+    QPixmap applyAlpha( const QPixmap &toThisPix,
+                        const QPixmap &fromThisPix,
+                        const QRect &rect = QRect(),
+                        const QRect &alphaRect = QRect());
 //    QPixmap applyAlpha(const QPixmap &toThisPix,
 //                       const OXPicture &fromThisPict,
 //                       const QRect &rect = QRect(),
@@ -76,7 +77,7 @@ namespace OXRender {
                       const ColorArray &colors,
                       const PointArray &stops = PointArray());
 #endif
-   void freePicture(OXPicture pict);
+    void freePicture(OXPicture pict);
 }
 
 #define Q2XRenderColor(_XRC_, _QC_) XRenderColor _XRC_; OXRender::setColor(_XRC_, _QC_)

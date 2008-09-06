@@ -239,7 +239,7 @@ BespinStyle::readSettings(const QSettings* settings)
         readRole(menu.active, MENU_ACTIVEROLE);
         readRole(menu.std, MENU_ROLE);
     }
-    if (QCoreApplication::applicationName() == "plasma")
+    if (appType == Plasma)
     {   // that's probably XBar, and we don't want a bg there...
         config.menu.bar_role[Bg] = QPalette::Window;
         config.menu.bar_role[Fg] = QPalette::WindowText;
@@ -375,6 +375,8 @@ BespinStyle::init(const QSettings* settings)
         { appType = GTK; qWarning("BESPIN: Detected GKT+ application"); }
     else if (QCoreApplication::applicationName() == "plasma")
         appType = Plasma;
+    else if (QCoreApplication::applicationName() == "kget")
+        appType = KGet;
     else if (QCoreApplication::applicationName() == "Designer")
         appType = QtDesigner;
     // ==========================

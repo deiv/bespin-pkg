@@ -127,10 +127,30 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    
     /** Setup the UI and geometry */
     ui.setupUi(this);
+
+    /** Some special stuff */
     ui.logo->setPixmap(QPixmap(":/bespin.png"));
     ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
+
+    const QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
     ui.info->viewport()->setAutoFillBackground(false);
+    QPalette pal = ui.info->palette();
+    for (int i = 0; i < 3; ++i)
+    {
+        pal.setColor(groups[i], QPalette::Base, pal.color(groups[i], QPalette::Window));
+        pal.setColor(groups[i], QPalette::Text, pal.color(groups[i], QPalette::WindowText));
+    }
+    ui.info->setPalette(pal);
+
     ui.sectionSelect->viewport()->setAutoFillBackground(false);
+    pal = ui.sectionSelect->palette();
+    for (int i = 0; i < 3; ++i)
+    {
+        pal.setColor(groups[i], QPalette::Base, pal.color(groups[i], QPalette::Window));
+        pal.setColor(groups[i], QPalette::Text, pal.color(groups[i], QPalette::WindowText));
+    }
+    ui.sectionSelect->setPalette(pal);
+    
     connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
                 ui.sections, SLOT(setCurrentIndex(int)));
     connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),

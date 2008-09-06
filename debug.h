@@ -41,7 +41,7 @@ f & QStyle::Style_Active ? "Active, " : "",\
 f & QStyle::Style_ButtonDefault ? "ButtonDefault" : "" )
 
 #ifndef _PRINTSTATE_
-#define _PRINTSTATE_ option ? qWarning("State Flags:\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",\
+#define _PRINTSTATE_ option ? qWarning("BESPIN, State Flags:\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",\
 option->state & State_Active ? "Active, " : "",\
 option->state & State_AutoRaise ? "AutoRaise, " : "",\
 option->state & State_Bottom ? "Bottom, " : "",\

@@ -482,9 +482,9 @@ const QPixmap
             p.drawLine( i, 0, i, 63 );
         break;
     case 5: // diagonals
-        i = _bgIntensity - 100;
-        pix->fill( c.light(100+i).rgb() );
-        p.setPen(QPen(c.dark(100 + i/(2*(light+1))), 11));
+        i = 100 + (_bgIntensity - 100)/4;
+        pix->fill( c.light(i).rgb() );
+        p.setPen(QPen(c.dark(i), 11));
         p.setRenderHint(QPainter::Antialiasing);
         p.drawLine(-64,64,64,-64);
         p.drawLine(0,64,64,0);

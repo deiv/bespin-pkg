@@ -59,17 +59,19 @@ BespinStyle::drawHeaderSection(const QStyleOption * option, QPainter * painter,
                                const QWidget *) const
 {
     OPT_SUNKEN OPT_HOVER
-    const QStyleOptionHeader *header =
-        qstyleoption_cast<const QStyleOptionHeader *>(option);
+    const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option);
+
     Qt::Orientation o = Qt::Vertical; int s = RECT.height();
     if (header && header->orientation == Qt::Vertical)
     {
         o = Qt::Horizontal;
         s = RECT.width();
     }
-    const QColor &c =   (header->sortIndicator != QStyleOptionHeader::None) ?
-                        COLOR(config.view.sortingHeader_role[Bg]) :
-                        COLOR(config.view.header_role[Bg]);
+
+    QColor c =  (header->sortIndicator != QStyleOptionHeader::None) ?
+                                        COLOR(config.view.sortingHeader_role[Bg]) :
+                                        COLOR(config.view.header_role[Bg]);
+
     if (appType == GTK)
         sunken = option->state & State_HasFocus;
     if (sunken)
@@ -87,16 +89,17 @@ BespinStyle::drawHeaderSection(const QStyleOption * option, QPainter * painter,
     if (hover)
     {
         const bool sort = (header->sortIndicator != QStyleOptionHeader::None);
-        QColor bg = Colors::mid(c, sort ? CCOLOR(view.sortingHeader, Fg) : CCOLOR(view.header, Fg),10,1);
-        painter->drawTiledPixmap(r, Gradients::pix(bg, s, o, gt));
+        c = Colors::mid(c, sort ? CCOLOR(view.sortingHeader, Fg) : CCOLOR(view.header, Fg),10,1);
     }
+    if (gt == Gradients::None)
+        painter->fillRect(r, c);
     else
         painter->drawTiledPixmap(r, Gradients::pix(c, s, o, gt));
 
     if (o == Qt::Vertical)
     {
         r.setLeft(r.right() - dpi.f1);
-        painter->drawTiledPixmap(r, Gradients::pix(c, s, o, Gradients::Sunken));
+        painter->drawTiledPixmap(r, Gradients::pix(COLOR(config.view.header_role[Bg]), s, o, Gradients::Sunken));
         painter->save();
         painter->setPen(Colors::mid(FCOLOR(Base), Qt::black, 8, 1));
         painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
@@ -176,7 +179,7 @@ BespinStyle::drawHeaderArrow(const QStyleOption * option, QPainter * painter, co
 static const int decoration_size = 9;
 
 void
-BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const QWidget *) const
+BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
     SAVE_PEN;
     int mid_h = RECT.x() + RECT.width() / 2;
@@ -186,11 +189,10 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const Q
     int aft_h = mid_h;
     int aft_v = mid_v;
 
-//    const QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
-//    if (widget) {
-//       bg = widget->backgroundRole();
-//       fg = widget->foregroundRole();
-//    }
+
+    QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
+    if (widget)
+        { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
 
     const bool firstCol = (RECT.x() ==  -1);
 
@@ -211,7 +213,7 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const Q
             if (option->state & State_Selected)
                 painter->setBrush(FCOLOR(HighlightedText));
             else
-                painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text)));
+                painter->setBrush(Colors::mid( COLOR(bg), COLOR(fg)));
             rect.translate(0,-decoration_size/6);
             if (option->direction == Qt::RightToLeft)
                 drawSolidArrow(Navi::SW, rect, painter);
@@ -223,7 +225,7 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const Q
             if (option->state & State_Selected)
                 painter->setBrush(FCOLOR(HighlightedText));
             else
-                painter->setBrush(Colors::mid( FCOLOR(Base), FCOLOR(Text), 6, 1));
+                painter->setBrush(Colors::mid( COLOR(bg), COLOR(fg), 6, 1));
             if (option->direction == Qt::RightToLeft)
                 drawArrow(Navi::W, rect, painter);
             else
@@ -239,7 +241,7 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const Q
         return;
     }
 
-    painter->setPen(Colors::mid( FCOLOR(Base), FCOLOR(Text), 40, 1));
+    painter->setPen(Colors::mid( COLOR(bg), COLOR(fg), 40, 1));
 
     if (option->state & (State_Item | State_Sibling))
         painter->drawLine(mid_h, RECT.y(), mid_h, bef_v);
@@ -425,6 +427,8 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWi
     const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
     hover = hover && (!view || view->selectionMode() != QAbstractItemView::NoSelection);
     const bool selected = item->state & QStyle::State_Selected;
+    const QPalette::ColorRole bg = widget ? widget->backgroundRole() : QPalette::Base;
+    const QPalette::ColorRole fg = widget ? widget->foregroundRole() : QPalette::Text;
 
    // this could just leads to cluttered listviews...?!
 //    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
@@ -452,8 +456,8 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWi
         if (gt == Gradients::None)
         {
             const QColor high = selected ? FCOLOR(Highlight) :
-                                Colors::mid(FCOLOR(Base), FCOLOR(Highlight),
-                                            100/Colors::contrast(FCOLOR(Highlight), FCOLOR(Text)), 4);
+                                Colors::mid(COLOR(bg), FCOLOR(Highlight),
+                                            100/Colors::contrast(FCOLOR(Highlight), COLOR(fg)), 4);
             painter->fillRect(RECT, high);
         }
         else

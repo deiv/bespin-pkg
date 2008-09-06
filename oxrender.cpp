@@ -99,7 +99,6 @@ QPixmap
 OXRender::applyAlpha(   const QPixmap &toThisPix, const QPixmap &fromThisPix,
                         const QRect &rect, const QRect &alphaRect)
 {
-//     return applyAlpha(toThisPix, fromThisPix.x11PictureHandle(), rect, alphaRect);
     int sx,sy,ax,ay,w,h;
     if (rect.isNull())
         { sx = sy = 0; w = toThisPix.width(); h = toThisPix.height(); }
@@ -124,6 +123,22 @@ OXRender::applyAlpha(   const QPixmap &toThisPix, const QPixmap &fromThisPix,
                         sx, sy, ax, ay, 0, 0, w, h);
     return pix;
 }
+
+QPixmap
+OXRender::tint(const QPixmap &mask, const QColor &color)
+{
+    Q2XRenderColor(c, color);
+    OXPicture tnt = createFill (dpy, &c);
+    if (tnt == X::None)
+        return false;
+    QPixmap pix = mask.copy();
+    pix.fill(Qt::transparent);
+    XRenderComposite( dpy, PictOpOver, tnt, mask.x11PictureHandle(), pix.x11PictureHandle(),
+                      0, 0, 0, 0, 0, 0, mask.width(), mask.height());
+    XRenderFreePicture (dpy, tnt);
+    return pix;
+}
+
 
 void // TODO: would be cool to get this working - doesn't, though...
 OXRender::setAlpha(QPixmap &pix, const OXPicture &alpha)

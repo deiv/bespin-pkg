@@ -439,33 +439,47 @@ BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComple
 
 QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * option, const QWidget * widget) const
 {
-   switch (element) {
-   case SE_PushButtonContents: // Area containing the label (icon with text or pixmap)
-      return visualRect(option->direction, RECT, RECT.adjusted(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4));
+   switch (element)
+   {
+    case SE_PushButtonContents: // Area containing the label (icon with text or pixmap)
+        return visualRect(option->direction, RECT, RECT.adjusted(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4));
 //    case SE_PushButtonFocusRect: // Area for the focus rect (usually larger than the contents rect)
-   case SE_CheckBoxContents:
-   case SE_ViewItemCheckIndicator: // Area for a view item's check mark
-   case SE_CheckBoxIndicator: { // Area for the state indicator (e.g., check mark)
-      int h = dpi.Indicator;
-      QRect r = RECT;
-      if (config.btn.layer)
-         r.setRect(r.x()+dpi.f1, r.y() + ((r.height() - h) / 2), h-dpi.f2, h);
-      else
-         r.setRect(r.x(), r.y() + ((r.height() - h) / 2), h, h);
-      if (element != SE_CheckBoxContents)
-         return visualRect(option->direction, RECT, r);
-      int spacing = dpi.f5;
-      r.setRect(r.right() + spacing, RECT.y(), RECT.width() - r.width() - spacing, RECT.height());
-      return visualRect(option->direction, RECT, r);
-   }
-   case SE_CheckBoxFocusRect: // Area for the focus indicator
-   case SE_CheckBoxClickRect: // Clickable area, defaults to SE_CheckBoxFocusRect
-   case SE_RadioButtonFocusRect: // Area for the focus indicator
-   case SE_RadioButtonClickRect: // Clickable area, defaults to SE_RadioButtonFocusRect
-      return option->rect;
-      
-//    case SE_RadioButtonIndicator: // Area for the state indicator
-//    case SE_RadioButtonContents: // Area for the label
+    case SE_CheckBoxContents: // Area for the state label
+    case SE_ViewItemCheckIndicator: // Area for a view item's check mark
+    case SE_CheckBoxIndicator: // Area for the state indicator (e.g., check mark)
+    {
+        int h = dpi.Indicator;
+        QRect r = RECT;
+        if (config.btn.layer)
+            r.setRect(r.x()+F(1), r.y() + ((r.height() - h) / 2), h-dpi.f2, h);
+        else
+            r.setRect(r.x(), r.y() + ((r.height() - h) / 2), h, h);
+        if (element != SE_CheckBoxContents)
+            return visualRect(option->direction, RECT, r);
+        int spacing = dpi.f5;
+        r.setRect(r.right() + spacing, RECT.y(), RECT.width() - r.width() - spacing, RECT.height());
+        return visualRect(option->direction, RECT, r);
+    }
+    case SE_RadioButtonIndicator: // Area for the state indicator
+    case SE_RadioButtonContents: // Area for the label
+    {
+        int h = dpi.ExclusiveIndicator;
+        QRect r = RECT;
+        r.setRect(r.x()+F(1), r.y() + ((r.height() - h) / 2), h, h);
+
+        if (element == SE_RadioButtonIndicator)
+            return visualRect(option->direction, RECT, r);
+            
+        int spacing = dpi.f5;
+        r.setRect(r.right() + spacing, RECT.y(), RECT.width() - r.width() - spacing, RECT.height());
+        return visualRect(option->direction, RECT, r);
+    }
+    case SE_CheckBoxFocusRect: // Area for the focus indicator
+    case SE_CheckBoxClickRect: // Clickable area, defaults to SE_CheckBoxFocusRect
+    case SE_RadioButtonFocusRect: // Area for the focus indicator
+    case SE_RadioButtonClickRect: // Clickable area, defaults to SE_RadioButtonFocusRect
+        return option->rect;
+   
 //    case SE_ComboBoxFocusRect: // Area for the focus indicator
 //    case SE_SliderFocusRect: // Area for the focus indicator
 //    case SE_Q3DockWindowHandleRect: // Area for the tear-off handle

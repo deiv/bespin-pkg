@@ -25,6 +25,7 @@
 #include <QMenuBar>
 #include <QPainter>
 #include <QPen>
+#include <QScrollArea>
 #include <QToolBar>
 #include <QToolTip>
 #include <QTreeView>
@@ -366,6 +367,11 @@ BespinStyle::polish( QWidget * widget )
 #endif
             )
         {
+            // NOTE: WORKAROUND for dolphin and probably others:
+            // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
+            // force this here, hoping it won't cause to many problems - and make a bug report
+            // NOTICE: viewport()->autoFillBackground() does NOT work as it's probably set later on (see below)
+            // TODO: find a way to catch that change! (and make a bug report anyway...)
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget) )
             {

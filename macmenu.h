@@ -31,35 +31,48 @@ class QActionEvent;
 namespace Bespin
 {
 
+class FullscreenWatcher : public QObject
+{
+public:
+    FullscreenWatcher() : QObject() {};
+protected:
+    bool eventFilter(QObject *o, QEvent *ev);
+};
+    
 class MacMenu : public QObject
 {
    Q_OBJECT
 public:
-   static void manage(QMenuBar *menu);
-   static void release(QMenuBar *menu);
-   void popup(qlonglong key, int idx, int x, int y);
-   void hover(qlonglong key, int idx,  int x, int y);
-   void popDown(qlonglong key);
-   void raise(qlonglong key);
+    static void manage(QMenuBar *menu);
+    static void release(QMenuBar *menu);
+    void popup(qlonglong key, int idx, int x, int y);
+    void hover(qlonglong key, int idx,  int x, int y);
+    void popDown(qlonglong key);
+    void raise(qlonglong key);
 public slots:
-   void activate();
-   void deactivate();
+    void activate();
+    void deactivate();
 protected:
-   bool eventFilter(QObject *o, QEvent *ev);
+    bool eventFilter(QObject *o, QEvent *ev);
+protected:
+    friend class FullscreenWatcher;
+    void deactivate(QWidget *window);
+    void activate(QWidget *window);
 private:
-   MacMenu();
-   void registerMenu(QMenuBar *menu);
-   void changeAction(QMenuBar *menu, QActionEvent *ev);
-   typedef QPointer<QMenuBar> QMenuBar_p;
-   typedef QList<QMenuBar_p> MenuList;
-   MenuList items;
-   QMenuBar *menuBar(qlonglong key);
-   QMap< QMenuBar_p, QList<QAction*> > actions;
-   bool usingMacMenu;
-   QString service;
+    MacMenu();
+    void activate(QMenuBar *menu);
+    void changeAction(QMenuBar *menu, QActionEvent *ev);
+    void deactivate(QMenuBar *menu);
+    typedef QPointer<QMenuBar> QMenuBar_p;
+    typedef QList<QMenuBar_p> MenuList;
+    MenuList items;
+    QMenuBar *menuBar(qlonglong key);
+    QMap< QMenuBar_p, QList<QAction*> > actions;
+    bool usingMacMenu;
+    QString service;
 private slots:
-   void menuClosed();
-   void _release(QObject *);
+    void menuClosed();
+    void _release(QObject *);
 };
 
 }; // namespace

@@ -470,27 +470,28 @@ BespinStyle::setupDecoFor(const QWidget *w)
 static void
 swapPalette(QWidget *widget, BespinStyle *style)
 {
-   QPalette pal(widget->palette());
-   QPalette::ColorGroup group = QPalette::Active;
-   while (group != QPalette::Disabled) {
-    QColor h = pal.color(group, QPalette::WindowText);
-    pal.setColor(group, QPalette::WindowText, pal.color(group, QPalette::Window));
-    pal.setColor(group, QPalette::Window, h);
+    QPalette pal(widget->palette());
+    QPalette::ColorGroup group = QPalette::Active;
+    while (group != QPalette::Disabled)
+    {
+        QColor h = pal.color(group, QPalette::WindowText);
+        pal.setColor(group, QPalette::WindowText, pal.color(group, QPalette::Window));
+        pal.setColor(group, QPalette::Window, h);
 
-    //    h = pal.color(group, QPalette::Text);
-    //    pal.setColor(group, QPalette::Text, pal.color(group, QPalette::Base));
-    //    pal.setColor(group, QPalette::Base, h);
+        //    h = pal.color(group, QPalette::Text);
+        //    pal.setColor(group, QPalette::Text, pal.color(group, QPalette::Base));
+        //    pal.setColor(group, QPalette::Base, h);
 
-    h = pal.color(group, QPalette::Button);
-    pal.setColor(group, QPalette::Button, pal.color(group, QPalette::ButtonText));
-    pal.setColor(group, QPalette::ButtonText, h);
-    if (config.fadeInactive || group == QPalette::Inactive)
-       group = QPalette::Disabled;
-    else
-       group = QPalette::Inactive;
-   }
-   style->polish(pal);
-   widget->setPalette(pal);
+        h = pal.color(group, QPalette::Button);
+        pal.setColor(group, QPalette::Button, pal.color(group, QPalette::ButtonText));
+        pal.setColor(group, QPalette::ButtonText, h);
+        if (config.fadeInactive || group == QPalette::Inactive)
+        group = QPalette::Disabled;
+        else
+        group = QPalette::Inactive;
+    }
+    style->polish(pal);
+    widget->setPalette(pal);
 }
 
 static QMenuBar*

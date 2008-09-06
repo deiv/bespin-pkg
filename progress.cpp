@@ -16,6 +16,8 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QAbstractItemView>
+#include "debug.h"
 #include "draw.h"
 #include "animator/aprogress.h"
 
@@ -66,6 +68,42 @@ BespinStyle::drawProgressBar(const QStyleOption *option, QPainter *painter, cons
     ASSURE_OPTION(pb, ProgressBar);
     OPT_HOVER
 
+    if (appType == KGet)
+    {   // kinda inline progress in itemview (but unfortunately kget doesn't use itemviews)
+        // TODO: widget doesn't set a state - make bug report!
+        OPT_ENABLED;
+        const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(pb);
+        QPalette::ColorRole fg = QPalette::Text, bg = QPalette::Base;
+        if (pb->state & State_Selected)
+            { fg = QPalette::HighlightedText; bg = QPalette::Highlight; }
+            
+        QRect r = RECT;
+        masks.rect[false].render(r, painter, Colors::mid(COLOR(bg), COLOR(fg),2,1));
+        r.adjust(F(2), F(2), -F(2), -F(2));
+
+        bool reverse = pb->direction == Qt::RightToLeft;
+        if (pb2 && pb2->invertedAppearance)
+            reverse = !reverse;
+        const bool vertical = (pb2 && pb2->orientation == Qt::Vertical);
+        double val = pb->progress / double(pb->maximum - pb->minimum);
+        if (vertical)
+        {
+            r.setTop(r.bottom() - r.height()*val);
+        }
+        else if (reverse)
+        {
+            r.setLeft(r.right() - r.width()*val);
+        }
+        else
+        {
+            r.setWidth(r.width()*val);
+        }
+        if (r.isValid())
+            masks.rect[false].render(r, painter, fg);
+        drawItemText(painter, RECT, Qt::AlignCenter, PAL, isEnabled, pb->text, bg);
+        return;
+    }
+
     // groove + contents ======
     step = Animator::Progress::step(widget);
     drawProgressBarGroove(pb, painter, widget);
@@ -96,12 +134,13 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
     if (appType == GTK && !content)
         return; // looks really crap
 
-    ASSURE_OPTION(pb, ProgressBarV2);
+    ASSURE_OPTION(pb, ProgressBar);
+    const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(pb);
 
     bool reverse = option->direction == Qt::RightToLeft;
-    if (pb->invertedAppearance)
+    if (pb2 && pb2->invertedAppearance)
         reverse = !reverse;
-    const bool vertical = pb->orientation == Qt::Vertical;
+    const bool vertical = (pb2 && pb2->orientation == Qt::Vertical);
     const bool busy = pb->maximum == 0 && pb->minimum == 0;
     int x,y,l,t;
     RECT.getRect(&x,&y,&l,&t);

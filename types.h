@@ -21,7 +21,7 @@ enum Orientation3D {Sunken = 0, Relief, Raised};
 
 enum AppType
 {
-    Unknown, GTK, QtDesigner, Plasma
+    Unknown, GTK, QtDesigner, Plasma, KGet
 };
 
 namespace Groove {
