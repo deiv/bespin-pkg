@@ -265,29 +265,6 @@ paintKrunner(QWidget *w, QPaintEvent *)
     return false;
 }
 
-static const QStyle::PrimitiveElement pe_capacityBar = (QStyle::PrimitiveElement)0xff00001;
-
-static bool
-hackCapacityBar(QWidget *w, QEvent *e)
-{
-    if (e->type() == QEvent::Paint)
-    {
-        QPainter p(w);
-        QStyleOptionProgressBar opt;
-        opt.initFrom(w);
-        opt.minimum = 0;
-        opt.maximum = 100;
-        opt.progress = 66;
-        opt.text = "ereslibre@kde.org";
-        opt.textAlignment = Qt::AlignCenter;
-        opt.textVisible = true;
-        w->style()->drawPrimitive(pe_capacityBar, &opt, &p, w);
-        p.end();
-        return true;
-    }
-    return false;
-}
-
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
@@ -307,9 +284,6 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 
     if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o))
         return hackMoveWindow(static_cast<QWidget*>(o), e);
-
-    if (o->inherits("KCapacityBar") || o->inherits("StatusBarSpaceInfo"))
-        return hackCapacityBar(static_cast<QWidget*>(o), e);
 
     return false;
 }
@@ -360,13 +334,6 @@ Hacks::add(QWidget *w)
     }
 
     if (isWindowDragWidget(w))
-    {
-        w->removeEventFilter(bespinHacks); // just to be sure
-        w->installEventFilter(bespinHacks);
-        return true;
-    }
-
-    if (false && (w->inherits("KCapacityBar") || w->inherits("StatusBarSpaceInfo")))
     {
         w->removeEventFilter(bespinHacks); // just to be sure
         w->installEventFilter(bespinHacks);

@@ -185,6 +185,7 @@ void
 Client::captionChange()
 {
     _caption = trimm(caption());
+    _caption.replace("[modified]", "*");
     widget()->update();
 }
 
@@ -207,6 +208,7 @@ Client::eventFilter(QObject *o, QEvent *e)
     {
         QPainter p(widget());
         p.setClipRect(static_cast<QPaintEvent*>(e)->rect());
+        p.setFont(options()->font());
         repaint(p);
         p.end();
         return true;
@@ -262,11 +264,12 @@ Client::init()
     if (isPreview())
     {
         _preview = new PreviewWidget(widget());
-//       _preview->setAutoFillBackground(true);
+        _preview->setAutoFillBackground(true);
         _preview->setGeometry(  borderSize, titleSize, widget()->width()-2*borderSize,
                                 widget()->height()-(borderSize+titleSize));
         _preview->show();
         _preview->raise();
+        qDebug() << "BESPIN, preview window!!!" << _preview->geometry();
     }
     if (config()->resizeCorner && isResizable())
         corner = new ResizeCorner(this);
@@ -672,7 +675,7 @@ Client::reset(unsigned long changed)
                 }
                 // usually the window is titlebar colored and the titleblend gradient painted upon - in case
                 // but the fallback shall be fully titleblend with a titlebar color section behind the title
-                // to not have to ahndle this during the painting, we just swap the colors here
+                // to not have to handle this during the painting, we just swap the colors here
                 else
                 {
                     QColor h = colors[i][ColorTitleBlend];
@@ -682,12 +685,22 @@ Client::reset(unsigned long changed)
             }
         }
         else if (bgMode == 1)
-        {   // needs titlefont and button bg swapped...
+        {
+            // iff the user set a colormode from the style, but no gradient, we use the color on 
+            // the default gradient and NOT the nonexisting accessoire
             for (int i = 0; i <  2; ++i)
             {
-                QColor h = colors[i][ColorButtonBg];
-                colors[i][ColorButtonBg] = colors[i][ColorFont];
-                colors[i][ColorFont] = h;
+                if (gType[i] == Gradients::None)
+                {
+                    colors[i][ColorTitleBar] = colors[i][ColorTitleBlend];
+                    colors[i][ColorFont] = colors[i][ColorButtonBg];
+                }
+                else
+                {   // needs titlefont and button bg swapped...
+                    QColor h = colors[i][ColorButtonBg];
+                    colors[i][ColorButtonBg] = colors[i][ColorFont];
+                    colors[i][ColorFont] = h;
+                }
             }
         }
         // last, clamp ColorTitleBlend to v >= 80
@@ -703,13 +716,16 @@ Client::reset(unsigned long changed)
         }
     }
 
-    if ((changed & (SettingColors | SettingButtons)) && (gType[true] || gType[false]))
+    if (changed & (SettingColors | SettingButtons))
     {
         // buttons[i]->isOnTitleBar att indicates a left side button
         for (int i = 0; i < 4; ++i)
-            buttons[i]->isOnTitleBar =
-                            (!buttons[i]->isOnTitleBar && buttonSpaceLeft >= buttonSpaceRight) ||
-                            (buttons[i]->isOnTitleBar && buttonSpaceLeft < buttonSpaceRight);
+            if (bgMode == 1)
+                buttons[i]->isOnTitleBar = !gType[true];
+            else
+                buttons[i]->isOnTitleBar = !gType[true] ||
+                                           (!buttons[i]->isOnTitleBar && buttonSpaceLeft >= buttonSpaceRight) ||
+                                           (buttons[i]->isOnTitleBar && buttonSpaceLeft < buttonSpaceRight);
     }
 
     if (changed)
@@ -885,7 +901,7 @@ Client::trimm(const QString &string)
 
     /* Ok, *some* apps have really long and nasty window captions
     this looks clutterd, so we allow to crop them a bit and remove
-    considered uninteresting informations ======================= */
+    considered to be uninteresting informations ==================== */
 
     QString ret = string;
 

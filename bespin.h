@@ -34,51 +34,51 @@ class QSettings;
 #define QT_NO_XRENDER #
 #endif
 
-namespace Bespin {
+namespace Bespin
+{
 
 // class BespinStyle;
 
-typedef struct {
-   int f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
-   int f12, f13, f16, f32, f18, f20, f80;
-   int ScrollBarExtent;
-   int ScrollBarSliderMin;
-   int SliderThickness;
-   int SliderControl;
-   int Indicator;
-   int ExclusiveIndicator;
+typedef struct
+{
+    int f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
+    int f12, f13, f16, f32, f18, f20, f80;
+    int ScrollBarExtent;
+    int ScrollBarSliderMin;
+    int SliderThickness;
+    int SliderControl;
+    int Indicator;
+    int ExclusiveIndicator;
 } Dpi;
 
 
-class BespinStyle : public QCommonStyle {
-   Q_OBJECT
+class
+BespinStyle : public QCommonStyle
+{
+    Q_OBJECT
 public:
-//    enum WidgetState{Basic = 0, Hovered, Focused, Active};
-   enum WidgetState{Bg = 0, Fg = 1};
-   
-   BespinStyle();
-   ~BespinStyle();
+    enum ColorRole { Bg = 0, Fg = 1 };
 
-   //inheritance from QStyle
-   void drawComplexControl ( ComplexControl control, const QStyleOptionComplex * option,
-                             QPainter * painter, const QWidget * widget = 0 ) const;
-  
-   void drawControl ( ControlElement element, const QStyleOption * option, QPainter * painter,
-                      const QWidget * widget = 0 ) const;
-   
-   /*what do they do?
-   virtual void drawItemPixmap ( QPainter * painter, const QRect & rect, int alignment, const QPixmap & pixmap ) const; 
-   */
+    BespinStyle();
+    ~BespinStyle();
 
-   void drawItemText ( QPainter * painter, const QRect & rect, int alignment, const QPalette & pal,
-                       bool enabled, const QString & text,
-                       QPalette::ColorRole textRole = QPalette::NoRole, QRect *boundingRect = 0 ) const;
-   
-   void drawPrimitive ( PrimitiveElement elem, const QStyleOption * option, QPainter * painter,
+    //inheritance from QStyle
+    void drawComplexControl ( ComplexControl control, const QStyleOptionComplex * option,
+                                QPainter * painter, const QWidget * widget = 0 ) const;
+
+    void drawControl ( ControlElement element, const QStyleOption * option, QPainter * painter,
                         const QWidget * widget = 0 ) const;
    
-   QPixmap standardPixmap ( StandardPixmap standardPixmap, const QStyleOption * option = 0,
+//    virtual void drawItemPixmap ( QPainter * painter, const QRect & rect, int alignment, const QPixmap & pixmap ) const; 
+
+    void drawItemText(QPainter*, const QRect&, int alignment, const QPalette&, bool enabled,
+                      const QString &text, QPalette::ColorRole textRole = QPalette::NoRole, QRect *boundingRect = 0) const;
+
+    void drawPrimitive ( PrimitiveElement elem, const QStyleOption * option, QPainter * painter,
                             const QWidget * widget = 0 ) const;
+
+    QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption * option = 0,
+                           const QWidget * widget = 0 ) const;
    
 //    what do they do? ========================================
 //    QPixmap generatedIconPixmap ( QIcon::Mode iconMode,
@@ -98,31 +98,31 @@ public:
 //                         const QString & text ) const;
 //=============================================================
    
-   int pixelMetric ( PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0 ) const;
-   
-   void polish( QWidget *w );
-   void polish( QApplication * );
-   void polish( QPalette &pal );
-   
-   QSize sizeFromContents ( ContentsType type, const QStyleOption * option,
-                            const QSize & contentsSize, const QWidget * widget = 0 ) const;
-      
-   int styleHint ( StyleHint hint, const QStyleOption * option = 0, const QWidget * widget = 0,
-                   QStyleHintReturn * returnData = 0 ) const;
-   
-   QRect subControlRect ( ComplexControl control, const QStyleOptionComplex * option,
-                          SubControl subControl, const QWidget * widget = 0 ) const;
-   
-   QRect subElementRect ( SubElement element, const QStyleOption * option,
-                          const QWidget * widget = 0 ) const;
-   
-   QPalette standardPalette () const;
-   
-   void unPolish( QWidget *w );
-   void unPolish( QApplication *a );
-   
-   // from QObject
-   bool eventFilter( QObject *object, QEvent *event );
+    int pixelMetric ( PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0 ) const;
+
+    void polish( QWidget *w );
+    void polish( QApplication * );
+    void polish( QPalette &pal );
+
+    QSize sizeFromContents ( ContentsType type, const QStyleOption * option,
+                                const QSize & contentsSize, const QWidget * widget = 0 ) const;
+
+    int styleHint ( StyleHint hint, const QStyleOption * option = 0, const QWidget * widget = 0,
+                    QStyleHintReturn * returnData = 0 ) const;
+
+    QRect subControlRect ( ComplexControl control, const QStyleOptionComplex * option,
+                            SubControl subControl, const QWidget * widget = 0 ) const;
+
+    QRect subElementRect ( SubElement element, const QStyleOption * option,
+                            const QWidget * widget = 0 ) const;
+
+    QPalette standardPalette () const;
+
+    void unPolish( QWidget *w );
+    void unPolish( QApplication *a );
+
+    // from QObject
+    bool eventFilter( QObject *object, QEvent *event );
 
     // STATICS
     static void drawExclusiveCheck(const QStyleOption*, QPainter*, const QWidget*);
@@ -221,96 +221,94 @@ protected:
     drawMenuCheck(const QStyleOption * option, QPainter * painter, const QWidget * widget) const
     { drawCheck(option, painter, widget, false); }
 
-   // slider.cpp
-   void drawSlider(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   void drawDial(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   // tabbing.cpp
-   void drawTabWidget(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawTabBar(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawTab(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawTabShape(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawTabLabel(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawToolboxTab(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawToolboxTabShape(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawToolboxTabLabel(const QStyleOption*, QPainter*, const QWidget*) const;
-   // toolbars.cpp
-   void drawToolButton(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   void drawToolButtonShape(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawToolButtonLabel(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawToolBarHandle(const QStyleOption*, QPainter*, const QWidget*) const;
-   // views.cpp
-   void drawHeader(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawHeaderSection(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawHeaderLabel(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawBranch(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawTree(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   void drawRubberBand(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawHeaderArrow(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawItem(const QStyleOption*, QPainter*, const QWidget*) const;
-   // window.cpp
-   void drawWindowFrame(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawWindowBg(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawToolTip(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawTitleBar(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
-   void drawSizeGrip(const QStyleOption*, QPainter*, const QWidget*) const;
-   // ==========================================
-   void fillWithMask(QPainter *painter,
-                     const QPoint &xy,
-                     const QBrush &brush,
-                     const QPixmap &mask,
-                     QPoint offset = QPoint()) const;
+    // slider.cpp
+    void drawSlider(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    void drawDial(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    // tabbing.cpp
+    void drawTabWidget(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawTabBar(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawTab(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawTabShape(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawTabLabel(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawToolboxTab(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawToolboxTabShape(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawToolboxTabLabel(const QStyleOption*, QPainter*, const QWidget*) const;
+    // toolbars.cpp
+    void drawToolButton(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    void drawToolButtonShape(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawToolButtonLabel(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawToolBarHandle(const QStyleOption*, QPainter*, const QWidget*) const;
+    // views.cpp
+    void drawHeader(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawHeaderSection(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawHeaderLabel(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawBranch(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawTree(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    void drawRubberBand(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawHeaderArrow(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawItem(const QStyleOption*, QPainter*, const QWidget*) const;
+    // window.cpp
+    void drawWindowFrame(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawWindowBg(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawToolTip(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawTitleBar(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    void drawSizeGrip(const QStyleOption*, QPainter*, const QWidget*) const;
+    // ==========================================
+    void fillWithMask(QPainter *painter, const QPoint &xy, const QBrush &brush, const QPixmap &mask, QPoint offset = QPoint()) const;
 //private slots:
 //   void fakeMouse();
    
 private:
-   BespinStyle( const BespinStyle & );
-   BespinStyle& operator=( const BespinStyle & );
-   QColor mapFadeColor(const QColor &color, int index) const;
-   void generatePixmaps();
-   void initMetrics();
-   void readSettings(const QSettings *settings = 0L);
-   void registerRoutines();
-   static bool isSpecialFrame(const QWidget *w);
-   void erase(const QStyleOption*, QPainter*, const QWidget*) const;
-   void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
-   void setupDecoFor(const QWidget *w);
+    BespinStyle( const BespinStyle & );
+    BespinStyle& operator=( const BespinStyle & );
+    QColor mapFadeColor(const QColor &color, int index) const;
+    int elementId(const QString &string, const QStyleOption*, const QWidget*) const;
+    void generatePixmaps();
+    void initMetrics();
+    void readSettings(const QSettings *settings = 0L);
+    void registerRoutines();
+    static bool isSpecialFrame(const QWidget *w);
+    void erase(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
+    void setupDecoFor(const QWidget *w);
 private:
-   typedef QHash<uint, Tile::Set> TileCache;
-   struct {
-      Tile::Set rect[2]; // round
-      QPixmap radio, radioIndicator, notch, slider;
-      QPixmap winClose, winMin, winMax;
-      QRegion corner[4];
-   } masks;
-   struct {
-      Tile::Set
-         fallback, group,
-         sunken[2][2], // round/enabled
-         raised[2][2][2],  // round/enabled/sunken
-         relief[2][2]; // round/enabled
-      QPixmap radio[2][2];
-      Tile::Line line[2][3];
-//       QPixmap slider[4][2][2]; // for triangles, currently not...
-      QPixmap slider[2][2];
-   } shadows;
+    typedef QHash<uint, Tile::Set> TileCache;
+    struct
+    {
+        Tile::Set rect[2]; // round
+        QPixmap radio, radioIndicator, notch, slider;
+        QPixmap winClose, winMin, winMax;
+        QRegion corner[4];
+    } masks;
+    struct
+    {
+        Tile::Set   fallback, group,
+                    sunken[2][2], // round/enabled
+                    raised[2][2][2],  // round/enabled/sunken
+                    relief[2][2]; // round/enabled
+                    QPixmap radio[2][2];
+                    Tile::Line line[2][3];
+//         QPixmap slider[4][2][2]; // for triangles, currently not...
+        QPixmap slider[2][2];
+    } shadows;
    
-   struct {
-      Tile::Line top;
-      QPixmap slider;
-//       QPixmap slider[4];
-      Tile::Set rect[2];
-   } lights;
+    struct
+    {
+        Tile::Line top;
+        QPixmap slider;
+//         QPixmap slider[4];
+        Tile::Set rect[2];
+    } lights;
    
-   // pixmaps
-   QPixmap *_scanlines[2];
-
-   // gtk-qt workarounds
-   AppType appType;
-
-   // KDE palette fix..
-   QPalette *originalPalette;
+    // pixmaps
+    QPixmap *_scanlines[2];
+    
+    // gtk-qt and other workarounds
+    AppType appType;
+    // KDE palette fix..
+    QPalette *originalPalette;
 private slots:
-   void fixKdePalette();
+    void fixKdePalette();
 };
 
 

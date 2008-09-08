@@ -208,11 +208,7 @@ BespinStyle::readSettings(const QSettings* settings)
     config.kwin.gradient[1] = readGrad(KWIN_ACTIVE_GRADIENT);
     config.kwin.gradient[1] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[1]);
     readRole(kwin.inactive, KWIN_INACTIVE_ROLE);
-    if (!config.kwin.gradient[0])
-        config.kwin.inactive_role[Fg] = QPalette::WindowText;
     readRole(kwin.active, KWIN_ACTIVE_ROLE);
-    if (!config.kwin.gradient[1])
-        config.kwin.active_role[Fg] = QPalette::WindowText;
 
     // flanders
     config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
@@ -315,8 +311,7 @@ BespinStyle::readSettings(const QSettings* settings)
 
         config.hack.messages = false;
 
-        config.progress.std_role[Bg] =
-            config.progress.std_role[Fg] = QPalette::Window;
+        config.progress.std_role[Bg] = config.progress.std_role[Fg] = QPalette::Window;
 
 //       config.tab.std_role[Bg] =  QPalette::Window;
     // gtk fixes the label color... so try to ensure it will be visible

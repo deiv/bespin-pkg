@@ -27,6 +27,16 @@
 using namespace Bespin;
 extern Config config;
 
+class KStyleOptionCustomElement : public QStyleOption
+{
+public:
+    KStyleOptionCustomElement(int version = QStyleOption::Version, int type = SO_Default):
+    QStyleOption(version, type) {}
+    QString name;
+};
+
+#define SH_KCustomStyleELement 0xff000001
+
 int BespinStyle::styleHint( StyleHint hint, const QStyleOption * option, const QWidget * widget,
                             QStyleHintReturn * returnData ) const
 {
@@ -191,6 +201,20 @@ int BespinStyle::styleHint( StyleHint hint, const QStyleOption * option, const Q
 #endif
     case SH_ItemView_PaintAlternatingRowColorsForEmptyArea:
         return true;
+    case SH_KCustomStyleELement:
+    {
+        // this should be a qstyleoption_cast<>(), but this won't work atm as KStyleOptionCustomStyleElement is no lib class
+        const KStyleOptionCustomElement *element = static_cast<const KStyleOptionCustomElement*>(option);
+        if (!option)
+            return 0;
+
+        int id = elementId(element->name, option, widget);
+
+        if (!id)
+            qDebug() << "Unsupported KCustomStyleElement requested:" << element->name;
+            
+        return id;
+    }
     default:
         return QCommonStyle::styleHint(hint, option, widget, returnData);
     } // switch

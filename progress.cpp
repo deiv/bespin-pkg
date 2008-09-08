@@ -17,48 +17,53 @@
  */
 
 #include <QAbstractItemView>
-#include "debug.h"
 #include "draw.h"
 #include "animator/aprogress.h"
 
 static int step = -1;
 
 void
-BespinStyle::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWidget*) const
+BespinStyle::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(cb, ProgressBar);
     OPT_ENABLED
     const int f2 = F(2);
     
     QRect r = RECT; r.setBottom(r.bottom()-f2);
-    masks.rect[false].render(r, painter, Gradients::Sunken, Qt::Vertical, CCOLOR(progress.std, Bg));
+    masks.rect[false].render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Window)); // CCOLOR(progress.std, Bg)
     shadows.sunken[false][isEnabled].render(RECT, painter);
-    r.setLeft(r.left() + r.width()*cb->progress/(cb->maximum - cb->minimum)-f2);
+    
+    r.setLeft(r.right() - r.width()*cb->progress/(cb->maximum - cb->minimum)  + f2);
     shadows.raised[false][isEnabled][false].render(r, painter);
     r.adjust(f2, f2, -f2, -f2);
-    masks.rect[false].render(r, painter, GRAD(progress), Qt::Vertical, CCOLOR(progress.std, Fg));
+#if 0
+    if (widget)
+    {
+        QPixmap buffer(widget->size());
+        QPainter bp(&buffer);
+        erase(option, &bp, widget);
+        bp.end();
+        masks.rect[false].render(r, painter, buffer, r.topLeft());
+    }
+    else
+        masks.rect[false].render(r, painter, FCOLOR(Window));
+#else
+    masks.rect[false].render(r, painter, GRAD(progress) == Gradients::Sunken ? Gradients::Button :
+                                         GRAD(progress), Qt::Vertical, FCOLOR(Window));
+#endif
+
     if (cb->textVisible && !cb->text.isEmpty())
     {
-        SAVE_PEN;
         QRect tr = painter->boundingRect(RECT, Qt::TextSingleLine | cb->textAlignment, cb->text);
-        ROLES(progress.std);
         if (tr.width() <= r.left() - RECT.left())
         {   // paint on free part
-            painter->setPen(COLOR(Colors::counterRole(ROLE[Bg])));
             tr = RECT; tr.setRight(r.left());
         }
-        else if (tr.width() <= r.width())
-        {   // paint on used part
-            painter->setPen(COLOR(Colors::counterRole(ROLE[Fg])));
+        else if (tr.width() <= r.width()) // paint on used part
             tr = r;
-        }
-        else
-        {   // mixed painting, maybe break colors? (is a bit annoying)
-            painter->setPen(Colors::mid(COLOR(Colors::counterRole(ROLE[Bg])), COLOR(Colors::counterRole(ROLE[Fg]))));
+        else // paint cenetered
             tr = RECT;
-        }
-        drawItemText(painter, tr, cb->textAlignment, PAL, isEnabled, cb->text);
-        RESTORE_PEN;
+        drawItemText(painter, tr, Qt::AlignCenter, PAL, isEnabled, cb->text, QPalette::WindowText);
     }
 }
 

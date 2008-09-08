@@ -166,8 +166,7 @@ BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * option,
         return contentsSize + QSize(dpi.f8,dpi.f6);
     case CT_ToolButton:
     {   // A tool button, like QToolButton
-        const QStyleOptionToolButton *toolbutton
-            = qstyleoption_cast<const QStyleOptionToolButton *>(option);
+        const QStyleOptionToolButton *toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option);
         // get ~goldem mean ratio
         int w, h;
         if (toolbutton && toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon)

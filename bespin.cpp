@@ -27,6 +27,7 @@
 #include <QMouseEvent>
 #include <QFrame>
 #include <QToolButton>
+#include <QTreeView>
 
 
 /**============= Bespin includes ==========================*/
@@ -268,7 +269,7 @@ BespinStyle::btnBg( const QPalette &pal, bool isEnabled, int hasFocus, int step,
 
     QColor c = CCOLOR(btn.std, Bg);
     if (hasFocus)
-        if (config.btn.layer == 2)
+        if (config.btn.layer)
             c = FCOLOR(Highlight);
         else
             c = Colors::mid(FCOLOR(Highlight), c, 1, 10 + Colors::contrast(FCOLOR(Highlight), c));
@@ -285,7 +286,7 @@ BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hasFocus, int step, 
     if (!isEnabled)
         return FCOLOR(WindowText); //Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
 
-    QColor  fg1 = (config.btn.layer == 2 && hasFocus) ? FCOLOR(HighlightedText) : CCOLOR(btn.std, Fg),
+    QColor  fg1 = (config.btn.layer && hasFocus) ? FCOLOR(HighlightedText) : CCOLOR(btn.std, Fg),
             fg2 = CCOLOR(btn.active, Fg);
     if (flat)
         { fg1 = FCOLOR(WindowText); fg2 = FCOLOR(Highlight); }
@@ -335,24 +336,61 @@ BespinStyle::drawItemText(QPainter *painter, const QRect &rect, int alignment, c
         painter->setPen(savedPen);
 }
 
+// NOTICE, really read this!!!
+// PE_CustomBase is unlike all others 0xff00000 (only 31 bits... signed int) ...
+// AND CAUSES SEGFAULT when used as 32bit 0xff000000 and (unit)pe > X_KdeBase
+// as enums are usually int - maybe here's a bug in Qt custom bases?
+// i'll keep it 0xff00000 (31 bit) for the moment (0xff000000 32bit is signed negative)
+#define PE_KdeBase 0xff00000
+#define X_KdeBase 0xff000000
+#define SH_KCustomStyleELement 0xff000001
+
+enum CustomPrimitives { _PE_CapacityBar = 0 /*, ...*/, N_CustomPrimitives };
+#if 0
+enum CustomComplexs { _CC_AmarokAnalyzer = 0 /*, ...*/, N_CustomComplexs };
+enum SubControls { _SC_AmarokAnalyzerSlider = 0 /*, ...*/, N_CustomSubControls };
+#endif
+
+static QStyle::PrimitiveElement primitives[N_CustomPrimitives];
+#if 0
+static QStyle::ComplexControl complexs[N_CustomComplexs];
+static QStyle::SubControl subcontrols[N_CustomSubControls];
+#endif
+
+enum ElementType { PE = 0, CE, CC, SE, SH, SC }; // SE are flags and need special handling?!
+static QMap<QString, int> styleElements; // yes. one is enough...
+#if 0
+static QMap<int, int> parentId[6];
+#endif
+// NOTICE: using QHash instead QMap is probably overhead, there won't be too many items per app
+static int counter[5] = { PE_KdeBase, X_KdeBase, X_KdeBase, X_KdeBase, X_KdeBase+1 /*sic!*/};
+#if 0
+static int scCounter[N_CustomComplexs] = { 0 };
+#endif
 void
 BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
 {
     Q_ASSERT(option);
     Q_ASSERT(painter);
+    
 //    if (pe == PE_IndicatorItemViewItemDrop)
 // An indicator that is drawn to show where an item in an item view is about to
 // be dropped during a drag-and-drop operation in an item view.
 //       qWarning("IndicatorItemViewItemDrop, %d", pe);
     if (pe < N_PE && primitiveRoutine[pe])
         (this->*primitiveRoutine[pe])(option, painter, widget);
-    else if (pe > 0xff00000)
-        switch (pe)
-        {
-        case 0xff00001: drawCapacityBar(option, painter, widget); break;
-        default: break;
-        }
+    else if (pe > PE_KdeBase)
+    {
+        if (pe == primitives[_PE_CapacityBar])
+            drawCapacityBar(option, painter, widget);
+        //if (pe == primitives[_PE_WhateverElse])
+        // ...
+#if 0
+        else if (int mappedPe = parentId[PE].value(pe, 0))
+            QCommonStyle::drawPrimitive( (PrimitiveElement)mappedPe, option, painter, widget );
+#endif
+    }
     else
         QCommonStyle::drawPrimitive( pe, option, painter, widget );
 }
@@ -382,6 +420,57 @@ BespinStyle::drawComplexControl ( ComplexControl control,
    else
       QCommonStyle::drawComplexControl( control, option, painter, widget );
 }
+
+int
+BespinStyle::elementId(const QString &string, const QStyleOption *option, const QWidget *widget) const
+{
+    int id = styleElements.value(string, 0);
+    if (id)
+        return id;
+
+    if (string == "PE_CapacityBar")
+        primitives[_PE_CapacityBar] = (PrimitiveElement)(id = ++counter[PE]);
+#if 0
+    else if (string == "amarok.CC_Analyzer")
+        complexs[_CC_AmarokAnalyzer] = (ComplexControl)(id = ++counter[CC]);
+    // subcontrols (SC_) work muchg different as they're 1. flags and 2. attached to a CC
+    else if (string == "amarok.CC_Analyzer:SC_Slider")
+    {
+        subcontrols[_SC_AmarokAnalyzerSlider] = (SubControl)(id = (1 << scCounter[_CC_AmarokAnalyzer]));
+        ++scCounter[_CC_AmarokAnalyzer];
+    }
+//     else if blablablaba...
+    if (!id && (id = QCommonStyle::styleHint((StyleHint)SH_KCustomStyleELement, option, widget)))
+    {
+        // ok, we don't support this item, but daddy does, now
+        // 1. we'll need to pass calls for this item to dad, with HIS id
+        // 2. chances are good, that HIS id is used by US for some other item
+        // 3. we cannot simply call the widget(s) that require the id now assigned to the
+        // current item by our dad, ask it to change the id as we changed our mind
+        // 4. this means we'll have to map calls for this item:
+        // a) we assign our next free id an return it to the widget
+        // b) when the widget calls "draw*()" with this (our) id, we'll map it to our dad's
+        // id just queried and tell dad to handle things for HIS id
+        // c) yes, this works for non direct base classes as well -> like map(map())
+        int did = id;
+        if (string.contains("PE_")) parentId[PE].insert(id = ++counter[PE], did);
+        else if (string.contains("CE_")) parentId[CE].insert(id = ++counter[CE], did);
+        else if (string.contains("CC_")) parentId[CC].insert(id = ++counter[CC], did);
+        else if (string.contains("SE_")) parentId[SE].insert(id = ++counter[SE], did);
+        else if (string.contains("SH_")) parentId[SH].insert(id = ++counter[SH], did);
+        else if (string.contains(":SC_"))
+        {
+            parentId[SC].insert(id = (1 << counter[SC]), did);
+            ++counter[SC];
+        }
+    }
+#endif
+    if (id)
+        styleElements.insert(string, id);
+    return id;
+}
+
+/// ----------------------------------------------------------------------
 
 void
 BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy,
@@ -467,30 +556,31 @@ BespinStyle::setupDecoFor(const QWidget *w)
 #endif
 }
 
+static const
+QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
+
 static void
 swapPalette(QWidget *widget, BespinStyle *style)
 {
     QPalette pal(widget->palette());
-    QPalette::ColorGroup group = QPalette::Active;
-    while (group != QPalette::Disabled)
+    QPalette::ColorGroup group;
+    for (int i = 0; i < 3; ++i)
     {
+        group = groups[i];
         QColor h = pal.color(group, QPalette::WindowText);
         pal.setColor(group, QPalette::WindowText, pal.color(group, QPalette::Window));
         pal.setColor(group, QPalette::Window, h);
 
-        //    h = pal.color(group, QPalette::Text);
-        //    pal.setColor(group, QPalette::Text, pal.color(group, QPalette::Base));
-        //    pal.setColor(group, QPalette::Base, h);
+//         h = pal.color(group, QPalette::Text);
+//         pal.setColor(group, QPalette::Text, pal.color(group, QPalette::Base));
+//         pal.setColor(group, QPalette::Base, h);
 
         h = pal.color(group, QPalette::Button);
         pal.setColor(group, QPalette::Button, pal.color(group, QPalette::ButtonText));
         pal.setColor(group, QPalette::ButtonText, h);
-        if (config.fadeInactive || group == QPalette::Inactive)
-        group = QPalette::Disabled;
-        else
-        group = QPalette::Inactive;
     }
     style->polish(pal);
+
     widget->setPalette(pal);
 }
 
@@ -672,6 +762,31 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             menu->move(menu->pos()-QPoint(0,dpi.f2));
 #endif
             return false;
+        }
+        
+        if (QAbstractItemView *view = qobject_cast<QAbstractItemView*>(widget))
+        {
+            if (!view->viewport()->autoFillBackground())
+            {
+                // NOTE: WORKAROUND for dolphin and probably others:
+                // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
+                // force this here, hoping it won't cause to many problems - and make a bug report
+                QPalette pal = view->palette();
+                pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
+                pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
+                pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
+                pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
+                pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
+                pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
+                view->setPalette(pal);
+            }
+            if (QTreeView* tv = qobject_cast<QTreeView*>(view))
+            {   // allow all treeviews to be animated!
+                if (config.hack.treeViews)
+                    // NOTICE: animation causes visual errors on non autofilling views...
+                    tv->setAnimated(tv->viewport()->autoFillBackground());
+                return false;
+            }
         }
         return false;
     }

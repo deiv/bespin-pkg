@@ -347,7 +347,16 @@ BespinStyle::polish( QWidget * widget )
     {
         // sunken looks soo much nicer ;)
         if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
-            frame->setFrameShadow(QFrame::Sunken);
+        {
+            if (config.bg.mode == Scanlines)
+                frame->setFrameShadow(QFrame::Sunken);
+            else
+            {
+                frame->setAutoFillBackground(false);
+                frame->setBackgroundRole(QPalette::Window);
+                frame->setForegroundRole(QPalette::WindowText);
+            }
+        }
 
         // Kill ugly winblows frames... (qShadeBlablabla stuff)
         else if (   frame->frameShape() == QFrame::Box ||
@@ -367,24 +376,14 @@ BespinStyle::polish( QWidget * widget )
 #endif
             )
         {
-            // NOTE: WORKAROUND for dolphin and probably others:
-            // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
-            // force this here, hoping it won't cause to many problems - and make a bug report
-            // NOTICE: viewport()->autoFillBackground() does NOT work as it's probably set later on (see below)
-            // TODO: find a way to catch that change! (and make a bug report anyway...)
             Animator::Hover::manage(frame);
-            if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget) )
+            if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                if (QTreeView* tv = qobject_cast<QTreeView*>(frame))
-                {   // allow all treeviews to be animated!
-                    // NOTICE: WORKAROUND for amarok, but should work in general
-                    // tv->viewport()->autoFillBackground() does NOT work
-                    // maybe GraphicsView issue?!?
-                    if (config.hack.treeViews && !tv->inherits("CollectionTreeView"))
-                        tv->setAnimated ( true );
-                }
-                else // treeview hovering sucks, as the "tree" doesn't get an update
-                { // Enable hover effects in listview, all itemviews like in kde is pretty annoying
+                // catch autofillbackground change to align colors, toggle treeview animation
+                // this is a WORKAROUND for dolphin, amarok, et al.
+                itemView->installEventFilter(this);
+                if (!qobject_cast<QTreeView*>(itemView))
+                {   // Enable hover effects in listview, treeview hovering sucks, as the "tree" doesn't get an update
                     itemView->viewport()->setAttribute(Qt::WA_Hover);
                     if (widget->inherits("QHeaderView"))
                         widget->setAttribute(Qt::WA_Hover);
@@ -492,6 +491,7 @@ BespinStyle::polish( QWidget * widget )
                     // TODO how's css/khtml policy on applying colors?
                     widget->setAutoFillBackground ( true );
                     widget->setBackgroundRole ( QPalette::Base ); // QPalette::Window looks wrong
+                    widget->setForegroundRole ( QPalette::Text );
                     break;
                 }
             }
