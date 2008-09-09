@@ -34,10 +34,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <normal file="window.png"/>
                 <pos anchor="nw" x="0" y="0" width="100%" height="100%"/>
             </item>
-            <item type="pixmap" id="session_button" button="true">
-                <normal file="session.png"/>
-                <prelight file="session-hover.png"/>
-                <active file="session-hover.png"/>
+            <item type="pixmap" id="system_button" button="true">
+                <show modes="console" type="system"/>
+                <normal file="system.png"/>
+                <prelight file="system-hover.png"/>
+                <active file="system-hover.png"/>
                 <pos anchor="w" x="5%" y="30%"/>
             </item>
             <item type="list" id="userlist">
@@ -71,11 +72,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     </item>
                 </box>
             </item>
-            <item type="pixmap" id="system_button" button="true">
-                <show modes="console" type="system"/>
-                <normal file="system.png"/>
-                <prelight file="system-hover.png"/>
-                <active file="system-hover.png"/>
+            <item type="pixmap" id="session_button" button="true">
+                <normal file="session.png"/>
+                <prelight file="session-hover.png"/>
+                <active file="session-hover.png"/>
                 <pos anchor="e" x="96%" y="40%"/>
             </item>
             <item type="label" id="caps-lock-warning">

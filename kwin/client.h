@@ -44,10 +44,13 @@ class PreviewWidget : public QWidget
 {
     Q_OBJECT
 public:
-    PreviewWidget(QWidget *p = 0, Qt::WindowFlags f = 0);
+    PreviewWidget(const QString &caption, QWidget *p = 0, Qt::WindowFlags f = 0);
     ~PreviewWidget();
 protected:
     void paintEvent(QPaintEvent *pe);
+    bool eventFilter(QObject*, QEvent*);
+private:
+    QString _caption;
 };
 
 class Client : public KDecoration

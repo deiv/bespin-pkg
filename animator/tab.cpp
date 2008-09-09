@@ -276,21 +276,21 @@ TabInfo::rewind()
 void
 TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 {
-   progress = 0.0;
-   // update from/to indices
-   //    const int oldIdx = tai->index; // just for debug out later on
-   QWidget *ow = sw->widget(index);
-   QWidget *cw = sw->widget(newIdx);
-   currentWidget = cw;
-   index = newIdx;
-   int maxRenderTime = qMin(200, (int)(_duration - _timeStep));
+    progress = 0.0;
+    // update from/to indices
+    //    const int oldIdx = tai->index; // just for debug out later on
+    QWidget *ow = sw->widget(index);
+    QWidget *cw = sw->widget(newIdx);
+    currentWidget = cw;
+    index = newIdx;
+    int maxRenderTime = qMin(200, (int)(_duration - _timeStep));
 
-   #define _RESET_SIZE_
-   #define AVOID(_COND_) if (_COND_) { _RESET_SIZE_ rewind(); return; } //
-   #define TOO_SLOW clock.elapsed() > maxRenderTime
-   
-   AVOID(!ow); // this is the first time the tab changes, nothing to blend
-   AVOID(ow == cw); // this can happen on destruction etc... and thus lead to segfaults...
+    #define _RESET_SIZE_
+    #define AVOID(_COND_) if (_COND_) { _RESET_SIZE_ rewind(); return; } //
+    #define TOO_SLOW clock.elapsed() > maxRenderTime
+
+    AVOID(!ow); // this is the first time the tab changes, nothing to blend
+    AVOID(ow == cw); // this can happen on destruction etc... and thus lead to segfaults...
 
 // this works around a possible bug in some handcrafted scrollareas?
 // not sure, but as soon as i call window->render(.) on them, the window resizes
@@ -299,55 +299,56 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 // TODO: remove this once widget->render(.) does no more trigger resizes!
 #undef _RESET_SIZE_
 #define _RESET_SIZE_ window->setMinimumSize(minSz); window->setMaximumSize(maxSz);
-   // fix the window size
-   QWidget *window = sw->window();
-   QSize minSz = window->minimumSize(), maxSz = window->maximumSize();
-   window->setFixedSize(window->size());
+    // fix the window size
+    QWidget *window = sw->window();
+    QSize minSz = window->minimumSize(), maxSz = window->maximumSize();
+    window->setFixedSize(window->size());
 //-----------------------------------------------------------------
 
-   // prepare the pixmaps we use to pretend the animation
-   QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
-   tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
-   
-   if (clock.isNull()) {
-      clock.start();
-      tabPix[0] = tabPix[1];
-      grabWidget(ow, tabPix[0]);
-      tabPix[2] = tabPix[0];
-      AVOID(TOO_SLOW);
-   }
-   else { // humm?? very fast tab change... maybe the user changed his mind...
-      clock.restart();
-      tabPix[0] = tabPix[2];
-   }
-   
-   grabWidget(cw, tabPix[1]);
-   AVOID(TOO_SLOW);
+    // prepare the pixmaps we use to pretend the animation
+    QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
+    tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
 
-   duration = _duration - clock.elapsed() + _timeStep;
-   clock.restart(); clock.addMSecs(_timeStep);
-   updatePixmaps(_transition, _timeStep);
+    if (clock.isNull())
+    {
+        clock.start();
+        tabPix[0] = tabPix[1];
+        grabWidget(ow, tabPix[0]);
+        tabPix[2] = tabPix[0];
+        AVOID(TOO_SLOW);
+    }
+    else
+    {   // humm?? very fast tab change... maybe the user changed his mind...
+        clock.restart();
+        tabPix[0] = tabPix[2];
+    }
 
-   // make curtain and first update ----------------
-   if (!curtain) {
-      // prevent w from doing freaky things with the curtain
-      // (e.g. QSplitter would add a new section...)
-      StdChildAdd *stdChildAdd = new StdChildAdd;
-      sw->installEventFilter(stdChildAdd);
-      
-      curtain = new Curtain(this, sw);
-      curtain->move(contentsRect.topLeft());
-      curtain->resize(contentsRect.size());
-      curtain->show();
+    grabWidget(cw, tabPix[1]);
+    AVOID(TOO_SLOW);
 
-      sw->removeEventFilter(stdChildAdd);
-      delete stdChildAdd;
-   }
-   else
-      curtain->raise();
+    duration = _duration - clock.elapsed() + _timeStep;
+    clock.restart(); clock.addMSecs(_timeStep);
+    updatePixmaps(_transition, _timeStep);
 
-   _RESET_SIZE_
+    // make curtain and first update ----------------
+    if (!curtain)
+    {   // prevent w from doing freaky things with the curtain
+        // (e.g. QSplitter would add a new section...)
+        StdChildAdd *stdChildAdd = new StdChildAdd;
+        sw->installEventFilter(stdChildAdd);
 
+        curtain = new Curtain(this, sw);
+        curtain->move(contentsRect.topLeft());
+        curtain->resize(contentsRect.size());
+        curtain->show();
+
+        sw->removeEventFilter(stdChildAdd);
+        delete stdChildAdd;
+    }
+    else
+        curtain->raise();
+
+    _RESET_SIZE_
 }
 
 void

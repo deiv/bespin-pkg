@@ -379,9 +379,20 @@ BespinStyle::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                // catch autofillbackground change to align colors, toggle treeview animation
-                // this is a WORKAROUND for dolphin, amarok, et al.
-                itemView->installEventFilter(this);
+                // NOTE: WORKAROUND for dolphin and probably others:
+                // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
+                // force this here, hoping it won't cause to many problems - and make a bug report
+                QWidget *vp = itemView->viewport();
+                if (vp && vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
+                {
+                    qDebug() << "BESPIN works around a visual problem in" << itemView << ", please contact thomas.luebking 'at' web.de";
+                    QPalette pal = itemView->palette();
+                    pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
+                    pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
+                    pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
+                    itemView->setPalette(pal);
+                }
+
                 if (!qobject_cast<QTreeView*>(itemView))
                 {   // Enable hover effects in listview, treeview hovering sucks, as the "tree" doesn't get an update
                     itemView->viewport()->setAttribute(Qt::WA_Hover);
@@ -474,28 +485,31 @@ BespinStyle::polish( QWidget * widget )
         // NOTICE
         // QAbstractSlider::setAttribute(Qt::WA_OpaquePaintEvent) saves surprisinlgy little CPU
         // so that'd just gonna add more complexity for literally nothing...
+        // ...as the slider is usually not bound to e.g. a "scrollarea"
         if (widget->inherits("QScrollBar"))
-        {   // ...as the slider is usually not bound to e.g. a "scrollarea"
-            QWidget *dad = widget;
-            if (!widget->parentWidget())
-            {   // this catches e.g. plasma used QGraphicsProxyWidgets...
-                qWarning("Bespin, transparent scrollbar!");
+        {
+            // TODO: find a general catch for the plasma problem
+            if (appType == Plasma) // yes - i currently don't know how to detect those things otherwise
                 widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
-            }
-            while ((dad = dad->parentWidget()))
-            {   // digg for a potential KHTMLView ancestor, making this a html input scroller
-                if (dad->inherits("KHTMLView"))
-                {   // NOTICE this slows down things as it triggers a repaint of the frame
-                    widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
-                    // ...but this re-enbales speed and currently does the job
-                    // TODO how's css/khtml policy on applying colors?
-                    widget->setAutoFillBackground ( true );
-                    widget->setBackgroundRole ( QPalette::Base ); // QPalette::Window looks wrong
-                    widget->setForegroundRole ( QPalette::Text );
-                    break;
+            else
+            {
+                QWidget *dad = widget;
+                while ((dad = dad->parentWidget()))
+                {   // digg for a potential KHTMLView ancestor, making this a html input scroller
+                    if (dad->inherits("KHTMLView"))
+                    {   // NOTICE this slows down things as it triggers a repaint of the frame
+                        widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+                        // ...but this would re-enbale speed - jsust: how to get the proper palette
+                        // what if there's a bg image?
+                        // TODO how's css/khtml policy on applying colors?
+    //                     widget->setAutoFillBackground ( true );
+    //                     widget->setBackgroundRole ( QPalette::Base ); // QPalette::Window looks wrong
+    //                     widget->setForegroundRole ( QPalette::Text );
+                        break;
+                    }
                 }
             }
-            
+
             /// Scrollarea hovering - yes, this is /NOT/ redundant to the one above!
             if (QWidget *area = widget->parentWidget())
             {
@@ -561,6 +575,16 @@ BespinStyle::polish( QWidget * widget )
             widget->parentWidget()->setAutoFillBackground(false);
             widget->setAutoFillBackground(false);
         }
+
+    // this is a WORKAROUND for amarok filebrowser, see above on itemviews...
+    if (widget->inherits("KDirOperator") && widget->parentWidget() && widget->parentWidget()->inherits("FileBrowser"))
+    {
+        QPalette pal = widget->palette();
+        pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
+        pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
+        pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
+        widget->setPalette(pal);
+    }
 
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors
     /// are set or KHtml does wrong OR (mainly) by html "designers"

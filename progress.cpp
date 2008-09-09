@@ -28,14 +28,28 @@ BespinStyle::drawCapacityBar(const QStyleOption *option, QPainter *painter, cons
     ASSURE_OPTION(cb, ProgressBar);
     OPT_ENABLED
     const int f2 = F(2);
+
+    QPalette::ColorRole bg = QPalette::Window;
+    QPalette::ColorRole fg = RECT.height() > F(10) ? bg : QPalette::WindowText;
+    if (widget)
+    {
+        bg = widget->backgroundRole();
+        fg = RECT.height() > F(10) ? bg : widget->foregroundRole();
+    }
     
     QRect r = RECT; r.setBottom(r.bottom()-f2);
-    masks.rect[false].render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Window)); // CCOLOR(progress.std, Bg)
+    masks.rect[false].render(r, painter, Gradients::Sunken, Qt::Vertical, COLOR(fg)); // CCOLOR(progress.std, Bg)
     shadows.sunken[false][isEnabled].render(RECT, painter);
-    
-    r.setLeft(r.right() - r.width()*cb->progress/(cb->maximum - cb->minimum)  + f2);
-    shadows.raised[false][isEnabled][false].render(r, painter);
-    r.adjust(f2, f2, -f2, -f2);
+
+    int w = r.width()*cb->progress/(cb->maximum - cb->minimum)  - f2;
+    if (w > F(4))
+    {
+        if (cb->direction == Qt::LeftToRight)
+            r.setLeft(r.right() - w);
+        else
+            r.setRight(r.left() + w);
+        shadows.raised[false][isEnabled][false].render(r, painter);
+        r.adjust(f2, f2, -f2, -f2);
 #if 0
     if (widget)
     {
@@ -48,22 +62,36 @@ BespinStyle::drawCapacityBar(const QStyleOption *option, QPainter *painter, cons
     else
         masks.rect[false].render(r, painter, FCOLOR(Window));
 #else
-    masks.rect[false].render(r, painter, GRAD(progress) == Gradients::Sunken ? Gradients::Button :
-                                         GRAD(progress), Qt::Vertical, FCOLOR(Window));
+        masks.rect[false].render(r, painter, GRAD(progress) == Gradients::Sunken ?
+                                                               Gradients::Button :
+                                                               GRAD(progress), Qt::Vertical, COLOR(fg));
 #endif
+    }
+    else
+        r = QRect();
 
     if (cb->textVisible && !cb->text.isEmpty())
     {
         QRect tr = painter->boundingRect(RECT, Qt::TextSingleLine | cb->textAlignment, cb->text);
-        if (tr.width() <= r.left() - RECT.left())
+        if (tr.width() <= RECT.width() - w)
         {   // paint on free part
-            tr = RECT; tr.setRight(r.left());
+            tr = RECT;
+            if (cb->direction == Qt::LeftToRight)
+                tr.setRight(r.left());
+            else
+                tr.setLeft(r.right());
         }
         else if (tr.width() <= r.width()) // paint on used part
             tr = r;
-        else // paint cenetered
+        else
+        {   // paint cenetered
             tr = RECT;
-        drawItemText(painter, tr, Qt::AlignCenter, PAL, isEnabled, cb->text, QPalette::WindowText);
+            drawItemText(painter, tr.adjusted(-1, -1, -1, -1), Qt::AlignCenter, PAL, isEnabled, cb->text, bg);
+            drawItemText(painter, tr.adjusted(1, 1, 1, 1), Qt::AlignCenter, PAL, isEnabled, cb->text, bg);
+        }
+        drawItemText(painter, tr, Qt::AlignCenter, PAL, isEnabled, cb->text, widget ?
+                                                                             widget->foregroundRole() :
+                                                                             QPalette::WindowText);
     }
 }
 

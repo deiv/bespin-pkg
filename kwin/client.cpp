@@ -52,20 +52,58 @@
 
 using namespace Bespin;
 
-PreviewWidget::PreviewWidget(QWidget *p, Qt::WindowFlags f) : QWidget(p,f)
+PreviewWidget::PreviewWidget(const QString &caption, QWidget *p, Qt::WindowFlags f) : QWidget(p,f)
 {
-    setAutoFillBackground(true);
-//    setAttribute(Qt::WA_OpaquePaintEvent);
+    _caption = caption;
+    setAutoFillBackground(false);
+    setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_PaintOnScreen, false);
+    if (p)
+        p->installEventFilter(this);
 }
 
 PreviewWidget::~PreviewWidget(){}
 
+
+bool
+PreviewWidget::eventFilter(QObject *o, QEvent* e)
+{
+    if (e->type() == QEvent::Resize && o == parentWidget())
+        setGeometry(parentWidget()->rect());
+    return false;
+}
+
 void
 PreviewWidget::paintEvent(QPaintEvent *pe)
 {
+    QRect r = rect();
     QPainter p(this);
-    p.fillRect(rect(), Qt::red);
+    p.setRenderHint( QPainter::Antialiasing );
+    // the shadow - this is rather expensive, but hey - who cares... ;-P
+    p.setPen(Qt::NoPen);
+    p.setBrush(QColor(0,0,0,40));
+    p.drawRoundedRect(r, 8, 8);
+    r.adjust(1,0,-1,-1);
+    p.drawRoundedRect(r, 7, 7);
+    r.adjust(1,0,-1,-1);
+    p.setBrush(QColor(0,0,0,20));
+    p.drawRoundedRect(r, 6, 6);
+    r.adjust(0,0,0,-1);
+    p.drawRoundedRect(r, 6, 6);
+    r.adjust(0,0,0,-1);
+
+    // the window
+    p.setBrush(Gradients::pix(palette().color(QPalette::Active, backgroundRole()), r.height(), Qt::Vertical, Gradients::Button));
+    QColor c = palette().color(QPalette::Active, foregroundRole());
+    c.setAlpha(80);
+    p.setPen(c);
+    p.drawRoundedRect(r, 6, 6);
+
+    // cation and text
+    p.setBrush(Qt::NoBrush);
+    p.setPen(palette().color(QPalette::Active, foregroundRole()));
+    p.drawText(r, Qt::AlignHCenter | Qt::TextSingleLine | Qt::AlignTop, _caption);
+    p.drawText(r, Qt::AlignCenter, "Bespin" );
     p.end();
 }
 
@@ -243,7 +281,7 @@ Client::init()
 
     _caption = trimm(caption());
     widget()->setAutoFillBackground(false);
-    widget()->setAttribute(Qt::WA_OpaquePaintEvent);
+    widget()->setAttribute(Qt::WA_OpaquePaintEvent, !isPreview());
     widget()->setAttribute(Qt::WA_NoSystemBackground);
     widget()->setAttribute(Qt::WA_PaintOnScreen, false);
     widget()->installEventFilter(this);
@@ -261,15 +299,11 @@ Client::init()
     gType[0] = Gradients::None;
     gType[1] = Gradients::Button;
 
-    if (isPreview())
+    if (isPreview() && !_preview)
     {
-        _preview = new PreviewWidget(widget());
-        _preview->setAutoFillBackground(true);
-        _preview->setGeometry(  borderSize, titleSize, widget()->width()-2*borderSize,
-                                widget()->height()-(borderSize+titleSize));
+        _preview = new PreviewWidget(isActive() ? "Active Window" : "Inactive Window", widget());
         _preview->show();
-        _preview->raise();
-        qDebug() << "BESPIN, preview window!!!" << _preview->geometry();
+//         _preview->raise();
     }
     if (config()->resizeCorner && isResizable())
         corner = new ResizeCorner(this);
@@ -551,8 +585,6 @@ Client::repaint(QPainter &p)
 void
 Client::reset(unsigned long changed)
 {
-    delete _preview; _preview = 0;
-
     if (changed & SettingFont)
     {
         titleSize = _factory->titleSize(_small);
@@ -620,7 +652,20 @@ Client::reset(unsigned long changed)
             colors[a][t] = options()->color((ColorType)t, a);
 
         bool def = (bgMode == 1);
-        if (!(isPreview() || config()->forceUserColors))
+        if (isPreview())
+        {
+            def = false;
+            bgMode = 0;
+            gType[0] = gType[1] = Gradients::None;
+            colors[0][ColorTitleBlend] = colors[1][ColorTitleBlend] =
+                                         colors[0][ColorTitleBar] = colors[1][ColorTitleBar] =
+                                         widget()->palette().color(QPalette::Active, QPalette::Window);
+            colors[1][ColorButtonBg] = colors[1][ColorFont] =
+                                       widget()->palette().color(QPalette::Active, QPalette::WindowText);
+            colors[0][ColorButtonBg] = colors[0][ColorFont] =
+                                     Colors::mid(colors[0][ColorTitleBar], colors[1][ColorFont]);
+        }
+        else if (!config()->forceUserColors)
         {
             KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
             if (info.windowClassClass() == "Wine")
@@ -780,9 +825,6 @@ Client::resize( const QSize& s )
 {
     widget()->resize(s);
     int w = s.width(), h = s.height();
-
-    if (_preview)
-        _preview->setGeometry(borderSize, titleSize, w-2*borderSize, h-(borderSize+titleSize));
 
     updateTitleLayout( s );
 

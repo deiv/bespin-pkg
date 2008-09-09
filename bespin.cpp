@@ -422,7 +422,7 @@ BespinStyle::drawComplexControl ( ComplexControl control,
 }
 
 int
-BespinStyle::elementId(const QString &string, const QStyleOption *option, const QWidget *widget) const
+BespinStyle::elementId(const QString &string, const QStyleOption *, const QWidget *) const
 {
     int id = styleElements.value(string, 0);
     if (id)
@@ -764,29 +764,14 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
         
-        if (QAbstractItemView *view = qobject_cast<QAbstractItemView*>(widget))
-        {
-            if (!view->viewport()->autoFillBackground())
-            {
-                // NOTE: WORKAROUND for dolphin and probably others:
-                // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
-                // force this here, hoping it won't cause to many problems - and make a bug report
-                QPalette pal = view->palette();
-                pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
-                pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
-                pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
-                pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
-                pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
-                pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
-                view->setPalette(pal);
-            }
-            if (QTreeView* tv = qobject_cast<QTreeView*>(view))
-            {   // allow all treeviews to be animated!
-                if (config.hack.treeViews)
-                    // NOTICE: animation causes visual errors on non autofilling views...
-                    tv->setAnimated(tv->viewport()->autoFillBackground());
-                return false;
-            }
+        if (QTreeView* tv = qobject_cast<QTreeView*>(object))
+        {   // allow all treeviews to be animated!
+            if (config.hack.treeViews &&
+                tv->viewport()->autoFillBackground() &&
+                tv->viewport()->palette().color(tv->viewport()->backgroundRole()).alpha() > 200) // 255 would be perfect, though
+                // NOTICE: animation causes visual errors on non autofilling views...
+                tv->setAnimated(true);
+            return false;
         }
         return false;
     }

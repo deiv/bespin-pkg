@@ -76,6 +76,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, cons
         }
         else if (appType == Plasma && widget)
         {
+            // i abuse this property as xbar menus are no menus and the active state is s thing of it's own...
             int action = (mbi->menuItemType & 0xffff);
             int activeAction = ((mbi->menuItemType >> 16) & 0xffff);
             info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, activeAction));
@@ -93,7 +94,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, cons
         QColor c;
         if (appType == Plasma)
         {   // NOTICE: opaque Colors::mid() are too flickerious with several plasma bgs...
-            COLOR(ROLE[Bg]);
+            c = COLOR(ROLE[Bg]);
             c.setAlpha(step*255/8);
         }
         else
