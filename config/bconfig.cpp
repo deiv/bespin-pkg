@@ -317,36 +317,42 @@ void BConfig::_save(QSettings *settings, bool makeDirty) {
 }
 
 bool BConfig::eventFilter ( QObject * o, QEvent * e) {
-   if (e->type() == QEvent::Enter) {
-      if (o == _infoBrowser) {
-         infoItemHovered = true;
-         return false;
-      }
-      infoItemHovered = false;
-      if (QComboBox *box = qobject_cast<QComboBox*>(o)) {
-         QMap<QComboBox*, QStringList>::iterator i;
-         for (i = _comboHelps.begin(); i != _comboHelps.end(); ++i)
-            if (o == i.key()) {
-               infoItemHovered = true;
-               _infoBrowser->setHtml(i.value().at(box->currentIndex()));
-               infoDirty = true;
-               return false;
-            }
-      }
-      QMap<QWidget*, QString>::iterator i;
-      for (i = _contextHelps.begin(); i != _contextHelps.end(); ++i)
-         if (o == i.key()) {
+    if (e->type() == QEvent::Enter)
+    {
+        if (o == _infoBrowser)
+        {
             infoItemHovered = true;
-            _infoBrowser->setHtml(i.value());
-            infoDirty = true;
             return false;
-         }
-      return false;
-   }
-   else if (e->type() == QEvent::Leave) {
-      infoItemHovered = false;
-      QTimer::singleShot(300, this, SLOT(resetInfo()));
-      return false;
-   }
-   return false;
+        }
+        infoItemHovered = false;
+        if (QComboBox *box = qobject_cast<QComboBox*>(o))
+        {
+            QMap<QComboBox*, QStringList>::iterator i;
+            for (i = _comboHelps.begin(); i != _comboHelps.end(); ++i)
+                if (o == i.key())
+                {
+                    infoItemHovered = true;
+                    _infoBrowser->setHtml(i.value().at(box->currentIndex()));
+                    infoDirty = true;
+                    return false;
+                }
+        }
+        QMap<QWidget*, QString>::iterator i;
+        for (i = _contextHelps.begin(); i != _contextHelps.end(); ++i)
+            if (o == i.key())
+            {
+                infoItemHovered = true;
+                _infoBrowser->setHtml(i.value());
+                infoDirty = true;
+                return false;
+            }
+        return false;
+    }
+    else if (e->type() == QEvent::Leave)
+    {
+        infoItemHovered = false;
+        QTimer::singleShot(300, this, SLOT(resetInfo()));
+        return false;
+    }
+    return false;
 }

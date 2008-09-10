@@ -213,11 +213,13 @@ static Transition _transition = SlideIn;
 class Animator::Curtain : public QWidget
 {
 public:
-   Curtain(TabInfo *info, QWidget *parent) : QWidget(parent), _info(info)
-   {
-      setAttribute(Qt::WA_NoSystemBackground);
-      raise();
-   }
+    Curtain(TabInfo *info, QWidget *parent) : QWidget(parent), _info(info)
+    {
+        setAutoFillBackground(false);
+        setAttribute(Qt::WA_NoSystemBackground);
+        setAttribute(Qt::WA_OpaquePaintEvent);
+        raise();
+    }
 protected:
    void paintEvent( QPaintEvent *  )
    {

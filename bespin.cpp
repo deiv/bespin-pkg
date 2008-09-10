@@ -19,6 +19,7 @@
 /**================== Qt4 includes ======================*/
 
 #include <QAbstractScrollArea>
+#include <QApplication>
 #include <QEvent>
 #include <QPainter>
 #include <QStylePlugin>
@@ -562,6 +563,20 @@ QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalett
 static void
 swapPalette(QWidget *widget, BespinStyle *style)
 {
+    // could be soo easy, but there's styleshit...
+    QMap<QWidget*, QString> shits;
+    QList<QWidget*> kids = widget->findChildren<QWidget*>();
+    kids.append(widget);
+    foreach (QWidget *kid, kids)
+    {   // first gather all styleshitted widgets...
+        if (!kid->styleSheet().isEmpty())
+        {
+            shits.insert(kid, kid->styleSheet());
+            // and get rid of shit
+            kid->setStyleSheet(QString());
+        }
+    }
+    // now swap the palette ----------------
     QPalette pal(widget->palette());
     QPalette::ColorGroup group;
     for (int i = 0; i < 3; ++i)
@@ -581,6 +596,20 @@ swapPalette(QWidget *widget, BespinStyle *style)
     }
     style->polish(pal);
 
+    // this is funny: style shits rely on QApplication::palette() (nice trick, TrottelTech... again)
+    // so to apply them with the proper color, we need to change the apps palette to the swapped one,
+    if (!shits.isEmpty())
+    {
+        QPalette appPal = QApplication::palette();
+        QApplication::setPalette(pal);
+        // reapply the shits
+        QMap<QWidget*, QString>::const_iterator shit = shits.constBegin();
+        while (shit != shits.constEnd())
+            { shit.key()->setStyleSheet(shit.value()); ++shit; }
+        // reset the apps palette
+        QApplication::setPalette(appPal);
+    }
+    // and finally apply the swapped palette to the widget... great ;-P
     widget->setPalette(pal);
 }
 
@@ -699,7 +728,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
     {
         QMouseEvent *mev = (QMouseEvent*)ev;
         qDebug() << "BESPIN:" << object;
-//       DEBUG (object);
+        //       DEBUG (object);
         return false;
     }
 #endif

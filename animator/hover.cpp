@@ -193,97 +193,109 @@ if ((sb = qobject_cast<QScrollBar*>(kid)))
 bool
 Hover::eventFilter( QObject* object, QEvent *e )
 {
-   
-   QWidget* widget = qobject_cast<QWidget*>(object);
-   if (!(widget && widget->isVisible() && widget->isEnabled()))
-      return false;
-   
-   switch (e->type()) {
-   case QEvent::MouseMove:
-   case QEvent::Timer:
-   case QEvent::Move:
-   case QEvent::Paint:
-      return false; // just for performance - they can occur really often
+    QWidget* widget = qobject_cast<QWidget*>(object);
+    if (!(widget && widget->isVisible() && widget->isEnabled()))
+        return false;
 
-   case QEvent::Enter: {
-      if (QAbstractScrollArea* area =
-          qobject_cast<QAbstractScrollArea*>(object)) {
-         if (!area->isEnabled()) return false;
-         HANDLE_SCROLL_AREA_EVENT(false);
-         return false;
-      }
-      else if (Q3ScrollView* area =
-               qobject_cast<Q3ScrollView*>(object)) {
-         if (!area->isEnabled()) return false;
-         HANDLE_SCROLL_AREA_EVENT(false);
-         return false;
-      }
-      else if (_scrollAreas.contains(object)) {
-         QObjectList kids = object->children();
-         QWidget *sb;
-         foreach (QObject *kid, kids) {
-            if isAttachedScrollbar
-               play(sb);
-         }
-         return false;
-      }
-      play(widget);
-      return false;
-   }
-   case QEvent::Leave: {
-      if (QAbstractScrollArea* area =
-          qobject_cast<QAbstractScrollArea*>(object)) {
-         if (!area->isEnabled()) return false;
-         HANDLE_SCROLL_AREA_EVENT(true);
+    switch (e->type())
+    {
+    case QEvent::Timer:
+    case QEvent::Move:
+    case QEvent::Paint:
+    case QEvent::MouseMove:
+    case QEvent::Wheel:
+    case QEvent::MouseButtonPress:
+        return false; // just for performance - they can occur really often
+    case QEvent::Enter:
+    {
+        if (QAbstractScrollArea* area = qobject_cast<QAbstractScrollArea*>(object))
+        {
+            if (!area->isEnabled())
+                return false;
+            HANDLE_SCROLL_AREA_EVENT(false);
             return false;
-      }
-      else if (Q3ScrollView* area =
-               qobject_cast<Q3ScrollView*>(object)) {
-         HANDLE_SCROLL_AREA_EVENT(true);
-         return false;
-      }
-      else if (_scrollAreas.contains(object)) {
-         QObjectList kids = object->children();
-         QWidget *sb;
-         foreach (QObject *kid, kids) {
-            if isAttachedScrollbar
-               play(sb, true);
-         }
-         return false;
-      }
-      play(widget, true);
-      return false;
-   }
+        }
+        else if (Q3ScrollView* area = qobject_cast<Q3ScrollView*>(object))
+        {
+            if (!area->isEnabled())
+                return false;
+            HANDLE_SCROLL_AREA_EVENT(false);
+            return false;
+        }
+        else if (_scrollAreas.contains(object))
+        {
+            QObjectList kids = object->children();
+            QWidget *sb;
+            foreach (QObject *kid, kids)
+            {
+                if isAttachedScrollbar
+                    play(sb);
+            }
+            return false;
+        }
+        play(widget);
+        return false;
+    }
+    case QEvent::Leave:
+    {
+        if (QAbstractScrollArea* area = qobject_cast<QAbstractScrollArea*>(object))
+        {
+            if (!area->isEnabled())
+                return false;
+            HANDLE_SCROLL_AREA_EVENT(true);
+            return false;
+        }
+        else if (Q3ScrollView* area = qobject_cast<Q3ScrollView*>(object))
+        {
+            HANDLE_SCROLL_AREA_EVENT(true);
+            return false;
+        }
+        else if (_scrollAreas.contains(object))
+        {
+            QObjectList kids = object->children();
+            QWidget *sb;
+            foreach (QObject *kid, kids)
+            {
+                if isAttachedScrollbar
+                    play(sb, true);
+            }
+            return false;
+        }
+        play(widget, true);
+        return false;
+    }
 #undef HANDLE_SCROLL_AREA_EVENT
    
 #if 0
-   case QEvent::FocusIn:
-      if (qobject_cast<QAbstractButton*>(object) ||
-          qobject_cast<QComboBox*>(object)) {
-         QWidget *widget = (QWidget*)object;
-         if (!widget->isEnabled()) return false;
-         if (widget->testAttribute(Qt::WA_UnderMouse))
-            widget->repaint();
-         else
-            animator->fade(widget);
-         return false;
-      }
-      return false;
-   case QEvent::FocusOut:
-      if (qobject_cast<QAbstractButton*>(object) ||
-          qobject_cast<QComboBox*>(object)) {
-         QWidget *widget = (QWidget*)object;
-         if (!widget->isEnabled()) return false;
-         if (widget->testAttribute(Qt::WA_UnderMouse))
-            widget->repaint();
-         else
-            animator->fade((QWidget*)(object), OUT);
-         return false;
-      }
-      return false;
+    case QEvent::FocusIn:
+        if (qobject_cast<QAbstractButton*>(object) || qobject_cast<QComboBox*>(object))
+        {
+            QWidget *widget = (QWidget*)object;
+            if (!widget->isEnabled())
+                return false;
+            if (widget->testAttribute(Qt::WA_UnderMouse))
+                widget->repaint();
+            else
+                animator->fade(widget);
+            return false;
+        }
+        return false;
+    case QEvent::FocusOut:
+        if (qobject_cast<QAbstractButton*>(object) || qobject_cast<QComboBox*>(object))
+        {
+            QWidget *widget = (QWidget*)object;
+            if (!widget->isEnabled())
+                return false;
+            if (widget->testAttribute(Qt::WA_UnderMouse))
+                widget->repaint();
+            else
+                animator->fade((QWidget*)(object), OUT);
+            return false;
+        }
+        return false;
 #endif
-   default:
-      return false;
-   }
+    default:
+        return false;
+    }
 }
 
