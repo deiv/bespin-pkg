@@ -293,7 +293,7 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter, cons
 
     // fallback for small dials ============================
     bool small = false;
-    if (small = (rect.width() < 5*dpi.SliderThickness/2))
+    if (small = (rect.width() < 8*dpi.SliderThickness/3))
     {
         painter->setRenderHint( QPainter::Antialiasing );
         painter->setPen(Qt::NoPen);
@@ -321,11 +321,11 @@ BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter, cons
     fnt.setPixelSize( h );
     painter->setFont(fnt);
     painter->setBrush(Qt::NoBrush);
-    painter->setPen(Colors::mid(PAL.background().color(), PAL.foreground().color(),1,2));
+    painter->setPen(Colors::mid(PAL.background().color(), PAL.foreground().color(),!hasFocus,2));
     drawItemText(painter, rect,  Qt::AlignCenter, PAL, isEnabled, QString::number(dial->sliderValue));
 
     if (small)
-        return;
+        { painter->restore(); return; }
 
     r = (rect.width()-d)/2;
     cp += QPoint((int)(r * cos(a)), -(int)(r * sin(a)));

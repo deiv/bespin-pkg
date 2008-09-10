@@ -132,22 +132,25 @@ qint64 lastIconPix = 0;
 static QPixmap &
 icon(QPixmap &pix, int step)
 {
-   if (pix.cacheKey() != lastIconPix) {
-      scaledIcon = pix.scaledToHeight ( pix.height() + dpi.f4, Qt::SmoothTransformation );
-      if (emptyIcon.size() != scaledIcon.size())
-         emptyIcon = QPixmap(scaledIcon.size());
-      lastIconPix = pix.cacheKey();
-   }
+    if (pix.cacheKey() != lastIconPix)
+    {
+        scaledIcon = pix.scaledToHeight ( pix.height() + F(4), Qt::SmoothTransformation );
+        if (emptyIcon.size() != scaledIcon.size())
+            emptyIcon = QPixmap(scaledIcon.size());
+        lastIconPix = pix.cacheKey();
+    }
+    emptyIcon.fill(Qt::transparent);
 #ifndef QT_NO_XRENDER
-   emptyIcon.fill(Qt::transparent);
-   OXRender::composite(pix, NULL, emptyIcon,
-                       0, 0, 0, 0, dpi.f2, dpi.f2,
-                       pix.width(), pix.height(), PictOpOver);
-   OXRender::blend(scaledIcon, emptyIcon, step/6.0);
-   return emptyIcon;
+    OXRender::composite(pix, NULL, emptyIcon, 0, 0, 0, 0, F(2), F(2), pix.width(), pix.height(), PictOpOver);
+    OXRender::blend(scaledIcon, emptyIcon, step/6.0);
 #else
-   return step ? scaledIcon : pix;
+    QPainter p(&emptyIcon);
+    p.drawPixmap(F(2), F(2), pix);
+    p.setOpacity(step/6.0);
+    p.drawPixmap(0, 0, scaledIcon);
+    p.end();
 #endif
+    return emptyIcon;
 }
 
 void
@@ -174,8 +177,6 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
         return;
     }
 
-//    OPT_HOVER
-      
     QPixmap pm;
     QSize pmSize = RECT.size() - QSize(dpi.f4, dpi.f4);
     pmSize = pmSize.boundedTo(toolbutton->iconSize);
@@ -192,11 +193,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
 
         pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), mode, state);
         if (step && !sunken && !pm.isNull())
-#ifndef QT_NO_XRENDER
             pm = icon(pm, step);
-#else
-            pm = icon(pm, hover);
-#endif
         pmSize = pm.size();
    }
 

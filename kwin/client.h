@@ -40,19 +40,6 @@ namespace Bespin
 class Button;
 class ResizeCorner;
 
-class PreviewWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    PreviewWidget(const QString &caption, QWidget *p = 0, Qt::WindowFlags f = 0);
-    ~PreviewWidget();
-protected:
-    void paintEvent(QPaintEvent *pe);
-    bool eventFilter(QObject*, QEvent*);
-private:
-    QString _caption;
-};
-
 class Client : public KDecoration
 {
     Q_OBJECT
@@ -112,7 +99,6 @@ private:
     QRect top, bottom, left, right, label;
     QPainterPath buttonCorner;
     QString _caption;
-    PreviewWidget *_preview;
     ResizeCorner *corner;
 };
 

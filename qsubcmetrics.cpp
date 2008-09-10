@@ -132,7 +132,7 @@ BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComple
             break;
         case SC_GroupBoxContents:
         {
-            int top = F(6);
+            int top = (groupBox->features & QStyleOptionFrameV2::Flat) ? F(3) : F(6);
             if (!groupBox->text.isEmpty())
                 top += groupBox->fontMetrics.height();
             ret = groupBox->rect.adjusted(F(3), top, -F(3), -F(7));
@@ -154,7 +154,7 @@ BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComple
             int marg = (groupBox->features & QStyleOptionFrameV2::Flat) ? 0 : F(4);
             Qt::Alignment align;
         
-            if (config.sunkenGroups)
+            if ((groupBox->features & QStyleOptionFrameV2::Flat) || config.sunkenGroups)
             {
                 int left = marg;
                 if (groupBox->subControls & SC_GroupBoxCheckBox)

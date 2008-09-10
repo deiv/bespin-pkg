@@ -197,13 +197,8 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, 
         QStyleOptionGroupBox copy = *groupBox;
         copy.fontMetrics = QFontMetrics(painter->font());
         QRect textRect = subControlRect(CC_GroupBox, &copy, SC_GroupBoxLabel, widget);
-        int alignment = Qt::AlignVCenter | BESPIN_MNEMONIC;
-        if (config.sunkenGroups)
-            alignment |= Qt::AlignLeft;
-        else
-            alignment |= Qt::AlignHCenter;
-        drawItemText(painter, textRect,  alignment, groupBox->palette, isEnabled, groupBox->text, role);
-        if (!config.sunkenGroups)
+        drawItemText(painter, textRect,  BESPIN_MNEMONIC, groupBox->palette, isEnabled, groupBox->text, role);
+        if (!((groupBox->features & QStyleOptionFrameV2::Flat) || config.sunkenGroups))
         {
             int x = textRect.bottom();
             textRect = RECT; textRect.setTop(x);

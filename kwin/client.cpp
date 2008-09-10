@@ -52,69 +52,13 @@
 
 using namespace Bespin;
 
-PreviewWidget::PreviewWidget(const QString &caption, QWidget *p, Qt::WindowFlags f) : QWidget(p,f)
-{
-    _caption = caption;
-    setAutoFillBackground(false);
-    setAttribute(Qt::WA_NoSystemBackground);
-    setAttribute(Qt::WA_PaintOnScreen, false);
-    if (p)
-        p->installEventFilter(this);
-}
-
-PreviewWidget::~PreviewWidget(){}
-
-
-bool
-PreviewWidget::eventFilter(QObject *o, QEvent* e)
-{
-    if (e->type() == QEvent::Resize && o == parentWidget())
-        setGeometry(parentWidget()->rect());
-    return false;
-}
-
-void
-PreviewWidget::paintEvent(QPaintEvent *pe)
-{
-    QRect r = rect();
-    QPainter p(this);
-    p.setRenderHint( QPainter::Antialiasing );
-    // the shadow - this is rather expensive, but hey - who cares... ;-P
-    p.setPen(Qt::NoPen);
-    p.setBrush(QColor(0,0,0,40));
-    p.drawRoundedRect(r, 8, 8);
-    r.adjust(1,0,-1,-1);
-    p.drawRoundedRect(r, 7, 7);
-    r.adjust(1,0,-1,-1);
-    p.setBrush(QColor(0,0,0,20));
-    p.drawRoundedRect(r, 6, 6);
-    r.adjust(0,0,0,-1);
-    p.drawRoundedRect(r, 6, 6);
-    r.adjust(0,0,0,-1);
-
-    // the window
-    p.setBrush(Gradients::pix(palette().color(QPalette::Active, backgroundRole()), r.height(), Qt::Vertical, Gradients::Button));
-    QColor c = palette().color(QPalette::Active, foregroundRole());
-    c.setAlpha(80);
-    p.setPen(c);
-    p.drawRoundedRect(r, 6, 6);
-
-    // cation and text
-    p.setBrush(Qt::NoBrush);
-    p.setPen(palette().color(QPalette::Active, foregroundRole()));
-    p.drawText(r, Qt::AlignHCenter | Qt::TextSingleLine | Qt::AlignTop, _caption);
-    p.drawText(r, Qt::AlignCenter, "Bespin" );
-    p.end();
-}
-
 Client::Client(KDecorationBridge *b, Factory *f) :
 KDecoration(b, f), retry(0),
 topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
-bgMode(1), _factory(f), _preview(0), corner(0) { }
+bgMode(1), _factory(f), corner(0) { }
 
 Client::~Client(){
 //    delete corner;
-//    delete _preview;
 //    delete [] buttons;
 //    delete titleBar;
 //    delete titleSpacer;
@@ -245,7 +189,7 @@ Client::eventFilter(QObject *o, QEvent *e)
     case QEvent::Paint:
     {
         QPainter p(widget());
-        p.setClipRect(static_cast<QPaintEvent*>(e)->rect());
+        p.setClipRegion(static_cast<QPaintEvent*>(e)->region());
         p.setFont(options()->font());
         repaint(p);
         p.end();
@@ -279,7 +223,7 @@ Client::init()
     NET::WindowType type = windowType( supported_types );
     _small = type == NET::Utility || type == NET::Menu || type == NET::Toolbar;
 
-    _caption = trimm(caption());
+    _caption = isPreview() ? (isActive() ? "Active Window" : "Inactive Window") : trimm(caption());
     widget()->setAutoFillBackground(false);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, !isPreview());
     widget()->setAttribute(Qt::WA_NoSystemBackground);
@@ -299,12 +243,6 @@ Client::init()
     gType[0] = Gradients::None;
     gType[1] = Gradients::Button;
 
-    if (isPreview() && !_preview)
-    {
-        _preview = new PreviewWidget(isActive() ? "Active Window" : "Inactive Window", widget());
-        _preview->show();
-//         _preview->raise();
-    }
     if (config()->resizeCorner && isResizable())
         corner = new ResizeCorner(this);
     reset(63);
@@ -385,7 +323,57 @@ Client::repaint(QPainter &p)
         return;
 
     QColor bg = color(ColorTitleBar, isActive());
-    if (isShade())
+    if (isPreview())
+    {
+        QRect r = widget()->rect();
+        p.setRenderHint( QPainter::Antialiasing );
+        // the shadow - this is rather expensive, but hey - who cares... ;-P
+        p.setPen(Qt::NoPen);
+        p.setBrush(QColor(0,0,0,40));
+        p.drawRoundedRect(r, 8, 8);
+        r.adjust(1,0,-1,-1);
+        p.drawRoundedRect(r, 7, 7);
+        r.adjust(1,0,-1,-1);
+        p.setBrush(QColor(0,0,0,20));
+        p.drawRoundedRect(r, 6, 6);
+        r.adjust(0,0,0,-1);
+        p.drawRoundedRect(r, 6, 6);
+        r.adjust(0,0,0,-1);
+        
+        // the window
+        p.setBrush(Gradients::pix(bg, r.height(), Qt::Vertical, Gradients::Button));
+        QColor c = color(ColorFont, isActive());
+        c.setAlpha(80);
+        p.setPen(c);
+        p.drawRoundedRect(r, 6, 6);
+        
+        // logo
+        if (isActive())
+        {
+            c.setAlpha(180);
+            p.setBrush(c);
+            p.setPen(Qt::NoPen);
+            int s = qMin(r.width(), r.height())/2;
+            QRect logo(0,0,s,s);
+            s /= 4;
+            logo.moveCenter(r.center());
+            QPainterPath path;
+            path.moveTo(logo.center());
+            path.arcTo(logo, 90, 270);
+            path.lineTo(logo.right(), logo.y()+4*s/3);
+            path.lineTo(logo.right()-s, logo.y()+4*s/3);
+            path.lineTo(logo.center().x() + s/2, logo.center().y());
+            path.lineTo(logo.center());
+            path.closeSubpath();
+            path.addEllipse(logo.right()-3*s/2, logo.y(), s, s);
+            p.drawPath(path);
+        }
+        c.setAlpha(255);
+        p.setPen(c);
+        p.setBrush(Qt::NoBrush);
+        p.drawText(r, Qt::AlignHCenter | Qt::TextSingleLine | Qt::AlignTop, _caption);
+    }
+    else if (isShade())
     { // only one "big" gradient, as we can't rely on windowId()!!
         const QPixmap &fill = Gradients::pix(bg, height(), Qt::Vertical, Gradients::Button);
         p.drawTiledPixmap(0,0,width(),height(), fill);

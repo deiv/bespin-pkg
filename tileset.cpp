@@ -169,9 +169,17 @@ Set::render(const QRect &r, QPainter *p) const
 
 #ifndef QT_NO_XRENDER
 #define ADJUST_ALPHA(_PIX_) filledPix = OXRender::applyAlpha(filledPix, _PIX_)
+#define TINT filledPix = OXRender::tint(*tile, *_texColor);
 #else
 #warning no XRender - performance will suffer!
 #define ADJUST_ALPHA(_PIX_) filledPix.setAlphaChannel(_PIX_)
+#define TINT { \
+    filledPix.fill(Qt::transparent); \
+    pixPainter.begin(&filledPix);\
+    pixPainter.setPen(Qt::NoPen); pixPainter.setBrush(*_texColor);\
+    pixPainter.drawRect(filledPix.rect());\
+    pixPainter.end(); \
+    ADJUST_ALPHA(*tile); }
 #endif
 
 #define MAKE_FILL(_OFF_)\
@@ -180,21 +188,16 @@ if (!tile->isNull()) {\
     {\
         if (filledPix.size() != tile->size())\
             filledPix = QPixmap(tile->size());\
-        filledPix.fill(Qt::transparent); \
         if (_texPix)\
         {\
+            filledPix.fill(Qt::transparent); \
             pixPainter.begin(&filledPix);\
             pixPainter.drawTiledPixmap(filledPix.rect(), *_texPix, _OFF_-off);\
             pixPainter.end();\
+            ADJUST_ALPHA(*tile);\
         }\
         else\
-        {\
-            pixPainter.begin(&filledPix);\
-            pixPainter.setPen(Qt::NoPen); pixPainter.setBrush(*_texColor);\
-            pixPainter.drawRect(filledPix.rect());\
-            pixPainter.end();\
-        }\
-        ADJUST_ALPHA(*tile);\
+            TINT\
         tile = &filledPix;\
     }\
     if (solidBg)\
