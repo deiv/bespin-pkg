@@ -84,13 +84,21 @@ Config::Config(QWidget* parent) : BConfig(parent)
     completely ignore these hints and use the colors configured for KWin and the gradients setup\
     below.");
 
-    handleSettings(ui.actGrad, "ActiveGradient", 1);
-    setContextHelp(ui.actGrad, "<b>Active Gradient</b><hr>\
-    The gradient in the titlebar center of ACTIVE windows.");
+    handleSettings(ui.actGrad, "ActiveGradient", 2);
+    setContextHelp(ui.actGrad, "<b>Active base gradient</b><hr>\
+    The BASE gradient of ACTIVE windows.");
 
     handleSettings(ui.inactGrad, "InactiveGradient", 0);
-    setContextHelp(ui.inactGrad, "<b>Inactive Gradient</b><hr>\
-    The gradient in the titlebar center of INACTIVE windows.");
+    setContextHelp(ui.inactGrad, "<b>Inctive base gradient</b><hr>\
+    The BASE gradient of INACTIVE windows.");
+
+    handleSettings(ui.actGrad2, "ActiveGradient2", 0);
+    setContextHelp(ui.actGrad2, "<b>Second active gradient</b><hr>\
+    Accessoire gradient in the titlebar center of ACTIVE windows.");
+    
+    handleSettings(ui.inactGrad2, "InactiveGradient2", 0);
+    setContextHelp(ui.inactGrad2, "<b>Second inactive gradient</b><hr>\
+    Accessoire gradient in the titlebar center of INACTIVE windows.");
 
     handleSettings(ui.multibutton, "MultiButtonOrder", "MHFBS");
     setContextHelp(ui.multibutton, "<b>The 'Multibutton'</b><hr>\

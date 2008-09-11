@@ -122,15 +122,14 @@ BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * option,
                 int h = contentsSize.height() + (config.btn.layer ? dpi.f4 : dpi.f6);
 
                 if (!btn->icon.isNull())
-                {
-                    w += dpi.f10; h += dpi.f2;
-                }
+                    { w += dpi.f10; h += dpi.f2; }
+                    
                 if (config.btn.round)
-                {
-                    w += dpi.f8; h -= dpi.f2;
-                }
+                    { w += dpi.f8; h -= dpi.f2; }
+
                 if (w < dpi.f80)
                     w = dpi.f80;
+
                 return QSize(w, h);
             }
         }

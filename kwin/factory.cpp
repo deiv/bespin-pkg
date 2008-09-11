@@ -53,11 +53,10 @@ KDE_EXPORT KDecorationFactory* create_factory()
 using namespace Bespin;
 
 bool Factory::initialized_ = false;
-Config Factory::_config = { false, false, false };
+Config Factory::_config = { false, false, false, {{Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None}} };
 int Factory::buttonSize_ = -1;
 int Factory::borderSize_ = 4;
 int Factory::titleSize_[2] = {18,16};
-Gradients::Type Factory::gradient_[2] = {Gradients::None, Gradients::Button};
 QVector<Button::Type> Factory::multiButton_(0);
 QMenu *Factory::desktopMenu_ = 0;
 QMenu *Factory::_windowList = 0;
@@ -143,65 +142,79 @@ multiString(const QVector<Button::Type> &vector)
 
 bool Factory::readConfig()
 {
-   bool ret = false;
-	QSettings settings("Bespin", "Style");
-	settings.beginGroup("Deco");
+    bool ret = false;
+    bool oldBool;
+    Gradients::Type oldgradient;
+    
+    QSettings settings("Bespin", "Style");
+    settings.beginGroup("Deco");
 
-   bool forcedusercolors = _config.forceUserColors;
-   _config.forceUserColors = settings.value("ForceUserColors", false).toBool();
-   if (forcedusercolors != _config.forceUserColors) ret = true;
+    oldBool = _config.forceUserColors;
+    _config.forceUserColors = settings.value("ForceUserColors", false).toBool();
+    if (oldBool != _config.forceUserColors) ret = true;
 
-   bool trimmedCaption = _config.trimmCaption;
-   _config.trimmCaption = settings.value("TrimmCaption", true).toBool();
-   if (trimmedCaption != _config.trimmCaption) ret = true;
+    oldBool = _config.trimmCaption;
+    _config.trimmCaption = settings.value("TrimmCaption", true).toBool();
+    if (oldBool != _config.trimmCaption) ret = true;
 
-   bool showedResCor = _config.resizeCorner;
-   _config.resizeCorner = settings.value("ResizeCorner", false).toBool();
-   if (showedResCor != _config.resizeCorner) ret = true;
+    oldBool = _config.resizeCorner;
+    _config.resizeCorner = settings.value("ResizeCorner", false).toBool();
+    if (oldBool != _config.resizeCorner) ret = true;
 
-   Gradients::Type oldgradient = gradient_[0];
-   gradient_[0] = Gradients::fromInfo(settings.value("InactiveGradient", 0).toInt());
-   if (oldgradient != gradient_[0]) ret = true;
+    oldgradient = _config.gradient[0][0];
+    _config.gradient[0][0] = (Gradients::Type)(settings.value("InactiveGradient", 0).toInt());
+    if (oldgradient != _config.gradient[0][0]) ret = true;
 
-   oldgradient = gradient_[1];
-   gradient_[1] = Gradients::fromInfo(settings.value("ActiveGradient", 2).toInt());
-   if (oldgradient != gradient_[1]) ret = true;
+    oldgradient = _config.gradient[0][1];
+    _config.gradient[0][1] = (Gradients::Type)(settings.value("ActiveGradient", 2).toInt());
+    if (oldgradient != _config.gradient[0][1]) ret = true;
 
-   QString oldmultiorder = multiString(multiButton_);
-   QString newmultiorder = settings.value("MultiButtonOrder", "MHFBSLE!").toString();
-   if (oldmultiorder != newmultiorder) {
-      ret = true;
-      multiVector(newmultiorder, multiButton_);
-   }
+    oldgradient = _config.gradient[1][0];
+    _config.gradient[1][0] = Gradients::fromInfo(settings.value("InactiveGradient2", 0).toInt());
+    if (oldgradient != _config.gradient[1][0]) ret = true;
+    
+    oldgradient = _config.gradient[1][1];
+    _config.gradient[1][1] = Gradients::fromInfo(settings.value("ActiveGradient2", 0).toInt());
+    if (oldgradient != _config.gradient[1][1]) ret = true;
 
-   int oldbordersize = borderSize_;
-   switch (options()->preferredBorderSize(this)) {
-      case BorderTiny: borderSize_ = 0; break;
-      default:
-      case BorderNormal: borderSize_ = 6; break;
-      case BorderLarge: borderSize_ = 8; break;
-      case BorderVeryLarge: borderSize_ = 11; break;
-      case BorderHuge: borderSize_ = 16; break;
-      case BorderVeryHuge: borderSize_ = 20; break;
-      case BorderOversized: borderSize_ = 30; break;
-   }
-   if (oldbordersize != borderSize_) ret = true;
+    QString oldmultiorder = multiString(multiButton_);
+    QString newmultiorder = settings.value("MultiButtonOrder", "MHFBSLE!").toString();
+    if (oldmultiorder != newmultiorder)
+    {
+        ret = true;
+        multiVector(newmultiorder, multiButton_);
+    }
 
-   int oldtitlesize = titleSize_[1];
-   QFontMetrics fm(options()->font());
-   titleSize_[1] = fm.height() + 2;
-   if (oldtitlesize != titleSize_[1]) ret = true;
-   oldtitlesize = titleSize_[0];
-   titleSize_[0] = qMax(titleSize_[1] + 2, borderSize_);
-   if (oldtitlesize != titleSize_[0]) ret = true;
+    int oldbordersize = borderSize_;
+    switch (options()->preferredBorderSize(this))
+    {
+        case BorderTiny: borderSize_ = 0; break;
+        default:
+        case BorderNormal: borderSize_ = 6; break;
+        case BorderLarge: borderSize_ = 8; break;
+        case BorderVeryLarge: borderSize_ = 11; break;
+        case BorderHuge: borderSize_ = 16; break;
+        case BorderVeryHuge: borderSize_ = 20; break;
+        case BorderOversized: borderSize_ = 30; break;
+    }
+    if (oldbordersize != borderSize_) ret = true;
 
-   if (buttonSize_ != titleSize_[1]) {
-      buttonSize_ = titleSize_[1]-4; // for the moment
-      Button::init( buttonSize_, options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
-                    settings.value("IAmMyLittleSister", false).toBool());
-   }
+    int oldtitlesize = titleSize_[1];
+    QFontMetrics fm(options()->font());
+    titleSize_[1] = fm.height() + 2;
+    if (oldtitlesize != titleSize_[1]) ret = true;
+    oldtitlesize = titleSize_[0];
+    titleSize_[0] = qMax(titleSize_[1] + 2, borderSize_);
+    if (oldtitlesize != titleSize_[0]) ret = true;
 
-   return ret;
+    if (buttonSize_ != titleSize_[1])
+    {
+        buttonSize_ = titleSize_[1]-4; // for the moment
+        Button::init( buttonSize_, options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
+                                                settings.value("IAmMyLittleSister", false).toBool());
+    }
+
+    return ret;
 }
 
 class Header : public QLabel

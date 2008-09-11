@@ -478,7 +478,7 @@ Client::repaint(QPainter &p)
         case 1:
         {   // scanlines, fallback
             p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
-            const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, Gradients::Button);
+            const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, config()->gradient[0][isActive()]);
             p.drawTiledPixmap(top, fill);
             p.setPen(Colors::mid(bg, Qt::black,6,1));
             p.drawLine(0,titleSize-1,width(),titleSize-1);
@@ -505,10 +505,12 @@ Client::repaint(QPainter &p)
     if (isShade())
     {   // splitter
         QColor bg2 = color(ColorTitleBlend, isActive());
-        p.setPen(Colors::mid(bg, Qt::black,4,1));
-        p.drawLine(8, titleSize, width()-8, titleSize);
-        p.setPen(Colors::mid(bg, Qt::white,2,1));
-        p.drawLine(8, titleSize+1, width()-8, titleSize+1);
+        p.setPen(Colors::mid(bg, Qt::black, 3, 1));
+        int y = titleSize-2;
+        p.drawLine(8, y, width()-8, y);
+        ++y;
+        p.setPen(Colors::mid(bg, Qt::white, 2, 1));
+        p.drawLine(8, y, width()-8, y);
     }
 
     // title ==============
@@ -581,8 +583,8 @@ Client::reset(unsigned long changed)
 
     if (changed & SettingDecoration)
     {
-        gType[0] = _factory->gradient(0);
-        gType[1] = _factory->gradient(1);
+        gType[0] = config()->gradient[1][0];
+        gType[1] = config()->gradient[1][1];
         changed |= SettingColors;
     }
 

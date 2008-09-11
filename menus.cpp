@@ -45,17 +45,18 @@ void
 BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(mbi, MenuItem);
-    drawMenuBarBg(option, painter, widget);
 
-#if 0 // was necessary once, not anymore?!
-    if (mbi->menuRect.height() > mbi->rect.height()) {
+#if 1 // was necessary once, not anymore?!
+    if (mbi->menuRect.height() > mbi->rect.height())
+    {
         QStyleOptionMenuItem copy = *mbi;
         copy.rect.setHeight(mbi->menuRect.height());
         drawMenuBarBg( &copy, painter, widget );
     }
     else
-        drawMenuBarBg(option, painter, widget);
 #endif
+        drawMenuBarBg(option, painter, widget);
+
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
     ROLES(menu.active);
 
@@ -207,7 +208,7 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
             bg = Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 1, 2);
             fg = COLOR(ROLE[Bg]);
         }
-        if (config.menu.itemGradient != Gradients::None)
+        if (config.menu.itemGradient == Gradients::Glass || config.menu.itemGradient == Gradients::Gloss)
             Tile::setShape(Tile::Top|Tile::Bottom|Tile::Center);
         masks.rect[round_].render( r, painter, sunken ? Gradients::Sunken : config.menu.itemGradient, Qt::Vertical, bg);
         if (sunken && config.menu.itemSunken)

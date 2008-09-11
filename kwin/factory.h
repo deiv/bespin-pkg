@@ -44,6 +44,7 @@ class Client;
 typedef struct
 {
     bool forceUserColors, trimmCaption, resizeCorner;
+    Gradients::Type gradient[2][2];
 } Config;
 
 class Factory : public QObject, public KDecorationFactory
@@ -66,7 +67,6 @@ public:
 //    virtual void checkRequirements( KDecorationProvides* provides );
     inline static int titleSize(bool minimal = false) {return titleSize_[minimal];}
     inline static const Config *config() { return &_config; }
-    inline static Gradients::Type gradient(bool active) { return gradient_[active]; }
     bool hasDecoInfo(qint64 pid, uint &bgColors, uint &activeColors, uint &inactiveColors);
     inline static const QVector<Button::Type> &multiButtons() { return multiButton_; }
     void showDesktopMenu(const QPoint &p, Client *client);
@@ -86,7 +86,6 @@ private:
     QMap<qint64, DecoInfo*> _decoInfos;
     static bool initialized_;
     static int buttonSize_, borderSize_, titleSize_[2];
-    static Gradients::Type gradient_[2];
     static QVector<Button::Type> multiButton_;
     static Config _config;
     static QMenu *desktopMenu_, *_windowList;
