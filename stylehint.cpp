@@ -17,6 +17,7 @@
  */
 
 // #include <QComboBox>
+#include <QtDebug>
 #include <QEvent>
 #include <QFrame>
 #include <QMenuBar>

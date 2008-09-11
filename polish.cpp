@@ -20,6 +20,7 @@
 // #include <QAbstractScrollArea>
 // #include <QAbstractSlider>
 #include <QApplication>
+#include <QtDebug>
 #include <QLayout>
 #include <QMenu>
 #include <QMenuBar>

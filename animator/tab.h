@@ -27,10 +27,7 @@ namespace Animator {
 
 enum Transition {Jump = 0, ScanlineBlend, SlideIn, SlideOut,
 RollIn, RollOut, OpenVertically, CloseVertically, OpenHorizontally,
-CloseHorizontally
-#ifndef QT_NO_XRENDER
-, CrossFade
-#endif
+CloseHorizontally, CrossFade
 };
 
 class Curtain;
