@@ -440,6 +440,14 @@ BespinStyle::polish( QWidget * widget )
         {
             if (widget->inherits("QToolButton"))
             {
+                if (config.hack.killThrobber && widget->inherits("KAnimatedButton") && widget->parentWidget())
+                if (QMenuBar *mbar = qobject_cast<QMenuBar*>(widget->parentWidget()))
+                {   // this is konquerors throbber...
+                    widget->hide();
+                    widget->setParent(mbar->parentWidget());
+                    mbar->setCornerWidget(NULL);
+                }
+
                 widget->setBackgroundRole(QPalette::Window);
                 widget->setForegroundRole(QPalette::WindowText);
             }

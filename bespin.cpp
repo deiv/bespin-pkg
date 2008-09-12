@@ -393,33 +393,40 @@ BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
 #endif
     }
     else
+    {
+//         qDebug() << "BESPIN, unsupported primitive:" << pe << widget;
         QCommonStyle::drawPrimitive( pe, option, painter, widget );
+    }
 }
 
 void
 BespinStyle::drawControl ( ControlElement element, const QStyleOption * option,
                            QPainter * painter, const QWidget * widget) const
 {
-   Q_ASSERT(option);
-   Q_ASSERT(painter);
-   if (element < N_CE && controlRoutine[element])
-      (this->*controlRoutine[element])(option, painter, widget);
-   else
-      QCommonStyle::drawControl( element, option, painter, widget );
+    Q_ASSERT(option);
+    Q_ASSERT(painter);
+    if (element < N_CE && controlRoutine[element])
+        (this->*controlRoutine[element])(option, painter, widget);
+    else
+    {
+//         qDebug() << "BESPIN, unsupported control:" << element << widget;
+        QCommonStyle::drawControl( element, option, painter, widget );
+    }
 }
 
 void
-BespinStyle::drawComplexControl ( ComplexControl control,
-                                  const QStyleOptionComplex * option,
-                                  QPainter * painter,
-                                  const QWidget * widget) const
+BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptionComplex * option,
+                                  QPainter * painter, const QWidget * widget) const
 {
-   Q_ASSERT(option);
-   Q_ASSERT(painter);
-   if (control < N_CC && complexRoutine[control])
-      (this->*complexRoutine[control])(option, painter, widget);
-   else
-      QCommonStyle::drawComplexControl( control, option, painter, widget );
+    Q_ASSERT(option);
+    Q_ASSERT(painter);
+    if (control < N_CC && complexRoutine[control])
+        (this->*complexRoutine[control])(option, painter, widget);
+    else
+    {
+//         qDebug() << "BESPIN, unsupported control:" << control << widget;
+        QCommonStyle::drawComplexControl( control, option, painter, widget );
+    }
 }
 
 int

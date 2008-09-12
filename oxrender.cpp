@@ -158,20 +158,23 @@ OXRender::fade(const QPixmap &pix, double percent)
     return newPix;
 }
 
+// adapted from Qt, because this really sucks ;)
+
 void
 OXRender::setColor(XRenderColor &xc, double r, double g, double b, double a)
 {
-    xc.red = ushort(r * 0xffff);
-    xc.green = ushort(g * 0xffff);
-    xc.blue = ushort(b * 0xffff);
-    xc.alpha = ushort(a * 0xffff);
+    setColor(xc, QColor(r*0xff, g*0xff, b*0xff, a*0xff));
 }
 
 void
 OXRender::setColor(XRenderColor &xc, QColor qc)
 {
-    xc.red = qc.red()*0x101; xc.green = qc.green()*0x101;
-    xc.blue = qc.blue()*0x101; xc.alpha = qc.alpha()*0x101;
+    uint a, r, g, b;
+    qc.getRgb((int*)&r, (int*)&g, (int*)&b, (int*)&a);
+    a = xc.alpha = (a | a << 8);
+    xc.red   = (r | r << 8) * a / 0x10000;
+    xc.green = (g | g << 8) * a / 0x10000;
+    xc.blue  = (b | b << 8) * a / 0x10000;
 }
 # if 0
 void OXRender::setGradient(XLinearGradient &lg, QPoint p1, QPoint p2) {

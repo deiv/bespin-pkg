@@ -171,8 +171,12 @@ Set::render(const QRect &r, QPainter *p) const
 #define ADJUST_ALPHA(_PIX_) filledPix = OXRender::applyAlpha(filledPix, _PIX_)
 #define TINT filledPix = OXRender::tint(*tile, *_texColor);
 #else
-#warning no XRender - performance will suffer!
-#define ADJUST_ALPHA(_PIX_) filledPix.setAlphaChannel(_PIX_)
+#define ADJUST_ALPHA(_PIX_) \
+pixPainter.begin(&filledPix);\
+pixPainter.setCompositionMode(QPainter::CompositionMode_DestinationIn);\
+pixPainter.drawPixmap(0,0, _PIX_);\
+pixPainter.end();
+
 #define TINT { \
     filledPix.fill(Qt::transparent); \
     pixPainter.begin(&filledPix);\

@@ -276,6 +276,14 @@ BespinStyle::drawTree(const QStyleOptionComplex *option, QPainter *painter, cons
     int c;
     int dotoffset = 0;
     QPolygon dotlines;
+
+    QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
+    if (widget)
+    { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
+    QColor  cLine = Colors::mid( COLOR(bg), COLOR(fg), 40, 1),
+            cIndi = Colors::mid( COLOR(bg), COLOR(fg), 6, 1),
+            cIndiOpen = Colors::mid( COLOR(bg), COLOR(fg) );
+            
     if ((lv->activeSubControls & SC_All) && (lv->subControls & SC_Q3ListViewExpand))
     {
         c = 2;
@@ -301,6 +309,7 @@ BespinStyle::drawTree(const QStyleOptionComplex *option, QPainter *painter, cons
         }
         int bx = lv->rect.width() / 2;
 
+        painter->setPen(Qt::NoPen);
         while (i < lv->items.size() && y < lv->rect.height())
         {   // paint stuff in the magical area
             QStyleOptionQ3ListViewItem child = lv->items.at(i);
@@ -317,21 +326,37 @@ BespinStyle::drawTree(const QStyleOptionComplex *option, QPainter *painter, cons
                 linebot = y + lh / 2;
                 if (child.features & QStyleOptionQ3ListViewItem::Expandable ||
                     child.childCount > 0 && child.height > 0)
-                {   // needs a box
-                    painter->setPen(lv->palette.mid().color());
-                    painter->drawRect(bx - 4, linebot - 4, 8, 8);
-                    // plus or minus
-                    painter->setPen(lv->palette.text().color());
-                    painter->drawLine(bx - 2, linebot, bx + 2, linebot);
-                    if (!(child.state & State_Open))
-                        painter->drawLine(bx, linebot - 2, bx, linebot + 2);
+                {
+                    if (child.state & State_Open)
+                    {
+                        if (child.state & State_Selected)
+                            painter->setBrush(FCOLOR(HighlightedText));
+                        else
+                            painter->setBrush(cIndiOpen);
+                        if (option->direction == Qt::RightToLeft)
+                            drawSolidArrow(Navi::SW, QRect(bx - 4, linebot - 4, 9, 9), painter);
+                        else
+                            drawSolidArrow(Navi::SE, QRect(bx - 4, linebot - 4, 9, 9), painter);
+                    }
+                    else
+                    {
+                        if (child.state & State_Selected)
+                            painter->setBrush(FCOLOR(HighlightedText));
+                        else
+                            painter->setBrush(cIndi);
+                        if (option->direction == Qt::RightToLeft)
+                            drawArrow(Navi::W, QRect(bx - 4, linebot - 4, 9, 9), painter);
+                        else
+                            drawArrow(Navi::E, QRect(bx - 4, linebot - 4, 9, 9), painter);
+                    }
                     // dotlinery
-                    painter->setPen(lv->palette.mid().color());
+                    painter->setPen(cLine);
                     dotlines[c++] = QPoint(bx, linetop);
-                    dotlines[c++] = QPoint(bx, linebot - 4);
+                    dotlines[c++] = QPoint(bx, linebot - 6);
                     dotlines[c++] = QPoint(bx + 5, linebot);
                     dotlines[c++] = QPoint(lv->rect.width(), linebot);
-                    linetop = linebot + 5;
+                    linetop = linebot + 11;
+                    painter->setPen(Qt::NoPen);
                 }
                 else
                 {   // just dotlinery
@@ -349,12 +374,13 @@ BespinStyle::drawTree(const QStyleOptionComplex *option, QPainter *painter, cons
         if (i < lv->items.size())
             linebot = lv->rect.height();
 
-        if (linetop < linebot) {
+        if (linetop < linebot)
+        {
             dotlines[c++] = QPoint(bx, linetop);
             dotlines[c++] = QPoint(bx, linebot);
         }
     }
-    painter->setPen(lv->palette.text().color());
+    painter->setPen(cLine);
 
     int line; // index into dotlines
     if (lv->subControls & SC_Q3ListViewBranch)

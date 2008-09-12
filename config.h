@@ -57,7 +57,7 @@ typedef struct Config
 
     struct hack
     {
-        bool messages, KHTMLView, treeViews, windowMovement, krunner;
+        bool messages, KHTMLView, treeViews, windowMovement, krunner, killThrobber;
     } hack;
    
     struct input

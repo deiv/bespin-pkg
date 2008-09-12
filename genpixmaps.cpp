@@ -14,27 +14,6 @@ extern Config config;
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 // #define fillRect2(_R_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_R_)
 
-#ifdef QT_NO_XRENDER
-// simply sets the pixmaps alpha value to all rgb (i.e. grey) channels
-// TODO: maybe adjust rgb to psychovisual values? (qGrey() inversion)
-static QPixmap
-rgbFromAlpha(const QPixmap &pix)
-{
-    QImage img = pix.toImage();
-    unsigned int *data = ( unsigned int * ) img.bits();
-    int total = img.width() * img.height(), alpha;
-    for ( int i = 0 ; i < total ; ++i )
-    {
-        alpha = qAlpha(data[i]);
-        data[i] = qRgba( alpha, alpha, alpha, 255 );
-    }
-    return QPixmap::fromImage(img);
-}
-#define UPDATE_COLORS(_PIX_) _PIX_ = rgbFromAlpha(_PIX_);
-#else
-#define UPDATE_COLORS(_PIX_) //
-#endif
-
 #define SCALE(_N_) lround(_N_*config.scale)
 
 #define EMPTY_PIX(_W_, _H_) \
@@ -91,7 +70,6 @@ roundMask(int size)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
     p.drawEllipse(pix.rect()); p.end();
-    UPDATE_COLORS(pix);
     return pix;
 }
 
@@ -100,7 +78,6 @@ roundedMask(int size, int factor)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
     p.drawRoundedRect(pix.rect(),factor,factor,Qt::RelativeSize); p.end();
-    UPDATE_COLORS(pix);
     return pix;
 }
 

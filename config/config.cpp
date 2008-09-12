@@ -369,9 +369,9 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 
     handleSettings(ui.hackMessages, HACK_MESSAGES);
     setContextHelp(ui.btnRole, "<b>Messageboxes</b><hr>\
-                    Overwrites the painting routines of QMessageBoxes for a custom appereance.<br>\
-                    Also removes the Window decoration but allows you to drag around the window by\
-                    clicking anywhere.");
+    Overwrites the painting routines of QMessageBoxes for a custom appereance.<br>\
+    Also removes the Window decoration but allows you to drag around the window by\
+    clicking anywhere.");
 
     handleSettings(ui.hackKrunner, HACK_KRUNNER);
     setContextHelp(ui.btnRole, "<b>KRunner</b><hr>\
@@ -379,39 +379,46 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 
     handleSettings(ui.hackKHtml, HACK_KHTMLVIEW);
     setContextHelp(ui.hackKHtml, "<b>Konqueror HTML window</b><hr>\
-                    By default, Konquerors HTML view has no frame around, but you may force a sunken\
-                    frame here.<br>\
-                    Notice that this may have a bad impact on scroll performance, especially if you\
-                    lack HW alpha blending.");
+    By default, Konquerors HTML view has no frame around, but you may force a sunken\
+    frame here.<br>\
+    Notice that this may have a bad impact on scroll performance, especially if you\
+    lack HW alpha blending.");
+
     handleSettings(ui.hackWindowMove, HACK_WINDOWMOVE);
     setContextHelp(ui.hackWindowMove, "<b>Easy Window Draging</b><hr>\
-                    Usually you'll have to hit the titlebar in order to drag around a window.<br>\
-                    This one allows you to drag the window by clicking many empty spaces.<br>\
-                    Currently supported items:<br>\
-                    - Dialogs<br>\
-                    - Menubars<br>\
-                    - Toolbars (including disabled buttons)<br>\
-                    - Docks<br>\
-                    - Groupboxers<br>\
-                    - Mainwindows<br>\
-                    - Statusbars<br>\
-                    - SMPlayer/DragonPlayer Video areas<br>");
+    Usually you'll have to hit the titlebar in order to drag around a window.<br>\
+    This one allows you to drag the window by clicking many empty spaces.<br>\
+    Currently supported items:<br>\
+    - Dialogs<br>\
+    - Menubars<br>\
+    - Toolbars (including disabled buttons)<br>\
+    - Docks<br>\
+    - Groupboxers<br>\
+    - Mainwindows<br>\
+    - Statusbars<br>\
+    - SMPlayer/DragonPlayer Video areas<br>");
 
+    handleSettings(ui.killThrobber, HACK_THROBBER);
+    setContextHelp(ui.killThrobber, "<b>Kill JarJar, err... Throbber</b><hr>\
+    You see the nasty rotating thing in the top right of konqueror, now even oversizing the menubar?\
+    Click here and you won't anymore >-P" );
+    
     handleSettings(ui.hackTreeViews, HACK_TREEVIEWS);
     setContextHelp(ui.hackTreeViews, "<b>Animate TreeViwes</b><hr>\
-                    This is a plain vanilla Qt feature, but must be activated by developers for each\
-                    treeview in order to be used - can be cute, can be annoying: choose by yourself<br>\
-                    This way it's activated globally." );
+    This is a plain vanilla Qt feature, but must be activated by developers for each\
+    treeview in order to be used - can be cute, can be annoying: choose by yourself<br>\
+    This way it's activated globally." );
 
     /** setContextHelp(.) attaches a context help string to a widget on your form */
     setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
-                    The default and the hovered color of a button.<br>\
-                    <b>Notice:</b> It's strongly suggested to select \"Button\" to\
-                    (at least and best excatly) one of the states!");
+    The default and the hovered color of a button.<br>\
+    <b>Notice:</b> It's strongly suggested to select \"Button\" to\
+    (at least and best excatly) one of the states!");
+
     setContextHelp(ui.btnActiveRole, "<b>Button Colors</b><hr>\
-                    The default and the hovered color of a button.<br>\
-                    <b>Notice:</b> It's strongly suggested to select \"Button\" to\
-                    (at least and best excatly) one of the states!");
+    The default and the hovered color of a button.<br>\
+    <b>Notice:</b> It's strongly suggested to select \"Button\" to\
+    (at least and best excatly) one of the states!");
 
     strList <<
         "<b>Plain (color)</b><hr>Select if you have a really lousy \

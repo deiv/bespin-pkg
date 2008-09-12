@@ -177,21 +177,27 @@ Button::init(int sz, bool leftMenu, bool fColors)
     shape[Close].addEllipse(-s2,-s2,sz,sz);
     shape[Close].addEllipse(-s4,-s4,s2,s2);
     shape[Close].addEllipse(s3-s2,s3-s2,s3,s3);
-    
-    shape[Min].addEllipse(-s2,-s2,sz,sz);
-    rubber.addEllipse(-s4,-s2,sz-s4+1,sz-s4+1);
+
+    shape[Min].moveTo(0,0);
+    shape[Min].arcTo(-s2,-s2,sz,sz, 135, 180);
+    rubber.moveTo(0,0);
+    rubber.arcTo(-s4,-s4,s2,s2, 135, 180);
     shape[Min] = shape[Min].subtracted(rubber);
     rubber = QPainterPath();
     shape[Min].addEllipse(s2-s3,-s2,s3,s3);
     
-    shape[Max].addEllipse(-s2,-s2,sz,sz);
-    rubber.addEllipse(-s2,-(s4+1),sz-s4+1,sz-s4+1);
+    shape[Max].moveTo(0,0);
+    shape[Max].arcTo(-s2,-s2,sz,sz, -45, 180);
+    rubber.moveTo(0,0);
+    rubber.arcTo(-s4,-s4,s2,s2, -45, 180);
     shape[Max] = shape[Max].subtracted(rubber);
     rubber = QPainterPath();
     shape[Max].addEllipse(-s2,s2-s3,s3,s3);
-    
-    shape[Restore].addEllipse(-s2,-s2,sz,sz);
-    rubber.addEllipse(-s2,-s2,sz-s4,sz-s4);
+
+    shape[Restore].moveTo(0,0);
+    shape[Restore].arcTo(-s2,-s2,sz,sz, -135, 180);
+    rubber.moveTo(0,0);
+    rubber.arcTo(-s4,-s4,s2,s2, -135, 180);
     shape[Restore] = shape[Restore].subtracted(rubber);
     rubber = QPainterPath();
     shape[Restore].addEllipse(-s2,-s2,s3,s3);

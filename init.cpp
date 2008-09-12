@@ -198,6 +198,7 @@ BespinStyle::readSettings(const QSettings* settings)
     config.hack.krunner= readBool(HACK_KRUNNER);
     config.hack.treeViews = readBool(HACK_TREEVIEWS);
     config.hack.windowMovement = readBool(HACK_WINDOWMOVE);
+    config.hack.killThrobber = readBool(HACK_THROBBER);
 
     // PW Echo Char ===========================
     config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
