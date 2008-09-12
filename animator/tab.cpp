@@ -44,6 +44,8 @@ SET_FPS(Tab)
 
 #undef ANIMATOR_IMPL
 
+// #define QT_NO_XRENDER
+
 static inline QAbstractScrollArea*
 scrollAncestor(QWidget *w, QWidget *root)
 {
@@ -58,11 +60,19 @@ scrollAncestor(QWidget *w, QWidget *root)
 // to get an idea about what the bg of out tabs looks like - seems as if we
 // need to paint it
 static QPixmap
-dumpBackground(QWidget *target, const QRect &r, const QStyle *style)
+dumpBackground(QWidget *target, const QRect &r, const QStyle *style
+#ifdef QT_NO_XRENDER
+, bool _32bit = false
+#endif
+)
 {
     if (!target) return QPixmap();
     QPoint zero(0,0);
     QPixmap pix(r.size());
+#ifdef QT_NO_XRENDER
+    if (_32bit)
+        pix.fill(Qt::transparent);
+#endif
     QWidgetList widgets; widgets << target;
     QWidget *w = target->parentWidget();
     while (w)
@@ -309,7 +319,11 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 
     // prepare the pixmaps we use to pretend the animation
     QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
+#ifdef QT_NO_XRENDER
+    tabPix[1] = dumpBackground(sw, contentsRect, qApp->style(), _transition == CrossFade);
+#else
     tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
+#endif
 
     if (clock.isNull())
     {
@@ -370,9 +384,17 @@ TabInfo::updatePixmaps(Transition transition, uint ms)
             // Heyhey... speed is ok now - at least better than setAlpha()...
             // not as fast as my solution, but not as specialised as well ;-P
             // important thing is that i can use it on other platforms!
-            QPainter p(&tabPix[2]);
-            p.setOpacity(quote);
+            QPixmap tmp = tabPix[1].copy();
+            tmp.fill(Qt::transparent);
+            QPainter p(&tmp);
             p.drawPixmap(0,0,tabPix[1]);
+            p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+            p.fillRect(tmp.rect(), QColor(0,0,0,255*quote));
+            p.end();
+            p.begin(&tabPix[2]);
+            p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+//             p.setOpacity(quote);
+            p.drawPixmap(0,0,tmp);
             p.end();
 #endif
             break;
