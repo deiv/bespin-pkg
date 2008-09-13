@@ -33,6 +33,8 @@ public:
     static QStringList colors(const QPalette &pal, QPalette::ColorGroup group);
     static bool load(const QString&);
     static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list);
+protected:
+    void changeEvent(QEvent *event);
 public slots:
     /** We'll reimplement the im/export functions to handle color settings as well*/
     void store();

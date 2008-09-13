@@ -104,6 +104,8 @@ BespinStyle::readSettings(const QSettings* settings)
                 !QCoreApplication::arguments().isEmpty())
                 cmd = QCoreApplication::arguments().at(0).section('/', -1);
             qPreset = iSettings->value(cmd, QString()).toString();
+            if (qPreset.isEmpty() && appType == GTK)
+                qPreset = iSettings->value("GTK", QString()).toString();
             iSettings->endGroup();
             iSettings->beginGroup("Style");
         }

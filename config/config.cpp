@@ -124,12 +124,12 @@ public:
 /** The Constructor - your first job! */
 Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(false)
 {
-   
     /** Setup the UI and geometry */
     ui.setupUi(this);
 
     /** Some special stuff */
-    ui.logo->setPixmap(QPixmap(":/bespin.png"));
+    QEvent event(QEvent::PaletteChange);
+    changeEvent(&event);
     ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
 
     const QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
@@ -426,8 +426,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 
         "<b>Scanlines</b><hr>Wanna Aqua feeling?" <<
 
-        "<b>Complex</b><hr>Several light gradients covering the whole window." <<
-
         "<b>Vertical Top/Bottom Gradient</b><hr>Simple gradient that brightens \
         on the upper and darkens on the lower end<br>(cheap, fallback suggestion 1)" <<
 
@@ -591,6 +589,35 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
         =========================================== */
 
     ui.sections->setCurrentIndex(0);
+}
+
+void
+Config::changeEvent(QEvent *event)
+{
+    if (event->type() != QEvent::PaletteChange)
+        return;
+    
+    const int s = 32;
+    QPixmap logo(s*4,s*4);
+    QPainterPath path;
+    path.moveTo(logo.rect().center());
+    path.arcTo(logo.rect(), 90, 270);
+    path.lineTo(logo.rect().right(), logo.rect().y()+4*s/3);
+    path.lineTo(logo.rect().right()-s, logo.rect().y()+4*s/3);
+    path.lineTo(logo.rect().center().x() + s/2, logo.rect().center().y());
+    path.lineTo(logo.rect().center());
+    path.closeSubpath();
+    path.addEllipse(logo.rect().right()-3*s/2, logo.rect().y(), s, s);
+    logo.fill(Qt::transparent);
+    QColor c = palette().color(foregroundRole());
+    c.setAlpha(180);
+    QPainter p(&logo);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setBrush(c);
+    p.setPen(Qt::NoPen);
+    p.drawPath(path);
+    p.end();
+    ui.logo->setPixmap(logo);
 }
 
 

@@ -95,6 +95,8 @@ BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, cons
         QColor c;
         if (appType == Plasma)
         {   // NOTICE: opaque Colors::mid() are too flickerious with several plasma bgs...
+            ROLE[Bg] = QPalette::WindowText;
+            ROLE[Fg] = QPalette::Window;
             c = COLOR(ROLE[Bg]);
             c.setAlpha(step*255/8);
         }

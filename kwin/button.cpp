@@ -178,26 +178,38 @@ Button::init(int sz, bool leftMenu, bool fColors)
     shape[Close].addEllipse(-s4,-s4,s2,s2);
     shape[Close].addEllipse(s3-s2,s3-s2,s3,s3);
 
-    shape[Min].moveTo(0,0);
-    shape[Min].arcTo(-s2,-s2,sz,sz, 135, 180);
-    rubber.moveTo(0,0);
-    rubber.arcTo(-s4,-s4,s2,s2, 135, 180);
+    QRect bigRect(-s2, -(sz+s2), 2*sz, 2*sz);
+    shape[Min].moveTo(bigRect.center());
+    shape[Min].arcTo(bigRect, 180, 90);
+    shape[Min].lineTo(bigRect.center());
+    bigRect.adjust(s4,s4,-s4,-s4);
+    rubber.moveTo(bigRect.center());
+    rubber.arcTo(bigRect, 180, 90);
+    rubber.lineTo(bigRect.center());
     shape[Min] = shape[Min].subtracted(rubber);
     rubber = QPainterPath();
     shape[Min].addEllipse(s2-s3,-s2,s3,s3);
-    
-    shape[Max].moveTo(0,0);
-    shape[Max].arcTo(-s2,-s2,sz,sz, -45, 180);
-    rubber.moveTo(0,0);
-    rubber.arcTo(-s4,-s4,s2,s2, -45, 180);
+
+    bigRect = QRect(-(sz+s2), -s2, 2*sz, 2*sz);
+    shape[Max].moveTo(bigRect.center());
+    shape[Max].arcTo(bigRect, 0, 90);
+    shape[Max].lineTo(bigRect.center());
+    bigRect.adjust(s4,s4,-s4,-s4);
+    rubber.moveTo(bigRect.center());
+    rubber.arcTo(bigRect, 0, 90);
+    rubber.lineTo(bigRect.center());
     shape[Max] = shape[Max].subtracted(rubber);
     rubber = QPainterPath();
     shape[Max].addEllipse(-s2,s2-s3,s3,s3);
 
-    shape[Restore].moveTo(0,0);
-    shape[Restore].arcTo(-s2,-s2,sz,sz, -135, 180);
-    rubber.moveTo(0,0);
-    rubber.arcTo(-s4,-s4,s2,s2, -135, 180);
+    bigRect = QRect(-(sz+s2), -(sz+s2), 2*sz, 2*sz);
+    shape[Restore].moveTo(bigRect.center());
+    shape[Restore].arcTo(bigRect, 0, -90);
+    shape[Restore].lineTo(bigRect.center());
+    bigRect.adjust(s4,s4,-s4,-s4);
+    rubber.moveTo(bigRect.center());
+    rubber.arcTo(bigRect, 0, -90);
+    rubber.lineTo(bigRect.center());
     shape[Restore] = shape[Restore].subtracted(rubber);
     rubber = QPainterPath();
     shape[Restore].addEllipse(-s2,-s2,s3,s3);

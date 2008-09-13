@@ -574,50 +574,57 @@ swapPalette(QWidget *widget, BespinStyle *style)
     QMap<QWidget*, QString> shits;
     QList<QWidget*> kids = widget->findChildren<QWidget*>();
     kids.append(widget);
+
+    QPalette pal;
+    QPalette::ColorGroup group;
     foreach (QWidget *kid, kids)
-    {   // first gather all styleshitted widgets...
-        if (!kid->styleSheet().isEmpty())
-        {
+    {
+        if (kid->testAttribute(Qt::WA_StyleSheet))
+        {   // first get rid of shit
             shits.insert(kid, kid->styleSheet());
-            // and get rid of shit
             kid->setStyleSheet(QString());
         }
-    }
-    // now swap the palette ----------------
-    QPalette pal(widget->palette());
-    QPalette::ColorGroup group;
-    for (int i = 0; i < 3; ++i)
-    {
-        group = groups[i];
-        QColor h = pal.color(group, QPalette::WindowText);
-        pal.setColor(group, QPalette::WindowText, pal.color(group, QPalette::Window));
-        pal.setColor(group, QPalette::Window, h);
+        
+        // now swap the palette ----------------
+        if (kid->testAttribute(Qt::WA_SetPalette) || kid == widget)
+        {
+            pal = kid->palette();
+            for (int i = 0; i < 3; ++i)
+            {
+                group = groups[i];
+                QColor h = pal.color(group, QPalette::WindowText);
+                pal.setColor(group, QPalette::WindowText, pal.color(group, QPalette::Window));
+                pal.setColor(group, QPalette::Window, h);
 
-//         h = pal.color(group, QPalette::Text);
-//         pal.setColor(group, QPalette::Text, pal.color(group, QPalette::Base));
-//         pal.setColor(group, QPalette::Base, h);
+                h = pal.color(group, QPalette::Text);
+                pal.setColor(group, QPalette::Text, pal.color(group, QPalette::Base));
+                pal.setColor(group, QPalette::Base, h);
 
-        h = pal.color(group, QPalette::Button);
-        pal.setColor(group, QPalette::Button, pal.color(group, QPalette::ButtonText));
-        pal.setColor(group, QPalette::ButtonText, h);
+                h = pal.color(group, QPalette::Button);
+                pal.setColor(group, QPalette::Button, pal.color(group, QPalette::ButtonText));
+                pal.setColor(group, QPalette::ButtonText, h);
+            }
+            style->polish(pal);
+            kid->setPalette(pal);
+        }
     }
-    style->polish(pal);
 
     // this is funny: style shits rely on QApplication::palette() (nice trick, TrottelTech... again)
     // so to apply them with the proper color, we need to change the apps palette to the swapped one,
     if (!shits.isEmpty())
     {
         QPalette appPal = QApplication::palette();
-        QApplication::setPalette(pal);
         // reapply the shits
         QMap<QWidget*, QString>::const_iterator shit = shits.constBegin();
         while (shit != shits.constEnd())
-            { shit.key()->setStyleSheet(shit.value()); ++shit; }
+        {
+            QApplication::setPalette(shit.key()->palette());
+            shit.key()->setStyleSheet(shit.value());
+            ++shit;
+        }
         // reset the apps palette
         QApplication::setPalette(appPal);
     }
-    // and finally apply the swapped palette to the widget... great ;-P
-    widget->setPalette(pal);
 }
 
 static QMenuBar*

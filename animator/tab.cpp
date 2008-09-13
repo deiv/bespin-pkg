@@ -381,20 +381,17 @@ TabInfo::updatePixmaps(Transition transition, uint ms)
 #ifndef QT_NO_XRENDER
             OXRender::blend(tabPix[1], tabPix[2], quote);
 #else
-            // Heyhey... speed is ok now - at least better than setAlpha()...
+            // Heyhey... speed is ok now - at least better than setAlpha() and setOpacity()...
             // not as fast as my solution, but not as specialised as well ;-P
             // important thing is that i can use it on other platforms!
             QPixmap tmp = tabPix[1].copy();
-            tmp.fill(Qt::transparent);
             QPainter p(&tmp);
-            p.drawPixmap(0,0,tabPix[1]);
-            p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-            p.fillRect(tmp.rect(), QColor(0,0,0,255*quote));
+                p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+                p.fillRect(tmp.rect(), QColor(0,0,0,255*quote));
             p.end();
             p.begin(&tabPix[2]);
-            p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-//             p.setOpacity(quote);
-            p.drawPixmap(0,0,tmp);
+                p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+                p.drawPixmap(0,0,tmp);
             p.end();
 #endif
             break;

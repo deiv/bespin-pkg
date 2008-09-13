@@ -108,24 +108,26 @@ XBar::init()
 void
 XBar::updatePalette()
 {
-   QColor fg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::TextColor);
-   QColor bg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::BackgroundColor);
-   QPalette pal(fg, bg, Qt::white, Qt::black, Qt::gray, fg, fg, bg, bg );
-   pal.setColor(QPalette::ButtonText, fg);
-   setPalette(pal);
-   d.taskbar->setPalette(pal);
-   foreach (MenuBar *menu, d.menus)
-      menu->setPalette(pal);
+    QColor fg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::TextColor);
+    QColor bg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::BackgroundColor);
+    QPalette pal(fg, bg, Qt::white, Qt::black, Qt::gray, fg, fg, bg, bg );
+    pal.setColor(QPalette::ButtonText, fg);
+    setPalette(pal);
+    d.taskbar->setPalette(pal);
+    foreach (MenuBar *menu, d.menus)
+        menu->setPalette(pal);
 }
 
 void
-XBar::activateWin() {
-   if (QAction *act = qobject_cast<QAction*>(sender())) {
-      bool ok;
-      int id = act->data().toUInt(&ok);
-      if (ok)
-         KWindowSystem::activateWindow( id );
-   }
+XBar::activateWin()
+{
+    if (QAction *act = qobject_cast<QAction*>(sender()))
+    {
+        bool ok;
+        int id = act->data().toUInt(&ok);
+        if (ok)
+            KWindowSystem::activateWindow( id );
+    }
 }
 
 void

@@ -2,13 +2,9 @@
 project (bespin-config)
 
 set (bespin_config_SOURCES main.cpp bconfig.cpp config.cpp kdeini.cpp)
-qt4_add_resources (bespin_config_SOURCES config.qrc)
+qt4_add_resources (bespin_config_SOURCES)
 qt4_wrap_ui (bespin_config_FRM_HDRS config.ui uiDemo.ui)
 
-add_definitions (-DEXECUTABLE=1)
-if (KDE4_FOUND)
-   add_definitions (-DKDE_SUPPORT=1)
-endif (KDE4_FOUND)
 set (bespin_config_MOC_HDRS bconfig.h config.h dialog.h)
 qt4_wrap_cpp(bespin_config_MOC_SRCS ${bespin_config_MOC_HDRS})
 
@@ -20,11 +16,8 @@ install (TARGETS bespin DESTINATION bin)
 if (KDE4_FOUND)
 project (kstyle-bespin-config)
 set (kstyle_bespin_config_SOURCES bconfig.cpp config.cpp kdeini.cpp)
-qt4_add_resources (kstyle_bespin_config_SOURCES config.qrc)
+qt4_add_resources (kstyle_bespin_config_SOURCES)
 qt4_wrap_ui (kstyle_bespin_config_FRM_HDRS config.ui)
-
-remove_definitions (-DEXECUTABLE)
-add_definitions (-DEXECUTABLE=0 -DKDE_SUPPORT=1)
 
 # set (kstyle_bespin_config_MOC_HDRS bconfig.h config.h)
 # kde4_add_plugin automocs, so either use automoc or postcompile rename

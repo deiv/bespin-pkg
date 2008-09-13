@@ -190,7 +190,7 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
     if (widget)
         copy.palette = widget->palette();
 
-    copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
+    copy.rect.setBottom(copy.rect.bottom()-F(2));
 
     if (appType == GTK)
     {

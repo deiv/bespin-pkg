@@ -140,14 +140,22 @@ icon(QPixmap &pix, int step)
         lastIconPix = pix.cacheKey();
     }
     emptyIcon.fill(Qt::transparent);
+    float quote = step/6.0;
+    if (quote >= 1.0)
+        return scaledIcon;
 #ifndef QT_NO_XRENDER
     OXRender::composite(pix, NULL, emptyIcon, 0, 0, 0, 0, F(2), F(2), pix.width(), pix.height(), PictOpOver);
-    OXRender::blend(scaledIcon, emptyIcon, step/6.0);
+    OXRender::blend(scaledIcon, emptyIcon, quote);
 #else
-    QPainter p(&emptyIcon);
+    QPixmap tmp = scaledIcon.copy();
+    QPainter p(&tmp);
+    p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+    p.fillRect(tmp.rect(), QColor(0,0,0, quote*255.0));
+    p.end();
+    p.begin(&emptyIcon);
+    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
     p.drawPixmap(F(2), F(2), pix);
-    p.setOpacity(step/6.0);
-    p.drawPixmap(0, 0, scaledIcon);
+    p.drawPixmap(0, 0, tmp);
     p.end();
 #endif
     return emptyIcon;
