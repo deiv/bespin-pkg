@@ -305,7 +305,11 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
             drawArrow(Navi::S, rect, painter);
         }
         else
+        {
+            if (dir == Navi::N) // loooks unbalanced otherwise
+                rect.translate(0, -f1);
             drawArrow(dir, rect, painter);
+        }
         painter->restore();
     }
 }
