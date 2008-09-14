@@ -47,10 +47,8 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 using namespace Bespin;
 extern Config config;
 
-enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM };
-
 static Hacks *bespinHacks = new Hacks;
-static HackAppType *appType = 0;
+static Hacks::HackAppType *appType = 0;
 const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
 
@@ -191,8 +189,8 @@ isWindowDragWidget(QObject *o)
         o->inherits("QDockWidget") ||
 //         o->inherits("QMainWindow") || // this is mostly useles... PLUS triggers problems
 
-        ((*appType == SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
-        ((*appType == Dragon) && o->inherits(DragonVideoWidget)) ||
+        ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
+        ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
 
         o->inherits("QStatusBar") ||
         (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar")));

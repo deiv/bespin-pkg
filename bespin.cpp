@@ -323,16 +323,20 @@ BespinStyle::drawItemText(QPainter *painter, const QRect &rect, int alignment, c
             penDirty = true;
         }
         QColor c = painter->pen().color();
-        const int a = c.alpha();
-        c.setAlpha(a/2); painter->setPen(QPen(c, savedPen.widthF()));
+        c.setAlpha(c.alpha()/4 + 2);
+        painter->setPen(QPen(c, savedPen.widthF()));
         QRect r = rect;
-        r.adjust(-1,-1,-1,-1);
+        r.translate(-1,-1);
         painter->drawText(r, alignment, text);
-        r.adjust(2,2,2,2);
+        r.translate(0,2);
         painter->drawText(r, alignment, text);
-        c.setAlpha(3*a/4); painter->setPen(QPen(c, savedPen.widthF()));
+        r.translate(2,0);
+        painter->drawText(r, alignment, text);
+        r.translate(0,-2);
+        painter->drawText(r, alignment, text);
     }
-    painter->drawText(rect, alignment, text, boundingRect);
+    else
+        painter->drawText(rect, alignment, text, boundingRect);
     if (penDirty)
         painter->setPen(savedPen);
 }
@@ -570,13 +574,21 @@ QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalett
 static void
 swapPalette(QWidget *widget, BespinStyle *style)
 {
-    // could be soo easy, but there's styleshit...
+    // looks complex? IS!
+    // reason nr. 1: stylesheets. they're nasty and qt operates on the app palette here
+    // reason nr. 2: some idiot must have spread the idea that pal.setColor(backgroundRole(), Qt::transparent) is a great
+    // idea instead of just using setAutoFillBackground(true), preserving all colors and just not using them.
+    // hey, why not call qt to paint some nothing.... *grrrr* i'm angry... again!
+    
     QMap<QWidget*, QString> shits;
     QList<QWidget*> kids = widget->findChildren<QWidget*>();
-    kids.append(widget);
+    kids.prepend(widget);
 
     QPalette pal;
     QPalette::ColorGroup group;
+    QWidget *solidBase = 0;
+    QColor c1, c2; int a;
+    bool fixViewport = false;
     foreach (QWidget *kid, kids)
     {
         if (kid->testAttribute(Qt::WA_StyleSheet))
@@ -589,32 +601,72 @@ swapPalette(QWidget *widget, BespinStyle *style)
         if (kid->testAttribute(Qt::WA_SetPalette) || kid == widget)
         {
             pal = kid->palette();
+            solidBase = 0;
+            fixViewport = false;
+            
+            // NOTE: WORKAROUND for dolphin and probably others: see polish.cpp
+            if (QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(kid) )
+            if (QWidget *vp = area->viewport())
+            if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() == 0)
+                fixViewport = true;
+
+            if (fixViewport || kid->palette().color(QPalette::Active, QPalette::Window).alpha() == 0)
+            {
+                solidBase = kid;
+                while ((solidBase = solidBase->parentWidget()))
+                {
+                    if ((solidBase->autoFillBackground() &&
+                        solidBase->palette().color(QPalette::Active, solidBase->backgroundRole()).alpha() != 0) ||
+                        solidBase->isWindow())
+                        break;
+                }
+                if (solidBase->palette().brush(solidBase->backgroundRole()).style() > 1)
+                    solidBase = 0; // there's some pixmap or so - better do not swap colors atm.
+            }
+
             for (int i = 0; i < 3; ++i)
             {
                 group = groups[i];
-                QColor h = pal.color(group, QPalette::WindowText);
-                pal.setColor(group, QPalette::WindowText, pal.color(group, QPalette::Window));
-                pal.setColor(group, QPalette::Window, h);
+                
+                if (solidBase && !fixViewport) // changing bg color is useless and it's worthless to calculate the fg color
+                    pal.setColor(group, QPalette::WindowText, solidBase->palette().color(group, solidBase->foregroundRole()));
+                else
+                {
+                    c1 = pal.color(group, QPalette::Window);
+                    a = c1.alpha();
+                    c2 = pal.color(group, QPalette::WindowText);
+                    c1.setAlpha(c2.alpha());
+                    c2.setAlpha(a);
+                    pal.setColor(group, QPalette::Window, c2);
+                    pal.setColor(group, QPalette::WindowText, c1);
+                }
 
-                h = pal.color(group, QPalette::Text);
-                pal.setColor(group, QPalette::Text, pal.color(group, QPalette::Base));
-                pal.setColor(group, QPalette::Base, h);
+                c1 = pal.color(group, QPalette::Button);
+                a = c1.alpha();
+                c2 = pal.color(group, QPalette::ButtonText);
+                c1.setAlpha(c2.alpha());
+                c2.setAlpha(a);
+                pal.setColor(group, QPalette::Button, c2);
+                pal.setColor(group, QPalette::ButtonText, c1);
 
-                h = pal.color(group, QPalette::Button);
-                pal.setColor(group, QPalette::Button, pal.color(group, QPalette::ButtonText));
-                pal.setColor(group, QPalette::ButtonText, h);
+                if (solidBase && fixViewport)
+                {   // means we have a widget w/o background, don't swap colors, but set colors to solidBase
+                    // this is very much a WORKAROUND
+                    pal.setColor(group, QPalette::Text, solidBase->palette().color(group, solidBase->foregroundRole()));
+                }
             }
             style->polish(pal);
             kid->setPalette(pal);
+
         }
     }
 
     // this is funny: style shits rely on QApplication::palette() (nice trick, TrottelTech... again)
-    // so to apply them with the proper color, we need to change the apps palette to the swapped one,
+    // so to apply them with the proper color, we need to change the apps palette to the swapped one,...
     if (!shits.isEmpty())
     {
         QPalette appPal = QApplication::palette();
-        // reapply the shits
+        // ... reapply the shits...
         QMap<QWidget*, QString>::const_iterator shit = shits.constBegin();
         while (shit != shits.constEnd())
         {
@@ -622,7 +674,7 @@ swapPalette(QWidget *widget, BespinStyle *style)
             shit.key()->setStyleSheet(shit.value());
             ++shit;
         }
-        // reset the apps palette
+        // ... and reset the apps palette
         QApplication::setPalette(appPal);
     }
 }

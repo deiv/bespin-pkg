@@ -96,10 +96,10 @@ void BespinStyle::polish( QPalette &pal )
     QColor c = pal.color(QPalette::Active, QPalette::Background);
     if (config.bg.mode > Plain)
     {
-        int h,s,v;
-        c.getHsv(&h,&s,&v);
+        int h,s,v,a;
+        c.getHsv(&h,&s,&v,&a);
         if (v < 80) // very dark colors won't make nice backgrounds ;)
-            c.setHsv(h,s,80);
+            c.setHsv(h,s,80,a);
         pal.setColor( QPalette::Window, c );
     }
 

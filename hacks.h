@@ -30,9 +30,10 @@ class Hacks : public QObject
 {
    Q_OBJECT
 public:
-   bool eventFilter( QObject *, QEvent *);
-   static bool add(QWidget *w);
-   static void remove(QWidget *w);
+    enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM };
+    bool eventFilter( QObject *, QEvent *);
+    static bool add(QWidget *w);
+    static void remove(QWidget *w);
 };
 } // namespace
 #endif // BESPIN_HACKS_H

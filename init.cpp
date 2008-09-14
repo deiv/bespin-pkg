@@ -99,9 +99,9 @@ BespinStyle::readSettings(const QSettings* settings)
             iSettings = new QSettings("Bespin", "Style");
             iSettings->beginGroup("PresetApps");
             QString cmd = QCoreApplication::applicationName();
-            if (cmd.isEmpty() &&
-                !qApp->inherits("GreeterApp") && // KDM segfaults on QCoreApplication::arguments()...
-                !QCoreApplication::arguments().isEmpty())
+            if (appType == KDM)
+                cmd = "KDM"; // KDM segfaults on QCoreApplication::arguments()...
+            else if (cmd.isEmpty() && !QCoreApplication::arguments().isEmpty())
                 cmd = QCoreApplication::arguments().at(0).section('/', -1);
             qPreset = iSettings->value(cmd, QString()).toString();
             if (qPreset.isEmpty() && appType == GTK)
@@ -150,7 +150,7 @@ BespinStyle::readSettings(const QSettings* settings)
     if (config.bg.mode > BevelH) config.bg.mode = BevelV;
     config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
     config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
-    config.bg.modal.invert = readBool(BG_MODAL_INVERT);
+    config.bg.modal.invert = (appType != KDM) && readBool(BG_MODAL_INVERT);
     config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
     readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 
@@ -371,6 +371,8 @@ BespinStyle::init(const QSettings* settings)
     // various workarounds... ==========================
     if (getenv("GTK_QT_ENGINE_ACTIVE"))
         { appType = GTK; qWarning("BESPIN: Detected GKT+ application"); }
+    else if (qApp->inherits("GreeterApp"))
+        appType = KDM;
     else if (QCoreApplication::applicationName() == "plasma")
         appType = Plasma;
     else if (QCoreApplication::applicationName() == "kget")
