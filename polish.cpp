@@ -91,7 +91,7 @@ static QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.Bespin
 #undef PAL
 #define PAL pal
 
-void BespinStyle::polish( QPalette &pal )
+void BespinStyle::polish( QPalette &pal, bool onInit )
 {
     QColor c = pal.color(QPalette::Active, QPalette::Background);
     if (config.bg.mode > Plain)
@@ -111,23 +111,26 @@ void BespinStyle::polish( QPalette &pal )
     const QColor grey(highlightGray,highlightGray,highlightGray);
     pal.setColor(QPalette::Disabled, QPalette::Highlight, grey);
 
-    // dark, light & etc are tinted... no good:
-    pal.setColor(QPalette::Dark, QColor(70,70,70));
-    pal.setColor(QPalette::Mid, QColor(100,100,100));
-    pal.setColor(QPalette::Midlight, QColor(220,220,220));
-    pal.setColor(QPalette::Light, QColor(240,240,240));
+    if (onInit)
+    {
+        // dark, light & etc are tinted... no good:
+        pal.setColor(QPalette::Dark, QColor(70,70,70));
+        pal.setColor(QPalette::Mid, QColor(100,100,100));
+        pal.setColor(QPalette::Midlight, QColor(220,220,220));
+        pal.setColor(QPalette::Light, QColor(240,240,240));
 
-    // Link colors can not be set through qtconfig - and the colors suck
-    pal.setColor(QPalette::Link, mid(pal.color(QPalette::Active, QPalette::Text),
-                                     pal.color(QPalette::Active, QPalette::Highlight), 1, 8));
-    pal.setColor(QPalette::LinkVisited, mid(pal.color(QPalette::Active, QPalette::Text),
-                                            pal.color(QPalette::Active, QPalette::Highlight), 1, 4));
+        // Link colors can not be set through qtconfig - and the colors suck
+        pal.setColor(QPalette::Link, mid(pal.color(QPalette::Active, QPalette::Text),
+                                         pal.color(QPalette::Active, QPalette::Highlight), 1, 8));
+        pal.setColor(QPalette::LinkVisited, mid(pal.color(QPalette::Active, QPalette::Text),
+                                                pal.color(QPalette::Active, QPalette::Highlight), 1, 4));
 
 #if QT_VERSION >= 0x040400
-    // tooltip (NOTICE not configurable by qtconfig, kde can, let's see what we're gonna do on this...)
-    pal.setColor(QPalette::ToolTipBase, pal.color(QPalette::Active, config.bg.tooltip_role[Bg]));
-    pal.setColor(QPalette::ToolTipText, pal.color(QPalette::Active, config.bg.tooltip_role[Fg]));
+        // tooltip (NOTICE not configurable by qtconfig, kde can, let's see what we're gonna do on this...)
+        pal.setColor(QPalette::ToolTipBase, pal.color(QPalette::Active, config.bg.tooltip_role[Bg]));
+        pal.setColor(QPalette::ToolTipText, pal.color(QPalette::Active, config.bg.tooltip_role[Fg]));
 #endif
+    }
 
     // inactive palette
     if (config.fadeInactive)
@@ -153,6 +156,9 @@ void BespinStyle::polish( QPalette &pal )
                  mid(pal.color(QPalette::Disabled, QPalette::Base), pal.color(QPalette::Disabled, QPalette::Text),15,1));
 
     // more on tooltips... (we force some colors...)
+    if (!onInit)
+        return;
+
     QPalette toolPal = QToolTip::palette();
     const QColor bg = pal.color(config.bg.tooltip_role[Bg]);
     const QColor fg = pal.color(config.bg.tooltip_role[Fg]);
@@ -167,7 +173,6 @@ void BespinStyle::polish( QPalette &pal )
     toolPal.setColor(QPalette::ToolTipBase, bg);
     toolPal.setColor(QPalette::ToolTipText, fg);
     QToolTip::setPalette(toolPal);
-
 
 #ifdef Q_WS_X11
     if (appType == GTK)

@@ -123,20 +123,21 @@ Button::init(int sz, bool leftMenu, bool fColors)
         shape[t] = QPainterPath();
    
     const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
+    QRectF bound(-s2,-s2,sz,sz);
 #if 1
-    shape[Close].addRect(-s2,-s2,sz,sz);
+    shape[Close].addRect(bound);
     shape[Close].addRect(-s4,-s4,s2,s2);
     shape[Close].addRect(s3-s2,s3-s2,s3,s3);
 
-    shape[Min].addRect(-s2,-s2,sz,sz);
+    shape[Min].addRect(bound);
     shape[Min].addRect(-s4,-s2,sz-s4,sz-s4);
     shape[Min].addRect(s2-s3,-s2,s3,s3);
 
-    shape[Max].addRect(-s2,-s2,sz,sz);
+    shape[Max].addRect(bound);
     shape[Max].addRect(-s2,-s4,sz-s4,sz-s4);
     shape[Max].addRect(-s2,s2-s3,s3,s3);
 
-    shape[Restore].addRect(-s2,-s2,sz,sz);
+    shape[Restore].addRect(bound);
     shape[Restore].addRect(-s2,-s2,sz-s4,sz-s4);
     shape[Restore].addRect(-s2,-s2,s3,s3);
 
@@ -154,7 +155,7 @@ Button::init(int sz, bool leftMenu, bool fColors)
     shape[UnAboveBelow].addRect(-s2,-s4,s3,s2);
     shape[UnAboveBelow].addRect(s2-s3,-s4,s3,s2);
 
-    shape[Menu].addRect(-s2,-s2,sz,sz);
+    shape[Menu].addRect(bound);
     shape[Menu].addRect(leftMenu?0:-s2,-s4,s2,sz-s4);
 
     shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
@@ -174,45 +175,36 @@ Button::init(int sz, bool leftMenu, bool fColors)
     shape[Info].addRect(-s6,-s6,s4,s2+s3);
 #else
     QPainterPath rubber;
-    shape[Close].addEllipse(-s2,-s2,sz,sz);
+    shape[Close].addEllipse(bound);
     shape[Close].addEllipse(-s4,-s4,s2,s2);
     shape[Close].addEllipse(s3-s2,s3-s2,s3,s3);
 
-    QRect bigRect(-s2, -(sz+s2), 2*sz, 2*sz);
-    shape[Min].moveTo(bigRect.center());
-    shape[Min].arcTo(bigRect, 180, 90);
-    shape[Min].lineTo(bigRect.center());
-    bigRect.adjust(s4,s4,-s4,-s4);
-    rubber.moveTo(bigRect.center());
-    rubber.arcTo(bigRect, 180, 90);
-    rubber.lineTo(bigRect.center());
+    shape[Min].addEllipse(bound);
+    bound.translate(s4, -s4);
+    rubber.moveTo(bound.center());
+    rubber.arcTo(bound, 90, 270);
+    rubber.lineTo(bound.center());
+    bound.translate(-s4, s4);
     shape[Min] = shape[Min].subtracted(rubber);
     rubber = QPainterPath();
-    shape[Min].addEllipse(s2-s3,-s2,s3,s3);
 
-    bigRect = QRect(-(sz+s2), -s2, 2*sz, 2*sz);
-    shape[Max].moveTo(bigRect.center());
-    shape[Max].arcTo(bigRect, 0, 90);
-    shape[Max].lineTo(bigRect.center());
-    bigRect.adjust(s4,s4,-s4,-s4);
-    rubber.moveTo(bigRect.center());
-    rubber.arcTo(bigRect, 0, 90);
-    rubber.lineTo(bigRect.center());
+    shape[Max].addEllipse(bound);
+    bound.translate(-s4, s4);
+    rubber.moveTo(bound.center());
+    rubber.arcTo(bound, -90, 270);
+    rubber.lineTo(bound.center());
+    bound.translate(s4, -s4);
     shape[Max] = shape[Max].subtracted(rubber);
     rubber = QPainterPath();
-    shape[Max].addEllipse(-s2,s2-s3,s3,s3);
 
-    bigRect = QRect(-(sz+s2), -(sz+s2), 2*sz, 2*sz);
-    shape[Restore].moveTo(bigRect.center());
-    shape[Restore].arcTo(bigRect, 0, -90);
-    shape[Restore].lineTo(bigRect.center());
-    bigRect.adjust(s4,s4,-s4,-s4);
-    rubber.moveTo(bigRect.center());
-    rubber.arcTo(bigRect, 0, -90);
-    rubber.lineTo(bigRect.center());
+    shape[Restore].addEllipse(bound);
+    bound.translate(-s4, -s4);
+    rubber.moveTo(bound.center());
+    rubber.arcTo(bound, 90, -270);
+    rubber.lineTo(bound.center());
+    bound.translate(s4, s4);
     shape[Restore] = shape[Restore].subtracted(rubber);
     rubber = QPainterPath();
-    shape[Restore].addEllipse(-s2,-s2,s3,s3);
 
     shape[Stick].addEllipse(s6-s2,s6-s2,sz-s3,sz-s3);
     shape[Unstick].addEllipse(s3-s2,s3-s2,s3,s3);
@@ -228,10 +220,8 @@ Button::init(int sz, bool leftMenu, bool fColors)
     shape[UnAboveBelow].addEllipse(-s2,-s4,s3,s2);
     shape[UnAboveBelow].addEllipse(s2-s3,-s4,s3,s2);
 
-    shape[Menu].addRoundedRect(-s2,-s2,sz,sz,50,50,Qt::RelativeSize);
-    rubber.addEllipse(leftMenu?0:-sz,-s4,1.2*sz,1.5*sz);
-    shape[Menu] = shape[Menu].subtracted(rubber);
-    rubber = QPainterPath();
+    shape[Menu].addRoundedRect(-s2,-s2,sz,s6,99,99,Qt::RelativeSize);
+    shape[Menu].addRoundedRect(leftMenu?-s2:0,-s4,sz-s2,s2+s4,99,25,Qt::RelativeSize);
 
     shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
     shape[Help].addRect(-s3,-s4,s3,sz-(s3+s4));

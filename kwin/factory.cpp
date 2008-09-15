@@ -25,6 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <QDBusConnection>
+// #include <QDir>
 #include <QFontMetrics>
 #include <QLabel>
 #include <QMenu>
@@ -142,6 +143,11 @@ multiString(const QVector<Button::Type> &vector)
 
 bool Factory::readConfig()
 {
+//     QSettings winecfg(QDir::homePath() + "/.wine/user.reg", QSettings::IniFormat);
+//     winecfg.beginGroup("Control Panel/Colors");//Colors");
+//     qDebug() << "BESPIN" << winecfg.childKeys();
+//     qDebug() << "BESPIN" << winecfg.value("\"InactiveTitleText\"").toString();
+    
     bool ret = false;
     bool oldBool;
     Gradients::Type oldgradient;

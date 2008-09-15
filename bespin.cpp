@@ -655,7 +655,7 @@ swapPalette(QWidget *widget, BespinStyle *style)
                     pal.setColor(group, QPalette::Text, solidBase->palette().color(group, solidBase->foregroundRole()));
                 }
             }
-            style->polish(pal);
+            style->polish(pal, false);
             kid->setPalette(pal);
 
         }

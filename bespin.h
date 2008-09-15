@@ -102,7 +102,7 @@ public:
 
     void polish( QWidget *w );
     void polish( QApplication * );
-    void polish( QPalette &pal );
+    void polish( QPalette &pal, bool onInit = true );
 
     QSize sizeFromContents ( ContentsType type, const QStyleOption * option,
                                 const QSize & contentsSize, const QWidget * widget = 0 ) const;
