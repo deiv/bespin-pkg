@@ -589,20 +589,23 @@ swapPalette(QWidget *widget, BespinStyle *style)
     QWidget *solidBase = 0;
     QColor c1, c2; int a;
     bool fixViewport = false;
+    bool hasShit = false;
     foreach (QWidget *kid, kids)
     {
         if (kid->testAttribute(Qt::WA_StyleSheet))
         {   // first get rid of shit
             shits.insert(kid, kid->styleSheet());
             kid->setStyleSheet(QString());
+            hasShit = true;
         }
         
         // now swap the palette ----------------
-        if (kid->testAttribute(Qt::WA_SetPalette) || kid == widget)
+        if (hasShit || kid->testAttribute(Qt::WA_SetPalette) || kid == widget)
         {
             pal = kid->palette();
             solidBase = 0;
             fixViewport = false;
+            hasShit = false;
             
             // NOTE: WORKAROUND for dolphin and probably others: see polish.cpp
             if (QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(kid) )
@@ -623,7 +626,6 @@ swapPalette(QWidget *widget, BespinStyle *style)
                 if (solidBase->palette().brush(solidBase->backgroundRole()).style() > 1)
                     solidBase = 0; // there's some pixmap or so - better do not swap colors atm.
             }
-
             for (int i = 0; i < 3; ++i)
             {
                 group = groups[i];
