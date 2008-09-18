@@ -18,6 +18,7 @@
 
 #include <QStyleOptionTitleBar>
 #include <QApplication>
+#include <QDockWidget>
 #include <QPainter>
 #include <QPen>
 
@@ -107,9 +108,22 @@ BespinStyle::standardPixmap(StandardPixmap standardPixmap,
         shape.addRect(0,s4,sz,s4);
         goto paint;
     case SP_TitleBarNormalButton:
-        shape.addRect(0,0,sz,sz);
-        shape.addRect(0,0,sz-s4,sz-s4);
-        shape.addRect(0,0,s3,s3);
+        if (const QDockWidget *dock = qobject_cast<const QDockWidget*>(widget))
+        {
+            if (dock->isFloating())
+                shape.addRect(0,s4,sz,s2);
+            else
+            {
+                shape.addRect(0,0,s4,2*s3);
+                shape.addRect(s3,s2,sz-s3,sz-s2);
+            }
+        }
+        else
+        {   // MDI control
+            shape.addRect(0,0,sz,sz);
+            shape.addRect(0,0,sz-s4,sz-s4);
+            shape.addRect(0,0,s3,s3);
+        }
         goto paint;
     case SP_TitleBarContextHelpButton:
     {

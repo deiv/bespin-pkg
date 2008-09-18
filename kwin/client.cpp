@@ -658,6 +658,7 @@ Client::reset(unsigned long changed)
         else if (!config()->forceUserColors)
         {
             KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
+#if 0 // thought wine couldn't configure colors, but can - leave that and maybe query wine settings for colors?
             if (info.windowClassClass() == "Wine")
             {   // this is a Wine window, make ungly win grey (everything 'bout win is ugly... ;-)
                 QColor winGrey(192,192,192);
@@ -668,6 +669,7 @@ Client::reset(unsigned long changed)
                 bgMode = 1;
             }
             else
+#endif
             {   // nope, but maybe stylecontrolled
                 uint bgColors, actColors, inactColors, pid;
                 bool b1 = false, b2 = false, b3 = false;
@@ -835,6 +837,7 @@ Client::resize( const QSize& s )
     mask += QRegion(1, 2, w-2, h-d/2);
 
     setMask(mask);
+    
     widget()->repaint(); // force! there're painting errors otherwise
 }
 

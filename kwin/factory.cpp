@@ -143,11 +143,48 @@ multiString(const QVector<Button::Type> &vector)
 
 bool Factory::readConfig()
 {
-//     QSettings winecfg(QDir::homePath() + "/.wine/user.reg", QSettings::IniFormat);
-//     winecfg.beginGroup("Control Panel/Colors");//Colors");
-//     qDebug() << "BESPIN" << winecfg.childKeys();
-//     qDebug() << "BESPIN" << winecfg.value("\"InactiveTitleText\"").toString();
-    
+    #if 0
+    QSettings winecfg(QDir::homePath() + "/.wine/user.reg", QSettings::IniFormat);
+    qDebug() << "BESPIN" << winecfg.childGroups();
+    winecfg.beginGroup("Control Panel");//Colors");//Colors");
+    winecfg.beginGroup(" ");
+//     winecfg.beginGroup("");
+//     winecfg.beginGroup("");
+    qDebug() << "BESPIN" << winecfg.childGroups();
+    winecfg.beginGroup("Colors");
+    qDebug() << "BESPIN" << winecfg.childKeys();
+//     qDebug() << "BESPIN" << winecfg.value("Control Panel//Colors/\"ButtonFace\"").toString();
+    "Control Panel//Colors/"ActiveBorder"",
+    "Control Panel//Colors/"ActiveTitle"",
+    "Control Panel//Colors/"AppWorkSpace"",
+    "Control Panel//Colors/"Background"",
+    "Control Panel//Colors/"ButtonAlternateFace"",
+    "Control Panel//Colors/"ButtonDkShadow"",
+    "Control Panel//Colors/"ButtonHilight"",
+    "Control Panel//Colors/"ButtonLight"",
+    "Control Panel//Colors/"ButtonShadow"",
+    "Control Panel//Colors/"ButtonText"",
+    "Control Panel//Colors/"GradientActiveTitle"",
+    "Control Panel//Colors/"GradientInactiveTitle"",
+    "Control Panel//Colors/"GrayText"",
+    "Control Panel//Colors/"Hilight"",
+    "Control Panel//Colors/"HilightText"",
+    "Control Panel//Colors/"HotTrackingColor"",
+    "Control Panel//Colors/"InactiveBorder"",
+    "Control Panel//Colors/"InactiveTitle"",
+    "Control Panel//Colors/"InactiveTitleText"",
+    "Control Panel//Colors/"InfoText"",
+    "Control Panel//Colors/"InfoWindow"",
+    "Control Panel//Colors/"Menu"",
+    "Control Panel//Colors/"MenuBar"",
+    "Control Panel//Colors/"MenuHilight"",
+    "Control Panel//Colors/"MenuText"",
+    "Control Panel//Colors/"Scrollbar"",
+    "Control Panel//Colors/"TitleText"",
+    "Control Panel//Colors/"Window"",
+    "Control Panel//Colors/"WindowFrame"",
+    "Control Panel//Colors/"WindowText""
+    #endif
     bool ret = false;
     bool oldBool;
     Gradients::Type oldgradient;

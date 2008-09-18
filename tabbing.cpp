@@ -97,57 +97,61 @@ void
 BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
                         const QWidget * widget) const
 {
-   ASSURE_OPTION(tbb, TabBarBase);
+    ASSURE_OPTION(tbb, TabBarBase);
 
-   QWidget *win = 0;
-   if (widget) {
-      if (widget->parentWidget() &&
-          qobject_cast<QTabWidget*>(widget->parentWidget())) {
-         // in general we don't want a tabbar on a tabwidget
-         // that's nonsense, looks crap... and still used by some KDE apps
-         // the konqueror guys however want the konqueror tabbar to look
-         // somewhat like Bespin =) - so permit their workaround for all other
-         // styles TODO: ask them why not just use a tabbar and a stack instead
-         // of a tabwidget
-         if (!widget->parentWidget()->inherits("KonqFrameTabs"))
-            return;
-      }
-      else if (qobject_cast<const QTabBar*>(widget))
-         return; // usually we alter the paintevent by eventfiltering
-      win = widget->window();
-   }
+    QWidget *win = 0;
+    if (widget)
+    {
+        if (widget->parentWidget() && qobject_cast<QTabWidget*>(widget->parentWidget()))
+        {
+            // in general we don't want a tabbar on a tabwidget
+            // that's nonsense, looks crap... and still used by some KDE apps
+            // the konqueror / kdevelop guys however want the konqueror tabbar to look
+            // somewhat like Bespin =)
+            // so permit the proxystyle solution
+            if (widget->parentWidget()->style() == this)
+                return; // otherwise it's a proxystyle like on konqueror / kdevelop...
+        }
+        else if (qobject_cast<const QTabBar*>(widget))
+            return; // usually we alter the paintevent by eventfiltering
+        win = widget->window();
+    }
 
-   QRect rect = RECT.adjusted(0, 0, 0, -dpi.f2);
-   int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
+    QRect rect = RECT.adjusted(0, 0, 0, -dpi.f2);
+    int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
 
-   QRect winRect;
-   if (win) {
-      winRect = win->rect();
-      winRect.moveTopLeft(widget->mapFrom(win, winRect.topLeft()));
-   }
-   else
-      winRect = tbb->tabBarRect; // we set this from the eventfilter QEvent::Paint
+    QRect winRect;
+    if (win)
+    {
+        winRect = win->rect();
+        winRect.moveTopLeft(widget->mapFrom(win, winRect.topLeft()));
+    }
+    else
+        winRect = tbb->tabBarRect; // we set this from the eventfilter QEvent::Paint
 
-   Tile::PosFlags pf = Tile::Full;
-   if (verticalTabs(tbb->shape)) {
-      if (RECT.bottom() >= winRect.bottom())
-         pf &= ~Tile::Bottom; // we do NEVER shape away the top - assuming deco here...!
-      o = Qt::Horizontal; size = RECT.width();
-   }
-   else {
-      if (RECT.width() >= winRect.width())
-         pf &= ~(Tile::Left | Tile::Right);
-      else {
-         if (RECT.left() <= winRect.left()) pf &= ~Tile::Left;
-         if (RECT.right() >= winRect.right()) pf &= ~Tile::Right;
-      }
-   }
-   Tile::setShape(pf);
+    Tile::PosFlags pf = Tile::Full;
+    if (verticalTabs(tbb->shape))
+    {
+        if (RECT.bottom() >= winRect.bottom())
+            pf &= ~Tile::Bottom; // we do NEVER shape away the top - assuming deco here...!
+        o = Qt::Horizontal; size = RECT.width();
+    }
+    else
+    {
+        if (RECT.width() >= winRect.width())
+            pf &= ~(Tile::Left | Tile::Right);
+        else
+        {
+            if (RECT.left() <= winRect.left()) pf &= ~Tile::Left;
+            if (RECT.right() >= winRect.right()) pf &= ~Tile::Right;
+        }
+    }
+    Tile::setShape(pf);
 
-   masks.rect[true].render(rect, painter, GRAD(tab), o, CCOLOR(tab.std, Bg), size);
-   rect.setBottom(rect.bottom()+dpi.f2);
-   shadows.sunken[true][true].render(rect, painter);
-   Tile::reset();
+    masks.rect[true].render(rect, painter, GRAD(tab), o, CCOLOR(tab.std, Bg), size);
+    rect.setBottom(rect.bottom()+dpi.f2);
+    shadows.sunken[true][true].render(rect, painter);
+    Tile::reset();
 }
 
 static int animStep = -1;

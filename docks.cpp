@@ -16,6 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QDockWidget>
 #include <QStyleOptionDockWidget>
 #include "draw.h"
 
@@ -36,11 +37,21 @@ BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, cons
 
     ASSURE_OPTION(dwOpt, DockWidget);
     OPT_ENABLED
+    Qt::Orientation o = Qt::Vertical;
+    if (const QDockWidget *dock = qobject_cast<const QDockWidget*>(w))
+    if (dock->features() & QDockWidget::DockWidgetVerticalTitleBar)
+        o = Qt::Horizontal;
+
+    painter->fillRect(RECT, Gradients::pix(FCOLOR(Window), RECT.height(), o, Gradients::Sunken));
 
     if (!dwOpt->title.isEmpty())
     {
         const int itemtextopts = Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextHideMnemonic;
-        QRect textRect;
+        QRect rect = RECT, textRect;
+
+        // adjust rect;
+        rect.setRight(rect.right() - (dwOpt->closable +  dwOpt->floatable) * (16 + F(2)));
+        
         painter->save();
         setBold(painter);
 
@@ -48,23 +59,25 @@ BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, cons
         if (Colors::value(FCOLOR(WindowText)) > 140)
         {
             painter->setPen(Colors::mid(FCOLOR(Window), Qt::black, 1, 4));
-            drawItemText(painter, RECT.adjusted(0,-1,0,-1), itemtextopts, PAL, isEnabled, dwOpt->title);
+            drawItemText(painter, rect.adjusted(0,-1,0,-1), itemtextopts, PAL, isEnabled, dwOpt->title);
         }
 
         painter->setPen(FCOLOR(WindowText));
-        drawItemText(painter, RECT, itemtextopts, PAL, isEnabled, dwOpt->title, QPalette::NoRole, &textRect);
+        drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dwOpt->title, QPalette::NoRole, &textRect);
+#if 0
         textRect.adjust(-F(6), 0, F(6), 0);
 
         painter->setPen(Qt::NoPen);
         const QPixmap *fill;
-        const int cnt = qMin(5, (textRect.left() - (RECT.left() + 2*F(18))) / F(12));
-        const int y = RECT.y()+(RECT.height()-F(6))/2;
+        const int cnt = qMin(5, (textRect.left() - (rect.left() + 2*F(6))) / F(12));
+        const int y = rect.y()+(rect.height()-F(6))/2;
         for (int i = 0; i < cnt; ++i)
         {
             fill = &Gradients::pix(Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 10+i, 1), F(6), Qt::Vertical, Gradients::Sunken);
             fillWithMask(painter, QPoint(textRect.left()-(1+i)*F(12), y), *fill, masks.notch);
             fillWithMask(painter, QPoint(textRect.right()+F(6)+i*F(12), y), *fill, masks.notch);
         }
+#endif
         painter->restore();
     }
 }
