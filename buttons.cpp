@@ -134,7 +134,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
    B_STATES;
 
     const QAbstractButton* btn = qobject_cast<const QAbstractButton*>(widget);
-    const int f1 = dpi.f1, f2 = dpi.f2;
+    const int f1 = F(1), f2 = F(2);
 //    const bool toggled = !hover && (option->state & State_On);
     const bool round = !isCheckbox && (config.btn.round || (btn && btn->isCheckable()));
     const bool fullHover = config.btn.fullHover ||
@@ -148,15 +148,16 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
     Gradients::Type gt = GRAD(btn);
     QColor c = btnBg(PAL, isEnabled, hasFocus, animStep, fullHover, Gradients::isReflective(gt));
 
-    QColor iC = CCOLOR(btn.std, Bg); //FCOLOR(Window);
+    QColor iC = CCOLOR(btn.std, Bg);
 
     bool drawInner = false;
-    if ((config.btn.cushion && sunken)/* || toggled*/)
+    if (config.btn.cushion && sunken)
     {
         gt = Gradients::Sunken;
         drawInner = true;
+        iC = CCOLOR(btn.active, Bg);
     }
-    if (animStep)
+    else if (animStep)
     {
         if (!fullHover)
             drawInner = true;
@@ -180,10 +181,10 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
         sunken = (sunken && !config.btn.cushion) || config.btn.layer == 2;
         if (isEnabled)
         {
-            if (!sunken)
-                r.adjust(f2, f2,-f2,-f2);
-            else
+            if (sunken)
                 r.setBottom(r.bottom()-f2);
+            else
+                r.adjust(0, f1,0,-f2);
             masks.rect[round].render(r, painter, gt, Qt::Vertical, c);
             if (drawInner)
             {

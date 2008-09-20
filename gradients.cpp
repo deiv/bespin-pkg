@@ -145,64 +145,66 @@ buttonGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
 }
 
 inline static void
-gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false) {
-   
-   int h,s,v, ch,cs,cv, delta, add;
-   
-   c.getHsv(&h,&s,&v);
+gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
+{
+    int h,s,v, ch,cs,cv, delta, add;
 
-   // calculate the variation
-   add = (180-qGray(c.rgb()))>>1;
-   if (add < 0) add = -add/2;
-   if (glass)
-      add = add>>4;
+    c.getHsv(&h,&s,&v);
+
+    // calculate the variation
+    add = (180-qGray(c.rgb()))/1;
+    if (add < 0)
+        add = -add/2;
+    add /= (glass?16:2);
+
+    // the brightest color (top)
+    cv = v+27+add;
+    if (cv > 255)
+    {
+        delta = cv-255; cv = 255;
+        cs = s - delta; if (cs < 0) cs = 0;
+        ch = h - delta/2; if (ch < 0) ch = 360+ch;
+    }
     else
-       add = add>>2;
+        { ch = h; cs = s; }
+    bb->setHsv(ch,cs,cv);
 
-   // the brightest color (top)
-   cv = v+27+add;
-   if (cv > 255) {
-      delta = cv-255; cv = 255;
-      cs = s - delta; if (cs < 0) cs = 0;
-      ch = h - delta/2; if (ch < 0) ch = 360+ch;
-   }
-   else {
-      ch = h; cs = s;
-   }
-   bb->setHsv(ch,cs,cv);
-   
-   // the darkest color (lower center)
-   cv = v - 14 - add; if (cv < 0) cv = 0;
-   cs = s*(glass?13:10)/7; if (cs > 255) cs = 255;
-   dd->setHsv(h,cs,cv);
+    // the darkest color (lower center)
+    cv = v - 14 - add; if (cv < 0) cv = 0;
+    cs = s*(glass?13:10)/7; if (cs > 255) cs = 255;
+    dd->setHsv(h,cs,cv);
 }
 
 static inline QLinearGradient
-gl_ssGradient(const QColor &c, const QPoint &start, const QPoint &stop, bool glass = false) {
-   QColor bb,dd; // b = d = c;
-   gl_ssColors(c, &bb, &dd, glass);
-   QLinearGradient lg(start, stop);
-   lg.setColorAt(0,bb); lg.setColorAt(glass ? 0.5 : 0.25,c);
-   lg.setColorAt(glass ? 0.5 : 0.4, dd); lg.setColorAt(glass ? 1 : .80, bb);
-//    if (!glass) lg.setColorAt(1, Qt::white);
-   return lg;
+gl_ssGradient(const QColor &c, const QPoint &start, const QPoint &stop, bool glass = false)
+{
+    QColor bb,dd; // b = d = c;
+    gl_ssColors(c, &bb, &dd, glass);
+    QLinearGradient lg(start, stop);
+    lg.setColorAt(0,bb); lg.setColorAt(glass ? 0.4 : 0.25,c);
+    lg.setColorAt(0.5, dd); lg.setColorAt(glass ? 1 : .80, bb);
+//     if (!glass)
+//         lg.setColorAt(1, Qt::white);
+    return lg;
 }
 
 static inline QPixmap *
-rGlossGradient(const QColor &c, int size) {
-   QColor bb,dd; // b = d = c;
-   gl_ssColors(c, &bb, &dd);
-   QPixmap *pix = new QPixmap(size, size);
-   QRadialGradient rg(2*pix->width()/3, pix->height(), pix->height());
-   rg.setColorAt(0,c); rg.setColorAt(0.8,dd);
-   rg.setColorAt(0.8, c); rg.setColorAt(1, bb);
-   QPainter p(pix); p.fillRect(pix->rect(), rg); p.end();
-   return pix;
+rGlossGradient(const QColor &c, int size)
+{
+    QColor bb,dd; // b = d = c;
+    gl_ssColors(c, &bb, &dd);
+    QPixmap *pix = new QPixmap(size, size);
+    QRadialGradient rg(2*pix->width()/3, pix->height(), pix->height());
+    rg.setColorAt(0,c); rg.setColorAt(0.8,dd);
+    rg.setColorAt(0.8, c); rg.setColorAt(1, bb);
+    QPainter p(pix); p.fillRect(pix->rect(), rg); p.end();
+    return pix;
 }
 
 #ifndef BESPIN_DECO
 static inline QPixmap *
-progressGradient(const QColor &c, int size, Qt::Orientation o) {
+progressGradient(const QColor &c, int size, Qt::Orientation o)
+{
 #define GLASS true
 #define GLOSS false
 // in addition, glosses should have the last stop at 0.9

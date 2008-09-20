@@ -222,7 +222,7 @@
      <item>
       <widget class="QCheckBox" name="forceUserColors" >
        <property name="text" >
-        <string>Ignore style colors hints</string>
+        <string>Ignore style color hints</string>
        </property>
       </widget>
      </item>

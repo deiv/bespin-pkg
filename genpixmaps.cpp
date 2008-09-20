@@ -126,9 +126,10 @@ relief(int size, bool enabled)
     EMPTY_PIX(size, size);
     p.setBrush(Qt::NoBrush);
     p.setPen(QPen(BLACK(int(f*70)), f1));
-    p.drawRoundedRect(f1,f1,size-f2,size-f2,99,99,Qt::RelativeSize);
+    p.drawRoundedRect(f1/2.0,0,size,size-f2,99,99,Qt::RelativeSize);
     p.setPen(QPen(WHITE(int(f*35)), f1));
-    p.drawRoundedRect(0,0,size,size,99,99,Qt::RelativeSize);
+    p.drawRoundedRect(0,f1+f1/2.0,size,size-f2,99,99,Qt::RelativeSize);
+#if 0
     // the borders cross the pixmap boundings, thus they're too weak, thus we stregth them a bit
     const int d1 = 0.3*size, d2 = 0.7*size;
     p.drawLine(d1, 0, d2, 0); // top
@@ -136,6 +137,7 @@ relief(int size, bool enabled)
     p.drawLine(size, d1, size, d2); // right
     p.setPen(QPen(WHITE(int(f*50)), f1));
     p.drawLine(d1, size-1, d2, size-1); // bottom
+#endif
     p.end(); return pix;
 }
 

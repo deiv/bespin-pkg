@@ -443,7 +443,9 @@ BespinStyle::polish( QWidget * widget )
             widget->setAttribute(Qt::WA_Hover); // KHtml
         else
         {
-            if (widget->inherits("QToolButton"))
+            if (widget->inherits("QToolButton") &&
+                // of course plasma needs - again - a WORKAROUND, we seem to be unable to use bg/fg-role, are we?
+                !(appType == Plasma && widget->inherits("ToolButton")))
             {
                 if (config.hack.killThrobber && widget->inherits("KAnimatedButton") && widget->parentWidget())
                 if (QMenuBar *mbar = qobject_cast<QMenuBar*>(widget->parentWidget()))

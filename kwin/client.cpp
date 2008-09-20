@@ -478,10 +478,9 @@ Client::repaint(QPainter &p)
         case 1:
         {   // scanlines, fallback
             p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
-            const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, config()->gradient[0][isActive()]);
-            p.drawTiledPixmap(top, fill);
+            p.fillRect(top, Gradients::brush(bg, titleSize, Qt::Vertical, config()->gradient[0][isActive()]));
             p.setPen(Colors::mid(bg, Qt::black,6,1));
-            p.drawLine(0,titleSize-1,width(),titleSize-1);
+            p.drawLine(borderSize,titleSize-1,width()-borderSize,titleSize-1);
 //       p.setPen(Colors::mid(bg, Qt::white,6,1));
 //       p.drawLine(0,titleSize-1,width(),titleSize-1);
 
