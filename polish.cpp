@@ -54,6 +54,16 @@
 #define CCOLOR(_TYPE_, _FG_) PAL.color(QPalette::Active, config._TYPE_##_role[_FG_])
 #define FCOLOR(_TYPE_) PAL.color(QPalette::Active, QPalette::_TYPE_)
 
+class EventKiller : public QObject
+{
+//     Q_OBJECT
+public:
+    bool eventFilter( QObject *, QEvent *)
+    { return true; }
+};
+
+static EventKiller eventKiller;
+
 using namespace Bespin;
 
 extern Config config;
@@ -556,6 +566,13 @@ BespinStyle::polish( QWidget * widget )
         widget->setAttribute(Qt::WA_Hover);
         // the eventfilter overtakes the widget painting to allow tabs ABOVE the tabbar
         widget->installEventFilter(this);
+    }
+    else if (widget->inherits("KFadeWidgetEffect"))
+    {   // interfers with our animation, is slower and cannot handle non plain backgrounds
+        // (unfortunately i cannot avoid the widget grabbing)
+        // maybe ask ereslibre to query a stylehint for this?
+        widget->hide();
+        widget->installEventFilter(&eventKiller);
     }
 
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!

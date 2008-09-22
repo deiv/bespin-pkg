@@ -432,8 +432,13 @@ BespinStyle::drawRubberBand(const QStyleOption *option, QPainter *painter, const
     painter->save();
     QColor c = FCOLOR(Highlight);
     painter->setPen(c);
-    c.setAlpha(100);
-    painter->setBrush(c);
+    c.setAlpha(80); painter->setBrush(c);
+#if 0
+    if (config.fastRender)
+        { c.setAlpha(80); painter->setBrush(c); }
+    else
+        painter->setBrush(QBrush(c, Qt::Dense4Pattern));
+#endif
     painter->drawRect(RECT.adjusted(0,0,-1,-1));
     painter->restore();
 }
@@ -453,8 +458,11 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWi
     const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
     hover = hover && (!view || view->selectionMode() != QAbstractItemView::NoSelection);
     const bool selected = item->state & QStyle::State_Selected;
-    const QPalette::ColorRole bg = widget ? widget->backgroundRole() : QPalette::Base;
-    const QPalette::ColorRole fg = widget ? widget->foregroundRole() : QPalette::Text;
+    QPalette::ColorRole bg = QPalette::Base, fg = QPalette::Text;
+    if (view && view->viewport())
+        { bg = view->viewport()->backgroundRole(); fg = view->viewport()->foregroundRole(); }
+    else if (widget)
+        { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
 
    // this could just leads to cluttered listviews...?!
 //    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
