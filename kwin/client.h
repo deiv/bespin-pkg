@@ -103,6 +103,6 @@ private:
 };
 
 
-} // namespace
+}; // namespace
 
 #endif // BESPINCLIENT_H
