@@ -92,7 +92,7 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
     case PM_DockWidgetHandleExtent: // Width of the handle in a horizontal dock window and the height of the handle in a vertical dock window
         return F(6);
     case PM_DockWidgetFrameWidth: // Frame width of a dock window
-        return F(1);
+        return 0; // F(1)
     case PM_MenuBarPanelWidth: // Frame width of a menubar, defaults to PM_DefaultFrameWidth
         return 0;
     case PM_MenuBarItemSpacing: // Spacing between menubar items
@@ -102,7 +102,7 @@ int BespinStyle::pixelMetric ( PixelMetric pm, const QStyleOption * option, cons
     case PM_MenuBarVMargin: // Spacing between menubar items and top/bottom of bar
         return 0;
     case PM_ToolBarFrameWidth: // Width of the frame around toolbars
-        return F(1);//f4;
+        return 0; //F(1);//f4;
     case PM_ToolBarHandleExtent: // Width of a toolbar handle in a horizontal toolbar and the height of the handle in a vertical toolbar
         return F(6);
     case PM_ToolBarItemMargin: // Spacing between the toolbar frame and the items

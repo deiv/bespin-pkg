@@ -182,14 +182,14 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
         if (sunken) fnt.setBold(true);
         painter->setFont(fnt);
         drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, toolbutton->text);
-        return;
     }
 
     QPixmap pm;
     QSize pmSize = RECT.size() - QSize(dpi.f4, dpi.f4);
     pmSize = pmSize.boundedTo(toolbutton->iconSize);
 
-    if (!toolbutton->icon.isNull()) {
+    if (!toolbutton->icon.isNull())
+    {
         const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
         QIcon::Mode mode;
         if (!isEnabled)
@@ -198,12 +198,12 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
 //          mode = QIcon::Active; // gamma thing looks dumb and i cannot turn it off in kde...
         else
             mode = QIcon::Normal;
-
+            
         pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), mode, state);
         if (step && !sunken && !pm.isNull())
             pm = icon(pm, step);
         pmSize = pm.size();
-   }
+    }
 
     if (!(toolbutton->text.isEmpty() || toolbutton->toolButtonStyle == Qt::ToolButtonIconOnly))
     {

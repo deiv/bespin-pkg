@@ -45,7 +45,8 @@ BespinStyle::standardPixmap(StandardPixmap standardPixmap,
                             const QStyleOption * option, const QWidget * widget ) const
 {
     bool sunken = false, isEnabled = false, hover = false;
-    if (option) {
+    if (option)
+    {
         sunken = option->state & State_Sunken;
         isEnabled = option->state & State_Enabled;
         hover = isEnabled && (option->state & State_MouseOver);
@@ -56,14 +57,17 @@ BespinStyle::standardPixmap(StandardPixmap standardPixmap,
 //       qstyleoption_cast<const QStyleOptionTitleBar *>(option);
     if (option)
     {
-        if (option->rect.isNull())
-            return QPixmap();
-        pal = option->palette;
-        rect = option->rect; rect.moveTo(0,0);
-        if (rect.width() > rect.height())
-            rect.setWidth(rect.height());
+        if (option->rect.isNull()) // THIS SHOULD NOT!!!! happen... but unfortunately does on dockwidgets...
+            rect = QRect(0,0,14,14);
         else
-            rect.setHeight(rect.width());
+        {
+            rect = option->rect; rect.moveTo(0,0);
+            if (rect.width() > rect.height())
+                rect.setWidth(rect.height());
+            else
+                rect.setHeight(rect.width());
+        }
+        pal = option->palette;
     }
     else
     {

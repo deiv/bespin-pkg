@@ -39,29 +39,28 @@ BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, cons
     OPT_ENABLED
     Qt::Orientation o = Qt::Vertical;
     if (const QDockWidget *dock = qobject_cast<const QDockWidget*>(w))
-    if (dock->features() & QDockWidget::DockWidgetVerticalTitleBar)
-        o = Qt::Horizontal;
+//     if (dock->features() & QDockWidget::DockWidgetVerticalTitleBar)
+//         o = Qt::Horizontal;
 
-    painter->fillRect(RECT, Gradients::pix(FCOLOR(Window), RECT.height(), o, Gradients::Sunken));
+//     painter->fillRect(RECT, Gradients::pix(FCOLOR(Window), RECT.height(), o, Gradients::Sunken));
 
     if (!dwOpt->title.isEmpty())
     {
-        const int itemtextopts = Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextHideMnemonic;
         QRect rect = RECT, textRect;
-
         // adjust rect;
         rect.setRight(rect.right() - (dwOpt->closable +  dwOpt->floatable) * (16 + F(2)));
-        
+
+        const int itemtextopts = Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextHideMnemonic;
+
         painter->save();
         setBold(painter);
 
         QPen pen = painter->pen();
         if (Colors::value(FCOLOR(WindowText)) > 140)
-        {
+        {   // emboss
             painter->setPen(Colors::mid(FCOLOR(Window), Qt::black, 1, 4));
             drawItemText(painter, rect.adjusted(0,-1,0,-1), itemtextopts, PAL, isEnabled, dwOpt->title);
         }
-
         painter->setPen(FCOLOR(WindowText));
         drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dwOpt->title, QPalette::NoRole, &textRect);
 #if 0
