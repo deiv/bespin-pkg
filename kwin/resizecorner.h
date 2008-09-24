@@ -51,6 +51,6 @@ private:
    Client *client; QColor fg;
 };
 
-}; // namespace
+} // namespace
 
 #endif //RESIZECORNER_H

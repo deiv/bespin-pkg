@@ -46,5 +46,5 @@ public:
    static int toGradient(int info);
    static int fromGradient(int gt);
 };
-};
+}
 #endif // XPROPERTY_H

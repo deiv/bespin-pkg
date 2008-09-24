@@ -97,7 +97,7 @@ void wipe();
 Type fromInfo(int info);
 int toInfo(Type type);
 
-};
-};
+}
+}
 
 #endif //GRADIENTS_H
