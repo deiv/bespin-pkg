@@ -31,8 +31,7 @@ extern Config config;
 class KStyleOptionCustomElement : public QStyleOption
 {
 public:
-    KStyleOptionCustomElement(int version = QStyleOption::Version, int type = SO_Default):
-    QStyleOption(version, type) {}
+    KStyleOptionCustomElement() : QStyleOption(version, 0xff0) {}
     QString name;
 };
 
@@ -204,9 +203,8 @@ int BespinStyle::styleHint( StyleHint hint, const QStyleOption * option, const Q
         return true;
     case SH_KCustomStyleELement:
     {
-        // this should be a qstyleoption_cast<>(), but this won't work atm as KStyleOptionCustomStyleElement is no lib class
-        const KStyleOptionCustomElement *element = static_cast<const KStyleOptionCustomElement*>(option);
-        if (!option)
+        const KStyleOptionCustomElement *element = qstyleoption_cast<const KStyleOptionCustomElement*>(option);
+        if (!element)
             return 0;
 
         int id = elementId(element->name, option, widget);

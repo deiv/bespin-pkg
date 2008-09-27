@@ -364,9 +364,6 @@ static QStyle::SubControl subcontrols[N_CustomSubControls];
 
 enum ElementType { PE = 0, CE, CC, SE, SH, SC }; // SE are flags and need special handling?!
 static QMap<QString, int> styleElements; // yes. one is enough...
-#if 0
-static QMap<int, int> parentId[6];
-#endif
 // NOTICE: using QHash instead QMap is probably overhead, there won't be too many items per app
 static int counter[5] = { PE_KdeBase, X_KdeBase, X_KdeBase, X_KdeBase, X_KdeBase+1 /*sic!*/};
 #if 0
@@ -391,10 +388,6 @@ BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
             drawCapacityBar(option, painter, widget);
         //if (pe == primitives[_PE_WhateverElse])
         // ...
-#if 0
-        else if (int mappedPe = parentId[PE].value(pe, 0))
-            QCommonStyle::drawPrimitive( (PrimitiveElement)mappedPe, option, painter, widget );
-#endif
     }
     else
     {
@@ -452,30 +445,6 @@ BespinStyle::elementId(const QString &string, const QStyleOption *, const QWidge
         ++scCounter[_CC_AmarokAnalyzer];
     }
 //     else if blablablaba...
-    if (!id && (id = QCommonStyle::styleHint((StyleHint)SH_KCustomStyleELement, option, widget)))
-    {
-        // ok, we don't support this item, but daddy does, now
-        // 1. we'll need to pass calls for this item to dad, with HIS id
-        // 2. chances are good, that HIS id is used by US for some other item
-        // 3. we cannot simply call the widget(s) that require the id now assigned to the
-        // current item by our dad, ask it to change the id as we changed our mind
-        // 4. this means we'll have to map calls for this item:
-        // a) we assign our next free id an return it to the widget
-        // b) when the widget calls "draw*()" with this (our) id, we'll map it to our dad's
-        // id just queried and tell dad to handle things for HIS id
-        // c) yes, this works for non direct base classes as well -> like map(map())
-        int did = id;
-        if (string.contains("PE_")) parentId[PE].insert(id = ++counter[PE], did);
-        else if (string.contains("CE_")) parentId[CE].insert(id = ++counter[CE], did);
-        else if (string.contains("CC_")) parentId[CC].insert(id = ++counter[CC], did);
-        else if (string.contains("SE_")) parentId[SE].insert(id = ++counter[SE], did);
-        else if (string.contains("SH_")) parentId[SH].insert(id = ++counter[SH], did);
-        else if (string.contains(":SC_"))
-        {
-            parentId[SC].insert(id = (1 << counter[SC]), did);
-            ++counter[SC];
-        }
-    }
 #endif
     if (id)
         styleElements.insert(string, id);

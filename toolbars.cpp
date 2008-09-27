@@ -182,6 +182,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
         if (sunken) fnt.setBold(true);
         painter->setFont(fnt);
         drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, toolbutton->text);
+        return;
     }
 
     QPixmap pm;

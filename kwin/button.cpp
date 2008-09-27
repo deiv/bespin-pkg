@@ -392,7 +392,8 @@ Button::color() const
     }
     QColor c = client->color(fgt, client->isActive());
     if (fixedColors && _type < Multi)
-        c = Colors::mid(c, QColor(fcolors[_type]), 6-zoomLevel, zoomLevel);
+        c = client->isActive() ? QColor(fcolors[_type]) :
+            Colors::mid(c, QColor(fcolors[_type]), 6-zoomLevel, zoomLevel);
     const QColor bg = client->color(bgt, client->isActive());
     if (isEnabled())
         c = Colors::mid(bg, c, 6-zoomLevel, 6);
