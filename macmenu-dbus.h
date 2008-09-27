@@ -46,6 +46,6 @@ public slots:
    Q_NOREPLY void popDown(qlonglong key) { mm->popDown(key); }
    Q_NOREPLY void raise(qlonglong key) { mm->raise(key); }
 };
-}; // namespace
+} // namespace
 
 #endif //MAC_MENU_ADAPTOR_H

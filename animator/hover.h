@@ -45,7 +45,7 @@ private:
    QObjectList _scrollAreas;
 };
 
-};
+}
 
 #endif //HOVER_ANIMATOR_H
 

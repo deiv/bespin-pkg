@@ -39,5 +39,5 @@ public slots:
     { fac->learn(pid, bgInfo, activeColors, inactiveColors); }
     Q_NOREPLY void forget(qint64 pid) { fac->forget(pid); }
 };
-}; //namespace
+} //namespace
 #endif //XBAR_ADAPTOR_H

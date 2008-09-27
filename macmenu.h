@@ -75,6 +75,6 @@ private slots:
     void _release(QObject *);
 };
 
-}; // namespace
+} // namespace
 
 #endif //MAC_MENU_H

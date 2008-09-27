@@ -74,7 +74,7 @@ protected slots:
 //    void pause(QWidget *w);
 };
 
-}; // namespace
+} // namespace
 
 #define INSTANCE(_CLASS_) static _CLASS_ *instance = 0;
 #define MANAGE(_CLASS_)\

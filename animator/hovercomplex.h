@@ -51,7 +51,7 @@ class HoverComplex : public HoverIndex {
       HoverComplex() : HoverIndex() {};
 };
 
-}; // namespace
+} // namespace
 
 #endif // HOVER_COMPLEX_ANIMATOR_H
 

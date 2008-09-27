@@ -18,6 +18,6 @@ protected slots:
    void timerEvent(QTimerEvent * event);
 };
 
-};
+}
 
 #endif //PROGRESS_ANIMATOR_H

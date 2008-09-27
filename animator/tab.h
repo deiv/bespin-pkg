@@ -73,4 +73,4 @@ class Tab : public Basic {
       void changed(int);
 };
 
-}; //namespace
+} //namespace

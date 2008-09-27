@@ -61,7 +61,7 @@ protected slots:
    void release(QObject *o);
 };
 
-};
+}
 
 #ifndef ANIMATOR_IMPL
 #define ANIMATOR_IMPL 0
