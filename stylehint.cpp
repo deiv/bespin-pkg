@@ -28,14 +28,12 @@
 using namespace Bespin;
 extern Config config;
 
-class KStyleOptionCustomElement : public QStyleOption
-{
-public:
-    KStyleOptionCustomElement() : QStyleOption(version, 0xff0) {}
-    QString name;
-};
-
-#define SH_KCustomStyleELement 0xff000001
+static const QStyle::StyleHint SH_KCustomPrimitiveElement = (QStyle::StyleHint)0xff000001;
+static const QStyle::StyleHint SH_KCustomControlElement = (QStyle::StyleHint)0xff000002;
+static const QStyle::StyleHint SH_KCustomComplexControl = (QStyle::StyleHint)0xff000003;
+static const QStyle::StyleHint SH_KCustomSubElement = (QStyle::StyleHint)0xff000004;
+static const QStyle::StyleHint SH_KCustomStyleHint = (QStyle::StyleHint)0xff000005;
+static const QStyle::StyleHint SH_KCustomSubControl = (QStyle::StyleHint)0xff000006;
 
 int BespinStyle::styleHint( StyleHint hint, const QStyleOption * option, const QWidget * widget,
                             QStyleHintReturn * returnData ) const
@@ -201,17 +199,20 @@ int BespinStyle::styleHint( StyleHint hint, const QStyleOption * option, const Q
 #endif
     case SH_ItemView_PaintAlternatingRowColorsForEmptyArea:
         return true;
-    case SH_KCustomStyleELement:
+    case SH_KCustomPrimitiveElement:
+    case SH_KCustomControlElement:
+    case SH_KCustomComplexControl:
+    case SH_KCustomSubElement:
+    case SH_KCustomStyleHint:
+    case SH_KCustomSubControl:
     {
-        const KStyleOptionCustomElement *element = qstyleoption_cast<const KStyleOptionCustomElement*>(option);
-        if (!element)
+        if (!widget)
             return 0;
-
-        int id = elementId(element->name, option, widget);
-
-        if (!id)
-            qDebug() << "Unsupported KCustomStyleElement requested:" << element->name;
-            
+        int id = elementId(widget->objectName());
+        if (id)
+            const_cast<QWidget*>(widget)->setObjectName("KDE_CustomStyleElementID");
+        else
+            qDebug() << "Unsupported KCustomStyleElement requested:" << widget->objectName();
         return id;
     }
     default:

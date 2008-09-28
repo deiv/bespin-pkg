@@ -427,7 +427,7 @@ BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptionComp
 }
 
 int
-BespinStyle::elementId(const QString &string, const QStyleOption *, const QWidget *) const
+BespinStyle::elementId(const QString &string) const
 {
     int id = styleElements.value(string, 0);
     if (id)

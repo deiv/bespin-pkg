@@ -262,7 +262,7 @@ private:
     BespinStyle( const BespinStyle & );
     BespinStyle& operator=( const BespinStyle & );
     QColor mapFadeColor(const QColor &color, int index) const;
-    int elementId(const QString &string, const QStyleOption*, const QWidget*) const;
+    int elementId(const QString &string) const;
     void generatePixmaps();
     void initMetrics();
     void readSettings(const QSettings *settings = 0L);
