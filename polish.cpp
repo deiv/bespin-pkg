@@ -525,7 +525,7 @@ BespinStyle::polish( QWidget * widget )
                     if (dad->inherits("KHTMLView"))
                     {   // NOTICE this slows down things as it triggers a repaint of the frame
                         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
-                        // ...but this would re-enbale speed - jsust: how to get the proper palette
+                        // ...but this would re-enbale speed - just: how to get the proper palette
                         // what if there's a bg image?
                         // TODO how's css/khtml policy on applying colors?
     //                     widget->setAutoFillBackground ( true );

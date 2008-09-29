@@ -374,10 +374,12 @@ BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
     {   // the checkmark -----------------
         painter->save();
         if (config.btn.backLightHover)
-        {
-            hover = 0; animStep = 0;
-        }
-        const QPoint center = copy.rect.center() - QPoint(0,dpi.f1);
+            { hover = 0; animStep = 0; }
+        QPoint center = copy.rect.center();
+        if (config.btn.checkType == Check::V && (option->state & State_On))
+            center += QPoint(F(2), -F(2));
+        else
+            center += QPoint(0, -F(1));
         painter->setBrush(btnFg(PAL, isEnabled, hasFocus, animStep));
         const int d = dpi.f5 - (bool(config.btn.checkType) + config.btn.layer) * dpi.f1;
         copy.rect.adjust(d, d, -d, -d);

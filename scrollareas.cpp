@@ -368,10 +368,7 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option, QPainter * painter
         c = Colors::mid(c, SCROLL_COLOR(complexStep),6-complexStep,complexStep);
     }
     else if (hover)
-    {
-        complexStep = 6;
-        c = SCROLL_COLOR(6);
-    }
+        { complexStep = 6; c = SCROLL_COLOR(6); }
     else if (widgetStep)
         c = Colors::mid(CCOLOR(btn.std, Bg), SCROLL_COLOR(widgetStep));
     else
@@ -383,11 +380,17 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option, QPainter * painter
     const bool grooveIsSunken = config.scroll.groove >= Groove::Sunken;
 
     /// draw shadow
-    painter->save();
+    // clip away innper part of shadow - hey why paint invisible alpha stuff =D   --------
+    bool hadClip = painter->hasClipping();
+    QRegion oldClip;
+    if (hadClip)
+        oldClip = painter->clipRegion();
+    painter->setClipping(true);
     if (horizontal)
         painter->setClipRegion(QRegion(RECT) - r.adjusted(F(9), F(3), -F(9), -F(3)));
     else
         painter->setClipRegion(QRegion(RECT) - r.adjusted(F(3), F(9), -F(3), -F(9)));
+    // --------------
     if (sunken && !grooveIsSunken)
     {
         r.adjust(f1, f1, -f1, -f1);
@@ -404,7 +407,11 @@ BespinStyle::drawScrollBarSlider(const QStyleOption * option, QPainter * painter
         shadows.raised[round_][true][false].render(r, painter);
         r.adjust(f2, f2, -f2, horizontal && grooveIsSunken ? -f2 : -F(3) );
     }
-    painter->restore();
+    // restore clip---------------
+    if (hadClip)
+        // sic! clippping e.g. in webkit seems to be broken? at least querky with size and pos twisted...
+        painter->setClipRegion(RECT);
+    painter->setClipping(hadClip);
 
     /// the always shown base
     Qt::Orientation o; int size; Tile::PosFlags pf;

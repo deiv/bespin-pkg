@@ -479,7 +479,7 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWi
 #if QT_VERSION >= 0x040400
                             item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
 #endif
-                            // HACK, dolphin should please use the proper position flag...
+                            // WORKAROUND, dolphin should please use the proper position flag...
                             (widget && widget->inherits("DolphinIconsView")));
         Gradients::Type gt = Gradients::None;
         if (round)
