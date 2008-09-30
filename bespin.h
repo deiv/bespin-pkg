@@ -309,6 +309,7 @@ private:
     QPalette *originalPalette;
 private slots:
     void fixKdePalette();
+    void clearScrollbarCache();
 };
 
 

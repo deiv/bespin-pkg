@@ -444,7 +444,9 @@ BespinStyle::drawToolboxTab(const QStyleOption *option, QPainter *painter,
 void
 BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
-    OPT_HOVER; OPT_SUNKEN;
+    if (option->state & State_Selected)
+        return; // plain selected items
+    OPT_HOVER OPT_SUNKEN
 
     QRect r = RECT; Tile::PosFlags pf = Tile::Full;
     if (const QStyleOptionToolBoxV2* tbt = qstyleoption_cast<const QStyleOptionToolBoxV2*>(option))
@@ -462,56 +464,52 @@ BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, 
         default:
             r.setBottom(r.bottom()-dpi.f2);
         }
-        if (option->state & State_Selected) {
-            pf |= Tile::Bottom;
-            r.setBottom(RECT.bottom()-dpi.f2);
-        }
-        else if (tbt->selectedPosition == // means we touch the displayed box bottom
-                QStyleOptionToolBoxV2::PreviousIsSelected)
+        // means we touch the displayed box bottom
+        if (tbt->selectedPosition == QStyleOptionToolBoxV2::PreviousIsSelected)
             pf |= Tile::Top;
+        // means we touch the displayed box top
+        else if (tbt->selectedPosition == QStyleOptionToolBoxV2::NextIsSelected)
+            pf |= Tile::Bottom;
     }
 
-    const bool selected = option->state & State_Selected;
+    QColor c = CCOLOR(tab.std, Bg);
+    Gradients::Type gt = GRAD(tab);
+    if (sunken)
+        { c = FCOLOR(Window); gt = Gradients::Sunken; }
+    else if (hover)
+        c = Colors::mid(CCOLOR(tab.std, Bg), FCOLOR(Window), 4, 1);
+
     Tile::setShape(pf);
-    if (selected || hover || sunken)
-    {
-        const QColor &c = selected ? CCOLOR(toolbox.active, Bg) : FCOLOR(Window);
-        Gradients::Type gt = selected ? GRAD(toolbox) : (sunken ? Gradients::Sunken : Gradients::Button);
-        masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
-    }
-    else
-        masks.rect[true].render(r, painter, FCOLOR(Window).dark(108));
+    masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
     Tile::setShape(pf & ~Tile::Center);
     shadows.sunken[true][true].render(RECT, painter);
     Tile::reset();
 }
 
 void
-BespinStyle::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter,
-                                 const QWidget *) const
+BespinStyle::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
-   ASSURE_OPTION(tbt, ToolBox);
-   OPT_ENABLED;
-   const bool selected = option->state & (State_Selected);
+    ASSURE_OPTION(tbt, ToolBox);
+    OPT_ENABLED OPT_SUNKEN
+    const bool selected = option->state & (State_Selected);
 
-   QColor cB = FCOLOR(Window), cF = FCOLOR(WindowText);
-   painter->save();
-   if (selected) {
-      cB = CCOLOR(toolbox.active, Bg);
-      cF = CCOLOR(toolbox.active, Fg);
-      QFont tmpFnt = painter->font(); tmpFnt.setBold(true);
-      painter->setFont(tmpFnt);
-   }
+    QColor cB = FCOLOR(Window), cF = FCOLOR(WindowText);
+    painter->save();
+    if (selected)
+        setBold(painter);
+    else if (!sunken)
+        { cB = CCOLOR(tab.std, Bg); cF = CCOLOR(tab.std, Fg); }
 
-   // on dark background, let's paint an emboss
-   if (isEnabled) {
-      QRect tr = RECT;
-      painter->setPen(cB.dark(120));
-      tr.moveTop(tr.top()-1);
-      drawItemText(painter, tr, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, tbt->text);
-      tr.moveTop(tr.top()+1);
-   }
-   painter->setPen(cF);
-   drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, tbt->text);
-   painter->restore();
+    // on dark background, let's paint an emboss
+    if (isEnabled && Colors::value(cB) < 100)
+    {
+        QRect tr = RECT;
+        painter->setPen(cB.dark(120));
+        tr.moveTop(tr.top()-1);
+        drawItemText(painter, tr, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, tbt->text);
+        tr.moveTop(tr.top()+1);
+    }
+    painter->setPen(cF);
+    drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, tbt->text);
+    painter->restore();
 }

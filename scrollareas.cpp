@@ -90,8 +90,16 @@ static int complexStep, widgetStep;
 static const bool round_ = true;
 
 static QPixmap *scrollBgCache = 0;
+static QTimer cacheCleaner;
 const static QWidget *cachedScroller = 0;
 static QPainter *cPainter = 0;
+
+void
+BespinStyle::clearScrollbarCache()
+{
+    cacheCleaner.stop(); cachedScroller = 0L;
+    delete scrollBgCache; scrollBgCache = 0L;
+}
 
 void
 BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
@@ -133,6 +141,8 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
                 }
                 if (!scrollBgCache || scrollBgCache->size() != RECT.size())
                 {   // we need a new cache pixmap
+                    cacheCleaner.disconnect();
+                    connect(&cacheCleaner, SIGNAL(timeout()), this, SLOT(clearScrollbarCache()));
                     delete scrollBgCache;
                     scrollBgCache = new QPixmap(RECT.size());
                     cPainter = new QPainter(scrollBgCache);
@@ -185,8 +195,10 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
         { cPainter->end(); delete cPainter; cPainter = painter; }
    
     /// Background and groove have been painted
-    if (useCache)  //flush the cache
+    if (useCache) //flush the cache
+    {   cacheCleaner.start(1000);
         painter->drawPixmap(RECT.topLeft(), *scrollBgCache);
+    }
 
     if (config.scroll.showButtons)
     {   // nasty useless "click-to-scroll-one-single-line" buttons
