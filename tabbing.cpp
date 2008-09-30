@@ -454,22 +454,24 @@ BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, 
         switch (tbt->position)
         {
         case QStyleOptionToolBoxV2::Beginning:
-            pf &= ~Tile::Bottom;
-            break;
+            pf &= ~Tile::Bottom; break;
         case QStyleOptionToolBoxV2::Middle:
-            pf &= ~(Tile::Top | Tile::Bottom);
-            break;
+            pf &= ~(Tile::Top | Tile::Bottom); break;
         case QStyleOptionToolBoxV2::End:
-            pf &= ~Tile::Top;
-        default:
+            pf &= ~Tile::Top; // fallthrough
+        default: // single
             r.setBottom(r.bottom()-dpi.f2);
         }
         // means we touch the displayed box bottom
-        if (tbt->selectedPosition == QStyleOptionToolBoxV2::PreviousIsSelected)
-            pf |= Tile::Top;
+        switch (tbt->selectedPosition)
+        {
+        case QStyleOptionToolBoxV2::PreviousIsSelected:
+            pf |= Tile::Top; break;
         // means we touch the displayed box top
-        else if (tbt->selectedPosition == QStyleOptionToolBoxV2::NextIsSelected)
-            pf |= Tile::Bottom;
+        case QStyleOptionToolBoxV2::NextIsSelected:
+            pf |= Tile::Bottom; break;
+        default: break;
+        }
     }
 
     QColor c = CCOLOR(tab.std, Bg);
@@ -477,7 +479,7 @@ BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, 
     if (sunken)
         { c = FCOLOR(Window); gt = Gradients::Sunken; }
     else if (hover)
-        c = Colors::mid(CCOLOR(tab.std, Bg), FCOLOR(Window), 4, 1);
+        c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 4, 1);
 
     Tile::setShape(pf);
     masks.rect[true].render(r, painter, gt, Qt::Vertical, c);

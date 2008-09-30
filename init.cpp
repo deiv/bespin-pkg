@@ -273,10 +273,7 @@ BespinStyle::readSettings(const QSettings* settings)
     readRole(tab.std, TAB_ROLE);
     Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));
     config.tab.activeTabSunken = readBool(TAB_ACTIVETABSUNKEN);
-
-    // ToolBoxes
-    readRole(toolbox.active, TOOLBOX_ACTIVEROLE);
-    GRAD(toolbox) = readGrad(TAB_ACTIVEGRADIENT);
+//     GRAD(toolbox) = readGrad(TAB_ACTIVEGRADIENT);
 
     // Views ===========================
     readRole(view.header, VIEW_HEADERROLE);

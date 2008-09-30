@@ -90,8 +90,6 @@
 #define TAB_ROLE "Tab.Role", QPalette::WindowText
 #define TAB_TRANSITION "Tab.Transition", 10
 #define TAB_ACTIVETABSUNKEN "Tab.ActiveTabSunken", true
-
-#define TOOLBOX_ACTIVEROLE "ToolBox.ActiveRole", QPalette::WindowText
 #define TAB_ACTIVEGRADIENT "Tab.ActiveGradient", Gradients::Sunken
 
 #define VIEW_HEADERROLE "View.HeaderRole", QPalette::Text

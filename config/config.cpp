@@ -218,7 +218,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateColorModes(ui.btnActiveRole);
     generateColorModes(ui.headerRole);
     generateColorModes(ui.headerSortingRole);
-    generateColorModes(ui.crTool);
     generateColorModes(ui.crMenu);
     generateColorModes(ui.kwinInactiveRole);
     generateColorModes(ui.kwinActiveRole);
@@ -232,7 +231,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateGradientTypes(ui.gradScroll);
     generateGradientTypes(ui.headerGradient);
     generateGradientTypes(ui.headerSortingGradient);
-    generateGradientTypes(ui.gradTool);
     ui.kwinInactiveGrad->clear();
     ui.kwinInactiveGrad->addItem("None", GradNone);
     ui.kwinInactiveGrad->addItem("Sunken", GradSunken);
@@ -353,9 +351,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.crTabBar, "Tab.Role", QPalette::Window);
     handleSettings(ui.tabTransition, TAB_TRANSITION);
     handleSettings(ui.activeTabSunken, "Tab.ActiveTabSunken", false);
-
-    handleSettings(ui.crTool, "ToolBox.ActiveRole", QPalette::Highlight);
-    handleSettings(ui.gradTool, "Tab.ActiveGradient", GradGlass);
 
     handleSettings(ui.headerRole, "View.HeaderRole", QPalette::Text);
     handleSettings(ui.headerSortingRole, "View.SortingHeaderRole", QPalette::Text);
