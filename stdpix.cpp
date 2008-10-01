@@ -74,14 +74,14 @@ BespinStyle::standardPixmap(StandardPixmap standardPixmap,
         rect = QRect(0,0,14,14);
         pal = qApp->palette();
     }
-   
 
-    QPixmap pm(rect.size());
+    const QDockWidget *dock = qobject_cast<const QDockWidget*>(widget);
+    const int sz = dock ? 14 : rect.width();
+    const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
+    QPixmap pm(sz, sz);
     pm.fill(Qt::transparent);
     QPainter painter(&pm);
     QPainterPath shape;
-    const int sz = rect.width();
-    const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
 
     switch (standardPixmap)
     {
@@ -112,7 +112,7 @@ BespinStyle::standardPixmap(StandardPixmap standardPixmap,
         shape.addRect(0,s4,sz,s4);
         goto paint;
     case SP_TitleBarNormalButton:
-        if (const QDockWidget *dock = qobject_cast<const QDockWidget*>(widget))
+        if (dock)
         {
             if (dock->isFloating())
                 shape.addRect(0,s4,sz,s2);

@@ -437,10 +437,11 @@ BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComple
    return ret;
 }
 
-QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * option, const QWidget * widget) const
+QRect
+BespinStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
-   switch (element)
-   {
+    switch (element)
+    {
     case SE_PushButtonContents: // Area containing the label (icon with text or pixmap)
         return visualRect(option->direction, RECT, RECT.adjusted(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4));
 //    case SE_PushButtonFocusRect: // Area for the focus rect (usually larger than the contents rect)
@@ -478,15 +479,15 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
     case SE_CheckBoxClickRect: // Clickable area, defaults to SE_CheckBoxFocusRect
     case SE_RadioButtonFocusRect: // Area for the focus indicator
     case SE_RadioButtonClickRect: // Clickable area, defaults to SE_RadioButtonFocusRect
-        return option->rect;
+        return RECT;
    
 //    case SE_ComboBoxFocusRect: // Area for the focus indicator
 //    case SE_SliderFocusRect: // Area for the focus indicator
 //    case SE_Q3DockWindowHandleRect: // Area for the tear-off handle
-   case SE_ProgressBarGroove: // Area for the groove
-   case SE_ProgressBarContents: // Area for the progress indicator
-   case SE_ProgressBarLabel: // Area for the text label
-      return option->rect;
+    case SE_ProgressBarGroove: // Area for the groove
+    case SE_ProgressBarContents: // Area for the progress indicator
+    case SE_ProgressBarLabel: // Area for the text label
+        return RECT;
 //    case SE_DialogButtonAccept: // Area for a dialog's accept button
 //    case SE_DialogButtonReject: // Area for a dialog's reject button
 //    case SE_DialogButtonApply: // Area for a dialog's apply button
@@ -496,110 +497,123 @@ QRect BespinStyle::subElementRect ( SubElement element, const QStyleOption * opt
 //    case SE_DialogButtonAbort: // Area for a dialog's abort button
 //    case SE_DialogButtonIgnore: // Area for a dialog's ignore button
 //    case SE_DialogButtonCustom: // Area for a dialog's custom widget area (in the button row)
-   case SE_HeaderArrow: { //
-      int x,y,w,h;
-      if (widget)
-         option->rect.intersected(widget->rect()).getRect(&x,&y,&w,&h);
-      else
-         option->rect.getRect(&x,&y,&w,&h);
-      int margin = dpi.f2;// ;) pixelMetric(QStyle::PM_HeaderMargin, opt, widget);
-      QRect r;
-      if (option->state & State_Horizontal) {
-         bool up = false;
-         if (const QStyleOptionHeader *hdr =
-               qstyleoption_cast<const QStyleOptionHeader *>(option))
-            up = hdr->sortIndicator == QStyleOptionHeader::SortUp;
-         const int h_3 = h / 3;
-         r.setRect(x + (w - h_3)/2, up ? y+h-h_3 : y, h_3, h_3);
+    case SE_HeaderArrow:
+    {
+        int x,y,w,h;
+        if (widget)
+            option->rect.intersected(widget->rect()).getRect(&x,&y,&w,&h);
+        else
+            option->rect.getRect(&x,&y,&w,&h);
+        int margin = dpi.f2;// ;) pixelMetric(QStyle::PM_HeaderMargin, opt, widget);
+        QRect r;
+        if (option->state & State_Horizontal)
+        {
+            bool up = false;
+            if HAVE_OPTION(hdr, Header)
+                up = hdr->sortIndicator == QStyleOptionHeader::SortUp;
+            const int h_3 = h / 3;
+            r.setRect(x + (w - h_3)/2, up ? y+h-h_3 : y, h_3, h_3);
 //          r.setRect(x + w - 2*margin - (h / 2), y + h/4 + margin, h / 2, h/2);
-      }
-      else {
-         r.setRect(x + dpi.f5, y, h / 2, h / 2 - margin * 2);
-         r = visualRect(option->direction, option->rect, r);
-      }
-      return r;
-   }
+        }
+        else
+        {
+            r.setRect(x + dpi.f5, y, h / 2, h / 2 - margin * 2);
+            r = visualRect(option->direction, option->rect, r);
+        }
+        return r;
+    }
 //    case SE_HeaderLabel: //  
-   case SE_TabWidgetLeftCorner:
-   case SE_TabWidgetRightCorner:
-      if (const QStyleOptionTabWidgetFrame *twf =
-          qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option)) {
-         int off = 0, x = 0, y = 0;
-         switch (twf->shape) {
-         case QTabBar::RoundedSouth:
-         case QTabBar::TriangularSouth:
-            y = twf->rect.bottom() - twf->tabBarSize.height();
-         case QTabBar::RoundedNorth:
-         case QTabBar::TriangularNorth:
-            off = twf->tabBarSize.height()/4;
-            if (element == SE_TabWidgetRightCorner)
-               x = twf->rect.right() - twf->tabBarSize.height();
-            break;
-         case QTabBar::RoundedEast:
-         case QTabBar::TriangularEast:
-            x = twf->rect.right() - twf->tabBarSize.width();
-         case QTabBar::RoundedWest:
-         case QTabBar::TriangularWest:
-            off = twf->tabBarSize.width()/4;
-            if (element == SE_TabWidgetRightCorner)
-               y = twf->rect.bottom() - twf->tabBarSize.width();
-         default:
-            break;
-         }
-         off -= dpi.f2; x +=off; y += off;
-         off = 2*(off+dpi.f4);
-         return QRect(x,y,off,off);
-      }
-   case SE_TabWidgetTabBar: { //
-      if (const QStyleOptionTabWidgetFrame *twf =
-          qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option)) {
-         QRect r = QCommonStyle::subElementRect ( element, option, widget);
-         if (verticalTabs(twf->shape)) {
-            r.translate(0,dpi.f4);
-         if (r.bottom() > option->rect.bottom())
-            r.setBottom(option->rect.bottom());
-         }
-         else {
-            r.translate(dpi.f4, 0);
-         if (r.right() > option->rect.right())
-            r.setRight(option->rect.right());
-         }
-         return r;
-      }
-   }
-   case SE_TabWidgetTabContents: //  
-      if (const QStyleOptionTabWidgetFrame *twf =
-          qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option)) {
-         QRect r = option->rect; //subElementRect ( SE_TabWidgetTabPane, option, widget);
+    case SE_TabWidgetLeftCorner:
+    case SE_TabWidgetRightCorner:
+        if HAVE_OPTION(twf, TabWidgetFrame)
+        {
+            int off = 0, x = 0, y = 0;
+            switch (twf->shape)
+            {
+            case QTabBar::RoundedSouth:
+            case QTabBar::TriangularSouth:
+                y = twf->rect.bottom() - twf->tabBarSize.height();
+            case QTabBar::RoundedNorth:
+            case QTabBar::TriangularNorth:
+                off = twf->tabBarSize.height()/4;
+                if (element == SE_TabWidgetRightCorner)
+                x = twf->rect.right() - twf->tabBarSize.height();
+                break;
+            case QTabBar::RoundedEast:
+            case QTabBar::TriangularEast:
+                x = twf->rect.right() - twf->tabBarSize.width();
+            case QTabBar::RoundedWest:
+            case QTabBar::TriangularWest:
+                off = twf->tabBarSize.width()/4;
+                if (element == SE_TabWidgetRightCorner)
+                y = twf->rect.bottom() - twf->tabBarSize.width();
+            default:
+                break;
+            }
+            off -= dpi.f2; x +=off; y += off;
+            off = 2*(off+dpi.f4);
+            return QRect(x,y,off,off);
+        }
+    case SE_TabWidgetTabBar:
+    {
+        if HAVE_OPTION(twf, TabWidgetFrame)
+        {
+            QRect r = QCommonStyle::subElementRect(SE_TabWidgetTabBar, option, widget);
+            if (verticalTabs(twf->shape))
+            {
+                r.translate(0, F(4));
+                if (r.bottom() > option->rect.bottom())
+                    r.setBottom(option->rect.bottom());
+            }
+            else if (option->direction == Qt::LeftToRight)
+            {
+                r.translate(F(4), 0);
+                if (r.right() > option->rect.right())
+                    r.setRight(option->rect.right());
+            }
+            else // rtl support
+            {
+                r.translate(-F(4), 0);
+                if (r.left() > option->rect.left())
+                    r.setLeft(option->rect.left());
+            }
+            return r;
+        }
+    }
+    case SE_TabWidgetTabContents:
+        if HAVE_OPTION(twf, TabWidgetFrame)
+        {
+            QRect r = RECT; //subElementRect ( SE_TabWidgetTabPane, option, widget);
 //          QStyleOptionTab tabopt;
 //          tabopt.shape = twf->shape;
-         const int margin = dpi.f4;
+            const int margin = F(4);
 //          int baseHeight = pixelMetric(PM_TabBarBaseHeight, &tabopt, widget);
-         switch (twf->shape) {
-         case QTabBar::RoundedNorth:
-         case QTabBar::TriangularNorth:
-            r.adjust(margin, margin+twf->tabBarSize.height(), -margin, -margin);
+            switch (twf->shape)
+            {
+            case QTabBar::RoundedNorth:
+            case QTabBar::TriangularNorth:
+                r.adjust(margin, margin+twf->tabBarSize.height(), -margin, -margin);
             break;
-         case QTabBar::RoundedSouth:
-         case QTabBar::TriangularSouth:
-            r.adjust(margin, margin, -margin, -margin-twf->tabBarSize.height());
+            case QTabBar::RoundedSouth:
+            case QTabBar::TriangularSouth:
+                r.adjust(margin, margin, -margin, -margin-twf->tabBarSize.height());
             break;
-         case QTabBar::RoundedEast:
-         case QTabBar::TriangularEast:
-            r.adjust(margin, margin, -margin-twf->tabBarSize.width(), -margin);
+            case QTabBar::RoundedEast:
+            case QTabBar::TriangularEast:
+                r.adjust(margin, margin, -margin-twf->tabBarSize.width(), -margin);
             break;
-         case QTabBar::RoundedWest:
-         case QTabBar::TriangularWest:
-            r.adjust(margin+twf->tabBarSize.width(), margin, -margin, -margin);
-         }
-         return r;
-      }
-   case SE_TabWidgetTabPane: //  
-      return option->rect;//.adjusted(-dpi.f8, 0, dpi.f8, 0);
-   case SE_ToolBoxTabContents: // Area for a toolbox tab's icon and label
-      return option->rect;
+            case QTabBar::RoundedWest:
+            case QTabBar::TriangularWest:
+                r.adjust(margin+twf->tabBarSize.width(), margin, -margin, -margin);
+            }
+            return r;
+        }
+    case SE_TabWidgetTabPane: //
+        return RECT;//.adjusted(-dpi.f8, 0, dpi.f8, 0);
+    case SE_ToolBoxTabContents: // Area for a toolbox tab's icon and label
+        return RECT;
 //    case SE_TabBarTearIndicator: // Area for the tear indicator on a tab bar with scroll arrows.
-   default:
-      return QCommonStyle::subElementRect ( element, option, widget);
+    default:
+        return QCommonStyle::subElementRect ( element, option, widget);
    }
 }

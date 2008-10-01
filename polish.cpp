@@ -21,7 +21,9 @@
 // #include <QAbstractSlider>
 #include <QApplication>
 #include <QtDebug>
+#include <QLabel>
 #include <QLayout>
+#include <QLCDNumber>
 #include <QMenu>
 #include <QMenuBar>
 #include <QPainter>
@@ -324,8 +326,8 @@ BespinStyle::polish( QWidget * widget )
             menu->installEventFilter(this);
 #if 0
             /// NOTE this was intended to be for some menu mock from nuno where the menu
-            // reaches kinda ribbon-like into the bar
-            // i'll keep it to remind myself and in case i get it to work one day ;-)
+            /// reaches kinda ribbon-like into the bar
+            /// i'll keep it to remind myself and in case i get it to work one day ;-)
             if (bar4popup(menu))
             {
                 QAction *action = new QAction( menu->menuAction()->iconText(), menu );
@@ -359,10 +361,26 @@ BespinStyle::polish( QWidget * widget )
     //END Window handling                                                                          -
 
     //BEGIN Frames                                                                                 -
-    else if (QFrame *frame = qobject_cast<QFrame *>(widget)) // sic!!! no window frames!
+    else if (QFrame *frame = qobject_cast<QFrame *>(widget)) // sic! for "else" - no window frames!
     {
+        // just saw they're niftier in skulpture -> had to do sth. ;-P
+        if (QLCDNumber *lcd = qobject_cast<QLCDNumber*>(frame))
+        {
+            if (lcd->frameShape() != QFrame::NoFrame)
+                lcd->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+            lcd->setSegmentStyle(QLCDNumber::Flat);
+            lcd->setAutoFillBackground(true);
+        }
+#if 0 // i want them centered, but titlewidget fights back, and it's not worth the eventfilter monitor
+        else if (QLabel *label = qobject_cast<QLabel*>(frame))
+        {   // i want them center aligned
+            if (label->parentWidget() && label->parentWidget()->parentWidget() &&
+                label->parentWidget()->parentWidget()->inherits("KTitleWidget"))
+                label->setAlignment(Qt::AlignCenter);
+        }
+#endif
         // sunken looks soo much nicer ;)
-        if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
+        else if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
         {
             if (config.bg.mode == Scanlines)
                 frame->setFrameShadow(QFrame::Sunken);
@@ -604,10 +622,10 @@ BespinStyle::polish( QWidget * widget )
         qobject_cast<QAbstractScrollArea*>(widget->parentWidget()->parentWidget()) &&
         widget->parentWidget()->parentWidget()->parentWidget() && // grangrampa
         widget->parentWidget()->parentWidget()->parentWidget()->inherits("QToolBox") )
-        {
-            widget->parentWidget()->setAutoFillBackground(false);
-            widget->setAutoFillBackground(false);
-        }
+    {
+        widget->parentWidget()->setAutoFillBackground(false);
+        widget->setAutoFillBackground(false);
+    }
 
     // this is a WORKAROUND for amarok filebrowser, see above on itemviews...
     if (widget->inherits("KDirOperator") && widget->parentWidget() && widget->parentWidget()->inherits("FileBrowser"))

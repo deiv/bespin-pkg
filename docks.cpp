@@ -37,46 +37,38 @@ BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, cons
 
     ASSURE_OPTION(dwOpt, DockWidget);
     OPT_ENABLED
+
+#if 1
     Qt::Orientation o = Qt::Vertical;
     if (const QDockWidget *dock = qobject_cast<const QDockWidget*>(w))
-//     if (dock->features() & QDockWidget::DockWidgetVerticalTitleBar)
-//         o = Qt::Horizontal;
-
-//     painter->fillRect(RECT, Gradients::pix(FCOLOR(Window), RECT.height(), o, Gradients::Sunken));
+    if (dock->features() & QDockWidget::DockWidgetVerticalTitleBar)
+        o = Qt::Horizontal;
+    painter->fillRect(RECT, Gradients::pix(FCOLOR(WindowText), RECT.height(), o, Gradients::Button));
+#endif
 
     if (!dwOpt->title.isEmpty())
     {
-        QRect rect = RECT, textRect;
+        const int itemtextopts = Qt::AlignCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
         // adjust rect;
-        rect.setRight(rect.right() - (dwOpt->closable +  dwOpt->floatable) * (16 + F(2)));
-
-        const int itemtextopts = Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine | Qt::TextHideMnemonic;
+        QRect rect = RECT;
+        const int bw = (dwOpt->closable +  dwOpt->floatable) * (16 + F(2));
+        if (option->direction == Qt::LeftToRight)
+            rect.setRight(rect.right() - bw);
+        else
+            rect.setLeft(rect.left() + bw);
 
         painter->save();
         setBold(painter);
 
         QPen pen = painter->pen();
-        if (Colors::value(FCOLOR(WindowText)) > 140)
+        if (Colors::value(FCOLOR(WindowText)) < 100)
         {   // emboss
-            painter->setPen(Colors::mid(FCOLOR(Window), Qt::black, 1, 4));
+            painter->setPen(Colors::mid(FCOLOR(WindowText), Qt::black, 1, 4));
             drawItemText(painter, rect.adjusted(0,-1,0,-1), itemtextopts, PAL, isEnabled, dwOpt->title);
         }
-        painter->setPen(FCOLOR(WindowText));
-        drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dwOpt->title, QPalette::NoRole, &textRect);
-#if 0
-        textRect.adjust(-F(6), 0, F(6), 0);
+        painter->setPen(FCOLOR(Window));
+        drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dwOpt->title);
 
-        painter->setPen(Qt::NoPen);
-        const QPixmap *fill;
-        const int cnt = qMin(5, (textRect.left() - (rect.left() + 2*F(6))) / F(12));
-        const int y = rect.y()+(rect.height()-F(6))/2;
-        for (int i = 0; i < cnt; ++i)
-        {
-            fill = &Gradients::pix(Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 10+i, 1), F(6), Qt::Vertical, Gradients::Sunken);
-            fillWithMask(painter, QPoint(textRect.left()-(1+i)*F(12), y), *fill, masks.notch);
-            fillWithMask(painter, QPoint(textRect.right()+F(6)+i*F(12), y), *fill, masks.notch);
-        }
-#endif
         painter->restore();
     }
 }
