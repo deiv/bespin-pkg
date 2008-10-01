@@ -131,10 +131,15 @@ void
 BespinStyle::drawButtonFrame(const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
 {
-   B_STATES;
+    const int f1 = F(1), f2 = F(2);
+    B_STATES
 
     const QAbstractButton* btn = qobject_cast<const QAbstractButton*>(widget);
-    const int f1 = F(1), f2 = F(2);
+    if (widget && !btn && widget->inherits("QAbstractItemView"))
+        { hover = false; animStep = 0; }
+    else if (animStep < 0)
+        animStep = HOVER_STEP;
+        
 //    const bool toggled = !hover && (option->state & State_On);
     const bool round = !isCheckbox && (config.btn.round || (btn && btn->isCheckable()));
     const bool fullHover = config.btn.fullHover ||
@@ -142,12 +147,10 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
 
     int iOff[4] = {0,0,0,0};
     QRect r = RECT;
-    if (animStep < 0)
-        animStep = HOVER_STEP;
-   
-    Gradients::Type gt = GRAD(btn);
-    QColor c = btnBg(PAL, isEnabled, hasFocus, animStep, fullHover, Gradients::isReflective(gt));
 
+    Gradients::Type gt = GRAD(btn);
+
+    QColor c = btnBg(PAL, isEnabled, hasFocus, animStep, fullHover, Gradients::isReflective(gt));
     QColor iC = CCOLOR(btn.std, Bg);
 
     bool drawInner = false;
