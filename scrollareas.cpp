@@ -20,6 +20,7 @@
 #include <Qt3Support/Q3ScrollView>
 #endif
 #include <QAbstractScrollArea>
+#include <QTimer>
 #include "draw.h"
 #include "animator/hover.h"
 #include "animator/hovercomplex.h"
