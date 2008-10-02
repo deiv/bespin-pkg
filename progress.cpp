@@ -38,7 +38,7 @@ BespinStyle::drawCapacityBar(const QStyleOption *option, QPainter *painter, cons
     }
     
     QRect r = RECT; r.setBottom(r.bottom()-f2);
-    masks.rect[false].render(r, painter, Gradients::Sunken, Qt::Vertical, COLOR(fg)); // CCOLOR(progress.std, Bg)
+    masks.rect[false].render(r, painter, Gradients::Sunken, Qt::Vertical, Colors::mid(COLOR(fg), Qt::black,6, 1)); // CCOLOR(progress.std, Bg)
     shadows.sunken[false][isEnabled].render(RECT, painter);
 
     int w = r.width()*cb->progress/(cb->maximum - cb->minimum)  - f2;

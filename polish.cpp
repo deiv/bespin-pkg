@@ -341,7 +341,10 @@ BespinStyle::polish( QWidget * widget )
         /// WORKAROUND Qt color bug, uses daddies palette and FGrole, but TooltipBase as background
         else if (widget->inherits("QWhatsThat"))
             widget->setPalette(QToolTip::palette()); // so this is Qt bug WORKAROUND
-    
+#if 0 // until kwin provides better shadows
+        else if (widget->inherits("QDockWidget"))
+            widget->installEventFilter(this); // shape corners... repeated below!
+#endif
         else
         {   /// modal dialogs
             if (config.bg.modal.invert || config.bg.modal.glassy || config.bg.modal.opacity < 100)
@@ -585,6 +588,10 @@ BespinStyle::polish( QWidget * widget )
         // the eventfilter overtakes the widget painting to allow tabs ABOVE the tabbar
         widget->installEventFilter(this);
     }
+#if 0 // until kwin provides better shaodws
+    else if (widget->inherits("QDockWidget"))
+        widget->installEventFilter(this); // shape corners... repeated above!
+#endif
     else if (widget->inherits("KFadeWidgetEffect"))
     {   // interfers with our animation, is slower and cannot handle non plain backgrounds
         // (unfortunately i cannot avoid the widget grabbing)
@@ -592,6 +599,11 @@ BespinStyle::polish( QWidget * widget )
         widget->hide();
         widget->installEventFilter(&eventKiller);
     }
+    /// hover some leftover widgets
+    else if (widget->inherits("QAbstractSpinBox") || widget->inherits("QSplitterHandle") ||
+        widget->inherits("QDockWidget") || widget->inherits("QWorkspaceTitleBar") ||
+        widget->inherits("Q3DockWindowResizeHandle"))
+        widget->setAttribute(Qt::WA_Hover);
 
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
     QMenuBar *mbar = qobject_cast<QMenuBar *>(widget);
@@ -609,11 +621,6 @@ BespinStyle::polish( QWidget * widget )
         if (!isTopContainer && widget->inherits("QToolBarHandle"))
             widget->setAttribute(Qt::WA_Hover);
     }
-
-    /// hover some leftover widgets
-    if (widget->inherits("QAbstractSpinBox") || widget->inherits("QSplitterHandle") ||
-        widget->inherits("QWorkspaceTitleBar") || widget->inherits("Q3DockWindowResizeHandle"))
-        widget->setAttribute(Qt::WA_Hover);
 
     /// this is for QToolBox kids - they're autofilled by default - what looks crap
     if (widget->autoFillBackground() && widget->parentWidget() &&

@@ -36,21 +36,15 @@ BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, cons
 {
 
     ASSURE_OPTION(dwOpt, DockWidget);
-    OPT_ENABLED
-
-#if 1
-    Qt::Orientation o = Qt::Vertical;
-    if (const QDockWidget *dock = qobject_cast<const QDockWidget*>(w))
-    if (dock->features() & QDockWidget::DockWidgetVerticalTitleBar)
-        o = Qt::Horizontal;
-    painter->fillRect(RECT, Gradients::pix(FCOLOR(WindowText), RECT.height(), o, Gradients::Button));
-#endif
+    OPT_ENABLED OPT_HOVER
+    QRect rect = RECT;
+    const QColor bg = FCOLOR(Window);
 
     if (!dwOpt->title.isEmpty())
     {
-        const int itemtextopts = Qt::AlignCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
+        QRect textRect;
+        const int itemtextopts = Qt::AlignBottom | Qt::AlignHCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
         // adjust rect;
-        QRect rect = RECT;
         const int bw = (dwOpt->closable +  dwOpt->floatable) * (16 + F(2));
         if (option->direction == Qt::LeftToRight)
             rect.setRight(rect.right() - bw);
@@ -58,16 +52,26 @@ BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, cons
             rect.setLeft(rect.left() + bw);
 
         painter->save();
-        setBold(painter);
+        QString title = dwOpt->title; // " " + dwOpt->title + " "; // good for undrlining
+        QFont fnt = painter->font();
+        fnt.setWeight(QFont::Black);
+//         fnt.setUnderline(true);
+        fnt.setStretch(QFont::SemiExpanded);
+#if QT_VERSION >= 0x040400
+        fnt.setCapitalization(QFont::/*AllUppercase*/SmallCaps);
+#else
+        title = title.toUpper();
+#endif
+        painter->setFont(fnt);
 
         QPen pen = painter->pen();
-        if (Colors::value(FCOLOR(WindowText)) < 100)
+        if (Colors::value(bg) < 100)
         {   // emboss
-            painter->setPen(Colors::mid(FCOLOR(WindowText), Qt::black, 1, 4));
-            drawItemText(painter, rect.adjusted(0,-1,0,-1), itemtextopts, PAL, isEnabled, dwOpt->title);
+            painter->setPen(Colors::mid(bg, Qt::black, 1, 4));
+            drawItemText(painter, rect.adjusted(0,-1,0,-1), itemtextopts, PAL, isEnabled, title);
         }
-        painter->setPen(FCOLOR(Window));
-        drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dwOpt->title);
+        painter->setPen(hover ? FCOLOR(WindowText) : Colors::mid(bg, FCOLOR(WindowText), 1, 3));
+        drawItemText(painter, rect, itemtextopts, PAL, isEnabled, title);
 
         painter->restore();
     }

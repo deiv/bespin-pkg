@@ -125,6 +125,9 @@ public:
     inline void
     setDefaultShape(PosFlags pf) { _defShape = pf; }
 
+    inline const QPixmap &
+    tile(Section s) const { return pixmap[s]; }
+
 protected:
    QPixmap pixmap[9];
    PosFlags _defShape;

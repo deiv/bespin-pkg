@@ -20,6 +20,7 @@
 
 #include <QAbstractScrollArea>
 #include <QApplication>
+#include <QDockWidget>
 #include <QEvent>
 #include <QPainter>
 #include <QStylePlugin>
@@ -707,10 +708,15 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
         return false;
 
     case QEvent::Resize:
-        if (QMenu *menu = qobject_cast<QMenu*>(object))
+        
+        if (qobject_cast<QMenu*>(object) /*|| qobject_cast<QDockWidget*>(object)*/)
         {
-            if (!menu->isWindow())
-                return false;
+            QWidget *widget = static_cast<QWidget*>(object);
+//             if (!widget->isWindow())
+//             {
+//                 widget->clearMask();
+//                 return false;
+//             }
 #if 0
             QAction *head = menu->actions().at(0);
             QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
@@ -729,8 +735,8 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
             br = masks.corner[3].boundingRect();
             mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
 #endif
-            const int w = menu->width();
-            const int h = menu->height();
+            const int w = widget->width();
+            const int h = widget->height();
             QRegion mask(4, 0, w-8, h);
             mask += QRegion(0, 4, w, h-8);
             mask += QRegion(2, 1, w-4, h-2);
@@ -741,7 +747,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
 //          mask += QRect(2, h-2, w-4, 1);
 //          mask += QRect(4, h-1, w-8, 1);
 
-            menu->setMask(mask);
+            widget->setMask(mask);
             return false;
         }
         return false;
