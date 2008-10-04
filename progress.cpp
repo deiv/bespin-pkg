@@ -26,6 +26,9 @@ void
 BespinStyle::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(cb, ProgressBar);
+    if (cb->maximum == cb->minimum)
+        return;
+        
     OPT_ENABLED
     const int f2 = F(2);
 
@@ -199,8 +202,10 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
 
     // calculate chunk dimensions - you don't wanna know and i forgot... ;-P
     int s = qMin(qMax(l / 10, dpi.f16), t /*16*t/10*/);
+    if (!s) return;
     int ss = (10*s)/16;
     int n = l/s;
+    if (!n) return;
     if (vertical || reverse)
     {
         x = vertical ? RECT.bottom() : RECT.right();

@@ -100,7 +100,7 @@ BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter, const QWid
 //          break;
     QStyleOption copy = *option;
 
-    const int f2 = dpi.f2;
+    const int f2 = F(2);
 
     // storage
     painter->save();
@@ -138,6 +138,7 @@ BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter, const QWid
     }
     else
     {
+        copy.rect.adjust(F(1), F(5), -F(6), -F(2));
         oldBrush = painter->pen().brush();
         copy.state |= State_On;
     }
@@ -150,7 +151,7 @@ BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter, const QWid
         painter->setBrush(oldBrush);
         painter->setBrushOrigin(r.topLeft());
     }
-    copy.rect.adjust(dpi.f3,0,0,-dpi.f3);
+    copy.rect.adjust(F(3),0,0,-F(3));
     drawCheckMark(&copy, painter, Check::V);
     painter->restore();
 }

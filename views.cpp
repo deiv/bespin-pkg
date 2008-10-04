@@ -489,9 +489,9 @@ BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWi
 
         if (gt == Gradients::None)
         {
+            const int contrast = qMax(1, Colors::contrast(FCOLOR(Highlight), COLOR(fg)));
             const QColor high = selected ? FCOLOR(Highlight) :
-                                Colors::mid(COLOR(bg), FCOLOR(Highlight),
-                                            100/Colors::contrast(FCOLOR(Highlight), COLOR(fg)), 4);
+                                Colors::mid(COLOR(bg), FCOLOR(Highlight), 100/contrast, 4);
             painter->fillRect(RECT, high);
         }
         else
