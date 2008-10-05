@@ -150,7 +150,8 @@ MacMenu::activate(QMenuBar *menu)
     
     // find a nice header
     QString title = menu->window()->windowTitle();
-    QString name = QCoreApplication::arguments().at(0).section('/', -1);
+    const QStringList appArgs = QCoreApplication::arguments();
+    QString name = appArgs.isEmpty() ? "" : appArgs.at(0).section('/', -1);
     if (title.isEmpty())
         title = name;
     else
