@@ -294,11 +294,12 @@ Hacks::add(QWidget *w)
         appType = new HackAppType((HackAppType)Unknown);
         if (qApp->inherits("GreeterApp")) // KDM segfaults on QCoreApplication::arguments()...
             *appType = KDM;
-        else if (config.hack.krunner && QCoreApplication::applicationName() == "krunner")
+        if (config.hack.krunner && QCoreApplication::applicationName() == "krunner")
             *appType = KRunner;
         else if (QCoreApplication::applicationName() == "dragonplayer")
             *appType = Dragon;
-        else if (QCoreApplication::arguments().at(0).endsWith("smplayer"))
+        else if (!QCoreApplication::arguments().isEmpty() &&
+                 QCoreApplication::arguments().at(0).endsWith("smplayer"))
             *appType = SMPlayer;
     }
 

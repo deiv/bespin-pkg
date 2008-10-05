@@ -154,19 +154,14 @@ grabWidget(QWidget * root, QPixmap &pix)
     QPainter p; QRegion rgn;
     QPixmap *saPix = 0L;
 
-// @ franz: hier mal machen
     QWidgetList widgets = root->findChildren<QWidget*>();
-//     qDebug() << "BESPIN" << widgets;
-    // make a save copy to protecd agains foreign thread deletions - this is still not 100% deterministic...
     QList< QPointer<QWidget> > widgets2;
     foreach (QWidget *w, widgets)
         widgets2.append(QPointer<QWidget>(w));
     foreach (QWidget *w, widgets2)
     {
-// qDebug() << "BESPIN" << w;
         if (w && w->isVisibleTo(root))
         {
-// qDebug() << "BESPIN passed...";
             // solids
             if (w->autoFillBackground())
             {
