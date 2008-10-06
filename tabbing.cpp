@@ -32,7 +32,7 @@ verticalTabs(QTabBar::Shape shape)
 
 
 void
-BespinStyle::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidget * widget) const
+Style::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidget * widget) const
 {
     if (appType == GTK)
     {
@@ -94,7 +94,7 @@ if (baseHeight < 0) \
 }
 #include <QtDebug>
 void
-BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
+Style::drawTabBar(const QStyleOption *option, QPainter *painter,
                         const QWidget * widget) const
 {
     ASSURE_OPTION(tbb, TabBarBase);
@@ -157,7 +157,7 @@ BespinStyle::drawTabBar(const QStyleOption *option, QPainter *painter,
 static int animStep = -1;
 
 void
-BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
+Style::drawTab(const QStyleOption *option, QPainter *painter,
                      const QWidget * widget) const
 {
     ASSURE_OPTION(tab, Tab);
@@ -248,7 +248,7 @@ BespinStyle::drawTab(const QStyleOption *option, QPainter *painter,
 }
 
 void
-BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
+Style::drawTabShape(const QStyleOption *option, QPainter *painter,
                           const QWidget *) const
 {
     ASSURE_OPTION(tab, Tab);
@@ -324,7 +324,7 @@ BespinStyle::drawTabShape(const QStyleOption *option, QPainter *painter,
 }
 
 void
-BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
+Style::drawTabLabel(const QStyleOption *option, QPainter *painter,
                           const QWidget *) const
 {
     ASSURE_OPTION(tab, Tab);
@@ -426,7 +426,7 @@ BespinStyle::drawTabLabel(const QStyleOption *option, QPainter *painter,
 }
 
 void
-BespinStyle::drawToolboxTab(const QStyleOption *option, QPainter *painter,
+Style::drawToolboxTab(const QStyleOption *option, QPainter *painter,
                             const QWidget * widget) const
 {
     ASSURE_OPTION(tbt, ToolBox);
@@ -442,7 +442,7 @@ BespinStyle::drawToolboxTab(const QStyleOption *option, QPainter *painter,
 }
 
 void
-BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const QWidget *) const
+Style::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     if (option->state & State_Selected)
         return; // plain selected items
@@ -489,7 +489,7 @@ BespinStyle::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, 
 }
 
 void
-BespinStyle::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter, const QWidget *) const
+Style::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     ASSURE_OPTION(tbt, ToolBox);
     OPT_ENABLED OPT_SUNKEN
@@ -498,20 +498,21 @@ BespinStyle::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter, 
     QColor cB = FCOLOR(Window), cF = FCOLOR(WindowText);
     painter->save();
     if (selected)
-        setBold(painter);
+        setTitle(painter);
     else if (!sunken)
         { cB = CCOLOR(tab.std, Bg); cF = CCOLOR(tab.std, Fg); }
 
     // on dark background, let's paint an emboss
+    const uint tf = Qt::AlignHCenter | Qt::AlignBottom | BESPIN_MNEMONIC;
     if (isEnabled && Colors::value(cB) < 100)
     {
         QRect tr = RECT;
         painter->setPen(cB.dark(120));
         tr.moveTop(tr.top()-1);
-        drawItemText(painter, tr, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, tbt->text);
+        drawItemText(painter, tr, tf, PAL, isEnabled, tbt->text);
         tr.moveTop(tr.top()+1);
     }
     painter->setPen(cF);
-    drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, tbt->text);
+    drawItemText(painter, RECT, tf, PAL, isEnabled, tbt->text);
     painter->restore();
 }

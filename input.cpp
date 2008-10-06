@@ -22,7 +22,7 @@
 #include "animator/hover.h"
 
 void
-BespinStyle::drawLineEditFrame(const QStyleOption *option, QPainter *painter, const QWidget *) const
+Style::drawLineEditFrame(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     // WARNING this is NOT used to draw lineedits - just the frame, see below!!
     OPT_ENABLED OPT_FOCUS
@@ -44,7 +44,7 @@ BespinStyle::drawLineEditFrame(const QStyleOption *option, QPainter *painter, co
 }
 
 void
-BespinStyle::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
 
     // spinboxes and combos allready have a lineedit as global frame
@@ -126,7 +126,7 @@ drawSBArrow(QStyle::SubControl sc, QPainter *painter, QStyleOptionSpinBox *optio
         {
             painter->setBrush(FCOLOR(Base).dark(108));
             RECT.translate(0, f2);
-            BespinStyle::drawArrow(dir, RECT, painter);
+            Style::drawArrow(dir, RECT, painter);
             RECT.translate(0, -f2);
         }
 
@@ -139,12 +139,12 @@ drawSBArrow(QStyle::SubControl sc, QPainter *painter, QStyleOptionSpinBox *optio
             c = Colors::mid(FCOLOR(Base), PAL.color(QPalette::Disabled, QPalette::Text));
 
         painter->setBrush(c);
-        BespinStyle::drawArrow(dir, RECT, painter);
+        Style::drawArrow(dir, RECT, painter);
     }
 }
 
 void
-BespinStyle::drawSpinBox(const QStyleOptionComplex * option, QPainter * painter,
+Style::drawSpinBox(const QStyleOptionComplex * option, QPainter * painter,
                          const QWidget * widget) const
 {
     ASSURE_OPTION(sb, SpinBox);
@@ -179,7 +179,7 @@ static int animStep = -1;
 static bool round_ = true;
 
 void
-BespinStyle::drawComboBox(const QStyleOptionComplex * option,
+Style::drawComboBox(const QStyleOptionComplex * option,
                           QPainter * painter, const QWidget * widget) const
 {
     ASSURE_OPTION(cmb, ComboBox);
@@ -316,7 +316,7 @@ BespinStyle::drawComboBox(const QStyleOptionComplex * option,
 
 
 void
-BespinStyle::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
+Style::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
                                const QWidget * widget) const
 {
     ASSURE_OPTION(cb, ComboBox);

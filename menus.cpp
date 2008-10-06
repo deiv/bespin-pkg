@@ -24,7 +24,7 @@
 static const bool round_ = true;
 
 void
-BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawMenuBarBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
     if (config.menu.bar_role[Bg] != QPalette::Window || config.menu.barGradient != Gradients::None)
         painter->fillRect(RECT.adjusted(0,0,0,-dpi.f2),
@@ -42,7 +42,7 @@ BespinStyle::drawMenuBarBg(const QStyleOption * option, QPainter * painter, cons
 
 
 void
-BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(mbi, MenuItem);
 
@@ -136,7 +136,7 @@ BespinStyle::drawMenuBarItem(const QStyleOption *option, QPainter *painter, cons
 }
 
 void
-BespinStyle::drawMenuFrame(const QStyleOption * option, QPainter * painter,
+Style::drawMenuFrame(const QStyleOption * option, QPainter * painter,
                            const QWidget *) const
 {
    if (!config.menu.shadow)
@@ -156,7 +156,7 @@ static const int windowsItemVMargin = 1; // menu item ver text margin
 static const int windowsRightBorder = 12; // right border on windows
 
 void
-BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
+Style::drawMenuItem(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
     ASSURE_OPTION(menuItem, MenuItem);
@@ -316,7 +316,7 @@ BespinStyle::drawMenuItem(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawMenuScroller(const QStyleOption * option, QPainter * painter,
+Style::drawMenuScroller(const QStyleOption * option, QPainter * painter,
                               const QWidget *) const
 {
    OPT_SUNKEN

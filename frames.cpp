@@ -28,7 +28,7 @@
 #include <QtDebug>
 
 bool
-BespinStyle::isSpecialFrame(const QWidget *w)
+Style::isSpecialFrame(const QWidget *w)
 {
     if (const QListView *view = qobject_cast<const QListView*>(w))
         return (view->viewMode() == QListView::IconMode);
@@ -38,7 +38,7 @@ BespinStyle::isSpecialFrame(const QWidget *w)
 }
 
 void
-BespinStyle::drawFocusFrame(const QStyleOption *option, QPainter *painter, const QWidget *) const
+Style::drawFocusFrame(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     if (option->state & State_Selected || option->state & State_MouseOver)
         return; // looks crap...
@@ -50,7 +50,7 @@ BespinStyle::drawFocusFrame(const QStyleOption *option, QPainter *painter, const
 }
 
 void
-BespinStyle::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_FOCUS
 
@@ -160,7 +160,7 @@ BespinStyle::drawFrame(const QStyleOption *option, QPainter *painter, const QWid
 }
 
 void
-BespinStyle::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
+Style::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(groupBox, GroupBox);
     OPT_ENABLED
@@ -223,7 +223,7 @@ BespinStyle::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, 
 }
 
 void
-BespinStyle::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     const QStyleOptionFrameV2 *groupBox = qstyleoption_cast<const QStyleOptionFrameV2 *>(option);
 

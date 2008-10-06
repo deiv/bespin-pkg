@@ -22,7 +22,7 @@
 #include "draw.h"
 
 void
-BespinStyle::drawHeader(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawHeader(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(header, Header);
 
@@ -55,7 +55,7 @@ BespinStyle::drawHeader(const QStyleOption *option, QPainter *painter, const QWi
 }
 
 void
-BespinStyle::drawHeaderSection(const QStyleOption * option, QPainter * painter,
+Style::drawHeaderSection(const QStyleOption * option, QPainter * painter,
                                const QWidget *) const
 {
     OPT_SUNKEN OPT_HOVER
@@ -108,7 +108,7 @@ BespinStyle::drawHeaderSection(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawHeaderLabel(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
+Style::drawHeaderLabel(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
     OPT_ENABLED
 
@@ -163,7 +163,7 @@ BespinStyle::drawHeaderLabel(const QStyleOption * option, QPainter * painter, co
 }
 
 void
-BespinStyle::drawHeaderArrow(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawHeaderArrow(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
     Navi::Direction dir = Navi::S;
     if (const QStyleOptionHeader* hopt = qstyleoption_cast<const QStyleOptionHeader*>(option))
@@ -179,7 +179,7 @@ BespinStyle::drawHeaderArrow(const QStyleOption * option, QPainter * painter, co
 static const int decoration_size = 9;
 
 void
-BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
+Style::drawBranch(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
     SAVE_PEN;
     int mid_h = RECT.x() + RECT.width() / 2;
@@ -258,7 +258,7 @@ BespinStyle::drawBranch(const QStyleOption * option, QPainter * painter, const Q
 }
 
 void
-BespinStyle::drawTree(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
+Style::drawTree(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
 #ifdef QT3_SUPPORT
     ASSURE_OPTION(lv, Q3ListView);
@@ -427,7 +427,7 @@ BespinStyle::drawTree(const QStyleOptionComplex *option, QPainter *painter, cons
 //    case PE_Q3CheckListController: // Qt 3 compatible Controller part of a list view item.
 
 void
-BespinStyle::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidget*) const
+Style::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
     painter->save();
     QColor c = FCOLOR(Highlight);
@@ -445,7 +445,7 @@ BespinStyle::drawRubberBand(const QStyleOption *option, QPainter *painter, const
 
 #include <QtDebug>
 void
-BespinStyle::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
+Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
 
 #if QT_VERSION >= 0x040400

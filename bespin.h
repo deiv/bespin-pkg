@@ -37,7 +37,7 @@ class QSettings;
 namespace Bespin
 {
 
-// class BespinStyle;
+// class Style;
 
 typedef struct
 {
@@ -53,14 +53,14 @@ typedef struct
 
 
 class
-BespinStyle : public QCommonStyle
+Style : public QCommonStyle
 {
     Q_OBJECT
 public:
     enum ColorRole { Bg = 0, Fg = 1 };
 
-    BespinStyle();
-    ~BespinStyle();
+    Style();
+    ~Style();
 
     //inheritance from QStyle
     void drawComplexControl ( ComplexControl control, const QStyleOptionComplex * option,
@@ -259,8 +259,8 @@ protected:
 //   void fakeMouse();
    
 private:
-    BespinStyle( const BespinStyle & );
-    BespinStyle& operator=( const BespinStyle & );
+    Style( const Style & );
+    Style& operator=( const Style & );
     QColor mapFadeColor(const QColor &color, int index) const;
     int elementId(const QString &string) const;
     void generatePixmaps();

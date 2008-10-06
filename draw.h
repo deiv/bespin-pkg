@@ -43,3 +43,18 @@ setBold(QPainter *p)
     fnt.setBold(true);
     p->setFont(fnt);
 }
+
+static inline void
+setTitle(QPainter *p)
+{
+        QFont fnt = p->font();
+        fnt.setWeight(QFont::Black);
+        fnt.setUnderline(true);
+        fnt.setStretch(QFont::SemiExpanded);
+#if QT_VERSION >= 0x040400
+        fnt.setCapitalization(QFont::/*AllUppercase*/SmallCaps);
+#else
+        title = title.toUpper();
+#endif
+        p->setFont(fnt);
+}

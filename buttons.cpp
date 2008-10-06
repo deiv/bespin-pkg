@@ -31,7 +31,7 @@ static int animStep = -1;
 static bool isCheckbox = false;
 
 void
-BespinStyle::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(btn, Button);
     OPT_SUNKEN OPT_HOVER;
@@ -71,7 +71,7 @@ BespinStyle::drawPushButton(const QStyleOption *option, QPainter *painter, const
 }
 
 void
-BespinStyle::drawPushButtonBevel(const QStyleOption * option,
+Style::drawPushButtonBevel(const QStyleOption * option,
                                  QPainter * painter,
                                  const QWidget * widget) const
 {
@@ -128,7 +128,7 @@ BespinStyle::drawPushButtonBevel(const QStyleOption * option,
 }
 
 void
-BespinStyle::drawButtonFrame(const QStyleOption * option,
+Style::drawButtonFrame(const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
 {
     const int f1 = F(1), f2 = F(2);
@@ -272,7 +272,7 @@ BespinStyle::drawButtonFrame(const QStyleOption * option,
 }
 
 void
-BespinStyle::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
+Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
     OPT_ENABLED OPT_FOCUS OPT_HOVER;
     ASSURE_OPTION(btn, Button);
@@ -358,7 +358,7 @@ BespinStyle::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, 
 }
 
 void
-BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
+Style::drawCheckBox(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
     B_STATES
@@ -398,7 +398,7 @@ BespinStyle::drawCheckBox(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     B_STATES
 
@@ -537,7 +537,7 @@ BespinStyle::drawRadio(const QStyleOption *option, QPainter *painter, const QWid
 //    case PE_FrameButtonBevel: // Panel frame for a button bevel
 
 void
-BespinStyle::drawRadioItem(const QStyleOption * option, QPainter * painter,
+Style::drawRadioItem(const QStyleOption * option, QPainter * painter,
                            const QWidget * widget) const
 {
    ASSURE_OPTION(btn, Button);
@@ -549,7 +549,7 @@ BespinStyle::drawRadioItem(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawCheckBoxItem(const QStyleOption * option, QPainter * painter,
+Style::drawCheckBoxItem(const QStyleOption * option, QPainter * painter,
                               const QWidget * widget) const
 {
    ASSURE_OPTION(btn, Button);
@@ -561,7 +561,7 @@ BespinStyle::drawCheckBoxItem(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawCheckLabel(const QStyleOption * option, QPainter * painter,
+Style::drawCheckLabel(const QStyleOption * option, QPainter * painter,
                             const QWidget * /*widget*/) const
 {
    ASSURE_OPTION(btn, Button);

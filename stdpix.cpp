@@ -41,7 +41,7 @@ setIconFont(QPainter &painter, const QRect &rect, float f = 0.75)
 }
 
 QPixmap
-BespinStyle::standardPixmap(StandardPixmap standardPixmap,
+Style::standardPixmap(StandardPixmap standardPixmap,
                             const QStyleOption * option, const QWidget * widget ) const
 {
     bool sunken = false, isEnabled = false, hover = false;

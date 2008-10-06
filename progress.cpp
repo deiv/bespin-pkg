@@ -23,7 +23,7 @@
 static int step = -1;
 
 void
-BespinStyle::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(cb, ProgressBar);
     if (cb->maximum == cb->minimum)
@@ -99,7 +99,7 @@ BespinStyle::drawCapacityBar(const QStyleOption *option, QPainter *painter, cons
 }
 
 void
-BespinStyle::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(pb, ProgressBar);
     OPT_HOVER
@@ -164,7 +164,7 @@ drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
 }
 
 void
-BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
+Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
                                const QWidget * widget, bool content) const
 {
     if (appType == GTK && !content)
@@ -285,7 +285,7 @@ BespinStyle::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawProgressBarLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
+Style::drawProgressBarLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
     ASSURE_OPTION(progress, ProgressBarV2);
    

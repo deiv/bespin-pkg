@@ -201,7 +201,7 @@ renderLightLine(Tile::Line &line)
 #endif
 
 void
-BespinStyle::generatePixmaps()
+Style::generatePixmaps()
 {
     f1 = dpi.f1; f2 = dpi.f2; f3 = dpi.f3; f4 = dpi.f4;
     const int f9 = dpi.f9; const int f11 = SCALE(11);
@@ -398,7 +398,7 @@ BespinStyle::generatePixmaps()
     // ================================================================
     // Popup corners - not really pxmaps, though ;) ===================
     // they at least break beryl's popup shadows...
-    // see bespin.cpp#BespinStyle::eventfilter as well
+    // see bespin.cpp#Style::eventfilter as well
     int f5 = 4;
     QBitmap bm(2*f5, 2*f5);
     bm.fill(Qt::black);

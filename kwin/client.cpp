@@ -309,9 +309,6 @@ Client::minimumSize() const
     return QSize(2*buttonSpace+6*titleSize, titleSize + borderSize);
 }
 
-int format, result; unsigned long de; //dead end
-uint decoDim = 0;
-
 #define DUMP_PICTURE(_PREF_, _PICT_)\
 XRenderComposite(QX11Info::display(), PictOpSrc, _PICT_, 0, _PREF_##Buffer.x11PictureHandle(),\
 0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);

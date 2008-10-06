@@ -21,7 +21,7 @@
 #include "draw.h"
 
 void
-BespinStyle::drawDockBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawDockBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
     painter->save();
     painter->setPen(Qt::NoPen);
@@ -32,7 +32,7 @@ BespinStyle::drawDockBg(const QStyleOption * option, QPainter * painter, const Q
 }
 
 void
-BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWidget *w) const
+Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWidget *w) const
 {
 
     ASSURE_OPTION(dwOpt, DockWidget);
@@ -52,17 +52,8 @@ BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, cons
             rect.setLeft(rect.left() + bw);
 
         painter->save();
-        QString title = dwOpt->title; // " " + dwOpt->title + " "; // good for undrlining
-        QFont fnt = painter->font();
-        fnt.setWeight(QFont::Black);
-//         fnt.setUnderline(true);
-        fnt.setStretch(QFont::SemiExpanded);
-#if QT_VERSION >= 0x040400
-        fnt.setCapitalization(QFont::/*AllUppercase*/SmallCaps);
-#else
-        title = title.toUpper();
-#endif
-        painter->setFont(fnt);
+        QString title = dwOpt->title; // " " + dwOpt->title + " "; // good for underlining
+        setTitle(painter);
 
         QPen pen = painter->pen();
         if (Colors::value(bg) < 100)
@@ -78,7 +69,7 @@ BespinStyle::drawDockTitle(const QStyleOption * option, QPainter * painter, cons
 }
 
 void
-BespinStyle::drawDockHandle(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawDockHandle(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
     OPT_HOVER
 
@@ -128,7 +119,7 @@ BespinStyle::drawDockHandle(const QStyleOption * option, QPainter * painter, con
 }
 
 void
-BespinStyle::drawMDIControls(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
+Style::drawMDIControls(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
     QStyleOptionButton btnOpt;
     btnOpt.QStyleOption::operator=(*option);

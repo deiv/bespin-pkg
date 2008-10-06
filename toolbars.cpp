@@ -24,7 +24,7 @@
 static int step = 0;
 
 void
-BespinStyle::drawToolButton(const QStyleOptionComplex * option,
+Style::drawToolButton(const QStyleOptionComplex * option,
                             QPainter * painter, const QWidget * widget) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
@@ -98,7 +98,7 @@ BespinStyle::drawToolButton(const QStyleOptionComplex * option,
 }
 
 void
-BespinStyle::drawToolButtonShape(const QStyleOption * option,
+Style::drawToolButtonShape(const QStyleOption * option,
                                  QPainter * painter, const QWidget * widget) const
 {
    OPT_ENABLED;
@@ -162,7 +162,7 @@ icon(QPixmap &pix, int step)
 }
 
 void
-BespinStyle::drawToolButtonLabel(const QStyleOption * option,
+Style::drawToolButtonLabel(const QStyleOption * option,
                                  QPainter * painter, const QWidget *widget) const
 {
     ASSURE_OPTION(toolbutton, ToolButton);
@@ -257,7 +257,7 @@ BespinStyle::drawToolButtonLabel(const QStyleOption * option,
 }
 
 void
-BespinStyle::drawToolBarHandle(const QStyleOption * option, QPainter * painter,
+Style::drawToolBarHandle(const QStyleOption * option, QPainter * painter,
                                const QWidget *) const
 {
 

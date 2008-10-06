@@ -52,22 +52,21 @@ Atom  XProperty::rCorner =
 XInternAtom(QX11Info::display(), "BESPIN_RIGHT_CORNER", False);
 Atom  XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
 
-static unsigned char *chardata = 0;
-static int result, de; //dead end
-static unsigned long de2;
-
 
 bool
 XProperty::get(WId window, Atom atom, uint& data)
 {
-   result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, 1L, False,
-                                XA_CARDINAL, &de2, &de, &de2, &de2, &chardata);
+    unsigned char *chardata = 0;
+    int result, de; //dead end
+    unsigned long de2;
+    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, 1L, False,
+                                    XA_CARDINAL, &de2, &de, &de2, &de2, &chardata);
 
-   if (result != Success || chardata == X::None)
-      return false;
+    if (result != Success || chardata == X::None)
+        return false;
 
-   memcpy (&data, chardata, sizeof (int));
-   return true;
+    memcpy (&data, chardata, sizeof (int));
+    return true;
 }
 
 void

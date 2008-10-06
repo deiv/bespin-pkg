@@ -29,7 +29,7 @@ extern Config config;
 static const int windowsArrowHMargin = 6; // arrow horizontal margin
 
 QSize
-BespinStyle::sizeFromContents ( ContentsType ct, const QStyleOption * option,
+Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
                                 const QSize & contentsSize, const QWidget * widget ) const
 {
     switch ( ct )

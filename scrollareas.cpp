@@ -96,14 +96,14 @@ const static QWidget *cachedScroller = 0;
 static QPainter *cPainter = 0;
 
 void
-BespinStyle::clearScrollbarCache()
+Style::clearScrollbarCache()
 {
     cacheCleaner.stop(); cachedScroller = 0L;
     delete scrollBgCache; scrollBgCache = 0L;
 }
 
 void
-BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
+Style::drawScrollBar(const QStyleOptionComplex * option,
                            QPainter * painter, const QWidget * widget) const
 {
 
@@ -241,7 +241,7 @@ BespinStyle::drawScrollBar(const QStyleOptionComplex * option,
 #undef PAINT_ELEMENT
 
 void
-BespinStyle::drawScrollBarButton(const QStyleOption * option, QPainter * painter,
+Style::drawScrollBarButton(const QStyleOption * option, QPainter * painter,
                                  const QWidget *, bool up) const
 {
     ASSURE_OPTION(opt, Slider);
@@ -288,7 +288,7 @@ BespinStyle::drawScrollBarButton(const QStyleOption * option, QPainter * painter
 }
 
 void
-BespinStyle::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
     const bool horizontal = option->state & QStyle::State_Horizontal;
 
@@ -328,7 +328,7 @@ BespinStyle::drawScrollBarGroove(const QStyleOption * option, QPainter * painter
 }
 
 void
-BespinStyle::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
+Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
                                  const QWidget * widget) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_HOVER

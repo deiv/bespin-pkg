@@ -35,7 +35,7 @@ static const QStyle::StyleHint SH_KCustomSubElement = (QStyle::StyleHint)0xff000
 static const QStyle::StyleHint SH_KCustomStyleHint = (QStyle::StyleHint)0xff000005;
 static const QStyle::StyleHint SH_KCustomSubControl = (QStyle::StyleHint)0xff000006;
 
-int BespinStyle::styleHint( StyleHint hint, const QStyleOption * option, const QWidget * widget,
+int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget * widget,
                             QStyleHintReturn * returnData ) const
 {
     switch (hint)

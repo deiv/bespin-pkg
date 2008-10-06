@@ -26,9 +26,6 @@
 #include "bespin.h"
 #include "draw.h"
 
-#define ASSURE_OPTION(_VAR_, _TYPE_) \
-const QStyleOption##_TYPE_ *_VAR_ = qstyleoption_cast<const QStyleOption##_TYPE_ *>(option);\
-if (!_VAR_) return ret;
 
 using namespace Bespin;
 extern Dpi dpi;
@@ -42,7 +39,7 @@ verticalTabs(QTabBar::Shape shape)
 }
 
 QRect
-BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComplex * option,
+Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * option,
                                 SubControl subControl, const QWidget * widget) const
 {
     QRect ret;
@@ -50,7 +47,7 @@ BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComple
     {
     case CC_SpinBox:
     {   // A spinbox, like QSpinBox
-        ASSURE_OPTION(spinbox, SpinBox);
+        ASSURE_OPTION(spinbox, SpinBox) ret;
 
         int w = spinbox->rect.width(), h = spinbox->rect.height();
         h /= 2;
@@ -82,7 +79,7 @@ BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComple
     }
     case CC_ComboBox:
     {   // A combobox, like QComboBox
-        ASSURE_OPTION(cb, ComboBox);
+        ASSURE_OPTION(cb, ComboBox) ret;
         int x,y,wi,he;
         cb->rect.getRect(&x,&y,&wi,&he);
         int margin = cb->editable ? 1 : config.btn.fullHover ? dpi.f2 : dpi.f4;
@@ -121,7 +118,7 @@ BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComple
     }
     case CC_GroupBox:
     {
-        ASSURE_OPTION(groupBox, GroupBox);
+        ASSURE_OPTION(groupBox, GroupBox) ret;
 
         switch (subControl)
         {
@@ -438,7 +435,7 @@ BespinStyle::subControlRect (   ComplexControl control, const QStyleOptionComple
 }
 
 QRect
-BespinStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
+Style::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
     switch (element)
     {

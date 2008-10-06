@@ -59,7 +59,7 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group)
 
 // this seems to be necessary as KDE sets it's own palette after
 // creating the style - god knows why...
-void BespinStyle::fixKdePalette()
+void Style::fixKdePalette()
 {
     if (originalPalette)
     {
@@ -82,7 +82,7 @@ Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1])
 #define readGrad(_DEF_) (Gradients::Type) iSettings->value(_DEF_).toInt();
 
 void
-BespinStyle::readSettings(const QSettings* settings)
+Style::readSettings(const QSettings* settings)
 {
     bool delSettings = false;
 
@@ -335,7 +335,7 @@ BespinStyle::readSettings(const QSettings* settings)
 
 #define SCALE(_N_) lround((_N_)*config.scale)
 
-void BespinStyle::initMetrics()
+void Style::initMetrics()
 {
    dpi.f1 = SCALE(1); dpi.f2 = SCALE(2);
    dpi.f3 = SCALE(3); dpi.f4 = SCALE(4);
@@ -363,7 +363,7 @@ void BespinStyle::initMetrics()
 #undef SCALE
 
 void
-BespinStyle::init(const QSettings* settings)
+Style::init(const QSettings* settings)
 {
     // various workarounds... ==========================
     if (getenv("GTK_QT_ENGINE_ACTIVE"))

@@ -30,7 +30,7 @@
 #endif
 
 void
-BespinStyle::drawWindowFrame(const QStyleOption * option, QPainter * painter,
+Style::drawWindowFrame(const QStyleOption * option, QPainter * painter,
                              const QWidget *) const
 {
    painter->save();
@@ -43,7 +43,7 @@ static QPainterPath glasPath;
 static QSize glasSize;
 
 void
-BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
+Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
     // cause of scrollbars - kinda optimization
@@ -157,7 +157,7 @@ BespinStyle::drawWindowBg(const QStyleOption * option, QPainter * painter,
 }
 
 void
-BespinStyle::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
    painter->save();
    
@@ -197,7 +197,7 @@ BespinStyle::drawToolTip(const QStyleOption * option, QPainter * painter, const 
 }
 
 void
-BespinStyle::drawTitleBar(const QStyleOptionComplex * option,
+Style::drawTitleBar(const QStyleOptionComplex * option,
                           QPainter * painter, const QWidget * widget) const
 {
    const QStyleOptionTitleBar *tb = qstyleoption_cast<const QStyleOptionTitleBar *>(option);
@@ -260,7 +260,7 @@ BespinStyle::drawTitleBar(const QStyleOptionComplex * option,
 }
 
 void
-BespinStyle::drawSizeGrip(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawSizeGrip(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
    Qt::Corner corner;
    if (const QStyleOptionSizeGrip *sgOpt =

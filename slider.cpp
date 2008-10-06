@@ -21,7 +21,7 @@
 #include "draw.h"
 
 void
-BespinStyle::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainter *painter,
+Style::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainter *painter,
                               int step) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_FOCUS
@@ -56,7 +56,7 @@ BespinStyle::drawSliderHandle(const QRect &handle, const QStyleOption *option, Q
 }
 
 void
-BespinStyle::drawSlider(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
+Style::drawSlider(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(slider, Slider);
 
@@ -257,7 +257,7 @@ while (v <= slider->maximum) { \
 }
 
 void
-BespinStyle::drawDial(const QStyleOptionComplex *option, QPainter *painter, const QWidget *) const
+Style::drawDial(const QStyleOptionComplex *option, QPainter *painter, const QWidget *) const
 {
     ASSURE_OPTION(dial, Slider);
 

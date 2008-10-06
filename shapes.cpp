@@ -19,7 +19,7 @@
 #include "draw.h"
 
 void
-BespinStyle::drawCheckMark(const QStyleOption *option, QPainter *painter, Check::Type type) const
+Style::drawCheckMark(const QStyleOption *option, QPainter *painter, Check::Type type) const
 {
     // the checkmark (using brush)
     painter->setPen(Qt::NoPen);
@@ -89,7 +89,7 @@ BespinStyle::drawCheckMark(const QStyleOption *option, QPainter *painter, Check:
 }
 
 void
-BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter, const QWidget*, bool itemview) const
+Style::drawCheck(const QStyleOption *option, QPainter *painter, const QWidget*, bool itemview) const
 {
 #if QT_VERSION >= 0x040400
     if (const QStyleOptionViewItemV2 *item = qstyleoption_cast<const QStyleOptionViewItemV2 *>(option))
@@ -157,7 +157,7 @@ BespinStyle::drawCheck(const QStyleOption *option, QPainter *painter, const QWid
 }
 
 /**static!*/ void
-BespinStyle::drawExclusiveCheck(const QStyleOption * option, QPainter * painter, const QWidget *)
+Style::drawExclusiveCheck(const QStyleOption * option, QPainter * painter, const QWidget *)
 {
     painter->save();
     painter->setBrush(Qt::NoBrush);
@@ -176,7 +176,7 @@ BespinStyle::drawExclusiveCheck(const QStyleOption * option, QPainter * painter,
 points[0] = _P1_; points[1] = _P2_; points[2] = _P3_;
 
 /**static!*/ void
-BespinStyle::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter)
+Style::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter)
 {
     // create an appropriate rect and move it to center of desired rect
     int s = qMin(rect.width(), rect.height());
@@ -236,7 +236,7 @@ BespinStyle::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter
 }
 
 /**static!*/ void
-BespinStyle::drawSolidArrow(Navi::Direction dir, const QRect &rect, QPainter *painter)
+Style::drawSolidArrow(Navi::Direction dir, const QRect &rect, QPainter *painter)
 {
     bool hadNoBrush = painter->brush() == Qt::NoBrush;
     if (hadNoBrush)

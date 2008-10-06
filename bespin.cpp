@@ -52,7 +52,7 @@
 
 
 /**============= extern C stuff ==========================*/
-class BespinStylePlugin : public QStylePlugin
+class StylePlugin : public QStylePlugin
 {
 public:
    QStringList keys() const {
@@ -61,12 +61,12 @@ public:
    
    QStyle *create(const QString &key) {
       if (key == "bespin")
-         return new Bespin::BespinStyle;
+         return new Bespin::Style;
       return 0;
    }
 };
 
-Q_EXPORT_PLUGIN2(BespinStyle, BespinStylePlugin)
+Q_EXPORT_PLUGIN2(Style, StylePlugin)
 /**=========================================================*/
 
 using namespace Bespin;
@@ -79,15 +79,15 @@ Dpi dpi;
 #define N_CE 50
 #define N_CC 12
 static void
-(BespinStyle::*primitiveRoutine[N_PE])(const QStyleOption*, QPainter*, const QWidget*) const;
+(Style::*primitiveRoutine[N_PE])(const QStyleOption*, QPainter*, const QWidget*) const;
 static void
-(BespinStyle::*controlRoutine[N_CE])(const QStyleOption*, QPainter*, const QWidget*) const;
+(Style::*controlRoutine[N_CE])(const QStyleOption*, QPainter*, const QWidget*) const;
 static void
-(BespinStyle::*complexRoutine[N_CC])(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+(Style::*complexRoutine[N_CC])(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
 
-#define registerPE(_FUNC_, _ELEM_) primitiveRoutine[QStyle::_ELEM_] = &BespinStyle::_FUNC_
-#define registerCE(_FUNC_, _ELEM_) controlRoutine[QStyle::_ELEM_] = &BespinStyle::_FUNC_
-#define registerCC(_FUNC_, _ELEM_) complexRoutine[QStyle::_ELEM_] = &BespinStyle::_FUNC_
+#define registerPE(_FUNC_, _ELEM_) primitiveRoutine[QStyle::_ELEM_] = &Style::_FUNC_
+#define registerCE(_FUNC_, _ELEM_) controlRoutine[QStyle::_ELEM_] = &Style::_FUNC_
+#define registerCC(_FUNC_, _ELEM_) complexRoutine[QStyle::_ELEM_] = &Style::_FUNC_
 
 // static void registerPE(char *S0, ...)
 // {
@@ -102,7 +102,7 @@ static void
 // }
 
 void
-BespinStyle::registerRoutines()
+Style::registerRoutines()
 {
     for (int i = 0; i < N_PE; ++i)
         primitiveRoutine[i] = 0;
@@ -245,14 +245,14 @@ BespinStyle::registerRoutines()
 
 /**THE STYLE ITSELF*/
 
-BespinStyle::BespinStyle() : QCommonStyle(), originalPalette(0)
+Style::Style() : QCommonStyle(), originalPalette(0)
 {
    _scanlines[0] = _scanlines[1] = 0L;
    init();
    registerRoutines();
 }
 
-BespinStyle::~BespinStyle()
+Style::~Style()
 {
    Gradients::wipe();
 }
@@ -262,7 +262,7 @@ BespinStyle::~BespinStyle()
 #define PAL pal
 
 QColor
-BespinStyle::btnBg( const QPalette &pal, bool isEnabled, int hasFocus, int step, bool fullHover,
+Style::btnBg( const QPalette &pal, bool isEnabled, int hasFocus, int step, bool fullHover,
                     bool reflective) const
 {
 
@@ -283,7 +283,7 @@ BespinStyle::btnBg( const QPalette &pal, bool isEnabled, int hasFocus, int step,
 }
 
 QColor
-BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hasFocus, int step, bool flat) const
+Style::btnFg(const QPalette &pal, bool isEnabled, int hasFocus, int step, bool flat) const
 {
     if (!isEnabled)
         return FCOLOR(WindowText); //Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
@@ -303,7 +303,7 @@ BespinStyle::btnFg(const QPalette &pal, bool isEnabled, int hasFocus, int step, 
 }
 
 void
-BespinStyle::drawItemText(QPainter *painter, const QRect &rect, int alignment, const QPalette &pal,
+Style::drawItemText(QPainter *painter, const QRect &rect, int alignment, const QPalette &pal,
                           bool enabled, const QString& text, QPalette::ColorRole textRole, QRect *boundingRect) const
 {
     if (text.isEmpty())
@@ -371,7 +371,7 @@ static int counter[5] = { PE_KdeBase, X_KdeBase, X_KdeBase, X_KdeBase, X_KdeBase
 static int scCounter[N_CustomComplexs] = { 0 };
 #endif
 void
-BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
+Style::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
 {
     Q_ASSERT(option);
@@ -398,7 +398,7 @@ BespinStyle::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
 }
 
 void
-BespinStyle::drawControl ( ControlElement element, const QStyleOption * option,
+Style::drawControl ( ControlElement element, const QStyleOption * option,
                            QPainter * painter, const QWidget * widget) const
 {
     Q_ASSERT(option);
@@ -413,7 +413,7 @@ BespinStyle::drawControl ( ControlElement element, const QStyleOption * option,
 }
 
 void
-BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptionComplex * option,
+Style::drawComplexControl ( ComplexControl control, const QStyleOptionComplex * option,
                                   QPainter * painter, const QWidget * widget) const
 {
     Q_ASSERT(option);
@@ -428,7 +428,7 @@ BespinStyle::drawComplexControl ( ComplexControl control, const QStyleOptionComp
 }
 
 int
-BespinStyle::elementId(const QString &string) const
+Style::elementId(const QString &string) const
 {
     int id = styleElements.value(string, 0);
     if (id)
@@ -455,7 +455,7 @@ BespinStyle::elementId(const QString &string) const
 /// ----------------------------------------------------------------------
 
 void
-BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy,
+Style::fillWithMask(QPainter *painter, const QPoint &xy,
                           const QBrush &brush, const QPixmap &mask,
                           QPoint offset) const
 {
@@ -477,7 +477,7 @@ BespinStyle::fillWithMask(QPainter *painter, const QPoint &xy,
 }
 
 void
-BespinStyle::erase(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     const QWidget *grampa = widget;
     while ( !(grampa->isWindow() ||
@@ -513,7 +513,7 @@ BespinStyle::erase(const QStyleOption *option, QPainter *painter, const QWidget 
 
 // X11 properties for the deco ---------------
 void
-BespinStyle::setupDecoFor(const QWidget *w)
+Style::setupDecoFor(const QWidget *w)
 {
 // XProperty actually handles the non X11 case, but we avoid overhead ;)
 #ifdef Q_WS_X11
@@ -542,7 +542,7 @@ static const
 QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
 
 static void
-swapPalette(QWidget *widget, BespinStyle *style)
+swapPalette(QWidget *widget, Style *style)
 {
     // looks complex? IS!
     // reason nr. 1: stylesheets. they're nasty and qt operates on the app palette here
@@ -665,7 +665,7 @@ bar4popup(QMenu *menu)
 }
 
 bool
-BespinStyle::eventFilter( QObject *object, QEvent *ev )
+Style::eventFilter( QObject *object, QEvent *ev )
 {
     switch (ev->type())
     {
@@ -888,7 +888,7 @@ BespinStyle::eventFilter( QObject *object, QEvent *ev )
 
 
 QPalette
-BespinStyle::standardPalette () const
+Style::standardPalette () const
 {
    QPalette pal ( QColor(70,70,70), QColor(70,70,70), // windowText, button
                      Qt::white, QColor(211,211,212), QColor(226,226,227), //light, dark, mid

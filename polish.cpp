@@ -79,7 +79,7 @@ setBoldFont(QWidget *w, bool bold = true)
     w->setFont(fnt);
 }
 
-void BespinStyle::polish ( QApplication * app )
+void Style::polish ( QApplication * app )
 {
     QPalette pal = app->palette();
     polish(pal);
@@ -103,7 +103,7 @@ static QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.Bespin
 #undef PAL
 #define PAL pal
 
-void BespinStyle::polish( QPalette &pal, bool onInit )
+void Style::polish( QPalette &pal, bool onInit )
 {
     QColor c = pal.color(QPalette::Active, QPalette::Background);
     if (config.bg.mode > Plain)
@@ -216,7 +216,7 @@ bar4popup(QMenu *menu)
 inline static void
 polishGTK(QWidget * widget)
 {
-    enum MyRole{Bg = BespinStyle::Bg, Fg = BespinStyle::Fg};
+    enum MyRole{Bg = Style::Bg, Fg = Style::Fg};
     if (widget->objectName() == "QPushButton" ||
         widget->objectName() == "QComboBox" ||
         widget->objectName() == "QCheckBox" ||
@@ -273,7 +273,7 @@ polishGTK(QWidget * widget)
 }
 
 void
-BespinStyle::polish( QWidget * widget )
+Style::polish( QWidget * widget )
 {
     // GTK-Qt gets a special handling - see above
     if (appType == GTK)
@@ -656,13 +656,13 @@ BespinStyle::polish( QWidget * widget )
 #undef PAL
 
 void
-BespinStyle::unPolish( QApplication *app )
+Style::unPolish( QApplication *app )
 {
     app->setPalette(QPalette());
 }
 
 void
-BespinStyle::unPolish( QWidget *widget )
+Style::unPolish( QWidget *widget )
 {
     if (QFrame *frame = qobject_cast<QFrame *>(widget))
         VisualFrame::release(frame);
