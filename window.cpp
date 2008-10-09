@@ -55,7 +55,14 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
         return; // we'd cover a gradient/pixmap/whatever
 
     // glassy Modal dialog/Popup menu ==========
-    const QColor &c = PAL.color(widget->backgroundRole());
+    QColor c = PAL.color(widget->backgroundRole());
+    if (c == Qt::transparent) // plasma uses this
+        return;
+    else if (c.alpha() < 255)
+        c.setAlpha(255); // = Qt::transparent; // for the moment
+
+//     c = Qt::transparent; // just for testing
+    
     if (widget->testAttribute(Qt::WA_MacBrushedMetal))
     {   // we just kinda abuse this mac only attribute... ;P
         if (widget->size() != glasSize)

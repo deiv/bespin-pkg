@@ -26,6 +26,8 @@ static const bool round_ = true;
 void
 Style::drawMenuBarBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
+    if (appType == Plasma)
+        return;
     if (config.menu.bar_role[Bg] != QPalette::Window || config.menu.barGradient != Gradients::None)
         painter->fillRect(RECT.adjusted(0,0,0,-dpi.f2),
                           Gradients::brush(Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6),
@@ -58,7 +60,8 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         drawMenuBarBg(option, painter, widget);
 
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
-    ROLES(menu.active);
+    QPalette::ColorRole bg = config.menu.active_role[Bg];
+    QPalette::ColorRole fg = config.menu.active_role[Fg];
 
     hover = option->state & State_Selected;
     Animator::IndexInfo *info = 0;
@@ -95,16 +98,21 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         QColor c;
         if (appType == Plasma)
         {   // NOTICE: opaque Colors::mid() are too flickerious with several plasma bgs...
-            ROLE[Bg] = QPalette::WindowText;
-            ROLE[Fg] = QPalette::Window;
-            c = COLOR(ROLE[Bg]);
+            bg = QPalette::WindowText;
+            fg = QPalette::Window;
+            c = COLOR(bg);
+            c.setAlpha(step*255/8);
+        }
+        else if (config.menu.itemGradient != config.menu.barGradient)
+        {
+            c = COLOR(bg);
             c.setAlpha(step*255/8);
         }
         else
         {   // ... but usually less performance killing... ;-P (it's not that much a problem n'owerdays)
             c = (config.menu.bar_role[Bg] == QPalette::Window) ? FCOLOR(Window) :
                                             Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6);
-            c = Colors::mid(c, COLOR(ROLE[Bg]), 8-step, step);
+            c = Colors::mid(c, COLOR(bg), 8-step, step);
         }
         // NOTICE: scale code - currently unused
 //       int dy = 0;
@@ -126,28 +134,27 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         else if (step == 6 && config.menu.itemSunken)
             shadows.sunken[round_][false].render(r, painter);
     }
+    QPalette::ColorRole fg2 = (appType == Plasma) ? QPalette::WindowText : config.menu.bar_role[Fg];
     QPixmap pix = mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ? QIcon::Normal : QIcon::Disabled);
     const uint alignment = Qt::AlignCenter | BESPIN_MNEMONIC | Qt::TextDontClip | Qt::TextSingleLine;
     if (!pix.isNull())
         drawItemPixmap(painter,r, alignment, pix);
     else
-        drawItemText(painter, r, alignment, mbi->palette, isEnabled, mbi->text,
-                     (hover || step > 3) ? ROLE[Fg] : config.menu.bar_role[Fg]);
+        drawItemText(painter, r, alignment, mbi->palette, isEnabled, mbi->text, (hover || step > 3) ? fg : fg2);
 }
 
 void
-Style::drawMenuFrame(const QStyleOption * option, QPainter * painter,
-                           const QWidget *) const
+Style::drawMenuFrame(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
-   if (!config.menu.shadow)
-      return;
-   const int f1 = dpi.f1;
-   QPen pen(Colors::mid(CCOLOR(menu.std, Bg), CCOLOR(menu.std, Fg),4,1), f1);
-   painter->save();
-   painter->setBrush(Qt::NoBrush);
-   painter->setPen(pen);
-   painter->drawRect(RECT.adjusted(f1/2,f1/2,-f1,-f1));
-   painter->restore();
+    if (!config.menu.shadow)
+        return;
+    const int f1 = dpi.f1;
+    QPen pen(Colors::mid(CCOLOR(menu.std, Bg), CCOLOR(menu.std, Fg),4,1), f1);
+    painter->save();
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(pen);
+    painter->drawRect(RECT.adjusted(f1/2,f1/2,-f1,-f1));
+    painter->restore();
 }
 
 static const int windowsItemFrame   = 1; // menu item frame width
@@ -199,7 +206,8 @@ Style::drawMenuItem(const QStyleOption * option, QPainter * painter,
     // selected bg
     if (selected)
     {
-        if (config.menu.itemGradient != Gradients::None || config.menu.bar_role[Bg] == ROLE[Bg] ||
+        if (config.menu.itemGradient != Gradients::None ||
+            config.menu.bar_role[Bg] == ROLE[Bg] ||
             Colors::contrast(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg)) > 8) // enough to indicate hover
         {
             bg = Colors::mid(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg), 1, 6);

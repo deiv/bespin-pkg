@@ -34,8 +34,6 @@
 
 using namespace Bespin;
 
-extern Config config;
-extern Dpi dpi;
 static Gradients::Type _progressBase;
 
 static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list)
@@ -239,18 +237,21 @@ Style::readSettings(const QSettings* settings)
         readRole(menu.std, MENU_ROLE);
     }
     if (appType == Plasma)
-    {   // that's probably XBar, and we don't want a bg there...
-        config.menu.bar_role[Bg] = QPalette::Window;
-        config.menu.bar_role[Fg] = QPalette::WindowText;
+    {   // that's probably XBar, ...
+        // ... and the menubar is handled, totally different - so assume we can use proper fg colors on popups...
+//         config.menu.bar_role[Bg] = config.menu.std_role[Bg];
+//         config.menu.bar_role[Fg] = config.menu.std_role[Fg];
+        // ... and we don't want a bg there
         config.menu.barGradient = Gradients::None;
         config.menu.barSunken = false;
     }
     else
     {
-        readRole(menu.bar, MENU_BARROLE);
+        
         config.menu.barGradient = readGrad(MENU_BAR_GRADIENT);
         config.menu.barSunken = readBool(MENU_BARSUNKEN);
     }
+    readRole(menu.bar, MENU_BARROLE);
     config.menu.boldText = readBool(MENU_BOLDTEXT);
     config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);
     config.menu.activeItemSunken = config.menu.itemSunken || readBool(MENU_ACTIVEITEMSUNKEN);
@@ -376,6 +377,8 @@ Style::init(const QSettings* settings)
         appType = KGet;
     else if (QCoreApplication::applicationName() == "Designer")
         appType = QtDesigner;
+    else
+        appType = Unknown;
     // ==========================
     
     readSettings(settings);

@@ -24,6 +24,7 @@
 
 #include "colors.h"
 #include "gradients.h"
+#include "makros.h"
 
 #ifndef BESPIN_DECO
 #ifndef QT_NO_XRENDER
@@ -639,12 +640,29 @@ Gradients::bgSet(const QColor &c)
     case BevelV:
     {
         set->topTile = QPixmap(32, 256);
-        set->btmTile = QPixmap(32, 256);
-        set->cornerTile = QPixmap(32, 128);
         set->lCorner = QPixmap(128, 128);
-        set->rCorner = QPixmap(128, 128);
-        const QColor c1 = c.light(_bgIntensity);
-        const QColor c2 = Colors::mid(c1, c);
+        QColor c1, c2, c3;
+        if (c == Qt::transparent)
+        {
+            set->topTile.fill(Qt::transparent);
+            set->lCorner.fill(Qt::transparent);
+            int a = qAbs(_bgIntensity - 100)*3; a = CLAMP(a,0,255);
+            int v = (_bgIntensity > 0)*255;
+            c1 = QColor(v,v,v, a);
+            c2 = Colors::mid(c1, c);
+            v = (!v)*255;
+            c3 = QColor(v,v,v, a);
+        }
+        else
+        {
+            c1 = c.light(_bgIntensity);
+            c2 = Colors::mid(c1, c);
+            c3 = c.dark(_bgIntensity);
+        }
+        // this can save some time on alpha enabled pixmaps
+        set->cornerTile = set->topTile.copy(set->cornerTile.rect());
+        set->btmTile = set->topTile.copy();
+        set->rCorner = set->lCorner.copy();
 
         lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
         QGradientStops stops;
@@ -656,7 +674,7 @@ Gradients::bgSet(const QColor &c)
         p.end();
         // Bottom Tile
         p.begin(&set->btmTile);
-        stops << QGradientStop(0, c) << QGradientStop(1, c.dark(_bgIntensity));
+        stops << QGradientStop(0, c) << QGradientStop(1, c3);
         lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg); stops.clear();
         p.drawTiledPixmap(set->btmTile.rect(), _dither);
         p.end();
@@ -771,7 +789,7 @@ Gradients::bgSet(const QColor &c)
     default:
         break;
     }
-    _bgSet.insert(c.rgb(), set, costs(set));
+    _bgSet.insert(c.rgba(), set, costs(set));
     return *set;
 }
 

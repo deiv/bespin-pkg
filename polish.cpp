@@ -53,7 +53,7 @@
 #include "makros.h"
 #undef CCOLOR
 #undef FCOLOR
-#define CCOLOR(_TYPE_, _FG_) PAL.color(QPalette::Active, config._TYPE_##_role[_FG_])
+#define CCOLOR(_TYPE_, _FG_) PAL.color(QPalette::Active, Style::config._TYPE_##_role[_FG_])
 #define FCOLOR(_TYPE_) PAL.color(QPalette::Active, QPalette::_TYPE_)
 
 class EventKiller : public QObject
@@ -67,9 +67,6 @@ public:
 static EventKiller eventKiller;
 
 using namespace Bespin;
-
-extern Config config;
-extern Dpi dpi;
 
 static inline void
 setBoldFont(QWidget *w, bool bold = true)

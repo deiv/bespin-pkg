@@ -28,8 +28,6 @@
 
 
 using namespace Bespin;
-extern Dpi dpi;
-extern Config config;
 
 inline static bool
 verticalTabs(QTabBar::Shape shape)

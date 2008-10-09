@@ -26,7 +26,6 @@
 #include "bespin.h"
 
 using namespace Bespin;
-extern Config config;
 
 static const QStyle::StyleHint SH_KCustomPrimitiveElement = (QStyle::StyleHint)0xff000001;
 static const QStyle::StyleHint SH_KCustomControlElement = (QStyle::StyleHint)0xff000002;

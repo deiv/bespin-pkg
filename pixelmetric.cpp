@@ -27,8 +27,6 @@
 
 using namespace Bespin;
 
-extern Dpi dpi;
-
 int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWidget * widget ) const
 {
     switch ( pm )

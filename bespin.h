@@ -273,14 +273,14 @@ private:
     void setupDecoFor(const QWidget *w);
 private:
     typedef QHash<uint, Tile::Set> TileCache;
-    struct
+    typedef struct
     {
         Tile::Set rect[2]; // round
         QPixmap radio, radioIndicator, notch, slider;
         QPixmap winClose, winMin, winMax;
         QRegion corner[4];
-    } masks;
-    struct
+    } Masks;
+    typedef struct
     {
         Tile::Set   fallback, group,
                     sunken[2][2], // round/enabled
@@ -290,15 +290,15 @@ private:
                     Tile::Line line[2][3];
 //         QPixmap slider[4][2][2]; // for triangles, currently not...
         QPixmap slider[2][2];
-    } shadows;
+    } Shadows;
    
-    struct
+    typedef struct
     {
         Tile::Line top;
         QPixmap slider;
 //         QPixmap slider[4];
         Tile::Set rect[2];
-    } lights;
+    } Lights;
    
     // pixmaps
     QPixmap *_scanlines[2];
@@ -307,11 +307,16 @@ private:
     AppType appType;
     // KDE palette fix..
     QPalette *originalPalette;
+    static Masks masks;
+    static Shadows shadows;
+    static Lights lights;
+public:
+    static Config config;
+    static Dpi dpi;
 private slots:
     void fixKdePalette();
     void clearScrollbarCache();
 };
-
 
 } // namespace Bespin
 #endif //BESPIN_STYLE_H

@@ -29,9 +29,6 @@
 
 using namespace Bespin;
 
-extern Dpi dpi;
-extern Config config;
-
 static void
 setIconFont(QPainter &painter, const QRect &rect, float f = 0.75)
 {

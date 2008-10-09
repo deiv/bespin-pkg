@@ -60,6 +60,7 @@ private:
         TaskBar *taskbar;
         MenuBar *currentBar;
     } d;
+    static QTimer bodyCleaner;
 private slots:
     void hover(int);
     void trigger(int);
@@ -71,6 +72,7 @@ private slots:
     void byeMenus();
     void raiseCurrentWindow();
     void showTaskbar();
+    void cleanBodies();
 };
 
 #endif //XBAR_H

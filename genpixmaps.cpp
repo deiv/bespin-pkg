@@ -8,13 +8,10 @@
 
 using namespace Bespin;
 
-extern Dpi dpi;
-extern Config config;
-
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 // #define fillRect2(_R_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_R_)
 
-#define SCALE(_N_) lround(_N_*config.scale)
+#define SCALE(_N_) lround(_N_*Style::config.scale)
 
 #define EMPTY_PIX(_W_, _H_) \
 QPixmap pix = transSrc->copy(0,0,_W_,_H_);\
@@ -32,14 +29,14 @@ renderButtonLight(Tile::Set &set)
    SET_ALPHA(30);
    p.drawRoundRect(0,0,f9,f9,90,90);
    SET_ALPHA(54);
-   p.drawRoundRect(f1,f1,f9-2*f1,f9-2*f1,80,80);
+   p.drawRoundRect(F(1),F(1),f9-2*F(1),f9-2*F(1),80,80);
    SET_ALPHA(64);
-   p.drawRoundRect(f2,f2,f9-2*f2,f9-2*f2,70,70);
+   p.drawRoundRect(F(2),F(2),f9-2*F(2),f9-2*F(2),70,70);
    SET_ALPHA(74);
-   p.drawRoundRect(f3,f3,f9-2*f3,f9-2*f3,60,60);
+   p.drawRoundRect(F(3),F(3),f9-2*F(3),f9-2*F(3),60,60);
    p.end();
    set = Tile::Set(*pix,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-   set.setClipOffsets(f3, f3, f3, f3);
+   set.setClipOffsets(F(3), F(3), F(3), F(3));
    set.setDefaultShape(Tile::Ring);
    delete pix;
 }
@@ -48,7 +45,6 @@ renderButtonLight(Tile::Set &set)
 #define WHITE(_A_) QColor(255,255,255, _A_)
 #define BLACK(_A_) QColor(0,0,0, _A_)
 
-static int f1, f2, f3, f4;
 static QPixmap *transSrc = 0;
 
 static QPixmap
@@ -57,7 +53,7 @@ shadow(int size, bool opaque, bool sunken, float factor = 1.0)
     EMPTY_PIX(size, size);
     float d = size/2.0;
     QRadialGradient rg(d, d, d);
-    const int alpha = (int) (config.shadowIntensity * factor * (sunken ? 70 : (opaque ? 48 : 20)));
+    const int alpha = (int) (Style::config.shadowIntensity * factor * (sunken ? 70 : (opaque ? 48 : 20)));
     rg.setColorAt(0.7, BLACK(CLAMP(alpha,0,255)));
     rg.setColorAt(1.0, BLACK(0));
     p.fillRect(pix.rect(), rg);
@@ -89,28 +85,28 @@ sunkenShadow(int size, bool enabled)
     p.setRenderHint(QPainter::Antialiasing); p.setPen(Qt::NoPen);
 
     int add = enabled*30;
-    const int add2 = lround(80./f4);
-    const int rAdd = lround(25./f4);
+    const int add2 = lround(80./F(4));
+    const int rAdd = lround(25./F(4));
 
     // draw a flat shadow
     SET_ALPHA(55+add);
-    p.drawRoundedRect(0,0,size,size-f2,80,80,Qt::RelativeSize);
+    p.drawRoundedRect(0,0,size,size-F(2),80,80,Qt::RelativeSize);
 
     // subtract light
     p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
     add = 100 + 30 - add; int xOff;
-    for (int i = 1; i <= f4; ++i)
+    for (int i = 1; i <= F(4); ++i)
     {
-        xOff = qMax(i-f2,0);
+        xOff = qMax(i-F(2),0);
         SET_ALPHA(add+i*add2);
-        p.drawRoundedRect(xOff,i,size-2*xOff,size-(f2+i), 75+rAdd, 75+rAdd,Qt::RelativeSize);
+        p.drawRoundedRect(xOff,i,size-2*xOff,size-(F(2)+i), 75+rAdd, 75+rAdd,Qt::RelativeSize);
     }
 
     // add bottom highlight
     p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-    p.fillRect(f3,size-f2,size-2*f3,f1, BLACK(10));
-    int w = size/f3;
-    p.fillRect(w,size-f1,size-2*w,f1, WHITE(30));
+    p.fillRect(F(3),size-F(2),size-2*F(3),F(1), BLACK(10));
+    int w = size/F(3);
+    p.fillRect(w,size-F(1),size-2*w,F(1), WHITE(30));
 
     p.end();
 
@@ -125,17 +121,17 @@ relief(int size, bool enabled)
     const float f = enabled ? 1.0 : 0.7;
     EMPTY_PIX(size, size);
     p.setBrush(Qt::NoBrush);
-    p.setPen(QPen(BLACK(int(f*70)), f1));
-    p.drawRoundedRect(f1/2.0,0,size,size-f2,99,99,Qt::RelativeSize);
-    p.setPen(QPen(WHITE(int(f*35)), f1));
-    p.drawRoundedRect(0,f1+f1/2.0,size,size-f2,99,99,Qt::RelativeSize);
+    p.setPen(QPen(BLACK(int(f*70)), F(1)));
+    p.drawRoundedRect(F(1)/2.0,0,size,size-F(2),99,99,Qt::RelativeSize);
+    p.setPen(QPen(WHITE(int(f*35)), F(1)));
+    p.drawRoundedRect(0,F(1)+F(1)/2.0,size,size-F(2),99,99,Qt::RelativeSize);
 #if 0
     // the borders cross the pixmap boundings, thus they're too weak, thus we stregth them a bit
     const int d1 = 0.3*size, d2 = 0.7*size;
     p.drawLine(d1, 0, d2, 0); // top
     p.drawLine(0, d1, 0, d2); // left
     p.drawLine(size, d1, size, d2); // right
-    p.setPen(QPen(WHITE(int(f*50)), f1));
+    p.setPen(QPen(WHITE(int(f*50)), F(1)));
     p.drawLine(d1, size-1, d2, size-1); // bottom
 #endif
     p.end(); return pix;
@@ -155,23 +151,23 @@ groupShadow(int size)
     p.setPen(Qt::NoPen);
 
     DRAW_ROUND_ALPHA_RECT(5, 0, 0, size, 14);
-    DRAW_ROUND_ALPHA_RECT(9, f1, f1, size-f2, 13);
-    DRAW_ROUND_ALPHA_RECT(11, f2, f2, size-f4, 12);
-    DRAW_ROUND_ALPHA_RECT(13, f3, f3, size-F(6), 48);
+    DRAW_ROUND_ALPHA_RECT(9, F(1), F(1), size-F(2), 13);
+    DRAW_ROUND_ALPHA_RECT(11, F(2), F(2), size-F(4), 12);
+    DRAW_ROUND_ALPHA_RECT(13, F(3), F(3), size-F(6), 48);
     
     p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
-    p.setBrush(QColor(0,0,0,0)); p.drawRoundedRect(f4,f2,size-dpi.f8,ss,6,11,Qt::RelativeSize);
+    p.setBrush(QColor(0,0,0,0)); p.drawRoundedRect(F(4),F(2),size-F(8),ss,6,11,Qt::RelativeSize);
 
     p.setCompositionMode( QPainter::CompositionMode_SourceOver );
     p.setPen(QColor(255,255,255,60));
     p.setBrush(Qt::NoBrush);
-    p.drawRoundedRect(f4,f2,size-dpi.f8,ss,6,11,Qt::RelativeSize);
+    p.drawRoundedRect(F(4),F(2),size-F(8),ss,6,11,Qt::RelativeSize);
     p.setRenderHint(QPainter::Antialiasing, false);
     p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
     int f33 = SCALE(33);
     for (int i = 1; i < f33; ++i)
     {
-        p.setPen(QColor(0,0,0,CLAMP(i*lround(255.0/dpi.f32),0,255)));
+        p.setPen(QColor(0,0,0,CLAMP(i*lround(255.0/F(32)),0,255)));
         p.drawLine(0, size-i, size, size-i);
     }
     p.end();
@@ -194,7 +190,7 @@ renderLightLine(Tile::Line &line)
    p.end();
    QPixmap tmp = pix->scaled( f49, dpi.f5, Qt::IgnoreAspectRatio,
                               Qt::SmoothTransformation );
-   tmp = tmp.copy(0,f2,f49,dpi.f3);
+   tmp = tmp.copy(0,F(2),f49,F(3));
    line = Tile::Line(tmp,Qt::Horizontal,f49_2,-f49_2);
    delete pix;
 }
@@ -203,14 +199,13 @@ renderLightLine(Tile::Line &line)
 void
 Style::generatePixmaps()
 {
-    f1 = dpi.f1; f2 = dpi.f2; f3 = dpi.f3; f4 = dpi.f4;
-    const int f9 = dpi.f9; const int f11 = SCALE(11);
+    const int f9 = F(9); const int f11 = SCALE(11);
     const int f13 = SCALE(13); const int f17 = SCALE(17);
     const int f49 = SCALE(49);
 
     // NOTICE!!! dpi.SliderControl is currently the biggest item using the transpix,
     // increase this in case we need it for bigger things...
-    transSrc = new QPixmap(dpi.SliderControl, dpi.SliderControl);
+    transSrc = new QPixmap(Style::dpi.SliderControl, Style::dpi.SliderControl);
     transSrc->fill(Qt::transparent);
 
     // MASKS =======================================
@@ -263,29 +258,28 @@ Style::generatePixmaps()
 
     
     // fallback ( sunken ) // TODO: raised
-    int f6 = dpi.f6;
     QPixmap tmp = transSrc->copy(0, 0, f9, f9);
     QPainter p;
     p.begin(&tmp);
-    p.fillRect(f1,0,f9-f2,f1, QColor(0,0,0,10));
-    p.fillRect(f2,f1,f9-f4,f1, QColor(0,0,0,20));
-    p.fillRect(f2,f2,f9-f4,f1, QColor(0,0,0,40));
-    p.fillRect(f3,f3,f9-f6,f1, QColor(0,0,0,80));
+    p.fillRect(F(1),0,f9-F(2),F(1), QColor(0,0,0,10));
+    p.fillRect(F(2),F(1),f9-F(4),F(1), QColor(0,0,0,20));
+    p.fillRect(F(2),F(2),f9-F(4),F(1), QColor(0,0,0,40));
+    p.fillRect(F(3),F(3),f9-F(6),F(1), QColor(0,0,0,80));
 
-    p.fillRect(f1,f9-f1,f9-f2,f1, QColor(255,255,255,10));
-    p.fillRect(f2,f9-f2,f9-f4,f1, QColor(255,255,255,20));
-    p.fillRect(f2,f9-f3,f9-f4,f1, QColor(255,255,255,40));
-    p.fillRect(f3,f9-f4,f9-f6,f1, QColor(255,255,255,80));
+    p.fillRect(F(1),f9-F(1),f9-F(2),F(1), QColor(255,255,255,10));
+    p.fillRect(F(2),f9-F(2),f9-F(4),F(1), QColor(255,255,255,20));
+    p.fillRect(F(2),f9-F(3),f9-F(4),F(1), QColor(255,255,255,40));
+    p.fillRect(F(3),f9-F(4),f9-F(6),F(1), QColor(255,255,255,80));
 
-    p.fillRect(0,f1,f1,f9-f2, QColor(128,128,128,10));
-    p.fillRect(f1,f2,f1,f9-f4, QColor(128,128,128,20));
-    p.fillRect(f2,f2,f1,f9-f4, QColor(128,128,128,40));
-    p.fillRect(f3,f3,f1,f9-f6, QColor(128,128,128,80));
+    p.fillRect(0,F(1),F(1),f9-F(2), QColor(128,128,128,10));
+    p.fillRect(F(1),F(2),F(1),f9-F(4), QColor(128,128,128,20));
+    p.fillRect(F(2),F(2),F(1),f9-F(4), QColor(128,128,128,40));
+    p.fillRect(F(3),F(3),F(1),f9-F(6), QColor(128,128,128,80));
 
-    p.fillRect(f9-f1,f1,f1,f9-f2, QColor(128,128,128,10));
-    p.fillRect(f9-f2,f2,f1,f9-f4, QColor(128,128,128,20));
-    p.fillRect(f9-f3,f2,f1,f9-f4, QColor(128,128,128,40));
-    p.fillRect(f9-f4,f3,f1,f9-f6, QColor(128,128,128,80));
+    p.fillRect(f9-F(1),F(1),F(1),f9-F(2), QColor(128,128,128,10));
+    p.fillRect(f9-F(2),F(2),F(1),f9-F(4), QColor(128,128,128,20));
+    p.fillRect(f9-F(3),F(2),F(1),f9-F(4), QColor(128,128,128,40));
+    p.fillRect(f9-F(4),F(3),F(1),f9-F(6), QColor(128,128,128,80));
 
     p.end();
     shadows.fallback = Tile::Set(tmp,f9/2,f9/2,1,1);
@@ -297,7 +291,7 @@ Style::generatePixmaps()
     {
         int s = r ? f17 : f11;
         lights.rect[r] = Tile::Set(shadow(s, true, false, 3.0), s/2,s/2,1,1);
-        lights.rect[r].setClipOffsets(f3,f3,f3,f3);
+        lights.rect[r].setClipOffsets(F(3),F(3),F(3),F(3));
         lights.rect[r].setDefaultShape(Tile::Ring);
     }
 
@@ -310,40 +304,39 @@ Style::generatePixmaps()
     // shadow
     for (int i = 0; i < 2; ++i)
     {   // opaque?
-        shadows.slider[i][false] = shadow(dpi.SliderControl, i,false);
-        shadows.slider[i][true] = shadow(dpi.SliderControl-f2, i,true);
+        shadows.slider[i][false] = shadow(Style::dpi.SliderControl, i,false);
+        shadows.slider[i][true] = shadow(Style::dpi.SliderControl-F(2), i,true);
     }
-    lights.slider = shadow(dpi.SliderControl, true, false, 3.0);
-    masks.slider = roundMask(dpi.SliderControl-f4);
+    lights.slider = shadow(Style::dpi.SliderControl, true, false, 3.0);
+    masks.slider = roundMask(Style::dpi.SliderControl-F(4));
     // ================================================================
 
     // RADIOUTTON =====================================
     // shadow
     for (int i = 0; i < 2; ++i)
     {   // opaque?
-        shadows.radio[i][false] = shadow(dpi.ExclusiveIndicator, i,false);
-        shadows.radio[i][true] = shadow(dpi.ExclusiveIndicator-f2, i,true);
+        shadows.radio[i][false] = shadow(Style::dpi.ExclusiveIndicator, i,false);
+        shadows.radio[i][true] = shadow(Style::dpi.ExclusiveIndicator-F(2), i,true);
     }
     // mask
-    masks.radio = roundMask(dpi.ExclusiveIndicator-f4);
+    masks.radio = roundMask(Style::dpi.ExclusiveIndicator-F(4));
     // mask fill
 #if 0
-    masks.radioIndicator = roundMask(dpi.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
+    masks.radioIndicator = roundMask(Style::dpi.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
 #else
-    int s = (dpi.ExclusiveIndicator)/4; s *= 2; // cause of int div...
-    s += f2; // cause sunken frame "outer" part covers f2 pixels
-    masks.radioIndicator = roundMask(dpi.ExclusiveIndicator - s);
+    int s = (Style::dpi.ExclusiveIndicator)/4; s *= 2; // cause of int div...
+    s += F(2); // cause sunken frame "outer" part covers F(2) pixels
+    masks.radioIndicator = roundMask(Style::dpi.ExclusiveIndicator - s);
 #endif
     // ================================================================
     // NOTCH =====================================
-    masks.notch = roundMask(dpi.f6);
+    masks.notch = roundMask(F(6));
     // ================================================================
 
 
 // GROUPBOX =====================================
     // shadow
-    int f12 = dpi.f12;
-    shadows.group = Tile::Set(groupShadow(f49),f12,f12,f49-2*f12,f1);
+    shadows.group = Tile::Set(groupShadow(f49),F(12),F(12),f49-2*F(12),F(1));
     shadows.group.setDefaultShape(Tile::Ring);
     // ================================================================
 
@@ -355,12 +348,12 @@ Style::generatePixmaps()
     {   // orientarion
         if (i)
         {
-            w = f2; h = f49;
+            w = F(2); h = f49;
             lg = QLinearGradient(0,0,0,f49);
         }
         else
         {
-            w = f49; h = f2;
+            w = f49; h = F(2);
             lg = QLinearGradient(0,0,f49,0);
         }
         tmp = QPixmap(w,h);
@@ -374,9 +367,9 @@ Style::generatePixmaps()
                     << QGradientStop( 1, QColor(c1,c1,c1,0) );
             lg.setStops(stops);
             if (i)
-                { p.fillRect(0,0,f1,f49,lg); }
+                { p.fillRect(0,0,F(1),f49,lg); }
             else
-                { p.fillRect(0,0,f49,f1,lg); }
+                { p.fillRect(0,0,f49,F(1),lg); }
             stops.clear();
 
             stops   << QGradientStop( 0, QColor(c2,c2,c2,0) )
@@ -384,9 +377,9 @@ Style::generatePixmaps()
                     << QGradientStop( 1, QColor(c2,c2,c2,0) );
             lg.setStops(stops);
             if (i)
-                { p.fillRect(f1,0,f2-f1,f49,lg); }
+                { p.fillRect(F(1),0,F(2)-F(1),f49,lg); }
             else
-                { p.fillRect(0,f1,f49,f2-f1,lg); }
+                { p.fillRect(0,F(1),f49,F(2)-F(1),lg); }
             stops.clear();
 
             p.end();

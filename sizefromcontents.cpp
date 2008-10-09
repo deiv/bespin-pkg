@@ -23,9 +23,7 @@
 #include "makros.h"
 
 using namespace Bespin;
-extern Dpi dpi;
 
-extern Config config;
 static const int windowsArrowHMargin = 6; // arrow horizontal margin
 
 QSize

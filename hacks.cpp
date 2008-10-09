@@ -41,11 +41,10 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 
 #include <QtDebug>
 #include "colors.h"
-#include "config.h"
+#include "bespin.h"
 #include "hacks.h"
 
 using namespace Bespin;
-extern Config config;
 
 static Hacks *bespinHacks = new Hacks;
 static Hacks::HackAppType *appType = 0;
@@ -179,21 +178,21 @@ hackMessageBox(QMessageBox* box, QEvent *e)
 static bool
 isWindowDragWidget(QObject *o)
 {
-    return config.hack.windowMovement && (
-        qobject_cast<QDialog*>(o) ||
-        qobject_cast<QMenuBar*>(o) ||
-        qobject_cast<QGroupBox*>(o) ||
+    return Style::config.hack.windowMovement &&
+           (qobject_cast<QDialog*>(o) ||
+            qobject_cast<QMenuBar*>(o) ||
+            qobject_cast<QGroupBox*>(o) ||
         
-        (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled()) ||
-        o->inherits("QToolBar") ||
-        o->inherits("QDockWidget") ||
+            (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled()) ||
+            o->inherits("QToolBar") ||
+            o->inherits("QDockWidget") ||
 //         o->inherits("QMainWindow") || // this is mostly useles... PLUS triggers problems
 
-        ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
-        ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
+            ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
+            ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
 
-        o->inherits("QStatusBar") ||
-        (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar")));
+            o->inherits("QStatusBar") ||
+            (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar")));
 }
 
 static bool
@@ -294,7 +293,7 @@ Hacks::add(QWidget *w)
         appType = new HackAppType((HackAppType)Unknown);
         if (qApp->inherits("GreeterApp")) // KDM segfaults on QCoreApplication::arguments()...
             *appType = KDM;
-        if (config.hack.krunner && QCoreApplication::applicationName() == "krunner")
+        if (Style::config.hack.krunner && QCoreApplication::applicationName() == "krunner")
             *appType = KRunner;
         else if (QCoreApplication::applicationName() == "dragonplayer")
             *appType = Dragon;
@@ -316,7 +315,7 @@ Hacks::add(QWidget *w)
         return true;
     }
     
-    if (config.hack.messages && qobject_cast<QMessageBox*>(w))
+    if (Style::config.hack.messages && qobject_cast<QMessageBox*>(w))
     {
         w->setWindowFlags ( Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint | Qt::FramelessWindowHint);
         w->removeEventFilter(bespinHacks); // just to be sure
@@ -324,7 +323,7 @@ Hacks::add(QWidget *w)
         return true;
     }
     
-    if (config.hack.KHTMLView)
+    if (Style::config.hack.KHTMLView)
     if (QFrame *frame = qobject_cast<QFrame*>(w))
     if (frame->inherits("KHTMLView"))
     {

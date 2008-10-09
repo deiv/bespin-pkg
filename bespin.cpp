@@ -52,7 +52,7 @@
 
 
 /**============= extern C stuff ==========================*/
-class StylePlugin : public QStylePlugin
+class BespinStylePlugin : public QStylePlugin
 {
 public:
    QStringList keys() const {
@@ -66,14 +66,16 @@ public:
    }
 };
 
-Q_EXPORT_PLUGIN2(Style, StylePlugin)
+Q_EXPORT_PLUGIN2(BespinStyle, BespinStylePlugin)
 /**=========================================================*/
 
 using namespace Bespin;
 
-/** static config object */
-Config config;
-Dpi dpi;
+Style::Masks Style::masks;
+Style::Shadows Style::shadows;
+Style::Lights Style::lights;
+Config Style::config;
+Dpi Style::dpi;
 
 #define N_PE 54
 #define N_CE 50

@@ -25,13 +25,13 @@
 #define RECT option->rect
 #define PAL option->palette
 #define COLOR(_ROLE_) PAL.color(_ROLE_)
-#define CONF_COLOR(_TYPE_, _FG_) PAL.color(config._TYPE_##_role[_FG_])
-#define CCOLOR(_TYPE_, _FG_) PAL.color(config._TYPE_##_role[_FG_])
+#define CONF_COLOR(_TYPE_, _FG_) PAL.color(Style::config._TYPE_##_role[_FG_])
+#define CCOLOR(_TYPE_, _FG_) PAL.color(Style::config._TYPE_##_role[_FG_])
 #define FCOLOR(_TYPE_) PAL.color(QPalette::_TYPE_)
 #define BGCOLOR (widget ? COLOR(widget->backgroundRole()) : FCOLOR(Window))
 #define FGCOLOR (widget ? COLOR(widget->foregroundRole()) : FCOLOR(WindowText))
-#define GRAD(_TYPE_) config._TYPE_.gradient
-#define ROLES(_TYPE_) QPalette::ColorRole (*role)[2] = &config._TYPE_##_role
+#define GRAD(_TYPE_) Style::config._TYPE_.gradient
+#define ROLES(_TYPE_) QPalette::ColorRole (*role)[2] = &Style::config._TYPE_##_role
 #define ROLE (*role)
 
 #define ASSURE_OPTION(_VAR_, _TYPE_) \
@@ -47,7 +47,7 @@ if (!_VAR_) return
 
 #define ASSURE(_VAR_) if (!_VAR_) return
 
-#define F(_I_) dpi.f##_I_
+#define F(_I_) Style::dpi.f##_I_
 
 #define IS_HTML_WIDGET (widget->objectName() == "RenderFormElementWidget")
 

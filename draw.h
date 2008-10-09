@@ -16,6 +16,9 @@
    Boston, MA 02110-1301, USA.
  */
 
+#ifndef BESPIN_DRAW_H
+#define BESPIN_DRAW_H
+
 #include <QPainter>
 
 #include "colors.h"
@@ -23,8 +26,13 @@
 #include "makros.h"
 
 using namespace Bespin;
-extern Config config;
-extern Dpi dpi;
+#if 0
+Style::Masks Style::masks;
+Style::Shadows Style::shadows;
+Style::Lights Style::lights;
+Config Style::config;
+Dpi Style::dpi;
+#endif
 
 #define OPT_SUNKEN bool sunken = option->state & State_Sunken;
 #define OPT_ENABLED bool isEnabled = option->state & State_Enabled;
@@ -58,3 +66,5 @@ setTitle(QPainter *p)
 #endif
         p->setFont(fnt);
 }
+
+#endif // BESPIN_DRAW_H

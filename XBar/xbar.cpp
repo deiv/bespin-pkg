@@ -46,6 +46,7 @@
 #include <QtDebug>
 
 static XBar *instance = NULL;
+QTimer XBar::bodyCleaner;
 
 XBar::XBar(QObject *parent, const QVariantList &args) : Plasma::Applet(parent, args)
 {
@@ -56,14 +57,18 @@ XBar::XBar(QObject *parent, const QVariantList &args) : Plasma::Applet(parent, a
         deleteLater();
     }
     else
+    {
         instance = this;
+    }
 }
 
 XBar::~XBar()
 {
     if (instance == this)
+    {
         instance = NULL;
-    byeMenus();
+        byeMenus();
+    }
 }
 
 void
@@ -102,6 +107,8 @@ XBar::init()
     connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(byeMenus()));
     connect (&d.windowList, SIGNAL(aboutToShow()), this, SLOT(updateWindowlist()));
     connect(Plasma::Theme::defaultTheme(), SIGNAL(themeChanged()), this, SLOT(updatePalette()));
+    connect (&bodyCleaner, SIGNAL(timeout()), this, SLOT(cleanBodies()));
+    bodyCleaner.start(30000); // every 5 minutes - it's just to clean menus from crashed windows, so users won't constantly scroll them
     callMenus();
 }
 
@@ -116,6 +123,7 @@ XBar::updatePalette()
     d.taskbar->setPalette(pal);
     foreach (MenuBar *menu, d.menus)
         menu->setPalette(pal);
+    d.windowList.setPalette(QApplication::palette());
 }
 
 void
@@ -178,6 +186,27 @@ XBar::changeEntry(qlonglong key, int idx, const QString &entry, bool add)
       if (idx < 0) return;
       bar->changeAction(idx+1, entry);
    }
+}
+
+void
+XBar::cleanBodies()
+{
+    QDBusConnectionInterface *session = QDBusConnection::sessionBus().interface();
+    QStringList services = session->registeredServiceNames();
+    services = services.filter(QRegExp("^org\\.kde\\.XBar-"));
+    MenuMap::iterator i = d.menus.begin();
+    MenuBar *mBar = 0;
+    while (i != d.menus.end())
+    {
+        if (services.contains(i.value()->service()))
+            ++i;
+        else
+        {
+            mBar = i.value();
+            i = d.menus.erase(i);
+            delete mBar;
+        }
+    }
 }
 
 bool
@@ -346,11 +375,16 @@ XBar::unregisterMenu(qlonglong key)
 void
 XBar::unregisterCurrentMenu()
 {
-   if (!d.currentBar || d.currentBar == d.taskbar)
-      return;
-   qlonglong key = d.menus.key(d.currentBar, 0);
-   if (key)
-      unregisterMenu(key);
+    if (!d.currentBar || d.currentBar == d.taskbar)
+        return;
+    qlonglong key = d.menus.key(d.currentBar, 0);
+    if (key)
+    {
+        QDBusInterface interface( d.currentBar->service(), "/XBarClient", "org.kde.XBarClient" );
+        if (interface.isValid())
+            interface.call("deactivate");
+        unregisterMenu(key);
+    }
 }
 
 
@@ -385,7 +419,7 @@ XBar::updateWindowlist()
       }
    }
    d.windowList.addSeparator();
-   d.windowList.addAction ( "Remove this Menubar", this, SLOT(unregisterCurrentMenu()) );
+   d.windowList.addAction ( "Embed menu in window", this, SLOT(unregisterCurrentMenu()) );
 }
 
 void
