@@ -1,8 +1,5 @@
 This is a simple bootsplash for Bespin (and people who like blue...)
 
-The Design is HEAVILY inspired by a Wallpaper called "lapse" <TODO: put some link to xicons.com here>
-it however uses the Oxygen palette.
-
 === GENERATION =============================================================
 
 To generate a splash set for your current framebuffer resolution
@@ -52,5 +49,5 @@ whatever you do and especially if you consider to be a noop and don't know what 
 - CONSULT YOUR DISTRIBUTORS DOCUMENTATION about changing bootsplashes, maybe user groups, try google!
 - USE THE DISTRIBUTION FRONTENT - if there's any
 - MAKE BACKUPS especially of any "initrd" file in /boot
-- STORE THE NAME OF THE BACKUPS - on a piece of PAPER! If you bork anything you can enter the path of the backup'd initrd file in GRUB - LiLo users: you better know what you're doing! ( - and don't forget calling before rebooting lilo)
+- STORE THE NAME OF THE BACKUPS - on a piece of PAPER! If you bork anything you can enter the path of the backup'd initrd file in GRUB - LiLo users: you better know what you're doing! ( - and don't forget calling "lilo" before rebooting)
 - NO PANIC - if you can't get access to your system anymore, there's still KNOPPIX =)
