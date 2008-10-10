@@ -16,12 +16,10 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA.
 */
 
-// TODO remove tabwidget / replace with stackedwidget only...!?
 #include <QAbstractScrollArea>
 #include <QApplication>
 #include <QPainter>
 #include <QPaintEvent>
-#include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QStackedWidget>
@@ -247,7 +245,7 @@ class StdChildAdd : public QObject
 
 
 TabInfo::TabInfo(QObject* parent, QWidget *current, int idx) :
-QObject(parent), curtain(0), progress(0.0), currentWidget(current), index(idx) {}
+QObject(parent), curtain(0), progress(0.0), currentWidget(current), index(idx){}
 
 bool
 TabInfo::proceed()

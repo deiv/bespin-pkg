@@ -18,6 +18,7 @@ Boston, MA 02110-1301, USA.
 
 #include <QHash>
 #include <QPixmap>
+#include <QPointer>
 #include <QTime>
 #include "basic.h"
 
@@ -40,7 +41,7 @@ class TabInfo : public QObject {
    protected:
       Curtain *curtain;
       float progress;
-      QWidget *currentWidget;
+      QPointer<QWidget> currentWidget;
       int index;
       uint duration;
       QTime clock;
