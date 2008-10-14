@@ -195,9 +195,9 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
         return (Qt::AlignHCenter | Qt::AlignTop); // (Qt::AlignLeft | Qt::AlignTop)
     case SH_FormLayoutLabelAlignment:
         return Qt::AlignRight;
-#endif
     case SH_ItemView_PaintAlternatingRowColorsForEmptyArea:
         return true;
+#endif
     case SH_KCustomPrimitiveElement:
     case SH_KCustomControlElement:
     case SH_KCustomComplexControl:

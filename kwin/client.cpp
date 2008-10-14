@@ -306,7 +306,10 @@ Client::mousePosition( const QPoint& p ) const
 QSize
 Client::minimumSize() const
 {
-    return QSize(2*buttonSpace+6*titleSize, titleSize + borderSize);
+//     if (_small)
+    return QSize(buttonSpaceLeft + buttonSpaceRight + 2*borderSize, titleSize + borderSize);
+//     else
+//         return QSize(2*buttonSpace+3*titleSize, titleSize + borderSize);
 }
 
 #define DUMP_PICTURE(_PREF_, _PICT_)\
@@ -806,6 +809,8 @@ Client::updateTitleLayout( const QSize& )
         int d = buttonSpace + 8;
         label = QRect(d, 0, width()-2*d, titleSize);
     }
+    if (!label.isValid())
+        label = QRect();
 }
 
 void
