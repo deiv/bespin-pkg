@@ -59,6 +59,7 @@ private:
         QMenu windowList;
         TaskBar *taskbar;
         MenuBar *currentBar;
+        bool extraTitle;
     } d;
     static QTimer bodyCleaner;
 private slots:

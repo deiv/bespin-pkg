@@ -649,7 +649,7 @@ Gradients::bgSet(const QColor &c)
             int a = qAbs(_bgIntensity - 100)*3; a = CLAMP(a,0,255);
             int v = (_bgIntensity > 0)*255;
             c1 = QColor(v,v,v, a);
-            c2 = Colors::mid(c1, c);
+            c2 = QColor(v,v,v, a/2);
             v = (!v)*255;
             c3 = QColor(v,v,v, a);
         }
@@ -685,7 +685,11 @@ Gradients::bgSet(const QColor &c)
         // Corner Tile
         lg = QLinearGradient(QPoint(0,0), QPoint(0,128));
         p.begin(&set->cornerTile);
-        stops << QGradientStop(0, Colors::mid(c1, c2,1,6)) << QGradientStop(1, c2);
+        if (c == Qt::transparent)
+            c1.setAlpha(4*c1.alpha()/7);
+        else
+            c1 = Colors::mid(c1, c2,1,6);
+        stops << QGradientStop(0, c1) << QGradientStop(1, c2);
         lg.setStops(stops);
         p.fillRect(set->cornerTile.rect(), lg);
         stops.clear();
@@ -698,7 +702,6 @@ Gradients::bgSet(const QColor &c)
             pix = (cnr ? &set->rCorner : &set->lCorner);
             p.begin(pix);
             p.drawTiledPixmap(pix->rect(), set->topTile);
-//             p.fillRect(pix->rect(), Qt::red);
             p.end();
             mask = cornerMask(cnr);
 #ifndef QT_NO_XRENDER

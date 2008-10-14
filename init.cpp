@@ -218,7 +218,10 @@ Style::readSettings(const QSettings* settings)
     config.macStyle = readBool(MACSTYLE);
 
     // Menus ===========================
+    // TODO: redundant, kwin and afaik compiz can handle this
     config.menu.opacity = readInt(MENU_OPACITY);
+    //--------
+    config.menu.round = readBool(MENU_ROUND);
     config.menu.itemGradient = readGrad(MENU_ITEMGRADIENT);
     config.menu.showIcons = readBool(MENU_SHOWICONS);
     config.menu.shadow = readBool(MENU_SHADOW);
@@ -238,9 +241,6 @@ Style::readSettings(const QSettings* settings)
     }
     if (appType == Plasma)
     {   // that's probably XBar, ...
-        // ... and the menubar is handled, totally different - so assume we can use proper fg colors on popups...
-//         config.menu.bar_role[Bg] = config.menu.std_role[Bg];
-//         config.menu.bar_role[Fg] = config.menu.std_role[Fg];
         // ... and we don't want a bg there
         config.menu.barGradient = Gradients::None;
         config.menu.barSunken = false;
@@ -284,6 +284,7 @@ Style::readSettings(const QSettings* settings)
 
     // General ===========================
     config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;
+    // TODO: better make this an env var???
     config.scale = iSettings->value(DEF_SCALE).toDouble();
     if (config.scale != 1.0)
     {

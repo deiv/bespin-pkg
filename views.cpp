@@ -447,7 +447,6 @@ Style::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidg
 void
 Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
-
 #if QT_VERSION >= 0x040400
     ASSURE_OPTION(item, ViewItemV4);
 #else

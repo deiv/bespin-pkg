@@ -283,6 +283,9 @@ Style::polish( QWidget * widget )
     if (!widget)
         return;
 
+//     if (widget->inherits("QGraphicsView"))
+//         qDebug() << "BESPIN" << widget;
+
 #ifdef MOUSEDEBUG
    widget->installEventFilter(this);
 #endif

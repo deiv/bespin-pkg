@@ -424,7 +424,7 @@ Style::drawComplexControl ( ComplexControl control, const QStyleOptionComplex * 
         (this->*complexRoutine[control])(option, painter, widget);
     else
     {
-//         qDebug() << "BESPIN, unsupported control:" << control << widget;
+//         qDebug() << "BESPIN, unsupported complex control:" << control << widget;
         QCommonStyle::drawComplexControl( control, option, painter, widget );
     }
 }
@@ -711,15 +711,17 @@ Style::eventFilter( QObject *object, QEvent *ev )
 
     case QEvent::Resize:
         
-        if (qobject_cast<QMenu*>(object) /*|| qobject_cast<QDockWidget*>(object)*/)
+        if (config.menu.round && qobject_cast<QMenu*>(object)
+            /*|| qobject_cast<QDockWidget*>(object)*/) // kwin yet cannot. compiz can't even menus...
         {
             QWidget *widget = static_cast<QWidget*>(object);
+            // this would be for docks
 //             if (!widget->isWindow())
 //             {
 //                 widget->clearMask();
 //                 return false;
 //             }
-#if 0
+#if 0 // xPerimental code for ribbon like looking menus - not atm.
             QAction *head = menu->actions().at(0);
             QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
             Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
@@ -743,7 +745,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             mask += QRegion(0, 4, w, h-8);
             mask += QRegion(2, 1, w-4, h-2);
             mask += QRegion(1, 2, w-2, h-4);
-
+// only top rounded - but looks nasty
 //          QRegion mask(0, 0, w, h-4);
 //          mask += QRect(1, h-4, w-2, 2);
 //          mask += QRect(2, h-2, w-4, 1);

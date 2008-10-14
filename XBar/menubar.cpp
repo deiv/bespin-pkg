@@ -196,9 +196,16 @@ MenuBar::initStyleOption(QStyleOptionMenuItem *option, int idx) const
         return;
 
     QAction *action = d.actions.at(idx);
-
-    option->text = action->text();
+    option->font = action->font();
     option->icon = action->icon();
+    if (idx)
+        option->text = action->text();
+    else
+    {
+        option->text = d.appTitle;
+        option->font.setWeight(QFont::Black);
+        option->font.setPointSize(option->font.pointSize()*1.2);
+    }
 
     if (isEnabled() && action->isEnabled())
         option->state |= QStyle::State_Enabled;
@@ -340,7 +347,7 @@ MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidge
         emptyArea -= adjustedActionRect;
         initStyleOption(&opt, i);
         opt.rect = adjustedActionRect;
-        painter->setFont(action->font());
+        painter->setFont(opt.font);
         painter->setClipRect(adjustedActionRect);
         style()->drawControl(QStyle::CE_MenuBarItem, &opt, painter, w);
     }
@@ -444,12 +451,12 @@ MenuBar::updateSize()
     for (int i = 0; i < d.actions.count(); ++i)
     {
         action = d.actions.at(i);
-        QFontMetrics fm(action->font());
         r = d.actionRects.at(i);
         if (!r.isValid())
         {
             initStyleOption(&opt, i);
-            r = fm.boundingRect(action->text());
+            QFontMetrics fm(opt.font);
+            r = fm.boundingRect(opt.text);
             r.setSize(style()->sizeFromContents(QStyle::CT_MenuBarItem, &opt, r.size(), 0));
         }
         r.moveTopLeft(QPoint(w, 0));

@@ -120,22 +120,31 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
     {
     case BevelV:
     {   // also fallback for ComplexLights
+        const bool hadClip = painter->hasClipping();
+        const QRegion oldClip = (hadClip) ? painter->clipRegion() : QRegion();
         int s1 = set.topTile.height();
         int s2 = qMin(s1, (rect.height()+1)/2);
         s1 -= s2;
-        painter->drawTiledPixmap( rect.x(), rect.y(), rect.width(), s2, set.topTile, 0, s1 );
         if (Colors::value(c) < 245)
         {   // no sense otherwise
             const int w = rect.width()/4 - 128;
+            const int s3 = 128-s1;
             if (w > 0)
             {
-                s2 = 128-s1;
-                painter->drawTiledPixmap( rect.x(), rect.y(), w, s2, set.cornerTile, 0, s1 );
-                painter->drawTiledPixmap( rect.right()+1-w, rect.y(), w, s2, set.cornerTile, 0, s1 );
+                painter->drawTiledPixmap( rect.x(), rect.y(), w, s3, set.cornerTile, 0, s1 );
+                painter->drawTiledPixmap( rect.right()+1-w, rect.y(), w, s3, set.cornerTile, 0, s1 );
             }
-            painter->drawPixmap(rect.x()+w, rect.y(), set.lCorner, 0, s1, 128, s2);
-            painter->drawPixmap(rect.right()-w-127, rect.y(), set.rCorner, 0, s1, 128, s2);
+            painter->drawPixmap(rect.x()+w, rect.y(), set.lCorner, 0, s1, 128, s3);
+            painter->drawPixmap(rect.right()-w-127, rect.y(), set.rCorner, 0, s1, 128, s3);
+            QRegion newClip(rect.x(), rect.y(), rect.width(), s2);
+            newClip -= QRegion(rect.x(), rect.y(), w+128, s3);
+            newClip -= QRegion(rect.right()-w-127, rect.y(), w+128, s3);
+            painter->setClipping(true);
+            painter->setClipRegion(newClip, Qt::IntersectClip);
         }
+        painter->drawTiledPixmap( rect.x(), rect.y(), rect.width(), s2, set.topTile, 0, s1 );
+        painter->setClipRegion(oldClip);
+        painter->setClipping(hadClip);
         s1 = set.btmTile.height();
         s2 = qMin(s1, (rect.height())/2);
         painter->drawTiledPixmap( rect.x(), rect.bottom() - s2, rect.width(), s2, set.btmTile );

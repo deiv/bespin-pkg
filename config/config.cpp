@@ -322,18 +322,19 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.leftHanded, "LeftHanded", false);
     handleSettings(ui.macStyle, "MacStyle", true);
 
-    handleSettings(ui.crMenuActive, "Menu.ActiveRole", QPalette::Highlight);
-    handleSettings(ui.menuGlas, "Menu.Glassy", true);
-    handleSettings(ui.gradMenuItem, "Menu.ItemGradient", GradNone);
-    handleSettings(ui.showMenuIcons, "Menu.ShowIcons", false);
-    handleSettings(ui.menuShadow, "Menu.Shadow", false); // i have a compmgr running :P
-    handleSettings(ui.menuOpacity, "Menu.Opacity", 80);
-    handleSettings(ui.crPopup, "Menu.Role", QPalette::Window);
+    handleSettings(ui.crMenuActive, MENU_ACTIVEROLE);
+    handleSettings(ui.menuRound, MENU_ROUND);
+    handleSettings(ui.menuGlas, MENU_GLASSY);
+    handleSettings(ui.gradMenuItem, MENU_ITEMGRADIENT);
+    handleSettings(ui.showMenuIcons, MENU_SHOWICONS);
+    handleSettings(ui.menuShadow, MENU_SHADOW); // false, i have a compmgr running :P
+    handleSettings(ui.menuOpacity, MENU_OPACITY);
+    handleSettings(ui.crPopup, MENU_ROLE);
     handleSettings(ui.gradMenuBar, MENU_BAR_GRADIENT);
-    handleSettings(ui.crMenu, "Menu.BarRole", QPalette::Window);
-    handleSettings(ui.barSunken, "Menu.BarSunken", false);
-    handleSettings(ui.menuBoldText, "Menu.BoldText", false);
-    handleSettings(ui.menuActiveItemSunken, "Menu.ActiveItemSunken", false);
+    handleSettings(ui.crMenu, MENU_BARROLE);
+    handleSettings(ui.barSunken, MENU_BARSUNKEN);
+    handleSettings(ui.menuBoldText, MENU_BOLDTEXT);
+    handleSettings(ui.menuActiveItemSunken, MENU_ACTIVEITEMSUNKEN);
 
     handleSettings(ui.gradProgress, "Progress.Gradient", GradGloss);
     handleSettings(ui.crProgressBg, PROGRESS_ROLE_BG);
@@ -535,6 +536,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                     Select \"WindowText\" if you want inversion.<br>\
                     <b>Warning!</b><br>If you select \"Window\" here and \"None\" \
                     below, the hovering is hardly indicated!");
+
+    setContextHelp(ui.menuBoldText, "<b>Rounded popup corners</b><hr>\
+                    Round popup corners are nifty, but lame (Buhhh ;-P) compiz won't draw shadows\
+                    then. So you can check them off here. (The proper solution to your problem was\
+                    of course to use KWin... You GNOME guy! We hates thy GNOME guys. Really much =D");
 
     setContextHelp(ui.menuBoldText, "<b>Bold Menu Text</b><hr>\
                     Depending on your font this can be a good choice especially \

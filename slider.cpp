@@ -29,9 +29,9 @@ Style::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainte
 
     // shadow
     QPoint xy = handle.topLeft();
-    if (hasFocus && !sunken)
-        fillWithMask(painter, xy, FCOLOR(Highlight), lights.slider);
-    else if (step && config.btn.backLightHover)
+//     if (hasFocus && !sunken)
+//         fillWithMask(painter, xy, FCOLOR(Highlight), lights.slider);
+    /*else */if (step && config.btn.backLightHover)
         fillWithMask(painter, xy, Colors::mid(FCOLOR(Window), CCOLOR(btn.active, Bg), 6-step, step), lights.slider);
     if (sunken)
         xy += QPoint(dpi.f1, 0);

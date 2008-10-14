@@ -26,6 +26,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QSplitter>
 #include <QStyle>
 #include <QStyleOption>
 #include <QStyleOptionGroupBox>
@@ -300,6 +301,8 @@ Hacks::add(QWidget *w)
         else if (!QCoreApplication::arguments().isEmpty() &&
                  QCoreApplication::arguments().at(0).endsWith("smplayer"))
             *appType = SMPlayer;
+        else if (QCoreApplication::applicationName() == "amarok")
+            *appType = Amarok;
     }
 
     if (*appType == KRunner)
@@ -313,6 +316,12 @@ Hacks::add(QWidget *w)
             w->installEventFilter(bespinHacks);
         }
         return true;
+    }
+
+    else if (*appType == Amarok)
+    if (QSplitter *splitter = qobject_cast<QSplitter*>(w)/*->inherits("Context::ContextView")*/)
+    {
+        splitter->setChildrenCollapsible(true);
     }
     
     if (Style::config.hack.messages && qobject_cast<QMessageBox*>(w))

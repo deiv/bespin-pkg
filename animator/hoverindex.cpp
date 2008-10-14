@@ -111,7 +111,13 @@ HoverIndex::timerEvent(QTimerEvent * event)
             it = items.erase(it);
             continue;
         }
+#if QT_VERSION >= 0x040400
+        // below does work in general, but is... ugly?!
+        // another way would be to map to a const widget first or perform a static_cast - ughh
         w = const_cast<QWidget*>(it.key().data());
+#else
+        w = const_cast<QWidget*>(&(*it.key()));
+#endif
         IndexInfo &info = it.value();
         if (info.fades[In].isEmpty() && info.fades[Out].isEmpty())
         {

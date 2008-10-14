@@ -45,12 +45,12 @@ public:
     inline const QString& service() const { return d.service; }
     inline qlonglong key() const { return d.key; }
     inline int openPopup() const { return d.openPopup; }
+    inline void setAppTitle(const QString &title) { d.appTitle = title; }
     QGraphicsView *view() const;
 signals:
     void hovered(int);
     void triggered(int);
 protected:
-    inline QList<QAction*> &actions() { return d.actions; }
     void initStyleOption(QStyleOptionMenuItem *option, int idx = -1) const;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *ev);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *ev);
@@ -62,6 +62,7 @@ protected:
     inline virtual void show() { QGraphicsItem::show(); }
     void timerEvent(QTimerEvent *event);
 friend class XBar;
+    inline QList<QAction*> &actions() { return d.actions; }
     void popDown();
     void setOpenPopup(int popup);
 friend class DummyQMenuBar;
@@ -78,7 +79,7 @@ private:
     {
         QList<QAction*> actions;
         QList<QRect> actionRects;
-        QString service;
+        QString service, appTitle;
         qlonglong key;
         int hoverIndex;
         int openPopup;
