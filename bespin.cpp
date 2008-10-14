@@ -140,8 +140,8 @@ Style::registerRoutines()
     registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
     // frames.cpp
     registerCE(skip, CE_FocusFrame);
-    registerPE(skip, PE_PanelStatusBar);
 #if QT_VERSION >= 0x040400
+    registerPE(skip, PE_PanelStatusBar);
     registerPE(skip, PE_FrameStatusBarItem);
 #else
     registerPE(skip, PE_FrameStatusBar);

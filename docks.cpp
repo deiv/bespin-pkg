@@ -62,7 +62,8 @@ Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWid
             drawItemText(painter, rect.adjusted(0,-1,0,-1), itemtextopts, PAL, isEnabled, title);
         }
         painter->setPen(hover ? FCOLOR(WindowText) : Colors::mid(bg, FCOLOR(WindowText), 1, 3));
-        drawItemText(painter, rect, itemtextopts, PAL, isEnabled, title);
+        drawItemText(painter, rect, itemtextopts, PAL, isEnabled, title, QPalette::NoRole, &rect);
+        painter->drawLine(rect.x(), RECT.bottom(), RECT.right(), RECT.bottom());
 
         painter->restore();
     }

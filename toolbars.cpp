@@ -261,45 +261,47 @@ Style::drawToolBarHandle(const QStyleOption * option, QPainter * painter,
                                const QWidget *) const
 {
 
-   OPT_HOVER
+    OPT_HOVER
 //    if (!hover) return;
-   
-   painter->save();
-   QRect rect = RECT; bool line = false; int dx(0), dy(0);
-   if (RECT.width() > RECT.height()) {
-      line = (RECT.width() > 9*RECT.height()/2);
-      if (line) {
-         dx = 3*RECT.height()/2; dy = 0;
-      }
-      rect.setLeft(rect.left()+(rect.width()-rect.height())/2);
-      rect.setWidth(rect.height());
-   }
-   else {
-      line = (RECT.height() > 3*RECT.width());
-      if (line) {
-         dx = 0; dy = 3*RECT.width()/2;
-      }
-      rect.setTop(rect.top()+(rect.height()-rect.width())/2);
-      rect.setHeight(rect.width());
-   }
-   QColor c = FCOLOR(Window);
-   if (hover)
-      c = Colors::mid(c, FCOLOR(Highlight), 3, 1);
-   painter->setRenderHint(QPainter::Antialiasing);
-   painter->setBrush(Gradients::pix(c, rect.height(), Qt::Vertical, Gradients::Sunken));
-   painter->setPen(Qt::NoPen);
-   painter->setBrushOrigin(rect.topLeft());
-   painter->drawEllipse(rect);
-   if (line) {
-      const int f1 = dpi.f1;
-      rect.adjust(f1,f1,-f1,-f1);
-      painter->setBrush(Gradients::pix(c, rect.height(), Qt::Vertical, Gradients::Sunken));
-      rect.translate(-dx,-dy);
-      painter->setBrushOrigin(rect.topLeft());
-      painter->drawEllipse(rect);
-      rect.translate( 2*dx, 2*dy);
-      painter->setBrushOrigin(rect.topLeft());
-      painter->drawEllipse(rect);
-   }
-   painter->restore();
+
+    painter->save();
+    QRect rect = RECT; bool line = false; int dx(0), dy(0);
+    if (RECT.width() > RECT.height())
+    {
+        line = (RECT.width() > 9*RECT.height()/2);
+        if (line)
+            { dx = 3*RECT.height()/2; dy = 0; }
+        rect.setLeft(rect.left()+(rect.width()-rect.height())/2);
+        rect.setWidth(rect.height());
+    }
+    else
+    {
+        line = (RECT.height() > 3*RECT.width());
+        if (line)
+            { dx = 0; dy = 3*RECT.width()/2; }
+        rect.setTop(rect.top()+(rect.height()-rect.width())/2);
+        rect.setHeight(rect.width());
+    }
+    QColor c = FCOLOR(Window);
+    if (hover)
+        c = Colors::mid(c, FCOLOR(Highlight), 3, 1);
+
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setBrush(Gradients::pix(c, rect.height(), Qt::Vertical, Gradients::Sunken));
+    painter->setPen(Qt::NoPen);
+    painter->setBrushOrigin(rect.topLeft());
+    painter->drawEllipse(rect);
+    if (line)
+    {
+        const int f1 = dpi.f1;
+        rect.adjust(f1,f1,-f1,-f1);
+        painter->setBrush(Gradients::pix(c, rect.height(), Qt::Vertical, Gradients::Sunken));
+        rect.translate(-dx,-dy);
+        painter->setBrushOrigin(rect.topLeft());
+        painter->drawEllipse(rect);
+        rect.translate( 2*dx, 2*dy);
+        painter->setBrushOrigin(rect.topLeft());
+        painter->drawEllipse(rect);
+    }
+    painter->restore();
 }

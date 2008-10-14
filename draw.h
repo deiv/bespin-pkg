@@ -57,7 +57,7 @@ setTitle(QPainter *p)
 {
         QFont fnt = p->font();
         fnt.setWeight(QFont::Black);
-        fnt.setUnderline(true);
+//         fnt.setUnderline(true);
         fnt.setStretch(QFont::SemiExpanded);
 #if QT_VERSION >= 0x040400
         fnt.setCapitalization(QFont::/*AllUppercase*/SmallCaps);

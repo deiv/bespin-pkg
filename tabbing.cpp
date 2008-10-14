@@ -513,6 +513,13 @@ Style::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter, const 
         tr.moveTop(tr.top()+1);
     }
     painter->setPen(cF);
-    drawItemText(painter, RECT, tf, PAL, isEnabled, tbt->text);
+    if (selected)
+    {
+        QRect rect;
+        drawItemText(painter, RECT, tf, PAL, isEnabled, tbt->text, QPalette::NoRole, &rect);
+        painter->drawLine(rect.x(), RECT.bottom(), RECT.right(), RECT.bottom());
+    }
+    else
+        drawItemText(painter, RECT, tf, PAL, isEnabled, tbt->text);
     painter->restore();
 }
