@@ -340,12 +340,12 @@ Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
         if (horizontal)
         {
             const int d = RECT.height()/3;
-            r = RECT.adjusted(dpi.f2, d, -dpi.f2, -d);
+            r = RECT.adjusted(F(2), d, -F(2), -d);
         }
         else
         {
             const int d = RECT.width()/3;
-            r = RECT.adjusted(d, dpi.f2, -d, -dpi.f2);
+            r = RECT.adjusted(d, F(2), -d, -F(2));
         }
         painter->save();
         painter->setPen(Qt::NoPen);
@@ -353,7 +353,12 @@ Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
         if (sunken || (hover && !complexStep))
             complexStep = 6;
         painter->setBrush(Colors::mid(FCOLOR(Base), FCOLOR(Text), 6-complexStep, complexStep+1));
-        painter->drawRoundedRect(r, dpi.f4, dpi.f4);
+#if QT_VERSION >= 0x040400
+        painter->drawRoundedRect(r, F(4), F(4));
+#else
+// NOTICE: this is no really working substitute, as r.width() >> rx and roundness has only 100 deg...
+        painter->drawRoundRect(r, (99*F(4))/qMax(r.width(), F(4)), (99*F(4))/qMax(F(4), r.height()));
+#endif
         painter->restore();
         return;
     }

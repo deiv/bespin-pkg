@@ -58,11 +58,7 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
     QColor c = PAL.color(widget->backgroundRole());
     if (c == Qt::transparent) // plasma uses this
         return;
-    else if (c.alpha() < 255)
-        c.setAlpha(255); // = Qt::transparent; // for the moment
 
-//     c = Qt::transparent; // just for testing
-    
     if (widget->testAttribute(Qt::WA_MacBrushedMetal))
     {   // we just kinda abuse this mac only attribute... ;P
         if (widget->size() != glasSize)
@@ -76,10 +72,20 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
         }
         painter->save();
         painter->setPen(Qt::NoPen);
-        painter->setBrush(c.light(115-Colors::value(c)/20));
+        if (c.alpha() < 255)
+            painter->setBrush(QColor(255,255,255,32));
+        else
+            painter->setBrush(c.light(115-Colors::value(c)/20));
         painter->drawPath(glasPath);
         painter->restore();
         return;
+    }
+
+    bool translucent = false;
+    if (c.alpha() < 255)
+    {
+//         translucent = true;
+        c.setAlpha(255); // for the moment = Qt::transparent;
     }
 
     if (config.bg.mode == Scanlines)
@@ -125,7 +131,7 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
         int s1 = set.topTile.height();
         int s2 = qMin(s1, (rect.height()+1)/2);
         s1 -= s2;
-        if (Colors::value(c) < 245)
+        if (!translucent && Colors::value(c) < 245)
         {   // no sense otherwise
             const int w = rect.width()/4 - 128;
             const int s3 = 128-s1;

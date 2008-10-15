@@ -109,6 +109,7 @@ void Style::polish( QPalette &pal, bool onInit )
         c.getHsv(&h,&s,&v,&a);
         if (v < 80) // very dark colors won't make nice backgrounds ;)
             c.setHsv(h,s,80,a);
+//         c.setAlpha(128);
         pal.setColor( QPalette::Window, c );
     }
 

@@ -316,6 +316,11 @@ Client::minimumSize() const
 XRenderComposite(QX11Info::display(), PictOpSrc, _PICT_, 0, _PREF_##Buffer.x11PictureHandle(),\
 0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);
 
+#if QT_VERSION < 0x040400
+// NOTICE: this is no really working substitute, as r.width() >> rx and roundness has only 100 deg...
+#define drawRoundedRect(_R_, _RX_, _RY_) drawRoundRect(_R_, ( 99*_RX_)/qMax(_RX_, _R_.width()), (99*_RY_)/qMax(_RY_, _R_.height()))
+#endif
+
 void
 Client::repaint(QPainter &p)
 {

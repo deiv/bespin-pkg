@@ -11,6 +11,12 @@ using namespace Bespin;
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 // #define fillRect2(_R_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_R_)
 
+#if QT_VERSION >= 0x040400
+#define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) drawRoundedRect(_X_, _Y_, _W_, _H_, _RX_, _RY_, Qt::RelativeSize)
+#else
+#define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) drawRoundRect(_X_, _Y_, _W_, _H_, _RX_, _RY_)
+#endif
+
 #define SCALE(_N_) lround(_N_*Style::config.scale)
 
 #define EMPTY_PIX(_W_, _H_) \
@@ -73,7 +79,12 @@ static QPixmap
 roundedMask(int size, int factor)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
-    p.drawRoundedRect(pix.rect(),factor,factor,Qt::RelativeSize); p.end();
+#if QT_VERSION >= 0x040400
+    p.drawRoundedRect(pix.rect(), factor, factor, Qt::RelativeSize);
+#else
+    p.drawRoundRect(pix.rect(), factor, factor);
+#endif
+    p.end();
     return pix;
 }
 
@@ -90,7 +101,7 @@ sunkenShadow(int size, bool enabled)
 
     // draw a flat shadow
     SET_ALPHA(55+add);
-    p.drawRoundedRect(0,0,size,size-F(2),80,80,Qt::RelativeSize);
+    p.DRAW_ROUND_RECT(0, 0, size, size-F(2), 80, 80);
 
     // subtract light
     p.setCompositionMode( QPainter::CompositionMode_DestinationOut );
@@ -99,7 +110,7 @@ sunkenShadow(int size, bool enabled)
     {
         xOff = qMax(i-F(2),0);
         SET_ALPHA(add+i*add2);
-        p.drawRoundedRect(xOff,i,size-2*xOff,size-(F(2)+i), 75+rAdd, 75+rAdd,Qt::RelativeSize);
+        p.DRAW_ROUND_RECT(xOff, i, size-2*xOff, size-(F(2)+i), 75+rAdd, 75+rAdd);
     }
 
     // add bottom highlight
@@ -122,9 +133,9 @@ relief(int size, bool enabled)
     EMPTY_PIX(size, size);
     p.setBrush(Qt::NoBrush);
     p.setPen(QPen(BLACK(int(f*70)), F(1)));
-    p.drawRoundedRect(F(1)/2.0,0,size,size-F(2),99,99,Qt::RelativeSize);
+    p.DRAW_ROUND_RECT(F(1)/2.0, 0, size, size-F(2), 99, 99);
     p.setPen(QPen(WHITE(int(f*35)), F(1)));
-    p.drawRoundedRect(0,F(1)+F(1)/2.0,size,size-F(2),99,99,Qt::RelativeSize);
+    p.DRAW_ROUND_RECT(0, F(1)+F(1)/2.0, size, size-F(2), 99, 99);
 #if 0
     // the borders cross the pixmap boundings, thus they're too weak, thus we stregth them a bit
     const int d1 = 0.3*size, d2 = 0.7*size;
@@ -138,7 +149,7 @@ relief(int size, bool enabled)
 }
 
 #define DRAW_ROUND_ALPHA_RECT(_A_, _X_, _Y_, _W_,_R_)\
-p.setBrush(QColor(0,0,0,_A_)); p.drawRoundedRect(_X_,_Y_,_W_,ss,(_R_+1)/2,_R_,Qt::RelativeSize)
+p.setBrush(QColor(0,0,0,_A_)); p.DRAW_ROUND_RECT(_X_, _Y_, _W_, ss, (_R_+1)/2, _R_)
 
 static QPixmap
 groupShadow(int size)
@@ -156,12 +167,12 @@ groupShadow(int size)
     DRAW_ROUND_ALPHA_RECT(13, F(3), F(3), size-F(6), 48);
     
     p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
-    p.setBrush(QColor(0,0,0,0)); p.drawRoundedRect(F(4),F(2),size-F(8),ss,6,11,Qt::RelativeSize);
+    p.setBrush(QColor(0,0,0,0)); p.DRAW_ROUND_RECT(F(4), F(2), size-F(8), ss, 6, 11);
 
     p.setCompositionMode( QPainter::CompositionMode_SourceOver );
     p.setPen(QColor(255,255,255,60));
     p.setBrush(Qt::NoBrush);
-    p.drawRoundedRect(F(4),F(2),size-F(8),ss,6,11,Qt::RelativeSize);
+    p.DRAW_ROUND_RECT(F(4), F(2), size-F(8), ss, 6, 11);
     p.setRenderHint(QPainter::Antialiasing, false);
     p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
     int f33 = SCALE(33);
