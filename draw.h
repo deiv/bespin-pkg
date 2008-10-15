@@ -61,8 +61,8 @@ setTitle(QPainter *p)
         fnt.setStretch(QFont::SemiExpanded);
 #if QT_VERSION >= 0x040400
         fnt.setCapitalization(QFont::/*AllUppercase*/SmallCaps);
-#else
-        title = title.toUpper();
+// #else
+//         title = title.toUpper();
 #endif
         p->setFont(fnt);
 }
