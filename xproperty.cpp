@@ -87,6 +87,8 @@ per channel and as we're gonna create gradients out of the colors, black could
 turn some kind of very dark red...)
 Just trust and don't touch ;) (Yes future Thomas, this means YOU!)
 ======================================================================*/
+
+#include <QtDebug>
 uint
 XProperty::encode(const QColor &bg, const QColor &fg, uint hint)
 {

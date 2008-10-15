@@ -144,6 +144,7 @@ Style::readSettings(const QSettings* settings)
         qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
 
     // Background ===========================
+    config.bg.minValue = readInt(BG_MINVALUE);
     config.bg.mode = (BGMode) readInt(BG_MODE);
     if (config.bg.mode > BevelH) config.bg.mode = BevelV;
     config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);

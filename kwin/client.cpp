@@ -743,16 +743,16 @@ Client::reset(unsigned long changed)
                     colors[i][ColorFont] = h;
                 }
             }
-        }
-        // last, clamp ColorTitleBlend to v >= 80
-        int h,s,v;
-        for (int i = 0; i <  2; ++i)
-        {
-            v = Colors::value(colors[i][ColorTitleBlend]);
-            if (v < 80)
+            // last, clamp ColorTitleBlend to v >= 80
+            int h,s,v;
+            for (int i = 0; i <  2; ++i)
             {
-                colors[i][ColorTitleBlend].getHsv(&h,&s,&v);
-                colors[i][ColorTitleBlend].setHsv(h,s,80);
+                v = Colors::value(colors[i][ColorTitleBlend]);
+                if (v < 70)
+                {
+                    colors[i][ColorTitleBlend].getHsv(&h,&s,&v);
+                    colors[i][ColorTitleBlend].setHsv(h,s,70);
+                }
             }
         }
     }

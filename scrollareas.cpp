@@ -445,8 +445,10 @@ Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
 
     const QColor &bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
     masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size);
+#if 0 // cool idea, looks however not that great...
     if (!sunken && Gradients::isReflective(GRAD(scroll)))
         masks.rect[round_].outline(r, painter, Colors::mid(bc,Qt::white,2,1));
+#endif
 
     /// the hover indicator (in case...)
     if (config.btn.fullHover || !(hover || complexStep || widgetStep))

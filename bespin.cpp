@@ -519,24 +519,24 @@ Style::setupDecoFor(const QWidget *w)
 {
 // XProperty actually handles the non X11 case, but we avoid overhead ;)
 #ifdef Q_WS_X11
-   const QPalette &pal = originalPalette ? *originalPalette : w->palette();
-   
-   // the title region in the center
-   uint info = XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode);
-   XProperty::set(w->winId(), XProperty::bgInfo, info);
-   
-   // the frame and button area for active windows
-   info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]);
-   XProperty::set(w->winId(), XProperty::actInfo, info);
-   
-   // the frame and button area for INactive windows
-   const QColor bg_inact = (GRAD(kwin)[0] != Gradients::None &&
-   config.kwin.active_role == config.kwin.inactive_role) ?
-   Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :
-   CCOLOR(kwin.inactive, Bg);
-   const QColor fg = Colors::mid(bg_inact, CCOLOR(kwin.inactive, Fg), 2, 1);
-   info = XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]);
-   XProperty::set(w->winId(), XProperty::inactInfo, info);
+    const QPalette &pal = originalPalette ? *originalPalette : w->palette();
+
+    // the title region in the center
+    uint info = XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode);
+    XProperty::set(w->winId(), XProperty::bgInfo, info);
+
+    // the frame and button area for active windows
+    info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]);
+    XProperty::set(w->winId(), XProperty::actInfo, info);
+
+    // the frame and button area for INactive windows
+    const QColor bg_inact = (GRAD(kwin)[0] != Gradients::None &&
+    config.kwin.active_role == config.kwin.inactive_role) ?
+    Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :
+    CCOLOR(kwin.inactive, Bg);
+    const QColor fg = Colors::mid(bg_inact, CCOLOR(kwin.inactive, Fg), 2, 1);
+    info = XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]);
+    XProperty::set(w->winId(), XProperty::inactInfo, info);
 #endif
 }
 
@@ -802,7 +802,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             else
                 widget->setAttribute(Qt::WA_MacBrushedMetal, false);
 #ifdef Q_WS_X11
-            int info = XProperty::encode(bg, FCOLOR(WindowText), bgMode);
+            uint info = XProperty::encode(bg, FCOLOR(WindowText), bgMode);
             XProperty::set(widget->winId(), XProperty::bgInfo, info);
             info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), gt[1]);
             XProperty::set(widget->winId(), XProperty::actInfo, info);

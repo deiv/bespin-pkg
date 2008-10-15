@@ -27,6 +27,7 @@
 #define SUNKEN_GROUPS "SunkenGroups", false
 
 #define BG_INTENSITY "Bg.Intensity", 10
+#define BG_MINVALUE "Bg.MinValue", 70
 #define BG_MODE "Bg.Mode", Gradients::BevelV
 #define BG_MODAL_GLASSY "Bg.Modal.Glassy", true
 #define BG_MODAL_OPACITY "Bg.Modal.Opacity", 80

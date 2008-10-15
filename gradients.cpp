@@ -54,33 +54,34 @@ So the handled size is actually demandedSize + (demandedSize % sizeSloppyness),
 beeing at least demanded size and the next sloppy size above at max
 ====================================================== */
 static inline uint
-hash(int size, const QColor &c, int *sloppyAdd) {
+hash(int size, const QColor &c, int *sloppyAdd)
+{
+    uint magicNumber = 0;
+    // this IS functionizable, but includes a sqrt, some multiplications and
+    // subtractions
+    // as the loop is typically iterated < 4, it's faster this way for our
+    // purpose
+    int sizeSloppyness = 1, frameBase = 0, frameSize = 20;
+    while ((frameBase += frameSize) < size)
+    {
+        ++sizeSloppyness;
+        frameSize += 20;
+    }
+    frameBase -=frameSize; frameSize -= 20;
 
-   uint magicNumber = 0;
-   // this IS functionizable, but includes a sqrt, some multiplications and
-   // subtractions
-   // as the loop is typically iterated < 4, it's faster this way for our
-   // purpose
-   int sizeSloppyness = 1, frameBase = 0, frameSize = 20;
-   while ((frameBase += frameSize) < size) {
-      ++sizeSloppyness;
-      frameSize += 20;
-   }
-   frameBase -=frameSize; frameSize -= 20;
-   
-   *sloppyAdd = size % sizeSloppyness;
-   if (!*sloppyAdd)
-      *sloppyAdd = sizeSloppyness;
+    *sloppyAdd = size % sizeSloppyness;
+    if (!*sloppyAdd)
+        *sloppyAdd = sizeSloppyness;
 
-   // first 9 bits to store the size, remaining 23 bits for the color (6bpc, 5b alpha)
-   magicNumber =
-      (((frameSize + (size - frameBase)/sizeSloppyness) & 0x1ff) << 23) |
-      (((c.red() >> 2) & 0x3f) << 17) |
-      (((c.green() >> 2) & 0x3f) << 11 ) |
-      ((c.blue() >> 2) & 0x3f << 5) |
-      ((c.alpha() >> 3) & 0x1f);
-   
-   return magicNumber;
+    // first 9 bits to store the size, remaining 23 bits for the color (6bpc, 5b alpha)
+    magicNumber =
+        (((frameSize + (size - frameBase)/sizeSloppyness) & 0x1ff) << 23) |
+        (((c.red() >> 2) & 0x3f) << 17) |
+        (((c.green() >> 2) & 0x3f) << 11 ) |
+        ((c.blue() >> 2) & 0x3f << 5) |
+        ((c.alpha() >> 3) & 0x1f);
+
+    return magicNumber;
 }
 
 static QPixmap*
@@ -120,37 +121,38 @@ metalGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
 }
 
 static inline QLinearGradient
-sunkenGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
-   QLinearGradient lg(start, stop);
-   lg.setColorAt(0, c.dark(110));
-   lg.setColorAt(1, c.light(112));
-   return lg;
+sunkenGradient(const QColor &c, const QPoint &start, const QPoint &stop)
+{
+    QLinearGradient lg(start, stop);
+    lg.setColorAt(0, c.dark(110));
+    lg.setColorAt(1, c.light(112));
+    return lg;
 }
 
 static inline QLinearGradient
-buttonGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
-   int h,s,v, inc, dec;
-   c.getHsv(&h,&s,&v);
-   
-   // calc difference
-   inc = 15; dec = 6;
-   if (v+inc > 255) {
-      inc = 255-v; dec += (15-inc);
-   }
-   QLinearGradient lg(start, stop);
-   QColor ic; ic.setHsv(h,s,v+inc);
-   lg.setColorAt(0, ic);
-   ic.setHsv(h,s,v-dec);
-   lg.setColorAt(0.75, ic);
-   return lg;
+buttonGradient(const QColor &c, const QPoint &start, const QPoint &stop)
+{
+    int h,s,v,a, inc, dec;
+    c.getHsv(&h,&s,&v,&a);
+
+    // calc difference
+    inc = 15; dec = 6;
+    if (v+inc > 255)
+        { inc = 255-v; dec += (15-inc); }
+    QLinearGradient lg(start, stop);
+    QColor ic; ic.setHsv(h,s,v+inc, a);
+    lg.setColorAt(0, ic);
+    ic.setHsv(h,s,v-dec, a);
+    lg.setColorAt(0.75, ic);
+    return lg;
 }
 
 inline static void
 gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
 {
-    int h,s,v, ch,cs,cv, delta, add;
+    int h,s,v,a, ch,cs,cv, delta, add;
 
-    c.getHsv(&h,&s,&v);
+    c.getHsv(&h,&s,&v,&a);
 
     // calculate the variation
     add = (180-qGray(c.rgb()))/1;
@@ -168,12 +170,12 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
     }
     else
         { ch = h; cs = s; }
-    bb->setHsv(ch,cs,cv);
+    bb->setHsv(ch,cs,cv,a);
 
     // the darkest color (lower center)
     cv = v - 14 - add; if (cv < 0) cv = 0;
     cs = s*(glass?13:10)/7; if (cs > 255) cs = 255;
-    dd->setHsv(h,cs,cv);
+    dd->setHsv(h,cs,cv,a);
 }
 
 static inline QLinearGradient
@@ -213,16 +215,16 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
    // some psychovisual stuff, we search a dark & bright surrounding and
    // slightly shift hue as well (e.g. for green the dark color will slide to
    // blue and the bright one to yellow - A LITTLE! ;)
-   int h,s,v;
-   c.getHsv(&h,&s,&v);
+   int h,s,v,a;
+   c.getHsv(&h,&s,&v,&a);
    QColor dkC = c, ltC = c;
-   int dv = 4*(v-80)/45; // v == 80 -> dv = 0, v = 255 -> dv = 12
+   int dv = 4*(v-70)/45; // v == 70 -> dv = 0, v = 255 -> dv = 12
 //    int th = h + 400;
    int dh = qAbs((h % 120)-60)/6;
-   dkC.setHsv(h+dh, s, v - dv);
+   dkC.setHsv(h+dh, s, v - dv, a);
    h -=dh; if (h < 0) h = 400 + h;
    dv = 12 - dv; // NOTICE 12 from above...
-   ltC.setHsv(h-5,s, qMin(v + dv,255));
+   ltC.setHsv(h-5,s, qMin(v + dv,255), a);
    
 //    int dc = Colors::value(c)/5; // how much darken/lighten we will
 //    QColor dkC = c.dark(100+sqrt(2*dc));
@@ -299,78 +301,82 @@ static PixmapCache _borderline[4];
 #endif
 
 const QPixmap&
-Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type) {
-   // validity check
-   if (size <= 0) {
-      qWarning("NULL Pixmap requested, size was %d",size);
-      return nullPix;
-   }
-   else if (size > 6800) { // this is where our dictionary reaches - should be enough for the moment ;)
-      qWarning("gradient with more than 6800 steps requested, returning NULL pixmap");
-      return nullPix;
-   }
+Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type)
+{
+    // validity check
+    if (size <= 0)
+    {
+        qWarning("NULL Pixmap requested, size was %d",size);
+        return nullPix;
+    }
+    else if (size > 6800)
+    {   // this is where our dictionary reaches - should be enough for the moment ;)
+        qWarning("gradient with more than 6800 steps requested, returning NULL pixmap");
+        return nullPix;
+    }
    
-   // very dark colors won't make nice buttons =)
-   QColor iC = c;
-   int v = Colors::value(c);
-   if (v < 80) {
-      int h,s;
-      c.getHsv(&h,&s,&v);
-      iC.setHsv(h,s,80);
-   }
+    // very dark colors won't make nice buttons =)
+    QColor iC = c;
+    int v = Colors::value(c);
+    if (v < 70)
+    {
+        int h,s,a;
+        c.getHsv(&h,&s,&v,&a);
+        iC.setHsv(h,s,70,a);
+    }
 
-   // hash 
-   int sloppyAdd = 1;
-   uint magicNumber = hash(size, iC, &sloppyAdd);
+    // hash
+    int sloppyAdd = 1;
+    uint magicNumber = hash(size, iC, &sloppyAdd);
 
-   PixmapCache *cache = &gradients[o == Qt::Horizontal][type];
-   QPixmap *pix = cache->object(magicNumber);
-   if (pix)
-      return *pix;
+    PixmapCache *cache = &gradients[o == Qt::Horizontal][type];
+    QPixmap *pix = cache->object(magicNumber);
+    if (pix)
+        return *pix;
    
-   QPoint start, stop;
+    QPoint start, stop;
 #ifndef BESPIN_DECO
-   if (type == Gradients::Cloudy)
-      pix = progressGradient(iC, size, o);
-   else if (type == Gradients::RadialGloss)
-      pix = rGlossGradient(iC, size);
-   else
+    if (type == Gradients::Cloudy)
+        pix = progressGradient(iC, size, o);
+    else if (type == Gradients::RadialGloss)
+        pix = rGlossGradient(iC, size);
+    else
 #endif
-   {
-      pix = newPix(size, o, &start, &stop);
+    {
+        pix = newPix(size, o, &start, &stop);
+
+        QGradient grad;
+        // no cache entry found, so let's create one
+        size += sloppyAdd; // rather to big than to small ;)
+        switch (type) {
+        case Gradients::Button:
+            grad = buttonGradient(iC, start, stop);
+            break;
+        case Gradients::Glass:
+            grad = gl_ssGradient(iC, start, stop, true);
+            break;
+        case Gradients::Simple:
+        default:
+            grad = simpleGradient(iC, start, stop);
+            break;
+        case Gradients::Sunken:
+            grad = sunkenGradient(iC, start, stop);
+            break;
+        case Gradients::Gloss:
+            grad = gl_ssGradient(iC, start, stop);
+            break;
+        case Gradients::Metal:
+            grad = metalGradient(iC, start, stop);
+            break;
+        }
+        if (c.alpha() < 255) pix->fill(Qt::transparent);
+        QPainter p(pix); p.fillRect(pix->rect(), grad); p.end();
+    }
    
-      QGradient grad;
-      // no cache entry found, so let's create one
-      size += sloppyAdd; // rather to big than to small ;)
-      switch (type) {
-      case Gradients::Button:
-         grad = buttonGradient(iC, start, stop);
-         break;
-      case Gradients::Glass:
-         grad = gl_ssGradient(iC, start, stop, true);
-         break;
-      case Gradients::Simple:
-      default:
-         grad = simpleGradient(iC, start, stop);
-         break;
-      case Gradients::Sunken:
-         grad = sunkenGradient(iC, start, stop);
-         break;
-      case Gradients::Gloss:
-         grad = gl_ssGradient(iC, start, stop);
-         break;
-      case Gradients::Metal:
-         grad = metalGradient(iC, start, stop);
-         break;
-      }
-      if (c.alpha() < 255) pix->fill(Qt::transparent);
-      QPainter p(pix); p.fillRect(pix->rect(), grad); p.end();
-   }
-   
-   // cache for later
-   if (cache)
-      cache->insert(magicNumber, pix, costs(pix));
-   return *pix;
+    // cache for later
+    if (cache)
+        cache->insert(magicNumber, pix, costs(pix));
+    return *pix;
 }
 
 #ifndef BESPIN_DECO
@@ -398,10 +404,11 @@ const QPixmap
 {
     QColor c = oc;
     int v = Colors::value(c);
-    if (v < 80) {
-        int h,s;
-        c.getHsv(&h,&s,&v);
-        c.setHsv(h,s,80);
+    if (v < 70)
+    {
+        int h,s,a;
+        c.getHsv(&h,&s,&v,&a);
+        c.setHsv(h,s,70,a);
     }
     
     QPixmap *pix = _structure[light].object(c.rgb());

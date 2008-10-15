@@ -107,32 +107,33 @@ bool Colors::counterRole(QPalette::ColorRole &from, QPalette::ColorRole &to,
    return true;
 }
 
-QColor Colors::emphasize(const QColor &c, int value) {
-   int h,s,v;
-   QColor ret;
-   c.getHsv(&h,&s,&v);
-   if (v < 75+value) {
-      ret.setHsv(h,s,CLAMP(85+value,85,255));
-      return ret;
-   }
-   if (v > 200) {
-      if (s > 30) {
-         h -= 5; if (h < 0) h = 360 + h;
-         s = (s<<3)/9;
-         v += value;
-         ret.setHsv(h,CLAMP(s,30,255),CLAMP(v,0,255));
-         return ret;
-      }
-      if (v > 230) {
-         ret.setHsv(h,s,CLAMP(v-value,0,255));
-         return ret;
-      }
-   }
-   if (v > 128)
-      ret.setHsv(h,s,CLAMP(v+value,0,255));
-   else
-      ret.setHsv(h,s,CLAMP(v-value,0,255));
-   return ret;
+QColor Colors::emphasize(const QColor &c, int value)
+{
+    int h,s,v,a;
+    QColor ret;
+    c.getHsv(&h,&s,&v,&a);
+    if (v < 75+value) {
+        ret.setHsv(h,s,CLAMP(85+value,85,255),a);
+        return ret;
+    }
+    if (v > 200) {
+        if (s > 30) {
+            h -= 5; if (h < 0) h = 360 + h;
+            s = (s<<3)/9;
+            v += value;
+            ret.setHsv(h,CLAMP(s,30,255),CLAMP(v,0,255),a);
+            return ret;
+        }
+        if (v > 230) {
+            ret.setHsv(h,s,CLAMP(v-value,0,255),a);
+            return ret;
+        }
+    }
+    if (v > 128)
+        ret.setHsv(h,s,CLAMP(v+value,0,255),a);
+    else
+        ret.setHsv(h,s,CLAMP(v-value,0,255),a);
+    return ret;
 }
 
 bool Colors::haveContrast(const QColor &a, const QColor &b)
@@ -154,23 +155,25 @@ bool Colors::haveContrast(const QColor &a, const QColor &b)
 
 QColor Colors::light(const QColor &c, int value)
 {
-   int h,s,v;
-   c.getHsv(&h,&s,&v);
-   QColor ret;
-   if (v < 255-value) {
-      ret.setHsv(h,s,CLAMP(v+value,0,255)); //value could be negative
-      return ret;
-   }
-   // psychovisual uplightning, i.e. shift hue and lower saturation
-   if (s > 30) {
-      h -= (value*5/20); if (h < 0) h = 400 + h;
-      s = CLAMP((s<<3)/9,30,255);
-      ret.setHsv(h,s,255);
-      return ret;
-   }
-   else // hue shifting has no sense, half saturation (btw, white won't get brighter :)
-      ret.setHsv(h,s>>1,255);
-   return ret;
+    int h,s,v, a;
+    c.getHsv(&h,&s,&v,&a);
+    QColor ret;
+    if (v < 255-value)
+    {
+        ret.setHsv(h,s,CLAMP(v+value,0,255),a); //value could be negative
+        return ret;
+    }
+    // psychovisual uplightning, i.e. shift hue and lower saturation
+    if (s > 30)
+    {
+        h -= (value*5/20); if (h < 0) h = 400 + h;
+        s = CLAMP((s<<3)/9,30,255);
+        ret.setHsv(h,s,255,a);
+        return ret;
+    }
+    else // hue shifting has no sense, half saturation (btw, white won't get brighter :)
+        ret.setHsv(h,s>>1,255,a);
+    return ret;
 }
 
 QColor
@@ -180,23 +183,24 @@ Colors::mid(const QColor &oc1, const QColor &c2, int w1, int w2)
     if (!sum)
        return Qt::black;
     QColor c1 = oc1;
-    int v = value(c1);
-    if (v < 70)
+    int r,g,b,a;
+    b = value(c1);
+    if (b < 70)
     {
-        int h,s;
-        c1.getHsv(&h,&s,&v);
-        c1.setHsv(h,s,70);
+        c1.getHsv(&r,&g,&b,&a);
+        c1.setHsv(r,g,70,a);
     }
-    int r = (w1*c1.red() + w2*c2.red())/sum; r = CLAMP(r,0,255);
-    int g = (w1*c1.green() + w2*c2.green())/sum; g = CLAMP(g,0,255);
-    int b = (w1*c1.blue() + w2*c2.blue())/sum; b = CLAMP(b,0,255);
-    int a = (w1*c1.alpha() + w2*c2.alpha())/sum; a = CLAMP(a,0,255);
+    r = (w1*c1.red() + w2*c2.red())/sum; r = CLAMP(r,0,255);
+    g = (w1*c1.green() + w2*c2.green())/sum; g = CLAMP(g,0,255);
+    b = (w1*c1.blue() + w2*c2.blue())/sum; b = CLAMP(b,0,255);
+    a = (w1*c1.alpha() + w2*c2.alpha())/sum; a = CLAMP(a,0,255);
     return QColor(r,g,b,a);
 }
 
-int Colors::value(const QColor &c) {
-   int v = c.red();
-   if (c.green() > v) v = c.green();
-   if (c.blue() > v) v = c.blue();
-   return v;
+int Colors::value(const QColor &c)
+{
+    int v = c.red();
+    if (c.green() > v) v = c.green();
+    if (c.blue() > v) v = c.blue();
+    return v;
 }
