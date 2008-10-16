@@ -606,7 +606,7 @@ Line::render(const QRect &rect, QPainter *p, PosFlags pf, bool btmRight) const
     int d0,d2;
     if (_o == Qt::Horizontal)
     {
-        int y = btmRight ? (rect.bottom() - _thickness + 1) : rect.y();
+        const int y = btmRight ? (rect.bottom() - _thickness) : rect.y();
         d0 = (pf & Left) ? width(0) : 0;
         d2 = (pf & Right) ? width(2) : 0;
         if ((pf & Center) && rect.width() >= d0+d2)
@@ -623,7 +623,7 @@ Line::render(const QRect &rect, QPainter *p, PosFlags pf, bool btmRight) const
     }
     else
     {
-        int x = btmRight ? (rect.right() - _thickness + 1) : rect.x();
+        const int x = btmRight ? (rect.right() - _thickness) : rect.x();
         d0 = (pf & Top) ? height(0) : 0;
         d2 = (pf & Bottom) ? height(2) : 0;
         if ((pf & Center) && rect.height() >= d0+d2)

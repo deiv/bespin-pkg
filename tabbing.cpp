@@ -517,7 +517,13 @@ Style::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter, const 
     {
         QRect rect;
         drawItemText(painter, RECT, tf, PAL, isEnabled, tbt->text, QPalette::NoRole, &rect);
-        painter->drawLine(rect.x(), RECT.bottom(), RECT.right(), RECT.bottom());
+        Tile::PosFlags pf = Tile::Center;
+        if (option->direction == Qt::LeftToRight)
+            { rect.setRight(RECT.right()); pf |= Tile::Left; }
+        else
+            { rect.setLeft(RECT.left()); pf |= Tile::Right; }
+        shadows.line[0][Sunken].render(rect, painter, pf, true);
+//         painter->drawLine(rect.x(), RECT.bottom(), RECT.right(), RECT.bottom());
     }
     else
         drawItemText(painter, RECT, tf, PAL, isEnabled, tbt->text);

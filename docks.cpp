@@ -63,7 +63,13 @@ Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWid
         }
         painter->setPen(hover ? FCOLOR(WindowText) : Colors::mid(bg, FCOLOR(WindowText), 1, 3));
         drawItemText(painter, rect, itemtextopts, PAL, isEnabled, title, QPalette::NoRole, &rect);
-        painter->drawLine(rect.x(), RECT.bottom(), RECT.right(), RECT.bottom());
+        Tile::PosFlags pf = Tile::Center;
+        if (option->direction == Qt::LeftToRight)
+            { rect.setRight(RECT.right()); pf |= Tile::Left; }
+        else
+            { rect.setLeft(RECT.left()); pf |= Tile::Right; }
+        shadows.line[0][Sunken].render(rect, painter, pf, true);
+//         painter->drawLine(rect.x(), RECT.bottom(), RECT.right(), RECT.bottom());
 
         painter->restore();
     }

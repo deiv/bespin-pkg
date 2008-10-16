@@ -37,6 +37,9 @@
 #include "colors.h"
 
 #ifdef Q_WS_X11
+#if QT_VERSION < 0x040400
+#include <unistd.h>
+#endif
 #include "xproperty.h"
 #endif
 
@@ -180,14 +183,22 @@ void Style::polish( QPalette &pal, bool onInit )
     toolPal.setColor(QPalette::ButtonText, fg);
     toolPal.setColor(QPalette::Highlight, fg); // sic!
     toolPal.setColor(QPalette::HighlightedText, bg); // sic!
+#if QT_VERSION >= 0x040400
     toolPal.setColor(QPalette::ToolTipBase, bg);
     toolPal.setColor(QPalette::ToolTipText, fg);
+#endif
     QToolTip::setPalette(toolPal);
+
 
 #ifdef Q_WS_X11
     if (appType == GTK)
     {
-        bespinDeco.call(QDBus::NoBlock, "styleByPid", QCoreApplication::applicationPid(),
+        bespinDeco.call(QDBus::NoBlock, "styleByPid",
+#if QT_VERSION < 0x040400
+                        getpid(),
+#else
+                        QCoreApplication::applicationPid(),
+#endif
                         XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode),
                         XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]),
                         XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]));
