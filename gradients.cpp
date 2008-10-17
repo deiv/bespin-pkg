@@ -158,7 +158,7 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
     add = (180-qGray(c.rgb()))/1;
     if (add < 0)
         add = -add/2;
-    add /= (glass?16:2);
+    add /= (glass ? 16 : 512/qMax(Colors::value(c),1));
 
     // the brightest color (top)
     cv = v+27+add;
@@ -215,60 +215,66 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
    // some psychovisual stuff, we search a dark & bright surrounding and
    // slightly shift hue as well (e.g. for green the dark color will slide to
    // blue and the bright one to yellow - A LITTLE! ;)
-   int h,s,v,a;
-   c.getHsv(&h,&s,&v,&a);
-   QColor dkC = c, ltC = c;
-   int dv = 4*(v-70)/45; // v == 70 -> dv = 0, v = 255 -> dv = 12
+    int h,s,v,a;
+    c.getHsv(&h,&s,&v,&a);
+    QColor dkC = c, ltC = c;
+    int dv = 4*(v-70)/45; // v == 70 -> dv = 0, v = 255 -> dv = 12
 //    int th = h + 400;
-   int dh = qAbs((h % 120)-60)/6;
-   dkC.setHsv(h+dh, s, v - dv, a);
-   h -=dh; if (h < 0) h = 400 + h;
-   dv = 12 - dv; // NOTICE 12 from above...
-   ltC.setHsv(h-5,s, qMin(v + dv,255), a);
+    int dh = qAbs((h % 120)-60)/6;
+    dkC.setHsv(h+dh, s, v - dv, a);
+    h -=dh; if (h < 0) h = 400 + h;
+    dv = 12 - dv; // NOTICE 12 from above...
+    ltC.setHsv(h-5,s, qMin(v + dv,255), a);
    
 //    int dc = Colors::value(c)/5; // how much darken/lighten we will
 //    QColor dkC = c.dark(100+sqrt(2*dc));
 //    QColor ltC = c.light(150-dc);
    
-   QPoint start, stop;
-   QPixmap *dark = newPix(size, o, &start, &stop, 4*size);
-   QGradient   lg1 = gl_ssGradient(ltC, start, stop, true),
-               lg2 = gl_ssGradient(dkC, start, stop, true);
+    QPoint start, stop;
+    QPixmap *dark = newPix(size, o, &start, &stop, 4*size);
+    QPixmap *pix = new QPixmap(dark->size());
 
-   QPainter p(dark); p.fillRect(dark->rect(), lg1); p.end();
-   
-   QPixmap alpha = QPixmap(dark->size());
-   QRadialGradient rg;
-   if (o == Qt::Horizontal)
-      rg = QRadialGradient(alpha.rect().center(), 10*size/4);
-   else
-      rg = QRadialGradient(alpha.width()/2, 5*alpha.height()/3, 10*size/4);
-   rg.setColorAt(0, Qt::white);
+    if (c.alpha() < 255)
+    {
+       dark->fill(Qt::transparent);
+       pix->fill(Qt::transparent);
+    }
+    QGradient lg1 = gl_ssGradient(ltC, start, stop, true),
+              lg2 = gl_ssGradient(dkC, start, stop, true);
+
+    QPainter p(dark); p.fillRect(dark->rect(), lg1); p.end();
+
+    QPixmap alpha = QPixmap(dark->size());
+    QRadialGradient rg;
+    if (o == Qt::Horizontal)
+        rg = QRadialGradient(alpha.rect().center(), 10*size/4);
+    else
+        rg = QRadialGradient(alpha.width()/2, 5*alpha.height()/3, 10*size/4);
+    rg.setColorAt(0, Qt::white);
 #ifndef QT_NO_XRENDER
-   rg.setColorAt(0.9, Qt::transparent);
-   alpha.fill(Qt::transparent);
+    rg.setColorAt(0.9, Qt::transparent);
+    alpha.fill(Qt::transparent);
 #else
-   rg.setColorAt(0.9, Qt::black);
+    rg.setColorAt(0.9, Qt::black);
 #endif
-   p.begin(&alpha); p.fillRect(alpha.rect(), rg); p.end();
+    p.begin(&alpha); p.fillRect(alpha.rect(), rg); p.end();
 #ifndef QT_NO_XRENDER
-   alpha = OXRender::applyAlpha(*dark, alpha);
+    alpha = OXRender::applyAlpha(*dark, alpha);
 #else
-   dark->setAlphaChannel(alpha);
+    dark->setAlphaChannel(alpha);
 #endif
-   
-   QPixmap *pix = new QPixmap(dark->size());
-   p.begin(pix);
-   p.fillRect(pix->rect(), lg2);
+
+    p.begin(pix);
+    p.fillRect(pix->rect(), lg2);
 #ifndef QT_NO_XRENDER
-   p.drawPixmap(0,0, alpha);
+    p.drawPixmap(0,0, alpha);
 #else
-   p.drawPixmap(0,0, *dark);
+    p.drawPixmap(0,0, *dark);
 #endif
-   p.end();
+    p.end();
    
-   delete dark;
-   return pix;
+    delete dark;
+    return pix;
 #undef GLASS
 #undef GLOSS
 }
@@ -463,7 +469,7 @@ const QPixmap
     case 2:  // fat scans
         i = (_bgIntensity - 100);
         pix->fill( c.light(100+3*i/10).rgb() );
-        p.setPen(QPen(light ? c.light(100+i/10) : c, 3));
+        p.setPen(QPen(light ? c.light(100+i/10) : c, 2));
         p.setBrush( c.dark(100+2*i/10) );
         p.drawRect(-3,8,70,8);
         p.drawRect(-3,24,70,8);

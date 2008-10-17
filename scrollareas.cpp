@@ -237,6 +237,9 @@ Style::drawScrollBar(const QStyleOptionComplex * option,
    
     if (!isComboDropDownSlider && grooveIsSunken)
         shadows.sunken[round_][isEnabled].render(groove, painter);
+
+    isComboDropDownSlider = scrollAreaHovered_ = false;
+    widgetStep = complexStep = 0;
 }
 #undef PAINT_ELEMENT
 
@@ -391,6 +394,7 @@ Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
         c = Colors::mid(CCOLOR(btn.std, Bg), SCROLL_COLOR(widgetStep));
     else
         c = CCOLOR(btn.std, 0);
+    c.setAlpha(255); // bg could be transparent, i don't want scrollers translucent, though.
 #undef SCROLL_COLOR
    
     QRect r = RECT;
@@ -443,7 +447,7 @@ Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
         pf = Tile::Left | Tile::Right;
     }
 
-    const QColor &bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
+    QColor bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
     masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size);
 #if 0 // cool idea, looks however not that great...
     if (!sunken && Gradients::isReflective(GRAD(scroll)))

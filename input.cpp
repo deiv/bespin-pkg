@@ -84,8 +84,8 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
             Tile::setShape(Tile::Full & ~Tile::Top);
             QColor bg = FCOLOR(Base);
             int v = Colors::value(bg);
-            if (v < 80)
-                { int h,s,a; bg.getHsv(&h, &s, &v, &a); bg.setHsv(h,s,80,a); }
+            if (v < config.bg.minValue)
+                { int h,s,a; bg.getHsv(&h, &s, &v, &a); bg.setHsv(h,s,config.bg.minValue,a); }
             mask.render(r, painter, bg.light(110));
             Tile::reset();
         }
