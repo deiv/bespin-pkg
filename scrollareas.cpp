@@ -262,6 +262,7 @@ Style::drawScrollBarButton(const QStyleOption * option, QPainter * painter,
         else
             drawSolidArrow(up ? Navi::N : Navi::S, rect, painter);
         painter->restore();
+        return;
     }
 
     if (!config.scroll.showButtons)

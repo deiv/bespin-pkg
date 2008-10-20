@@ -37,6 +37,13 @@ setIconFont(QPainter &painter, const QRect &rect, float f = 0.75)
     fnt.setBold(true); painter.setFont(fnt);
 }
 
+static inline uint qt_intensity(uint r, uint g, uint b)
+{
+    // 30% red, 59% green, 11% blue
+    return (77 * r + 150 * g + 28 * b) / 255;
+}
+
+
 QPixmap
 Style::standardPixmap(StandardPixmap standardPixmap,
                             const QStyleOption * option, const QWidget * widget ) const

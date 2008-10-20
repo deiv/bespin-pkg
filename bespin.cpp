@@ -344,34 +344,24 @@ Style::drawItemText(QPainter *painter, const QRect &rect, int alignment, const Q
         painter->setPen(savedPen);
 }
 
-// NOTICE, really read this!!!
-// PE_CustomBase is unlike all others 0xff00000 (only 31 bits... signed int) ...
-// AND CAUSES SEGFAULT when used as 32bit 0xff000000 and (unit)pe > X_KdeBase
-// as enums are usually int - maybe here's a bug in Qt custom bases?
-// i'll keep it 0xff00000 (31 bit) for the moment (0xff000000 32bit is signed negative)
-#define PE_KdeBase 0xff00000
 #define X_KdeBase 0xff000000
 #define SH_KCustomStyleELement 0xff000001
 
-enum CustomPrimitives { _PE_CapacityBar = 0 /*, ...*/, N_CustomPrimitives };
+enum CustomElements { _CE_CapacityBar = 0 /*, ...*/, N_CustomControls };
 #if 0
-enum CustomComplexs { _CC_AmarokAnalyzer = 0 /*, ...*/, N_CustomComplexs };
-enum SubControls { _SC_AmarokAnalyzerSlider = 0 /*, ...*/, N_CustomSubControls };
+enum SubElements { _SE_AmarokAnalyzerSlider = 0 /*, ...*/, N_CustomSubElements };
 #endif
 
-static QStyle::PrimitiveElement primitives[N_CustomPrimitives];
+static QStyle::ControlElement primitives[N_CustomControls];
 #if 0
-static QStyle::ComplexControl complexs[N_CustomComplexs];
-static QStyle::SubControl subcontrols[N_CustomSubControls];
+static QStyle::SubElement subcontrols[N_CustomSubElements];
 #endif
 
-enum ElementType { PE = 0, CE, CC, SE, SH, SC }; // SE are flags and need special handling?!
+enum ElementType { SH, CE, SE };
 static QMap<QString, int> styleElements; // yes. one is enough...
 // NOTICE: using QHash instead QMap is probably overhead, there won't be too many items per app
-static int counter[5] = { PE_KdeBase, X_KdeBase, X_KdeBase, X_KdeBase, X_KdeBase+1 /*sic!*/};
-#if 0
-static int scCounter[N_CustomComplexs] = { 0 };
-#endif
+static int counter[3] = { X_KdeBase+3 /*sic!*/, X_KdeBase, X_KdeBase };
+
 void
 Style::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
@@ -385,13 +375,6 @@ Style::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
 //       qWarning("IndicatorItemViewItemDrop, %d", pe);
     if (pe < N_PE && primitiveRoutine[pe])
         (this->*primitiveRoutine[pe])(option, painter, widget);
-    else if (pe > PE_KdeBase)
-    {
-        if (pe == primitives[_PE_CapacityBar])
-            drawCapacityBar(option, painter, widget);
-        //if (pe == primitives[_PE_WhateverElse])
-        // ...
-    }
     else
     {
 //         qDebug() << "BESPIN, unsupported primitive:" << pe << widget;
@@ -407,6 +390,13 @@ Style::drawControl ( ControlElement element, const QStyleOption * option,
     Q_ASSERT(painter);
     if (element < N_CE && controlRoutine[element])
         (this->*controlRoutine[element])(option, painter, widget);
+    else if (element > X_KdeBase)
+    {
+        if (element == primitives[_CE_CapacityBar])
+            drawCapacityBar(option, painter, widget);
+        //if (pe == primitives[_PE_WhateverElse])
+        // ...
+    }
     else
     {
 //         qDebug() << "BESPIN, unsupported control:" << element << widget;
@@ -436,8 +426,8 @@ Style::elementId(const QString &string) const
     if (id)
         return id;
 
-    if (string == "PE_CapacityBar")
-        primitives[_PE_CapacityBar] = (PrimitiveElement)(id = ++counter[PE]);
+    if (string == "CE_CapacityBar")
+        primitives[_CE_CapacityBar] = (ControlElement)(id = ++counter[CE]);
 #if 0
     else if (string == "amarok.CC_Analyzer")
         complexs[_CC_AmarokAnalyzer] = (ComplexControl)(id = ++counter[CC]);

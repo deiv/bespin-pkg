@@ -17,9 +17,98 @@
  */
 
 #include <QAbstractButton>
+#include <cmath>
 #include "oxrender.h"
 #include "draw.h"
 #include "animator/hover.h"
+
+
+/*
+// Exponential blur, Jani Huhtanen, 2006 ==========================
+*  expblur(QImage &img, int radius)
+*
+*  In-place blur of image 'img' with kernel of approximate radius 'radius'.
+*  Blurs with two sided exponential impulse response.
+*
+*  aprec = precision of alpha parameter in fixed-point format 0.aprec
+*  zprec = precision of state parameters zR,zG,zB and zA in fp format 8.zprec
+*/
+
+template<int aprec, int zprec>
+static inline void blurinner(unsigned char *bptr, int &zR, int &zG, int &zB, int &zA, int alpha)
+{
+    int R,G,B,A;
+    R = *bptr;
+    G = *(bptr+1);
+    B = *(bptr+2);
+    A = *(bptr+3);
+
+    zR += (alpha * ((R<<zprec)-zR))>>aprec;
+    zG += (alpha * ((G<<zprec)-zG))>>aprec;
+    zB += (alpha * ((B<<zprec)-zB))>>aprec;
+    zA += (alpha * ((A<<zprec)-zA))>>aprec;
+
+    *bptr =     zR>>zprec;
+    *(bptr+1) = zG>>zprec;
+    *(bptr+2) = zB>>zprec;
+    *(bptr+3) = zA>>zprec;
+}
+
+template<int aprec,int zprec>
+static inline void blurrow( QImage & im, int line, int alpha)
+{
+    int zR,zG,zB,zA;
+
+    QRgb *ptr = (QRgb *)im.scanLine(line);
+
+    zR = *((unsigned char *)ptr    )<<zprec;
+    zG = *((unsigned char *)ptr + 1)<<zprec;
+    zB = *((unsigned char *)ptr + 2)<<zprec;
+    zA = *((unsigned char *)ptr + 3)<<zprec;
+
+    for(int index=1; index<im.width(); index++)
+        blurinner<aprec,zprec>((unsigned char *)&ptr[index],zR,zG,zB,zA,alpha);
+
+    for(int index=im.width()-2; index>=0; index--)
+        blurinner<aprec,zprec>((unsigned char *)&ptr[index],zR,zG,zB,zA,alpha);
+}
+
+template<int aprec, int zprec>
+static inline void blurcol( QImage & im, int col, int alpha)
+{
+    int zR,zG,zB,zA;
+
+    QRgb *ptr = (QRgb *)im.bits();
+    ptr+=col;
+
+    zR = *((unsigned char *)ptr    )<<zprec;
+    zG = *((unsigned char *)ptr + 1)<<zprec;
+    zB = *((unsigned char *)ptr + 2)<<zprec;
+    zA = *((unsigned char *)ptr + 3)<<zprec;
+
+    for(int index=im.width(); index<(im.height()-1)*im.width(); index+=im.width())
+        blurinner<aprec,zprec>((unsigned char *)&ptr[index],zR,zG,zB,zA,alpha);
+
+    for(int index=(im.height()-2)*im.width(); index>=0; index-=im.width())
+        blurinner<aprec,zprec>((unsigned char *)&ptr[index],zR,zG,zB,zA,alpha);
+}
+
+template<int aprec,int zprec>
+void expblur( QImage &img, int radius )
+{
+    if(radius<1)
+        return;
+
+    // Calculate the alpha such that 90% of the kernel is within the radius. (Kernel extends to infinity)
+    int alpha = (int)((1<<aprec)*(1.0f-expf(-2.3f/(radius+1.f))));
+
+    for(int row=0;row<img.height();row++)
+        blurrow<aprec,zprec>(img,row,alpha);
+
+    for(int col=0;col<img.width();col++)
+        blurcol<aprec,zprec>(img,col,alpha);
+}
+// ======================================================
 
 static int step = 0;
 
@@ -101,30 +190,18 @@ void
 Style::drawToolButtonShape(const QStyleOption * option,
                                  QPainter * painter, const QWidget * widget) const
 {
-   OPT_ENABLED;
-      
-   if (!isEnabled)
-      return;
-   
-   const bool isOn = option->state & State_On;
-   const QColor &c = Colors::bg(PAL, widget);
-   if (isOn) {
-      masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
-//    if (step || sunken) {
-//       QRect r = RECT;
-//       if (!sunken) {
-//          step = 6 - step;
-//          const int dx = step*r.width()/20, dy = step*r.height()/20;
-//          r.adjust(dx, dy, -dx, -dy);
-//          step = 6 - step;
-//       }
-//       const Gradients::Type gt = sunken ? Gradients::Sunken :
-//          (Colors::value(c) < 108 ? Gradients::Simple : Gradients::Button);
-//       masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
-//    }
-//    if (isOn)
-      shadows.sunken[true][true].render(RECT, painter);
-   }
+    OPT_ENABLED;
+
+    if (!isEnabled)
+        return;
+
+    const bool isOn = option->state & State_On;
+    const QColor &c = Colors::bg(PAL, widget);
+    if (isOn)
+    {
+        masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
+        shadows.sunken[true][true].render(RECT, painter);
+    }
 }
 
 static QPixmap scaledIcon, emptyIcon;
@@ -186,22 +263,25 @@ Style::drawToolButtonLabel(const QStyleOption * option,
     }
 
     QPixmap pm;
-    QSize pmSize = RECT.size() - QSize(dpi.f4, dpi.f4);
+    QSize pmSize = RECT.size() - QSize(F(4), F(4));
     pmSize = pmSize.boundedTo(toolbutton->iconSize);
 
     if (!toolbutton->icon.isNull())
     {
-        const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
-        QIcon::Mode mode;
+//         const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
+        pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), QIcon::Normal, QIcon::Off);
         if (!isEnabled)
-            mode = QIcon::Disabled;
-//       else if (hover && (option->state & State_AutoRaise))
-//          mode = QIcon::Active; // gamma thing looks dumb and i cannot turn it off in kde...
-        else
-            mode = QIcon::Normal;
-            
-        pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), mode, state);
-        if (step && !sunken && !pm.isNull())
+        {
+            QImage img(pm.width() + F(4), pm.height() + F(4), QImage::Format_ARGB32);
+            img.fill(Qt::transparent);
+            QPainter p(&img);
+            p.setOpacity(0.4);
+            p.drawImage(F(2),F(2),pm.toImage());
+            p.end();
+            expblur<16,7>(img, F(4)/*pm.width()/4*/); // aligning blur kernel to icon size looks crap
+            pm = QPixmap::fromImage(img);
+        }
+        else if (step && !sunken && !pm.isNull())
             pm = icon(pm, step);
         pmSize = pm.size();
     }

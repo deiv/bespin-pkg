@@ -1,7 +1,8 @@
 #!/bin/sh
 
+dest=${2:-"/etc/bootsplash/themes"}
+
 if [ "$1" = "install" ]; then
-    dest=${2:-"/etc/bootsplash/themes"}
     echo -e "\nInstalling files to $dest/Bespin\n
     Please enter your sudo password:\n"
     sudo cp -rfd Bespin $dest/
@@ -43,8 +44,8 @@ else
     SPLASH=bootsplash.jpg
 fi
 
-convert -quality 85 -scale ${width}x${height} $SPLASH Bespin/images/bootsplash-${width}x${height}.jpg
-convert -quality 85 -scale ${width}x${height} $SILENT Bespin/images/silent-${width}x${height}.jpg
+convert -quality 85 -scale ${width}x${height}! $SPLASH Bespin/images/bootsplash-${width}x${height}.jpg
+convert -quality 85 -scale ${width}x${height}! $SILENT Bespin/images/silent-${width}x${height}.jpg
 
 X2=$((1024*$width/1280))
 X3=$((512*$width/1280))

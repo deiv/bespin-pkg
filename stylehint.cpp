@@ -198,19 +198,14 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
     case SH_ItemView_PaintAlternatingRowColorsForEmptyArea:
         return true;
 #endif
-    case SH_KCustomPrimitiveElement:
-    case SH_KCustomControlElement:
-    case SH_KCustomComplexControl:
-    case SH_KCustomSubElement:
     case SH_KCustomStyleHint:
-    case SH_KCustomSubControl:
+    case SH_KCustomControlElement:
+    case SH_KCustomSubElement:
     {
         if (!widget)
             return 0;
         int id = elementId(widget->objectName());
-        if (id)
-            const_cast<QWidget*>(widget)->setObjectName("KDE_CustomStyleElementID");
-        else
+        if (!id)
             qDebug() << "Unsupported KCustomStyleElement requested:" << widget->objectName();
         return id;
     }

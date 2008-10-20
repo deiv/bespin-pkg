@@ -56,6 +56,8 @@ class
 Style : public QCommonStyle
 {
     Q_OBJECT
+    Q_CLASSINFO ("X-KDE-CustomElements", "true")
+    
 public:
     enum ColorRole { Bg = 0, Fg = 1 };
 
@@ -74,16 +76,13 @@ public:
     void drawItemText(QPainter*, const QRect&, int alignment, const QPalette&, bool enabled,
                       const QString &text, QPalette::ColorRole textRole = QPalette::NoRole, QRect *boundingRect = 0) const;
 
-    void drawPrimitive ( PrimitiveElement elem, const QStyleOption * option, QPainter * painter,
-                            const QWidget * widget = 0 ) const;
+    void drawPrimitive (PrimitiveElement elem, const QStyleOption *opt, QPainter *p, const QWidget *w = 0 ) const;
 
-    QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption * option = 0,
-                           const QWidget * widget = 0 ) const;
+    QPixmap standardPixmap(StandardPixmap stdPix, const QStyleOption *opt = 0, const QWidget *w = 0 ) const;
+//     QPixmap generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *opt) const;
    
 //    what do they do? ========================================
-//    QPixmap generatedIconPixmap ( QIcon::Mode iconMode,
-//                                  const QPixmap & pixmap,
-//                                  const QStyleOption * option ) const;
+   
 //    SubControl hitTestComplexControl ( ComplexControl control,
 //                                       const QStyleOptionComplex * option,
 //                                       const QPoint & pos,
