@@ -110,10 +110,8 @@ Style::standardPixmap(StandardPixmap standardPixmap,
         shape.addRect(0,s4,s2,sz-s4);
         goto paint;
     case SP_TitleBarShadeButton:
-        shape.addRect(0,0,sz,s4);
-        goto paint;
     case SP_TitleBarUnshadeButton:
-        shape.addRect(0,s4,sz,s4);
+        shape.addRect(0,0,sz,s4);
         goto paint;
     case SP_TitleBarNormalButton:
         if (dock)

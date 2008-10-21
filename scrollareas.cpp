@@ -276,16 +276,16 @@ Style::drawScrollBarButton(const QStyleOption * option, QPainter * painter,
     hover = hover && alive;
     const int step = (hover && !complexStep) ? 6 : complexStep;
     
-    const QColor c = alive ? Colors::mid(CCOLOR(btn.std, 0), CCOLOR(btn.active, 0), 6-step, step) :
-                             FCOLOR(Window);
+    const QColor c = alive ? Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.active, Bg), 6-step, step) : FCOLOR(Window);
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
     if (alive)
-        painter->setPen(CCOLOR(btn.std, 0).dark(120));
+        painter->setPen(CCOLOR(btn.std, Bg).dark(120));
     else
         painter->setPen(Qt::NoPen);
-    painter->setBrush(Gradients::pix(c, r.height(), Qt::Vertical,
-                                     (sunken || !alive) ? Gradients::Sunken : Gradients::Button));
+    const QPixmap &fill = Gradients::pix(c, r.height(), Qt::Vertical,
+                                         (sunken || !alive) ? Gradients::Sunken : Gradients::Button);
+    painter->setBrush(fill);
     painter->setBrushOrigin(r.topLeft());
     painter->drawEllipse(r);
     painter->restore();

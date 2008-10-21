@@ -27,12 +27,7 @@
 
 using namespace Bespin;
 
-static const QStyle::StyleHint SH_KCustomPrimitiveElement = (QStyle::StyleHint)0xff000001;
-static const QStyle::StyleHint SH_KCustomControlElement = (QStyle::StyleHint)0xff000002;
-static const QStyle::StyleHint SH_KCustomComplexControl = (QStyle::StyleHint)0xff000003;
-static const QStyle::StyleHint SH_KCustomSubElement = (QStyle::StyleHint)0xff000004;
-static const QStyle::StyleHint SH_KCustomStyleHint = (QStyle::StyleHint)0xff000005;
-static const QStyle::StyleHint SH_KCustomSubControl = (QStyle::StyleHint)0xff000006;
+static const QStyle::StyleHint SH_KCustomStyleElement = (QStyle::StyleHint)0xff000001;
 
 int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget * widget,
                             QStyleHintReturn * returnData ) const
@@ -198,9 +193,7 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
     case SH_ItemView_PaintAlternatingRowColorsForEmptyArea:
         return true;
 #endif
-    case SH_KCustomStyleHint:
-    case SH_KCustomControlElement:
-    case SH_KCustomSubElement:
+    case SH_KCustomStyleElement:
     {
         if (!widget)
             return 0;
