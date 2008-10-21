@@ -121,10 +121,10 @@ Button::init(int sz, bool leftMenu, bool fColors)
     fixedColors = fColors;
     for (int t = 0; t < NumTypes; ++t)
         shape[t] = QPainterPath();
-   
+
     const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
     QRectF bound(-s2,-s2,sz,sz);
-#if 1
+#if 0
     shape[Close].addRect(bound);
     shape[Close].addRect(-s4,-s4,s2,s2);
     shape[Close].addRect(s3-s2,s3-s2,s3,s3);
@@ -176,67 +176,78 @@ Button::init(int sz, bool leftMenu, bool fColors)
 #else
     QPainterPath rubber;
     shape[Close].addEllipse(bound);
-    shape[Close].addEllipse(-s4,-s4,s2,s2);
-    shape[Close].addEllipse(s3-s2,s3-s2,s3,s3);
+    shape[Close].addEllipse(bound.adjusted(s3, s3, -s3, -s3));
 
-    shape[Min].addEllipse(bound);
-    bound.translate(s4, -s4);
-    rubber.moveTo(bound.center());
-    rubber.arcTo(bound, 90, 270);
-    rubber.lineTo(bound.center());
-    bound.translate(-s4, s4);
-    shape[Min] = shape[Min].subtracted(rubber);
-    rubber = QPainterPath();
+    shape[Min].moveTo(bound.center());
+    shape[Min].arcTo(bound, 180, 180);
+    shape[Min].closeSubpath();
 
-    shape[Max].addEllipse(bound);
-    bound.translate(-s4, s4);
-    rubber.moveTo(bound.center());
-    rubber.arcTo(bound, -90, 270);
-    rubber.lineTo(bound.center());
-    bound.translate(s4, -s4);
-    shape[Max] = shape[Max].subtracted(rubber);
-    rubber = QPainterPath();
+    shape[Max].moveTo(bound.center());
+    shape[Max].arcTo(bound, 0, 180);
+    shape[Max].closeSubpath();
 
-    shape[Restore].addEllipse(bound);
-    bound.translate(-s4, -s4);
-    rubber.moveTo(bound.center());
-    rubber.arcTo(bound, 90, -270);
-    rubber.lineTo(bound.center());
-    bound.translate(s4, s4);
-    shape[Restore] = shape[Restore].subtracted(rubber);
-    rubber = QPainterPath();
+    shape[Restore].moveTo(bound.center());
+    shape[Restore].arcTo(bound, 225, 180);
+    shape[Restore].closeSubpath();
+
+    shape[Menu].moveTo(bound.center());
+    shape[Menu].arcTo(bound, leftMenu ? 0 : -80, 260);
 
     shape[Stick].addEllipse(s6-s2,s6-s2,sz-s3,sz-s3);
     shape[Unstick].addEllipse(s3-s2,s3-s2,s3,s3);
-    
-    shape[Above].addEllipse(-s4,-s2,s2,s3);
-    shape[Above].addEllipse(-s2,s2-s3,s3,s3);
-    shape[Above].addEllipse(s2-s3,s2-s3,s3,s3);
-    
-    shape[Below].addEllipse(-s4,s2-s3,s2,s3);
-    shape[Below].addEllipse(-s2,-s2,s3,s3);
-    shape[Below].addEllipse(s2-s3,-s2,s3,s3);
-    
-    shape[UnAboveBelow].addEllipse(-s2,-s4,s3,s2);
-    shape[UnAboveBelow].addEllipse(s2-s3,-s4,s3,s2);
 
-    shape[Menu].addRoundedRect(-s2,-s2,sz,s6,99,99,Qt::RelativeSize);
-    shape[Menu].addRoundedRect(leftMenu?-s2:0,-s4,sz-s2,s2+s4,99,25,Qt::RelativeSize);
+    shape[Above].moveTo(bound.center());
+    shape[Above].arcTo(bound, 0, 180);
+    shape[Above].closeSubpath();
+    bound.adjust(0, s2+s6, -s2, s6);
+    shape[Above].moveTo(bound.center());
+    shape[Above].arcTo(bound, 0, 180);
+    shape[Above].closeSubpath();
+    bound.translate(s2, 0);
+    shape[Above].moveTo(bound.center());
+    shape[Above].arcTo(bound, 0, 180);
+    shape[Above].closeSubpath();
+    bound = QRectF(-s2,-s2,sz,sz);
 
-    shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
-    shape[Help].addRect(-s3,-s4,s3,sz-(s3+s4));
-    shape[Help].addRect(0,s2-s6,s4,s6);
+    shape[Below].moveTo(bound.center());
+    shape[Below].arcTo(bound, 180, 180);
+    shape[Below].closeSubpath();
+    bound.adjust(0, -s6, -s2, -(s2+s6));
+    shape[Below].moveTo(bound.center());
+    shape[Below].arcTo(bound, 180, 180);
+    shape[Below].closeSubpath();
+    bound.translate(s2, 0);
+    shape[Below].moveTo(bound.center());
+    shape[Below].arcTo(bound, 180, 180);
+    shape[Below].closeSubpath();
+    bound = QRectF(-s2,-s2,sz,sz);
+
+    bound.adjust(0,0,-s6, 0);
+    shape[UnAboveBelow].moveTo(bound.center());
+    shape[UnAboveBelow].arcTo(bound, 90, 180);
+    shape[UnAboveBelow].closeSubpath();
+    bound.translate(s6,0);
+    shape[UnAboveBelow].moveTo(bound.center());
+    shape[UnAboveBelow].arcTo(bound, -90, 180);
+    shape[UnAboveBelow].closeSubpath();
+    bound = QRectF(-s2,-s2,sz,sz);
+
+    shape[Help].moveTo(bound.center());
+    shape[Help].arcTo(bound, -30, 180);
+    shape[Help].addEllipse(bound.adjusted(s2, s2+s6, -s6, 0));
     
-    shape[Shade].addEllipse(-s2,-s2,sz,s4);
-    shape[Unshade].addEllipse(-s2,s4,sz,s4);
+    shape[Shade].addEllipse(-s2,-s2+s3,sz,s3);
+    shape[Unshade].addEllipse(-s2,-s2+s3,sz,s3);
+
+    bound.adjust(0,0,-s2,-s2);
+    shape[Exposee].addEllipse(bound);
+    shape[Exposee].addEllipse(bound.translated(s2,0));
+    shape[Exposee].addEllipse(bound.translated(0,s2));
+    shape[Exposee].addEllipse(bound.translated(s2,s2));
+    bound = QRectF(-s2,-s2,sz,sz);
     
-    shape[Exposee].addEllipse(-s2,-s2,s3,s3);
-    shape[Exposee].addEllipse(s2-s3,-s2,s3,s3);
-    shape[Exposee].addEllipse(-s2,s2-s3,s3,s3);
-    shape[Exposee].addEllipse(s2-s3,s2-s3,s3,s3);
-    
-    shape[Info].addEllipse(-s6,-s2,s4,s4);
-    shape[Info].addEllipse(-s6,-s6,s4,s2+s3);
+    shape[Info].addEllipse(-s2+s3, -s2, s3, s3);
+    shape[Info].addEllipse(-s2+s3, -s6, s3, s2+s6);
 #endif
 
 //    tip[Close] = i18n("Close");
@@ -411,7 +422,7 @@ Button::paintEvent(QPaintEvent *)
    p.translate( QPoint(t,t) );
    const float f = (18 + (!(state & Sunken))*zoomLevel)/24.0;
    p.scale ( f, f );
-//    p.rotate(60*zoomLevel);
+//    p.rotate(60*zoomLevel); // too annoying, especially for fast zoom in...
    p.setPen(Qt::NoPen);
    p.setBrush(color());
    p.drawPath(shape[_type]);
