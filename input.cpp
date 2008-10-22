@@ -46,7 +46,6 @@ Style::drawLineEditFrame(const QStyleOption *option, QPainter *painter, const QW
 void
 Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-
     // spinboxes and combos allready have a lineedit as global frame
     // TODO: exclude Q3Combo??
     if (qstyleoption_cast<const QStyleOptionFrame *>(option) &&
@@ -58,6 +57,9 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
         painter->fillRect(RECT, FCOLOR(Base));
         return;
     }
+
+    if (appType == KRunner && widget && widget->inherits("KHistoryComboBox"))
+        return;
 
     OPT_ENABLED OPT_FOCUS
 

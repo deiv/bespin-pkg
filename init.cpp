@@ -373,8 +373,12 @@ Style::init(const QSettings* settings)
         { appType = GTK; qWarning("BESPIN: Detected GKT+ application"); }
     else if (qApp->inherits("GreeterApp"))
         appType = KDM;
+    else if (QCoreApplication::applicationName() == "dolphin")
+        appType = Dolphin;
     else if (QCoreApplication::applicationName() == "plasma")
         appType = Plasma;
+    else if (QCoreApplication::applicationName() == "krunner")
+        appType = KRunner;
     else if (QCoreApplication::applicationName() == "kget")
         appType = KGet;
     else if (QCoreApplication::applicationName() == "Designer")
