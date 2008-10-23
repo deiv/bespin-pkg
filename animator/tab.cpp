@@ -42,8 +42,6 @@ SET_FPS(Tab)
 
 #undef ANIMATOR_IMPL
 
-// #define QT_NO_XRENDER
-
 static inline QAbstractScrollArea*
 scrollAncestor(QWidget *w, QWidget *root)
 {
@@ -312,11 +310,11 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 
     // prepare the pixmaps we use to pretend the animation
     QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
+    tabPix[1] = dumpBackground(sw, contentsRect, qApp->style()
 #ifdef QT_NO_XRENDER
-    tabPix[1] = dumpBackground(sw, contentsRect, qApp->style(), _transition == CrossFade);
-#else
-    tabPix[1] = dumpBackground(sw, contentsRect, qApp->style());
+    , _transition == CrossFade // this helps the non render blender with ARGB pixmaps
 #endif
+    );
 
     if (clock.isNull())
     {
@@ -371,22 +369,7 @@ TabInfo::updatePixmaps(Transition transition, uint ms)
             // belive it or not: linear and will end up at a fully blended pixmap, as
             // progress = (1-quote)*progress + quote; // !
             float quote = (float)_timeStep / (duration-ms);
-#ifndef QT_NO_XRENDER
-            OXRender::blend(tabPix[1], tabPix[2], quote);
-#else
-            // Heyhey... speed is ok now - at least better than setAlpha() and setOpacity()...
-            // not as fast as my solution, but not as specialised as well ;-P
-            // important thing is that i can use it on other platforms!
-            QPixmap tmp = tabPix[1].copy();
-            QPainter p(&tmp);
-                p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-                p.fillRect(tmp.rect(), QColor(0,0,0,255*quote));
-            p.end();
-            p.begin(&tabPix[2]);
-                p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-                p.drawPixmap(0,0,tmp);
-            p.end();
-#endif
+            FX::blend(tabPix[1], tabPix[2], quote);
             break;
         }
         case ScanlineBlend:

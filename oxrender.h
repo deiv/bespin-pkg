@@ -20,24 +20,29 @@
 #define QT_NO_XRENDER #
 #endif
 
-#ifndef QT_NO_XRENDER
-
 #ifndef OXRENDER_H
 #define OXRENDER_H
 
 #include <QPixmap>
-#include <QVector>
+// #include <QVector>
+#ifndef QT_NO_XRENDER
+
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrender.h>
 #include "fixx11h.h"
 
-typedef QVector<double> PointArray;
-typedef QVector<QColor> ColorArray;
 typedef Picture OXPicture;
 typedef Pixmap OXPixmap;
 
-namespace OXRender
+#endif
+
+// typedef QVector<double> PointArray;
+// typedef QVector<QColor> ColorArray;
+
+namespace FX
 {
+#ifndef QT_NO_XRENDER
+    void freePicture(OXPicture pict);
     void composite( OXPicture src, OXPicture mask, OXPicture dst,
                     int sx, int sy, int mx, int my, int dx, int dy,
                     uint w, uint h, int op = PictOpSrc);
@@ -50,21 +55,20 @@ namespace OXRender
 
     void setColor(XRenderColor &xc, double r, double g, double b, double a = 1);
     void setColor(XRenderColor &xc, QColor qc);
+#endif
 
     bool blend(const QPixmap &upper, QPixmap &lower, double opacity = 0.5, int x = 0, int y = 0);
     QPixmap fade(const QPixmap &pix, double percent);
     QPixmap tint(const QPixmap &mask, const QColor &color);
-   
-    void setAlpha(QPixmap &pix, const OXPicture &mask);
-    QPixmap applyAlpha( const QPixmap &toThisPix,
-                        const QPixmap &fromThisPix,
-                        const QRect &rect = QRect(),
-                        const QRect &alphaRect = QRect());
+    QPixmap applyAlpha( const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect &rect = QRect(), const QRect &alphaRect = QRect());
+    void expblur(QImage &img, int radius);
 //    QPixmap applyAlpha(const QPixmap &toThisPix,
 //                       const OXPicture &fromThisPict,
 //                       const QRect &rect = QRect(),
 //                       const QRect &alphaRect = QRect());
 #if 0
+    void setAlpha(QPixmap &pix, const OXPicture &mask);
+    
 // -- couple of XRender versions don't know + others are broken, so we'll leave it for the moment
    void setGradient(XLinearGradient &lg, QPoint p1, QPoint p2);
    void setGradient(XLinearGradient &lg,
@@ -77,10 +81,8 @@ namespace OXRender
                       const ColorArray &colors,
                       const PointArray &stops = PointArray());
 #endif
-    void freePicture(OXPicture pict);
 }
 
-#define Q2XRenderColor(_XRC_, _QC_) XRenderColor _XRC_; OXRender::setColor(_XRC_, _QC_)
+#define Q2XRenderColor(_XRC_, _QC_) XRenderColor _XRC_; FX::setColor(_XRC_, _QC_)
 
 #endif //OXRENDER_H
-#endif // #ifndef QT_NO_XRENDER

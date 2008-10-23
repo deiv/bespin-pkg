@@ -428,7 +428,7 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                // NOTE: WORKAROUND for dolphin and probably others:
+                // NOTE: WORKAROUND for (no more) dolphin and probably others:
                 // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
                 // force this here, hoping it won't cause to many problems - and make a bug report
                 QWidget *vp = itemView->viewport();
@@ -627,9 +627,9 @@ Style::polish( QWidget * widget )
         if (!lables.isEmpty())
         {   // this is my ticket to hell...
             // i want the lineedit use the plasma theme fg color
-            // a) we have no access to plasma themes from here.
-            // b) krunner sets QPalette::WindowText, but lineedits hardcode QPalette::Text
-            // c) krunner only plasmafies some lables, but not our lineedit
+            // a) we have no access to plasma themes from here (... as i do no way intend to link plasma)
+            // b) krunner only plasmafies some lables, but not our lineedit
+            // c) krunner sets QPalette::WindowText, but lineedits hardcode QPalette::Text
             // => i just look for the lables, take their palette,
             // map the WindowText color to the Text color and put the palette on the lineedit
             // (font adjustment is just for fun - and looks better + is more readable, especially on

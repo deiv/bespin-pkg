@@ -53,7 +53,7 @@ Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWid
 
         painter->save();
         QString title = dwOpt->title; // " " + dwOpt->title + " "; // good for underlining
-        setTitle(painter);
+        setTitleFont(painter);
 
         QPen pen = painter->pen();
         if (Colors::value(bg) < 100)

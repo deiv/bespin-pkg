@@ -40,7 +40,7 @@ pixelmetric.cpp stdpix.cpp
 visualframe.cpp gradients.cpp init.cpp genpixmaps.cpp polish.cpp
 buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp
 scrollareas.cpp shapes.cpp slider.cpp tabbing.cpp toolbars.cpp
-views.cpp window.cpp hacks.cpp macmenu.cpp)
+views.cpp window.cpp hacks.cpp macmenu.cpp paths.cpp)
 
 if ( X11_FOUND )
    set (bespin_SOURCES ${bespin_SOURCES} xproperty.cpp)

@@ -27,9 +27,7 @@
 #include "makros.h"
 
 #ifndef BESPIN_DECO
-#ifndef QT_NO_XRENDER
 #include "oxrender.h"
-#endif
 #endif
 
 using namespace Bespin;
@@ -251,26 +249,15 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
     else
         rg = QRadialGradient(alpha.width()/2, 5*alpha.height()/3, 10*size/4);
     rg.setColorAt(0, Qt::white);
-#ifndef QT_NO_XRENDER
+
     rg.setColorAt(0.9, Qt::transparent);
     alpha.fill(Qt::transparent);
-#else
-    rg.setColorAt(0.9, Qt::black);
-#endif
     p.begin(&alpha); p.fillRect(alpha.rect(), rg); p.end();
-#ifndef QT_NO_XRENDER
-    alpha = OXRender::applyAlpha(*dark, alpha);
-#else
-    dark->setAlphaChannel(alpha);
-#endif
+    alpha = FX::applyAlpha(*dark, alpha);
 
     p.begin(pix);
     p.fillRect(pix->rect(), lg2);
-#ifndef QT_NO_XRENDER
     p.drawPixmap(0,0, alpha);
-#else
-    p.drawPixmap(0,0, *dark);
-#endif
     p.end();
    
     delete dark;
@@ -528,12 +515,14 @@ const QPixmap
     if (pix)
         return *pix;
 
+    const int v = 255;
+    const int a = v ? 80 : 20;
     pix = new QPixmap(32, height);
     pix->fill(Qt::transparent);
     QPoint start(0,0), stop(0,height);
     QLinearGradient lg(start, stop);
-    lg.setColorAt(0, QColor(255,255,255,80));
-    lg.setColorAt(1, QColor(255,255,255,0));
+    lg.setColorAt(0, QColor(v,v,v,a));
+    lg.setColorAt(1, QColor(v,v,v,0));
     QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
 
     // cache for later ;)
@@ -626,14 +615,14 @@ cornerMask(bool right = false)
 //    QLinearGradient rg;
 //    if (right) rg = QLinearGradient(0,0, 128,0);
 //    else rg = QLinearGradient(128,0, 0,0);
-#ifndef QT_NO_XRENDER
+// #ifndef QT_NO_XRENDER
     alpha->fill(Qt::transparent);
     rg.setColorAt(0, Qt::transparent);
     rg.setColorAt(0.5, Qt::transparent);
-#else
-    rg.setColorAt(0, Qt::black);
-    rg.setColorAt(0.5, Qt::black);
-#endif
+// #else
+//     rg.setColorAt(0, Qt::black);
+//     rg.setColorAt(0.5, Qt::black);
+// #endif
     rg.setColorAt(1, Qt::white);
     QPainter p(alpha); p.fillRect(alpha->rect(), rg); p.end();
     return alpha;
@@ -717,20 +706,18 @@ Gradients::bgSet(const QColor &c)
             p.drawTiledPixmap(pix->rect(), set->topTile);
             p.end();
             mask = cornerMask(cnr);
-#ifndef QT_NO_XRENDER
-            for (int i = 0; i < 128; i += 32)
-                OXRender::composite(set->cornerTile, mask->x11PictureHandle(),
-                                    *pix, 0, 0, i, 0, i, 0, 32, 128, PictOpOver);
-            p.begin(pix); p.drawTiledPixmap(pix->rect(), _dither); p.end();
-#else
-            QPixmap fill(pix->size());
+
+            QPixmap fill(mask->size());
             p.begin(&fill);
-            p.drawTiledPixmap(fill.rect(), set->cornerTile); p.end();
-            fill.setAlphaChannel(*mask);
-            p.begin(pix);
-            p.drawPixmap(0,0, fill); p.drawTiledPixmap(pix->rect(), _dither);
+            p.drawTiledPixmap(fill.rect(), set->cornerTile);
             p.end();
-#endif
+
+            fill = FX::applyAlpha(fill, *mask);
+
+            p.begin(pix);
+            p.drawPixmap(0,0, fill);
+            p.drawTiledPixmap(pix->rect(), _dither);
+            p.end();
             delete mask;
         }
         break;
@@ -775,23 +762,20 @@ Gradients::bgSet(const QColor &c)
             pix->fill(c);
             lg = QLinearGradient(0,0, 0,32);
             lg.setColorAt(1, Qt::white);
-#ifndef QT_NO_XRENDER
-            mask->fill(Qt::transparent);
             lg.setColorAt(0, Qt::transparent);
+            
+            mask->fill(Qt::transparent);
             p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
-            OXRender::composite(*blend, mask->x11PictureHandle(),
-                                *pix, 0, 0, 0, 0, 0, 0, 256, 32, PictOpOver);
-            p.begin(pix); p.drawTiledPixmap(pix->rect(), _dither); p.end();
-#else
-            lg.setColorAt(0, Qt::black);
-            p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
-            QPixmap fill(pix->size());
+
+            QPixmap fill(mask->size());
             p.begin(&fill); p.drawTiledPixmap(fill.rect(), *blend); p.end();
-            fill.setAlphaChannel(*mask);
+
+            fill = FX::applyAlpha(fill, *mask);
+
             p.begin(pix);
-            p.drawPixmap(0,0, fill); p.drawTiledPixmap(pix->rect(), _dither);
+            p.drawPixmap(0,0, fill);
+            p.drawTiledPixmap(pix->rect(), _dither);
             p.end();
-#endif
         }
         delete mask;
         lg = QLinearGradient(QPoint(0,0), QPoint(0, 128));

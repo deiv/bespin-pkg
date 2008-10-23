@@ -47,7 +47,7 @@ public:
         Restore, Unstick, UnAboveBelow, Unshade, NumTypes
     };
     Button(Client *parent, Type type, bool left = false);
-    static void init(int sz, bool leftMenu = false, bool fixedColors = false);
+    static void init(int sz, bool leftMenu = false, bool fixedColors = false, bool round = true);
     bool isEnabled() const;
     inline bool type() {return _type;}
 protected:

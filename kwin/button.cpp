@@ -29,6 +29,7 @@
 #include <cmath>
 
 #include "../colors.h"
+#include "../paths.h"
 #include "client.h"
 #include "factory.h"
 #include "button.h"
@@ -116,151 +117,41 @@ Button::isEnabled() const
 }
 
 void
-Button::init(int sz, bool leftMenu, bool fColors)
+Button::init(int sz, bool leftMenu, bool fColors, bool round)
 {
     fixedColors = fColors;
     for (int t = 0; t < NumTypes; ++t)
         shape[t] = QPainterPath();
 
-    const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
-    QRectF bound(-s2,-s2,sz,sz);
+    QRectF bound(-sz/2.0, -sz/2.0, sz, sz);
+    shape[Close] = Shapes::close(bound, round);
+    shape[Min] = Shapes::min(bound, round);
+    shape[Max] = Shapes::max(bound, round);
+    shape[Restore] = Shapes::restore(bound, round);
+    shape[Stick] = Shapes::stick(bound, round);
+    shape[Unstick] = Shapes::unstick(bound, round);
+    shape[Above] = Shapes::keepAbove(bound, round);
+    shape[Below] = Shapes::keepBelow(bound, round);
+    shape[UnAboveBelow] = Shapes::unAboveBelow(bound, round);
+    shape[Menu] = Shapes::menu(bound, leftMenu, round);
+    shape[Help] = Shapes::help(bound, round);
+    shape[Shade] = Shapes::shade(bound, round);
+    shape[Unshade] = Shapes::unshade(bound, round);
+    shape[Exposee] = Shapes::exposee(bound, round);
+    shape[Info] = Shapes::info(bound, round);
 #if 0
-    shape[Close].addRect(bound);
-    shape[Close].addRect(-s4,-s4,s2,s2);
-    shape[Close].addRect(s3-s2,s3-s2,s3,s3);
-
-    shape[Min].addRect(bound);
-    shape[Min].addRect(-s4,-s2,sz-s4,sz-s4);
-    shape[Min].addRect(s2-s3,-s2,s3,s3);
-
-    shape[Max].addRect(bound);
-    shape[Max].addRect(-s2,-s4,sz-s4,sz-s4);
-    shape[Max].addRect(-s2,s2-s3,s3,s3);
-
-    shape[Restore].addRect(bound);
-    shape[Restore].addRect(-s2,-s2,sz-s4,sz-s4);
-    shape[Restore].addRect(-s2,-s2,s3,s3);
-
-    shape[Stick].addRect(s6-s2,s6-s2,sz-s3,sz-s3);
-    shape[Unstick].addRect(s3-s2,s3-s2,s3,s3);
-    
-    shape[Above].addRect(-s4,-s2,s2,s3);
-    shape[Above].addRect(-s2,s2-s3,s3,s3);
-    shape[Above].addRect(s2-s3,s2-s3,s3,s3);
-    
-    shape[Below].addRect(-s4,s2-s3,s2,s3);
-    shape[Below].addRect(-s2,-s2,s3,s3);
-    shape[Below].addRect(s2-s3,-s2,s3,s3);
-    
-    shape[UnAboveBelow].addRect(-s2,-s4,s3,s2);
-    shape[UnAboveBelow].addRect(s2-s3,-s4,s3,s2);
-
-    shape[Menu].addRect(bound);
-    shape[Menu].addRect(leftMenu?0:-s2,-s4,s2,sz-s4);
-
-    shape[Help].addRect(-s3,-s2,s3+s4,sz-s3);
-    shape[Help].addRect(-s3,-s4,s3,sz-(s3+s4));
-    shape[Help].addRect(0,s2-s6,s4,s6);
-    
-    shape[Shade].addRect(-s2,-s2,sz,s4);
-    
-    shape[Unshade].addRect(-s2,s4,sz,s4);
-    
-    shape[Exposee].addRect(-s2,-s2,s3,s3);
-    shape[Exposee].addRect(s2-s3,-s2,s3,s3);
-    shape[Exposee].addRect(-s2,s2-s3,s3,s3);
-    shape[Exposee].addRect(s2-s3,s2-s3,s3,s3);
-    
-    shape[Info].addRect(-s6,-s2,s4,s4);
-    shape[Info].addRect(-s6,-s6,s4,s2+s3);
-#else
-    QPainterPath rubber;
-    shape[Close].addEllipse(bound);
-    shape[Close].addEllipse(bound.adjusted(s3, s3, -s3, -s3));
-
-    shape[Min].moveTo(bound.center());
-    shape[Min].arcTo(bound, 180, 180);
-    shape[Min].closeSubpath();
-
-    shape[Max].moveTo(bound.center());
-    shape[Max].arcTo(bound, 0, 180);
-    shape[Max].closeSubpath();
-
-    shape[Restore].moveTo(bound.center());
-    shape[Restore].arcTo(bound, 225, 180);
-    shape[Restore].closeSubpath();
-
-    shape[Menu].moveTo(bound.center());
-    shape[Menu].arcTo(bound, leftMenu ? 0 : -80, 260);
-
-    shape[Stick].addEllipse(s6-s2,s6-s2,sz-s3,sz-s3);
-    shape[Unstick].addEllipse(s3-s2,s3-s2,s3,s3);
-
-    shape[Above].moveTo(bound.center());
-    shape[Above].arcTo(bound, 0, 180);
-    shape[Above].closeSubpath();
-    bound.adjust(0, s2+s6, -s2, s6);
-    shape[Above].moveTo(bound.center());
-    shape[Above].arcTo(bound, 0, 180);
-    shape[Above].closeSubpath();
-    bound.translate(s2, 0);
-    shape[Above].moveTo(bound.center());
-    shape[Above].arcTo(bound, 0, 180);
-    shape[Above].closeSubpath();
-    bound = QRectF(-s2,-s2,sz,sz);
-
-    shape[Below].moveTo(bound.center());
-    shape[Below].arcTo(bound, 180, 180);
-    shape[Below].closeSubpath();
-    bound.adjust(0, -s6, -s2, -(s2+s6));
-    shape[Below].moveTo(bound.center());
-    shape[Below].arcTo(bound, 180, 180);
-    shape[Below].closeSubpath();
-    bound.translate(s2, 0);
-    shape[Below].moveTo(bound.center());
-    shape[Below].arcTo(bound, 180, 180);
-    shape[Below].closeSubpath();
-    bound = QRectF(-s2,-s2,sz,sz);
-
-    bound.adjust(0,0,-s6, 0);
-    shape[UnAboveBelow].moveTo(bound.center());
-    shape[UnAboveBelow].arcTo(bound, 90, 180);
-    shape[UnAboveBelow].closeSubpath();
-    bound.translate(s6,0);
-    shape[UnAboveBelow].moveTo(bound.center());
-    shape[UnAboveBelow].arcTo(bound, -90, 180);
-    shape[UnAboveBelow].closeSubpath();
-    bound = QRectF(-s2,-s2,sz,sz);
-
-    shape[Help].moveTo(bound.center());
-    shape[Help].arcTo(bound, -30, 180);
-    shape[Help].addEllipse(bound.adjusted(s2, s2+s6, -s6, 0));
-    
-    shape[Shade].addEllipse(-s2,-s2+s3,sz,s3);
-    shape[Unshade].addEllipse(-s2,-s2+s3,sz,s3);
-
-    bound.adjust(0,0,-s2,-s2);
-    shape[Exposee].addEllipse(bound);
-    shape[Exposee].addEllipse(bound.translated(s2,0));
-    shape[Exposee].addEllipse(bound.translated(0,s2));
-    shape[Exposee].addEllipse(bound.translated(s2,s2));
-    bound = QRectF(-s2,-s2,sz,sz);
-    
-    shape[Info].addEllipse(-s2+s3, -s2, s3, s3);
-    shape[Info].addEllipse(-s2+s3, -s6, s3, s2+s6);
+    tip[Close] = i18n("Close");
+    tip[Min] = i18n("Minimize");
+    tip[Max] = i18n("Maximize");
+    tip[Restore] = i18n("Restore");
+    tip[Menu] = i18n("Menu");
+    tip[Help] = i18n("Help");
+    tip[Above] = i18n("Keep above others");
+    tip[Below] = i18n("Keep below others");
+    tip[UnAboveBelow] = i18n("Equal to others");
+    tip[Stick] = i18n("All Desktops");
+    tip[Unstick] = i18n("This Desktops only");
 #endif
-
-//    tip[Close] = i18n("Close");
-//    tip[Min] = i18n("Minimize");
-//    tip[Max] = i18n("Maximize");
-//    tip[Restore] = i18n("Restore");
-//    tip[Menu] = i18n("Menu");
-//    tip[Help] = i18n("Help");
-//    tip[Above] = i18n("Keep above others");
-//    tip[Below] = i18n("Keep below others");
-//    tip[UnAboveBelow] = i18n("Equal to others");
-//    tip[Stick] = i18n("All Desktops");
-//    tip[Unstick] = i18n("This Desktops only");
 }
 
 void

@@ -53,7 +53,7 @@ setBold(QPainter *p)
 }
 
 static inline void
-setTitle(QPainter *p)
+setTitleFont(QPainter *p)
 {
         QFont fnt = p->font();
         fnt.setWeight(QFont::Black);

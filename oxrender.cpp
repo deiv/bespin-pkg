@@ -17,29 +17,25 @@
  */
 
 #ifndef QT_NO_XRENDER
-
 #include <QX11Info>
+#else
 #include <QPainter>
-#include <QRegion>
-#include <QWidget>
-#include <QtCore/QVarLengthArray>
+#endif
+// #include <QPainter>
+// #include <QWidget>
+// #include <QtCore/QVarLengthArray>
 #include <cmath>
 #include "oxrender.h"
 
-// #ifndef QT_NO_XRENDER
+using namespace FX;
+
+#ifndef QT_NO_XRENDER
 
 static Display *dpy = QX11Info::display();
 static Window root = RootWindow (dpy, DefaultScreen (dpy));
 
-/* "qt_getClipRects" is friend enough to qregion... ;)*/
-inline void *
-qt_getClipRects( const QRegion &r, int &num )
-{
-    return r.clipRectangles( num );
-}
-
-static
-OXPicture createFill(Display *dpy, const XRenderColor *c)
+static OXPicture
+createFill(Display *dpy, const XRenderColor *c)
 {
     XRenderPictureAttributes pa;
     OXPixmap pixmap = XCreatePixmap (dpy, root, 1, 1, 32);
@@ -57,48 +53,187 @@ OXPicture createFill(Display *dpy, const XRenderColor *c)
     return fill;
 }
 
-using namespace OXRender;
+void
+FX::freePicture(OXPicture pict)
+{
+    XRenderFreePicture (dpy, pict);
+}
 
 void
-OXRender::composite(OXPicture src, OXPicture mask, OXPicture dst,
+FX::composite(OXPicture src, OXPicture mask, OXPicture dst,
                     int sx, int sy, int mx, int my, int dx, int dy, uint w, uint h, int op)
 {
     XRenderComposite (dpy, op, src, mask, dst, sx, sy, mx, my, dx, dy, w, h);
 }
 
 void
-OXRender::composite(OXPicture src, OXPicture mask, const QPixmap &dst,
+FX::composite(OXPicture src, OXPicture mask, const QPixmap &dst,
                     int sx, int sy, int mx, int my, int dx, int dy, uint w, uint h, int op)
 {
    XRenderComposite (dpy, op, src, mask, dst.x11PictureHandle(), sx, sy, mx, my, dx, dy, w, h);
 }
 
 void
-OXRender::composite(const QPixmap &src, OXPicture mask, const QPixmap &dst,
+FX::composite(const QPixmap &src, OXPicture mask, const QPixmap &dst,
                     int sx, int sy, int mx, int my, int dx, int dy, uint w, uint h, int op)
 {
     XRenderComposite(   dpy, op, src.x11PictureHandle(), mask,
                         dst.x11PictureHandle(), sx, sy, mx, my, dx, dy, w, h );
 }
 
-bool
-OXRender::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
+// adapted from Qt, because this really sucks ;)
+void
+FX::setColor(XRenderColor &xc, double r, double g, double b, double a)
 {
-   XRenderColor c = {0,0,0, ushort(opacity * 0xffff) };
-   OXPicture alpha = createFill (dpy, &c);
-   if (alpha == X::None)
-      return false;
-   XRenderComposite (dpy, PictOpOver, upper.x11PictureHandle(), alpha,
-                     lower.x11PictureHandle(), 0, 0, 0, 0, x, y,
-                     upper.width(), upper.height());
-   XRenderFreePicture (dpy, alpha);
+    setColor(xc, QColor(r*0xff, g*0xff, b*0xff, a*0xff));
+}
+
+void
+FX::setColor(XRenderColor &xc, QColor qc)
+{
+    uint a, r, g, b;
+    qc.getRgb((int*)&r, (int*)&g, (int*)&b, (int*)&a);
+    a = xc.alpha = (a | a << 8);
+    xc.red   = (r | r << 8) * a / 0x10000;
+    xc.green = (g | g << 8) * a / 0x10000;
+    xc.blue  = (b | b << 8) * a / 0x10000;
+}
+
+#endif
+
+
+/*
+// Exponential blur, Jani Huhtanen, 2006 ==========================
+*  expblur(QImage &img, int radius)
+*
+*  In-place blur of image 'img' with kernel of approximate radius 'radius'.
+*  Blurs with two sided exponential impulse response.
+*
+*  aprec = precision of alpha parameter in fixed-point format 0.aprec
+*  zprec = precision of state parameters zR,zG,zB and zA in fp format 8.zprec
+*/
+
+template<int aprec, int zprec>
+static inline void blurinner(unsigned char *bptr, int &zR, int &zG, int &zB, int &zA, int alpha)
+{
+    int R,G,B,A;
+    R = *bptr;
+    G = *(bptr+1);
+    B = *(bptr+2);
+    A = *(bptr+3);
+
+    zR += (alpha * ((R<<zprec)-zR))>>aprec;
+    zG += (alpha * ((G<<zprec)-zG))>>aprec;
+    zB += (alpha * ((B<<zprec)-zB))>>aprec;
+    zA += (alpha * ((A<<zprec)-zA))>>aprec;
+
+    *bptr =     zR>>zprec;
+    *(bptr+1) = zG>>zprec;
+    *(bptr+2) = zB>>zprec;
+    *(bptr+3) = zA>>zprec;
+}
+
+template<int aprec,int zprec>
+static inline void blurrow( QImage & im, int line, int alpha)
+{
+    int zR,zG,zB,zA;
+
+    QRgb *ptr = (QRgb *)im.scanLine(line);
+
+    zR = *((unsigned char *)ptr    )<<zprec;
+    zG = *((unsigned char *)ptr + 1)<<zprec;
+    zB = *((unsigned char *)ptr + 2)<<zprec;
+    zA = *((unsigned char *)ptr + 3)<<zprec;
+
+    for(int index=1; index<im.width(); index++)
+        blurinner<aprec,zprec>((unsigned char *)&ptr[index],zR,zG,zB,zA,alpha);
+
+    for(int index=im.width()-2; index>=0; index--)
+        blurinner<aprec,zprec>((unsigned char *)&ptr[index],zR,zG,zB,zA,alpha);
+}
+
+template<int aprec, int zprec>
+static inline void blurcol( QImage & im, int col, int alpha)
+{
+    int zR,zG,zB,zA;
+
+    QRgb *ptr = (QRgb *)im.bits();
+    ptr+=col;
+
+    zR = *((unsigned char *)ptr    )<<zprec;
+    zG = *((unsigned char *)ptr + 1)<<zprec;
+    zB = *((unsigned char *)ptr + 2)<<zprec;
+    zA = *((unsigned char *)ptr + 3)<<zprec;
+
+    for(int index=im.width(); index<(im.height()-1)*im.width(); index+=im.width())
+        blurinner<aprec,zprec>((unsigned char *)&ptr[index],zR,zG,zB,zA,alpha);
+
+    for(int index=(im.height()-2)*im.width(); index>=0; index-=im.width())
+        blurinner<aprec,zprec>((unsigned char *)&ptr[index],zR,zG,zB,zA,alpha);
+}
+
+void
+FX::expblur( QImage &img, int radius )
+{
+    if(radius<1)
+        return;
+
+    static const int aprec = 16; static const int zprec = 7;
+
+    // Calculate the alpha such that 90% of the kernel is within the radius. (Kernel extends to infinity)
+    int alpha = (int)((1<<aprec)*(1.0f-expf(-2.3f/(radius+1.f))));
+
+    for(int row=0;row<img.height();row++)
+        blurrow<aprec,zprec>(img,row,alpha);
+
+    for(int col=0;col<img.width();col++)
+        blurcol<aprec,zprec>(img,col,alpha);
+}
+// ======================================================
+
+
+bool
+FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
+{
+    if (opacity == 0.0)
+        return false; // haha...
+#ifndef QT_NO_XRENDER
+    OXPicture alpha = NULL;
+    if (opacity != 1.0)
+    {
+        XRenderColor c = {0,0,0, ushort(opacity * 0xffff) };
+        alpha = createFill (dpy, &c);
+        if (alpha == X::None)
+            return false;
+    }
+    XRenderComposite (dpy, PictOpOver, upper.x11PictureHandle(), alpha,
+                        lower.x11PictureHandle(), 0, 0, 0, 0, x, y,
+                        upper.width(), upper.height());
+    if (alpha)
+        XRenderFreePicture (dpy, alpha);
+#else
+    QPixmap tmp = upper;
+    QPainter p;
+    if (opacity != 1.0)
+    {
+        tmp = upper.copy();
+        p.begin(&tmp);
+        p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+        p.fillRect(tmp.rect(), QColor(0,0,0, opacity*255.0));
+        p.end();
+    }
+    p.begin(&lower);
+    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    p.drawPixmap(x, y, tmp);
+    p.end();
+#endif
    return true;
 }
 
 QPixmap
-OXRender::applyAlpha(   const QPixmap &toThisPix, const QPixmap &fromThisPix,
-                        const QRect &rect, const QRect &alphaRect)
+FX::applyAlpha(const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect &rect, const QRect &alphaRect)
 {
+    QPixmap pix;
     int sx,sy,ax,ay,w,h;
     if (rect.isNull())
         { sx = sy = 0; w = toThisPix.width(); h = toThisPix.height(); }
@@ -112,45 +247,57 @@ OXRender::applyAlpha(   const QPixmap &toThisPix, const QPixmap &fromThisPix,
         w = qMin(alphaRect.width(),w); h = qMin(alphaRect.height(),h);
     }
 
-    QPixmap pix;
     if (w > fromThisPix.width() || h > fromThisPix.height())
         pix = QPixmap(w, h);
     else
         pix = fromThisPix.copy(0,0,w,h); // cause slow depth conversion...
     pix.fill(Qt::transparent);
-    XRenderComposite(   dpy, PictOpOver, toThisPix.x11PictureHandle(),
-                        fromThisPix.x11PictureHandle(), pix.x11PictureHandle(),
-                        sx, sy, ax, ay, 0, 0, w, h);
+#ifndef QT_NO_XRENDER
+    XRenderComposite( dpy, PictOpOver, toThisPix.x11PictureHandle(),
+                      fromThisPix.x11PictureHandle(), pix.x11PictureHandle(),
+                      sx, sy, ax, ay, 0, 0, w, h);
+#else
+    QPainter p(&pix);
+    p.drawPixmap(0, 0, toThisPix, sx, sy, w, h);
+    p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+    p.drawPixmap(0, 0, fromThisPix, ax, ay, w, h);
+    p.end();
+#endif
     return pix;
 }
 
 QPixmap
-OXRender::tint(const QPixmap &mask, const QColor &color)
+FX::tint(const QPixmap &mask, const QColor &color)
 {
+    QPixmap pix = mask.copy();
+    pix.fill(Qt::transparent);
+
+#ifndef QT_NO_XRENDER
+
     Q2XRenderColor(c, color);
     OXPicture tnt = createFill (dpy, &c);
     if (tnt == X::None)
-        return false;
-    QPixmap pix = mask.copy();
-    pix.fill(Qt::transparent);
+        return pix;
+
     XRenderComposite( dpy, PictOpOver, tnt, mask.x11PictureHandle(), pix.x11PictureHandle(),
                       0, 0, 0, 0, 0, 0, mask.width(), mask.height());
     XRenderFreePicture (dpy, tnt);
+    
+#else
+
+    QPainter p(&pix);
+    p.setPen(Qt::NoPen); p.setBrush(color);
+    p.drawRect(pix.rect());
+    p.end();
+    pix = FX::applyAlpha(pix, mask);
+    
+#endif
     return pix;
 }
 
 
-void // TODO: would be cool to get this working - doesn't, though...
-OXRender::setAlpha(QPixmap &pix, const OXPicture &alpha)
-{
-   XRenderPictureAttributes pa;
-   pa.alpha_map = alpha;
-   pa.alpha_x_origin = pa.alpha_y_origin = 0;
-   XRenderChangePicture(dpy, pix.x11PictureHandle(), CPAlphaMap|CPAlphaXOrigin|CPAlphaYOrigin, &pa);
-}
-
 QPixmap
-OXRender::fade(const QPixmap &pix, double percent)
+FX::fade(const QPixmap &pix, double percent)
 {
     QPixmap newPix(pix.size());
     newPix.fill(Qt::transparent);
@@ -158,37 +305,38 @@ OXRender::fade(const QPixmap &pix, double percent)
     return newPix;
 }
 
-// adapted from Qt, because this really sucks ;)
-
-void
-OXRender::setColor(XRenderColor &xc, double r, double g, double b, double a)
+#if 0
+void // TODO: would be cool to get this working - doesn't, though...
+FX::setAlpha(QPixmap &pix, const OXPicture &alpha)
 {
-    setColor(xc, QColor(r*0xff, g*0xff, b*0xff, a*0xff));
+   XRenderPictureAttributes pa;
+   pa.alpha_map = alpha;
+   pa.alpha_x_origin = pa.alpha_y_origin = 0;
+   XRenderChangePicture(dpy, pix.x11PictureHandle(), CPAlphaMap|CPAlphaXOrigin|CPAlphaYOrigin, &pa);
 }
+#endif
 
-void
-OXRender::setColor(XRenderColor &xc, QColor qc)
-{
-    uint a, r, g, b;
-    qc.getRgb((int*)&r, (int*)&g, (int*)&b, (int*)&a);
-    a = xc.alpha = (a | a << 8);
-    xc.red   = (r | r << 8) * a / 0x10000;
-    xc.green = (g | g << 8) * a / 0x10000;
-    xc.blue  = (b | b << 8) * a / 0x10000;
-}
 # if 0
-void OXRender::setGradient(XLinearGradient &lg, QPoint p1, QPoint p2) {
+/* "qt_getClipRects" is friend enough to qregion... ;)*/
+#include <QRegion>
+inline void *
+qt_getClipRects( const QRegion &r, int &num )
+{
+    return r.clipRectangles( num );
+}
+
+void FX::setGradient(XLinearGradient &lg, QPoint p1, QPoint p2) {
    lg.p1.x = p1.x(); lg.p1.y = p1.y();
    lg.p2.x = p2.x(); lg.p2.y = p2.y();
 }
 
-void OXRender::setGradient(XLinearGradient &lg,
+void FX::setGradient(XLinearGradient &lg,
                            XFixed x1, XFixed y1, XFixed x2, XFixed y2) {
    lg.p1.x = x1; lg.p1.y = y1;
    lg.p2.x = x2; lg.p2.y = y2;
 }
 
-OXPicture OXRender::gradient(const QPoint start, const QPoint stop,
+OXPicture FX::gradient(const QPoint start, const QPoint stop,
                              const ColorArray &colors,
                              const PointArray &stops) {
    XLinearGradient lg = {
@@ -219,7 +367,7 @@ OXPicture OXRender::gradient(const QPoint start, const QPoint stop,
    return lgp;
 }
 
-OXPicture OXRender::gradient(const QPoint c1, int r1, const QPoint c2, int r2,
+OXPicture FX::gradient(const QPoint c1, int r1, const QPoint c2, int r2,
                              const ColorArray &colors,
                              const PointArray &stops) {
    XRadialGradient rg = {
@@ -251,10 +399,4 @@ OXPicture OXRender::gradient(const QPoint c1, int r1, const QPoint c2, int r2,
    return lgp;
 }
 #endif
-void
-OXRender::freePicture(OXPicture pict)
-{
-    XRenderFreePicture (dpy, pict);
-}
 
-#endif // #ifndef QT_NO_XRENDER

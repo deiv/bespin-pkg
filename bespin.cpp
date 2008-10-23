@@ -37,18 +37,15 @@
 // #include "debug.h"
 
 #ifdef Q_WS_X11
-#ifndef QT_NO_XRENDER
-#include "oxrender.h"
-#endif
 #include "xproperty.h"
 #endif
-
+#include "oxrender.h"
 #include "colors.h"
 #include "bespin.h"
 
 /**=========================================================*/
 
-#include <QtDebug>
+// #include <QtDebug>
 
 
 /**============= extern C stuff ==========================*/
@@ -459,12 +456,7 @@ Style::fillWithMask(QPainter *painter, const QPoint &xy,
       p.drawTiledPixmap(mask.rect(),brush.texture(),offset);
       p.end();
    }
-#ifndef QT_NO_XRENDER
-   qPix = OXRender::applyAlpha(qPix, mask);
-#else
-#warning no XRender - performance will suffer!
-   qPix.setAlphaChannel(mask);
-#endif
+   qPix = FX::applyAlpha(qPix, mask);
    painter->drawPixmap(xy, qPix);
 }
 

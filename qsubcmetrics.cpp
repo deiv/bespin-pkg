@@ -144,12 +144,13 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         case SC_GroupBoxLabel:
         {
             QFontMetrics fontMetrics = groupBox->fontMetrics;
+            const bool flat = groupBox->features & QStyleOptionFrameV2::Flat;
             int h = fontMetrics.height() + dpi.f4;
             int tw = fontMetrics.size(BESPIN_MNEMONIC, groupBox->text + QLatin1Char(' ')).width();
-            int marg = (groupBox->features & QStyleOptionFrameV2::Flat) ? 0 : F(4);
+            int marg = flat ? 0 : F(4);
             Qt::Alignment align;
         
-            if ((groupBox->features & QStyleOptionFrameV2::Flat) || config.sunkenGroups)
+            if (flat || config.sunkenGroups)
             {
                 int left = marg;
                 if (groupBox->subControls & SC_GroupBoxCheckBox)
@@ -159,7 +160,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             }
             else
             {
-                ret = groupBox->rect.adjusted(marg, F(4), -marg, 0);
+                ret = groupBox->rect.adjusted(marg, marg, -marg, 0);
                 align = Qt::AlignCenter;
             }
             ret.setHeight(h);

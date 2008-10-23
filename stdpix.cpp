@@ -24,6 +24,7 @@
 
 #include "bespin.h"
 #include "colors.h"
+#include "paths.h"
 
 #define COLOR(_TYPE_) pal.color(QPalette::_TYPE_)
 
@@ -42,7 +43,6 @@ static inline uint qt_intensity(uint r, uint g, uint b)
     // 30% red, 59% green, 11% blue
     return (77 * r + 150 * g + 28 * b) / 255;
 }
-
 
 QPixmap
 Style::standardPixmap(StandardPixmap standardPixmap,
@@ -81,7 +81,6 @@ Style::standardPixmap(StandardPixmap standardPixmap,
 
     const QDockWidget *dock = qobject_cast<const QDockWidget*>(widget);
     const int sz = dock ? 14 : rect.width();
-    const float s2 = sz/2.0, s3 = sz/3.0, s4 = sz/4.0, s6 = sz/6.0;
     QPixmap pm(sz, sz);
     pm.fill(Qt::transparent);
     QPainter painter(&pm);
@@ -91,51 +90,30 @@ Style::standardPixmap(StandardPixmap standardPixmap,
     {
     case SP_DockWidgetCloseButton:
     case SP_TitleBarCloseButton:
-        shape.addRect(0,0,sz,sz);
-        shape.addRect(s4,s4,s2,s2);
-        shape.addRect(s3,s3,s3,s3);
+        shape = Shapes::close(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMinButton:
-        shape.addRect(0,0,sz,sz);
-        shape.addRect(s4,0,sz-s4,sz-s4);
-        shape.addRect(sz-s3,0,s3,s3);
+        shape = Shapes::min(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMaxButton:
-        shape.addRect(0,0,sz,sz);
-        shape.addRect(0,s4,sz-s4,sz-s4);
-        shape.addRect(0,sz-s3,s3,s3);
+        shape = Shapes::max(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMenuButton:
-        shape.addRect(0,0,sz,sz);
-        shape.addRect(0,s4,s2,sz-s4);
+        shape = Shapes::menu(pm.rect(), false, config.newWinBtns);
         goto paint;
     case SP_TitleBarShadeButton:
     case SP_TitleBarUnshadeButton:
-        shape.addRect(0,0,sz,s4);
+        shape = Shapes::shade(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarNormalButton:
         if (dock)
-        {
-            if (dock->isFloating())
-                shape.addRect(0,s4,sz,s2);
-            else
-            {
-                shape.addRect(0,0,s4,2*s3);
-                shape.addRect(s3,s2,sz-s3,sz-s2);
-            }
-        }
+            shape = Shapes::dockControl(pm.rect(), dock->isFloating(), config.newWinBtns);
         else
-        {   // MDI control
-            shape.addRect(0,0,sz,sz);
-            shape.addRect(0,0,sz-s4,sz-s4);
-            shape.addRect(0,0,s3,s3);
-        }
+            shape = Shapes::restore(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarContextHelpButton:
     {
-        shape.addRect(s2-s3,0,s3+s4,sz-s3);
-        shape.addRect(s2-s3,s4,s3,sz-(s3+s4));
-        shape.addRect(s2,sz-s6,s4,s6);
+        shape = Shapes::help(pm.rect(), config.newWinBtns);
 
 paint:
 

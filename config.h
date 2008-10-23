@@ -88,6 +88,8 @@ typedef struct Config
         QPalette::ColorRole std_role[2];
     } progress;
 
+    bool newWinBtns;
+
     float scale;
    
     struct scroll

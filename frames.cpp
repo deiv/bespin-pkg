@@ -193,18 +193,37 @@ Style::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, const 
             painter->setPen(textColor);
             role = QPalette::NoRole;
         }
-        setBold(painter);
+        setTitleFont(painter);
         QStyleOptionGroupBox copy = *groupBox;
         copy.fontMetrics = QFontMetrics(painter->font());
         QRect textRect = subControlRect(CC_GroupBox, &copy, SC_GroupBoxLabel, widget);
-        drawItemText(painter, textRect,  BESPIN_MNEMONIC, groupBox->palette, isEnabled, groupBox->text, role);
-        if (!((groupBox->features & QStyleOptionFrameV2::Flat) || config.sunkenGroups))
+        drawItemText(painter, textRect, BESPIN_MNEMONIC, groupBox->palette, isEnabled, groupBox->text, role);
+        if (groupBox->features & QStyleOptionFrameV2::Flat)
         {
-            int x = textRect.bottom();
-            textRect = RECT; textRect.setTop(x);
-            x = textRect.width()/4;
+            Tile::PosFlags pf = Tile::Center;
+            if (option->direction == Qt::LeftToRight)
+            {
+                textRect.setLeft(RECT.left());
+                textRect.setRight(textRect.right() + (RECT.right()-textRect.right())/2);
+                pf |= Tile::Right;
+            }
+            else
+            {
+                textRect.setRight(RECT.right());
+                textRect.setLeft(textRect.left() - (textRect.left() - RECT.left())/2);
+                pf |= Tile::Left;
+            }
+            shadows.line[0][Sunken].render(textRect, painter, pf, true);
+        
+//             const int x = textRect.right();
+//             textRect.setRight(RECT.right()); textRect.setLeft(x);
+//             shadows.line[0][Sunken].render(textRect, painter, Tile::Center | Tile::Right, true);
+        }
+        else if (!config.sunkenGroups)
+        {
+            const int x = textRect.width()/8;
             textRect.adjust(x,0,-x,0);
-            shadows.line[0][Sunken].render(textRect, painter);
+            shadows.line[0][Sunken].render(textRect, painter, Tile::Full, true);
         }
     }
        

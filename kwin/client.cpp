@@ -47,6 +47,7 @@
 #include "../colors.h"
 #include "../gradients.h"
 #include "../xproperty.h"
+#include "../paths.h"
 #include "resizecorner.h"
 #include "client.h"
 
@@ -355,27 +356,14 @@ Client::repaint(QPainter &p)
         // logo
         if (isActive())
         {
-            c.setAlpha(180);
-            p.setBrush(c);
-            p.setPen(Qt::NoPen);
-            int s = qMin(r.width(), r.height())/2;
+            const int s = qMin(r.width(), r.height())/2;
             QRect logo(0,0,s,s);
-            s /= 4;
             logo.moveCenter(r.center());
-            QPainterPath path;
-            path.moveTo(logo.center());
-            path.arcTo(logo, 90, 270);
-            path.lineTo(logo.right(), logo.y()+4*s/3);
-            path.lineTo(logo.right()-s, logo.y()+4*s/3);
-            path.lineTo(logo.center().x() + s/2, logo.center().y());
-            path.lineTo(logo.center());
-            path.closeSubpath();
-            path.addEllipse(logo.right()-3*s/2, logo.y(), s, s);
-            p.drawPath(path);
+
+            c.setAlpha(180); p.setBrush(c); p.setPen(Qt::NoPen);
+            p.drawPath(Shapes::logo(logo));
         }
-        c.setAlpha(255);
-        p.setPen(c);
-        p.setBrush(Qt::NoBrush);
+        c.setAlpha(255); p.setPen(c); p.setBrush(Qt::NoBrush);
         p.drawText(r, Qt::AlignHCenter | Qt::TextSingleLine | Qt::AlignTop, _caption);
     }
     else if (isShade())

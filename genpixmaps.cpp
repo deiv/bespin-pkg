@@ -161,10 +161,10 @@ groupShadow(int size)
     p.setRenderHint(QPainter::Antialiasing);
     p.setPen(Qt::NoPen);
 
-    DRAW_ROUND_ALPHA_RECT(5, 0, 0, size, 14);
-    DRAW_ROUND_ALPHA_RECT(9, F(1), F(1), size-F(2), 13);
-    DRAW_ROUND_ALPHA_RECT(11, F(2), F(2), size-F(4), 12);
-    DRAW_ROUND_ALPHA_RECT(13, F(3), F(3), size-F(6), 48);
+    DRAW_ROUND_ALPHA_RECT(5, 0, 0, size, 48);
+    DRAW_ROUND_ALPHA_RECT(9, F(1), F(1), size-F(2), 32);
+    DRAW_ROUND_ALPHA_RECT(11, F(2), F(2), size-F(4), 20);
+    DRAW_ROUND_ALPHA_RECT(13, F(3), F(3), size-F(6), 12);
     
     p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
     p.setBrush(QColor(0,0,0,0)); p.DRAW_ROUND_RECT(F(4), F(2), size-F(8), ss, 6, 11);

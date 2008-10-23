@@ -257,6 +257,8 @@ Style::readSettings(const QSettings* settings)
     config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);
     config.menu.activeItemSunken = config.menu.itemSunken || readBool(MENU_ACTIVEITEMSUNKEN);
 
+    config.newWinBtns = true;
+
     // Progress ===========================
     GRAD(progress) = readGrad(PROGRESS_GRADIENT);
     config.progress.std_role[Bg] =  (QPalette::ColorRole) readInt(PROGRESS_ROLE_BG);

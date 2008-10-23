@@ -498,7 +498,7 @@ Style::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter, const 
     QColor cB = FCOLOR(Window), cF = FCOLOR(WindowText);
     painter->save();
     if (selected)
-        setTitle(painter);
+        setTitleFont(painter);
     else if (!sunken)
         { cB = CCOLOR(tab.std, Bg); cF = CCOLOR(tab.std, Fg); }
 

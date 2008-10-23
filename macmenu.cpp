@@ -161,6 +161,13 @@ MacMenu::activate(QMenuBar *menu)
             title = title.mid(i, name.length());
     }
     title = title.section(" - ", -1);
+    if (title.isEmpty())
+    {
+        if (!menu->actions().isEmpty())
+            title = menu->actions().at(0)->text();
+        if (title.isEmpty())
+            title = "QApplication";
+    }
     
     // register the menu via dbus
     QStringList entries;

@@ -255,7 +255,8 @@ bool Factory::readConfig()
         buttonSize_ = titleSize_[1]-4; // for the moment
         buttonSize_ += buttonSize_ % 2;
         Button::init( buttonSize_, options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
-                                                settings.value("IAmMyLittleSister", false).toBool());
+                                                settings.value("IAmMyLittleSister", false).toBool(),
+                                                settings.value("RoundButtons", true).toBool());
     }
 
     return ret;
