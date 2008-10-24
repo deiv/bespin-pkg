@@ -16,6 +16,12 @@
    Boston, MA 02110-1301, USA.
  */
 
+ /**
+ erhem... just noticed and in case you should wonder:
+ this is NOT derived from the Oxygen style, but rather kinda vice versa.
+ so i'm not forgetting credits. period.
+ */
+
 #include <QPainter>
 #include <cmath>
 #include "oxrender.h"

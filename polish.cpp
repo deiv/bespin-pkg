@@ -350,6 +350,10 @@ Style::polish( QWidget * widget )
         }
         //END Popup menu handling                                                                  -
 
+        /// WORKAROUND for krunner's white flicker showup bg...
+        else if (appType == KRunner && widget->inherits("Interface"))
+            widget->setAttribute(Qt::WA_NoSystemBackground);
+
         /// WORKAROUND Qt color bug, uses daddies palette and FGrole, but TooltipBase as background
         else if (widget->inherits("QWhatsThat"))
             widget->setPalette(QToolTip::palette()); // so this is Qt bug WORKAROUND

@@ -207,14 +207,16 @@ Style::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidge
 }
 
 #define PAINT_WINDOW_BUTTON(_btn_) {\
-   tmpOpt.rect =\
-      subControlRect(CC_TitleBar, tb, SC_TitleBar##_btn_##Button, widget);\
-   if (!tmpOpt.rect.isNull()) { \
-      if (tb->activeSubControls & SC_TitleBar##_btn_##Button)\
-         tmpOpt.state = tb->state;\
-      else\
-         tmpOpt.state &= ~(State_Sunken | State_MouseOver);\
-      painter->drawPixmap(tmpOpt.rect.topLeft(), standardPixmap(SP_TitleBar##_btn_##Button, &tmpOpt, widget));\
+    tmpOpt.rect = subControlRect(CC_TitleBar, tb, SC_TitleBar##_btn_##Button, widget);\
+    if (!tmpOpt.rect.isNull())\
+    { \
+        if (tb->activeSubControls & SC_TitleBar##_btn_##Button)\
+            tmpOpt.state = tb->state;\
+        else\
+            tmpOpt.state &= ~(State_Sunken | State_MouseOver);\
+        if (!(tmpOpt.state & State_MouseOver))\
+            tmpOpt.rect.adjust(F(2), F(2), -F(2), -F(2));\
+        painter->drawPixmap(tmpOpt.rect.topLeft(), standardPixmap(SP_TitleBar##_btn_##Button, &tmpOpt, widget));\
    }\
 }
 

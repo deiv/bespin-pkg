@@ -121,6 +121,8 @@ Client::addButtons(const QString& s, int &sz, bool left)
         case 'F': // Keep Above
         case 'B': // Keep Below
         case 'L': // Shade button
+            if (factory()->multiButtons().isEmpty())
+                continue; // no button to insert
             type = Button::Multi; break;
         case 'I': // Minimize
             type = Button::Min; break;
@@ -749,12 +751,16 @@ Client::reset(unsigned long changed)
     {
         // buttons[i]->isOnTitleBar att indicates a left side button
         for (int i = 0; i < 4; ++i)
+        {
+            if (!buttons[i])
+                continue;
             if (bgMode == 1)
                 buttons[i]->isOnTitleBar = !gType[true];
             else
                 buttons[i]->isOnTitleBar = !gType[true] ||
                                            (!buttons[i]->isOnTitleBar && buttonSpaceLeft >= buttonSpaceRight) ||
                                            (buttons[i]->isOnTitleBar && buttonSpaceLeft < buttonSpaceRight);
+        }
     }
 
     if (changed)

@@ -86,59 +86,64 @@ KDecoration* Factory::createDecoration(KDecorationBridge* b)
 
 bool Factory::reset(unsigned long changed)
 {
-	initialized_ = false;
-	const bool configChanged = readConfig();
-   initialized_ = true;
+    initialized_ = false;
+    const bool configChanged = readConfig();
+    initialized_ = true;
 
-	if (configChanged ||
-		(changed & (SettingDecoration | SettingButtons | SettingBorder))) {
-		return true;
-	}
-	else {
-		resetDecorations(changed);
-		return false;
-	}
+    if (configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder)))
+    {
+        return true;
+    }
+    else
+    {
+        resetDecorations(changed);
+        return false;
+    }
 }
 
 static void
 multiVector(const QString & string, QVector<Button::Type> &vector)
 {
-   Button::Type type; vector.clear();
-   for (int i = 0; i < string.length(); ++i) {
-      switch (string.at(i).toAscii()) {
-         case 'M': type = Button::Menu; break;
-         case 'S': type = Button::Stick; break;
-         case 'H': type = Button::Help; break;
-         case 'F': type = Button::Above; break;
-         case 'B': type = Button::Below; break;
-         case 'L': type = Button::Shade; break;
-         case 'E': type = Button::Exposee; break;
-         case '!': type = Button::Info; break;
-         default: continue;
-      }
-      vector.append(type);
-   }
+    Button::Type type; vector.clear();
+    for (int i = 0; i < string.length(); ++i)
+    {
+        switch (string.at(i).toAscii())
+        {
+        case 'M': type = Button::Menu; break;
+        case 'S': type = Button::Stick; break;
+        case 'H': type = Button::Help; break;
+        case 'F': type = Button::Above; break;
+        case 'B': type = Button::Below; break;
+        case 'L': type = Button::Shade; break;
+        case 'E': type = Button::Exposee; break;
+        case '!': type = Button::Info; break;
+        default: continue;
+        }
+        vector.append(type);
+    }
 }
 
 static QString
 multiString(const QVector<Button::Type> &vector)
 {
-   QString string; char c;
-   for (int i = 0; i < vector.size(); ++i) {
-      switch (vector.at(i)) {
-         case Button::Menu: c = 'M'; break;
-         case Button::Stick: c = 'S'; break;
-         case Button::Help: c = 'H'; break;
-         case Button::Above: c = 'F'; break;
-         case Button::Below: c = 'B'; break;
-         case Button::Shade: c = 'L'; break;
-         case Button::Exposee: c = 'E'; break;
-         case Button::Info: c = '!'; break;
-         default: continue;
-      }
-      string.append(c);
-   }
-   return string;
+    QString string; char c;
+    for (int i = 0; i < vector.size(); ++i)
+    {
+        switch (vector.at(i))
+        {
+        case Button::Menu: c = 'M'; break;
+        case Button::Stick: c = 'S'; break;
+        case Button::Help: c = 'H'; break;
+        case Button::Above: c = 'F'; break;
+        case Button::Below: c = 'B'; break;
+        case Button::Shade: c = 'L'; break;
+        case Button::Exposee: c = 'E'; break;
+        case Button::Info: c = '!'; break;
+        default: continue;
+        }
+        string.append(c);
+    }
+    return string;
 }
 
 bool Factory::readConfig()
