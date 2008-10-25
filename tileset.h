@@ -65,13 +65,8 @@ public:
     Set()
     {
         setDefaultShape(Ring);
-        _clipOffset[0] = _clipOffset[1] = _clipOffset[2] = _clipOffset[3] = 0;
         _hasCorners = false;
     }
-
-    QRect bounds(const QRect &rect, PosFlags pf = Full) const;
-
-    QRegion clipRegion(const QRect &rect, PosFlags pf = Ring) const;
 
     const QPixmap &corner(PosFlags pf) const;
 
@@ -120,8 +115,6 @@ public:
     inline int
     width(Section sect) const { return pixmap[sect].width(); }
 
-    void setClipOffsets(uint left, uint top, uint right, uint bottom);
-
     inline void
     setDefaultShape(PosFlags pf) { _defShape = pf; }
 
@@ -132,13 +125,11 @@ protected:
    QPixmap pixmap[9];
    PosFlags _defShape;
 private:
-   int _clipOffset[4];
    bool _isBitmap, _hasCorners;
    QRect rndRect;
 };
 
 PosFlags shape();
-void setPreferClip(bool b);
 void setShape(PosFlags pf);
 void setSolidBackground(const QColor &c);
 void reset();

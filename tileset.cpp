@@ -27,6 +27,8 @@
 #include "oxrender.h"
 #include "tileset.h"
 
+#include <QtDebug>
+
 using namespace Tile;
 
 // some static elements (benders)
@@ -36,31 +38,52 @@ static const QPixmap *_texPix = 0;
 static const QColor *_texColor = 0;
 static const QColor *_bgColor = 0;
 static const QPoint *_offset = 0;
-static bool _preferClip = true;
 
 // static functions
 PosFlags Tile::shape() { return _shape; }
-void Tile::setPreferClip(bool b) { _preferClip = b; }
 void Tile::setSolidBackground(const QColor &c) { _bgColor = &c; }
 void Tile::setShape(PosFlags pf) { _shape = pf; }
 void Tile::reset()
 {
     _shape = 0;
     _bgColor = 0;
-    _preferClip = true;
 }
 
-static bool isEmpty(const QPixmap &pix)
+static void
+simplify(QPixmap &pix)
 {
     if (!pix.hasAlpha())
-        return false;
+        return;
+        
+    bool translucent = false, content = false;
     QImage img =  pix.toImage();
     uint *data = ( uint * ) img.bits();
     int total = img.width() * img.height();
-    for ( int current = 0 ; current < total ; ++current )
-        if (qAlpha(data[ current ]))
-            return false;
-    return true;
+    int alpha;
+    for (int current = 0 ; current < total ; ++current)
+    {
+        alpha = qAlpha(data[ current ]);
+        if (alpha)
+        {
+            content = true;
+            if (alpha < 255)
+            {
+                translucent = true;
+                break;
+            }
+        }
+    }
+
+    if (!content)
+        pix = QPixmap();
+    else if (!translucent)
+    {
+        QPixmap tmp(pix.size());
+        QPainter p(&tmp);
+        p.drawPixmap(0,0, pix);
+        p.end();
+        pix = tmp;
+    }
 }
 #if 0
 static QPixmap invertAlpha(const QPixmap & pix)
@@ -82,13 +105,10 @@ static QPixmap invertAlpha(const QPixmap & pix)
 Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round)
 {
     if (pix.isNull())
-    {
-        _isBitmap = false;
-        return;
-    }
+        { _isBitmap = false; return; }
+        
     _isBitmap = pix.isQBitmap();
-    int w = qMax(1, width),
-        h = qMax(1, height);
+    int w = qMax(1, width), h = qMax(1, height);
 
     int i = xOff*2*round/100;
     rndRect = QRect(i, i, i, i);
@@ -105,27 +125,25 @@ Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int roun
 
 #define DUMP(_SECTION_, _WIDTH_, _HEIGHT_, _X_, _Y_, _W_, _H_)\
 dump = pix.copy(_X_, _Y_, _W_, _H_);\
-if (isEmpty(dump))\
-    pixmap[_SECTION_] = QPixmap();\
-else\
+simplify(dump);\
+if (!dump.isNull())\
 {\
-    pixmap[_SECTION_] = transSrc.copy(0,0,_WIDTH_, _HEIGHT_);\
+    if (dump.hasAlphaChannel())\
+        pixmap[_SECTION_] = transSrc.copy(0,0,_WIDTH_, _HEIGHT_);\
+    else\
+        pixmap[_SECTION_] = QPixmap(_WIDTH_, _HEIGHT_);\
     p.begin(&pixmap[_SECTION_]);\
     p.drawTiledPixmap(pixmap[_SECTION_].rect(), dump);\
     p.end();\
-}//
-
-#define VALIDATE(_SECTION_)\
-if (isEmpty(pixmap[_SECTION_]))\
-    pixmap[_SECTION_] = QPixmap()
+} //
 
     pixmap[TopLeft] = pix.copy(0, 0, xOff, yOff);
-    VALIDATE(TopLeft);
+    simplify(pixmap[TopLeft]);
 
     DUMP(TopMid,   tileWidth, yOff,   xOff, 0, w, yOff);
 
     pixmap[TopRight] = pix.copy(xOff+w, 0, rOff, yOff);
-    VALIDATE(TopRight);
+    simplify(pixmap[TopRight]);
 
     //----------------------------------
     DUMP(MidLeft,   xOff, tileHeight,   0, yOff, xOff, h);
@@ -134,14 +152,13 @@ if (isEmpty(pixmap[_SECTION_]))\
     //----------------------------------
 
     pixmap[BtmLeft] = pix.copy(0, yOff+h, xOff, bOff);
-    VALIDATE(BtmLeft);
+    simplify(pixmap[BtmLeft]);
 
     DUMP(BtmMid,   tileWidth, bOff,   xOff, yOff+h, w, bOff);
 
     pixmap[BtmRight] = pix.copy(xOff+w, yOff+h, rOff, bOff);
-    VALIDATE(BtmRight);
+    simplify(pixmap[BtmRight]);
 
-    _clipOffset[0] = _clipOffset[2] = _clipOffset[1] = _clipOffset[3] = 0;
     _hasCorners = !pix.isNull();
     _defShape = Full;
 #undef initPixmap
@@ -204,26 +221,6 @@ if (!tile->isNull())\
 } // skip semicolon
 
     PosFlags pf = _shape ? _shape : _defShape;
-   
-    if (_preferClip && (_texPix || _texColor) && (pf & Center))
-    {   // first the inner region
-        //NOTE: using full alphablend can become enourmously slow due to VRAM size -
-        // even on HW that has Render acceleration!
-        p->save();
-        p->setClipRegion(clipRegion(r, pf), Qt::IntersectClip);
-        if (_texPix)
-            p->drawTiledPixmap(r, *_texPix, _offset ? *_offset : QPoint());
-        else // if (_texColor)
-            p->fillRect(r, *_texColor);
-//       else // this is nonsense... just i don't forget :)
-//          p->drawTiledPixmap(r, pixmap[MidMid]);
-        p->restore();
-
-        if (!_hasCorners)
-            return;
-
-        pf &= ~Center;
-    }
 
     QPixmap filledPix, solidPix; QPainter pixPainter;
     const QColor *solidBg = 0;
@@ -265,6 +262,11 @@ if (!tile->isNull())\
     QRect checkRect;
     const bool unclipped = !p->hasClipping() || p->clipRegion().isEmpty();
 #define UNCLIPPED (unclipped || p->clipRegion().intersects(checkRect))
+
+#define NEED_RECT_FILL(_TILE_)\
+_texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
+(_texPix->width() > pixmap[_TILE_].width() && checkRect.width() > pixmap[_TILE_].width()) ||\
+(_texPix->height() > pixmap[_TILE_].height() && checkRect.height() > pixmap[_TILE_].height()))
    
     if (pf & Top)
     {
@@ -297,11 +299,16 @@ if (!tile->isNull())\
         checkRect.setRect(xOff, r.y(), w, tlh);
         if (w > 0 && !pixmap[TopMid].isNull() && UNCLIPPED)
         {   // upper line
-            solidBg = _bgColor;
-            tile = &pixmap[TopMid];
-            MAKE_FILL(QPoint(xOff, r.y()));
-            p->drawTiledPixmap(checkRect, *tile);
-            solidBg = 0;
+            if (NEED_RECT_FILL(TopMid))
+                p->drawTiledPixmap(checkRect, *_texPix, QPoint(xOff, r.y()) - off);
+            else
+            {
+                solidBg = _bgColor;
+                tile = &pixmap[TopMid];
+                MAKE_FILL(QPoint(xOff, r.y()));
+                p->drawTiledPixmap(checkRect, *tile);
+                solidBg = 0;
+            }
         }
     }
     
@@ -336,41 +343,63 @@ if (!tile->isNull())\
         checkRect.setRect(xOff, bOff, w, blh);
         if (w > 0 && !pixmap[BtmMid].isNull() && UNCLIPPED)
         {   // lower line
-            solidBg = _bgColor;
-            tile = &pixmap[BtmMid];
-            MAKE_FILL(QPoint(xOff, bOff));
-            p->drawTiledPixmap(checkRect, *tile, QPoint(0, height(BtmMid) - blh));
-            solidBg = 0;
+            if (NEED_RECT_FILL(TopMid))
+                p->drawTiledPixmap(checkRect, *_texPix, QPoint(xOff, bOff) - off);
+            else
+            {
+                solidBg = _bgColor;
+                tile = &pixmap[BtmMid];
+                MAKE_FILL(QPoint(xOff, bOff));
+                p->drawTiledPixmap(checkRect, *tile, QPoint(0, height(BtmMid) - blh));
+                solidBg = 0;
+            }
         }
     }
-   
+
     if (h > 0)
     {
         checkRect.setRect(xOff, yOff, w, h);
-        if ((pf & Center) && (w > 0) && UNCLIPPED)
+        if ((pf & Center) && (w > 0) && !pixmap[MidMid].isNull() && UNCLIPPED)
         {   // center part
-            tile = &pixmap[MidMid];
-            MAKE_FILL(QPoint(xOff, yOff));
-            p->drawTiledPixmap(checkRect, *tile);
+            if (NEED_RECT_FILL(MidMid))
+                p->drawTiledPixmap(checkRect, *_texPix, QPoint(xOff, yOff) - off);
+            else
+            {
+                tile = &pixmap[MidMid];
+                MAKE_FILL(QPoint(xOff, yOff));
+                p->drawTiledPixmap(checkRect, *tile);
+            }
         }
+        
         checkRect.setRect(r.x(), yOff, width(MidLeft), h);
-        if (pf & Left && !pixmap[MidLeft].isNull() && UNCLIPPED)
+        if ((pf & Left) && !pixmap[MidLeft].isNull() && UNCLIPPED)
         {
-            solidBg = _bgColor;
-            tile = &pixmap[MidLeft];
-            MAKE_FILL(QPoint(r.x(), yOff));
-            p->drawTiledPixmap(checkRect, *tile);
-            solidBg = 0;
+            if (NEED_RECT_FILL(MidLeft))
+                p->drawTiledPixmap(checkRect, *_texPix, QPoint(r.x(), yOff) - off);
+            else
+            {
+                solidBg = _bgColor;
+                tile = &pixmap[MidLeft];
+                MAKE_FILL(QPoint(r.x(), yOff));
+                p->drawTiledPixmap(checkRect, *tile);
+                solidBg = 0;
+            }
         }
+        
         checkRect.setRect(rOff, yOff, width(MidRight), h);
-        if (pf & Right && !pixmap[MidRight].isNull() && UNCLIPPED)
+        if ((pf & Right) && !pixmap[MidRight].isNull() && UNCLIPPED)
         {
-            solidBg = _bgColor;
-            tile = &pixmap[MidRight];
-            rOff = r.right()-width(MidRight)+1;
-            MAKE_FILL(QPoint(rOff, yOff));
-            p->drawTiledPixmap(checkRect, *tile);
-            solidBg = 0;
+            if (NEED_RECT_FILL(MidRight))
+                p->drawTiledPixmap(checkRect, *_texPix, QPoint(rOff, yOff) - off);
+            else
+            {
+                solidBg = _bgColor;
+                tile = &pixmap[MidRight];
+                rOff = r.right()-width(MidRight)+1;
+                MAKE_FILL(QPoint(rOff, yOff));
+                p->drawTiledPixmap(checkRect, *tile);
+                solidBg = 0;
+            }
         }
     }
 
@@ -467,32 +496,6 @@ Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
     p->restore();
 }
 
-void Set::setClipOffsets(uint left, uint top, uint right, uint bottom) {
-   _clipOffset[0] = left;
-   _clipOffset[2] = -right;
-   _clipOffset[1] = top;
-   _clipOffset[3] = -bottom;
-   
-   if (!left) pixmap[MidLeft] = QPixmap();
-   if (!right) pixmap[MidRight] = QPixmap();
-   if (!top) pixmap[TopMid] = QPixmap();
-   if (!bottom) pixmap[BtmMid] = QPixmap();
-}
-
-QRect Set::bounds(const QRect &rect, PosFlags pf) const
-{
-   QRect ret = rect;
-   if (pf & Left)
-      ret.setLeft(ret.left()+_clipOffset[0]);
-   if (pf & Top)
-      ret.setTop(ret.top()+_clipOffset[1]);
-   if (pf & Right)
-      ret.setRight(ret.right()+_clipOffset[2]);
-   if (pf & Bottom)
-      ret.setBottom(ret.bottom()+_clipOffset[3]);
-   return ret;
-}
-
 const QPixmap &Set::corner(PosFlags pf) const
 {
    if (pf == (Top | Left))
@@ -506,35 +509,6 @@ const QPixmap &Set::corner(PosFlags pf) const
 
    qWarning("requested impossible corner %d",pf);
    return nullPix;
-}
-
-QRegion Set::clipRegion(const QRect &rect, PosFlags pf) const
-{
-   QRegion ret(rect.adjusted(_clipOffset[0], _clipOffset[1],
-                             _clipOffset[2], _clipOffset[3]));
-   int w,h;
-   if (matches(Top | Left, pf)) {
-      ret -= QRect(rect.x(), rect.y(), width(TopLeft), height(TopLeft));
-   }
-   if (matches(Top | Right, pf)) {
-      w = width(TopRight);
-      ret -= QRect(rect.right()-w+1, rect.y(), w, height(TopRight));
-   }
-   if (matches(Bottom | Left, pf)) {
-      h = height(BtmLeft);
-      ret -= QRect(rect.x(), rect.bottom()-h+1, width(BtmLeft), h);
-   }
-   if (matches(Bottom | Right, pf)) {
-      w = width(BtmRight); h = height(BtmRight);
-      ret -= QRect(rect.right()-w+1, rect.bottom()-h+1, w, h);
-   }
-   if (!matches(Center, pf))
-      ret &=
-      QRegion(rect).subtracted(rect.adjusted(_clipOffset[0],
-                                             _clipOffset[1],
-                                             _clipOffset[2],
-                                             _clipOffset[3]));
-   return ret;
 }
 
 void

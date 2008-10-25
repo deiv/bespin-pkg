@@ -620,6 +620,7 @@ Style::polish( QWidget * widget )
         widget->inherits("QDockWidget") || widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("Q3DockWindowResizeHandle"))
         widget->setAttribute(Qt::WA_Hover);
+#if 0 // does not work for all plasma versions...
     else if (appType == KRunner && widget->inherits("KLineEdit") &&
              widget->parentWidget() && widget->parentWidget()->inherits("KHistoryComboBox"))
     {
@@ -650,6 +651,7 @@ Style::polish( QWidget * widget )
             QFont fnt = widget->font(); fnt.setBold(true); widget->setFont(fnt);
         }
     }
+#endif
 
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
     QMenuBar *mbar = qobject_cast<QMenuBar *>(widget);

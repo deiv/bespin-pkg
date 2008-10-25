@@ -42,7 +42,6 @@ renderButtonLight(Tile::Set &set)
    p.drawRoundRect(F(3),F(3),f9-2*F(3),f9-2*F(3),60,60);
    p.end();
    set = Tile::Set(*pix,f9_2,f9_2,f9-2*f9_2,f9-2*f9_2);
-   set.setClipOffsets(F(3), F(3), F(3), F(3));
    set.setDefaultShape(Tile::Ring);
    delete pix;
 }
@@ -228,7 +227,6 @@ Style::generatePixmaps()
         else
             { s = f9; r = 70; }
         masks.rect[i] = Tile::Set(roundedMask(s, r),s/2,s/2,1,1, r);
-        masks.rect[i].setClipOffsets(0,0,0,0);
     }
 
     // SHADOWS ===============================
@@ -302,7 +300,6 @@ Style::generatePixmaps()
     {
         int s = r ? f17 : f11;
         lights.rect[r] = Tile::Set(shadow(s, true, false, 3.0), s/2,s/2,1,1);
-        lights.rect[r].setClipOffsets(F(3),F(3),F(3),F(3));
         lights.rect[r].setDefaultShape(Tile::Ring);
     }
 

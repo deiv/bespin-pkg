@@ -682,7 +682,10 @@ Gradients::bgSet(const QColor &c)
         p.end();
 
         if (Colors::value(c) > 244)
+        {
+            set->cornerTile = set->lCorner = set->rCorner = QPixmap();
             break; // would be mathematically nonsense, i.e. shoulders = 255...
+        }
 
         // Corner Tile
         lg = QLinearGradient(QPoint(0,0), QPoint(0,128));

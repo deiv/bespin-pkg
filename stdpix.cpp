@@ -88,14 +88,38 @@ Style::standardPixmap(StandardPixmap standardPixmap,
 
     switch (standardPixmap)
     {
+//         case SP_ArrowBack:
+//         case SP_ArrowLeft:
+//         case SP_ArrowRight:
+//         case SP_ArrowForward:
+//         case SP_MediaPlay:
+//             shape.moveTo(pm.rect().center());
+//             shape.arcTo(pm.rect(), standardPixmap == SP_ArrowLeft ? 90 :270, 180);
+//             shape.closeSubpath();
+//             goto paint;
+//         case SP_MediaPause:
+//             shape = Shapes::unAboveBelow(pm.rect());
+//             goto paint;
+//         SP_BrowserReload    58  Icon indicating that the current page should be reloaded.
+//         SP_MediaSkipForward 63  Icon indicating that media should skip forward.
+//         SP_MediaSkipBackward    64  Icon indicating that media should skip backward.
+//         SP_MediaSeekForward 65  Icon indicating that media should seek forward.
+//         SP_MediaSeekBackward    66  Icon indicating that media should seek backward.
+//         SP_MediaVolume  67  Icon indicating a volume control.
+//         SP_MediaVolumeMuted
+
     case SP_DockWidgetCloseButton:
     case SP_TitleBarCloseButton:
+//     case SP_BrowserStop:
+//     case SP_MediaStop:
         shape = Shapes::close(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMinButton:
+//     case SP_ArrowDown:
         shape = Shapes::min(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMaxButton:
+//     case SP_ArrowUp:
         shape = Shapes::max(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMenuButton:

@@ -503,7 +503,7 @@ Style::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter, const 
         { cB = CCOLOR(tab.std, Bg); cF = CCOLOR(tab.std, Fg); }
 
     // on dark background, let's paint an emboss
-    const uint tf = Qt::AlignHCenter | Qt::AlignBottom | BESPIN_MNEMONIC;
+    const uint tf = Qt::AlignHCenter | (selected ? Qt::AlignBottom : Qt::AlignVCenter) | BESPIN_MNEMONIC;
     if (isEnabled && Colors::value(cB) < 100)
     {
         QRect tr = RECT;

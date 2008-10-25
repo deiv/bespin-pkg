@@ -57,9 +57,10 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
         painter->fillRect(RECT, FCOLOR(Base));
         return;
     }
-
+#if 0 // does not work for all plasma versions...
     if (appType == KRunner && widget && widget->inherits("KHistoryComboBox"))
         return;
+#endif
 
     OPT_ENABLED OPT_FOCUS
 
@@ -82,7 +83,7 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
             r.setBottom(r.y() + r.height()/2);
             Tile::setShape(Tile::Full & ~Tile::Bottom);
             mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
-            r.setTop(r.bottom()+1); r.setBottom(RECT.bottom()-dpi.f2);
+            r.setTop(r.bottom()); r.setBottom(RECT.bottom()-F(2));
             Tile::setShape(Tile::Full & ~Tile::Top);
             QColor bg = FCOLOR(Base);
             int v = Colors::value(bg);
