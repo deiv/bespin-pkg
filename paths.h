@@ -16,6 +16,9 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA.
 */
 
+#ifndef PATHS_H
+#define PATHS_H
+
 class QPainterPath;
 class QRectF;
 
@@ -42,3 +45,5 @@ namespace Shapes
     QPainterPath logo(const QRectF &bound);
 }
 }
+#endif // PATHS_H
+
