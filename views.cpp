@@ -472,18 +472,14 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
     if (hover || selected)
     {
         // NOTE: single list/treeviews are typically single selected - but amarok doesn't set this..
-        const bool single = qobject_cast<const QTreeView*>(view) ||
-                            view && view->selectionMode() == QAbstractItemView::SingleSelection;
-        const bool round =  !single && (
+        const QTreeView *tree = qobject_cast<const QTreeView*>(view);
+        const bool single =  tree || view && view->selectionMode() == QAbstractItemView::SingleSelection;
+        bool round = !tree; // looks ultimatly CRAP!
 #if QT_VERSION >= 0x040400
-                            item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne ||
+        if  (item->viewItemPosition != QStyleOptionViewItemV4::OnlyOne)
+            round = false;
 #endif
-#if 0 // current dolphin does right =D
-                            // WORKAROUND, dolphin should please use the proper position flag...
-                            (appType == Dolphin && widget && widget->inherits("DolphinIconsView")));
-#else
-                            false);
-#endif
+
         Gradients::Type gt = Gradients::None;
         if (round)
         {

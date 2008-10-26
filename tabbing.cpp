@@ -442,7 +442,7 @@ Style::drawToolboxTab(const QStyleOption *option, QPainter *painter,
 }
 
 void
-Style::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const QWidget *) const
+Style::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     if (option->state & State_Selected)
         return; // plain selected items
@@ -462,6 +462,7 @@ Style::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const 
         default: // single
             r.setBottom(r.bottom()-dpi.f2);
         }
+
         // means we touch the displayed box bottom
         switch (tbt->selectedPosition)
         {
@@ -471,6 +472,21 @@ Style::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const 
         case QStyleOptionToolBoxV2::NextIsSelected:
             pf |= Tile::Bottom; break;
         default: break;
+        }
+
+        // handle window relative position
+        if (widget)
+        if (QWidget *win = widget->window())
+        {
+            QRect winRect = win->rect();
+            winRect.moveTopLeft(widget->mapFrom(win, winRect.topLeft()));
+            if (RECT.width() >= winRect.width())
+                pf &= ~(Tile::Left | Tile::Right);
+            else
+            {
+                if (RECT.left() <= winRect.left()) pf &= ~Tile::Left;
+                if (RECT.right() >= winRect.right()) pf &= ~Tile::Right;
+            }
         }
     }
 

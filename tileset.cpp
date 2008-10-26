@@ -36,17 +36,14 @@ static QPixmap nullPix;
 static PosFlags _shape = 0;
 static const QPixmap *_texPix = 0;
 static const QColor *_texColor = 0;
-static const QColor *_bgColor = 0;
 static const QPoint *_offset = 0;
 
 // static functions
 PosFlags Tile::shape() { return _shape; }
-void Tile::setSolidBackground(const QColor &c) { _bgColor = &c; }
 void Tile::setShape(PosFlags pf) { _shape = pf; }
 void Tile::reset()
 {
     _shape = 0;
-    _bgColor = 0;
 }
 
 static void
@@ -209,21 +206,11 @@ if (!tile->isNull())\
             filledPix = FX::tint(*tile, *_texColor);\
         tile = &filledPix;\
     }\
-    if (solidBg)\
-    {\
-        if (solidPix.size() != tile->size())\
-            solidPix = QPixmap(tile->size());\
-        solidPix.fill(*solidBg);\
-        pixPainter.begin(&solidPix);\
-        pixPainter.drawPixmap(0,0, *tile); pixPainter.end();\
-        tile = &solidPix;\
-    }\
 } // skip semicolon
 
     PosFlags pf = _shape ? _shape : _defShape;
 
-    QPixmap filledPix, solidPix; QPainter pixPainter;
-    const QColor *solidBg = 0;
+    QPixmap filledPix; QPainter pixPainter;
 
     QPoint off = r.topLeft();
     if (_offset)
@@ -249,8 +236,9 @@ if (!tile->isNull())\
     }
     if (pf & Right)
     {
+        rOff = r.right()-trw+1;
         w -= width(TopRight);
-        if (matches(Top | Bottom, pf) && trh + brh > r.height())
+        if (pf & (Top | Bottom) && trh + brh > r.height())
         {   // vertical edge overlap
             trh = (trh*r.height())/(trh+brh);
             brh = r.height() - trh;
@@ -276,7 +264,6 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
             trw = r.width() - tlw;
         }
 
-        rOff = r.right()-trw+1;
         yOff += tlh;
         h -= tlh;
 
@@ -303,11 +290,9 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
                 p->drawTiledPixmap(checkRect, *_texPix, QPoint(xOff, r.y()) - off);
             else
             {
-                solidBg = _bgColor;
                 tile = &pixmap[TopMid];
                 MAKE_FILL(QPoint(xOff, r.y()));
                 p->drawTiledPixmap(checkRect, *tile);
-                solidBg = 0;
             }
         }
     }
@@ -321,7 +306,6 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
         }
 
         int bOff = r.bottom()-blh+1;
-        rOff = r.right()-brw+1;
         h -= blh;
 
         checkRect.setRect(r.x(), bOff, blw, blh);
@@ -347,11 +331,9 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
                 p->drawTiledPixmap(checkRect, *_texPix, QPoint(xOff, bOff) - off);
             else
             {
-                solidBg = _bgColor;
                 tile = &pixmap[BtmMid];
                 MAKE_FILL(QPoint(xOff, bOff));
                 p->drawTiledPixmap(checkRect, *tile, QPoint(0, height(BtmMid) - blh));
-                solidBg = 0;
             }
         }
     }
@@ -378,11 +360,9 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
                 p->drawTiledPixmap(checkRect, *_texPix, QPoint(r.x(), yOff) - off);
             else
             {
-                solidBg = _bgColor;
                 tile = &pixmap[MidLeft];
                 MAKE_FILL(QPoint(r.x(), yOff));
                 p->drawTiledPixmap(checkRect, *tile);
-                solidBg = 0;
             }
         }
         
@@ -393,12 +373,10 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
                 p->drawTiledPixmap(checkRect, *_texPix, QPoint(rOff, yOff) - off);
             else
             {
-                solidBg = _bgColor;
                 tile = &pixmap[MidRight];
                 rOff = r.right()-width(MidRight)+1;
                 MAKE_FILL(QPoint(rOff, yOff));
                 p->drawTiledPixmap(checkRect, *tile);
-                solidBg = 0;
             }
         }
     }

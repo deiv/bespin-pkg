@@ -113,12 +113,7 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
     if (brush)
         mask->render(rect, painter, *brush);
     if (shadow)
-    {
-//       if (brush) // nahhh - didn't work too good...
-//          Tile::setSolidBackground(*brush);
         shadow->render(RECT, painter);
-//       Tile::reset();
-    }
     else
     {   // plain frame
         //horizontal

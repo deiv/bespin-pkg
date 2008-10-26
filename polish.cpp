@@ -432,7 +432,7 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                // NOTE: WORKAROUND for (no more) dolphin and probably others:
+                /// NOTE: WORKAROUND for (no more) dolphin and probably others:
                 // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
                 // force this here, hoping it won't cause to many problems - and make a bug report
                 QWidget *vp = itemView->viewport();
@@ -445,6 +445,8 @@ Style::polish( QWidget * widget )
                     pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
                     itemView->setPalette(pal);
                 }
+
+//                 if (itemView->inherits("KCategorizedView"))
 
                 if (!qobject_cast<QTreeView*>(itemView))
                 {   // Enable hover effects in listview, treeview hovering sucks, as the "tree" doesn't get an update
