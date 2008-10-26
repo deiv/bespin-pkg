@@ -505,6 +505,8 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
             else
                 painter->drawTiledPixmap(RECT, fill);
         }
+        // try to convince the itemview to use the proper fg color, WORKAROUND (kcategorizedview, mainly)
+        painter->setPen(FCOLOR(HighlightedText));
     }
 #if QT_VERSION >= 0x040400
 #warning Compiling with Qt4.4 - do NOT use with lower versions

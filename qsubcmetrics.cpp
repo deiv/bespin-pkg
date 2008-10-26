@@ -93,7 +93,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             x += wi; wi = (int)(he*1.1); //1.618
             x -= margin + wi;
 //             y += margin;
-            y += (cb->rect.height()-he)/2;
+            y += (cb->rect.height() - he + 1)/2;
             ret.setRect(x, y, wi, he);
             break;
         case SC_ComboBoxEditField:

@@ -234,9 +234,9 @@ if (!tile->isNull())\
             blh = r.height() - tlh;
         }
     }
+
     if (pf & Right)
     {
-        rOff = r.right()-trw+1;
         w -= width(TopRight);
         if (pf & (Top | Bottom) && trh + brh > r.height())
         {   // vertical edge overlap
@@ -244,6 +244,20 @@ if (!tile->isNull())\
             brh = r.height() - trh;
         }
     }
+
+    if (pf & (Top | Bottom))
+    {
+        if (w < 0 && matches(Left | Right, pf))
+        {   // horizontal edge overlap
+            blw = /*atm*/ tlw = tlw*r.width()/(tlw+trw);
+            brw = /*atm*/ trw = r.width() - tlw;
+
+//             blw = (blw*r.width())/(blw+brw); // see above
+//             brw = r.width() - blw; // see above
+        }
+    }
+
+    rOff = r.right()-trw+1;
 
    // painting
     const QPixmap *tile;
@@ -258,12 +272,6 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
    
     if (pf & Top)
     {
-        if (matches(Left | Right, pf) && w < 0)
-        {   // horizontal edge overlap
-            tlw = tlw*r.width()/(tlw+trw);
-            trw = r.width() - tlw;
-        }
-
         yOff += tlh;
         h -= tlh;
 
@@ -281,6 +289,7 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
             tile = &pixmap[TopRight];
             MAKE_FILL(r.topRight()-tile->rect().topRight());
             p->drawPixmap(rOff, r.y(), *tile, width(TopRight)-trw, 0, trw, trh);
+//             p->fillRect(checkRect, Qt::red);
         }
 
         checkRect.setRect(xOff, r.y(), w, tlh);
@@ -299,12 +308,6 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
     
     if (pf & Bottom)
     {
-        if (matches(Left | Right, pf) && w < 0)
-        {   // horizontal edge overlap
-            blw = (blw*r.width())/(blw+brw);
-            brw = r.width() - blw;
-        }
-
         int bOff = r.bottom()-blh+1;
         h -= blh;
 
@@ -333,7 +336,7 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
             {
                 tile = &pixmap[BtmMid];
                 MAKE_FILL(QPoint(xOff, bOff));
-                p->drawTiledPixmap(checkRect, *tile, QPoint(0, height(BtmMid) - blh));
+                p->drawTiledPixmap(checkRect, *tile);
             }
         }
     }
@@ -353,7 +356,7 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
             }
         }
         
-        checkRect.setRect(r.x(), yOff, width(MidLeft), h);
+        checkRect.setRect(r.x(), yOff, tlw, h);
         if ((pf & Left) && !pixmap[MidLeft].isNull() && UNCLIPPED)
         {
             if (NEED_RECT_FILL(MidLeft))
@@ -366,7 +369,7 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
             }
         }
         
-        checkRect.setRect(rOff, yOff, width(MidRight), h);
+        checkRect.setRect(rOff, yOff, trw, h);
         if ((pf & Right) && !pixmap[MidRight].isNull() && UNCLIPPED)
         {
             if (NEED_RECT_FILL(MidRight))
