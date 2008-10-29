@@ -260,7 +260,7 @@ TabInfo::proceed()
    
    // normal action
    updatePixmaps(_transition, ms);
-   curtain->repaint();
+   if (curtain) curtain->repaint();
    return true;  // for counter
 }
 

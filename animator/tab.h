@@ -39,7 +39,7 @@ class TabInfo : public QObject {
       bool proceed();
       void switchTab(QStackedWidget *sw, int index);
    protected:
-      Curtain *curtain;
+      QPointer<Curtain> curtain;
       float progress;
       QPointer<QWidget> currentWidget;
       int index;

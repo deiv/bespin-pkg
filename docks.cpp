@@ -36,20 +36,27 @@ Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWid
 {
 
     ASSURE_OPTION(dwOpt, DockWidget);
-    OPT_ENABLED OPT_HOVER
+    
     QRect rect = RECT;
+    // adjust rect;
+    const int bw = (dwOpt->closable +  dwOpt->floatable) * (16 + F(2));
+    if (option->direction == Qt::LeftToRight)
+        rect.setRight(rect.right() - bw);
+    else
+        rect.setLeft(rect.left() + bw);
     const QColor bg = FCOLOR(Window);
 
-    if (!dwOpt->title.isEmpty())
+    if (dwOpt->title.isEmpty())
     {
+        rect.setHeight(F(6));
+        rect.moveTop(RECT.center().y()-F(3));
+        painter->drawTiledPixmap(rect, Gradients::pix(bg, F(6), Qt::Vertical, Gradients::Button));
+    }
+    else
+    {
+        OPT_ENABLED OPT_HOVER
         QRect textRect;
         const int itemtextopts = Qt::AlignBottom | Qt::AlignHCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
-        // adjust rect;
-        const int bw = (dwOpt->closable +  dwOpt->floatable) * (16 + F(2));
-        if (option->direction == Qt::LeftToRight)
-            rect.setRight(rect.right() - bw);
-        else
-            rect.setLeft(rect.left() + bw);
 
         painter->save();
         QString title = dwOpt->title; // " " + dwOpt->title + " "; // good for underlining

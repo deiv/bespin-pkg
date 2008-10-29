@@ -148,7 +148,7 @@ relief(int size, bool enabled)
 }
 
 #define DRAW_ROUND_ALPHA_RECT(_A_, _X_, _Y_, _W_,_R_)\
-p.setBrush(QColor(0,0,0,_A_)); p.DRAW_ROUND_RECT(_X_, _Y_, _W_, ss, (_R_+1)/2, _R_)
+p.setBrush(BLACK(_A_)); p.DRAW_ROUND_RECT(_X_, _Y_, _W_, ss, (_R_+1)/2, _R_)
 
 static QPixmap
 groupShadow(int size)
@@ -166,10 +166,10 @@ groupShadow(int size)
     DRAW_ROUND_ALPHA_RECT(13, F(3), F(3), size-F(6), 12);
     
     p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
-    p.setBrush(QColor(0,0,0,0)); p.DRAW_ROUND_RECT(F(4), F(2), size-F(8), ss, 6, 11);
+    p.setBrush(BLACK(0)); p.DRAW_ROUND_RECT(F(4), F(2), size-F(8), ss, 6, 11);
 
     p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-    p.setPen(QColor(255,255,255,60));
+    p.setPen(WHITE(60));
     p.setBrush(Qt::NoBrush);
     p.DRAW_ROUND_RECT(F(4), F(2), size-F(8), ss, 6, 11);
     p.setRenderHint(QPainter::Antialiasing, false);
@@ -177,7 +177,7 @@ groupShadow(int size)
     int f33 = SCALE(33);
     for (int i = 1; i < f33; ++i)
     {
-        p.setPen(QColor(0,0,0,CLAMP(i*lround(255.0/F(32)),0,255)));
+        p.setPen(BLACK(CLAMP(i*lround(255.0/F(32)),0,255)));
         p.drawLine(0, size-i, size, size-i);
     }
     p.end();
@@ -270,15 +270,15 @@ Style::generatePixmaps()
     QPixmap tmp = transSrc->copy(0, 0, f9, f9);
     QPainter p;
     p.begin(&tmp);
-    p.fillRect(F(1),0,f9-F(2),F(1), QColor(0,0,0,10));
-    p.fillRect(F(2),F(1),f9-F(4),F(1), QColor(0,0,0,20));
-    p.fillRect(F(2),F(2),f9-F(4),F(1), QColor(0,0,0,40));
-    p.fillRect(F(3),F(3),f9-F(6),F(1), QColor(0,0,0,80));
+    p.fillRect(F(1),0,f9-F(2),F(1), BLACK(10));
+    p.fillRect(F(2),F(1),f9-F(4),F(1), BLACK(20));
+    p.fillRect(F(2),F(2),f9-F(4),F(1), BLACK(40));
+    p.fillRect(F(3),F(3),f9-F(6),F(1), BLACK(80));
 
-    p.fillRect(F(1),f9-F(1),f9-F(2),F(1), QColor(255,255,255,10));
-    p.fillRect(F(2),f9-F(2),f9-F(4),F(1), QColor(255,255,255,20));
-    p.fillRect(F(2),f9-F(3),f9-F(4),F(1), QColor(255,255,255,40));
-    p.fillRect(F(3),f9-F(4),f9-F(6),F(1), QColor(255,255,255,80));
+    p.fillRect(F(1),f9-F(1),f9-F(2),F(1), WHITE(10));
+    p.fillRect(F(2),f9-F(2),f9-F(4),F(1), WHITE(20));
+    p.fillRect(F(2),f9-F(3),f9-F(4),F(1), WHITE(40));
+    p.fillRect(F(3),f9-F(4),f9-F(6),F(1), WHITE(80));
 
     p.fillRect(0,F(1),F(1),f9-F(2), QColor(128,128,128,10));
     p.fillRect(F(1),F(2),F(1),f9-F(4), QColor(128,128,128,20));
