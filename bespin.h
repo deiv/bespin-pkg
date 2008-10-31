@@ -313,7 +313,6 @@ public:
     static Config config;
     static Dpi dpi;
 private slots:
-    void fixKdePalette();
     void clearScrollbarCache();
 };
 

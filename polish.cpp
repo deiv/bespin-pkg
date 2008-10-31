@@ -83,7 +83,10 @@ void Style::polish ( QApplication * app )
 {
     QPalette pal = app->palette();
     polish(pal);
+    QPalette *opal = originalPalette;
+    originalPalette = 0; // so our eventfilter won't react on this... ;-P
     app->setPalette(pal);
+    originalPalette = opal;
 }
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
@@ -432,7 +435,7 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                /// NOTE: WORKAROUND for (no more) dolphin and probably others:
+                /// NOTE: WORKAROUND for (no more) dolphin but amarok and probably others:
                 // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
                 // force this here, hoping it won't cause to many problems - and make a bug report
                 QWidget *vp = itemView->viewport();
@@ -440,6 +443,13 @@ Style::polish( QWidget * widget )
                 {
                     qDebug() << "BESPIN works around a visual problem in" << itemView << ", please contact thomas.luebking 'at' web.de";
                     QPalette pal = itemView->palette();
+                    if (vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)
+                    {
+                        pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
+                        pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Inactive, QPalette::Window));
+                        pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Disabled, QPalette::Window));
+                        vp->setAutoFillBackground(false);
+                    }
                     pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
                     pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
                     pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));

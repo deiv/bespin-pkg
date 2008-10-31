@@ -318,21 +318,19 @@ Style::drawItemText(QPainter *painter, const QRect &rect, int alignment, const Q
     if (!enabled)
     {   // let's see if we can get some blurrage here =)
         if (!penDirty)
-        {
-            savedPen = painter->pen();
-            penDirty = true;
-        }
+            { savedPen = painter->pen(); penDirty = true; }
+
         QColor c = painter->pen().color();
         c.setAlpha(c.alpha()/4 + 2);
         painter->setPen(QPen(c, savedPen.widthF()));
         QRect r = rect;
         r.translate(-1,-1);
         painter->drawText(r, alignment, text);
-        r.translate(0,2);
+        r.translate(1,2);
         painter->drawText(r, alignment, text);
         r.translate(2,0);
         painter->drawText(r, alignment, text);
-        r.translate(0,-2);
+        r.translate(-1,-2);
         painter->drawText(r, alignment, text);
     }
     else
@@ -528,6 +526,9 @@ QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalett
 static void
 swapPalette(QWidget *widget, Style *style)
 {
+    // protect our KDE palette fix - in case
+//     QPalette *savedPal = originalPalette;
+//     originalPalette = 0;
     // looks complex? IS!
     // reason nr. 1: stylesheets. they're nasty and qt operates on the app palette here
     // reason nr. 2: some idiot must have spread the idea that pal.setColor(backgroundRole(), Qt::transparent) is a great
@@ -633,6 +634,8 @@ swapPalette(QWidget *widget, Style *style)
         // ... and reset the apps palette
         QApplication::setPalette(appPal);
     }
+    
+//     originalPalette = savedPal;
 }
 
 static QMenuBar*
@@ -769,7 +772,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
         
         if (widget->isModal())
         {
-            if (config.bg.modal.invert) swapPalette(widget, this);
+            if (config.bg.modal.invert)
+                swapPalette(widget, this);
             const QPalette &pal = widget->palette();
             BGMode bgMode = config.bg.mode;
             QColor bg = FCOLOR(Window);
@@ -864,6 +868,21 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 pal.setColor(QPalette::Text, HARD_CONTRAST(Base));
             widget->setPalette(pal);
             widget->installEventFilter(this);
+        }
+        return false;
+    }
+    case QEvent::ApplicationPaletteChange:
+    {
+        if (object == qApp && originalPalette)
+        {   // this fixes KApplications
+            // "we create the style, then reload teh palette from personal settings and reapply it" junk"
+            // the order is important or we'll get reloads for sure or eventually!
+            object->removeEventFilter(this);
+            QPalette *pal = originalPalette;
+            originalPalette = 0;
+            polish(*pal);
+            qApp->setPalette(*pal);
+            delete pal;
         }
         return false;
     }

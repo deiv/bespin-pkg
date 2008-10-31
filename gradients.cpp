@@ -830,7 +830,7 @@ Gradients::borderline(const QColor &c, Position pos)
         return *pix;
 
     QColor c1 = c, c2 = c;
-    c1.setAlpha(c.alpha()*0.7); c2.setAlpha(0);
+    /*c1.setAlpha(c.alpha()); */c2.setAlpha(0);
 
     QPoint start(0,0), stop;
     if (pos > Bottom)

@@ -55,21 +55,6 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group)
     return list;
 }
 
-// this seems to be necessary as KDE sets it's own palette after
-// creating the style - god knows why...
-void Style::fixKdePalette()
-{
-    if (originalPalette)
-    {
-        polish(*originalPalette);
-        qApp->setPalette(*originalPalette);
-        delete originalPalette;
-        originalPalette = 0;
-    }
-    QPalette pal = qApp->palette();
-    polish(pal);
-}
-
 
 #define readInt(_DEF_) iSettings->value(_DEF_).toInt()
 #define readBool(_DEF_) iSettings->value(_DEF_).toBool()
@@ -128,11 +113,13 @@ Style::readSettings(const QSettings* settings)
                 iSettings->endGroup();
             }
             else
-            {
-                delete iSettings; iSettings = 0L;
-            }
+                { delete iSettings; iSettings = 0L; }
+
             if (qApp->inherits("KApplication"))
+            {   // KDE replaces the palette after styling with an unpolished own version, breaking presets...
                 originalPalette = new QPalette(qApp->palette());
+                qApp->installEventFilter(this);
+            }
         }
         if (!iSettings)
         {
@@ -404,6 +391,4 @@ Style::init(const QSettings* settings)
     inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
     inner.adjust(f2,f2,-f2,0); outer.adjust(-f2,-f2,f2,0);
     VisualFrame::setGeometry(QFrame::Raised, inner, outer);
-    if (qApp->inherits("KApplication"))
-        QTimer::singleShot(0, this, SLOT(fixKdePalette()));
 }

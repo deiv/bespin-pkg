@@ -266,6 +266,54 @@ FX::applyAlpha(const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect
     return pix;
 }
 
+#if 0
+// taken from QCommonStyle generatedIconPixmap - why oh why cannot KDE apps take this function into account...
+static inline uint qt_intensity(uint r, uint g, uint b)
+{
+    // 30% red, 59% green, 11% blue
+    return (77 * r + 150 * g + 28 * b) / 255;
+}
+
+void
+FX::desaturate(QImage &img, const QColor &c)
+{
+    int r,g,b; c.getRgb(&r, &g, &b);
+    uchar reds[256], greens[256], blues[256];
+
+    for (int i=0; i<128; ++i)
+    {
+        reds[i]   = uchar((r * (i<<1)) >> 8);
+        greens[i] = uchar((g * (i<<1)) >> 8);
+        blues[i]  = uchar((b * (i<<1)) >> 8);
+    }
+    for (int i=0; i<128; ++i)
+    {
+        reds[i+128]   = uchar(qMin(r   + (i << 1), 255));
+        greens[i+128] = uchar(qMin(g + (i << 1), 255));
+        blues[i+128]  = uchar(qMin(b + (i << 1), 255));
+    }
+
+    int intensity = qt_intensity(r, g, b);
+    const int f = 191;
+
+    if ((r - f > g && r - f > b) || (g - f > r && g - f > b) || (b - f > r && b - f > g))
+        intensity = qMin(255, intensity + 91);
+    else if (intensity <= 128)
+        intensity -= 51;
+
+    for (int y = 0; y < img.height(); ++y)
+    {
+        QRgb *scanLine = (QRgb*)img.scanLine(y);
+        for (int x = 0; x < img.width(); ++x)
+        {
+            QRgb pixel = *scanLine;
+            uint ci = uint(qGray(pixel)/3 + (130 - intensity / 3));
+            *scanLine = qRgba(reds[ci], greens[ci], blues[ci], qAlpha(pixel));
+            ++scanLine;
+        }
+    }
+}
+#endif
 QPixmap
 FX::tint(const QPixmap &mask, const QColor &color)
 {

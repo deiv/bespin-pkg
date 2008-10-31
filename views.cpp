@@ -44,11 +44,7 @@ Style::drawHeader(const QStyleOption *option, QPainter *painter, const QWidget *
     {
         QStyleOptionHeader subopt = *header;
         subopt.rect = subElementRect(SE_HeaderArrow, option, widget);
-        painter->save();
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(Colors::mid(CCOLOR(view.sortingHeader, Bg), CCOLOR(view.sortingHeader, Fg)));
         drawHeaderArrow(&subopt, painter, widget);
-        painter->restore();
     }
        
 //    painter->setClipRegion(clipRegion);
@@ -100,10 +96,10 @@ Style::drawHeaderSection(const QStyleOption * option, QPainter * painter,
     {
         r.setLeft(r.right() - dpi.f1);
         painter->drawTiledPixmap(r, Gradients::pix(COLOR(config.view.header_role[Bg]), s, o, Gradients::Sunken));
-        painter->save();
+        SAVE_PEN
         painter->setPen(Colors::mid(FCOLOR(Base), Qt::black, 8, 1));
         painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
-        painter->restore();
+        RESTORE_PEN
     }
 }
 
@@ -173,7 +169,11 @@ Style::drawHeaderArrow(const QStyleOption * option, QPainter * painter, const QW
         if (hopt->sortIndicator == QStyleOptionHeader::SortUp)
             dir = Navi::N;
     }
-    drawArrow(dir, option->rect, painter);
+    painter->save();
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Colors::mid(CCOLOR(view.sortingHeader, Bg), CCOLOR(view.sortingHeader, Fg)));
+    drawArrow(dir, RECT, painter);
+    painter->restore();
 }
 
 static const int decoration_size = 9;

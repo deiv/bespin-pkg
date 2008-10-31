@@ -548,7 +548,7 @@ Client::repaint(QPainter &p)
         else if (borderSize)
         {   // static bool KWindowSystem::compositingActive();
             // frame ==============
-            const QColor border = Colors::mid(bg, color(ColorButtonBg, true),2,1);
+            const QColor border = Colors::mid(bg, color(ColorFont, true),5,2);
             p.setPen(border);
             p.drawLine(32+4, 0, width()-(32+5), 0);
             p.drawLine(32+4, height()-1, width()-(32+5), height()-1);

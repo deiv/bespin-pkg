@@ -177,6 +177,7 @@ Style::drawToolButtonLabel(const QStyleOption * option,
             p.setOpacity(0.4);
             p.drawImage(F(2),F(2),pm.toImage());
             p.end();
+//             FX::desaturate(img, FCOLOR(Window)); // nope - don't use 2 chained FX!
             FX::expblur(img, F(4)/*pm.width()/4*/); // aligning blur kernel to icon size looks crap
             pm = QPixmap::fromImage(img);
         }
