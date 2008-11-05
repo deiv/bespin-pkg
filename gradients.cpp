@@ -317,6 +317,13 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         c.getHsv(&h,&s,&v,&a);
         iC.setHsv(h,s,70,a);
     }
+    else if (v > 245 && type > Sunken) // glosses etc hate high value colors
+    {
+        int h,s,a;
+        c.getHsv(&h,&s,&v,&a);
+        s = 400*s/(400+v-245);
+        iC.setHsv(h,CLAMP(s,0,255),245,a);
+    }
 
     // hash
     int sloppyAdd = 1;
@@ -341,28 +348,25 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         QGradient grad;
         // no cache entry found, so let's create one
         size += sloppyAdd; // rather to big than to small ;)
-        switch (type) {
+        switch (type)
+        {
         case Gradients::Button:
             grad = buttonGradient(iC, start, stop);
             break;
         case Gradients::Glass:
-            grad = gl_ssGradient(iC, start, stop, true);
-            break;
+            grad = gl_ssGradient(iC, start, stop, true); break;
         case Gradients::Simple:
         default:
-            grad = simpleGradient(iC, start, stop);
-            break;
+            grad = simpleGradient(iC, start, stop); break;
         case Gradients::Sunken:
-            grad = sunkenGradient(iC, start, stop);
-            break;
+            grad = sunkenGradient(iC, start, stop); break;
         case Gradients::Gloss:
-            grad = gl_ssGradient(iC, start, stop);
-            break;
+            grad = gl_ssGradient(iC, start, stop); break;
         case Gradients::Metal:
-            grad = metalGradient(iC, start, stop);
-            break;
+            grad = metalGradient(iC, start, stop); break;
         }
-        if (c.alpha() < 255) pix->fill(Qt::transparent);
+        if (c.alpha() < 255)
+            pix->fill(Qt::transparent);
         QPainter p(pix); p.fillRect(pix->rect(), grad); p.end();
     }
    

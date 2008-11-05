@@ -450,9 +450,12 @@ Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
 
     QColor bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
     masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size);
-#if 0 // cool idea, looks however not that great...
-    if (!sunken && Gradients::isReflective(GRAD(scroll)))
-        masks.rect[round_].outline(r, painter, Colors::mid(bc,Qt::white,2,1));
+#if 1 // helps with black in black styles...
+    if (!sunken && Gradients::isReflective(GRAD(btn)))
+    {
+        const int g = qGray(bc.rgb());
+        masks.rect[round_].outline(r.adjusted(f1,0,-f1,0), painter, Colors::mid(c, Qt::white, 6*(255-g), 255), f1);
+    }
 #endif
 
     /// the hover indicator (in case...)

@@ -163,7 +163,7 @@ Style::readSettings(const QSettings* settings)
         GRAD(btn) = Gradients::None;
 
     config.btn.backLightHover = readBool(BTN_BACKLIGHTHOVER);
-    config.btn.layer = config.btn.backLightHover ? 0 : CLAMP(readInt(BTN_LAYER), 0, 2);
+    config.btn.layer = CLAMP(readInt(BTN_LAYER), 0, 2);
     config.btn.fullHover = config.btn.backLightHover || readBool(BTN_FULLHOVER);
 
     if (config.btn.layer == 2) config.btn.cushion = true;

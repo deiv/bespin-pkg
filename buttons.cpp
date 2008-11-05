@@ -194,6 +194,11 @@ Style::drawButtonFrame(const QStyleOption * option,
                 iOff[0] = iOff[2] = F(3);
                 iOff[1] = iOff[3] = sunken ? F(3) : F(2);
             }
+            if (animStep && !hasFocus && config.btn.backLightHover)
+            {   // we MUST use alpha blending as this crosses between button and bg
+                QColor c2 = CCOLOR(btn.active, Bg); c2.setAlpha(c2.alpha()*animStep/10);
+                masks.rect[round].outline(RECT, painter, c2, F(3));
+            }
 //             if (hasFocus) {
 //                 QColor fc = fullHover ? iC : CCOLOR(btn.std, Bg);
 //                 const int contrast = Colors::contrast(fc, FCOLOR(Highlight));
@@ -245,9 +250,9 @@ Style::drawButtonFrame(const QStyleOption * option,
         masks.rect[round].render(r, painter, GRAD(btn), Qt::Vertical, c);
 
         // outline
-        if (Gradients::isReflective(GRAD(btn)) || qGray(c.rgb()) > 128)
-            masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter,
-                                        Colors::mid(c, Qt::white, isEnabled ? 1 : 2), f1);
+        int g = qGray(c.rgb());
+        if (g > 128 || Gradients::isReflective(GRAD(btn)))
+            masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter, Colors::mid(c, Qt::white, (isEnabled ? 6:9) * (255-g), 255), f1);
 
     }
     

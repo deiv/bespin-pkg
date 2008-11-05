@@ -492,6 +492,8 @@ Style::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const 
 
     QColor c = CCOLOR(tab.std, Bg);
     Gradients::Type gt = GRAD(tab);
+    if (gt == Gradients::Sunken) // looks freaky
+        gt = Gradients::Button;
     if (sunken)
         { c = FCOLOR(Window); gt = Gradients::Sunken; }
     else if (hover)

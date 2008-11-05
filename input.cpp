@@ -235,12 +235,21 @@ Style::drawComboBox(const QStyleOptionComplex * option,
 
                 mask.render(r, painter, GRAD(chooser), Qt::Vertical, c);
 
-                if (!config.btn.fullHover && animStep)
-                {   // maybe hover indicator?
-                    r.adjust(f3, f3, -f3, -f3);
-                    c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-                    mask.render(r, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0,f3));
-                    r = RECT.adjusted(f1, f1, -f1, -f2); // RESET 'r' !!!
+                if (animStep)
+                {
+                    if (!config.btn.fullHover)
+                    {   // maybe hover indicator?
+                        r.adjust(f3, f3, -f3, -f3);
+                        c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
+                        mask.render(r, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0,f3));
+                        r = RECT.adjusted(f1, f1, -f1, -f2); // RESET 'r' !!!
+                    }
+                    else if (config.btn.backLightHover && !hasFocus)
+                    {   // we MUST use alpha blending as this crosses between combo and bg
+                        QColor c2 = CCOLOR(btn.active, Bg);
+                        c2.setAlpha(c2.alpha()*animStep/6);
+                        masks.rect[round_].outline(RECT, painter, c2, F(3));
+                    }
                 }
             }
             r.setBottom(RECT.bottom());

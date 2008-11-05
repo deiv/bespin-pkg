@@ -51,17 +51,8 @@ if [ "$REPLY" = "n" -o "$REPLY" = "N" ]; then
 else
    mkdir build > /dev/null 2>&1
    cd build
-   if ! cmake ..; then
-      cd ..
-      rm -rfd build
-      echo -e "!!! CMAKE ERROR !!!
-In order to compile with KDE support you NEED cmake >= 2.4\n"
-      read -n1 -s -p "--> Do you want to compile for <q>t only or <e>xit now? [q/E]"
-      echo ""
-      if [ "$REPLY" != "e" -a "$REPLY" != "E" ]; then
-         exit 1
-      fi
-      KDE=false
+   if ! cmake -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix` -DCMAKE_BUILD_TYPE=Release ..; then
+       exit
    fi
 fi
 fi
@@ -74,7 +65,7 @@ if $KDE; then
    fi
    cd ..
    echo -e "\n\n========================= Configuration done ============================\n
-   Ok, now just \"cd build\" \"make\" and \"sudo make install\"...\n\n"
+   Ok, now just \"cd build\", \"make\" and \"sudo make install\"...\n\n"
 else
    QMAKE="qmake"
    find_qt || ask_for_qt
