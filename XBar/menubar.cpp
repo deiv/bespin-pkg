@@ -38,7 +38,7 @@ This library is distributed in the hope that it will be useful,
 static QBasicTimer mousePoll;
 static QPointF lastMousePos;
 
-MenuBar::MenuBar( const QString &service, qlonglong key, QGraphicsItem *parent) :
+MenuBar::MenuBar( const QString &service, qlonglong key, QGraphicsItem *parent, const QWidget *dummy) :
 QGraphicsWidget(parent)
 {
     setFocusPolicy(Qt::NoFocus);
@@ -47,6 +47,7 @@ QGraphicsWidget(parent)
     d.openPopup = -1;
     d.service = service;
     d.key = key;
+    d.widget = dummy;
 //    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 //    setObjectName( "XBarMenubar" );
 }
@@ -334,7 +335,6 @@ MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidge
     //draw the items
     QStyleOptionMenuItem opt;
     QRect adjustedActionRect;
-    QWidget *w = widget ? widget : view();
     QAction *action;
     painter->save();
     for (int i = 0; i <  d.actions.count(); ++i)
@@ -351,14 +351,14 @@ MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidge
         opt.rect = adjustedActionRect;
         painter->setFont(opt.font);
         painter->setClipRect(adjustedActionRect);
-        style()->drawControl(QStyle::CE_MenuBarItem, &opt, painter, w);
+        style()->drawControl(QStyle::CE_MenuBarItem, &opt, painter, d.widget);
     }
 
     painter->setClipRegion(emptyArea);
     initStyleOption(&opt, -1);
     opt.menuItemType = QStyleOptionMenuItem::EmptyArea;
     opt.rect = rect().toRect();
-    style()->drawControl(QStyle::CE_MenuBarEmptyArea, &opt, painter, w);
+    style()->drawControl(QStyle::CE_MenuBarEmptyArea, &opt, painter, d.widget);
     painter->restore();
 }
 

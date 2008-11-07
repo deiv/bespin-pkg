@@ -52,7 +52,7 @@ class TaskBar : public MenuBar
 {
     Q_OBJECT
 public:
-    TaskBar(QGraphicsItem *parent = 0);
+    TaskBar(QGraphicsItem *parent = 0, const QWidget *dummy = 0);
     void show();
 protected:
     void rightMouseButtonEvent(int idx, QGraphicsSceneMouseEvent *ev);

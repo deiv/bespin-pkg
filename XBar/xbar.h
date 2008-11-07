@@ -54,6 +54,7 @@ private:
     bool dbusAction(const QObject *o, int idx, const QString &cmd);
 private:
     typedef QMap<qlonglong, MenuBar*> MenuMap;
+    friend class DummyWidget;
     struct {
         MenuMap menus;
         QMenu windowList;

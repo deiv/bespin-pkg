@@ -108,7 +108,8 @@ TaskAction::update()
     emit changed();
 }
 
-TaskBar::TaskBar(QGraphicsItem *parent) : MenuBar( QString(), 0, parent), dirty(true), isSqueezed(false)
+TaskBar::TaskBar(QGraphicsItem *parent, const QWidget *dummy) : MenuBar( QString(), 0, parent, dummy),
+dirty(true), isSqueezed(false)
 {
    QMenu *sm = new QMenu;
    sm->addAction("Lock Screen", this, SLOT(lock()));

@@ -46,10 +46,28 @@
 #include <QtDebug>
 
 static XBar *instance = NULL;
+
+class DummyWidget : public QWidget
+{
+public:
+    DummyWidget( QWidget * parent = 0, Qt::WindowFlags f = 0 ) : QWidget(parent, Qt::X11BypassWindowManagerHint) {}
+protected:
+    void paintEvent(QPaintEvent *)
+    {
+        if (instance && instance->d.currentBar)
+            instance->d.currentBar->update();
+    }
+};
+
+static DummyWidget *dummy = NULL;
+
 QTimer XBar::bodyCleaner;
 
 XBar::XBar(QObject *parent, const QVariantList &args) : Plasma::Applet(parent, args)
 {
+    d.taskbar = 0;
+    d.currentBar = 0; // important!
+    dummy = 0;
     if (instance)
     {
 //         QMessageBox::warning ( 0, "Multiple XBar requests", "XBar shall be unique dummy text");
@@ -67,6 +85,7 @@ XBar::~XBar()
     if (instance == this)
     {
         instance = NULL;
+        delete dummy; dummy = NULL;
         byeMenus();
     }
 }
@@ -88,11 +107,16 @@ XBar::init()
         deleteLater();
         return;
     }
+    dummy = new DummyWidget();
+    dummy->setGeometry(5000,5000,1,1);
+    dummy->show();
+    Plasma::Applet::init();
     setAspectRatioMode(Plasma::IgnoreAspectRatio);
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setMaximumSize(INT_MAX, INT_MAX);
+//     setFlag(ItemClipsChildrenToShape); setFlag(ItemClipsToShape);
     
-    d.taskbar = new TaskBar(this);
+    d.taskbar = new TaskBar(this, dummy);
     d.currentBar = d.taskbar;
     d.extraTitle = false;
     
@@ -269,7 +293,7 @@ XBar::raiseCurrentWindow()
 void
 XBar::registerMenu(const QString &service, qlonglong key, const QString &title, const QStringList &entries)
 {
-    MenuBar *newBar = new MenuBar(service, key, this);
+    MenuBar *newBar = new MenuBar(service, key, this, dummy);
     newBar->setAppTitle(title);
     newBar->setPalette(palette());
     connect (newBar, SIGNAL(hovered(int)), this, SLOT(hover(int)));
