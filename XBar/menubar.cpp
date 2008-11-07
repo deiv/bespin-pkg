@@ -185,7 +185,9 @@ MenuBar::initStyleOption(QStyleOptionMenuItem *option, int idx) const
     option->palette = palette();
     option->fontMetrics = QFontMetrics(font());
     option->menuRect = rect().toRect();
-    option->menuItemType = (QStyleOptionMenuItem::MenuItemType)(((d.hoverIndex+1) << 16) | ((idx+1) & 0xffff));
+    int idxdata = (d.openPopup < 0) ? ((d.hoverIndex+1) << 16) : 0;
+    idxdata |= ((idx+1) & 0xffff);
+    option->menuItemType = (QStyleOptionMenuItem::MenuItemType)idxdata;
     option->checkType = QStyleOptionMenuItem::NotCheckable;
 
     option->state = QStyle::State_None;

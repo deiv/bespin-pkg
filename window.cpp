@@ -30,13 +30,33 @@
 #endif
 
 void
-Style::drawWindowFrame(const QStyleOption * option, QPainter * painter,
-                             const QWidget *) const
+Style::drawWindowFrame(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
-   painter->save();
-   painter->setPen(PAL.color(QPalette::Window).dark(110));
-   painter->drawRect(RECT);
-   painter->restore();
+    const QColor border = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 5,2);
+    const int right = RECT.right()-(32+4);
+    const int bottom = RECT.bottom()-(32+4);
+    QPen pen = painter->pen();
+    painter->setPen(border);
+    painter->drawLine(32+4, 0, right, 0);
+    painter->drawLine(32+4, RECT.bottom(), right, RECT.bottom());
+    painter->drawLine(0, 32+4, 0, bottom);
+    painter->drawLine(RECT.right(), 32+4, RECT.right(), bottom);
+
+    const QPixmap &top = Gradients::borderline(border, Gradients::Top);
+    painter->drawPixmap(0,4, top);
+    painter->drawPixmap(RECT.right(), 4, top);
+
+    const QPixmap &btm = Gradients::borderline(border, Gradients::Bottom);
+    painter->drawPixmap(0, bottom, btm);
+    painter->drawPixmap(RECT.right(), bottom, btm);
+
+    const QPixmap &left = Gradients::borderline(border, Gradients::Left);
+    painter->drawPixmap(4, 0, left);
+    painter->drawPixmap(4, RECT.bottom(), left);
+
+    const QPixmap &rgt = Gradients::borderline(border, Gradients::Right);
+    painter->drawPixmap(right, 0, rgt);
+    painter->drawPixmap(right, RECT.bottom(), rgt);
 }
 
 static QPainterPath glasPath;

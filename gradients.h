@@ -49,6 +49,8 @@ enum BgMode {
    BevelV = 2, BevelH, LightV, LightH
 };
 
+enum Position { Top = 0, Bottom, Left, Right };
+
 
 /** use only if sure you're not requesting Type::None */
 const QPixmap& pix(const QColor &c,
@@ -89,9 +91,9 @@ const BgSet &bgSet(const QColor &c);
 void init(BgMode mode, int structure = 0, Type progress = Glass, int bgBevelIntesity = 110, int btnBevelSize = 16);
 #else
 void init();
-enum Position { Top = 0, Bottom, Left, Right };
-const QPixmap &borderline(const QColor &c, Position pos);
 #endif
+
+const QPixmap &borderline(const QColor &c, Position pos);
 void wipe();
 
 Type fromInfo(int info);

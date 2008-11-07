@@ -90,7 +90,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         // ================================================
     }
     
-    QRect r = RECT.adjusted(0, dpi.f2, 0, -dpi.f4);
+    QRect r = RECT.adjusted(0, F(2), 0, -F(4));
     if (step || hover)
     {
         if (!step)
@@ -100,20 +100,9 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         {   // NOTICE: opaque Colors::mid() are too flickerious with several plasma bgs...
             bg = QPalette::WindowText;
             fg = QPalette::Window;
-            c = COLOR(bg);
-            c.setAlpha(step*255/8);
         }
-        else if (config.menu.itemGradient != config.menu.barGradient)
-        {
-            c = COLOR(bg);
-            c.setAlpha(step*255/8);
-        }
-        else
-        {   // ... but usually less performance killing... ;-P (it's not that much a problem n'owerdays)
-            c = (config.menu.bar_role[Bg] == QPalette::Window) ? FCOLOR(Window) :
-                                            Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6);
-            c = Colors::mid(c, COLOR(bg), 8-step, step);
-        }
+        c = COLOR(bg);
+        c.setAlpha(step*255/8);
         // NOTICE: scale code - currently unused
 //       int dy = 0;
 //       if (!sunken) {

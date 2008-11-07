@@ -32,7 +32,9 @@
 
 using namespace Bespin;
 
+typedef QCache<uint, QPixmap> PixmapCache;
 static QPixmap nullPix;
+
 // static Gradients::Type _progressBase = Gradients::Glass;
 
 /* ========= MAGIC NUMBERS ARE COOL ;) =================
@@ -266,32 +268,60 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
 #undef GLOSS
 }
 
-#endif
+static inline uint costs(BgSet *set)
+{
+    return (set->topTile.width()*set->topTile.height() +
+            set->btmTile.width()*set->btmTile.height() +
+            set->cornerTile.width()*set->cornerTile.height() +
+            set->lCorner.width()*set->lCorner.height() +
+            set->rCorner.width()*set->rCorner.height())*set->topTile.depth()/8;
+}
 
-static inline uint costs(QPixmap *pix) {
-   return ((pix->width()*pix->height()*pix->depth())>>3);
-}
-#ifndef BESPIN_DECO
-static inline uint costs(BgSet *set) {
-   return (set->topTile.width()*set->topTile.height() +
-           set->btmTile.width()*set->btmTile.height() +
-           set->cornerTile.width()*set->cornerTile.height() +
-           set->lCorner.width()*set->lCorner.height() +
-           set->rCorner.width()*set->rCorner.height())*set->topTile.depth()/8;
-}
-#endif
-typedef QCache<uint, QPixmap> PixmapCache;
-static PixmapCache gradients[2][Gradients::TypeAmount];
-#ifndef BESPIN_DECO
 static int _struct = 0;
 static int _bgIntensity = 110;
 static Gradients::BgMode _mode = Gradients::BevelV;
 static PixmapCache _btnAmbient, _tabShadow, _groupLight, _structure[2];
 typedef QCache<uint, BgSet> BgSetCache;
 static BgSetCache _bgSet;
-#else
-static PixmapCache _borderline[4];
 #endif
+
+static PixmapCache gradients[2][Gradients::TypeAmount];
+static PixmapCache _borderline[4];
+
+static inline uint costs(QPixmap *pix)
+{
+    return ((pix->width()*pix->height()*pix->depth())>>3);
+}
+
+const QPixmap&
+Gradients::borderline(const QColor &c, Position pos)
+{
+    QPixmap *pix = _borderline[pos].object(c.rgba());
+    if (pix)
+        return *pix;
+    
+    QColor c1 = c, c2 = c;
+    /*c1.setAlpha(c.alpha()); */c2.setAlpha(0);
+    
+    QPoint start(0,0), stop;
+    if (pos > Bottom)
+    { pix = new QPixmap(32, 1); stop = QPoint(32,0); }
+    else
+    { pix = new QPixmap(1, 32); stop = QPoint(0,32); }
+    pix->fill(Qt::transparent);
+    
+    QLinearGradient lg(start, stop);
+    if (pos % 2) // Bottom, right
+    { lg.setColorAt(0, c1); lg.setColorAt(1, c2); }
+    else
+    { lg.setColorAt(0, c2); lg.setColorAt(1, c1); }
+    
+    QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
+    
+    // cache for later ;)
+    _borderline[pos].insert(c.rgba(), pix, costs(pix));
+    return *pix;
+}
 
 const QPixmap&
 Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type)
@@ -826,44 +856,13 @@ Gradients::init(BgMode mode, int structure, Type progress, int bgIntesity, int b
     createDither();
 #else
 
-const QPixmap&
-Gradients::borderline(const QColor &c, Position pos)
-{
-    QPixmap *pix = _borderline[pos].object(c.rgba());
-    if (pix)
-        return *pix;
-
-    QColor c1 = c, c2 = c;
-    /*c1.setAlpha(c.alpha()); */c2.setAlpha(0);
-
-    QPoint start(0,0), stop;
-    if (pos > Bottom)
-        { pix = new QPixmap(32, 1); stop = QPoint(32,0); }
-    else
-        { pix = new QPixmap(1, 32); stop = QPoint(0,32); }
-    pix->fill(Qt::transparent);
-
-    QLinearGradient lg(start, stop);
-    if (pos % 2) // Bottom, right
-        { lg.setColorAt(0, c1); lg.setColorAt(1, c2); }
-    else
-        { lg.setColorAt(0, c2); lg.setColorAt(1, c1); }
-
-    QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
-
-    // cache for later ;)
-    _borderline[pos].insert(c.rgba(), pix, costs(pix));
-    return *pix;
-}
-
-
 void Gradients::init() {
-   for (int i = 0; i < 4; ++i)
-      _borderline[i].setMaxCost( ((32*32)<<3)<<4 ); // enough for 16 different colors
 #endif
-   for (int i = 0; i < 2; ++i) {
-      for (int j = 0; j < Gradients::TypeAmount; ++j)
-         gradients[i][j].setMaxCost( 1024<<10 );
+    for (int i = 0; i < 4; ++i)
+        _borderline[i].setMaxCost( ((32*32)<<3)<<4 ); // enough for 16 different colors
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < Gradients::TypeAmount; ++j)
+            gradients[i][j].setMaxCost( 1024<<10 );
    }
 }
 

@@ -157,7 +157,6 @@ Style::registerRoutines()
     registerPE(drawMenuBarBg, PE_PanelMenuBar);
     registerCE(drawMenuBarBg, CE_MenuBarEmptyArea);
     registerCE(drawMenuBarItem, CE_MenuBarItem);
-    registerPE(drawMenuFrame, PE_FrameMenu);
     registerCE(drawMenuItem, CE_MenuItem);
     registerCE(drawMenuScroller, CE_MenuScroller);
     registerCE(skip, CE_MenuEmptyArea);
@@ -235,6 +234,7 @@ Style::registerRoutines()
 #endif
     // window.cpp
     registerPE(drawWindowFrame, PE_FrameWindow);
+    registerPE(drawWindowFrame, PE_FrameMenu);
     registerPE(drawWindowBg, PE_Widget);
     registerPE(drawToolTip, PE_PanelTipLabel);
     registerCC(drawTitleBar, CC_TitleBar);
