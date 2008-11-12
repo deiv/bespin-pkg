@@ -128,16 +128,13 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
     XProperty::get(widget->winId(), XProperty::decoDim, decoDim);
     if (decoDim)
     {
-        Qt::HANDLE picture = set.topTile.x11PictureHandle();
-        XProperty::set(widget->winId(), XProperty::topTile, picture);
-        picture = set.btmTile.x11PictureHandle();
-        XProperty::set(widget->winId(), XProperty::btmTile, picture);
-        picture = set.cornerTile.x11PictureHandle();
-        XProperty::set(widget->winId(), XProperty::cnrTile, picture);
-        picture = set.lCorner.x11PictureHandle();
-        XProperty::set(widget->winId(), XProperty::lCorner, picture);
-        picture = set.rCorner.x11PictureHandle();
-        XProperty::set(widget->winId(), XProperty::rCorner, picture);
+        WindowPics pics;
+        pics.topTile = set.topTile.x11PictureHandle();
+        pics.btmTile = set.btmTile.x11PictureHandle();
+        pics.cnrTile = set.cornerTile.x11PictureHandle();
+        pics.lCorner = set.lCorner.x11PictureHandle();
+        pics.rCorner = set.rCorner.x11PictureHandle();
+        XProperty::set(widget->winId(), XProperty::bgPics, &pics, 5);
         rect.adjust(-((decoDim >> 24) & 0xff), -((decoDim >> 16) & 0xff), (decoDim >> 8) & 0xff, decoDim & 0xff);
     }
 #endif

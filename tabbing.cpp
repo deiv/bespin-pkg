@@ -30,7 +30,6 @@ verticalTabs(QTabBar::Shape shape)
             shape == QTabBar::TriangularWest;
 }
 
-
 void
 Style::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidget * widget) const
 {
@@ -43,7 +42,11 @@ Style::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidge
     ASSURE_OPTION(twf, TabWidgetFrame);
 
     QLine line[2];
-    QStyleOptionTabBarBase tbb; tbb.initFrom(widget);
+    QStyleOptionTabBarBase tbb;
+    if (widget)
+        tbb.initFrom(widget);
+    else
+        tbb.QStyleOption::operator=(*twf);
     tbb.shape = twf->shape; tbb.rect = twf->rect;
 
 #define SET_BASE_HEIGHT(_o_) \
@@ -88,7 +91,6 @@ if (baseHeight < 0) \
     painter->setPen(FCOLOR(Window).light(114));
     painter->drawLine(line[1]);
     painter->restore();
-
     // the bar
     drawTabBar(&tbb, painter, widget);
 }

@@ -35,8 +35,8 @@ public:
     BespinDecoAdaptor(Factory *factory) : QDBusAbstractAdaptor(factory), fac(factory) { }
 
 public slots:
-    Q_NOREPLY void styleByPid(qint64 pid, uint bgInfo, uint activeColors, uint inactiveColors)
-    { fac->learn(pid, bgInfo, activeColors, inactiveColors); }
+    Q_NOREPLY void styleByPid(qint64 pid, QByteArray data)
+    { fac->learn(pid, data); }
     Q_NOREPLY void forget(qint64 pid) { fac->forget(pid); }
 };
 } //namespace

@@ -196,18 +196,30 @@ void Style::polish( QPalette &pal, bool onInit )
 #ifdef Q_WS_X11
     if (appType == GTK)
     {
+        WindowData winData;
+        setup(winData, pal, config.bg.mode, GRAD(kwin));
+        QByteArray data(36, 'a');
+        int *ints = (int*)data.data();
+        ints[0] = winData.winColor[0];
+        ints[1] = winData.winColor[1];
+        ints[2] = winData.decoColor[0];
+        ints[3] = winData.decoColor[1];
+        ints[4] = winData.textColor[0];
+        ints[5] = winData.textColor[1];
+        ints[6] = winData.btnColor[0];
+        ints[7] = winData.btnColor[1];
+        ints[8] = winData.style;
         bespinDeco.call(QDBus::NoBlock, "styleByPid",
 #if QT_VERSION < 0x040400
                         getpid(),
 #else
                         QCoreApplication::applicationPid(),
 #endif
-                        XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode),
-                        XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]),
-                        XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]));
+                        data);
     }
 #endif
 }
+
 
 #if 0
 static QMenuBar *
@@ -375,8 +387,8 @@ Style::polish( QWidget * widget )
                                         Qt::SplashScreen | Qt::Desktop |
                                         Qt::X11BypassWindowManagerHint;// | Qt::FramelessWindowHint; <- could easily change mind...?!
             ignore &= ~Qt::Dialog; // erase dialog, it's in drawer et al. - takes away window as well
-            if (!(widget->windowFlags() & ignore))
-                setupDecoFor(widget); // this can be expensive, so avoid for popups, combodrops etc.
+            if (!(widget->windowFlags() & ignore)) // this can be expensive, so avoid for popups, combodrops etc.
+                setupDecoFor(widget->winId(), widget->palette(), config.bg.mode, GRAD(kwin));
         }
 
     }

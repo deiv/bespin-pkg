@@ -68,12 +68,13 @@ Client::~Client(){
 void
 Client::updateStylePixmaps()
 {
-    if (XProperty::get(windowId(), XProperty::topTile, topTile))
+    if (WindowPics *pics = (WindowPics*)XProperty::get(windowId(), XProperty::bgPics, 5))
     {
-        XProperty::get(windowId(), XProperty::btmTile, btmTile);
-        XProperty::get(windowId(), XProperty::cnrTile, cnrTile);
-        XProperty::get(windowId(), XProperty::lCorner, lCorner);
-        XProperty::get(windowId(), XProperty::rCorner, rCorner);
+        topTile = pics->topTile;
+        btmTile = pics->btmTile;
+        cnrTile = pics->cnrTile;
+        lCorner = pics->lCorner;
+        rCorner = pics->rCorner;
         widget()->update();
     }
     else
@@ -665,33 +666,28 @@ Client::reset(unsigned long changed)
             else
 #endif
             {   // nope, but maybe stylecontrolled
-                uint bgColors, actColors, inactColors, pid;
-                bool b1 = false, b2 = false, b3 = false;
-                if (XProperty::get(windowId(), XProperty::pid, pid) &&
-                    factory()->hasDecoInfo(pid, bgColors, actColors, inactColors))
-                    { b1 = b2 = b3 = true; }
-                else
+                WindowData *data = (WindowData*)XProperty::get(windowId(), XProperty::winData, 9);
+                if (!data)
                 {
-                    b1 = XProperty::get(windowId(), XProperty::bgInfo, bgColors);
-                    b2 = XProperty::get(windowId(), XProperty::actInfo, actColors);
-                    b3 = XProperty::get(windowId(), XProperty::inactInfo, inactColors);
+                    uint pid;
+                    XProperty::get(windowId(), XProperty::pid, pid);
+                    data = factory()->decoInfo(pid);
                 }
-                if (b1)
+
+                if (data)
                 {
                     def = false;
-                    XProperty::decode(bgColors, colors[1][ColorTitleBar], colors[1][ColorFont], bgMode);
-                    colors[0][ColorTitleBar] = colors[1][ColorTitleBar];
-                    colors[0][ColorFont] = Colors::mid(colors[1][ColorTitleBar], colors[1][ColorFont],2,1);
-                }
-                if (b2)
-                {
-                    XProperty::decode(actColors, colors[1][ColorTitleBlend], colors[1][ColorButtonBg], gType[1]);
-                    gType[1] = Gradients::fromInfo(gType[1]);
-                }
-                if (b3)
-                {
-                    XProperty::decode(inactColors, colors[0][ColorTitleBlend], colors[0][ColorButtonBg], gType[0]);
-                    gType[0] = Gradients::fromInfo(gType[0]);
+                    colors[0][ColorTitleBar] = QColor(data->winColor[0]);
+                    colors[1][ColorTitleBar] = QColor(data->winColor[1]);
+                    colors[0][ColorFont] = QColor(data->textColor[0]);
+                    colors[1][ColorFont] = QColor(data->textColor[1]);
+                    colors[0][ColorTitleBlend] = QColor(data->decoColor[0]);
+                    colors[1][ColorTitleBlend] = QColor(data->decoColor[1]);
+                    colors[0][ColorButtonBg] = QColor(data->btnColor[0]);
+                    colors[1][ColorButtonBg] = QColor(data->btnColor[1]);
+                    bgMode = ((data->style >> 16) & 0xff);
+                    gType[0] = ((data->style >> 8) & 0xff);
+                    gType[1] = (data->style & 0xff);
                 }
             }
         }

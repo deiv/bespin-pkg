@@ -40,6 +40,7 @@ namespace Bespin
 {
 
 class Client;
+class WindowData;
 
 typedef struct
 {
@@ -67,23 +68,19 @@ public:
 //    virtual void checkRequirements( KDecorationProvides* provides );
     inline static int titleSize(bool minimal = false) {return titleSize_[minimal];}
     inline static const Config *config() { return &_config; }
-    bool hasDecoInfo(qint64 pid, uint &bgColors, uint &activeColors, uint &inactiveColors);
+    WindowData *decoInfo(qint64 pid);
     inline static const QVector<Button::Type> &multiButtons() { return multiButton_; }
     void showDesktopMenu(const QPoint &p, Client *client);
     void showInfo(const QPoint &p, WId id);
     void showWindowList(const QPoint &p, Client *client);
 protected:
     friend class BespinDecoAdaptor;
-    void learn(qint64 pid, uint bgColors, uint activeColors, uint inactiveColors);
+    void learn(qint64 pid, QByteArray data);
     void forget(qint64 pid);
 private:
     bool readConfig();
 private:
-    typedef struct
-    {
-        uint bgColors, activeColors, inactiveColors;
-    } DecoInfo;
-    QMap<qint64, DecoInfo*> _decoInfos;
+    QMap<qint64, WindowData*> _decoInfos;
     static bool initialized_;
     static int buttonSize_, borderSize_, titleSize_[2];
     static QVector<Button::Type> multiButton_;

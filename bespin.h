@@ -38,6 +38,7 @@ namespace Bespin
 {
 
 // class Style;
+class WindowData;
 
 typedef struct
 {
@@ -269,7 +270,8 @@ private:
     static bool isSpecialFrame(const QWidget *w);
     void erase(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
-    void setupDecoFor(const QWidget *w);
+    void setup(WindowData &data, const QPalette &palette, int mode, const int (&gt)[2]);
+    void setupDecoFor(WId winId, const QPalette &palette, int mode, const int (&gt)[2]);
 private:
     typedef QHash<uint, Tile::Set> TileCache;
     typedef struct

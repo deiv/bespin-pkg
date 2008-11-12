@@ -353,7 +353,7 @@ void Style::initMetrics()
 }
 
 #undef SCALE
-
+#include <QtDebug>
 void
 Style::init(const QSettings* settings)
 {

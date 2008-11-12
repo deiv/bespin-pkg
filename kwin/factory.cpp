@@ -40,6 +40,7 @@
 #include "client.h"
 #include "factory.h"
 #include "dbus.h"
+#include "../xproperty.h"
 
 #include <QtDebug>
 
@@ -509,20 +510,29 @@ Factory::supports( Ability ability ) const
 }
 
 void
-Factory::learn(qint64 pid, uint bgColors, uint activeColors, uint inactiveColors)
+Factory::learn(qint64 pid, QByteArray data)
 {
+    if (data.length() != 36)
+        return;
     forget(pid);
-    DecoInfo *info = new DecoInfo;
-    info->bgColors = bgColors;
-    info->activeColors = activeColors;
-    info->inactiveColors = inactiveColors;
+    WindowData *info = new WindowData;
+    int *ints = (int*)data.data();
+    info->winColor[0] = ints[0];
+    info->winColor[1] = ints[1];
+    info->decoColor[0] = ints[2];
+    info->decoColor[1] = ints[3];
+    info->textColor[0] = ints[4];
+    info->textColor[1] = ints[5];
+    info->btnColor[0] = ints[6];
+    info->btnColor[1] = ints[7];
+    info->style = ints[8];
     _decoInfos.insert(pid, info);
 }
 
 void
 Factory::forget(qint64 pid)
 {
-    QMap<qint64, DecoInfo*>::iterator i = _decoInfos.find(pid);
+    QMap<qint64, WindowData*>::iterator i = _decoInfos.find(pid);
     if (i == _decoInfos.end())
         return;
     
@@ -530,16 +540,13 @@ Factory::forget(qint64 pid)
     _decoInfos.erase(i);
 }
 
-bool
-Factory::hasDecoInfo(qint64 pid, uint &bgColors, uint &activeColors, uint &inactiveColors)
+WindowData*
+Factory::decoInfo(qint64 pid)
 {
-    QMap<qint64, DecoInfo*>::iterator i = _decoInfos.find(pid);
+    QMap<qint64, WindowData*>::iterator i = _decoInfos.find(pid);
     if (i == _decoInfos.end())
         return false;
-    bgColors = i.value()->bgColors;
-    activeColors = i.value()->activeColors;
-    inactiveColors = i.value()->inactiveColors;
-    return true;
+    return i.value();
 }
 
 #include "dbus.moc"

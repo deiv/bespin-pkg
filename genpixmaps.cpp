@@ -99,7 +99,7 @@ sunkenShadow(int size, bool enabled)
     const int rAdd = lround(25./F(4));
 
     // draw a flat shadow
-    SET_ALPHA(55+add);
+    SET_ALPHA(sqrt(Style::config.shadowIntensity) * (55 + add));
     p.DRAW_ROUND_RECT(0, 0, size, size-F(2), 80, 80);
 
     // subtract light
@@ -128,7 +128,7 @@ sunkenShadow(int size, bool enabled)
 static QPixmap
 relief(int size, bool enabled)
 {
-    const float f = enabled ? 1.0 : 0.7;
+    const float f = Style::config.shadowIntensity * (enabled ? 1.0 : 0.7);
     EMPTY_PIX(size, size);
     p.setBrush(Qt::NoBrush);
     p.setPen(QPen(BLACK(int(f*70)), F(1)));

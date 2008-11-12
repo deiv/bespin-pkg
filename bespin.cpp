@@ -31,7 +31,6 @@
 #include <QToolButton>
 #include <QTreeView>
 
-
 /**============= Bespin includes ==========================*/
 
 // #include "debug.h"
@@ -45,7 +44,7 @@
 
 /**=========================================================*/
 
-// #include <QtDebug>
+#include <QtDebug>
 
 
 /**============= extern C stuff ==========================*/
@@ -495,28 +494,32 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 
 // X11 properties for the deco ---------------
 void
-Style::setupDecoFor(const QWidget *w)
+Style::setup(WindowData &data, const QPalette &pal, int mode, const int (&gt)[2])
+{
+    data.winColor[0] = pal.color(QPalette::Inactive, QPalette::Window).rgba();
+    data.winColor[1] = pal.color(QPalette::Active, QPalette::Window).rgba();
+    data.textColor[0] = pal.color(QPalette::Inactive, QPalette::WindowText).rgba();
+    data.textColor[1] = pal.color(QPalette::Active, QPalette::WindowText).rgba();
+    //     const QColor bg_inact = (gt[0] != Gradients::None && config.kwin.active_role == config.kwin.inactive_role) ?
+    //     Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :    ;
+    data.decoColor[0] = CCOLOR(kwin.inactive, Bg).rgba();
+    data.decoColor[1] = CCOLOR(kwin.active, Bg).rgba();
+    data.btnColor[0] = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1).rgba();
+    data.btnColor[1] = CCOLOR(kwin.active, Fg).rgba();
+    data.style = ((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff);
+}
+
+void
+Style::setupDecoFor(WId winId, const QPalette &palette, int mode, const int (&gt)[2])
 {
 // XProperty actually handles the non X11 case, but we avoid overhead ;)
 #ifdef Q_WS_X11
-    const QPalette &pal = originalPalette ? *originalPalette : w->palette();
+    const QPalette &pal = originalPalette ? *originalPalette : palette;
 
     // the title region in the center
-    uint info = XProperty::encode(FCOLOR(Window), FCOLOR(WindowText), config.bg.mode);
-    XProperty::set(w->winId(), XProperty::bgInfo, info);
-
-    // the frame and button area for active windows
-    info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), GRAD(kwin)[1]);
-    XProperty::set(w->winId(), XProperty::actInfo, info);
-
-    // the frame and button area for INactive windows
-    const QColor bg_inact = (GRAD(kwin)[0] != Gradients::None &&
-    config.kwin.active_role == config.kwin.inactive_role) ?
-    Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :
-    CCOLOR(kwin.inactive, Bg);
-    const QColor fg = Colors::mid(bg_inact, CCOLOR(kwin.inactive, Fg), 2, 1);
-    info = XProperty::encode(CCOLOR(kwin.inactive, Bg), fg, GRAD(kwin)[0]);
-    XProperty::set(w->winId(), XProperty::inactInfo, info);
+    WindowData data;
+    setup(data, palette, mode, gt);
+    XProperty::set(winId, XProperty::winData, &data, 9);
 #endif
 }
 
@@ -774,7 +777,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             if (config.bg.modal.invert)
                 swapPalette(widget, this);
-            const QPalette &pal = widget->palette();
+            QPalette pal = widget->palette();
             BGMode bgMode = config.bg.mode;
             QColor bg = FCOLOR(Window);
             int gt[2] = { GRAD(kwin)[0], GRAD(kwin)[1] };
@@ -783,17 +786,13 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 widget->setAttribute(Qt::WA_MacBrushedMetal);
                 bgMode = Plain;
                 bg = bg.light(115-Colors::value(bg)/20);
+                pal.setColor(QPalette::Window, bg);
                 gt[0] = gt[1] = 0;
             }
             else
                 widget->setAttribute(Qt::WA_MacBrushedMetal, false);
 #ifdef Q_WS_X11
-            uint info = XProperty::encode(bg, FCOLOR(WindowText), bgMode);
-            XProperty::set(widget->winId(), XProperty::bgInfo, info);
-            info = XProperty::encode(CCOLOR(kwin.active, Bg), CCOLOR(kwin.active, Fg), gt[1]);
-            XProperty::set(widget->winId(), XProperty::actInfo, info);
-            info = XProperty::encode(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), gt[0]);
-            XProperty::set(widget->winId(), XProperty::inactInfo, info);
+            setupDecoFor(widget->winId(), pal, bgMode, gt);
 #endif
             widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
             return false;
@@ -846,28 +845,26 @@ Style::eventFilter( QObject *object, QEvent *ev )
         
     case QEvent::PaletteChange:
     {
-#define LACK_CONTRAST(_C_) Colors::contrast(pal.color(QPalette::Active, QPalette::_C_), pal.color(QPalette::Active, QPalette::_C_##Text)) < 40
-#define HARD_CONTRAST(_C_) Colors::value(pal.color(QPalette::Active, QPalette::_C_)) < 128 ? Qt::white : Qt::black
+#define LACK_CONTRAST(_C1_, _C2_) Colors::contrast(pal.color(QPalette::Active, _C1_), pal.color(QPalette::Active, _C2_)) < 40
+#define HARD_CONTRAST(_C_) Colors::value(pal.color(QPalette::Active, _C_)) < 128 ? Qt::white : Qt::black
         QWidget * widget = qobject_cast<QWidget*>(object);
         if (!widget)
             return false;
         
         if (widget->objectName() == "RenderFormElementWidget")
         {
-            widget->removeEventFilter(this);
-            QPalette pal = widget->palette();
-            if (LACK_CONTRAST(Window))
-                pal.setColor(QPalette::WindowText, HARD_CONTRAST(Window));
-            if (LACK_CONTRAST(Button))
-                pal.setColor(QPalette::ButtonText, HARD_CONTRAST(Button));
-            if (Colors::contrast(pal.color(QPalette::Active, QPalette::Highlight),
-                                 pal.color(QPalette::Active, QPalette::HighlightedText)) < 40)
-                pal.setColor(QPalette::HighlightedText, HARD_CONTRAST(Highlight));
-            if (Colors::contrast(pal.color(QPalette::Active, QPalette::Base),
-                                 pal.color(QPalette::Active, QPalette::Text)) < 40)
-                pal.setColor(QPalette::Text, HARD_CONTRAST(Base));
-            widget->setPalette(pal);
-            widget->installEventFilter(this);
+                QPalette pal = widget->palette();
+                if (LACK_CONTRAST(QPalette::Window, QPalette::WindowText))
+                    pal.setColor(QPalette::WindowText, HARD_CONTRAST(QPalette::Window));
+                if (LACK_CONTRAST(QPalette::Button, QPalette::ButtonText))
+                    pal.setColor(QPalette::ButtonText, HARD_CONTRAST(QPalette::Button));
+                if (LACK_CONTRAST(QPalette::Highlight, QPalette::HighlightedText))
+                    pal.setColor(QPalette::HighlightedText, HARD_CONTRAST(QPalette::Highlight));
+                if (LACK_CONTRAST(QPalette::Base, QPalette::Text))
+                    pal.setColor(QPalette::Text, HARD_CONTRAST(QPalette::Base));
+                widget->removeEventFilter(this);
+                widget->setPalette(pal);
+                widget->installEventFilter(this);
         }
         return false;
     }

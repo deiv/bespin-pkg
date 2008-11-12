@@ -34,17 +34,29 @@
 
 namespace Bespin {
 
-class XProperty {
-public:
-   static Atom bgInfo, actInfo, inactInfo, decoDim,
-   topTile, btmTile, cnrTile, lCorner, rCorner, pid;
 
-   static bool get(WId window, Atom atom, uint& data);
-   static void set(WId window, Atom atom, uint data);
-   static uint encode(const QColor &bg, const QColor &fg, uint hint);
-   static void decode(uint info, QColor &bg, QColor &fg, uint &hint);
-   static int toGradient(int info);
-   static int fromGradient(int gt);
+class WindowData
+{
+public:
+    QRgb winColor[2], decoColor[2], textColor[2], btnColor[2];
+    int style;
+};
+
+typedef struct _WindowPics
+{
+    uint topTile, btmTile, cnrTile, lCorner, rCorner;
+} WindowPics;
+
+class XProperty
+{
+public:
+    static Atom winData, bgPics, decoDim, pid;
+    static bool get(WId window, Atom atom, uint& data);
+    static void *get(WId window, Atom atom, unsigned long n);
+    static void set(WId window, Atom atom, uint data);
+    static void set(WId window, Atom atom, void *data, unsigned long n);
+    static int toGradient(int info);
+    static int fromGradient(int gt);
 };
 }
 #endif // XPROPERTY_H

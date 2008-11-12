@@ -32,26 +32,28 @@ using namespace Bespin;
 #include <X11/Xatom.h>
 #include <QX11Info>
 
-Atom XProperty::bgInfo =
-XInternAtom(QX11Info::display(), "BESPIN_DECO_BG_INFO", False);
-Atom XProperty::actInfo =
-XInternAtom(QX11Info::display(), "BESPIN_DECO_ACTIVE_INFO", False);
-Atom  XProperty::inactInfo =
-XInternAtom(QX11Info::display(), "BESPIN_DECO_INACTIVE_INFO", False);
-Atom  XProperty::decoDim =
-XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
-Atom  XProperty::topTile =
-XInternAtom(QX11Info::display(), "BESPIN_TOP_TILE", False);
-Atom  XProperty::btmTile =
-XInternAtom(QX11Info::display(), "BESPIN_BTM_TILE", False);
-Atom  XProperty::cnrTile =
-XInternAtom(QX11Info::display(), "BESPIN_CORNER_TILE", False);
-Atom  XProperty::lCorner =
-XInternAtom(QX11Info::display(), "BESPIN_LEFT_CORNER", False);
-Atom  XProperty::rCorner =
-XInternAtom(QX11Info::display(), "BESPIN_RIGHT_CORNER", False);
+Atom  XProperty::winData = XInternAtom(QX11Info::display(), "BESPIN_WIN_DATA", False);
+Atom  XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", False);
+Atom  XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
 Atom  XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
 
+void *
+XProperty::get(WId window, Atom atom, unsigned long n)
+{
+    unsigned char *chardata = 0;
+    int result, de; //dead end
+    unsigned long nn, de2;
+    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, n, False,
+                                    XA_CARDINAL, &de2, &de, &nn, &de2, &chardata);
+
+    if (result != Success || chardata == X::None || n != nn)
+        return NULL;
+        
+    return (void*)chardata;
+
+//     memcpy (&data, chardata, sizeof (int));
+//     return true;
+}
 
 bool
 XProperty::get(WId window, Atom atom, uint& data)
@@ -72,9 +74,16 @@ XProperty::get(WId window, Atom atom, uint& data)
 void
 XProperty::set(WId window, Atom atom, uint data)
 {
-   XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 32,
-                    PropModeReplace, (const unsigned char*)&data, 1L);
+   XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&data, 1L);
 }
+
+void
+XProperty::set(WId window, Atom atom, void *data, unsigned long n)
+{
+   XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)data, n);
+}
+
+#if 0
 
 /* The below functions mangle 2 rbg (24bit) colors and a 2 bit hint into
 a 32bit integer to be set as X11 property
@@ -125,3 +134,4 @@ XProperty::decode(uint info, QColor &bg, QColor &fg, uint &hint)
                 ((info >> 2) & 0x1f) << 3 );
     hint = info & 3;
 }
+#endif
