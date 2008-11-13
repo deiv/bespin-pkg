@@ -193,8 +193,8 @@ Style::drawToolButtonLabel(const QStyleOption * option,
             c = Colors::mid(c, FCOLOR(Highlight), 6-step, step);
         painter->setPen(c);
             
-//       QFont fnt = toolbutton->font;
-//       if (hover) fnt.setUnderline(true);
+//         QFont fnt = toolbutton->font;
+//         fnt.setStretch(QFont::SemiCondensed);
         painter->setFont(toolbutton->font);
 
         QRect pr = RECT, tr = RECT;

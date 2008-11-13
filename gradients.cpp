@@ -318,9 +318,9 @@ Gradients::borderline(const QColor &c, Position pos)
     
     QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
     
-    // cache for later ;)
-    _borderline[pos].insert(c.rgba(), pix, costs(pix));
-    return *pix;
+    if (_borderline[pos].insert(c.rgba(), pix, costs(pix)))
+        return *pix;
+    return nullPix;
 }
 
 const QPixmap&
@@ -400,10 +400,9 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         QPainter p(pix); p.fillRect(pix->rect(), grad); p.end();
     }
    
-    // cache for later
-    if (cache)
-        cache->insert(magicNumber, pix, costs(pix));
-    return *pix;
+    if (cache && cache->insert(magicNumber, pix, costs(pix)))
+        return *pix;
+    return nullPix;
 }
 
 #ifndef BESPIN_DECO
@@ -532,9 +531,9 @@ const QPixmap
     }
     p.end();
 
-    // cache for later ;)
-    _structure[light].insert(c.rgb(), pix, costs(pix));
-    return *pix;
+    if (_structure[light].insert(c.rgb(), pix, costs(pix)))
+        return *pix;
+    return nullPix;
 }
 
 const QPixmap
@@ -559,9 +558,9 @@ const QPixmap
     lg.setColorAt(1, QColor(v,v,v,0));
     QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
 
-    // cache for later ;)
-    _groupLight.insert(height, pix, costs(pix));
-    return *pix;
+    if (_groupLight.insert(height, pix, costs(pix)))
+        return *pix;
+    return nullPix;
 }
 
 const
@@ -587,8 +586,9 @@ QPixmap &Gradients::ambient(int height)
     QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
 
     // cache for later ;)
-    _btnAmbient.insert(height, pix, costs(pix));
-    return *pix;
+    if (_btnAmbient.insert(height, pix, costs(pix)))
+        return *pix;
+    return nullPix;
 }
 
 static QPixmap _bevel[2];
@@ -636,9 +636,9 @@ Gradients::shadow(int height, bool bottom)
     lg.setColorAt(1, QColor(0,0,0,0));
     QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
 
-    // cache for later ;)
-    _tabShadow.insert(val, pix, costs(pix));
-    return *pix;
+    if (_tabShadow.insert(val, pix, costs(pix)))
+        return *pix;
+    return nullPix;
 }
 
 static inline QPixmap *

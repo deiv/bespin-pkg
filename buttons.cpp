@@ -126,7 +126,7 @@ Style::drawPushButtonBevel(const QStyleOption * option,
         painter->restore();
     }
 }
-
+#include <QtDebug>
 void
 Style::drawButtonFrame(const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
