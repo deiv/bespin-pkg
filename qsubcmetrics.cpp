@@ -104,8 +104,8 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             ret = cb->rect;
             if (!cb->editable)
             { // shorten for the arrow
-                wi -= (int)((he - 2*margin)/1.1) + 3*margin;
-                ret.setRect(x+margin, y, wi, he);
+                wi -= (int)((he - 2*margin)/1.1) + margin;
+                ret.setRect(x + margin, y, wi, he);
             }
             break;
         default:
@@ -453,7 +453,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
             r.setRect(r.x(), r.y() + ((r.height() - h) / 2), h, h);
         if (element != SE_CheckBoxContents)
             return visualRect(option->direction, RECT, r);
-        int spacing = dpi.f5;
+        int spacing = F(5);
         r.setRect(r.right() + spacing, RECT.y(), RECT.width() - r.width() - spacing, RECT.height());
         return visualRect(option->direction, RECT, r);
     }
@@ -606,6 +606,9 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
         }
     case SE_TabWidgetTabPane: //
         return RECT;//.adjusted(-dpi.f8, 0, dpi.f8, 0);
+//     case SE_ItemViewItemFocusRect:
+//     case SE_ItemViewItemText:
+//     case SE_TreeViewDisclosureItem: //Area for the actual disclosure item in a tree branch.
     case SE_ToolBoxTabContents: // Area for a toolbox tab's icon and label
         return RECT;
 //    case SE_TabBarTearIndicator: // Area for the tear indicator on a tab bar with scroll arrows.

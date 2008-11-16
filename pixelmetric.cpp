@@ -104,9 +104,9 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
     case PM_ToolBarHandleExtent: // Width of a toolbar handle in a horizontal toolbar and the height of the handle in a vertical toolbar
         return F(6);
     case PM_ToolBarItemMargin: // Spacing between the toolbar frame and the items
-        return F(1);//f4
+        return F(2);//f4
     case PM_ToolBarItemSpacing: // Spacing between toolbar items
-        return F(2);
+        return F(4);
     case PM_ToolBarSeparatorExtent: // Width of a toolbar separator in a horizontal toolbar and the height of a separator in a vertical toolbar
         return F(6);
     case PM_ToolBarExtensionExtent: // Width of a toolbar extension button in a horizontal toolbar and the height of the button in a vertical toolbar
@@ -180,15 +180,16 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
         return F(4);
 //    case PM_DefaultTopLevelMargin: //
 //    case PM_DefaultChildMargin: //
-//    case PM_DefaultLayoutSpacing: //
+//     case PM_DefaultLayoutSpacing: //
+//         return 100;
     case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize
         return 22;
     case PM_SmallIconSize: // Default small icon size
         return 16;
     case PM_LargeIconSize: // Default large icon size
         return 32;
-    case PM_FocusFrameHMargin: // Horizontal margin that the focus frame will outset the widget by.
-        return F(4);
+//     case PM_FocusFrameHMargin: // Horizontal margin that the focus frame will outset the widget by.
+//         return //F(4); // GNARF, KCategoryView or dolphin hardcodes this value to Qt def. TODO!
     case PM_FocusFrameVMargin: // Vertical margin that the focus frame will outset the widget by.
         return F(2);
 //    case PM_IconViewIconSize: //
