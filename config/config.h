@@ -44,6 +44,7 @@ public slots:
     void import();
     void saveAs();
 private:
+    Q_DISABLE_COPY(Config)
     /** This is the UI created with Qt Designer and included by ui_config.h */
     Ui::Config ui;
 

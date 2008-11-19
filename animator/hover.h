@@ -24,25 +24,26 @@
 namespace Animator {
 
 class Hover : public Basic {
-   Q_OBJECT
-public:
-   static bool manage(QWidget *w, bool isScrollArea = false);
-   static bool managesArea(QWidget *area);
-   static void release(QWidget *w);
-   static void setDuration(uint ms);
-   static void setFPS(uint fps);
-   static int step(const QWidget *widget);
+Q_OBJECT
+    public:
+    static bool manage(QWidget *w, bool isScrollArea = false);
+    static bool managesArea(QWidget *area);
+    static void release(QWidget *w);
+    static void setDuration(uint ms);
+    static void setFPS(uint fps);
+    static int step(const QWidget *widget);
 protected:
-   Hover();
-   virtual bool manageScrollArea(QWidget *w);
-   void _setFPS(uint fps);
-   virtual int _step(const QWidget *widget, long int index = 0) const;
-   virtual void play(QWidget *widget, bool bwd = false);
+    Hover();
+    virtual bool manageScrollArea(QWidget *w);
+    void _setFPS(uint fps);
+    virtual int _step(const QWidget *widget, long int index = 0) const;
+    virtual void play(QWidget *widget, bool bwd = false);
 protected slots:
-   virtual bool eventFilter( QObject *object, QEvent *event );
-   virtual void timerEvent(QTimerEvent * event);
+    virtual bool eventFilter( QObject *object, QEvent *event );
+    virtual void timerEvent(QTimerEvent * event);
 private:
-   QObjectList _scrollAreas;
+    Q_DISABLE_COPY(Hover)
+    QObjectList _scrollAreas;
 };
 
 }

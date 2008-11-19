@@ -83,6 +83,7 @@ protected:
     QColor color(ColorType type, bool active=true) const;
     inline int buttonSize() const { return _factory->buttonSize(); }
 private:
+    Q_DISABLE_COPY(Client)
     void repaint(QPainter &p);
     void updateTitleLayout( const QSize& s );
     void updateButtonCorner(bool right = false);

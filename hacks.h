@@ -30,10 +30,13 @@ class Hacks : public QObject
 {
    Q_OBJECT
 public:
+    Hacks() {}
     enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM, Amarok };
     bool eventFilter( QObject *, QEvent *);
     static bool add(QWidget *w);
     static void remove(QWidget *w);
+private:
+    Q_DISABLE_COPY(Hacks)
 };
 } // namespace
 #endif // BESPIN_HACKS_H

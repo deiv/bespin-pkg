@@ -54,7 +54,7 @@ typedef struct
 
 
 class
-Style : public QCommonStyle
+Q_GUI_EXPORT Style : public QCommonStyle
 {
     Q_OBJECT
     Q_CLASSINFO ("X-KDE-CustomElements", "true")
@@ -259,8 +259,7 @@ protected:
 //   void fakeMouse();
    
 private:
-    Style( const Style & );
-    Style& operator=( const Style & );
+    Q_DISABLE_COPY(Style)
     QColor mapFadeColor(const QColor &color, int index) const;
     int elementId(const QString &string) const;
     void generatePixmaps();

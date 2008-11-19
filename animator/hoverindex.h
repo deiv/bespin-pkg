@@ -59,6 +59,8 @@ protected:
    Items items;
 protected slots:
    void release(QObject *o);
+private:
+    Q_DISABLE_COPY(HoverIndex)
 };
 
 }

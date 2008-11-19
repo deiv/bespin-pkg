@@ -353,10 +353,11 @@ void Style::initMetrics()
 }
 
 #undef SCALE
-#include <QtDebug>
+
 void
 Style::init(const QSettings* settings)
 {
+    QTime time; time.start();
     // various workarounds... ==========================
     if (getenv("GTK_QT_ENGINE_ACTIVE"))
         { appType = GTK; qWarning("BESPIN: Detected GKT+ application"); }
@@ -375,13 +376,12 @@ Style::init(const QSettings* settings)
     else
         appType = Unknown;
     // ==========================
-    
     readSettings(settings);
     initMetrics();
     generatePixmaps();
     Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
-                    config.bg.structure, _progressBase, config.bg.intensity, dpi.f8);
-    int f2 = dpi.f2, f4 = dpi.f4;
+                    config.bg.structure, _progressBase, config.bg.intensity, F(8));
+    int f2 = F(2), f4 = F(4);
     QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
     inner.adjust(f4,f4,-f4,-dpi.f1); outer.adjust(0,0,0,dpi.f3);
     VisualFrame::setGeometry(QFrame::Sunken, inner, outer);

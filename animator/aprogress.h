@@ -6,16 +6,18 @@
 namespace Animator {
 
 class Progress : public Basic {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   static bool manage(QWidget *w);
-   static void release(QWidget *w);
-   static int step(const QWidget *w);
+    static bool manage(QWidget *w);
+    static void release(QWidget *w);
+    static int step(const QWidget *w);
 protected:
-   Progress() : Basic() {};
-   int _step(const QWidget *widget, long int index = 0) const;
+    Progress() : Basic() {};
+    int _step(const QWidget *widget, long int index = 0) const;
 protected slots:
-   void timerEvent(QTimerEvent * event);
+    void timerEvent(QTimerEvent * event);
+private:
+    Q_DISABLE_COPY(Progress)
 };
 
 }

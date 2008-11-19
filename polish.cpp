@@ -101,8 +101,6 @@ mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
                  ((w1*c1.alpha() + w2*c2.alpha())/sum) & 0xff);
 }
 
-static QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco");
-
 #undef PAL
 #define PAL pal
 
@@ -209,6 +207,7 @@ void Style::polish( QPalette &pal, bool onInit )
         ints[6] = winData.btnColor[0];
         ints[7] = winData.btnColor[1];
         ints[8] = winData.style;
+        QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco");
         bespinDeco.call(QDBus::NoBlock, "styleByPid",
 #if QT_VERSION < 0x040400
                         getpid(),

@@ -62,6 +62,7 @@ protected:
     void timerEvent ( QTimerEvent * event );
     void wheelEvent(QWheelEvent * event);
 private:
+    Q_DISABLE_COPY(Button)
     QColor color() const;
     bool zoomOut;
     Client *client;

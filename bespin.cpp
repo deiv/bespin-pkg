@@ -46,23 +46,22 @@
 
 #include <QtDebug>
 
-
 /**============= extern C stuff ==========================*/
 class BespinStylePlugin : public QStylePlugin
 {
 public:
-   QStringList keys() const {
-      return QStringList() << "Bespin";
-   }
-   
-   QStyle *create(const QString &key) {
-      if (key == "bespin")
-         return new Bespin::Style;
-      return 0;
-   }
+    QStringList keys() const {
+        return QStringList() << "Bespin";
+    }
+
+    QStyle *create(const QString &key) {
+        if (key == "bespin")
+            return new Bespin::Style;
+        return 0;
+    }
 };
 
-Q_EXPORT_PLUGIN2(BespinStyle, BespinStylePlugin)
+Q_EXPORT_PLUGIN2(Bespin, BespinStylePlugin)
 /**=========================================================*/
 
 using namespace Bespin;
@@ -245,6 +244,7 @@ Style::registerRoutines()
 
 Style::Style() : QCommonStyle(), originalPalette(0)
 {
+    setObjectName(QLatin1String("Bespin"));
    _scanlines[0] = _scanlines[1] = 0L;
    init();
    registerRoutines();

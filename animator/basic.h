@@ -25,53 +25,57 @@
 
 namespace Animator {
 
-class Info {
+class Info
+{
 public:
-   Info(int s = 0, bool bwd = false);
-   virtual ~Info(){}
-   virtual int step(long int idx = 0) const;
-   bool bwd() const;
-   int & operator++ (){return ++_step;}
-   int operator++ ( int ) {return _step++;}
-   int & operator-- () {return --_step;}
-   int operator-- ( int ) {return _step--;}
+    Info(int s = 0, bool bwd = false);
+    virtual ~Info(){}
+    virtual int step(long int idx = 0) const;
+    bool bwd() const;
+    int & operator++ (){return ++_step;}
+    int operator++ ( int ) {return _step++;}
+    int & operator-- () {return --_step;}
+    int operator-- ( int ) {return _step--;}
 protected:
-   friend class Basic;
-   friend class Progress;
-   friend class Hover;
-   int _step; bool backwards;
-   void init(int s = 0, bool bwd = false);
+    friend class Basic;
+    friend class Progress;
+    friend class Hover;
+    int _step; bool backwards;
+    void init(int s = 0, bool bwd = false);
 };
 
-class Basic : public QObject {
-   Q_OBJECT
+class Basic : public QObject
+{
+    Q_OBJECT
 public:
-   static bool manage(QWidget *w);
-   static void release(QWidget *w);
-   static int step(const QWidget *widget);
-   virtual const Info &info(const QWidget *widget, long int index = 0) const;
-   static void setFPS(uint fps);
-   
+    static bool manage(QWidget *w);
+    static void release(QWidget *w);
+    static int step(const QWidget *widget);
+    virtual const Info &info(const QWidget *widget, long int index = 0) const;
+    static void setFPS(uint fps);
+
 protected:
-   Basic();
-   virtual ~Basic(){}
-   virtual bool eventFilter( QObject *object, QEvent *event );
-   virtual bool noAnimations() const;
-   virtual void play(QWidget *widget, bool bwd = false);
-   virtual bool _manage(QWidget *w);
-   virtual void _release(QWidget *w);
-   virtual int _step(const QWidget *widget, long int index = 0) const;
-   virtual void timerEvent(QTimerEvent * event);
-   virtual void _setFPS(uint fps);
-   QBasicTimer timer;
-   uint timeStep;
-   uint count;
-   typedef QPointer<QWidget> WidgetPtr;
-   typedef QMap<WidgetPtr, Info> Items;
-   Items items;
+    Basic();
+    virtual ~Basic(){}
+    virtual bool eventFilter( QObject *object, QEvent *event );
+    virtual bool noAnimations() const;
+    virtual void play(QWidget *widget, bool bwd = false);
+    virtual bool _manage(QWidget *w);
+    virtual void _release(QWidget *w);
+    virtual int _step(const QWidget *widget, long int index = 0) const;
+    virtual void timerEvent(QTimerEvent * event);
+    virtual void _setFPS(uint fps);
+    QBasicTimer timer;
+    uint timeStep;
+    uint count;
+    typedef QPointer<QWidget> WidgetPtr;
+    typedef QMap<WidgetPtr, Info> Items;
+    Items items;
 protected slots:
-   virtual void release_s(QObject*);
+    virtual void release_s(QObject*);
 //    void pause(QWidget *w);
+private:
+    Q_DISABLE_COPY(Basic)
 };
 
 } // namespace

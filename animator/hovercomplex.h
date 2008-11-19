@@ -24,31 +24,34 @@
 
 namespace Animator {
 
-class ComplexInfo {
-   public:
-      ComplexInfo() {
-         active = fades[In] = fades[Out] = QStyle::SC_None;
-      }
-      QStyle::SubControls active, fades[2];
-      inline int step(QStyle::SubControl sc) const {return steps.value(sc);}
-   private:
-      friend class HoverComplex;
-      QHash<QStyle::SubControl, int> steps;
+class ComplexInfo
+{
+    public:
+        ComplexInfo() {
+            active = fades[In] = fades[Out] = QStyle::SC_None;
+        }
+        QStyle::SubControls active, fades[2];
+        inline int step(QStyle::SubControl sc) const {return steps.value(sc);}
+    private:
+        friend class HoverComplex;
+        QHash<QStyle::SubControl, int> steps;
 };
 
-class HoverComplex : public HoverIndex {
-   public:
-      static const ComplexInfo *info(const QWidget *widget, QStyle::SubControls active);
-      static void setDuration(uint ms);
-      static void setFPS(uint fps);
-   protected:
-      const ComplexInfo *_info(const QWidget *widget, QStyle::SubControls active) const;
-      void timerEvent(QTimerEvent * event);
-      typedef QPointer<QWidget> WidgetPtr;
-      typedef QMap<WidgetPtr, ComplexInfo> Items;
-      Items items;
-   private:
-      HoverComplex() : HoverIndex() {};
+class HoverComplex : public HoverIndex
+{
+    public:
+        static const ComplexInfo *info(const QWidget *widget, QStyle::SubControls active);
+        static void setDuration(uint ms);
+        static void setFPS(uint fps);
+    protected:
+        const ComplexInfo *_info(const QWidget *widget, QStyle::SubControls active) const;
+        void timerEvent(QTimerEvent * event);
+        typedef QPointer<QWidget> WidgetPtr;
+        typedef QMap<WidgetPtr, ComplexInfo> Items;
+        Items items;
+    private:
+        Q_DISABLE_COPY(HoverComplex)
+        HoverComplex() {}
 };
 
 } // namespace

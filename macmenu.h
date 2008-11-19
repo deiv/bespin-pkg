@@ -59,6 +59,7 @@ protected:
     void deactivate(QWidget *window);
     void activate(QWidget *window);
 private:
+    Q_DISABLE_COPY(MacMenu)
     MacMenu();
     void activate(QMenuBar *menu);
     void changeAction(QMenuBar *menu, QActionEvent *ev);
