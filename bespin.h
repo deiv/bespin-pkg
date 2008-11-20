@@ -167,7 +167,6 @@ protected:
     // menus.cpp
     void drawMenuBarBg(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawMenuBarItem(const QStyleOption*, QPainter*, const QWidget*) const;
-    void drawMenuFrame(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawMenuItem(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawMenuScroller(const QStyleOption*, QPainter*, const QWidget*) const;
     // progress.cpp

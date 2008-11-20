@@ -132,20 +132,6 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         drawItemText(painter, r, alignment, mbi->palette, isEnabled, mbi->text, (hover || step > 3) ? fg : fg2);
 }
 
-void
-Style::drawMenuFrame(const QStyleOption * option, QPainter * painter, const QWidget *) const
-{
-    if (!config.menu.shadow)
-        return;
-    const int f1 = dpi.f1;
-    QPen pen(Colors::mid(CCOLOR(menu.std, Bg), CCOLOR(menu.std, Fg),4,1), f1);
-    painter->save();
-    painter->setBrush(Qt::NoBrush);
-    painter->setPen(pen);
-    painter->drawRect(RECT.adjusted(f1/2,f1/2,-f1,-f1));
-    painter->restore();
-}
-
 static const int windowsItemFrame   = 1; // menu item frame width
 static const int windowsItemHMargin = 3; // menu item hor text margin
 static const int windowsItemVMargin = 1; // menu item ver text margin

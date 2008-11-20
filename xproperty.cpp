@@ -48,7 +48,7 @@ XProperty::get(WId window, Atom atom, unsigned long n)
 
     if (result != Success || chardata == X::None || n != nn)
         return NULL;
-        
+
     return (void*)chardata;
 
 //     memcpy (&data, chardata, sizeof (int));

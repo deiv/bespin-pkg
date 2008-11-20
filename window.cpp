@@ -134,7 +134,7 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
         pics.cnrTile = set.cornerTile.x11PictureHandle();
         pics.lCorner = set.lCorner.x11PictureHandle();
         pics.rCorner = set.rCorner.x11PictureHandle();
-        XProperty::set(widget->winId(), XProperty::bgPics, &pics, 5);
+        XProperty::set(widget->winId(), XProperty::bgPics, &pics, (5*sizeof(Picture))/4);
         rect.adjust(-((decoDim >> 24) & 0xff), -((decoDim >> 16) & 0xff), (decoDim >> 8) & 0xff, decoDim & 0xff);
     }
 #endif

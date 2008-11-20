@@ -68,7 +68,7 @@ Client::~Client(){
 void
 Client::updateStylePixmaps()
 {
-    if (WindowPics *pics = (WindowPics*)XProperty::get(windowId(), XProperty::bgPics, 5))
+    if (WindowPics *pics = (WindowPics*)XProperty::get(windowId(), XProperty::bgPics, (5*sizeof(Picture))/4))
     {
         topTile = pics->topTile;
         btmTile = pics->btmTile;
@@ -669,9 +669,9 @@ Client::reset(unsigned long changed)
                 WindowData *data = (WindowData*)XProperty::get(windowId(), XProperty::winData, 9);
                 if (!data)
                 {
-                    uint pid;
-                    XProperty::get(windowId(), XProperty::pid, pid);
-                    data = factory()->decoInfo(pid);
+                    long int *pid = (long int*)XProperty::get(windowId(), XProperty::pid, sizeof(long int)/4);
+                    if (pid)
+                        data = factory()->decoInfo(*pid);
                 }
 
                 if (data)
