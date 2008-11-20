@@ -175,10 +175,10 @@ Style::drawToolButtonLabel(const QStyleOption * option,
             img.fill(Qt::transparent);
             QPainter p(&img);
             p.setOpacity(0.4);
-            p.drawImage(F(2),F(2),pm.toImage());
+            p.drawImage(F(4),F(4),pm.toImage().scaled(pm.size() - QSize(F(4),F(4)), Qt::KeepAspectRatio, Qt::SmoothTransformation));
             p.end();
 //             FX::desaturate(img, FCOLOR(Window)); // nope - don't use 2 chained FX!
-            FX::expblur(img, F(4)/*pm.width()/4*/); // aligning blur kernel to icon size looks crap
+            FX::expblur(img, F(5));
             pm = QPixmap::fromImage(img);
         }
         else if (step && !sunken && !pm.isNull())

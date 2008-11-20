@@ -359,7 +359,7 @@ Style::init(const QSettings* settings)
 {
     QTime time; time.start();
     // various workarounds... ==========================
-    if (getenv("GTK_QT_ENGINE_ACTIVE"))
+    if (!qApp->inherits("KApplication") && getenv("GTK_QT_ENGINE_ACTIVE"))
         { appType = GTK; qWarning("BESPIN: Detected GKT+ application"); }
     else if (qApp->inherits("GreeterApp"))
         appType = KDM;

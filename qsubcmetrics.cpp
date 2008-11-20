@@ -88,7 +88,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             ret = cb->rect;
             break;
          case SC_ComboBoxArrow:
-            he = cb->fontMetrics.ascent() + dpi.f2;
+            he = cb->fontMetrics.ascent() + F(2);
 //             he -= 2*margin;
             x += wi; wi = (int)(he*1.1); //1.618
             x -= margin + wi;
