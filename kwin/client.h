@@ -31,6 +31,9 @@
 #include <kdecoration.h>
 #include "factory.h"
 
+#include <X11/extensions/Xrender.h>
+#include "../fixx11h.h"
+
 class QHBoxLayout;
 class QSpacerItem;
 
@@ -91,7 +94,7 @@ private:
     QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
     Button *buttons[4];
     int borderSize, titleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
-    uint topTile, btmTile, cnrTile, lCorner, rCorner;
+    Picture topTile, btmTile, cnrTile, lCorner, rCorner;
     uint bgMode, gType[2];
     bool _small;
     Factory *_factory;
