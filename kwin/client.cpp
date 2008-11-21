@@ -641,13 +641,16 @@ Client::reset(unsigned long changed)
             def = false;
             bgMode = 0;
             gType[0] = gType[1] = Gradients::None;
+
             colors[0][ColorTitleBlend] = colors[1][ColorTitleBlend] =
-                                         colors[0][ColorTitleBar] = colors[1][ColorTitleBar] =
-                                         widget()->palette().color(QPalette::Active, QPalette::Window);
+            colors[0][ColorTitleBar] = colors[1][ColorTitleBar] =
+            widget()->palette().color(QPalette::Active, QPalette::Window);
+            
             colors[1][ColorButtonBg] = colors[1][ColorFont] =
-                                       widget()->palette().color(QPalette::Active, QPalette::WindowText);
+            widget()->palette().color(QPalette::Active, QPalette::WindowText);
+
             colors[0][ColorButtonBg] = colors[0][ColorFont] =
-                                     Colors::mid(colors[0][ColorTitleBar], colors[1][ColorFont]);
+            Colors::mid(colors[0][ColorTitleBar], colors[1][ColorFont]);
         }
         else if (!config()->forceUserColors)
         {
@@ -676,14 +679,14 @@ Client::reset(unsigned long changed)
                 if (data)
                 {
                     def = false;
-                    colors[0][ColorTitleBar] = QColor(data->winColor[0]);
-                    colors[1][ColorTitleBar] = QColor(data->winColor[1]);
-                    colors[0][ColorFont] = QColor(data->textColor[0]);
-                    colors[1][ColorFont] = QColor(data->textColor[1]);
-                    colors[0][ColorTitleBlend] = QColor(data->decoColor[0]);
-                    colors[1][ColorTitleBlend] = QColor(data->decoColor[1]);
-                    colors[0][ColorButtonBg] = QColor(data->btnColor[0]);
-                    colors[1][ColorButtonBg] = QColor(data->btnColor[1]);
+                    colors[0][ColorTitleBar].setRgba(data->winColor[0]);
+                    colors[1][ColorTitleBar].setRgba(data->winColor[1]);
+                    colors[0][ColorFont].setRgba(data->textColor[0]);
+                    colors[1][ColorFont].setRgba(data->textColor[1]);
+                    colors[0][ColorTitleBlend].setRgba(data->decoColor[0]);
+                    colors[1][ColorTitleBlend].setRgba(data->decoColor[1]);
+                    colors[0][ColorButtonBg].setRgba(data->btnColor[0]);
+                    colors[1][ColorButtonBg].setRgba(data->btnColor[1]);
                     bgMode = ((data->style >> 16) & 0xff);
                     gType[0] = ((data->style >> 8) & 0xff);
                     gType[1] = (data->style & 0xff);

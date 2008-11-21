@@ -501,15 +501,15 @@ Style::setup(WindowData &data, const QPalette &pal, int mode, const int (&gt)[2]
 {
     data.winColor[0] = pal.color(QPalette::Inactive, QPalette::Window).rgba();
     data.winColor[1] = pal.color(QPalette::Active, QPalette::Window).rgba();
-    data.textColor[0] = pal.color(QPalette::Inactive, QPalette::WindowText).rgba();
-    data.textColor[1] = pal.color(QPalette::Active, QPalette::WindowText).rgba();
-    //     const QColor bg_inact = (gt[0] != Gradients::None && config.kwin.active_role == config.kwin.inactive_role) ?
-    //     Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :    ;
     data.decoColor[0] = CCOLOR(kwin.inactive, Bg).rgba();
     data.decoColor[1] = CCOLOR(kwin.active, Bg).rgba();
+    data.textColor[0] = pal.color(QPalette::Inactive, QPalette::WindowText).rgba();
+    data.textColor[1] = pal.color(QPalette::Active, QPalette::WindowText).rgba();
+//     const QColor bg_inact = (gt[0] != Gradients::None && config.kwin.active_role == config.kwin.inactive_role) ?
+//     Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :    ;
     data.btnColor[0] = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1).rgba();
     data.btnColor[1] = CCOLOR(kwin.active, Fg).rgba();
-    data.style = ((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff);
+    data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
 }
 
 void

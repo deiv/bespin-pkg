@@ -197,7 +197,7 @@ void Style::polish( QPalette &pal, bool onInit )
         WindowData winData;
         setup(winData, pal, config.bg.mode, GRAD(kwin));
         QByteArray data(36, 'a');
-        int *ints = (int*)data.data();
+        uint *ints = (uint*)data.data();
         ints[0] = winData.winColor[0];
         ints[1] = winData.winColor[1];
         ints[2] = winData.decoColor[0];
@@ -376,16 +376,17 @@ Style::polish( QWidget * widget )
             widget->installEventFilter(this); // shape corners... repeated below!
 #endif
         else
-        {   /// modal dialogs
+        {
             if (config.bg.modal.invert || config.bg.modal.glassy || config.bg.modal.opacity < 100)
             // the modality isn't necessarily set yet, so we catch it on QEvent::Show
-                widget->installEventFilter(this);
+                widget->installEventFilter(this); /// modal dialogs
 
             // talk to kwin about colors, gradients, etc.
             Qt::WindowFlags ignore =    Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::ToolTip |
                                         Qt::SplashScreen | Qt::Desktop |
                                         Qt::X11BypassWindowManagerHint;// | Qt::FramelessWindowHint; <- could easily change mind...?!
-            ignore &= ~Qt::Dialog; // erase dialog, it's in drawer et al. - takes away window as well
+            ignore &= ~Qt::Dialog; // erase dialog, it's in drawer et al. but takes away window as well
+            
             if (!(widget->windowFlags() & ignore)) // this can be expensive, so avoid for popups, combodrops etc.
                 setupDecoFor(widget->winId(), widget->palette(), config.bg.mode, GRAD(kwin));
         }
