@@ -30,6 +30,7 @@
 #include <QWidget>
 
 #include <X11/Xlib.h>
+#include <X11/extensions/Xrender.h>
 #include "fixx11h.h"
 
 namespace Bespin {
@@ -44,7 +45,7 @@ public:
 
 typedef struct _WindowPics
 {
-    uint topTile, btmTile, cnrTile, lCorner, rCorner;
+    Picture topTile, btmTile, cnrTile, lCorner, rCorner;
 } WindowPics;
 
 class XProperty
