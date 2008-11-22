@@ -40,7 +40,7 @@ namespace Bespin
 {
 
 class Client;
-class WindowData;
+typedef struct _WindowData WindowData;
 
 typedef struct
 {

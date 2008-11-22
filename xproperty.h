@@ -36,12 +36,11 @@
 namespace Bespin {
 
 
-class WindowData
+typedef struct _WindowData
 {
-public:
     QRgb winColor[2], decoColor[2], textColor[2], btnColor[2];
     int style;
-};
+} WidownData;
 
 typedef struct _WindowPics
 {

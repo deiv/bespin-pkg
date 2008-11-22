@@ -38,7 +38,7 @@ namespace Bespin
 {
 
 // class Style;
-class WindowData;
+typedef struct _WindowData WindowData;
 
 typedef struct
 {
