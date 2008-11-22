@@ -184,7 +184,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>0</number>
+      <number>9</number>
      </property>
      <widget class="QWidget" name="Seite_3" >
       <layout class="QGridLayout" name="gridLayout_2" >
@@ -1738,7 +1738,20 @@
           <string>Active Titlebar</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_7" >
-          <item row="0" column="0" >
+          <item row="0" column="0" colspan="2" >
+           <widget class="QLabel" name="label_9" >
+            <property name="text" >
+             <string>Text:</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QComboBox" name="kwinActiveText" />
+          </item>
+          <item row="1" column="0" >
            <widget class="QComboBox" name="kwinActiveGrad" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
@@ -1748,7 +1761,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
+          <item row="1" column="1" >
            <widget class="QLabel" name="label_22" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
@@ -1764,7 +1777,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2" >
+          <item row="1" column="2" >
            <widget class="QComboBox" name="kwinActiveRole" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
@@ -1783,7 +1796,20 @@
           <string>Inactive Titlebar</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_14" >
-          <item row="0" column="0" >
+          <item row="0" column="0" colspan="2" >
+           <widget class="QLabel" name="label_4" >
+            <property name="text" >
+             <string>Text (autoshadeed):</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QComboBox" name="kwinInactiveText" />
+          </item>
+          <item row="1" column="0" >
            <widget class="QComboBox" name="kwinInactiveGrad" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
@@ -1793,7 +1819,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
+          <item row="1" column="1" >
            <widget class="QLabel" name="label_23" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
@@ -1815,7 +1841,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2" >
+          <item row="1" column="2" >
            <widget class="QComboBox" name="kwinInactiveRole" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >

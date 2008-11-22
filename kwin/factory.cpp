@@ -239,11 +239,11 @@ bool Factory::readConfig()
     {
         case BorderTiny: borderSize_ = 0; break;
         default:
-        case BorderNormal: borderSize_ = 6; break;
-        case BorderLarge: borderSize_ = 8; break;
-        case BorderVeryLarge: borderSize_ = 11; break;
-        case BorderHuge: borderSize_ = 16; break;
-        case BorderVeryHuge: borderSize_ = 20; break;
+        case BorderNormal: borderSize_ = 3; break;
+        case BorderLarge: borderSize_ = 6; break;
+        case BorderVeryLarge: borderSize_ = 9; break;
+        case BorderHuge: borderSize_ = 15; break;
+        case BorderVeryHuge: borderSize_ = 21; break;
         case BorderOversized: borderSize_ = 30; break;
     }
     if (oldbordersize != borderSize_) ret = true;

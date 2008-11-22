@@ -95,7 +95,8 @@ private:
     Button *buttons[4];
     int borderSize, titleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
     Picture topTile, btmTile, cnrTile, lCorner, rCorner;
-    uint bgMode, gType[2];
+    uint bgMode;
+    Gradients::Type gType[2];
     bool _small;
     Factory *_factory;
     QHBoxLayout *titleBar;

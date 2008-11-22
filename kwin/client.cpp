@@ -479,7 +479,7 @@ Client::repaint(QPainter &p)
 //       p.setPen(Colors::mid(bg, Qt::white,6,1));
 //       p.drawLine(0,titleSize-1,width(),titleSize-1);
 
-            Gradients::Type titleGradient = (Gradients::Type)gType[isActive()];
+            Gradients::Type titleGradient = gType[isActive()];
             if (titleGradient && label.width())
             {   // nice deco
                 p.setRenderHint( QPainter::Antialiasing );
@@ -528,7 +528,7 @@ Client::repaint(QPainter &p)
         if (gType[isActive()])
         {   // button corner
             QColor shadow = Colors::mid(bg2, Qt::black,4,1);
-            const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, (Gradients::Type)gType[isActive()]);
+            const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, gType[isActive()]);
             p.setPen(shadow);
             p.setBrush(fill);
             p.setRenderHint( QPainter::Antialiasing );
@@ -688,8 +688,8 @@ Client::reset(unsigned long changed)
                     colors[0][ColorButtonBg].setRgba(data->btnColor[0]);
                     colors[1][ColorButtonBg].setRgba(data->btnColor[1]);
                     bgMode = ((data->style >> 16) & 0xff);
-                    gType[0] = ((data->style >> 8) & 0xff);
-                    gType[1] = (data->style & 0xff);
+                    gType[0] = (Gradients::Type)((data->style >> 8) & 0xff);
+                    gType[1] = (Gradients::Type)(data->style & 0xff);
                 }
             }
         }

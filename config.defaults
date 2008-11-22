@@ -62,6 +62,8 @@
 #define KWIN_ACTIVE_ROLE "KWin.ActiveRole", QPalette::WindowText
 #define KWIN_INACTIVE_GRADIENT "KWin.InactiveGradient", Gradients::None
 #define KWIN_ACTIVE_GRADIENT "KWin.ActiveGradient", Gradients::Button
+#define KWIN_INACTIVE_TEXT_ROLE "KWin.InactiveText", QPalette::WindowText
+#define KWIN_ACTIVE_TEXT_ROLE "KWin.ActiveText", QPalette::WindowText
 
 #define MENU_GLASSY "Menu.Glassy", true
 #define MENU_OPACITY "Menu.Opacity", 100

@@ -268,8 +268,8 @@ private:
     static bool isSpecialFrame(const QWidget *w);
     void erase(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
-    void setup(WindowData &data, const QPalette &palette, int mode, const int (&gt)[2]);
-    void setupDecoFor(WId winId, const QPalette &palette, int mode, const int (&gt)[2]);
+    void setup(WindowData &data, const QPalette &palette, int mode, const Gradients::Type (&gt)[2]);
+    void setupDecoFor(WId winId, const QPalette &palette, int mode, const Gradients::Type (&gt)[2]);
 private:
     typedef QHash<uint, Tile::Set> TileCache;
     typedef struct

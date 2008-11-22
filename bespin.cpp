@@ -497,14 +497,14 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 
 // X11 properties for the deco ---------------
 void
-Style::setup(WindowData &data, const QPalette &pal, int mode, const int (&gt)[2])
+Style::setup(WindowData &data, const QPalette &pal, int mode, const Gradients::Type (&gt)[2])
 {
     data.winColor[0] = pal.color(QPalette::Inactive, QPalette::Window).rgba();
     data.winColor[1] = pal.color(QPalette::Active, QPalette::Window).rgba();
     data.decoColor[0] = CCOLOR(kwin.inactive, Bg).rgba();
     data.decoColor[1] = CCOLOR(kwin.active, Bg).rgba();
-    data.textColor[0] = pal.color(QPalette::Inactive, QPalette::WindowText).rgba();
-    data.textColor[1] = pal.color(QPalette::Active, QPalette::WindowText).rgba();
+    data.textColor[0] = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window), CCOLOR(kwin.text, Bg)).rgba();
+    data.textColor[1] = CCOLOR(kwin.text, Fg).rgba();
 //     const QColor bg_inact = (gt[0] != Gradients::None && config.kwin.active_role == config.kwin.inactive_role) ?
 //     Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :    ;
     data.btnColor[0] = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1).rgba();
@@ -513,7 +513,7 @@ Style::setup(WindowData &data, const QPalette &pal, int mode, const int (&gt)[2]
 }
 
 void
-Style::setupDecoFor(WId winId, const QPalette &palette, int mode, const int (&gt)[2])
+Style::setupDecoFor(WId winId, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
 {
 // XProperty actually handles the non X11 case, but we avoid overhead ;)
 #ifdef Q_WS_X11
@@ -783,14 +783,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
             QPalette pal = widget->palette();
             BGMode bgMode = config.bg.mode;
             QColor bg = FCOLOR(Window);
-            int gt[2] = { GRAD(kwin)[0], GRAD(kwin)[1] };
+            Gradients::Type gt[2] = { GRAD(kwin)[0], GRAD(kwin)[1] };
             if (config.bg.modal.glassy)
             {
                 widget->setAttribute(Qt::WA_MacBrushedMetal);
                 bgMode = Plain;
                 bg = bg.light(115-Colors::value(bg)/20);
                 pal.setColor(QPalette::Window, bg);
-                gt[0] = gt[1] = 0;
+                gt[0] = gt[1] = Gradients::None;
             }
             else
                 widget->setAttribute(Qt::WA_MacBrushedMetal, false);

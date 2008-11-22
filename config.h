@@ -67,8 +67,8 @@ typedef struct Config
 
     struct kwin
     {
-        int gradient[2]; // this is NOT Gradients::Type!!!
-        QPalette::ColorRole inactive_role[2], active_role[2];
+        Gradients::Type gradient[2];
+        QPalette::ColorRole inactive_role[2], active_role[2], text_role[2];
     } kwin;
     Qt::LayoutDirection leftHanded;
 

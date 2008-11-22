@@ -193,11 +193,11 @@ Style::readSettings(const QSettings* settings)
 
     // kwin - yes i let the style control the deco, iff the deco permits, though :)
     config.kwin.gradient[0] = readGrad(KWIN_INACTIVE_GRADIENT);
-    config.kwin.gradient[0] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[0]);
     config.kwin.gradient[1] = readGrad(KWIN_ACTIVE_GRADIENT);
-    config.kwin.gradient[1] = Gradients::toInfo((Gradients::Type)config.kwin.gradient[1]);
     readRole(kwin.inactive, KWIN_INACTIVE_ROLE);
     readRole(kwin.active, KWIN_ACTIVE_ROLE);
+    config.kwin.text_role[0] = (QPalette::ColorRole) iSettings->value(KWIN_INACTIVE_TEXT_ROLE).toInt();
+    config.kwin.text_role[1] = (QPalette::ColorRole) iSettings->value(KWIN_ACTIVE_TEXT_ROLE).toInt();
 
     // flanders
     config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;

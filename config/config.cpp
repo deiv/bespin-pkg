@@ -221,6 +221,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateColorModes(ui.crMenu);
     generateColorModes(ui.kwinInactiveRole);
     generateColorModes(ui.kwinActiveRole);
+    generateColorModes(ui.kwinInactiveText);
+    generateColorModes(ui.kwinActiveText);
    
     generateGradientTypes(ui.gradButton);
     generateGradientTypes(ui.gradChoose);
@@ -231,16 +233,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateGradientTypes(ui.gradScroll);
     generateGradientTypes(ui.headerGradient);
     generateGradientTypes(ui.headerSortingGradient);
-    ui.kwinInactiveGrad->clear();
-    ui.kwinInactiveGrad->addItem("None", GradNone);
-    ui.kwinInactiveGrad->addItem("Sunken", GradSunken);
-    ui.kwinInactiveGrad->addItem("Button", GradButton);
-    ui.kwinInactiveGrad->addItem("Glassy", GradGlass);
-    ui.kwinActiveGrad->clear();
-    ui.kwinActiveGrad->addItem("None", GradNone);
-    ui.kwinActiveGrad->addItem("Sunken", GradSunken);
-    ui.kwinActiveGrad->addItem("Button", GradButton);
-    ui.kwinActiveGrad->addItem("Glassy", GradGlass);
+    generateGradientTypes(ui.kwinInactiveGrad);
+    generateGradientTypes(ui.kwinActiveGrad);
    
     QSettings csettings("Bespin", "Config");
     QStringList strList = csettings.value ( "UserPwChars", QStringList() ).toStringList();
@@ -362,6 +356,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.kwinInactiveGrad, KWIN_INACTIVE_GRADIENT);
     handleSettings(ui.kwinActiveRole, KWIN_ACTIVE_ROLE);
     handleSettings(ui.kwinInactiveRole, KWIN_INACTIVE_ROLE);
+    handleSettings(ui.kwinActiveText, KWIN_ACTIVE_TEXT_ROLE);
+    handleSettings(ui.kwinInactiveText, KWIN_INACTIVE_TEXT_ROLE);
 
     handleSettings(ui.hackMessages, HACK_MESSAGES);
     setContextHelp(ui.btnRole, "<b>Messageboxes</b><hr>\

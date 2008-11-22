@@ -25,10 +25,7 @@
 #include "colors.h"
 #include "gradients.h"
 #include "makros.h"
-
-#ifndef BESPIN_DECO
 #include "oxrender.h"
-#endif
 
 using namespace Bespin;
 
@@ -204,7 +201,6 @@ rGlossGradient(const QColor &c, int size)
     return pix;
 }
 
-#ifndef BESPIN_DECO
 static inline QPixmap *
 progressGradient(const QColor &c, int size, Qt::Orientation o)
 {
@@ -267,6 +263,8 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
 #undef GLASS
 #undef GLOSS
 }
+
+#ifndef BESPIN_DECO
 
 static inline uint costs(BgSet *set)
 {
@@ -365,13 +363,13 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         return *pix;
    
     QPoint start, stop;
-#ifndef BESPIN_DECO
     if (type == Gradients::Cloudy)
         pix = progressGradient(iC, size, o);
+#ifndef BESPIN_DECO
     else if (type == Gradients::RadialGloss)
         pix = rGlossGradient(iC, size);
-    else
 #endif
+    else
     {
         pix = newPix(size, o, &start, &stop);
 

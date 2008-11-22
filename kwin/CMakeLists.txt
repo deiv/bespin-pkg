@@ -3,7 +3,7 @@ project (kwin3-bespin)
 add_definitions (-DBESPIN_DECO)
 
 set (kwin3_bespin_SOURCES button.cpp client.cpp resizecorner.cpp
-../colors.cpp factory.cpp ../gradients.cpp ../xproperty.cpp ../paths.cpp)
+../colors.cpp factory.cpp ../gradients.cpp ../xproperty.cpp ../paths.cpp ../oxrender.cpp)
 # kde4_add_plugin automocs, so either use automoc or postcompile rename
 # set (kwin3_bespin_MOC_HDRS button.h client.h resizecorner.h)
 # qt4_wrap_cpp(kwin3_bespin_MOC_SRCS ${kwin3_bespin_MOC_HDRS})
