@@ -679,14 +679,14 @@ Client::reset(unsigned long changed)
                 if (data)
                 {
                     def = false;
-                    colors[0][ColorTitleBar].setRgba(data->winColor[0]);
-                    colors[1][ColorTitleBar].setRgba(data->winColor[1]);
-                    colors[0][ColorFont].setRgba(data->textColor[0]);
-                    colors[1][ColorFont].setRgba(data->textColor[1]);
-                    colors[0][ColorTitleBlend].setRgba(data->decoColor[0]);
-                    colors[1][ColorTitleBlend].setRgba(data->decoColor[1]);
-                    colors[0][ColorButtonBg].setRgba(data->btnColor[0]);
-                    colors[1][ColorButtonBg].setRgba(data->btnColor[1]);
+                    colors[0][ColorTitleBar].setRgba(data->inactiveWindow);
+                    colors[1][ColorTitleBar].setRgba(data->activeWindow);
+                    colors[0][ColorTitleBlend].setRgba(data->inactiveDeco);
+                    colors[1][ColorTitleBlend].setRgba(data->activeDeco);
+                    colors[0][ColorFont].setRgba(data->inactiveText);
+                    colors[1][ColorFont].setRgba(data->activeText);
+                    colors[0][ColorButtonBg].setRgba(data->inactiveButton);
+                    colors[1][ColorButtonBg].setRgba(data->activeButton);
                     bgMode = ((data->style >> 16) & 0xff);
                     gType[0] = (Gradients::Type)((data->style >> 8) & 0xff);
                     gType[1] = (Gradients::Type)(data->style & 0xff);

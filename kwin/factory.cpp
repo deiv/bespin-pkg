@@ -516,15 +516,15 @@ Factory::learn(qint64 pid, QByteArray data)
         return;
     forget(pid);
     WindowData *info = new WindowData;
-    int *ints = (int*)data.data();
-    info->winColor[0] = ints[0];
-    info->winColor[1] = ints[1];
-    info->decoColor[0] = ints[2];
-    info->decoColor[1] = ints[3];
-    info->textColor[0] = ints[4];
-    info->textColor[1] = ints[5];
-    info->btnColor[0] = ints[6];
-    info->btnColor[1] = ints[7];
+    uint *ints = (uint*)data.data();
+    info->inactiveWindow = ints[0];
+    info->activeWindow = ints[1];
+    info->inactiveDeco = ints[2];
+    info->activeDeco = ints[3];
+    info->inactiveText = ints[4];
+    info->activeText = ints[5];
+    info->inactiveButton = ints[6];
+    info->activeButton = ints[7];
     info->style = ints[8];
     _decoInfos.insert(pid, info);
 }

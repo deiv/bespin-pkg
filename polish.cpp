@@ -198,15 +198,16 @@ void Style::polish( QPalette &pal, bool onInit )
         setup(winData, pal, config.bg.mode, GRAD(kwin));
         QByteArray data(36, 'a');
         uint *ints = (uint*)data.data();
-        ints[0] = winData.winColor[0];
-        ints[1] = winData.winColor[1];
-        ints[2] = winData.decoColor[0];
-        ints[3] = winData.decoColor[1];
-        ints[4] = winData.textColor[0];
-        ints[5] = winData.textColor[1];
-        ints[6] = winData.btnColor[0];
-        ints[7] = winData.btnColor[1];
+        ints[0] = winData.inactiveWindow;
+        ints[1] = winData.activeWindow;
+        ints[2] = winData.inactiveDeco;
+        ints[3] = winData.activeDeco;
+        ints[4] = winData.inactiveText;
+        ints[5] = winData.activeText;
+        ints[6] = winData.inactiveButton;
+        ints[7] = winData.activeButton;
         ints[8] = winData.style;
+        
         QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco");
         bespinDeco.call(QDBus::NoBlock, "styleByPid",
 #if QT_VERSION < 0x040400

@@ -499,17 +499,18 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 void
 Style::setup(WindowData &data, const QPalette &pal, int mode, const Gradients::Type (&gt)[2])
 {
-    data.winColor[0] = pal.color(QPalette::Inactive, QPalette::Window).rgba();
-    data.winColor[1] = pal.color(QPalette::Active, QPalette::Window).rgba();
-    data.decoColor[0] = CCOLOR(kwin.inactive, Bg).rgba();
-    data.decoColor[1] = CCOLOR(kwin.active, Bg).rgba();
-    data.textColor[0] = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window), CCOLOR(kwin.text, Bg)).rgba();
-    data.textColor[1] = CCOLOR(kwin.text, Fg).rgba();
+    data.inactiveWindow = pal.color(QPalette::Inactive, QPalette::Window).rgba();
+    data.activeWindow = pal.color(QPalette::Active, QPalette::Window).rgba();
+    data.inactiveDeco = CCOLOR(kwin.inactive, Bg).rgba();
+    data.activeDeco = CCOLOR(kwin.active, Bg).rgba();
+    data.inactiveText = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window), CCOLOR(kwin.text, Bg)).rgba();
+    data.activeText = CCOLOR(kwin.text, Fg).rgba();
 //     const QColor bg_inact = (gt[0] != Gradients::None && config.kwin.active_role == config.kwin.inactive_role) ?
 //     Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :    ;
-    data.btnColor[0] = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1).rgba();
-    data.btnColor[1] = CCOLOR(kwin.active, Fg).rgba();
-    data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
+    data.inactiveButton = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1).rgba();
+    data.activeButton = CCOLOR(kwin.active, Fg).rgba();
+    int style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
+    data.style = style;
 }
 
 void

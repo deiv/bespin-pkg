@@ -38,9 +38,10 @@ namespace Bespin {
 
 typedef struct _WindowData
 {
-    QRgb winColor[2], decoColor[2], textColor[2], btnColor[2];
+    QRgb inactiveWindow, activeWindow, inactiveDeco, activeDeco,
+         inactiveText, activeText, inactiveButton, activeButton;
     int style;
-} WidownData;
+} WindowData;
 
 typedef struct _WindowPics
 {
