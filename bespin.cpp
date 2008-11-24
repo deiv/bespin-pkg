@@ -509,8 +509,7 @@ Style::setup(WindowData &data, const QPalette &pal, int mode, const Gradients::T
 //     Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :    ;
     data.inactiveButton = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1).rgba();
     data.activeButton = CCOLOR(kwin.active, Fg).rgba();
-    int style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
-    data.style = style;
+    data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
 }
 
 void
@@ -523,7 +522,7 @@ Style::setupDecoFor(WId winId, const QPalette &palette, int mode, const Gradient
     // the title region in the center
     WindowData data;
     setup(data, palette, mode, gt);
-    XProperty::set(winId, XProperty::winData, &data, 9);
+    XProperty::set(winId, XProperty::winData, (uchar*)&data, 9*sizeof(unsigned int));
 #endif
 }
 

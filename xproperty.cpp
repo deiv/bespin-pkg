@@ -37,7 +37,7 @@ Atom  XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", Fal
 Atom  XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
 Atom  XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
 
-void *
+unsigned char *
 XProperty::get(WId window, Atom atom, unsigned long n)
 {
     unsigned char *chardata = 0;
@@ -49,7 +49,7 @@ XProperty::get(WId window, Atom atom, unsigned long n)
     if (result != Success || chardata == X::None || n != nn)
         return NULL;
 
-    return (void*)chardata;
+    return chardata;
 
 //     memcpy (&data, chardata, sizeof (int));
 //     return true;
@@ -58,10 +58,10 @@ XProperty::get(WId window, Atom atom, unsigned long n)
 bool
 XProperty::get(WId window, Atom atom, uint& data)
 {
-    unsigned char *chardata = 0;
+    uchar *chardata = 0;
     int result, de; //dead end
     unsigned long de2;
-    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, 1L, False,
+    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, sizeof(uint), False,
                                     XA_CARDINAL, &de2, &de, &de2, &de2, &chardata);
 
     if (result != Success || chardata == X::None)
@@ -74,13 +74,13 @@ XProperty::get(WId window, Atom atom, uint& data)
 void
 XProperty::set(WId window, Atom atom, uint data)
 {
-   XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&data, 1L);
+    XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 8, PropModeReplace, (const uchar*)&data, sizeof(uint));
 }
 
 void
-XProperty::set(WId window, Atom atom, void *data, unsigned long n)
+XProperty::set(WId window, Atom atom, const uchar *data, unsigned long n)
 {
-   XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)data, n);
+   XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 8, PropModeReplace, (const uchar*)data, n);
 }
 
 #if 0

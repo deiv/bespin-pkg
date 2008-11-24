@@ -53,9 +53,9 @@ class XProperty
 public:
     static Atom winData, bgPics, decoDim, pid;
     static bool get(WId window, Atom atom, uint& data);
-    static void *get(WId window, Atom atom, unsigned long n);
+    static uchar *get(WId window, Atom atom, unsigned long n);
     static void set(WId window, Atom atom, uint data);
-    static void set(WId window, Atom atom, void *data, unsigned long n);
+    static void set(WId window, Atom atom, const uchar *data, unsigned long n);
     static int toGradient(int info);
     static int fromGradient(int gt);
 };
