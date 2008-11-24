@@ -49,13 +49,16 @@ class Client : public KDecoration
 public:
     Client(KDecorationBridge *b, Factory *f);
     ~Client();
+    void activeChange();
     void addButtons(const QString &, int &, bool);
+    inline uint backgroundMode() {return bgMode;}
     void borders( int& left, int& right, int& top, int& bottom ) const;
+    int buttonBoxPos(bool active);
     void captionChange();
     inline const Config* config() const { return _factory->config(); }
     void desktopChange() {/*TODO what??*/}
+    inline Gradients::Type gradient() {return gType[isActive()];}
     inline void iconChange() {} // no icon!
-    void activeChange();
     void init();
     void maximizeChange();
     QSize minimumSize() const;

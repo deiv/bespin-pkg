@@ -166,6 +166,16 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     //    top = titleSize;
 }
 
+int
+Client::buttonBoxPos(bool active)
+{
+    if (bgMode == 1 || !gType[active])
+        return 0;
+    if (buttonSpaceLeft < buttonSpaceRight)
+        return 1;
+    return -1;
+}
+
 void
 Client::captionChange()
 {
@@ -742,22 +752,6 @@ Client::reset(unsigned long changed)
                     colors[i][ColorTitleBlend].setHsv(h,s,70);
                 }
             }
-        }
-    }
-
-    if (changed & (SettingColors | SettingButtons))
-    {
-        // buttons[i]->isOnTitleBar att indicates a left side button
-        for (int i = 0; i < 4; ++i)
-        {
-            if (!buttons[i])
-                continue;
-            if (bgMode == 1)
-                buttons[i]->isOnTitleBar = !gType[true];
-            else
-                buttons[i]->isOnTitleBar = !gType[true] ||
-                                           (!buttons[i]->isOnTitleBar && buttonSpaceLeft >= buttonSpaceRight) ||
-                                           (buttons[i]->isOnTitleBar && buttonSpaceLeft < buttonSpaceRight);
         }
     }
 

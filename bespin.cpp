@@ -507,7 +507,7 @@ Style::setup(WindowData &data, const QPalette &pal, int mode, const Gradients::T
     data.activeText = CCOLOR(kwin.text, Fg).rgba();
 //     const QColor bg_inact = (gt[0] != Gradients::None && config.kwin.active_role == config.kwin.inactive_role) ?
 //     Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :    ;
-    data.inactiveButton = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1).rgba();
+    data.inactiveButton = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 1, 2).rgba();
     data.activeButton = CCOLOR(kwin.active, Fg).rgba();
     data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
 }

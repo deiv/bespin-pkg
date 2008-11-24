@@ -51,9 +51,6 @@ public:
     bool isEnabled() const;
     inline bool type() {return _type;}
 protected:
-    friend class Client;
-    bool isOnTitleBar;
-protected:
     void enterEvent(QEvent *e);
     void leaveEvent(QEvent *e);
     void mousePressEvent ( QMouseEvent * event );
@@ -64,7 +61,7 @@ protected:
 private:
     Q_DISABLE_COPY(Button)
     QColor color() const;
-    bool zoomOut;
+    bool zoomOut, left;
     Client *client;
     Type _type;
     int state, multiIdx, zoomTimer, zoomLevel;

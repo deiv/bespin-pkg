@@ -39,14 +39,14 @@ using namespace Bespin;
 QPainterPath Button::shape[NumTypes];
 bool Button::fixedColors = false;
 
-Button::Button(Client *parent, Type type, bool isOnTitleBar) : QWidget(parent->widget()),
+Button::Button(Client *parent, Type type, bool left) : QWidget(parent->widget()),
 client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
 {
     setAutoFillBackground(false);
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setFixedSize(parent->buttonSize(), parent->buttonSize());
     setCursor(Qt::ArrowCursor);
-    this->isOnTitleBar = isOnTitleBar;
+    this->left = left;
 
     if (type == Multi)
     {
@@ -286,8 +286,9 @@ QColor
 Button::color() const
 {
     KDecorationDefines::ColorType   fgt = KDecorationDefines::ColorButtonBg,
-                                    bgt = KDecorationDefines::ColorFrame;
-    if (isOnTitleBar)
+                                    bgt = KDecorationDefines::ColorTitleBlend;
+    int bbp = left + client->buttonBoxPos(client->isActive());
+    if (bbp < 0 || bbp > 1) // 1 + -1 || 0 + 1 vs. 1 + 1 || 0 + -1
     {
         fgt = KDecorationDefines::ColorFont;
         bgt = KDecorationDefines::ColorTitleBar;
