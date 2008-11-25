@@ -681,7 +681,7 @@ Client::reset(unsigned long changed)
                 WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
                 if (!data)
                 {
-                    qint64 *pid = (qint64*)XProperty::get<qint64>(windowId(), XProperty::pid, XProperty::LONG, 1);
+                    long int *pid = XProperty::get<long int>(windowId(), XProperty::pid, XProperty::LONG);
                     if (pid)
                         data = factory()->decoInfo(*pid);
                 }

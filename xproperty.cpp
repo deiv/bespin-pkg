@@ -37,8 +37,6 @@ Atom XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", Fals
 Atom XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
 Atom XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
 
-#if 1
-
 void
 XProperty::handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n)
 {
@@ -54,54 +52,6 @@ XProperty::handleProperty(WId window, Atom atom, uchar **data, Type type, unsign
         *data = NULL; // superflous?!?
 }
 
-#else
-
-unsigned char *
-XProperty::get(WId window, Atom atom, unsigned long n)
-{
-    unsigned char *chardata = 0;
-    int result, de; //dead end
-    unsigned long nn, de2;
-    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, n, False,
-                                    XA_CARDINAL, &de2, &de, &nn, &de2, &chardata);
-
-    if (result != Success || chardata == X::None || n != nn)
-        return NULL;
-
-    return chardata;
-
-//     memcpy (&data, chardata, sizeof (int));
-//     return true;
-}
-
-bool
-XProperty::get(WId window, Atom atom, uint& data)
-{
-    uchar *chardata = 0;
-    int result, de; //dead end
-    unsigned long de2;
-    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, sizeof(uint), False,
-                                    XA_CARDINAL, &de2, &de, &de2, &de2, &chardata);
-
-    if (result != Success || chardata == X::None)
-        return false;
-
-    memcpy (&data, chardata, sizeof (int));
-    return true;
-}
-
-void
-XProperty::set(WId window, Atom atom, uint data)
-{
-    XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 8, PropModeReplace, (const uchar*)&data, sizeof(uint));
-}
-
-void
-XProperty::set(WId window, Atom atom, const uchar *data, unsigned long n)
-{
-   XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 8, PropModeReplace, (const uchar*)data, n);
-}
-#endif
 #if 0
 
 /* The below functions mangle 2 rbg (24bit) colors and a 2 bit hint into
