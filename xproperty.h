@@ -28,6 +28,7 @@
 #define XPROPERTY_H
 
 #include <QWidget>
+#include <QtDebug>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrender.h>
@@ -51,13 +52,29 @@ typedef struct _WindowPics
 class XProperty
 {
 public:
+    enum Type { BYTE = 8, WORD = 16, LONG = 32 };
     static Atom winData, bgPics, decoDim, pid;
-    static bool get(WId window, Atom atom, uint& data);
-    static uchar *get(WId window, Atom atom, unsigned long n);
-    static void set(WId window, Atom atom, uint data);
-    static void set(WId window, Atom atom, const uchar *data, unsigned long n);
-    static int toGradient(int info);
-    static int fromGradient(int gt);
+
+    template <typename T> inline static T *get(WId window, Atom atom, Type type, unsigned long n = 1)
+    {
+        T *data = 0;
+        handleProperty(window, atom, (uchar**)&data, type, _n<T>(type, n));
+        return data;
+    }
+
+    template <typename T> inline static void set(WId window, Atom atom, T *data, Type type, unsigned long n = 1)
+    {
+        if (!data) return;
+        handleProperty(window, atom, (uchar**)&data, type, _n<T>(type, n));
+    }
+private:
+    static void handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n);
+    template <typename T> inline static long _n(Type type, unsigned long n)
+    {
+        unsigned long _n = n*sizeof(T)*8;
+        _n /= (type == XProperty::LONG) ? 8*sizeof(long int) : (uint)type;
+        return _n ? _n : 1L;
+    }
 };
 }
 #endif // XPROPERTY_H

@@ -522,7 +522,7 @@ Style::setupDecoFor(WId winId, const QPalette &palette, int mode, const Gradient
     // the title region in the center
     WindowData data;
     setup(data, palette, mode, gt);
-    XProperty::set(winId, XProperty::winData, (uchar*)&data, 9*sizeof(unsigned int));
+    XProperty::set<uint>(winId, XProperty::winData, (uint*)&data, XProperty::WORD, 9);
 #endif
 }
 

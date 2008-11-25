@@ -67,7 +67,7 @@ Client::~Client(){
 void
 Client::updateStylePixmaps()
 {
-    if (WindowPics *pics = (WindowPics*)XProperty::get(windowId(), XProperty::bgPics, 5*sizeof(Picture)))
+    if (WindowPics *pics = (WindowPics*)XProperty::get<Picture>(windowId(), XProperty::bgPics, XProperty::LONG, 5))
     {
         topTile = pics->topTile;
         btmTile = pics->btmTile;
@@ -619,9 +619,9 @@ Client::reset(unsigned long changed)
         left = QRect(0, titleSize, borderSize, sideHeight);
         right = QRect(width()-borderSize, titleSize, borderSize, sideHeight);
 
-        int decoDim =   ((borderSize & 0xff) << 24) | ((titleSize &0xff) << 16) |
+        uint decoDim =   ((borderSize & 0xff) << 24) | ((titleSize &0xff) << 16) |
                         ((borderSize &0xff) << 8) | (borderSize & 0xff);
-        XProperty::set(windowId(), XProperty::decoDim, decoDim);
+        XProperty::set<uint>(windowId(), XProperty::decoDim, &decoDim, XProperty::LONG);
         titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
 
@@ -678,10 +678,10 @@ Client::reset(unsigned long changed)
             else
 #endif
             {   // nope, but maybe stylecontrolled
-                WindowData *data = (WindowData*)XProperty::get(windowId(), XProperty::winData, 9*sizeof(unsigned int));
+                WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
                 if (!data)
                 {
-                    long int *pid = (long int*)XProperty::get(windowId(), XProperty::pid, sizeof(long int));
+                    qint64 *pid = (qint64*)XProperty::get<qint64>(windowId(), XProperty::pid, XProperty::LONG, 1);
                     if (pid)
                         data = factory()->decoInfo(*pid);
                 }

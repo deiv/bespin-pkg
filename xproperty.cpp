@@ -32,10 +32,29 @@ using namespace Bespin;
 #include <X11/Xatom.h>
 #include <QX11Info>
 
-Atom  XProperty::winData = XInternAtom(QX11Info::display(), "BESPIN_WIN_DATA", False);
-Atom  XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", False);
-Atom  XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
-Atom  XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
+Atom XProperty::winData = XInternAtom(QX11Info::display(), "BESPIN_WIN_DATA", False);
+Atom XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", False);
+Atom XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
+Atom XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
+
+#if 1
+
+void
+XProperty::handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n)
+{
+    if (*data) // this is ok, internally used only
+    {
+        XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, type, PropModeReplace, *data, n );
+        return;
+    }
+    int result, de; //dead end
+    unsigned long nn, de2;
+    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, n, False, XA_CARDINAL, &de2, &de, &nn, &de2, data);
+    if (result != Success || *data == X::None || n != nn)
+        *data = NULL; // superflous?!?
+}
+
+#else
 
 unsigned char *
 XProperty::get(WId window, Atom atom, unsigned long n)
@@ -82,7 +101,7 @@ XProperty::set(WId window, Atom atom, const uchar *data, unsigned long n)
 {
    XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, 8, PropModeReplace, (const uchar*)data, n);
 }
-
+#endif
 #if 0
 
 /* The below functions mangle 2 rbg (24bit) colors and a 2 bit hint into

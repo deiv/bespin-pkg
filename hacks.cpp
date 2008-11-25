@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPointer>
 #include <QPushButton>
 #include <QSplitter>
 #include <QStyle>
@@ -201,12 +202,8 @@ hackMoveWindow(QWidget* w, QEvent *e)
 {
     // general validity ================================
     QMouseEvent *mev = static_cast<QMouseEvent*>(e);
-    if ( w->mouseGrabber() || // someone else is more interested in this
-        (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
-        (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
 //         !w->rect().contains(w->mapFromGlobal(QCursor::pos()))) // KColorChooser etc., catched by mouseGrabber ?!
-        return false;
-
+    qDebug() << "BESPIN, drag" << w;
     // avoid if we click a menu action ========================================
     if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
     if (bar->activeAction())
@@ -263,6 +260,9 @@ paintKrunner(QWidget *w, QPaintEvent *)
     return false;
 }
 
+static QPointer<QWidget> dragWidget = NULL;
+static bool dragHadTrack = false;
+
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
@@ -281,7 +281,33 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         return hackMessageBox(box, e);
 
     if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o))
-        return hackMoveWindow(static_cast<QWidget*>(o), e);
+    {
+        QWidget *w = static_cast<QWidget*>(o);
+        QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+        if ( w->mouseGrabber() || // someone else is more interested in this
+            (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
+            (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
+            return false;
+        
+        dragWidget = w;
+        dragHadTrack = dragWidget->hasMouseTracking();
+        dragWidget->setMouseTracking(true);
+        return false;
+    }
+    else if (e->type() == QEvent::MouseButtonRelease)
+    {
+        if (dragWidget)
+            dragWidget->setMouseTracking(dragHadTrack);
+        dragWidget = NULL;
+        return false;
+    }
+    else if (e->type() == QEvent::MouseMove && dragWidget)
+    {
+        dragWidget->setMouseTracking(dragHadTrack);
+        bool ret = hackMoveWindow(dragWidget, e);
+        dragWidget = NULL;
+        return ret;
+    }
 
     return false;
 }

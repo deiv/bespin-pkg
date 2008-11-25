@@ -124,17 +124,17 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
     const BgSet &set = Gradients::bgSet(c);
     QRect rect = widget->rect();
 #ifndef QT_NO_XRENDER
-    uint decoDim = 0;
-    XProperty::get(widget->winId(), XProperty::decoDim, decoDim);
-    if (decoDim)
+    uint *decoDimP = XProperty::get<uint>(widget->winId(), XProperty::decoDim, XProperty::LONG);
+    if (decoDimP)
     {
+        uint decoDim = *decoDimP;
         WindowPics pics;
         pics.topTile = set.topTile.x11PictureHandle();
         pics.btmTile = set.btmTile.x11PictureHandle();
         pics.cnrTile = set.cornerTile.x11PictureHandle();
         pics.lCorner = set.lCorner.x11PictureHandle();
         pics.rCorner = set.rCorner.x11PictureHandle();
-        XProperty::set(widget->winId(), XProperty::bgPics, (uchar*)&pics, 5*sizeof(Picture));
+        XProperty::set<Picture>(widget->winId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
         rect.adjust(-((decoDim >> 24) & 0xff), -((decoDim >> 16) & 0xff), (decoDim >> 8) & 0xff, decoDim & 0xff);
     }
 #endif
