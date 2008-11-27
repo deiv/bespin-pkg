@@ -203,7 +203,6 @@ hackMoveWindow(QWidget* w, QEvent *e)
     // general validity ================================
     QMouseEvent *mev = static_cast<QMouseEvent*>(e);
 //         !w->rect().contains(w->mapFromGlobal(QCursor::pos()))) // KColorChooser etc., catched by mouseGrabber ?!
-    qDebug() << "BESPIN, drag" << w;
     // avoid if we click a menu action ========================================
     if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
     if (bar->activeAction())

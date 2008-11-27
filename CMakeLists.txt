@@ -34,7 +34,7 @@ endif (KDE4_FOUND)
 
 set (bespin_SOURCES animator/basic.cpp animator/aprogress.cpp animator/hover.cpp
 animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp
-colors.cpp bespin.cpp tileset.cpp stylehint.cpp
+colors.cpp bespin.cpp tileset.cpp oxrender.cpp stylehint.cpp
 sizefromcontents.cpp qsubcmetrics.cpp
 pixelmetric.cpp stdpix.cpp
 visualframe.cpp gradients.cpp init.cpp genpixmaps.cpp polish.cpp
@@ -47,7 +47,6 @@ if ( X11_FOUND )
 endif ( X11_FOUND )
 if (X11_Xrender_FOUND)
    message (STATUS "INFO: XRender was found - kwin deco & FX via GPU available!")
-   set (bespin_SOURCES ${bespin_SOURCES} oxrender.cpp)
 endif (X11_Xrender_FOUND)
 
 set (bespin_MOC_HDRS animator/basic.h animator/aprogress.h animator/hover.h
