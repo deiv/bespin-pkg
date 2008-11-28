@@ -313,7 +313,7 @@ void BConfig::_save(QSettings *settings, bool makeDirty) {
       delete settings;
    
    if (makeDirty)
-      emit changed(false);
+      emit changed(true);
 }
 
 bool BConfig::eventFilter ( QObject * o, QEvent * e) {
