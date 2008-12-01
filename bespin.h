@@ -299,13 +299,11 @@ private:
         Tile::Set rect[2];
     } Lights;
    
-    // pixmaps
-    QPixmap *_scanlines[2];
-    
     // gtk-qt and other workarounds
     static AppType appType;
     // KDE palette fix..
-    QPalette *originalPalette;
+    static QPalette *originalPalette;
+    // pixmaps
     static Masks masks;
     static Shadows shadows;
     static Lights lights;
@@ -314,6 +312,7 @@ public:
     static Dpi dpi;
 private slots:
     void clearScrollbarCache();
+    void removeAppEventFilter();
 };
 
 } // namespace Bespin

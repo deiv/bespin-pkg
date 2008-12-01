@@ -66,12 +66,13 @@ Q_EXPORT_PLUGIN2(Bespin, BespinStylePlugin)
 
 using namespace Bespin;
 
-Style::Masks Style::masks;
-Style::Shadows Style::shadows;
-Style::Lights Style::lights;
 AppType Style::appType;
 Config Style::config;
 Dpi Style::dpi;
+Style::Lights Style::lights;
+Style::Masks Style::masks;
+QPalette *Style::originalPalette = 0;
+Style::Shadows Style::shadows;
 
 
 #define N_PE 54
@@ -246,13 +247,12 @@ Style::registerRoutines()
 }
 
 /**THE STYLE ITSELF*/
-
-Style::Style() : QCommonStyle(), originalPalette(0)
+#include <QTimer>
+Style::Style() : QCommonStyle()
 {
     setObjectName(QLatin1String("Bespin"));
-   _scanlines[0] = _scanlines[1] = 0L;
-   init();
-   registerRoutines();
+    init();
+    registerRoutines();
 }
 
 Style::~Style()
@@ -876,8 +876,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::ApplicationPaletteChange:
     {
         if (object == qApp && originalPalette)
-        {   // this fixes KApplications
-            // "we create the style, then reload teh palette from personal settings and reapply it" junk"
+        {
+            // this fixes KApplications
+            // "we create the style, then reload the palette from personal settings and reapply it" junk"
             // the order is important or we'll get reloads for sure or eventually!
             object->removeEventFilter(this);
             QPalette *pal = originalPalette;

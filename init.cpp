@@ -32,6 +32,8 @@
 #include "makros.h"
 #include "config.defaults"
 
+#include <QtDebug>
+
 using namespace Bespin;
 
 static Gradients::Type _progressBase;
@@ -55,7 +57,6 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group)
     return list;
 }
 
-
 #define readInt(_DEF_) iSettings->value(_DEF_).toInt()
 #define readBool(_DEF_) iSettings->value(_DEF_).toBool()
 #define readRole(_VAR_, _DEF_)\
@@ -63,6 +64,13 @@ config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_DEF_).toInt();\
 Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1])
 //, QPalette::_DEF_, Colors::counterRole(QPalette::_DEF_))
 #define readGrad(_DEF_) (Gradients::Type) iSettings->value(_DEF_).toInt();
+
+void
+Style::removeAppEventFilter()
+{
+    // for plain qt apps that don't need the palette fix, otherwise we'd keep filtering the app for no reason
+    qApp->removeEventFilter(this);
+}
 
 void
 Style::readSettings(const QSettings* settings)
@@ -118,8 +126,10 @@ Style::readSettings(const QSettings* settings)
             if (qApp->inherits("KApplication"))
             {   // KDE replaces the palette after styling with an unpolished own version, breaking presets...
                 originalPalette = new QPalette(qApp->palette());
-                qApp->installEventFilter(this);
             }
+            // must be for all apps - KDE does some freaky stuff between the qapp and kapp constructor...
+            qApp->installEventFilter(this);
+            QTimer::singleShot(10000, this, SLOT(removeAppEventFilter()));
         }
         if (!iSettings)
         {
