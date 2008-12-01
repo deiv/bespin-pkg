@@ -69,8 +69,10 @@ using namespace Bespin;
 Style::Masks Style::masks;
 Style::Shadows Style::shadows;
 Style::Lights Style::lights;
+AppType Style::appType;
 Config Style::config;
 Dpi Style::dpi;
+
 
 #define N_PE 54
 #define N_CE 50

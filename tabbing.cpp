@@ -196,29 +196,33 @@ Style::drawTab(const QStyleOption *option, QPainter *painter,
     if (widget)
         copy.palette = widget->palette();
 
-    copy.rect.setBottom(copy.rect.bottom()-F(2));
+    copy.rect.setBottom(RECT.bottom()-F(2));
 
     if (appType == GTK)
     {
+        QRect r = copy.rect;
+        r.adjust(0, F(2), 0, -F(1));
         switch (tab->position)
         {
         default:
         case QStyleOptionTab::OnlyOneTab:
-            break;
+            r.adjust(F(2), 0, -F(2), 0); break;
         case QStyleOptionTab::Beginning:
+            r.setLeft(r.left()+F(2));
             Tile::setShape(Tile::Full &~ Tile::Right); break;
         case QStyleOptionTab::End:
+            r.setRight(r.right()-F(2));
             Tile::setShape(Tile::Full &~ Tile::Left); break;
         case QStyleOptionTab::Middle:
             Tile::setShape(Tile::Full &~ (Tile::Left | Tile::Right)); break;
         }
-        masks.rect[true].render(copy.rect, painter, GRAD(tab), Qt::Vertical,
-                                CCOLOR(tab.std, Bg), copy.rect.height());
-        shadows.sunken[true][true].render(RECT, painter);
+        shadows.raised[true][true][false].render(RECT, painter);
+        masks.rect[true].render(r, painter, GRAD(tab), Qt::Vertical, CCOLOR(tab.std, Bg), r.height());
+//         shadows.sunken[true][true].render(RECT, painter);
         Tile::reset();
     }
 
-    if (tab->position != QStyleOptionTab::OnlyOneTab)
+    if (tab->position != QStyleOptionTab::OnlyOneTab || appType == GTK)
     {
         OPT_SUNKEN OPT_ENABLED OPT_HOVER
         sunken = sunken || (option->state & State_Selected);
@@ -256,10 +260,14 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
     ASSURE_OPTION(tab, Tab);
     OPT_SUNKEN
 
-    if (tab->position == QStyleOptionTab::OnlyOneTab)
-        sunken = false;
-    else if (appType == GTK)
+    QRect rect = RECT;
+
+    if (appType == GTK) {
+        rect.translate(0, F(3));
         sunken = option->state & State_Selected;
+    }
+    else if (tab->position == QStyleOptionTab::OnlyOneTab)
+        sunken = false;
     else
         sunken = sunken || (option->state & State_Selected);
 
@@ -267,19 +275,18 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
     if (!(animStep || sunken))
         return;
        
-    const int f2 = dpi.f2;
-    QRect rect = RECT;
+    const int f2 = F(2);
     int size = RECT.height()-f2;
     Qt::Orientation o = Qt::Vertical;
     const bool vertical = verticalTabs(tab->shape);
     if (vertical)
     {
-        rect.adjust(dpi.f5, dpi.f1, -dpi.f5, -dpi.f1);
+        rect.adjust(F(5), F(1), -F(5), -F(1));
         o = Qt::Horizontal;
         size = RECT.width()-f2;
     }
     else
-        rect.adjust(dpi.f1, dpi.f5, -dpi.f1, -dpi.f5);
+        rect.adjust(F(1), F(5), -F(1), -F(5));
 
     QColor c;
     if (sunken)
@@ -288,16 +295,16 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
         if (config.tab.activeTabSunken)
         {
             if (vertical)
-                rect.adjust(0, dpi.f1, 0, -dpi.f2);
+                rect.adjust(0, F(1), 0, -f2);
             else
                 rect.adjust(f2, -f2, -f2, 0);
         }
         else
         {
             if (vertical)
-                rect.adjust(-dpi.f1, f2, dpi.f1, -f2);
+                rect.adjust(-F(1), f2, F(1), -f2);
             else
-                rect.adjust(f2, -dpi.f1, -f2, dpi.f1);
+                rect.adjust(f2, -F(1), -f2, F(1));
         }
     }
     else
@@ -316,7 +323,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
         else
             gt = Gradients::Sunken;
     }
-    const QPoint off = rect.topLeft()-/*RECT.topLeft()-*/QPoint(dpi.f3,f2);
+    const QPoint off = rect.topLeft()-/*RECT.topLeft()-*/QPoint(F(3),f2);
     masks.rect[true].render(rect, painter, gt, o, c, size, off);
     if (config.tab.activeTabSunken && sunken)
     {

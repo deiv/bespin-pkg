@@ -103,8 +103,7 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
 {
     ASSURE_OPTION(pb, ProgressBar);
     OPT_HOVER
-
-    if (appType == KGet)
+    if (appType == KGet && !widget)
     {   // kinda inline progress in itemview (but unfortunately kget doesn't use itemviews)
         // TODO: widget doesn't set a state - make bug report!
         OPT_ENABLED;
@@ -201,7 +200,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
         return;
 
     // calculate chunk dimensions - you don't wanna know and i forgot... ;-P
-    int s = qMin(qMax(l / 10, dpi.f16), t /*16*t/10*/);
+    int s = qMin(qMax(l / 10, F(16)), qMin(t, dpi.SliderThickness) /*16*t/10*/);
     if (!s) return;
     int ss = (10*s)/16;
     int n = l/s;

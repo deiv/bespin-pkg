@@ -238,7 +238,7 @@ bar4popup(QMenu *menu)
 
 
 inline static void
-polishGTK(QWidget * widget)
+polishGTK(QWidget * widget, const Config &config)
 {
     enum MyRole{Bg = Style::Bg, Fg = Style::Fg};
     if (widget->objectName() == "QPushButton" ||
@@ -255,7 +255,7 @@ polishGTK(QWidget * widget)
         pal.setColor(QPalette::Disabled, QPalette::ButtonText,
                     Colors::mid(FCOLOR(Window), FCOLOR(WindowText),3,1));
         pal.setColor(QPalette::Inactive, QPalette::ButtonText, CCOLOR(btn.std, Fg));
-        pal.setColor(QPalette::Active, QPalette::ButtonText, CCOLOR(btn.active, Fg));
+        pal.setColor(QPalette::Active, QPalette::ButtonText, config.btn.backLightHover ? CCOLOR(btn.std, Fg) : CCOLOR(btn.active, Fg));
         widget->setPalette(pal);
     }
     if (widget->objectName() == "QTabWidget" ||
@@ -271,7 +271,7 @@ polishGTK(QWidget * widget)
         pal.setColor(QPalette::Active, QPalette::WindowText, CCOLOR(tab.active, Fg));
         widget->setPalette(pal);
     }
-   
+
     if (widget->objectName() == "QMenuBar" )
     {
         QPalette pal = widget->palette();
@@ -302,7 +302,7 @@ Style::polish( QWidget * widget )
     // GTK-Qt gets a special handling - see above
     if (appType == GTK)
     {
-        polishGTK(widget);
+        polishGTK(widget, config);
         return;
     }
 

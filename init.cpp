@@ -303,7 +303,7 @@ Style::readSettings(const QSettings* settings)
 
         config.hack.messages = false;
 
-        config.progress.std_role[Bg] = config.progress.std_role[Fg] = QPalette::Window;
+//         config.progress.std_role[Bg] = config.progress.std_role[Fg] = QPalette::Window;
 
 //       config.tab.std_role[Bg] =  QPalette::Window;
     // gtk fixes the label color... so try to ensure it will be visible
@@ -314,8 +314,8 @@ Style::readSettings(const QSettings* settings)
 //          config.tab.activeTabSunken = true;
 //       }
 
-        config.view.header_role[Bg] = QPalette::Window;
-        config.view.sortingHeader_role[Bg] = QPalette::Window;
+//         config.view.header_role[Bg] = QPalette::Window;
+//         config.view.sortingHeader_role[Bg] = QPalette::Window;
     }
    
     if (delSettings)
@@ -360,7 +360,7 @@ Style::init(const QSettings* settings)
     QTime time; time.start();
     // various workarounds... ==========================
     if (!qApp->inherits("KApplication") && getenv("GTK_QT_ENGINE_ACTIVE"))
-        { appType = GTK; qWarning("BESPIN: Detected GKT+ application"); }
+        { appType = GTK; /*qWarning("BESPIN: Detected GKT+ application");*/ }
     else if (qApp->inherits("GreeterApp"))
         appType = KDM;
     else if (QCoreApplication::applicationName() == "dolphin")

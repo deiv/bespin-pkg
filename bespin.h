@@ -303,7 +303,7 @@ private:
     QPixmap *_scanlines[2];
     
     // gtk-qt and other workarounds
-    AppType appType;
+    static AppType appType;
     // KDE palette fix..
     QPalette *originalPalette;
     static Masks masks;
