@@ -443,7 +443,7 @@ Style::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidg
     painter->restore();
 }
 
-#include <QtDebug>
+
 void
 Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {

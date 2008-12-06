@@ -116,7 +116,7 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
     case PM_TabBarTabHSpace: // Extra space added to the tab width
         return F(12);
     case PM_TabBarTabVSpace: // Extra space added to the tab height
-        return F(10);
+        return F(8);
     case PM_TabBarBaseHeight: // Height of the area between the tab bar and the tab pages
     case PM_TabBarBaseOverlap: { // Number of pixels the tab bar overlaps the tab bar base
         if (!widget)
@@ -178,10 +178,12 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
         return F(2);
     case PM_SpinBoxSliderHeight: // The height of the optional spin box slider
         return F(4);
-//    case PM_DefaultTopLevelMargin: //
-//    case PM_DefaultChildMargin: //
-//     case PM_DefaultLayoutSpacing: //
-//         return 100;
+    case PM_DefaultTopLevelMargin: //
+        return F(8);
+    case PM_DefaultChildMargin: //
+        return F(6);
+    case PM_DefaultLayoutSpacing: //
+        return F(4);
     case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize
         return 22;
     case PM_SmallIconSize: // Default small icon size

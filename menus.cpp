@@ -28,12 +28,20 @@ Style::drawMenuBarBg(const QStyleOption * option, QPainter * painter, const QWid
 {
     if (appType == Plasma)
         return;
-    if (config.menu.bar_role[Bg] != QPalette::Window || config.menu.barGradient != Gradients::None)
-        painter->fillRect(RECT.adjusted(0,0,0,-dpi.f2),
-                          Gradients::brush(Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6),
-                          RECT.height()-dpi.f2, Qt::Vertical, config.menu.barGradient));
-    else if (config.bg.mode == Scanlines && (appType != Plasma))
-        painter->fillRect(RECT, Gradients::structure(FCOLOR(Window), true));
+
+    QRect rect = RECT;
+    QColor c = FCOLOR(Window);
+    if (config.menu.bar_role[Bg] != QPalette::Window)
+    {
+        if (config.menu.barSunken) rect.setBottom(rect.bottom()-F(2));
+        c = Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6);
+    }
+
+    if (config.menu.barGradient != Gradients::None)
+        painter->fillRect(rect, Gradients::brush(c, rect.height(), Qt::Vertical, config.menu.barGradient));
+    else if (config.bg.mode == Scanlines)
+        painter->fillRect(rect, Gradients::structure(c, true));
+
     if (config.menu.barSunken)
     {
         Tile::setShape(Tile::Top | Tile::Bottom);
@@ -49,9 +57,10 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
     ASSURE_OPTION(mbi, MenuItem);
 
 #if 1 // was necessary once, not anymore?!
-    if (mbi->menuRect.height() > mbi->rect.height())
+    if (appType != GTK && mbi->menuRect.height() > mbi->rect.height())
     {
         QStyleOptionMenuItem copy = *mbi;
+        copy.rect.setTop(mbi->menuRect.top());
         copy.rect.setHeight(mbi->menuRect.height());
         drawMenuBarBg( &copy, painter, widget );
     }
@@ -90,7 +99,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         // ================================================
     }
     
-    QRect r = RECT.adjusted(0, F(2), 0, -F(4));
+    QRect r = RECT.adjusted(0, F(1), 0, -F(2));
     if (step || hover)
     {
         if (!step)
@@ -116,9 +125,9 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         masks.rect[round_].render(r, painter, gt, Qt::Vertical, c, r.height()/*, QPoint(0,-dy)*/);
         if (config.menu.activeItemSunken && sunken)
         {
-            r.setBottom(r.bottom()+dpi.f2);
+            r.setBottom(r.bottom()+F(1));
             shadows.sunken[round_][true].render(r, painter);
-            r.adjust(0,dpi.f1,0,-dpi.f1); // -> text repositioning
+            r.adjust(0,F(1),0,-F(1)); // -> text repositioning
         }
         else if (step == 6 && config.menu.itemSunken)
             shadows.sunken[round_][false].render(r, painter);

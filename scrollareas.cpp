@@ -312,6 +312,10 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
         painter->fillRect(r, Colors::mid(FCOLOR(Base), FCOLOR(Text), 10, 1));
         return;
     }
+    // opera paints groove and slider directly, but messes up with bg, does not pass a widget and ignores the opaquePaintevent hint...
+    if (appType == Opera)
+        painter->fillRect(RECT, FCOLOR(Window));
+
     const Groove::Mode gType = config.scroll.groove;
     QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1 + gType*gType*gType, 1);
     if (gType)
@@ -373,6 +377,8 @@ Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
             drawScrollBarGroove(option, painter, widget);
         return;
     }
+    if (appType == Opera)
+        painter->fillRect(RECT, FCOLOR(Window));
 
     // --> we need to paint a slider
 

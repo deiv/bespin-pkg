@@ -281,12 +281,12 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
     const bool vertical = verticalTabs(tab->shape);
     if (vertical)
     {
-        rect.adjust(F(5), F(1), -F(5), -F(1));
+        rect.adjust(F(4), F(1), -F(5), -F(1));
         o = Qt::Horizontal;
         size = RECT.width()-f2;
     }
     else
-        rect.adjust(F(1), F(5), -F(1), -F(5));
+        rect.adjust(F(1), F(4), -F(1), -F(5));
 
     QColor c;
     if (sunken)
@@ -297,7 +297,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
             if (vertical)
                 rect.adjust(0, F(1), 0, -f2);
             else
-                rect.adjust(f2, -f2, -f2, 0);
+                rect.adjust(f2, -F(1), -f2, 0);
         }
         else
         {

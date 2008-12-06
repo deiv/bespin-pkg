@@ -230,6 +230,9 @@ Style::readSettings(const QSettings* settings)
         config.menu.std_role[Fg] = QPalette::WindowText;
         config.menu.active_role[Bg] = QPalette::Highlight;
         config.menu.active_role[Fg] = QPalette::HighlightedText;
+        // both do not work :-( - also the user has to choose a bg that usually fits window fg
+        config.menu.barGradient = Gradients::None;
+        config.menu.barSunken = false;
     }
     else
     {
@@ -245,7 +248,6 @@ Style::readSettings(const QSettings* settings)
     }
     else
     {
-        
         config.menu.barGradient = readGrad(MENU_BAR_GRADIENT);
         config.menu.barSunken = readBool(MENU_BARSUNKEN);
     }
@@ -369,7 +371,9 @@ Style::init(const QSettings* settings)
 {
     QTime time; time.start();
     // various workarounds... ==========================
-    if (!qApp->inherits("KApplication") && getenv("GTK_QT_ENGINE_ACTIVE"))
+    if (getenv("OPERA_LD_PRELOAD"))
+        appType = Opera;
+    else if (!qApp->inherits("KApplication") && getenv("GTK_QT_ENGINE_ACTIVE"))
         { appType = GTK; /*qWarning("BESPIN: Detected GKT+ application");*/ }
     else if (qApp->inherits("GreeterApp"))
         appType = KDM;

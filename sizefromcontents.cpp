@@ -53,7 +53,7 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
             int margin = F(2);
             int iconSize = hdr->icon.isNull() ? 0 : pixelMetric(QStyle::PM_SmallIconSize, hdr, widget);
             QSize txt = hdr->fontMetrics.size(0, hdr->text);
-            sz.setHeight(qMax(iconSize, txt.height()) + F(4));
+            sz.setHeight(qMax(iconSize, txt.height()) + F(3));
             sz.setWidth((iconSize?margin+iconSize:0) + (hdr->text.isNull()?0:margin+txt.width()) + margin);
             return sz;
         }
@@ -61,7 +61,7 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
         return contentsSize + QSize(F(4),F(2));
     case CT_MenuBarItem:
     {   // A menu bar item, like the buttons in a QMenuBar
-        const int h = contentsSize.height()+F(6);
+        const int h = contentsSize.height()+F(4);
         return QSize(qMax(contentsSize.width()+F(18), h*8/5), h);
     }
    case CT_MenuItem: // A menu item, like QMenuItem
@@ -117,13 +117,16 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
                     if (abn->isCheckable())
                         w += contentsSize.height()+F(16);
 
-                int h = contentsSize.height() + (config.btn.layer ? F(4) : F(6));
+                int h = config.btn.layer ? F(2) : F(3);
+                if (!config.btn.fullHover)
+                    h *= 2;
+                h += contentsSize.height();
 
                 if (!btn->icon.isNull())
                     { w += F(10); h += F(2); }
                     
                 if (config.btn.round)
-                    { w += F(8); h -= F(2); }
+                    { w += F(8); /*h -= F(2);*/ }
 
                 if (w < F(80))
                     w = F(80);

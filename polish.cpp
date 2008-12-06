@@ -241,57 +241,73 @@ inline static void
 polishGTK(QWidget * widget, const Config &config)
 {
     enum MyRole{Bg = Style::Bg, Fg = Style::Fg};
+    QColor c1, c2, c3, c4;
     if (widget->objectName() == "QPushButton" ||
         widget->objectName() == "QComboBox" ||
         widget->objectName() == "QCheckBox" ||
         widget->objectName() == "QRadioButton" )
     {
         QPalette pal = widget->palette();
-        pal.setColor(QPalette::Disabled, QPalette::Button,
-                    Colors::mid(Qt::black, FCOLOR(Window),5,100));
-        pal.setColor(QPalette::Inactive, QPalette::Button, CCOLOR(btn.std, Bg));
-        pal.setColor(QPalette::Active, QPalette::Button, CCOLOR(btn.active, Bg));
+        c1 = CCOLOR(btn.std, Bg);
+        c2 = CCOLOR(btn.active, Bg);
+        c3 = CCOLOR(btn.std, Fg);
+        c4 = CCOLOR(btn.active, Fg);
+        
+        pal.setColor(QPalette::Disabled, QPalette::Button, Colors::mid(Qt::black, FCOLOR(Window),5,100));
+        pal.setColor(QPalette::Disabled, QPalette::ButtonText, Colors::mid(FCOLOR(Window), FCOLOR(WindowText),3,1));
+        
+        pal.setColor(QPalette::Inactive, QPalette::Button, c1);
+        pal.setColor(QPalette::Active, QPalette::Button, c2);
+        pal.setColor(QPalette::Inactive, QPalette::ButtonText, c3);
+        pal.setColor(QPalette::Active, QPalette::ButtonText, config.btn.backLightHover ? c3 : c4);
 
-        pal.setColor(QPalette::Disabled, QPalette::ButtonText,
-                    Colors::mid(FCOLOR(Window), FCOLOR(WindowText),3,1));
-        pal.setColor(QPalette::Inactive, QPalette::ButtonText, CCOLOR(btn.std, Fg));
-        pal.setColor(QPalette::Active, QPalette::ButtonText, config.btn.backLightHover ? CCOLOR(btn.std, Fg) : CCOLOR(btn.active, Fg));
         widget->setPalette(pal);
     }
+
     if (widget->objectName() == "QTabWidget" ||
         widget->objectName() == "QTabBar")
     {
         QPalette pal = widget->palette();
-        pal.setColor(QPalette::Inactive, QPalette::Window, CCOLOR(tab.std, Bg));
-        pal.setColor(QPalette::Active, QPalette::Window, CCOLOR(tab.active, Bg));
+        c1 = CCOLOR(tab.std, Bg);
+        c2 = CCOLOR(tab.active, Bg);
+        c3 = CCOLOR(tab.std, Fg);
+        c4 = CCOLOR(tab.active, Fg);
 
-        pal.setColor(QPalette::Disabled, QPalette::WindowText,
-                    Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg),3,1));
-        pal.setColor(QPalette::Inactive, QPalette::WindowText, CCOLOR(tab.std, Fg));
-        pal.setColor(QPalette::Active, QPalette::WindowText, CCOLOR(tab.active, Fg));
+        pal.setColor(QPalette::Disabled, QPalette::WindowText, Colors::mid(c1, c3, 3, 1));
+        pal.setColor(QPalette::Inactive, QPalette::Window, c1);
+        pal.setColor(QPalette::Active, QPalette::Window, c2);
+        pal.setColor(QPalette::Inactive, QPalette::WindowText, c3);
+        pal.setColor(QPalette::Active, QPalette::WindowText, c4);
         widget->setPalette(pal);
     }
 
     if (widget->objectName() == "QMenuBar" )
     {
         QPalette pal = widget->palette();
-        pal.setColor(QPalette::Inactive, QPalette::Window,
-                    Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg)));
-        pal.setColor(QPalette::Active, QPalette::Window, CCOLOR(menu.active, Bg));
-
-        pal.setColor(QPalette::Inactive, QPalette::WindowText, CCOLOR(menu.bar, Fg));
-        pal.setColor(QPalette::Active, QPalette::WindowText, CCOLOR(menu.active, Fg));
+        c1 = Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6);
+        c2 = CCOLOR(menu.active, Bg);
+        c3 = CCOLOR(menu.bar, Fg);
+        c4 = CCOLOR(menu.active, Fg);
+        
+        pal.setColor(QPalette::Inactive, QPalette::Window, c1);
+        pal.setColor(QPalette::Active, QPalette::Window, c2);
+        pal.setColor(QPalette::Inactive, QPalette::WindowText, c3);
+        pal.setColor(QPalette::Active, QPalette::WindowText, c4);
         widget->setPalette(pal);
     }
 
     if (widget->objectName() == "QMenu" )
     {
         QPalette pal = widget->palette();
-        pal.setColor(QPalette::Inactive, QPalette::Window, CCOLOR(menu.std, Bg));
-        pal.setColor(QPalette::Active, QPalette::Window, CCOLOR(menu.active, Bg));
-
-        pal.setColor(QPalette::Inactive, QPalette::WindowText, CCOLOR(menu.std, Fg));
-        pal.setColor(QPalette::Active, QPalette::WindowText, CCOLOR(menu.active, Fg));
+        c1 = CCOLOR(menu.std, Bg);
+        c2 = CCOLOR(menu.active, Bg);
+        c3 = CCOLOR(menu.std, Fg);
+        c4 = CCOLOR(menu.active, Fg);
+        
+        pal.setColor(QPalette::Inactive, QPalette::Window, c1);
+        pal.setColor(QPalette::Active, QPalette::Window, c2);
+        pal.setColor(QPalette::Inactive, QPalette::WindowText, c3);
+        pal.setColor(QPalette::Active, QPalette::WindowText, c4);
         widget->setPalette(pal);
     }
 }
@@ -716,6 +732,9 @@ Style::polish( QWidget * widget )
         pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
         widget->setPalette(pal);
     }
+
+//     if (widget->inherits("KUrlNavigator"))
+//         widget->installEventFilter(this);
 
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors
     /// are set or KHtml does wrong OR (mainly) by html "designers"

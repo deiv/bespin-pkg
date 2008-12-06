@@ -28,6 +28,7 @@
 #include <QMenuBar>
 #include <QMouseEvent>
 #include <QFrame>
+#include <QComboBox>
 #include <QToolButton>
 #include <QTreeView>
 
@@ -700,6 +701,21 @@ Style::eventFilter( QObject *object, QEvent *ev )
             p.end();
             return false;
         }
+#if 0 // doesn't work. sth. weakens the fist sectore -> TODO: make KUrlNavigator make use of custom style elements
+        else if (object->inherits("KUrlNavigator"))
+        {
+            QList<QComboBox*> lel = object->findChildren<QComboBox*>();
+            if (!lel.isEmpty() && lel.first()->isVisible())
+                return false;
+            QWidget *w = static_cast<QWidget*>(object);
+            qDebug() << "BESPIN" << w;
+            QStyleOption opt; opt.initFrom(w);
+            QPainter p(w);
+            drawLineEdit(&opt, &p, w);
+            p.end();
+            return false;
+        }
+#endif
         return false;
 
     case QEvent::Resize:

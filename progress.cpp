@@ -225,7 +225,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
     // draw a chunk
     int nn = (val < 0) ? 0 : int(n*val);
     if (content)
-        p.setBrush(Gradients::pix(CCOLOR(progress.std, Fg), ss, Qt::Vertical, GRAD(progress) ));
+        p.setBrush(Gradients::brush(CCOLOR(progress.std, Fg), ss, Qt::Vertical, GRAD(progress) ));
     else
     {   // this is the "not-yet-done" part - in case we're currently painting it...
         if (busy)
@@ -233,7 +233,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
         else
             { x += nn*s; nn = n - nn; }
         const QColor c = CCOLOR(progress.std, Bg);
-        p.setBrush(Gradients::pix(c, ss, Qt::Vertical, GRAD(progress) ));
+        p.setBrush(Gradients::brush(c, ss, Qt::Vertical, GRAD(progress) ));
     }
     p.setBrushOrigin(0,1);
     drawShape(&p, ss);
@@ -270,7 +270,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
                 painter->setRenderHint(QPainter::Antialiasing);
 
                 const QColor c = Colors::mid(CCOLOR(progress.std, Bg), CCOLOR(progress.std, Fg), 10-q, q);
-                painter->setBrush(Gradients::pix(c, ss, Qt::Vertical, GRAD(progress) ));
+                painter->setBrush(Gradients::brush(c, ss, Qt::Vertical, GRAD(progress) ));
 
                 if (vertical) // swap again, we abuse 'q' from above
                     { q = x; x = y; y = q; }

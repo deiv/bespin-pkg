@@ -130,7 +130,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             int top = (groupBox->features & QStyleOptionFrameV2::Flat) ? F(3) : F(6);
             if (!groupBox->text.isEmpty())
                 top += groupBox->fontMetrics.height();
-            ret = groupBox->rect.adjusted(F(3), top, -F(3), -F(7));
+            ret = groupBox->rect.adjusted(F(3), top, -F(3), -F(5));
             break;
         }
         case SC_GroupBoxCheckBox:
@@ -145,9 +145,9 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         {
             QFontMetrics fontMetrics = groupBox->fontMetrics;
             const bool flat = groupBox->features & QStyleOptionFrameV2::Flat;
-            int h = fontMetrics.height() + dpi.f4;
+            int h = fontMetrics.height() + F(3);
             int tw = fontMetrics.size(BESPIN_MNEMONIC, groupBox->text + QLatin1Char(' ')).width();
-            int marg = flat ? 0 : F(4);
+            int marg = flat ? 0 : F(3);
             Qt::Alignment align;
         
             if (flat || config.sunkenGroups)
@@ -546,8 +546,8 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
             default:
                 break;
             }
-            off -= dpi.f2; x +=off; y += off;
-            off = 2*(off+dpi.f4);
+            off -= F(2); x +=off; y += off;
+            off = 2*(off+F(4));
             return QRect(x,y,off,off);
         }
     case SE_TabWidgetTabBar:
@@ -582,7 +582,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
             QRect r = RECT; //subElementRect ( SE_TabWidgetTabPane, option, widget);
 //          QStyleOptionTab tabopt;
 //          tabopt.shape = twf->shape;
-            const int margin = F(4);
+            const int margin = 0; //F(20);
 //          int baseHeight = pixelMetric(PM_TabBarBaseHeight, &tabopt, widget);
             switch (twf->shape)
             {
