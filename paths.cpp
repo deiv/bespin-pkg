@@ -249,14 +249,18 @@ QPainterPath
 Shapes::menu(const QRectF &bound, bool leftSide, bool round)
 {
     QPainterPath path;
+    _S(2)
     if (round)
     {
+        _S(9)
         path.moveTo(bound.center());
-        path.arcTo(bound, leftSide ? 0 : -80, 260);
+        path.arcTo(bound, leftSide ? -90 : 0, 270);
+        path.closeSubpath();
+        path.addRect(bound.adjusted(leftSide ? 0 : 5*s9, 5*s9, leftSide ? 5*s9 : 0, 0));
     }
     else
     {
-        _S(2) _S(4)
+        _S(4)
         path.addRect(bound);
         path.addRect(bound.adjusted(leftSide ? s2 : 0, s4, leftSide ? 0 : -s2, 0));
     }

@@ -936,11 +936,15 @@ Client::trimm(const QString &string)
     uninteresting one (usually it's the apps name, if there's add info, that's
     more important to the user) ------------------------------------- */
 
+    // Amarok 2 is however different...
+    if (ret.contains(" :: "))
+        ret = ret.section(" :: ", 0, -2, QString::SectionSkipEmpty );
+
     // ok, here's currently some conflict
-    // in e.g. amarok, i'd like to snip "amarok" and preserver "<song> by <artist>"
+    // in e.g. amarok, i'd like to snip "amarok" and preserve "<song> by <artist>"
     // but for e.g. k3b, i'd like to get rid of stupid
     // "the kde application to burn cds and dvds" ...
-    if (ret.contains(" - "))
+    else if (ret.contains(" - "))
         ret = ret.section(" - ", 0, -2, QString::SectionSkipEmpty );
 
     KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
@@ -974,11 +978,12 @@ Client::trimm(const QString &string)
             ret = ret.mid(i, appName.length());
     }
 
+    // in general, remove leading and ending blanks...
     ret = ret.trimmed();
+    
     if (ret.isEmpty())
         ret = string; // ...
-
-    /* in general, remove leading and ending blanks... */
+    
     return ret;
    
 //    KWindowInfo info(windowId(), NET::WMVisibleName | NET::WMName, NET::WM2WindowClass);

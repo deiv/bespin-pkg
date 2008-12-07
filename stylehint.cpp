@@ -16,14 +16,17 @@
    Boston, MA 02110-1301, USA.
  */
 
-// #include <QComboBox>
+#include <QComboBox>
 #include <QtDebug>
 #include <QEvent>
 #include <QFrame>
 #include <QMenuBar>
 #include <QStyleOptionComboBox>
+// #include <QTabBar>
+// #include <QTabWidget>
 #include "colors.h"
 #include "bespin.h"
+#include "makros.h"
 
 using namespace Bespin;
 
@@ -48,8 +51,14 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
     case SH_ScrollBar_ScrollWhenPointerLeavesControl:
         return true; // UIs are no ego shooters...
     case SH_TabBar_Alignment:
-//       return Qt::AlignRight;
+//         if (const QTabWidget *tab = qobject_cast<const QTabWidget*>(widget))
+//         if (tab->count() == 1)
+//             return Qt::AlignCenter;
+//         if (const QTabBar *tab = qobject_cast<const QTabBar*>(widget))
+//         if (tab->count() == 1)
+//             return Qt::AlignCenter;
         return Qt::AlignLeft;
+//       return Qt::AlignRight;
 //       return Qt::AlignCenter;
     case SH_Header_ArrowAlignment:
         return Qt::AlignLeft; // we move it to text center though...
@@ -67,8 +76,8 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
         if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
         if (menubar->height() == 0)
         if (!menubar->actions().isEmpty())
-        { // we trick menubars if we use macmenus - hehehe...
-            // the final result needs to be > "0" (i.e. "1") to avoid side effects...
+        {   // we trick menubars if we use macmenus - hehehe...
+            // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
             return -menubar->actionGeometry(menubar->actions().first()).height() + 1;
         }
         return 0; // no space between menus and docks (we need padding rather than margin)
@@ -102,8 +111,9 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
     case SH_TabBar_PreferNoArrows:
         return false; // the can grow horribly big...
     case SH_ComboBox_Popup: // Allows popups as a combobox drop-down menu.
-//       if (const QComboBox *cmb = qobject_cast<const QComboBox *>(widget))
-//          return cmb->count() < 11; // maybe depend on item count?!
+//         if (const QComboBox *cmb = qobject_cast<const QComboBox *>(widget))
+//         if (!cmb->isEditable())
+//             return cmb->count() < 11; // maybe depend on item count?!
         return false;
     case SH_ComboBox_PopupFrameStyle:
         return QFrame::StyledPanel | QFrame::Plain;
@@ -115,7 +125,7 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
     case SH_BlinkCursorWhenTextSelected:
         return false; // that's annoying
     case SH_RichText_FullWidthSelection:
-        return true; /// (hähh?)
+        return true;
     case SH_GroupBox_TextLabelVerticalAlignment:
         return Qt::AlignTop; // we've no halfheight frame
     case SH_GroupBox_TextLabelColor:
@@ -127,20 +137,18 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
         return true; // yes please
     case SH_LineEdit_PasswordCharacter:
     { // configurable...
-        const QFontMetrics &fm =
-        option ? option->fontMetrics :
-        (widget ? widget->fontMetrics() : QFontMetrics(QFont()));
+        const QFontMetrics &fm = option ? option->fontMetrics :
+                                (widget ? widget->fontMetrics() : QFontMetrics(QFont()));
         if (fm.inFont(QChar(config.input.pwEchoChar)))
             return config.input.pwEchoChar;
-        return '|';
+        return '*';
         }
     case SH_Table_GridLineColor:
         if (option)
-            return Colors::mid(option->palette.color(QPalette::Base),
-                                option->palette.color(QPalette::Text),6,1).rgb();
+            return Colors::mid(FCOLOR(Base), FCOLOR(Text),6,1).rgb();
         return -1;
     case SH_UnderlineShortcut:
-        return true; // means the alt+<x> menu thing
+        return true; // means the alt+<x> menu thing, we handle global setting throught BESPIN_MNEMONIC
     case SH_SpinBox_AnimateButton:
         return true; // feedback to the user, please
     case SH_SpinBox_ClickAutoRepeatRate:
@@ -158,14 +166,14 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
     case SH_MenuBar_DismissOnSecondClick:
         return true; // simple close popups
     case SH_MessageBox_UseBorderForButtonSpacing:
-        return false; // h�hh?
+        return false; // hähh?
     case SH_TitleBar_AutoRaise:
         return true; // hover titlebar buttons in MDI
     case SH_ToolButton_PopupDelay:
-        return 200; // everyone can do a click in 200ms - yesno?
+        return 150; // everyone can do a click in 150ms - yesno?
 ///    case SH_FocusFrame_Mask: // The mask of the focus frame.
     case SH_RubberBand_Mask: // The mask of the rubber band.
-        return false; // we an opaque one
+        return false; // we have an opaque one
 ///    case SH_WindowFrame_Mask: // The mask of the window frame.
     case SH_SpinControls_DisableOnBounds:
         return true; // yeah - don't trick the user
