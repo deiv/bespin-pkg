@@ -31,6 +31,7 @@
 #include <QComboBox>
 #include <QToolButton>
 #include <QTreeView>
+#include <QtDBus/QDBusInterface>
 
 /**============= Bespin includes ==========================*/
 
@@ -500,10 +501,29 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 
 // X11 properties for the deco ---------------
 void
-Style::setup(WindowData &data, const QPalette &pal, int mode, const Gradients::Type (&gt)[2])
+Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
 {
-    data.inactiveWindow = pal.color(QPalette::Inactive, QPalette::Window).rgba();
-    data.activeWindow = pal.color(QPalette::Active, QPalette::Window).rgba();
+    // this is important because KDE apps may alter the original palette any time
+    const QPalette &pal = originalPalette ? *originalPalette : palette;
+
+    // the title region in the center
+    WindowData data;
+    if (widget && widget->testAttribute(Qt::WA_MacBrushedMetal))
+    {
+        data.style = (((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff));
+        QColor bg = pal.color(QPalette::Inactive, QPalette::Window);
+        bg = bg.light(115-Colors::value(bg)/20);
+        data.inactiveWindow = bg.rgba();
+        bg = pal.color(QPalette::Active, QPalette::Window);
+        bg = bg.light(115-Colors::value(bg)/20);
+        data.activeWindow = bg.rgba();
+    }
+    else
+    {
+        data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
+        data.inactiveWindow = pal.color(QPalette::Inactive, QPalette::Window).rgba();
+        data.activeWindow = pal.color(QPalette::Active, QPalette::Window).rgba();
+    }
     data.inactiveDeco = CCOLOR(kwin.inactive, Bg).rgba();
     data.activeDeco = CCOLOR(kwin.active, Bg).rgba();
     data.inactiveText = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window), CCOLOR(kwin.text, Bg)).rgba();
@@ -512,21 +532,34 @@ Style::setup(WindowData &data, const QPalette &pal, int mode, const Gradients::T
 //     Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :    ;
     data.inactiveButton = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 1, 2).rgba();
     data.activeButton = CCOLOR(kwin.active, Fg).rgba();
-    data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
-}
-
-void
-Style::setupDecoFor(WId winId, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
-{
-// XProperty actually handles the non X11 case, but we avoid overhead ;)
+    
+    // XProperty actually handles the non X11 case, but we avoid overhead ;)
 #ifdef Q_WS_X11
-    const QPalette &pal = originalPalette ? *originalPalette : palette;
-
-    // the title region in the center
-    WindowData data;
-    setup(data, palette, mode, gt);
-    XProperty::set<uint>(winId, XProperty::winData, (uint*)&data, XProperty::WORD, 9);
+    if (widget)
+        XProperty::set<uint>(widget->winId(), XProperty::winData, (uint*)&data, XProperty::WORD, 9);
+    else
 #endif
+    {   // dbus solution, currently for gtk
+        QByteArray ba(36, 'a');
+        uint *ints = (uint*)ba.data();
+        ints[0] = data.inactiveWindow;
+        ints[1] = data.activeWindow;
+        ints[2] = data.inactiveDeco;
+        ints[3] = data.activeDeco;
+        ints[4] = data.inactiveText;
+        ints[5] = data.activeText;
+        ints[6] = data.inactiveButton;
+        ints[7] = data.activeButton;
+        ints[8] = data.style;
+
+        QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco");
+#if QT_VERSION < 0x040400
+        const qint64 pid = getpid();
+#else
+        const qint64 pid = QCoreApplication::applicationPid();
+#endif
+        bespinDeco.call(QDBus::NoBlock, "styleByPid", pid, ba);
+    }
 }
 
 static const
@@ -798,22 +831,10 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             if (config.bg.modal.invert)
                 swapPalette(widget, this);
-            QPalette pal = widget->palette();
-            BGMode bgMode = config.bg.mode;
-            QColor bg = FCOLOR(Window);
-            Gradients::Type gt[2] = { GRAD(kwin)[0], GRAD(kwin)[1] };
             if (config.bg.modal.glassy)
-            {
                 widget->setAttribute(Qt::WA_MacBrushedMetal);
-                bgMode = Plain;
-                bg = bg.light(115-Colors::value(bg)/20);
-                pal.setColor(QPalette::Window, bg);
-                gt[0] = gt[1] = Gradients::None;
-            }
-            else
-                widget->setAttribute(Qt::WA_MacBrushedMetal, false);
 #ifdef Q_WS_X11
-            setupDecoFor(widget->winId(), pal, bgMode, gt);
+            setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
 #endif
             widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
             return false;

@@ -32,7 +32,6 @@
 #include <QToolBar>
 #include <QToolTip>
 #include <QTreeView>
-#include <QtDBus/QDBusInterface>
 
 #include "colors.h"
 
@@ -193,30 +192,7 @@ void Style::polish( QPalette &pal, bool onInit )
 
 #ifdef Q_WS_X11
     if (appType == GTK)
-    {
-        WindowData winData;
-        setup(winData, pal, config.bg.mode, GRAD(kwin));
-        QByteArray data(36, 'a');
-        uint *ints = (uint*)data.data();
-        ints[0] = winData.inactiveWindow;
-        ints[1] = winData.activeWindow;
-        ints[2] = winData.inactiveDeco;
-        ints[3] = winData.activeDeco;
-        ints[4] = winData.inactiveText;
-        ints[5] = winData.activeText;
-        ints[6] = winData.inactiveButton;
-        ints[7] = winData.activeButton;
-        ints[8] = winData.style;
-        
-        QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco");
-        bespinDeco.call(QDBus::NoBlock, "styleByPid",
-#if QT_VERSION < 0x040400
-                        getpid(),
-#else
-                        QCoreApplication::applicationPid(),
-#endif
-                        data);
-    }
+        setupDecoFor(NULL, pal, config.bg.mode, GRAD(kwin));
 #endif
 }
 
@@ -348,6 +324,9 @@ Style::polish( QWidget * widget )
         if (config.bg.mode > Plain)
             widget->setAttribute(Qt::WA_StyledBackground);
 
+//         widget->setAttribute(Qt::WA_MacBrushedMetal);
+//         widget->setAttribute(Qt::WA_StyledBackground);
+
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
         {
@@ -405,7 +384,7 @@ Style::polish( QWidget * widget )
             ignore &= ~Qt::Dialog; // erase dialog, it's in drawer et al. but takes away window as well
             
             if (!(widget->windowFlags() & ignore)) // this can be expensive, so avoid for popups, combodrops etc.
-                setupDecoFor(widget->winId(), widget->palette(), config.bg.mode, GRAD(kwin));
+                setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
         }
 
     }
