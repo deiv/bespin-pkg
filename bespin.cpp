@@ -237,10 +237,10 @@ Style::registerRoutines()
 #endif
     // window.cpp
     registerPE(drawWindowFrame, PE_FrameWindow);
-    if (config.menu.shadow)
+//     if (config.menu.shadow)
         registerPE(drawWindowFrame, PE_FrameMenu);
-    else
-        registerPE(skip, PE_FrameMenu);
+//     else
+//         registerPE(skip, PE_FrameMenu);
     registerPE(drawWindowBg, PE_Widget);
     registerPE(drawToolTip, PE_PanelTipLabel);
     registerCC(drawTitleBar, CC_TitleBar);

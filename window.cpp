@@ -20,6 +20,7 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QToolBar>
 #include <QtDebug>
 #include "draw.h"
 
@@ -30,8 +31,20 @@
 #endif
 
 void
-Style::drawWindowFrame(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawWindowFrame(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
+    // toolbar extensions, floating tolbars
+    if (qobject_cast<const QToolBar*>(widget))
+    {
+        if (config.bg.mode == Scanlines)
+            painter->fillRect(RECT, Gradients::structure(FCOLOR(Window), true));
+        else
+            painter->fillRect(RECT, Gradients::pix(FCOLOR(Window), RECT.height(), Qt::Vertical));
+    }
+
+    else if (!config.menu.shadow)
+        return;
+    // windows, docks etc. - just a frame
     const QColor border = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 5,2);
     const int right = RECT.right()-(32+4);
     const int bottom = RECT.bottom()-(32+4);

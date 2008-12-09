@@ -110,7 +110,7 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
     case PM_ToolBarSeparatorExtent: // Width of a toolbar separator in a horizontal toolbar and the height of a separator in a vertical toolbar
         return F(6);
     case PM_ToolBarExtensionExtent: // Width of a toolbar extension button in a horizontal toolbar and the height of the button in a vertical toolbar
-        return F(16);
+        return F(13);
     case PM_TabBarTabOverlap: // Number of pixels the tabs should overlap
         return 0;
     case PM_TabBarTabHSpace: // Extra space added to the tab width

@@ -94,7 +94,7 @@ if (baseHeight < 0) \
     // the bar
     drawTabBar(&tbb, painter, widget);
 }
-#include <QtDebug>
+
 void
 Style::drawTabBar(const QStyleOption *option, QPainter *painter,
                         const QWidget * widget) const
@@ -151,7 +151,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter,
     Tile::setShape(pf);
 
     masks.rect[true].render(rect, painter, GRAD(tab), o, CCOLOR(tab.std, Bg), size);
-    rect.setBottom(rect.bottom()+dpi.f2);
+    rect.setBottom(rect.bottom()+F(2));
     shadows.sunken[true][true].render(rect, painter);
     Tile::reset();
 }
@@ -262,7 +262,8 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
 
     QRect rect = RECT;
 
-    if (appType == GTK) {
+    if (appType == GTK)
+    {
         rect.translate(0, F(3));
         sunken = option->state & State_Selected;
     }
@@ -293,36 +294,18 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
     {
         c = CCOLOR(tab.active, Bg);
         if (config.tab.activeTabSunken)
-        {
-            if (vertical)
-                rect.adjust(0, F(1), 0, -f2);
-            else
-                rect.adjust(f2, -F(1), -f2, 0);
-        }
+            vertical ?  rect.adjust(0, F(1), 0, -f2) : rect.adjust(f2, -F(1), -f2, 0);
         else
-        {
-            if (vertical)
-                rect.adjust(-F(1), f2, F(1), -f2);
-            else
-                rect.adjust(f2, -F(1), -f2, F(1));
-        }
+            vertical ? rect.adjust(-F(1), f2, F(1), -f2) : rect.adjust(f2, -F(1), -f2, F(1));
     }
     else
-    {
-    //       c = CCOLOR(tab.std, Bg);
-    //       int quota = 6 + (int) (.16 * Colors::contrast(c, CCOLOR(tab.active, 0)));
-    //       c = Colors::mid(c, CCOLOR(tab.active, 0), quota, animStep);
         c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 8-animStep, animStep);
-    }
 
     Gradients::Type gt = GRAD(tab);
+    // active tab has same color as inactive one, we must do sth. on the gradient...
     if (sunken && config.tab.active_role[Bg] == config.tab.std_role[Bg])
-    {   // active tab has same color as inactive one, we must do sth. on the gradient...
-        if (gt == Gradients::Sunken)
-            gt = Gradients::Simple;
-        else
-            gt = Gradients::Sunken;
-    }
+        gt = (gt == Gradients::Sunken) ? Gradients::Simple : Gradients::Sunken;
+        
     masks.rect[true].render(rect, painter, gt, o, c, size, rect.topLeft());
     if (config.tab.activeTabSunken && sunken)
     {
@@ -332,16 +315,12 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
 }
 
 void
-Style::drawTabLabel(const QStyleOption *option, QPainter *painter,
-                          const QWidget *) const
+Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     ASSURE_OPTION(tab, Tab);
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
     if (tab->position == QStyleOptionTab::OnlyOneTab)
-    {
-        sunken = false;
-        hover = false;
-    }
+        { sunken = false; hover = false; }
     else
         sunken = sunken || (option->state & State_Selected);
     if (sunken) hover = false;
@@ -351,9 +330,6 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter,
 
     bool verticalTabs = false;
     bool east = false;
-
-
-    int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
 
     switch(tab->shape)
     {
@@ -370,18 +346,15 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter,
     {
         int newX, newY, newRot;
         if (east)
-        {
-            newX = tr.width(); newY = tr.y(); newRot = 90;
-        }
+            { newX = tr.width(); newY = tr.y(); newRot = 90; }
         else
-        {
-            newX = 0; newY = tr.y() + tr.height(); newRot = -90;
-        }
+            { newX = 0; newY = tr.y() + tr.height(); newRot = -90; }
         tr.setRect(0, 0, tr.height(), tr.width());
         QMatrix m; m.translate(newX, newY); m.rotate(newRot);
         painter->setMatrix(m, true);
     }
-       
+
+    int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
     if (!tab->icon.isNull())
     {
         QSize iconSize;
@@ -399,11 +372,12 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter,
     }
 
     // color adjustment
-    QColor cF, cB;
+    QColor cF = CCOLOR(tab.std, Fg), cB = CCOLOR(tab.std, Bg);
     if (sunken)
     {
         cF = CCOLOR(tab.active, Fg);
         cB = CCOLOR(tab.active, Bg);
+        setBold(painter);
     }
     else if (animStep)
     {
@@ -412,15 +386,14 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter,
         if (Colors::contrast(CCOLOR(tab.active, Fg), cB) > Colors::contrast(cF, cB))
             cF = CCOLOR(tab.active, Fg);
     }
-    else
-    {
-        cB = Colors::mid(CCOLOR(tab.std, Bg), FCOLOR(Window), 2, 1);
-        cF = Colors::mid(cB, CCOLOR(tab.std, Fg), 1,4);
-    }
+//     else
+//     {
+//         cB = Colors::mid(CCOLOR(tab.std, Bg), FCOLOR(Window), 2, 1);
+//         cF = Colors::mid(cB, CCOLOR(tab.std, Fg), 1,4);
+//     }
 
-    // dark background, let's paint an emboss
-    if (isEnabled)
-    {
+    if (isEnabled && Colors::value(cB) < 148)
+    {   // dark background, let's paint an emboss
         painter->setPen(cB.dark(120));
         tr.moveTop(tr.top()-1);
         drawItemText(painter, tr, alignment, PAL, isEnabled, tab->text);
@@ -434,8 +407,7 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter,
 }
 
 void
-Style::drawToolboxTab(const QStyleOption *option, QPainter *painter,
-                            const QWidget * widget) const
+Style::drawToolboxTab(const QStyleOption *option, QPainter *painter, const QWidget * widget) const
 {
     ASSURE_OPTION(tbt, ToolBox);
 

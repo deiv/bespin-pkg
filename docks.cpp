@@ -37,32 +37,33 @@ Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWid
 
     ASSURE_OPTION(dwOpt, DockWidget);
     
-    QRect rect = RECT;
-    // adjust rect;
-    const int bw = (dwOpt->closable +  dwOpt->floatable) * (16 + F(2));
-    if (option->direction == Qt::LeftToRight)
-        rect.setRight(rect.right() - bw);
-    else
-        rect.setLeft(rect.left() + bw);
     const QColor bg = FCOLOR(Window);
 
+    painter->save();
+
+    painter->setPen(bg.dark(120));
+    painter->drawLine(RECT.topLeft(), RECT.topRight());
+
+    painter->setPen(bg.light(114));
+    painter->drawLine(RECT.left(), RECT.y()+1, RECT.right(), RECT.y()+1);
+
     if (dwOpt->title.isEmpty())
-    {
-        rect.setHeight(F(6));
-        rect.moveTop(RECT.center().y()-F(3));
-        painter->drawTiledPixmap(rect, Gradients::pix(bg, F(6), Qt::Vertical, Gradients::Button));
-    }
-    else
+        { painter->restore(); return; }
+        
     {
         OPT_ENABLED OPT_HOVER
-        QRect textRect;
-        const int itemtextopts = Qt::AlignBottom | Qt::AlignHCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
+        QRect textRect, rect = RECT;
+        // adjust rect;
+        const int bw = (dwOpt->closable +  dwOpt->floatable) * (16 + F(2));
+        if (option->direction == Qt::LeftToRight)
+            rect.setRight(rect.right() - bw);
+        else
+            rect.setLeft(rect.left() + bw);
 
-        painter->save();
+        // text
+        const int itemtextopts = Qt::AlignBottom | Qt::AlignHCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
         QString title = dwOpt->title; // " " + dwOpt->title + " "; // good for underlining
         setTitleFont(painter);
-
-        QPen pen = painter->pen();
         if (Colors::value(bg) < 100)
         {   // emboss
             painter->setPen(Colors::mid(bg, Qt::black, 1, 4));
@@ -70,16 +71,16 @@ Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWid
         }
         painter->setPen(hover ? FCOLOR(WindowText) : Colors::mid(bg, FCOLOR(WindowText), 1, 3));
         drawItemText(painter, rect, itemtextopts, PAL, isEnabled, title, QPalette::NoRole, &rect);
+
+        // underline
         Tile::PosFlags pf = Tile::Center;
         if (option->direction == Qt::LeftToRight)
             { rect.setRight(RECT.right()); pf |= Tile::Left; }
         else
             { rect.setLeft(RECT.left()); pf |= Tile::Right; }
         shadows.line[0][Sunken].render(rect, painter, pf, true);
-//         painter->drawLine(rect.x(), RECT.bottom(), RECT.right(), RECT.bottom());
-
-        painter->restore();
     }
+    painter->restore();
 }
 
 void
