@@ -55,7 +55,7 @@ KDE_EXPORT KDecorationFactory* create_factory()
 using namespace Bespin;
 
 bool Factory::initialized_ = false;
-Config Factory::_config = { false, false, false, {{Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None}} };
+Config Factory::_config = { false, false, false, false, {{Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None}} };
 int Factory::buttonSize_ = -1;
 int Factory::borderSize_ = 4;
 int Factory::titleSize_[2] = {18,16};
@@ -205,6 +205,10 @@ bool Factory::readConfig()
     oldBool = _config.trimmCaption;
     _config.trimmCaption = settings.value("TrimmCaption", true).toBool();
     if (oldBool != _config.trimmCaption) ret = true;
+
+    oldBool = _config.slickButtons;
+    _config.slickButtons = settings.value("SlickButtons", false).toBool();
+    if (oldBool != _config.slickButtons) ret = true;
 
     oldBool = _config.resizeCorner;
     _config.resizeCorner = settings.value("ResizeCorner", false).toBool();

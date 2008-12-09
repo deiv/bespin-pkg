@@ -181,7 +181,7 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
     case PM_DefaultTopLevelMargin: //
         return F(8);
     case PM_DefaultChildMargin: //
-        return F(6);
+        return F(7);
     case PM_DefaultLayoutSpacing: //
         return F(4);
     case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize

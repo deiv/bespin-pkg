@@ -256,7 +256,7 @@ Shapes::menu(const QRectF &bound, bool leftSide, bool round)
         path.moveTo(bound.center());
         path.arcTo(bound, leftSide ? -90 : 0, 270);
         path.closeSubpath();
-        path.addRect(bound.adjusted(leftSide ? 0 : 5*s9, 5*s9, leftSide ? 5*s9 : 0, 0));
+        path.addRect(bound.adjusted(leftSide ? 0 : 5*s9, 5*s9, leftSide ? -5*s9 : 0, 0));
     }
     else
     {

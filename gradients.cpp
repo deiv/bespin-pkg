@@ -298,8 +298,7 @@ Gradients::borderline(const QColor &c, Position pos)
     if (pix)
         return *pix;
     
-    QColor c1 = c, c2 = c;
-    /*c1.setAlpha(c.alpha()); */c2.setAlpha(0);
+    QColor c2 = c; c2.setAlpha(0);
     
     QPoint start(0,0), stop;
     if (pos > Bottom)
@@ -310,9 +309,9 @@ Gradients::borderline(const QColor &c, Position pos)
     
     QLinearGradient lg(start, stop);
     if (pos % 2) // Bottom, right
-    { lg.setColorAt(0, c1); lg.setColorAt(1, c2); }
+    { lg.setColorAt(0, c); lg.setColorAt(1, c2); }
     else
-    { lg.setColorAt(0, c2); lg.setColorAt(1, c1); }
+    { lg.setColorAt(0, c2); lg.setColorAt(1, c); }
     
     QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
     

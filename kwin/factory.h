@@ -44,7 +44,7 @@ typedef struct _WindowData WindowData;
 
 typedef struct
 {
-    bool forceUserColors, trimmCaption, resizeCorner;
+    bool forceUserColors, trimmCaption, resizeCorner, slickButtons;
     Gradients::Type gradient[2][2];
 } Config;
 
@@ -70,6 +70,7 @@ public:
     inline static const Config *config() { return &_config; }
     WindowData *decoInfo(qint64 pid);
     inline static const QVector<Button::Type> &multiButtons() { return multiButton_; }
+    inline static bool slickButtons() { return _config.slickButtons; }
     void showDesktopMenu(const QPoint &p, Client *client);
     void showInfo(const QPoint &p, WId id);
     void showWindowList(const QPoint &p, Client *client);
@@ -82,6 +83,7 @@ private:
 private:
     QMap<qint64, WindowData*> _decoInfos;
     static bool initialized_;
+    static bool slickButtons_;
     static int buttonSize_, borderSize_, titleSize_[2];
     static QVector<Button::Type> multiButton_;
     static Config _config;

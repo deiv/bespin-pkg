@@ -125,8 +125,12 @@ Client::addButtons(const QString& s, int &sz, bool left)
                 continue; // no button to insert
             type = Button::Multi; break;
         case 'I': // Minimize
+            if (!(isMinimizable() || isMaximizable()))
+                continue;
             type = Button::Min; break;
         case 'A': // Maximize
+            if (!(isMinimizable() || isMaximizable()))
+                continue;
             type = Button::Max; break;
         case 'X': // Close button
             type = Button::Close; break;
@@ -559,6 +563,7 @@ Client::repaint(QPainter &p)
         {   // static bool KWindowSystem::compositingActive();
             // frame ==============
             const QColor border = Colors::mid(bg, color(ColorFont, true),5,2);
+            p.setRenderHint( QPainter::Antialiasing, false );
             p.setPen(border);
             p.drawLine(32+4, 0, width()-(32+5), 0);
             p.drawLine(32+4, height()-1, width()-(32+5), height()-1);

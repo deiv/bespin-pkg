@@ -308,17 +308,33 @@ Button::color() const
 void
 Button::paintEvent(QPaintEvent *)
 {
-   QPainter p(this);
-   p.setRenderHint(QPainter::Antialiasing);
-   const float t = height()/2.0;
-   p.translate( QPoint(t,t) );
-   const float f = (18 + (!(state & Sunken))*zoomLevel)/24.0;
-   p.scale ( f, f );
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setPen(Qt::NoPen);
+    p.setBrush(color());
+    
+    float f;
+    if (state & Sunken)
+        f = .75;
+    else if (client->slickButtons())
+    {
+        const float s = height()/3.0;
+        if (!zoomLevel)
+        {
+            p.drawEllipse(s, s, s, s);
+            p.end();
+            return;
+        }
+        f = (3+zoomLevel)/9.0;
+    }
+    else
+        f = (18 + zoomLevel)/24.0;
+    const float t = height()/2.0;
+    p.translate( QPoint(t,t) );
+    p.scale ( f, f );
 //    p.rotate(60*zoomLevel); // too annoying, especially for fast zoom in...
-   p.setPen(Qt::NoPen);
-   p.setBrush(color());
-   p.drawPath(shape[_type]);
-   p.end();
+    p.drawPath(shape[_type]);
+    p.end();
 }
 
 void
