@@ -464,7 +464,8 @@ Style::polish( QWidget * widget )
                     itemView->setPalette(pal);
                 }
 
-//                 if (itemView->inherits("KCategorizedView"))
+//                 if (itemView->verticalScrollBar() && itemView->inherits("KCategorizedView"))
+//                     itemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
                 if (!qobject_cast<QTreeView*>(itemView))
                 {   // Enable hover effects in listview, treeview hovering sucks, as the "tree" doesn't get an update

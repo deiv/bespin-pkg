@@ -196,12 +196,12 @@ Style::drawTab(const QStyleOption *option, QPainter *painter,
     if (widget)
         copy.palette = widget->palette();
 
-    copy.rect.setBottom(RECT.bottom()-F(2));
+    copy.rect.adjust(0, F(1), 0, -F(2));
 
     if (appType == GTK)
     {
         QRect r = copy.rect;
-        r.adjust(0, F(2), 0, -F(1));
+        r.adjust(0, F(1), 0, -F(1));
         switch (tab->position)
         {
         default:
@@ -276,17 +276,17 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
         return;
        
     const int f2 = F(2);
-    int size = RECT.height()-f2;
+    int size = RECT.height()+F(3);
     Qt::Orientation o = Qt::Vertical;
     const bool vertical = verticalTabs(tab->shape);
     if (vertical)
     {
-        rect.adjust(F(4), F(1), -F(5), -F(1));
+        rect.adjust(F(3), F(1), -F(4), -F(1));
         o = Qt::Horizontal;
-        size = RECT.width()-f2;
+        size = RECT.width();
     }
     else
-        rect.adjust(F(1), F(4), -F(1), -F(5));
+        rect.adjust(F(1), F(3), -F(1), -F(4));
 
     QColor c;
     if (sunken)
@@ -323,8 +323,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
         else
             gt = Gradients::Sunken;
     }
-    const QPoint off = rect.topLeft()-/*RECT.topLeft()-*/QPoint(F(3),f2);
-    masks.rect[true].render(rect, painter, gt, o, c, size, off);
+    masks.rect[true].render(rect, painter, gt, o, c, size, rect.topLeft());
     if (config.tab.activeTabSunken && sunken)
     {
         rect.setBottom(rect.bottom()+f2);
@@ -394,8 +393,8 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter,
             iconSize = QSize(iconExtent, iconExtent);
         }
         QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ? QIcon::Normal : QIcon::Disabled);
-        painter->drawPixmap(tr.left() + dpi.f9, tr.center().y() - tabIcon.height() / 2, tabIcon);
-        tr.setLeft(tr.left() + iconSize.width() + dpi.f12);
+        painter->drawPixmap(tr.left() + F(9), tr.center().y() - tabIcon.height() / 2 + F(1), tabIcon);
+        tr.setLeft(tr.left() + iconSize.width() + F(12));
         alignment = Qt::AlignLeft | Qt::AlignVCenter | BESPIN_MNEMONIC;
     }
 

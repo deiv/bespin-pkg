@@ -371,9 +371,9 @@ Style::drawCheckBox(const QStyleOption * option, QPainter * painter,
     // the button -----------------
     QStyleOption copy = *option;
     if (config.btn.layer == 1)
-        copy.rect.adjust(0,dpi.f1,0,-dpi.f1); // get rect appereance again
+        copy.rect.adjust(0,F(1),0,-F(2)); // get rect appereance again
     else if (config.btn.layer == 0)
-        copy.rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0); // get rect appereance again
+        copy.rect.adjust(F(1),F(1),-F(1),0); // get rect appereance again
     isCheckbox = true;
     drawButtonFrame(&copy, painter, widget);
     isCheckbox = false;
@@ -389,7 +389,7 @@ Style::drawCheckBox(const QStyleOption * option, QPainter * painter,
         else
             center += QPoint(0, -F(1));
         painter->setBrush(btnFg(PAL, isEnabled, hasFocus, animStep));
-        const int d = dpi.f5 - (bool(config.btn.checkType) + config.btn.layer) * dpi.f1;
+        const int d = F(5) - (bool(config.btn.checkType) + config.btn.layer) * F(1);
         copy.rect.adjust(d, d, -d, -d);
         if (copy.rect.width() > copy.rect.height())
             copy.rect.setWidth(copy.rect.height());

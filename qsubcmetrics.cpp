@@ -448,9 +448,9 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
         int h = dpi.Indicator;
         QRect r = RECT;
         if (config.btn.layer)
-            r.setRect(r.x()+F(1), r.y() + ((r.height() - h) / 2), h-dpi.f2, h);
+            r.setRect(r.x()+F(1), r.y() + ((r.height() - h) / 2), h-F(2), h);
         else
-            r.setRect(r.x(), r.y() + ((r.height() - h) / 2), h, h);
+            r.setRect(r.x(), r.y() + ((r.height() - h) / 2)-F(1), h, h);
         if (element != SE_CheckBoxContents)
             return visualRect(option->direction, RECT, r);
         int spacing = F(5);

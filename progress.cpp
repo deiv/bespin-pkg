@@ -141,6 +141,10 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
 
     // groove + contents ======
     step = Animator::Progress::step(widget);
+//     QPoint c = RECT.center();
+//     painter->drawLine(RECT.left(), c.y(), RECT.right(), c.y());
+//             masks.rect[true].render(RECT, painter, Gradients::pix(FCOLOR(Window), RECT.height(), Qt::Vertical, Gradients::Button));
+//             shadows.sunken[true][false].render(RECT, painter);
     drawProgressBarGroove(pb, painter, widget);
     drawProgressBarContents(pb, painter, widget);
     // label? =========
@@ -168,7 +172,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
 {
     if (appType == GTK && !content)
         return; // looks really crap
-
+        
     ASSURE_OPTION(pb, ProgressBar);
     const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(pb);
 
@@ -176,6 +180,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
     if (pb2 && pb2->invertedAppearance)
         reverse = !reverse;
     const bool vertical = (pb2 && pb2->orientation == Qt::Vertical);
+    
     const bool busy = pb->maximum == 0 && pb->minimum == 0;
     int x,y,l,t;
     RECT.getRect(&x,&y,&l,&t);
@@ -184,7 +189,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
         { int h = x; x = y; y = h; l = RECT.height(); t = RECT.width(); }
 
     double val = 0.0;
-    if (busy)
+    if (busy )
     {   // progress with undefined duration / stepamount
         if (step < 0)
             step = Animator::Progress::step(widget);
@@ -291,28 +296,24 @@ Style::drawProgressBarLabel(const QStyleOption *option, QPainter *painter, const
     painter->save();
     QRect rect = RECT;
     if (progress->orientation == Qt::Vertical)
-    {   // vertical progresses have text rotated by 90Â° or 270Â°
+    {   // vertical progresses have text rotated by 90¡Æ or 270¡Æ
         QMatrix m;
-        int h = rect.height(); rect.setHeight(rect.width()); rect.setHeight(h);
+        int h = rect.height(); rect.setHeight(rect.width()); rect.setWidth(h);
         if (progress->bottomToTop)
             { m.translate(0.0, RECT.height()); m.rotate(-90); }
         else
             { m.translate(RECT.width(), 0.0); m.rotate(90); }
         painter->setMatrix(m);
     }
-    painter->setPen(FCOLOR(Window));
     int flags = Qt::AlignCenter | Qt::TextSingleLine;
-    // "burred" background contrast
-    rect.translate(-1,-1);
-    painter->drawText(rect, flags, progress->text);
-    rect.translate(0,2);
-    painter->drawText(rect, flags, progress->text);
-    rect.translate(2,0);
-    painter->drawText(rect, flags, progress->text);
-    rect.translate(0,-2);
-    painter->drawText(rect, flags, progress->text);
-    rect.translate(-1,1);
-    // text
+    QRect tr = painter->boundingRect(rect, flags, progress->text);
+    if (!tr.isValid())
+        { painter->restore(); return; }
+    tr.adjust(-F(6), -F(3), F(6), F(3));
+    Tile::setShape(Tile::Full);
+    QColor bg = FCOLOR(Window); bg.setAlpha(200);
+    masks.rect[true].render(tr, painter, bg);
+    Tile::reset();
     painter->setPen(FCOLOR(WindowText));
     painter->drawText(rect, flags, progress->text);
     painter->restore();

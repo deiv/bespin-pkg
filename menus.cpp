@@ -41,6 +41,8 @@ Style::drawMenuBarBg(const QStyleOption * option, QPainter * painter, const QWid
         painter->fillRect(rect, Gradients::brush(c, rect.height(), Qt::Vertical, config.menu.barGradient));
     else if (config.bg.mode == Scanlines)
         painter->fillRect(rect, Gradients::structure(c, true));
+    else if (config.menu.bar_role[Bg] != QPalette::Window)
+        painter->fillRect(rect, c);
 
     if (config.menu.barSunken)
     {
@@ -99,7 +101,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         // ================================================
     }
     
-    QRect r = RECT.adjusted(0, F(1), 0, -F(2));
+    QRect r = RECT.adjusted(0, F(2), 0, -F(4));
     if (step || hover)
     {
         if (!step)

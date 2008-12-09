@@ -26,6 +26,8 @@
 #include "colors.h"
 #include "paths.h"
 
+#include <QtDebug>
+
 #define COLOR(_TYPE_) pal.color(QPalette::_TYPE_)
 
 using namespace Bespin;
@@ -228,8 +230,12 @@ paint:
 //    case SP_FileDialogContentsView: //  34   
 //    case SP_FileDialogListView: //  35   
 //    case SP_FileDialogBack: //  36   
-   ///    case SP_ToolBarHorizontalExtensionButton: //  26  Extension button for horizontal toolbars
-   ///    case SP_ToolBarVerticalExtensionButton: //  27  Extension button for vertical toolbars
+    case SP_ToolBarHorizontalExtensionButton: //  26  Extension button for horizontal toolbars
+    case SP_ToolBarVerticalExtensionButton: //  27  Extension button for vertical toolbars
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(Colors::mid(COLOR(Window), COLOR(WindowText)));
+        drawSolidArrow(standardPixmap == SP_ToolBarHorizontalExtensionButton ? Navi::E : Navi::S, rect, &painter);
+        break;
     default:
         return QCommonStyle::standardPixmap ( standardPixmap, option, widget );
     }

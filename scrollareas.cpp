@@ -317,7 +317,7 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
         painter->fillRect(RECT, FCOLOR(Window));
 
     const Groove::Mode gType = config.scroll.groove;
-    QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1 + gType*gType*gType, 1);
+    QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 2 + gType*gType*gType, 1);
     if (gType)
         masks.rect[true].render(RECT, painter, Gradients::Sunken,
                                 horizontal ? Qt::Vertical : Qt::Horizontal, bg);
