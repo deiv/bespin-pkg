@@ -99,43 +99,57 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
 }
 
 void
+Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget) const
+{   // TODO: widget doesn't set a state - make bug report!
+    OPT_ENABLED;
+    
+    const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(option);
+    QPalette::ColorRole fg = QPalette::Text, bg = QPalette::Base;
+    if (option->state & State_Selected)
+        { fg = QPalette::HighlightedText; bg = QPalette::Highlight; }
+
+    bool reverse = option->direction == Qt::RightToLeft;
+    if (pb2 && pb2->invertedAppearance)
+        reverse = !reverse;
+    const bool vertical = (pb2 && pb2->orientation == Qt::Vertical);
+    double val = option->progress / double(option->maximum - option->minimum);
+
+    painter->save();
+    painter->setPen(QPen(Colors::mid(COLOR(fg), COLOR(bg)), F(3)));
+    if (vertical)
+        { int x = RECT.center().x(); painter->drawLine(x, RECT.top(), x, RECT.bottom()); }
+    else
+        { int y = RECT.center().y(); painter->drawLine(RECT.left(), y, RECT.right(), y); }
+    painter->restore();
+
+    QString text = option->text.isEmpty() ? QString(" %1% ").arg((int)(val*100)) : " " + option->text + " ";
+    QRect r = painter->boundingRect(RECT, Qt::AlignLeft | Qt::AlignVCenter, text);
+    
+    if (vertical)
+        r.moveBottom(RECT.bottom() - val*(RECT.height()-r.height()));
+    else
+    {
+        const int d = val*(RECT.width()-r.width());
+        if (reverse)
+            r.moveRight(RECT.right() - d);
+        else
+            r.moveLeft(RECT.left() + d);
+    }
+
+    if (r.isValid())
+        masks.rect[true].render(r, painter, Colors::mid(COLOR(fg), COLOR(bg),3,1));
+        
+    drawItemText(painter, r, Qt::AlignCenter, PAL, isEnabled, text, bg);
+}
+
+void
 Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(pb, ProgressBar);
     OPT_HOVER
     if (appType == KGet && !widget)
     {   // kinda inline progress in itemview (but unfortunately kget doesn't use itemviews)
-        // TODO: widget doesn't set a state - make bug report!
-        OPT_ENABLED;
-        const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(pb);
-        QPalette::ColorRole fg = QPalette::Text, bg = QPalette::Base;
-        if (pb->state & State_Selected)
-            { fg = QPalette::HighlightedText; bg = QPalette::Highlight; }
-            
-        QRect r = RECT;
-        masks.rect[false].render(r, painter, Colors::mid(COLOR(bg), COLOR(fg),2,1));
-        r.adjust(F(2), F(2), -F(2), -F(2));
-
-        bool reverse = pb->direction == Qt::RightToLeft;
-        if (pb2 && pb2->invertedAppearance)
-            reverse = !reverse;
-        const bool vertical = (pb2 && pb2->orientation == Qt::Vertical);
-        double val = pb->progress / double(pb->maximum - pb->minimum);
-        if (vertical)
-        {
-            r.setTop(r.bottom() - r.height()*val);
-        }
-        else if (reverse)
-        {
-            r.setLeft(r.right() - r.width()*val);
-        }
-        else
-        {
-            r.setWidth(r.width()*val);
-        }
-        if (r.isValid())
-            masks.rect[false].render(r, painter, fg);
-        drawItemText(painter, RECT, Qt::AlignCenter, PAL, isEnabled, pb->text, bg);
+        drawListViewProgress(pb, painter, widget);
         return;
     }
 
@@ -189,11 +203,11 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
         { int h = x; x = y; y = h; l = RECT.height(); t = RECT.width(); }
 
     double val = 0.0;
-    if (busy )
+    if (busy && content)
     {   // progress with undefined duration / stepamount
         if (step < 0)
             step = Animator::Progress::step(widget);
-        val = -3.0 * step / l;
+        val = - Animator::Progress::speed() * step / l;
     }
     else
         val = pb->progress / double(pb->maximum - pb->minimum);
@@ -271,15 +285,14 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
             int q = int((10*n)*val) - 10*nn;
             if (q)
             {
-                painter->save();
-                painter->setRenderHint(QPainter::Antialiasing);
-
                 const QColor c = Colors::mid(CCOLOR(progress.std, Bg), CCOLOR(progress.std, Fg), 10-q, q);
-                painter->setBrush(Gradients::brush(c, ss, Qt::Vertical, GRAD(progress) ));
 
                 if (vertical) // swap again, we abuse 'q' from above
                     { q = x; x = y; y = q; }
 
+                painter->save();
+                painter->setRenderHint(QPainter::Antialiasing);
+                painter->setBrush(Gradients::brush(c, ss, Qt::Vertical, GRAD(progress) ));
                 painter->setBrushOrigin(0, y);
                 drawShape(painter, ss, x, y, false);
                 painter->restore();

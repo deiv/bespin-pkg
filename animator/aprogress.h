@@ -11,6 +11,7 @@ public:
     static bool manage(QWidget *w);
     static void release(QWidget *w);
     static int step(const QWidget *w);
+    static float speed();
 protected:
     Progress() : Basic() {};
     int _step(const QWidget *widget, long int index = 0) const;

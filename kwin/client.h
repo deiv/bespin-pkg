@@ -88,7 +88,7 @@ protected:
     /// works like options()->color(.), but allows per window settings to match the window itself
     QColor color(ColorType type, bool active=true) const;
     inline int buttonSize() const { return _factory->buttonSize(); }
-    inline bool slickButtons() const { return _factory->slickButtons(); }
+    inline int slickButtons() const { return _factory->slickButtons(); }
 private:
     Q_DISABLE_COPY(Client)
     void repaint(QPainter &p);
