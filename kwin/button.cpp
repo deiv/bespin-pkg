@@ -339,7 +339,7 @@ Button::paintEvent(QPaintEvent *)
                 p.drawEllipse(QRectF(s, s, s, s));
                 p.end(); return;
             }
-            fx = 1; fy = (3+zoomLevel)/9.0;
+            fx = fy = (3+zoomLevel)/9.0;
         }
     }
     else

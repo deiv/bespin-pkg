@@ -127,7 +127,7 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
         painter->save();
         painter->setPen(Qt::NoPen);
         painter->setBrush(Gradients::structure(c, light));
-        painter->drawRect(RECT);
+        painter->drawRect(widget->rect());
         painter->restore();
         return;
     }

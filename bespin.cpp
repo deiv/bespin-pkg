@@ -490,10 +490,9 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
     {   // means we need to paint the global bg as well
         painter->setClipRect(option->rect, Qt::IntersectClip);
         QStyleOption tmpOpt = *option;
-        tmpOpt.rect = QRect(tl, grampa->size());
+        tmpOpt.rect = grampa->rect();
         tmpOpt.palette = grampa->palette();
         painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
-        painter->translate(tl);
         drawWindowBg(&tmpOpt, painter, grampa);
     }
     painter->restore();
