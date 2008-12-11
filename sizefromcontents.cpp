@@ -39,8 +39,8 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
             int hgt = contentsSize.height();
             if ( cb->frame )
                 hgt += (cb->editable || config.btn.fullHover) ? F(2) : F(4);
-            if ( !cb->currentIcon.isNull())
-                hgt += F(2);
+//             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
+//                 hgt += F(2);
             return QSize(contentsSize.width()+F(10)+(int)(hgt/1.1), hgt);
         }
 //    case CT_DialogButtons: //

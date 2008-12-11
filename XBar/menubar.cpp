@@ -207,6 +207,7 @@ MenuBar::initStyleOption(QStyleOptionMenuItem *option, int idx) const
     {
         option->text = d.appTitle;
         option->font.setWeight(QFont::Black);
+//         option->font.setCapitalization ( QFont::AllUppercase );
         option->font.setPointSize(option->font.pointSize()*1.2);
     }
 

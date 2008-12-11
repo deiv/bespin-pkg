@@ -33,8 +33,8 @@ Style::isSpecialFrame(const QWidget *w)
     if (const QListView *view = qobject_cast<const QListView*>(w))
         return (view->viewMode() == QListView::IconMode);
         
-    return  w->inherits("QTextEdit") || w->objectName() == "RenderFormElementWidget" ||
-            (w->parentWidget() && w->parentWidget()->inherits("KateView"));
+    return  w->inherits("QTextEdit") || w->objectName() == "RenderFormElementWidget";
+//     || (w->parentWidget() && w->parentWidget()->inherits("KateView")); // kate repaints the frame anyway
 }
 
 void
@@ -79,7 +79,7 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
     if (qobject_cast<const QFrame*>(widget))
     {   // frame, can be killed unless...
         if (isSpecialFrame(widget))
-        {   // ...TextEdit, KateView, ...
+        {   // ...TextEdit, ...
             brush = &PAL.color(QPalette::Base);
             if (sunken)
                 rect.setBottom(rect.bottom() + F(2));
