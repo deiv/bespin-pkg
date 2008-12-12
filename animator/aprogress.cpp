@@ -61,7 +61,7 @@ Progress::timerEvent(QTimerEvent * event)
         else if (*step == -1)
             *step = l/36-1;
 
-        int s = qMin(qMax(l / 10, 16), qMin(t, 20) /*16*t/10*/); // TODO: qMin(t, 20 -> dpi.SliderThickness)
+        int s = qMin(qMax(l / 10, 16), qMin(t, 8*20/7) /*16*t/10*/); // TODO: qMin(t, 20 -> dpi.SliderThickness)
         int ss = (10*s)/16;
         int n = l/s;
         if ( pb->orientation() == Qt::Vertical)

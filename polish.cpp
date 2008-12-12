@@ -497,7 +497,7 @@ Style::polish( QWidget * widget )
         else if (isSpecialFrame(widget))
         {   // ...QTextEdit etc. can be handled more efficiently
             if (frame->lineWidth() == 1)
-                frame->setLineWidth(dpi.f4); // but must have enough indention
+                frame->setLineWidth(F(4)); // but must have enough indention
         }
         else
             VisualFrame::manage(frame);
@@ -515,7 +515,7 @@ Style::polish( QWidget * widget )
                 // of course plasma needs - again - a WORKAROUND, we seem to be unable to use bg/fg-role, are we?
                 !(appType == Plasma && widget->inherits("ToolButton")))
             {
-                if (config.hack.killThrobber && widget->inherits("KAnimatedButton") && widget->parentWidget())
+                if (config.hack.killThrobber && widget->inherits("KAnimatedButton"))
                 if (QMenuBar *mbar = qobject_cast<QMenuBar*>(widget->parentWidget()))
                 {   // this is konquerors throbber...
                     widget->hide();
@@ -736,6 +736,16 @@ Style::unPolish( QApplication *app )
 void
 Style::unPolish( QWidget *widget )
 {
+    if (!widget)
+        return;
+
+    if (qobject_cast<QToolBar*>(widget) || qobject_cast<QMenuBar*>(widget) ||
+        qobject_cast<QMenu*>(widget) || widget->inherits("QAbstractButton") ||
+        widget->inherits("QToolBox"))
+    {
+        widget->setBackgroundRole(QPalette::Button);
+        widget->setForegroundRole(QPalette::ButtonText);
+    }
     if (QFrame *frame = qobject_cast<QFrame *>(widget))
         VisualFrame::release(frame);
     if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))

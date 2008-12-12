@@ -219,7 +219,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
         return;
 
     // calculate chunk dimensions - you don't wanna know and i forgot... ;-P
-    int s = qMin(qMax(l / 10, F(16)), qMin(t, dpi.SliderThickness) /*16*t/10*/);
+    int s = qMin(qMax(l / 10, F(16)), qMin(t, 8*dpi.SliderThickness/7) /*16*t/10*/);
     if (!s) return;
     int ss = (10*s)/16;
     int n = l/s;
