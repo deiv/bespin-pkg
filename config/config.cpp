@@ -63,7 +63,7 @@ static const char* defInfo1 =
 </div>\
 <b>Bespin Style</b><hr>\
 <p>\
-&copy;&nbsp;2006-2008 by Thomas L&uuml;bking<br>\
+&copy;&nbsp;2006-2009 by Thomas L&uuml;bking<br>\
 Includes Design Ideas by\
 <ul type=\"disc\">\
 <li>Nuno Pinheiro</li>\
@@ -282,7 +282,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Can be any QTextBrowser on your UI form */
     setInfoBrowser(ui.info);
     /** 2. Define a context info that is displayed when no other context help is demanded */
-
+    setDefaultContextInfo(defInfo1);
+    
     /** handleSettings(.) tells BConfig to take care (save/load) of a widget
     In this case "ui.bgMode" is the widget on the form,
     "BackgroundMode" specifies the entry in the ini style config file and
@@ -1193,7 +1194,7 @@ Config::generateGradientTypes(QComboBox *box)
 void
 Config::setHeader(const QString &title)
 {
-    setDefaultContextInfo("<qt><center><h1>" + title + "</h1></center></qt>");
-    ui.info->setHtml("<qt><center><h1>" + title + "</h1></center></qt>"); // must force
-    resetInfo();
+//     setDefaultContextInfo("<qt><center><h1>" + title + "</h1></center></qt>");
+    ui.header->setText("<qt><center><h1>" + title + "</h1></center></qt>"); // must force
+//     resetInfo();
 }
