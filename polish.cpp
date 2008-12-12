@@ -728,13 +728,13 @@ Style::polish( QWidget * widget )
 #undef PAL
 
 void
-Style::unPolish( QApplication *app )
+Style::unpolish( QApplication *app )
 {
     app->setPalette(QPalette());
 }
 
 void
-Style::unPolish( QWidget *widget )
+Style::unpolish( QWidget *widget )
 {
     if (!widget)
         return;

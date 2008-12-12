@@ -118,8 +118,8 @@ public:
 
     QPalette standardPalette () const;
 
-    void unPolish( QWidget *w );
-    void unPolish( QApplication *a );
+    void unpolish( QWidget *w );
+    void unpolish( QApplication *a );
 
     // from QObject
     bool eventFilter( QObject *object, QEvent *event );
