@@ -147,6 +147,7 @@ Style::drawScrollBar(const QStyleOptionComplex * option,
                     delete scrollBgCache;
                     scrollBgCache = new QPixmap(RECT.size());
                     cPainter = new QPainter(scrollBgCache);
+//                     if (config.bg.mode > Scanlines) cPainter->translate(tl);
                 }
                 else
                     needsPaint = false;

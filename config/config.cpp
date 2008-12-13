@@ -58,10 +58,7 @@ enum GradientType {
 using namespace Bespin;
 
 static const char* defInfo1 =
-"<div align=\"center\">\
-<img src=\":/bespin.png\"/><br>\
-</div>\
-<b>Bespin Style</b><hr>\
+"<b>Bespin Style</b><hr>\
 <p>\
 &copy;&nbsp;2006-2009 by Thomas L&uuml;bking<br>\
 Includes Design Ideas by\
@@ -141,6 +138,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
         pal.setColor(groups[i], QPalette::Text, pal.color(groups[i], QPalette::WindowText));
     }
     ui.info->setPalette(pal);
+
+    ui.logo->setMargin(9);
 
     ui.sectionSelect->viewport()->setAutoFillBackground(false);
     pal = ui.sectionSelect->palette();
@@ -940,7 +939,10 @@ Config::savePalette(const QPalette &pal)
 
     KdeIni *kdeglobals = KdeIni::open("kdeglobals");
     if (!kdeglobals)
+    {
+        qWarning("Warning: kde4-config not found or \"--path config\" flag does not work\nWarning: No KDE support!");
         return;
+    }
     const QString prefix("Colors:");
 #if QT_VERSION >= 0x040400
     const int numItems = 5;

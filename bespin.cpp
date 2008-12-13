@@ -490,7 +490,7 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
     {   // means we need to paint the global bg as well
         painter->setClipRect(option->rect, Qt::IntersectClip);
         QStyleOption tmpOpt = *option;
-        tmpOpt.rect = QRect(tl, widget->size());
+//         tmpOpt.rect = QRect(tl, widget->size());
         tmpOpt.palette = grampa->palette();
         painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
         if (config.bg.mode > Scanlines) painter->translate(tl);
