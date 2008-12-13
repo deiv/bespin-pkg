@@ -168,7 +168,7 @@ Style::drawToolButtonLabel(const QStyleOption * option,
     if (!toolbutton->icon.isNull())
     {
 //         const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
-        pm = toolbutton->icon.QIcon::pixmap(RECT.size().boundedTo(pmSize), QIcon::Normal, QIcon::Off);
+        pm = toolbutton->icon.QIcon::pixmap(RECT.size().boundedTo(pmSize), /*isEnabled ? */QIcon::Normal/* : QIcon::Disabled*/, QIcon::Off);
         if (!isEnabled)
         {
             QImage img(pm.width() + F(4), pm.height() + F(4), QImage::Format_ARGB32);

@@ -401,6 +401,16 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     treeview in order to be used - can be cute, can be annoying: choose by yourself<br>\
     This way it's activated globally." );
 
+    handleSettings(ui.hackAmarokContext, HACK_AMAROK_CONTEXT);
+    setContextHelp(ui.hackAmarokContext, "<b>Hide Amarok's Context</b><hr>\
+    Did i mention that i don't get a resonable internet connection ;-)\
+    Anyway. You should be able to toggle this as an Amarok feature (QDockWidget instead QSplitter\
+    would imho be a good idea) but it seems as if this layout is gonna sty hardcoded for a while.\
+    Atm it is <b><i>not</i></b> possible to change this dynamically while amarok is running, but\
+    you can toggle it here and the next time you startup Amarok, the Context will be gone.\
+    (I.e. to reshow, you must quit Amarok, toggle it off and restart Amarok afterwards - i'll look\
+    for a smarter solution)" );
+
     /** setContextHelp(.) attaches a context help string to a widget on your form */
     setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
     The default and the hovered color of a button.<br>\

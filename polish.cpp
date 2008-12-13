@@ -446,22 +446,36 @@ Style::polish( QWidget * widget )
                 /// NOTE: WORKAROUND for (no more) dolphin but amarok and probably others:
                 // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
                 // force this here, hoping it won't cause to many problems - and make a bug report
-                QWidget *vp = itemView->viewport();
-                if (vp && vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
+                if (QWidget *vp = itemView->viewport())
                 {
-                    qDebug() << "BESPIN works around a visual problem in" << itemView << ", please contact thomas.luebking 'at' web.de";
-                    QPalette pal = itemView->palette();
-                    if (vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)
+                    if (vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
                     {
-                        pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
-                        pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Inactive, QPalette::Window));
-                        pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Disabled, QPalette::Window));
-                        vp->setAutoFillBackground(false);
+                        qDebug() << "BESPIN works around a visual problem in" << itemView << ", please contact thomas.luebking 'at' web.de";
+                        QPalette pal = itemView->palette();
+                        if (vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)
+                        {
+                            pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
+                            pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Inactive, QPalette::Window));
+                            pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Disabled, QPalette::Window));
+                            vp->setAutoFillBackground(false);
+                        }
+                        pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
+                        pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
+                        pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
+                        itemView->setPalette(pal);
                     }
-                    pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
-                    pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
-                    pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
-                    itemView->setPalette(pal);
+                    if (!vp->autoFillBackground())
+                    {
+                        QPalette pal = itemView->palette();
+//                         mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::Base),6,1)
+                        #define ALT_BASE(_S_) mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
+                        Colors::contrast(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase)), 10)
+                        pal.setColor(QPalette::Active, QPalette::AlternateBase, ALT_BASE(QPalette::Active));
+                        pal.setColor(QPalette::Inactive, QPalette::AlternateBase, ALT_BASE(QPalette::Inactive));
+                        pal.setColor(QPalette::Disabled, QPalette::AlternateBase, ALT_BASE(QPalette::Disabled));
+                        itemView->setPalette(pal);
+                        #undef ALT_BASE
+                    }
                 }
 
 //                 if (itemView->verticalScrollBar() && itemView->inherits("KCategorizedView"))

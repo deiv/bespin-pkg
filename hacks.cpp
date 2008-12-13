@@ -344,9 +344,23 @@ Hacks::add(QWidget *w)
     }
 
     else if (*appType == Amarok)
-    if (QSplitter *splitter = qobject_cast<QSplitter*>(w)/*->inherits("Context::ContextView")*/)
     {
-        splitter->setChildrenCollapsible(true);
+        if (QSplitter *splitter = qobject_cast<QSplitter*>(w))
+        {
+            splitter->setChildrenCollapsible(true);
+        }
+        else if (Style::config.hack.amarokContext && w->inherits("Context::ContextView"))
+        {
+            QWidget *splitterKid = w;
+
+            while (splitterKid->parentWidget() && !qobject_cast<QSplitter*>(splitterKid->parentWidget()))
+                splitterKid = splitterKid->parentWidget();
+
+            if (qobject_cast<QSplitter*>(splitterKid->parentWidget()))
+            {
+                splitterKid->hide();
+            }
+        }
     }
     
     if (Style::config.hack.messages && qobject_cast<QMessageBox*>(w))
