@@ -22,8 +22,10 @@
 #include <QApplication>
 #include <QDockWidget>
 #include <QEvent>
+#include <QListView>
 #include <QPainter>
 #include <QStylePlugin>
+#include <QScrollBar>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMouseEvent>
@@ -812,6 +814,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
 //          return false;
 //       }
 //       return false;
+    case QEvent::Wheel:
+    {
+        if (QListView *list = qobject_cast<QListView*>(object))
+        //         if (list->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) // this should be, but semms to be not
+        if (list->inherits("KCategorizedView"))
+            list->verticalScrollBar()->setSingleStep(list->iconSize().height()/3);
+        return false;
+    }
 #ifdef MOUSEDEBUG
     case QEvent::MouseButtonPress:
     {

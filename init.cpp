@@ -104,6 +104,8 @@ Style::readSettings(const QSettings* settings)
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
         // TODO: redundant, kwin and afaik compiz can handle this
         config.menu.opacity = readInt(MENU_OPACITY);
+        config.menu.showIcons = readBool(MENU_SHOWICONS);
+        config.menu.shadow = readBool(MENU_SHADOW);
 
         config.newWinBtns = true; // this is a kwin deco setting, TODO: read from there?
         
@@ -232,8 +234,6 @@ Style::readSettings(const QSettings* settings)
     //--------
     config.menu.round = readBool(MENU_ROUND);
     config.menu.itemGradient = readGrad(MENU_ITEMGRADIENT);
-    config.menu.showIcons = readBool(MENU_SHOWICONS);
-    config.menu.shadow = readBool(MENU_SHADOW);
     if (appType == GTK)
     {
         config.menu.glassy = false;
@@ -359,7 +359,7 @@ void Style::initMetrics()
    dpi.f20 = SCALE(20); dpi.f32 = SCALE(32);
    dpi.f80 = SCALE(80);
    
-   dpi.ScrollBarExtent = SCALE(config.scroll.groove > Groove::Groove ? 15 : 17);
+   dpi.ScrollBarExtent = SCALE((config.scroll.groove > Groove::Groove ? 15 : 17) - 2*config.btn.fullHover);
    dpi.ScrollBarSliderMin = SCALE(40);
    dpi.SliderThickness = SCALE(20);
    dpi.SliderControl = SCALE(20);

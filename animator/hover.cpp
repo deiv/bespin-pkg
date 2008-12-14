@@ -18,7 +18,6 @@
 
 #include <Qt3Support/Q3ScrollView>
 #include <QAbstractScrollArea>
-#include <QListView>
 #include <QScrollBar>
 #include <QTimerEvent>
 #include <QWidget>
@@ -206,12 +205,8 @@ Hover::eventFilter( QObject* object, QEvent *e )
     case QEvent::MouseMove:
     case QEvent::UpdateRequest:
     case QEvent::MouseButtonPress:
-        return false; // just for performance - they can occur really often
     case QEvent::Wheel:
-        if (QListView *list = qobject_cast<QListView*>(object))
-//         if (list->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) // this should be, but semms to be not
-        if (list->inherits("KCategorizedView"))
-            list->verticalScrollBar()->setSingleStep(list->iconSize().height()/3);
+        return false; // just for performance - they can occur really often
     case QEvent::Enter:
     {
         if (QAbstractScrollArea* area = qobject_cast<QAbstractScrollArea*>(object))

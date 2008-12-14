@@ -73,7 +73,7 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
             bool checkable = menuItem->menuHasCheckableItems;
             int maxpmw = config.menu.showIcons*menuItem->maxIconWidth;
             int w = contentsSize.width();
-            int h = qMax(contentsSize.height(), menuItem->fontMetrics.lineSpacing()) +F(4);
+            int h = qMax(contentsSize.height(), menuItem->fontMetrics.lineSpacing()) + F(2);
 
             if (config.menu.showIcons && !menuItem->icon.isNull())
                 h = qMax(h, menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), QIcon::Normal).height() + F(2));

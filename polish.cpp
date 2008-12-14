@@ -478,7 +478,8 @@ Style::polish( QWidget * widget )
                     }
                 }
 
-//                 if (itemView->verticalScrollBar() && itemView->inherits("KCategorizedView"))
+                if (itemView->inherits("KCategorizedView"))
+                    itemView->installEventFilter(this); // scrolldistance...
 //                     itemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
                 if (!qobject_cast<QTreeView*>(itemView))
