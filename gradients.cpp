@@ -827,9 +827,14 @@ Gradients::bgSet(const QColor &c)
     return *set;
 }
 
+static bool _initialized = false;
+
 void
-Gradients::init(BgMode mode, int structure, Type progress, int bgIntesity, int btnBevelSize)
+Gradients::init(BgMode mode, int structure, Type progress, int bgIntesity, int btnBevelSize, bool force)
 {
+    if (_initialized && !force)
+        return;
+    _initialized = true;
     _mode = mode;
     _struct = structure;
 //    _progressBase = progress;

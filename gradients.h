@@ -88,7 +88,7 @@ const QPixmap &structure(const QColor &c, bool light = false);
 const BgSet &bgSet(const QColor &c);
 // const QPixmap &bgCorner(const QColor &c, bool other = false);
 
-void init(BgMode mode, int structure = 0, Type progress = Glass, int bgBevelIntesity = 110, int btnBevelSize = 16);
+void init(BgMode mode, int structure = 0, Type progress = Glass, int bgBevelIntesity = 110, int btnBevelSize = 16, bool force = false);
 #else
 void init();
 #endif

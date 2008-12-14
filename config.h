@@ -57,7 +57,8 @@ typedef struct Config
 
     struct hack
     {
-        bool messages, KHTMLView, treeViews, windowMovement, krunner, killThrobber, amarokContext;
+        bool    messages, KHTMLView, treeViews, windowMovement, krunner, killThrobber,
+                amarokContext, amarokFrames;
     } hack;
    
     struct input

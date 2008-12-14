@@ -411,6 +411,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     (I.e. to reshow, you must quit Amarok, toggle it off and restart Amarok afterwards - i'll look\
     for a smarter solution)" );
 
+    handleSettings(ui.hackAmarokFrames, HACK_AMAROK_FRAMES);
+    setContextHelp(ui.hackAmarokFrames, "<b>Unframe Amarok</b><hr>\
+    Amarok uses lists with a window background. Therefore it might be resonable to not use sunken\
+    frames on them. Choose yourself." );
+
     /** setContextHelp(.) attaches a context help string to a widget on your form */
     setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
     The default and the hovered color of a button.<br>\

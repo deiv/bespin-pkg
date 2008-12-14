@@ -81,13 +81,44 @@ Style::readSettings(const QSettings* settings)
     if (!iSettings)
     {
         delSettings = true;
-        const char *preset = getenv("BESPIN_PRESET");
         QString qPreset;
+        
+        iSettings = new QSettings("Bespin", "Style");
+        iSettings->beginGroup("Style");
+        //BEGIN read some user personal settings (i.e. not preset related)
+        // flanders
+        config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
+        // item single vs. double click, wizard appereance
+        config.macStyle = readBool(MACSTYLE);
+        config.fadeInactive = readBool(FADE_INACTIVE);
+        // Hacks ==================================
+        config.hack.amarokContext = readBool(HACK_AMAROK_CONTEXT);
+        config.hack.amarokFrames = readBool(HACK_AMAROK_FRAMES);
+        config.hack.messages = readBool(HACK_MESSAGES);
+        config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
+        config.hack.krunner= readBool(HACK_KRUNNER);
+        config.hack.treeViews = readBool(HACK_TREEVIEWS);
+        config.hack.windowMovement = readBool(HACK_WINDOWMOVE);
+        config.hack.killThrobber = readBool(HACK_THROBBER);
+        // PW Echo Char ===========================
+        config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
+        // TODO: redundant, kwin and afaik compiz can handle this
+        config.menu.opacity = readInt(MENU_OPACITY);
+
+        config.newWinBtns = true; // this is a kwin deco setting, TODO: read from there?
+        
+        Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));
+        Animator::Tab::setDuration(CLAMP(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));
+        //END personal settings
+        //NOTICE we do not end group here, but below. this way it's open if we don't make use of presets
+        
+        // check for environment override
+        const char *preset = getenv("BESPIN_PRESET");
         if (preset)
             qPreset = preset;
-        else
-        {   // maybe there's a preset config'd for this app...
-            iSettings = new QSettings("Bespin", "Style");
+        else // but maybe there's a preset config'd for this app...
+        {
+            iSettings->endGroup();
             iSettings->beginGroup("PresetApps");
             QString cmd = QCoreApplication::applicationName();
             if (appType == KDM)
@@ -100,6 +131,7 @@ Style::readSettings(const QSettings* settings)
             iSettings->endGroup();
             iSettings->beginGroup("Style");
         }
+
         if (!qPreset.isEmpty())
         {
             delete iSettings;
@@ -188,20 +220,6 @@ Style::readSettings(const QSettings* settings)
     // Choosers ===========================
     GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
 
-    config.fadeInactive = readBool(FADE_INACTIVE);
-
-    // Hacks ==================================
-    config.hack.amarokContext = readBool(HACK_AMAROK_CONTEXT);
-    config.hack.messages = readBool(HACK_MESSAGES);
-    config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
-    config.hack.krunner= readBool(HACK_KRUNNER);
-    config.hack.treeViews = readBool(HACK_TREEVIEWS);
-    config.hack.windowMovement = readBool(HACK_WINDOWMOVE);
-    config.hack.killThrobber = readBool(HACK_THROBBER);
-
-    // PW Echo Char ===========================
-    config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
-
     // kwin - yes i let the style control the deco, iff the deco permits, though :)
     config.kwin.gradient[0] = readGrad(KWIN_INACTIVE_GRADIENT);
     config.kwin.gradient[1] = readGrad(KWIN_ACTIVE_GRADIENT);
@@ -210,15 +228,7 @@ Style::readSettings(const QSettings* settings)
     config.kwin.text_role[0] = (QPalette::ColorRole) iSettings->value(KWIN_INACTIVE_TEXT_ROLE).toInt();
     config.kwin.text_role[1] = (QPalette::ColorRole) iSettings->value(KWIN_ACTIVE_TEXT_ROLE).toInt();
 
-    // flanders
-    config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
-
-    // item single vs. double click, wizard appereance
-    config.macStyle = readBool(MACSTYLE);
-
     // Menus ===========================
-    // TODO: redundant, kwin and afaik compiz can handle this
-    config.menu.opacity = readInt(MENU_OPACITY);
     //--------
     config.menu.round = readBool(MENU_ROUND);
     config.menu.itemGradient = readGrad(MENU_ITEMGRADIENT);
@@ -257,8 +267,6 @@ Style::readSettings(const QSettings* settings)
     config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);
     config.menu.activeItemSunken = config.menu.itemSunken || readBool(MENU_ACTIVEITEMSUNKEN);
 
-    config.newWinBtns = true;
-
     // Progress ===========================
     GRAD(progress) = readGrad(PROGRESS_GRADIENT);
     config.progress.std_role[Bg] =  (QPalette::ColorRole) readInt(PROGRESS_ROLE_BG);
@@ -271,11 +279,9 @@ Style::readSettings(const QSettings* settings)
 
     // Tabs ===========================
     readRole(tab.active, TAB_ACTIVEROLE);
-    Animator::Tab::setDuration(CLAMP(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));
     Animator::Tab::setFPS(25);
     GRAD(tab) = readGrad(TAB_GRADIENT);
     readRole(tab.std, TAB_ROLE);
-    Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));
     config.tab.activeTabSunken = readBool(TAB_ACTIVETABSUNKEN);
 //     GRAD(toolbox) = readGrad(TAB_ACTIVEGRADIENT);
 

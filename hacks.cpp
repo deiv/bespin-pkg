@@ -361,6 +361,19 @@ Hacks::add(QWidget *w)
                 splitterKid->hide();
             }
         }
+        if (Style::config.hack.amarokFrames)
+        if (QFrame *frame = qobject_cast<QFrame*>(w))
+        {
+            QWidget *runner = w;
+            while (runner = runner->parentWidget())
+            {
+                if (qobject_cast<QSplitter*>(runner))
+                {
+                    frame->setFrameStyle(QFrame::NoFrame);
+                    break;
+                }
+            }
+        }
     }
     
     if (Style::config.hack.messages && qobject_cast<QMessageBox*>(w))
