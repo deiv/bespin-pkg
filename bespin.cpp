@@ -20,17 +20,17 @@
 
 #include <QAbstractScrollArea>
 #include <QApplication>
+#include <QComboBox>
 #include <QDockWidget>
 #include <QEvent>
+#include <QFrame>
 #include <QListView>
-#include <QPainter>
-#include <QStylePlugin>
-#include <QScrollBar>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMouseEvent>
-#include <QFrame>
-#include <QComboBox>
+#include <QPainter>
+#include <QStylePlugin>
+#include <QScrollBar>
 #include <QToolButton>
 #include <QTreeView>
 #include <QtDBus/QDBusInterface>
@@ -45,6 +45,8 @@
 #include "oxrender.h"
 #include "colors.h"
 #include "bespin.h"
+
+#include "animator/hover.h"
 
 /**=========================================================*/
 
@@ -736,7 +738,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             p.end();
             return false;
         }
-#if 0 // doesn't work. sth. weakens the fist sectore -> TODO: make KUrlNavigator make use of custom style elements
+#if 0 // doesn't work. sth. weakens the fist sector -> TODO: make KUrlNavigator make use of custom style elements
         else if (object->inherits("KUrlNavigator"))
         {
             QList<QComboBox*> lel = object->findChildren<QComboBox*>();
@@ -816,6 +818,15 @@ Style::eventFilter( QObject *object, QEvent *ev )
 //       return false;
     case QEvent::Wheel:
     {
+        if (QAbstractSlider* slider = qobject_cast<QAbstractSlider*>(object))
+        {
+            QWheelEvent *we = static_cast<QWheelEvent*>(ev);
+            if ((slider->value() == slider->minimum() && we->delta() > 0) ||
+                (slider->value() == slider->maximum() && we->delta() < 0))
+                Animator::Hover::Play(slider);
+            return false;
+        }
+    
         if (QListView *list = qobject_cast<QListView*>(object))
         //         if (list->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) // this should be, but semms to be not
         if (list->inherits("KCategorizedView"))

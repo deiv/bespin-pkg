@@ -32,6 +32,7 @@ Q_OBJECT
     static void setDuration(uint ms);
     static void setFPS(uint fps);
     static int step(const QWidget *widget);
+    static void Play(QWidget *widget, bool bwd = false);
 protected:
     Hover();
     virtual bool manageScrollArea(QWidget *w);

@@ -18,7 +18,7 @@
 
 #include <QAbstractItemView>
 // #include <QAbstractScrollArea>
-// #include <QAbstractSlider>
+#include <QAbstractSlider>
 #include <QApplication>
 #include <QtDebug>
 #include <QLabel>
@@ -580,6 +580,8 @@ Style::polish( QWidget * widget )
     //BEGIN SLIDERS / SCROLLBARS / SCROLLAREAS - hovering/animation                                -
     else if (qobject_cast<QAbstractSlider*>(widget))
     {
+        widget->installEventFilter(this); // finish animation
+        
         widget->setAttribute(Qt::WA_Hover);
         // NOTICE
         // QAbstractSlider::setAttribute(Qt::WA_OpaquePaintEvent) saves surprisinlgy little CPU

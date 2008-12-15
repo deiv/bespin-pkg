@@ -182,7 +182,7 @@ isWindowDragWidget(QObject *o)
 {
     return Style::config.hack.windowMovement &&
            (qobject_cast<QDialog*>(o) ||
-            qobject_cast<QMenuBar*>(o) ||
+            qobject_cast<QMenuBar*>(o) && !static_cast<QMenuBar*>(o)->activeAction()||
             qobject_cast<QGroupBox*>(o) ||
         
             (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled()) ||

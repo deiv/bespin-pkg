@@ -80,6 +80,13 @@ Hover::manageScrollArea(QWidget *area)
 }
 
 void
+Hover::Play(QWidget *widget, bool bwd)
+{
+    if (instance)
+        instance->play(widget, bwd);
+}
+
+void
 Hover::play(QWidget *widget, bool bwd)
 {
    if (!widget) return;

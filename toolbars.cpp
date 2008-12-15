@@ -136,7 +136,7 @@ icon(QPixmap &pix, int step)
     FX::blend(scaledIcon, emptyIcon, quote);
     return emptyIcon;
 }
-
+#include <QtDebug>
 void
 Style::drawToolButtonLabel(const QStyleOption * option,
                                  QPainter * painter, const QWidget *widget) const
@@ -168,8 +168,10 @@ Style::drawToolButtonLabel(const QStyleOption * option,
     if (!toolbutton->icon.isNull())
     {
 //         const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
-        pm = toolbutton->icon.QIcon::pixmap(RECT.size().boundedTo(pmSize), /*isEnabled ? */QIcon::Normal/* : QIcon::Disabled*/, QIcon::Off);
-        if (!isEnabled)
+        pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), /*isEnabled ? */QIcon::Normal/* : QIcon::Disabled*/, QIcon::Off);
+//         if (!isEnabled)
+//             pm = generatedIconPixmap ( QIcon::Disabled, pm, toolbutton );
+        if (false && !isEnabled)
         {
             QImage img(pm.width() + F(4), pm.height() + F(4), QImage::Format_ARGB32);
             img.fill(Qt::transparent);
