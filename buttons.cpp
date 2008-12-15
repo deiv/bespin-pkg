@@ -44,7 +44,7 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
         {
             animStep = HOVER_STEP;
             if (option->state & State_HasFocus)
-                masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), dpi.f3);
+                masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
             if (sunken)
                 shadows.sunken[true][true].render(RECT, painter);
             else
@@ -56,26 +56,32 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
         if (sunken && !config.btn.cushion)
         {
             if (config.btn.layer == 1)
-                _btn->rect.adjust(dpi.f1,dpi.f1,-dpi.f1,0);
+                _btn->rect.adjust(F(1), F(1), -F(1), 0);
             else if (!config.btn.layer)
-                _btn->rect.adjust(0,dpi.f1,0,dpi.f1);
+                _btn->rect.adjust(0, F(1), 0, F(1));
         }
         drawPushButtonBevel(btn, painter, widget);
     }
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
     if (appType == GTK)
         return; // GTK paints the label itself
-    _btn->rect.adjust(dpi.f6,dpi.f4,-dpi.f6,-dpi.f4);
+    _btn->rect.adjust(F(6), F(4), -F(6), -F(4));
     drawPushButtonLabel(btn, painter, widget);
     _btn->rect = oldRect;
 }
 
 void
-Style::drawPushButtonBevel(const QStyleOption * option,
-                                 QPainter * painter,
-                                 const QWidget * widget) const
+Style::drawPushButtonBevel(const QStyleOption * option, QPainter * painter, const QWidget * widget) const
 {
+
+//     if (widget && widget->parentWidget() && widget->parentWidget()->inherits("KPIM::StatusbarProgressWidget"))
+//         return;
+
     ASSURE_OPTION(btn, Button);
+
+    if (btn->features & QStyleOptionButton::Flat)
+        return;
+
     OPT_SUNKEN OPT_HOVER
 
     animStep = HOVER_STEP;
@@ -126,7 +132,7 @@ Style::drawPushButtonBevel(const QStyleOption * option,
         painter->restore();
     }
 }
-#include <QtDebug>
+
 void
 Style::drawButtonFrame(const QStyleOption * option,
                              QPainter * painter, const QWidget * widget) const
@@ -277,7 +283,7 @@ Style::drawButtonFrame(const QStyleOption * option,
 }
 
 void
-Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
+Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     OPT_ENABLED OPT_FOCUS OPT_HOVER;
     ASSURE_OPTION(btn, Button);

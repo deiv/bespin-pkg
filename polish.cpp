@@ -28,6 +28,7 @@
 #include <QMenuBar>
 #include <QPainter>
 #include <QPen>
+#include <QPushButton>
 #include <QScrollArea>
 #include <QToolBar>
 #include <QToolTip>
@@ -514,19 +515,25 @@ Style::polish( QWidget * widget )
             if (frame->lineWidth() == 1)
                 frame->setLineWidth(F(4)); // but must have enough indention
         }
-        else
+        else if (!widget->inherits("OverlayWidget"))
             VisualFrame::manage(frame);
     }
     //END FRAMES                                                                                   -
 
     //BEGIN PUSHBUTTONS - hovering/animation                                                       -
-    else if (widget->inherits("QAbstractButton"))
+    else if (qobject_cast<QAbstractButton*>(widget))
     {
         if (widget->inherits("QToolBoxButton") || IS_HTML_WIDGET )
             widget->setAttribute(Qt::WA_Hover); // KHtml
         else
         {
-            if (widget->inherits("QToolButton") &&
+            if (QPushButton *pbtn = qobject_cast<QPushButton*>(widget))
+            {
+                if (widget->parentWidget() &&
+                    widget->parentWidget()->inherits("KPIM::StatusbarProgressWidget"))
+                    pbtn->setFlat(true);
+            }
+            else if (widget->inherits("QToolButton") &&
                 // of course plasma needs - again - a WORKAROUND, we seem to be unable to use bg/fg-role, are we?
                 !(appType == Plasma && widget->inherits("ToolButton")))
             {
@@ -729,10 +736,17 @@ Style::polish( QWidget * widget )
         pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
         widget->setPalette(pal);
     }
-
-//     if (widget->inherits("KUrlNavigator"))
-//         widget->installEventFilter(this);
-
+#if 0
+    if (widget->inherits("KUrlNavigator") && widget->layout())
+    {
+        widget->layout()->setSpacing(8);
+        widget->layout()->setContentsMargins( 0, 0, 0, 0 );
+        QList<QAbstractButton*> tbl = widget->findChildren<QAbstractButton*>();
+        foreach (QAbstractButton *btn, tbl)
+            btn->setIconSize(QSize(16,16));
+        widget->installEventFilter(this);
+    }
+#endif
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors
     /// are set or KHtml does wrong OR (mainly) by html "designers"
     if (IS_HTML_WIDGET)
@@ -756,8 +770,8 @@ Style::unpolish( QWidget *widget )
     if (!widget)
         return;
 
-    if (qobject_cast<QToolBar*>(widget) || qobject_cast<QMenuBar*>(widget) ||
-        qobject_cast<QMenu*>(widget) || widget->inherits("QAbstractButton") ||
+    if (qobject_cast<QAbstractButton*>(widget) || qobject_cast<QToolBar*>(widget) ||
+        qobject_cast<QMenuBar*>(widget) || qobject_cast<QMenu*>(widget) ||
         widget->inherits("QToolBox"))
     {
         widget->setBackgroundRole(QPalette::Button);
