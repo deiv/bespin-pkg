@@ -47,22 +47,23 @@ usage(const char* appname)
    printf(
 "Usage:\n\
 ==========================\n\
-%s [config]\t\t\t\tConfigure the Bespin Style\n\
-%s presets\t\t\t\tList the available Presets\n\
-%s demo [style]\t\t\tLaunch a demo, you can pass other stylenames\n\
-%s try <some_config.bespin>\tTry out an exported setting\n\
-%s sshot <some_file.png> [preset] [width]\tSave a screenshot\n\
-%s load <some_preset>\tLoad a preset to current settings\n\
-%s import <some_config.bespin>\tImport an exported setting\n\
-%s export <some_preset> <some_config.bespin>\tImport an exported setting\n\
-%s listStyles \t\t\tList all styles on this System\n",
-appname, appname, appname, appname, appname, appname, appname, appname, appname );
+%s [config]\t\t\t\t\t\tConfigure the Bespin Style\n\
+%s presets\t\t\t\t\t\tList the available Presets\n\
+%s demo [style]\t\t\t\t\tLaunch a demo, you can pass other stylenames\n\
+%s show <some_preset>\t\t\t\tOpen demo dialog with a preset\n\
+%s try <some_config.bespin>\t\t\t\tTry out an exported setting\n\
+%s sshot <some_file.png> [preset] [width]\t\tSave a screenshot\n\
+%s load <some_preset>\t\t\t\tLoad a preset to current settings\n\
+%s import <some_config.bespin>\t\t\tImport an exported setting\n\
+%s export <some_preset> <some_config.bespin>\tExport an imported setting\n\
+%s listStyles \t\t\t\t\tList all styles on this System\n",
+appname, appname, appname, appname, appname, appname, appname, appname, appname, appname );
    return 1;
 }
 
 enum Mode
 {
-    Invalid = 0, Configure, Presets, Import, Export, Load, Demo, Try, Screenshot, ListStyles
+    Invalid = 0, Configure, Presets, Import, Export, Load, Demo, Try, Screenshot, ListStyles, Show
 };
 
 int
@@ -80,6 +81,7 @@ main(int argc, char *argv[])
         else if (!qstrcmp( argv[1], "export" )) mode = Export;
         else if (!qstrcmp( argv[1], "demo" )) mode = Demo;
         else if (!qstrcmp( argv[1], "try" )) mode = Try;
+        else if (!qstrcmp( argv[1], "show" )) mode = Show;
         else if (!qstrcmp( argv[1], "sshot" )) mode = Screenshot;
         else if (!qstrcmp( argv[1], "load" )) mode = Load;
         else if (!qstrcmp( argv[1], "listStyles" )) mode = ListStyles;
@@ -173,24 +175,36 @@ main(int argc, char *argv[])
 
         file.endGroup();
     }
+    case Show:
     case Demo:
     {
         if (title.isEmpty())
             title = "Bespin Demo";
-        if (!app)
-            app = new QApplication(argc, argv);
-        Dialog *window = new Dialog;
-        if (mode == Demo && argc > 2)
+
+        char *preset;
+        if (mode == Show)
+        {
+            if (argc < 3)
+                return error("you lack <preset>");
+#ifndef Q_WS_WIN
+            setenv("BESPIN_PRESET", argv[2], 1);
+            preset = argv[2];
+#endif
+        }
+        else if (mode == Demo && argc > 2)
         {   // allow setting another style
+            if (!app) app = new QApplication(argc, argv);
             app->setStyle(argv[2]);
             app->setPalette(app->style()->standardPalette());
             title = QString("Bespin Demo / %1 Style").arg(argv[2]);
         }
         else
-        {
-            char *preset = getenv("BESPIN_PRESET");
-            if (preset) title = QString("%1 @ Bespin Demo").arg(preset);
-        }
+            preset = getenv("BESPIN_PRESET");
+        if (preset)
+            title = QString("%1 @ Bespin Demo").arg(preset);
+        if (!app)
+            app = new QApplication(argc, argv);
+        Dialog *window = new Dialog;
         Ui::Demo ui;
         ui.setupUi(window);
         ui.tabWidget->setCurrentIndex(0);
