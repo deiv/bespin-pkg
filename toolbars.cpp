@@ -171,7 +171,7 @@ Style::drawToolButtonLabel(const QStyleOption * option,
         pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), /*isEnabled ? */QIcon::Normal/* : QIcon::Disabled*/, QIcon::Off);
 //         if (!isEnabled)
 //             pm = generatedIconPixmap ( QIcon::Disabled, pm, toolbutton );
-        if (false && !isEnabled)
+        if (!isEnabled)
         {
             QImage img(pm.width() + F(4), pm.height() + F(4), QImage::Format_ARGB32);
             img.fill(Qt::transparent);
