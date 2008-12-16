@@ -94,6 +94,7 @@ Style::readSettings(const QSettings* settings)
         // Hacks ==================================
         config.hack.amarokContext = readBool(HACK_AMAROK_CONTEXT);
         config.hack.amarokFrames = readBool(HACK_AMAROK_FRAMES);
+        config.hack.amarokDisplay = readBool(HACK_AMAROK_DISPLAY);
         config.hack.messages = readBool(HACK_MESSAGES);
         config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
         config.hack.krunner= readBool(HACK_KRUNNER);

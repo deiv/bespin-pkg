@@ -29,6 +29,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QRectF>
+#include <QSettings>
 #include <QStyle>
 #include <QStyleOption>
 #include <QTimer>
@@ -118,7 +119,10 @@ XBar::init()
     
     d.taskbar = new TaskBar(this, dummy);
     d.currentBar = d.taskbar;
-    d.extraTitle = false;
+    // TODO: use plasmoid popup and make this dynamic -> update all menubars...
+    QSettings settings("Bespin", "XBar");
+    settings.beginGroup("XBar");
+    d.extraTitle = settings.value("WindowList", false).toBool();
     
     updatePalette();
     

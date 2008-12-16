@@ -416,6 +416,21 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Amarok uses lists with a window background. Therefore it might be resonable to not use sunken\
     frames on them. Choose yourself." );
 
+    handleSettings(ui.hackAmarokDisplay, HACK_AMAROK_DISPLAY);
+    setContextHelp(ui.hackAmarokDisplay, "<b>Bespinification ;-P</b><hr>\
+    You get a system frame, inverted colors, system sliders and the current track above the position\
+    slider. Also a button to toggle the context view (plasma thing in the middle).<hr>\
+    <b>RANT:</b><br>\
+    Amarok uses overheaded svg theming, but (though possible) custom theming isn't wanted, ending up\
+    with the UI halfwise themed by the system style and a static svg theme.<br>\
+    Allthough many ppl. mourned you shall not be allowed to redesign the UI (simple using QDockWIdget\
+    - like dolphis does) or even toggle elements (many ppl. seem to have low interest in a permanent\
+    plasma center and handling collapsed splitters isn't too much fun either).<br>\
+    I like Amarok alot. I don't even mind the debatable new playlist look - especially as it's sayd to\
+    be configurable, pretty much like KMail currently is.<br>\
+    BUT THIS SUCKS!<br>\
+    I do not want an overheaded alien application where i'm told what UI elements i need where - Sorry :(" );
+
     /** setContextHelp(.) attaches a context help string to a widget on your form */
     setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
     The default and the hovered color of a button.<br>\

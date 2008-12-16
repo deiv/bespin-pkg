@@ -37,6 +37,9 @@ public:
     static void remove(QWidget *w);
 private:
     Q_DISABLE_COPY(Hacks)
+private slots:
+    void setAmarokMetaInfo(int);
+    void toggleAmarokContext();
 };
 } // namespace
 #endif // BESPIN_HACKS_H
