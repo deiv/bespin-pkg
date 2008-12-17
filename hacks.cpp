@@ -280,6 +280,7 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
     {
         if (!amarokDisplayBg || amarokDisplayBg->height() != frame->height())
         {
+            delete amarokDisplayBg;
             amarokDisplayBg = new QPixmap(32, frame->height());
             QLinearGradient lg( 1, 0, 1, frame->height() );
             QColor c = frame->palette().color(w->backgroundRole());
@@ -350,8 +351,7 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
         p.setMatrix(m, true);
         if (opt.state & (QStyle::State_On | QStyle::State_Sunken))
             { QFont fnt = p.font(); fnt.setBold(true); p.setFont(fnt); }
-        p.setPen(opt.palette.color(opt.state & QStyle::State_MouseOver && !(opt.state & (QStyle::State_On | QStyle::State_Sunken)) ?
-                 QPalette::Highlight : btn->foregroundRole()));
+        p.setPen(opt.palette.color(opt.state & QStyle::State_MouseOver ? QPalette::Highlight : btn->foregroundRole()));
         
         p.drawText(opt.rect, Qt::AlignCenter | Qt::TextHideMnemonic, btn->text());
 //         btn->style()->drawControl(QStyle::CE_ToolButtonLabel, &opt, &p, btn);
@@ -380,32 +380,72 @@ Hacks::setAmarokMetaInfo(int)
         return;
     QDBusInterface amarok( "org.kde.amarok", "/Player", "org.freedesktop.MediaPlayer");
     QDBusReply<QVariantMap> reply = amarok.call("GetMetadata");
-    QString text;
+    QString text, toolTip;
     if (reply.isValid())
     {
         QString tmp = reply.value().value("artist").toString();
-        if (!tmp.isEmpty() && tmp != "Unknown") text += tmp + ": ";
+        if (!tmp.isEmpty() && tmp != "Unknown") {
+            text += tmp + ": ";
+            toolTip += "Artist: " + tmp;
+        }
 
         tmp = reply.value().value("title").toString();
-        if (!tmp.isEmpty() && tmp != "Unknown") text += "<b>" + tmp + "</b>";
+        if (!tmp.isEmpty() && tmp != "Unknown") {
+            text += "<b>" + tmp + "</b>";
+            toolTip += "<br>Title: " + tmp;
+        }
 
         tmp = reply.value().value("album").toString();
-        if (!tmp.isEmpty() && tmp != "Unknown") text += " on \"" + tmp + "\"";
+        if (!tmp.isEmpty() && tmp != "Unknown") {
+            text += " on \"" + tmp + "\"";
+            toolTip += "<br>Album: " + tmp;
+        }
 
         tmp = reply.value().value("year").toString();
-        if (!tmp.isEmpty() && tmp != "0") text += " (" + tmp + ")";
-        
-//         audio-bitrate: 320
-//         audio-samplerate: 44100
+        if (!tmp.isEmpty() && tmp != "0") {
+            text += " (" + tmp + ")";
+            toolTip += "<br>Year: " + tmp;
+        }
+
+        tmp = reply.value().value("genre").toString();
+        if (!tmp.isEmpty() && tmp != "Unknown") {
+            toolTip += "<br>Genre: " + tmp;
+        }
+
+        tmp = reply.value().value("time").toString();
+        bool ok; int s = tmp.toInt(&ok);
+        if (ok && s > 0) {
+            int m = s/60; s = s - 60*m;
+            toolTip += QString("<br>Legth: %1:%2").arg(m).arg(s);
+        }
+
+        tmp = reply.value().value("audio-bitrate").toString();
+        if (!tmp.isEmpty() && tmp != "0") {
+            toolTip += "<br>" + tmp + "kbps";
+            tmp = reply.value().value("audio-samplerate").toString();
+            if (!tmp.isEmpty() && tmp != "0") {
+                toolTip += " / " + tmp + "Hz";
+            }
+        }
+        else
+        {
+            tmp = reply.value().value("audio-samplerate").toString();
+            if (!tmp.isEmpty() && tmp != "0") {
+                toolTip += "<br>" + tmp + "Hz";
+            }
+        }
 //         comment: Hans Zimmer & James Newton Howard
-//         genre: 2008
 //         location: file:///home/music/ost/Hans%20Zimmer/The%20Dark%20Knight/01%20-%20Why%20So%20Serious.mp3
 //         mtime: 554000
 //         rating: 5
-//         time: 554
+//         
 //         tracknumber: 146059284
     }
+    if (text.isEmpty())
+        text = "<b>Amarok² / Bespin edition</b>";
     amarokMeta->setText(text);
+    if (!toolTip.isEmpty())
+        amarokMeta->setToolTip(toolTip);
 }
 
 bool
@@ -423,6 +463,12 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     }
     else if (*appType == Amarok)
     {
+        if (e->type() == QEvent::PaletteChange)
+        {
+            if (o->objectName() == "MainToolbar")
+                { delete amarokDisplayBg; amarokDisplayBg = 0; }
+            return false;
+        }
         if (e->type() != QEvent::Paint)
             return false;
         return paintAmarok(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
@@ -533,7 +579,7 @@ Hacks::add(QWidget *w)
                 if (f && f->layout())
                 if (QBoxLayout *box = qobject_cast<QBoxLayout*>(f->layout()))
                 {
-                    amarokMeta = new QLabel(f);
+                    amarokMeta = new QLabel("<b>Amarok² / Bespin edition</b>", f);
                     box->insertWidget(0, amarokMeta);
                     amarokMeta->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
                     amarokMeta->setAlignment(Qt::AlignCenter);
