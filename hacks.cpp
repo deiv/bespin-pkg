@@ -59,9 +59,10 @@ static Hacks *bespinHacks = new Hacks;
 static Hacks::HackAppType *appType = 0;
 const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
-static QPointer<QLabel> amarokMeta = 0;
 static QPointer<QWidget> dragWidget = NULL;
 static QPointer<QWidget> amarokContext = NULL;
+static QPointer<QLabel> amarokMeta = NULL;
+static QPointer<QWidget> amarokLowerPart = NULL;
 static bool dragHadTrack = false;
 
 static void
@@ -372,6 +373,22 @@ Hacks::toggleAmarokContext()
     amarokContext->setVisible(!amarokContext->isVisible());
 }
 
+static QSize amarokSize;
+void
+Hacks::toggleAmarokCompact()
+{
+    if (!amarokLowerPart)
+        return;
+    amarokLowerPart->setVisible(!amarokLowerPart->isVisible());
+    if (QWidget *window = amarokLowerPart->window())
+    {
+        if (amarokLowerPart->isVisible())
+            window->resize(amarokSize);
+        else
+            { amarokSize = window->size(); window->resize(QSize(600, 2)); }
+    }
+}
+
 
 void
 Hacks::setAmarokMetaInfo(int)
@@ -546,6 +563,9 @@ Hacks::add(QWidget *w)
         if (QSplitter *splitter = qobject_cast<QSplitter*>(w))
         {
             splitter->setChildrenCollapsible(true);
+            if (splitter->parentWidget() && splitter->parentWidget()->parentWidget() &&
+                splitter->parentWidget()->parentWidget()->inherits("MainWindow"))
+                amarokLowerPart = splitter;
         }
         else if (QFrame *frame = qobject_cast<QFrame*>(w))
         {
@@ -591,6 +611,13 @@ Hacks::add(QWidget *w)
                     btn->setToolTip("Toggle ContextView");
                     box->addWidget(btn);
                     connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokContext())); // TODO: bind toggle?
+
+                    btn = new QToolButton(f);
+                    btn->setText("=");
+                    //                     btn->setIcon(btn->style()->standardIcon(QStyle::SP_DesktopIcon, 0, btn));
+                    btn->setToolTip("Toggle comapct mode");
+                    box->addWidget(btn);
+                    connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokCompact())); // TODO: bind toggle?
                 }
                 
                 frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);

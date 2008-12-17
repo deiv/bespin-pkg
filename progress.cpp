@@ -155,8 +155,6 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
 
     // groove + contents ======
     step = Animator::Progress::step(widget);
-//     QPoint c = RECT.center();
-//     painter->drawLine(RECT.left(), c.y(), RECT.right(), c.y());
 //             masks.rect[true].render(RECT, painter, Gradients::pix(FCOLOR(Window), RECT.height(), Qt::Vertical, Gradients::Button));
 //             shadows.sunken[true][false].render(RECT, painter);
     drawProgressBarGroove(pb, painter, widget);
@@ -172,11 +170,18 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
 static inline void
 drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
 {
+//     QBrush brush = p->brush();
+//     p->setPen(Qt::NoPen);
+//     p->setBrush(QColor(0,0,0,64));
+//     s -= 2;
+//     p->drawEllipse(x+1,y+2,s,s);
+//     p->setBrush(brush);
+//     p->drawEllipse(x+1,y+1,s,s);
     s -= 2;
-    p->setPen(QPen(QColor(0,0,0,70),2));
+    p->setPen(QPen(QColor(0,0,0,50),2));
     p->drawEllipse(x+1,y+2,s,s);
     p->setBrush(Qt::NoBrush);
-    p->setPen(QPen(QColor(255,255,255,outline ? 40 : 20),1));
+    p->setPen(QPen(QColor(255,255,255,outline ? 30 : 15),1));
     p->drawEllipse(x,y+1,s+2,s);
 }
 
@@ -219,7 +224,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
         return;
 
     // calculate chunk dimensions - you don't wanna know and i forgot... ;-P
-    int s = qMin(qMax(l / 10, F(16)), qMin(t, 8*dpi.SliderThickness/7) /*16*t/10*/);
+    int s = qMin(qMax(l / 10, F(16)), t /*16*t/10*/);
     if (!s) return;
     int ss = (10*s)/16;
     int n = l/s;
@@ -234,6 +239,16 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
         x += (l - n*s + s - ss)/2;
     y += (t-ss)/2;
     --x; --y;
+
+    if (!content || val == 1.0)
+    {
+        int y2 = y + ss/2;
+        painter->setPen(Colors::mid(FCOLOR(Window), FCOLOR(WindowText),3,1));
+        if (vertical)
+            painter->drawLine(y2-1, x, y2-1, x+(n-1)*s);
+        else
+            painter->drawLine(x, y2+1, x+(n-1)*s, y2+1);
+    }
 
     // cause most chunks will look the same we render ONE into a buffer and then just dump that multiple times...
     QPixmap renderPix(ss+2,ss+2);

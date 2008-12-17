@@ -40,6 +40,7 @@ private:
 private slots:
     void setAmarokMetaInfo(int);
     void toggleAmarokContext();
+    void toggleAmarokCompact();
 };
 } // namespace
 #endif // BESPIN_HACKS_H
