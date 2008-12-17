@@ -87,7 +87,7 @@ triggerWMMove(const QWidget *w, const QPoint &p)
 #endif // Q_WS_X11
 }
 
-static bool
+inline static bool
 hackMessageBox(QMessageBox* box, QEvent *e)
 {
    switch (e->type()) {
@@ -256,7 +256,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
     return true;
 }
 
-static bool
+inline static bool
 paintKrunner(QWidget *w, QPaintEvent *)
 {
     // TODO: use paintevent clipping
@@ -266,6 +266,100 @@ paintKrunner(QWidget *w, QPaintEvent *)
         opt.initFrom ( w );
         w->style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, w);
         return true;
+    }
+    return false;
+}
+
+static QPixmap *amarokDisplayBg = 0;
+
+inline static bool
+paintAmarok(QWidget *w, QPaintEvent *pe)
+{
+    if (QFrame *frame = qobject_cast<QFrame*>(w)) {
+    if (frame->objectName() == "MainToolbar")
+    {
+        if (!amarokDisplayBg || amarokDisplayBg->height() != frame->height())
+        {
+            amarokDisplayBg = new QPixmap(32, frame->height());
+            QLinearGradient lg( 1, 0, 1, frame->height() );
+            QColor c = frame->palette().color(w->backgroundRole());
+            lg.setColorAt(0, Colors::mid(c, Qt::white, 8, 1));
+            lg.setColorAt(1, Colors::mid(c, Qt::black, 8, 1));
+            QPainter p(amarokDisplayBg);
+            p.setBrush(lg); p.setPen(Qt::NoPen);
+            p.drawRect(amarokDisplayBg->rect());
+            p.end();
+        }
+        QPainter p(w); p.setClipRegion(pe->region());
+        p.drawTiledPixmap(w->rect(), *amarokDisplayBg); p.end();
+        return true;
+    }
+    return false;
+    }
+    
+    if (QSlider *slider = qobject_cast<QSlider*>(w)) {
+    if (slider->inherits("Amarok::Slider"))
+    {
+        QStyleOptionSlider opt; opt.initFrom(slider);
+        opt.maximum = slider->maximum();
+        opt.minimum = slider->minimum();
+        // SIC! wrong set in Amarok::Slider ====== (TODO: maybe check w vs. h...)
+        opt.state |= QStyle::State_Horizontal;
+        opt.orientation = Qt::Horizontal;
+        // ============
+        opt.pageStep = slider->pageStep();
+        opt.singleStep = slider->singleStep();
+        opt.sliderPosition = slider->sliderPosition();
+        opt.sliderValue = slider->value();
+        QPainter p(slider); p.setClipRegion(pe->region());
+        if (slider->inherits("Amarok::VolumeSlider"))
+        {
+            //TODO: maybe volume icon...
+            if (slider->testAttribute(Qt::WA_UnderMouse))
+            {
+                const QRect rect( opt.rect.right()-40, 0, 40, slider->height() );
+                p.drawText( rect, Qt::AlignRight | Qt::AlignVCenter, QString::number( slider->value() ) + '%' );
+            }
+            opt.rect.adjust(slider->height()*.877+4, 0, -44, 0);
+        }
+        slider->style()->drawComplexControl(QStyle::CC_Slider, &opt, &p, slider);
+        p.end();
+        return true;
+    }
+    return false;
+    }
+    
+    if (QAbstractButton *btn = qobject_cast<QAbstractButton*>(w)) {
+    if (btn->inherits("SideBarButton"))
+    {
+//         bool sunken = btn->isChecked() || btn->isDown();
+        QStyleOptionToolButton opt;
+        opt.initFrom(w);
+        opt.text = btn->text();
+        opt.toolButtonStyle = Qt::ToolButtonTextOnly;
+        if (btn->isChecked())
+            opt.state |= QStyle::State_On;
+        if (btn->isDown())
+            opt.state |= QStyle::State_Sunken;
+
+        QPainter p(w);
+        btn->style()->drawPrimitive(QStyle::PE_PanelButtonTool, &opt, &p, btn);
+        // rotated text
+        opt.rect.setRect(0, 0, btn->height(), btn->width());
+        QMatrix m; m.translate(0, opt.rect.width()); m.rotate(-90);
+        p.setMatrix(m, true);
+        if (opt.state & (QStyle::State_On | QStyle::State_Sunken))
+            { QFont fnt = p.font(); fnt.setBold(true); p.setFont(fnt); }
+        p.setPen(opt.palette.color(opt.state & QStyle::State_MouseOver && !(opt.state & (QStyle::State_On | QStyle::State_Sunken)) ?
+                 QPalette::Highlight : btn->foregroundRole()));
+        
+        p.drawText(opt.rect, Qt::AlignCenter | Qt::TextHideMnemonic, btn->text());
+//         btn->style()->drawControl(QStyle::CE_ToolButtonLabel, &opt, &p, btn);
+
+        p.end();
+        return true;
+    }
+    return false;
     }
     return false;
 }
@@ -329,47 +423,9 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     }
     else if (*appType == Amarok)
     {
-        if (e->type() != QEvent::Paint) return false;
-        if (QFrame *w = qobject_cast<QFrame*>(o))
-        {   if (o->objectName() == "MainToolbar")
-        {
-            QStyleOptionFrame opt; opt.initFrom(w);
-            QLinearGradient lg( 1, 0, 1, w->height() );
-            QColor c = w->palette().color(w->backgroundRole());
-            lg.setColorAt(0, Colors::mid(c, Qt::white, 8, 1));
-            lg.setColorAt(1, Colors::mid(c, Qt::black, 8, 1));
-            QPainter p(w); p.setBrush(lg); p.drawRect(w->rect()); p.setBrush(Qt::NoBrush);
-            w->style()->drawPrimitive(QStyle::PE_Frame, &opt, &p, w);
-            p.end(); return true;
-        }}
-        else if (QSlider *w = qobject_cast<QSlider*>(o))
-        {   if (w->inherits("Amarok::Slider"))
-        {
-            QStyleOptionSlider opt; opt.initFrom(w);
-            opt.maximum = w->maximum();
-            opt.minimum = w->minimum();
-            // SIC! wrong set in Amarok::Slider ====== (TODO: maybe check w vs. h...)
-            opt.state |= QStyle::State_Horizontal;
-            opt.orientation = Qt::Horizontal;
-            // ============
-            opt.pageStep = w->pageStep();
-            opt.singleStep = w->singleStep();
-            opt.sliderPosition = w->sliderPosition();
-            opt.sliderValue = w->value();
-            QPainter p(w);
-            if (w->inherits("Amarok::VolumeSlider"))
-            {
-                //TODO: maybe volume icon...
-                if (w->testAttribute(Qt::WA_UnderMouse))
-                {
-                    const QRect rect( opt.rect.right()-40, 0, 40, w->height() );
-                    p.drawText( rect, Qt::AlignRight | Qt::AlignVCenter, QString::number( w->value() ) + '%' );
-                }
-                opt.rect.adjust(w->height()*.877+4, 0, -44, 0);
-            }
-            w->style()->drawComplexControl(QStyle::CC_Slider, &opt, &p, w);
-            p.end(); return true;
-        }}
+        if (e->type() != QEvent::Paint)
+            return false;
+        return paintAmarok(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
     }
 
     if (QMessageBox* box = qobject_cast<QMessageBox*>(o))
@@ -459,12 +515,13 @@ Hacks::add(QWidget *w)
                 {
                     if (Style::config.hack.amarokDisplay)
                         amarokContext = splitterKid;
-                    else
+                    if (Style::config.hack.amarokContext)
                         splitterKid->hide();
                 }
             }
             if (Style::config.hack.amarokDisplay && frame->objectName() == "MainToolbar")
             {
+                frame->setAttribute(Qt::WA_OpaquePaintEvent);
                 QList<QFrame*> list = frame->findChildren<QFrame*>();
                 QFrame *f;
                 foreach (f, list)
@@ -513,6 +570,12 @@ Hacks::add(QWidget *w)
                     }
                 }
             }
+        }
+        else if (qobject_cast<QAbstractButton*>(w) && w->inherits("SideBarButton"))
+        {
+            w->setBackgroundRole(QPalette::Window);
+            w->setForegroundRole(QPalette::WindowText);
+            w->installEventFilter(bespinHacks);
         }
         else if (w->inherits("Amarok::Slider"))
             w->installEventFilter(bespinHacks);
