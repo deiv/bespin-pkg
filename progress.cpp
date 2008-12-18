@@ -181,7 +181,7 @@ drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
     p->setPen(QPen(QColor(0,0,0,50),2));
     p->drawEllipse(x+1,y+2,s,s);
     p->setBrush(Qt::NoBrush);
-    p->setPen(QPen(QColor(255,255,255,outline ? 30 : 15),1));
+    p->setPen(QPen(QColor(255,255,255, outline ? 30 : 15),1));
     p->drawEllipse(x,y+1,s+2,s);
 }
 
@@ -320,7 +320,11 @@ void
 Style::drawProgressBarLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
     ASSURE_OPTION(progress, ProgressBarV2);
-   
+    OPT_HOVER
+
+    if (!(hover && progress->textVisible))
+        return;
+
     painter->save();
     QRect rect = RECT;
     if (progress->orientation == Qt::Vertical)

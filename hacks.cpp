@@ -371,6 +371,8 @@ Hacks::toggleAmarokContext()
     if (!amarokContext)
         return;
     amarokContext->setVisible(!amarokContext->isVisible());
+    if (QToolButton *btn = qobject_cast<QToolButton*>(sender()))
+        btn->setText(amarokContext->isVisibleTo(amarokContext->parentWidget()) ? "[|]" : "[||]");
 }
 
 static QSize amarokSize;
@@ -380,6 +382,8 @@ Hacks::toggleAmarokCompact()
     if (!amarokLowerPart)
         return;
     amarokLowerPart->setVisible(!amarokLowerPart->isVisible());
+    if (QToolButton *btn = qobject_cast<QToolButton*>(sender()))
+        btn->setText(amarokLowerPart->isVisible() ? "-" : "+");
     if (QWidget *window = amarokLowerPart->window())
     {
         if (amarokLowerPart->isVisible())
@@ -606,14 +610,17 @@ Hacks::add(QWidget *w)
                     QDBusConnection::sessionBus().connect("org.kde.amarok", "/Player",
                     "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)));
                     QToolButton *btn = new QToolButton(f);
-                    btn->setText("#");
+                    QFont fnt = btn->font(); fnt.setBold(true);
+                    btn->setFont(fnt);
+                    btn->setText(amarokContext && !amarokContext->isVisible() ? "[||]" : "[|]");
 //                     btn->setIcon(btn->style()->standardIcon(QStyle::SP_DesktopIcon, 0, btn));
                     btn->setToolTip("Toggle ContextView");
                     box->addWidget(btn);
                     connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokContext())); // TODO: bind toggle?
 
                     btn = new QToolButton(f);
-                    btn->setText("=");
+                    btn->setFont(fnt);
+                    btn->setText("-");
                     //                     btn->setIcon(btn->style()->standardIcon(QStyle::SP_DesktopIcon, 0, btn));
                     btn->setToolTip("Toggle comapct mode");
                     box->addWidget(btn);
