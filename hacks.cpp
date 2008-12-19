@@ -55,15 +55,80 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 
 using namespace Bespin;
 
+static const int DT = 4000;
+static const int FT = 500; // > 50!!!!
+
+class PrettyLabel : public QWidget
+{
+public:
+    PrettyLabel( const QStringList & data, QWidget * parent = 0, Qt::WindowFlags f = 0) :
+    QWidget(parent, f), time(0), index(0), animTimer(0)
+    {
+        QFont font; font.setBold(true); setFont(font);
+        setData(data);
+    }
+    void setData(const QStringList &data)
+    {
+        if (data == this->data)
+            return;
+        this->data = data.isEmpty() ? QStringList() << "" : data;
+        time = 0; index = 0;
+        if (data.count() > 1)
+            { if (!animTimer) animTimer = startTimer(50); }
+        else if (animTimer)
+            { killTimer(animTimer); animTimer = 0; }
+    }
+protected:
+    void paintEvent( QPaintEvent * pe)
+    {
+        QPainter p(this);
+        p.setClipRegion(pe->region());
+        if (animTimer)
+        {
+            int level = -1;
+            if (time < FT/50)
+                level = time;
+            else if (time > (DT-FT)/50)
+                level = DT/50-time;
+            if (level > -1)
+            {
+                QColor c(palette().color(foregroundRole()));
+                c.setAlpha((255*level) / (FT/50));
+                p.setPen(c);
+            }
+        }
+        p.drawText(rect(), Qt::AlignCenter | Qt::TextHideMnemonic | Qt::TextSingleLine, data.at(index));
+        p.end();
+    }
+    void timerEvent( QTimerEvent * te )
+    {
+        if (!isVisible() || te->timerId() != animTimer)
+            return;
+        if (time < FT/50 || time > (DT-FT)/50)
+            update();
+        ++time;
+        if (time > DT/50)
+        {
+            time = 0; ++index;
+            if (index >= data.count())
+                index = 0;
+        }
+    }
+private:
+    int time, index, animTimer;
+    QStringList data;
+};
+
 static Hacks *bespinHacks = new Hacks;
 static Hacks::HackAppType *appType = 0;
 const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
 static QPointer<QWidget> dragWidget = NULL;
 static QPointer<QWidget> amarokContext = NULL;
-static QPointer<QLabel> amarokMeta = NULL;
+static QPointer<PrettyLabel> amarokMeta = NULL;
 static QPointer<QWidget> amarokLowerPart = NULL;
 static bool dragHadTrack = false;
+
 
 static void
 triggerWMMove(const QWidget *w, const QPoint &p)
@@ -401,32 +466,36 @@ Hacks::setAmarokMetaInfo(int)
         return;
     QDBusInterface amarok( "org.kde.amarok", "/Player", "org.freedesktop.MediaPlayer");
     QDBusReply<QVariantMap> reply = amarok.call("GetMetadata");
-    QString text, toolTip;
+    QString toolTip;
+    QStringList data;
     if (reply.isValid())
     {
         QString tmp = reply.value().value("artist").toString();
         if (!tmp.isEmpty() && tmp != "Unknown") {
-            text += tmp + ": ";
+            data << tmp;
             toolTip += "Artist: " + tmp;
         }
 
         tmp = reply.value().value("title").toString();
         if (!tmp.isEmpty() && tmp != "Unknown") {
-            text += "<b>" + tmp + "</b>";
+            data << tmp;
             toolTip += "<br>Title: " + tmp;
         }
 
+        QString tmp2;
         tmp = reply.value().value("album").toString();
         if (!tmp.isEmpty() && tmp != "Unknown") {
-            text += " on \"" + tmp + "\"";
+            tmp2 = tmp;
             toolTip += "<br>Album: " + tmp;
         }
 
         tmp = reply.value().value("year").toString();
         if (!tmp.isEmpty() && tmp != "0") {
-            text += " (" + tmp + ")";
+            tmp2 += " (" + tmp + ")";
             toolTip += "<br>Year: " + tmp;
         }
+        if (!tmp2.isEmpty())
+            data << tmp2;
 
         tmp = reply.value().value("genre").toString();
         if (!tmp.isEmpty() && tmp != "Unknown") {
@@ -462,9 +531,9 @@ Hacks::setAmarokMetaInfo(int)
 //         
 //         tracknumber: 146059284
     }
-    if (text.isEmpty())
-        text = "<b>Amarok² / Bespin edition</b>";
-    amarokMeta->setText(text);
+    if (data.isEmpty())
+        data << "Amarok² / Bespin edition";
+    amarokMeta->setData(data);
     if (!toolTip.isEmpty())
         amarokMeta->setToolTip(toolTip);
 }
@@ -603,10 +672,10 @@ Hacks::add(QWidget *w)
                 if (f && f->layout())
                 if (QBoxLayout *box = qobject_cast<QBoxLayout*>(f->layout()))
                 {
-                    amarokMeta = new QLabel("<b>Amarok² / Bespin edition</b>", f);
+                    amarokMeta = new PrettyLabel(QStringList() << "Amarok² / Bespin edition", f);
                     box->insertWidget(0, amarokMeta);
                     amarokMeta->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-                    amarokMeta->setAlignment(Qt::AlignCenter);
+//                     amarokMeta->setAlignment(Qt::AlignCenter);
                     QDBusConnection::sessionBus().connect("org.kde.amarok", "/Player",
                     "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)));
                     QToolButton *btn = new QToolButton(f);
@@ -641,7 +710,7 @@ Hacks::add(QWidget *w)
             else if (Style::config.hack.amarokFrames)
             {
                 QWidget *runner = w;
-                while (runner = runner->parentWidget())
+                while ((runner = runner->parentWidget()))
                 {
                     if (qobject_cast<QSplitter*>(runner))
                     {

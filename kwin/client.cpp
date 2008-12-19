@@ -827,7 +827,7 @@ Client::resize( const QSize& s )
     if (maximizeMode() == MaximizeFull)
         { clearMask(); /*repaint();*/ return; }
 
-    int d = (isShade() || borderSize > 5) ? 8 : 4;
+    int d = (isShade() || borderSize > 3) ? 8 : 4;
     QRegion mask(4, 0, w-8, h);
     mask += QRegion(0, 4, w, h-d);
     mask += QRegion(2, 1, w-4, h-d/4);
