@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ask_for_qt() {
    bad "Qt4 could not be found in usual locations, pass it here"
