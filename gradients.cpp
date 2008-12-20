@@ -121,8 +121,8 @@ static inline QLinearGradient
 sunkenGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 {
     QLinearGradient lg(start, stop);
-    lg.setColorAt(0, c.dark(110));
-    lg.setColorAt(1, c.light(112));
+    lg.setColorAt(0, c.dark(115));
+    lg.setColorAt(1, c.light(117));
     return lg;
 }
 

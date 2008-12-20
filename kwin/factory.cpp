@@ -280,7 +280,7 @@ public:
         QFont font; font.setBold(false); setFont(font);
     }
 protected:
-    void paintEvent(QPaintEvent *pe)
+    void paintEvent(QPaintEvent *)
     {
         QStyleOptionHeader opt; opt.initFrom(this);
         opt.textAlignment = Qt::AlignCenter;

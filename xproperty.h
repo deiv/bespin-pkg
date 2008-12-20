@@ -58,14 +58,16 @@ public:
     template <typename T> inline static T *get(WId window, Atom atom, Type type, unsigned long n = 1)
     {
         T *data = 0;
-        handleProperty(window, atom, (uchar**)&data, type, _n<T>(type, n));
+	T **data_p = &data;
+        handleProperty(window, atom, (uchar**)data_p, type, _n<T>(type, n));
         return data;
     }
 
     template <typename T> inline static void set(WId window, Atom atom, T *data, Type type, unsigned long n = 1)
     {
         if (!data) return;
-        handleProperty(window, atom, (uchar**)&data, type, _n<T>(type, n));
+	T **data_p = &data;
+        handleProperty(window, atom, (uchar**)data_p, type, _n<T>(type, n));
     }
 private:
     static void handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n);
