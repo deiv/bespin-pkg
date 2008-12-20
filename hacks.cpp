@@ -62,21 +62,23 @@ class PrettyLabel : public QWidget
 {
 public:
     PrettyLabel( const QStringList & data, QWidget * parent = 0, Qt::WindowFlags f = 0) :
-    QWidget(parent, f), time(0), index(0), animTimer(0)
+    QWidget(parent, f), time(0), index(0), animTimer(0), animated(true)
     {
         QFont font; font.setBold(true); setFont(font);
-        setData(data);
+        setData(data, false);
     }
-    void setData(const QStringList &data)
+    void setData(const QStringList &data, bool upd = true)
     {
         if (data == this->data)
             return;
         this->data = data.isEmpty() ? QStringList() << "" : data;
         time = 0; index = 0;
-        if (data.count() > 1)
+        if (data.count() > 1 && animated)
             { if (!animTimer) animTimer = startTimer(50); }
         else if (animTimer)
             { killTimer(animTimer); animTimer = 0; }
+        if (upd && !animTimer)
+            update();
     }
 protected:
     void paintEvent( QPaintEvent * pe)
@@ -100,6 +102,20 @@ protected:
         p.drawText(rect(), Qt::AlignCenter | Qt::TextHideMnemonic | Qt::TextSingleLine, data.at(index));
         p.end();
     }
+    void mouseReleaseEvent( QMouseEvent * me )
+    {
+        if (me->button() == Qt::LeftButton)
+        {
+            animated = !animated;
+            if (animated)
+            {
+                if (data.count() > 1)
+                    { animTimer = startTimer(50); update(); }
+            }
+            else if (animTimer)
+                { killTimer(animTimer); animTimer = 0; update(); }
+        }
+    }
     void timerEvent( QTimerEvent * te )
     {
         if (!isVisible() || te->timerId() != animTimer)
@@ -114,8 +130,19 @@ protected:
                 index = 0;
         }
     }
+    void wheelEvent ( QWheelEvent * we )
+    {
+        if (data.count() < 2)
+            return;
+        if (we->delta() < 0)
+            { ++index; if (index >= data.count()) index = 0; }
+        else
+            { --index; if (index < 0) index = data.count()-1; }
+        update();
+    }
 private:
     int time, index, animTimer;
+    bool animated;
     QStringList data;
 };
 
@@ -470,16 +497,17 @@ Hacks::setAmarokMetaInfo(int)
     QStringList data;
     if (reply.isValid())
     {
-        QString tmp = reply.value().value("artist").toString();
-        if (!tmp.isEmpty() && tmp != "Unknown") {
-            data << tmp;
-            toolTip += "Artist: " + tmp;
-        }
 
-        tmp = reply.value().value("title").toString();
+        QString tmp = reply.value().value("title").toString();
         if (!tmp.isEmpty() && tmp != "Unknown") {
             data << tmp;
             toolTip += "<br>Title: " + tmp;
+        }
+
+        tmp = reply.value().value("artist").toString();
+        if (!tmp.isEmpty() && tmp != "Unknown") {
+            data << tmp;
+            toolTip += "Artist: " + tmp;
         }
 
         QString tmp2;
@@ -532,7 +560,7 @@ Hacks::setAmarokMetaInfo(int)
 //         tracknumber: 146059284
     }
     if (data.isEmpty())
-        data << "Amarok² / Bespin edition";
+        data << "Amarok² / Bespin edition" << "Click to toggle animation" << "Wheel to change item";
     amarokMeta->setData(data);
     if (!toolTip.isEmpty())
         amarokMeta->setToolTip(toolTip);
@@ -672,7 +700,7 @@ Hacks::add(QWidget *w)
                 if (f && f->layout())
                 if (QBoxLayout *box = qobject_cast<QBoxLayout*>(f->layout()))
                 {
-                    amarokMeta = new PrettyLabel(QStringList() << "Amarok² / Bespin edition", f);
+                    amarokMeta = new PrettyLabel(QStringList() << "Amarok² / Bespin edition" << "Click to toggle animation" << "Wheel to change item", f);
                     box->insertWidget(0, amarokMeta);
                     amarokMeta->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 //                     amarokMeta->setAlignment(Qt::AlignCenter);

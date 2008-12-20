@@ -117,6 +117,10 @@ Config::Config(QWidget* parent) : BConfig(parent)
     <b>L</b>: Toggle Shade (The window is shrinked into the titlebar)<br>\
     <b>_</b>: Some space");
 
+    handleSettings(ui.slickButtons, "SlickButtons", 0);
+    setContextHelp(ui.slickButtons, "The appereance of unhovered buttons. Morphs to icon on hover<br>\
+    Dots and bricks look slick, but may be considered less usable, as unhovered buttons look all the same");
+
     /** if you call setContextHelp(.) with a combobox and pass a stringlist,
     the strings are attached to the combo entries and shown on select/hover */
 

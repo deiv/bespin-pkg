@@ -563,8 +563,11 @@ Client::repaint(QPainter &p)
         {   // static bool KWindowSystem::compositingActive();
             // frame ==============
             const QColor border = Colors::mid(bg, color(ColorFont, true),5,2);
-            p.setRenderHint( QPainter::Antialiasing, false );
+            p.setRenderHint( QPainter::Antialiasing, true );
             p.setPen(border);
+            p.setBrush(Qt::NoBrush);
+            p.drawRoundedRect ( widget()->rect(), 5, 5 );
+#if 0
             p.drawLine(32+4, 0, width()-(32+5), 0);
             p.drawLine(32+4, height()-1, width()-(32+5), height()-1);
             p.drawLine(0, 32+4, 0, height()-(32+5));
@@ -577,6 +580,7 @@ Client::repaint(QPainter &p)
             p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
             const QPixmap &right = Gradients::borderline(border, Gradients::Right);
             p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
+#endif
         }
     }
 }

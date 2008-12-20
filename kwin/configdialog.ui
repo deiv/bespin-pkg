@@ -26,6 +26,13 @@
    <item row="1" column="0" colspan="2" >
     <layout class="QHBoxLayout" name="horizontalLayout" >
      <item>
+      <widget class="QCheckBox" name="forceUserColors" >
+       <property name="text" >
+        <string>Ignore style color hints</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="label_2" >
        <property name="text" >
         <string>Active</string>
@@ -220,10 +227,51 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="forceUserColors" >
-       <property name="text" >
-        <string>Ignore style color hints</string>
+      <spacer name="horizontalSpacer" >
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4" >
+       <property name="font" >
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text" >
+        <string>Unhovered Buttons</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="slickButtons" >
+       <item>
+        <property name="text" >
+         <string>Scaled icons</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Dots</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Bricks</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
