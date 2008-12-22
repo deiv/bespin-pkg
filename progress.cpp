@@ -262,17 +262,17 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
     p.setBrush(Gradients::pix(Colors::mid(FCOLOR(Window), Qt::black, 8,1), t, o, Gradients::Sunken));
     p.setPen(Qt::NoPen);
     p.drawRect(renderPix.rect());
-    p.setBrush(Gradients::pix(FCOLOR(Window), s, Qt::Vertical, Gradients::Button));
-    p.setBrushOrigin(F(3), F(3));
+    p.setBrush(Gradients::pix(FCOLOR(Window), t, Qt::Vertical, Gradients::Simple));
     p.setPen(QColor(0,0,0,40));
     p.setRenderHint(QPainter::Antialiasing);
     p.drawEllipse(disc);
 
     int nn = (val < 0) ? 0 : int(n*val);
-    p.setBrush(Gradients::brush(content ? CCOLOR(progress.std, Fg) : CCOLOR(progress.std, Bg), s, Qt::Vertical, GRAD(progress) ));
-    p.setPen(Qt::NoPen);
     int h = disc.width()/4+1;
     disc.adjust(h, h, -h, -h);
+    p.setBrushOrigin(disc.topLeft());
+    p.setBrush(Gradients::brush(content ? CCOLOR(progress.std, Fg) : CCOLOR(progress.std, Bg), disc.height(), Qt::Vertical, GRAD(progress) ));
+    p.setPen(Qt::NoPen);
     p.drawEllipse(disc);
 
     if (!content)
@@ -320,8 +320,10 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
                 painter->setRenderHint(QPainter::Antialiasing);
                 painter->setBrush(Gradients::brush(c, s, Qt::Vertical, GRAD(progress) ));
                 painter->setPen(Qt::NoPen);
-                painter->setBrushOrigin(F(3), F(3));
-                painter->drawEllipse(x+(renderPix.width()-disc.width())/2, y+(renderPix.height()-disc.height())/2, disc.width(), disc.height());
+                disc.moveTop(y + (renderPix.height()-disc.height())/2);
+                disc.moveLeft(x + (renderPix.width()-disc.width())/2);
+                painter->setBrushOrigin(disc.topLeft());
+                painter->drawEllipse(disc);
                 painter->restore();
             }
         }

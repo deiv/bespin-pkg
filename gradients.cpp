@@ -427,12 +427,6 @@ const QPixmap
 {
     QColor c = oc;
     int v = Colors::value(c);
-    if (v < 70)
-    {
-        int h,s,a;
-        c.getHsv(&h,&s,&v,&a);
-        c.setHsv(h,s,70,a);
-    }
     
     QPixmap *pix = _structure[light].object(c.rgb());
     if (pix)

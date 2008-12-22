@@ -747,9 +747,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
             QWidget *w = static_cast<QWidget*>(object);
             QStyleOption opt; opt.initFrom(w);
             QPainter p(w);
-            drawLineEdit(&opt, &p, w);
+            drawLineEditFrame(&opt, &p, w);
             p.end();
-            return false;
+            return true;
         }
 #endif
         return false;
