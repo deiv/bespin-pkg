@@ -36,8 +36,6 @@
 
 using namespace Bespin;
 
-static Gradients::Type _progressBase;
-
 static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list)
 {
     int max = QPalette::NColorRoles;
@@ -182,7 +180,7 @@ Style::readSettings(const QSettings* settings)
     config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
     config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
     config.bg.modal.invert = (appType != KDM) && readBool(BG_MODAL_INVERT);
-    config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),50,150);
+    config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),30,300);
     readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 
 #if 0
@@ -203,7 +201,6 @@ Style::readSettings(const QSettings* settings)
     config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
     config.btn.round = readBool(BTN_ROUND);
     GRAD(btn) = readGrad(BTN_GRADIENT);
-    _progressBase = GRAD(btn);
     if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
         GRAD(btn) = Gradients::None;
 
@@ -402,7 +399,7 @@ Style::init(const QSettings* settings)
     initMetrics();
     generatePixmaps();
     Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
-                    config.bg.structure, _progressBase, config.bg.intensity, F(8));
+                    config.bg.structure, config.bg.intensity, F(8));
     int f2 = F(2), f4 = F(4);
     QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
     inner.adjust(f4,f4,-f4,-dpi.f1); outer.adjust(0,0,0,dpi.f3);

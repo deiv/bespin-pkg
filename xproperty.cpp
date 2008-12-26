@@ -52,6 +52,12 @@ XProperty::handleProperty(WId window, Atom atom, uchar **data, Type type, unsign
         *data = NULL; // superflous?!?
 }
 
+void
+XProperty::remove(WId window, Atom atom)
+{
+    XDeleteProperty(QX11Info::display(), window, atom);
+}
+
 #if 0
 
 /* The below functions mangle 2 rbg (24bit) colors and a 2 bit hint into

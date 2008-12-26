@@ -770,6 +770,12 @@ Style::unpolish( QWidget *widget )
     if (!widget)
         return;
 
+    if (widget->isWindow())
+    {
+        XProperty::remove(widget->winId(), XProperty::winData);
+        XProperty::remove(widget->winId(), XProperty::bgPics);
+    }
+
     if (qobject_cast<QAbstractButton*>(widget) || qobject_cast<QToolBar*>(widget) ||
         qobject_cast<QMenuBar*>(widget) || qobject_cast<QMenu*>(widget) ||
         widget->inherits("QToolBox"))

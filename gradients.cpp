@@ -110,10 +110,10 @@ simpleGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
 static inline QLinearGradient
 metalGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
    QLinearGradient lg(start, stop);
-   QColor iC = c.light(106); lg.setColorAt(0, iC);
-   iC = c.light(103); lg.setColorAt(0.45, iC);
-   iC = c.dark(103); lg.setColorAt(0.451, iC);
-   iC = c.dark(110); lg.setColorAt(1, iC);
+   QColor iC = c.light(108); lg.setColorAt(0, iC);
+   iC = c.light(105); lg.setColorAt(0.45, iC);
+   iC = c.dark(105); lg.setColorAt(0.451, iC);
+   iC = c.dark(112); lg.setColorAt(1, iC);
    return lg;
 }
 
@@ -338,11 +338,11 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
     // very dark colors won't make nice buttons =)
     QColor iC = c;
     int v = Colors::value(c);
-    if (v < 70)
+    if (v < 40)
     {
         int h,s,a;
         c.getHsv(&h,&s,&v,&a);
-        iC.setHsv(h,s,70,a);
+        iC.setHsv(h,s,50,a);
     }
     else if (v > 245 && type > Sunken) // glosses etc hate high value colors
     {
@@ -674,7 +674,7 @@ Gradients::bgSet(const QColor &c)
             set->topTile.fill(Qt::transparent);
             set->lCorner.fill(Qt::transparent);
             int a = qAbs(_bgIntensity - 100)*3; a = CLAMP(a,0,255);
-            int v = (_bgIntensity > 0)*255;
+            int v = (_bgIntensity > 100)*255;
             c1 = QColor(v,v,v, a);
             c2 = QColor(v,v,v, a/2);
             v = (!v)*255;
@@ -824,14 +824,13 @@ Gradients::bgSet(const QColor &c)
 static bool _initialized = false;
 
 void
-Gradients::init(BgMode mode, int structure, Type progress, int bgIntesity, int btnBevelSize, bool force)
+Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bool force)
 {
     if (_initialized && !force)
         return;
     _initialized = true;
     _mode = mode;
     _struct = structure;
-//    _progressBase = progress;
     _bgIntensity = bgIntesity;
     _bgSet.setMaxCost( 900<<10 ); // 832 should be enough - we keep some safety
     _btnAmbient.setMaxCost( 64<<10 );

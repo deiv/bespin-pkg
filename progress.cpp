@@ -32,17 +32,27 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
         return;
         
     OPT_ENABLED
-    const int f2 = F(2);
 
-    QPalette::ColorRole bg = QPalette::Window;
-    QPalette::ColorRole fg = RECT.height() > F(10) ? bg : QPalette::WindowText;
-    if (widget)
-    {
-        bg = widget->backgroundRole();
-        fg = RECT.height() > F(10) ? bg : widget->foregroundRole();
-    }
+    const int f2 = F(2);
+    QRect r = RECT;
+    QPalette::ColorRole bg = widget ? widget->backgroundRole() : QPalette::Window;
+    QPalette::ColorRole fg = bg;
     
-    QRect r = RECT; r.setBottom(r.bottom()-f2);
+    if (RECT.height() < F(16))
+    {
+        fg = widget ? widget->foregroundRole() : QPalette::WindowText;
+        int w = r.width()*cb->progress/(cb->maximum - cb->minimum);
+        masks.rect[false].render(RECT, painter, COLOR(fg));
+        r.adjust(1, 1, -1, -1);
+        if (cb->direction == Qt::LeftToRight)
+            r.setLeft(r.right() - w);
+        else
+            r.setRight(r.left() + w);
+        masks.rect[false].render(r, painter, COLOR(bg));
+        return;
+    }
+
+    r.setBottom(r.bottom()-f2);
     masks.rect[false].render(r, painter, Gradients::Sunken, Qt::Vertical, Colors::mid(COLOR(fg), Qt::black,6, 1)); // CCOLOR(progress.std, Bg)
     shadows.sunken[false][isEnabled].render(RECT, painter);
 
@@ -157,8 +167,6 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
 
     // groove + contents ======
     step = Animator::Progress::step(widget);
-//     masks.rect[true].render(RECT, painter, Gradients::pix(Colors::mid(FCOLOR(Window), Qt::black, 8,1), RECT.height(), Qt::Vertical, Gradients::Sunken));
-//     shadows.sunken[true][false].render(RECT, painter);
     drawProgressBarGroove(pb, painter, widget);
     drawProgressBarContents(pb, painter, widget);
     // label? =========
@@ -172,13 +180,6 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
 static inline void
 drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
 {
-//     QBrush brush = p->brush();
-//     p->setPen(Qt::NoPen);
-//     p->setBrush(QColor(0,0,0,64));
-//     s -= 2;
-//     p->drawEllipse(x+1,y+2,s,s);
-//     p->setBrush(brush);
-//     p->drawEllipse(x+1,y+1,s,s);
     s -= 2;
     p->setPen(QPen(QColor(0,0,0,50),2));
     p->drawEllipse(x+1,y+2,s,s);
@@ -224,7 +225,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
         { if (val == 0.0) return; }
     else
     {
-        masks.rect[true].render(RECT, painter, Gradients::pix(Colors::mid(FCOLOR(Window), Qt::black, 8,1),
+        masks.rect[true].render(RECT, painter, Gradients::brush(Colors::mid(FCOLOR(Window), Qt::black, 8,1),
                                                               t, vertical ? Qt::Horizontal : Qt::Vertical, Gradients::Sunken));
         if (val == 1.0)
             return;
@@ -259,7 +260,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
     }
 
     QPainter p(&renderPix);
-    p.setBrush(Gradients::pix(Colors::mid(FCOLOR(Window), Qt::black, 8,1), t, o, Gradients::Sunken));
+    p.setBrush(Gradients::brush(Colors::mid(FCOLOR(Window), Qt::black, 8,1), t, o, Gradients::Sunken));
     p.setPen(Qt::NoPen);
     p.drawRect(renderPix.rect());
     p.setBrush(Gradients::pix(FCOLOR(Window), t, Qt::Vertical, Gradients::Simple));
@@ -473,7 +474,7 @@ Style::drawProgressBarLabel(const QStyleOption *option, QPainter *painter, const
     painter->save();
     QRect rect = RECT;
     if (progress->orientation == Qt::Vertical)
-    {   // vertical progresses have text rotated by 90¡Æ or 270¡Æ
+    {   // vertical progresses have text rotated by 90ï¿½ï¿½ or 270ï¿½ï¿½
         QMatrix m;
         int h = rect.height(); rect.setHeight(rect.width()); rect.setWidth(h);
         if (progress->bottomToTop)

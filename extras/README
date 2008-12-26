@@ -1,0 +1,45 @@
+=================
+BESPIN EXTRAS 
+=================
+
+
+bespin-compl:
+=============
+Bash completion for the "bespin" tool, written by Franz Fellner
+
+INSTALLATION:
+-------------
+copy the file into your bash completion directory (or append it to the completion file, not suggested)
+sudo cp bespin-compl /etc/bash_completion.d/
+
+NOTICE:
+* that the dir name may differ depending on your distribution
+
+####################################################################################################
+
+default-theme.svg.bz2:
+======================
+modified (much simpler) theme for amarok2
+
+INSTALLATION:
+-------------
+extract and copy the file to your local amarok data dir, then close amarok, flush the pixmap cache
+and restart amarok
+bunzip2 default-theme.svg.bz2
+mkdir -p ~/.kde/share/apps/amarok/images
+cp default-theme.svg ~/.kde/share/apps/amarok/images/
+kquitapp amarok
+rm -f /var/tmp/kdecache-$(whoami)/kpc/Amarok-pixmaps.*
+
+NOTICE:
+* that the location of kpc may differ depending on your distribution
+
+amarok&
+
+NOTICE:
+* that the first amarok start will take a little longer.
+* that the buttons contrast with the background, but amarok seems to ignore palette changes atm, so
+if you run amarok with a different color setup, you'll probably have to flush the pixmap cache in
+order to update the button pixmaps :(
+
+####################################################################################################
