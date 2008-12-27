@@ -114,7 +114,7 @@ void
 Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget) const
 {   // TODO: widget doesn't set a state - make bug report!
     OPT_ENABLED;
-    
+
     const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(option);
     QPalette::ColorRole fg = QPalette::Text, bg = QPalette::Base;
     if (option->state & State_Selected)
@@ -126,32 +126,36 @@ Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *pai
     const bool vertical = (pb2 && pb2->orientation == Qt::Vertical);
     double val = option->progress / double(option->maximum - option->minimum);
 
-    painter->save();
-    painter->setPen(QPen(Colors::mid(COLOR(fg), COLOR(bg)), F(3)));
-    if (vertical)
-        { int x = RECT.center().x(); painter->drawLine(x, RECT.top(), x, RECT.bottom()); }
-    else
-        { int y = RECT.center().y(); painter->drawLine(RECT.left(), y, RECT.right(), y); }
-    painter->restore();
-
     QString text = option->text.isEmpty() ? QString(" %1% ").arg((int)(val*100)) : " " + option->text + " ";
     QRect r = painter->boundingRect(RECT, Qt::AlignLeft | Qt::AlignVCenter, text);
-    
+
+    QPen oldPen = painter->pen();
+    painter->setPen(QPen(Colors::mid(COLOR(fg), COLOR(bg)), F(3)));
     if (vertical)
+    {
+        painter->drawLine(RECT.x(), RECT.top(), RECT.x(), RECT.bottom());
+        painter->setPen(QPen(COLOR(fg), F(3)));
         r.moveBottom(RECT.bottom() - val*(RECT.height()-r.height()));
+        painter->drawLine(RECT.x(), RECT.bottom()-val*RECT.height(), RECT.x(), RECT.bottom());
+    }
     else
     {
+        painter->drawLine(RECT.left(), RECT.bottom(), RECT.right(), RECT.bottom());
+        painter->setPen(QPen(COLOR(fg), F(3)));
         const int d = val*(RECT.width()-r.width());
         if (reverse)
+        {
             r.moveRight(RECT.right() - d);
+            painter->drawLine(RECT.right()-val*RECT.width(), RECT.bottom(), RECT.right(), RECT.bottom());
+        }
         else
+        {
             r.moveLeft(RECT.left() + d);
+            painter->drawLine(RECT.left(), RECT.bottom(), RECT.left()+val*RECT.width(), RECT.bottom());
+        }
     }
-
-    if (r.isValid())
-        masks.rect[true].render(r, painter, Colors::mid(COLOR(fg), COLOR(bg),3,1));
-        
-    drawItemText(painter, r, Qt::AlignCenter, PAL, isEnabled, text, bg);
+    drawItemText(painter, r, Qt::AlignHCenter|Qt::AlignTop, PAL, isEnabled, text);
+    painter->setPen(oldPen);
 }
 
 void
@@ -159,8 +163,8 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
 {
     ASSURE_OPTION(pb, ProgressBar);
     OPT_HOVER
-    if (appType == KGet && !widget)
-    {   // kinda inline progress in itemview (but unfortunately kget doesn't use itemviews)
+    if ((widget && qobject_cast<const QAbstractItemView*>(widget)) || (appType == KGet && !widget))
+    {   // kinda inline progress in itemview (but unfortunately kget doesn't send a widget)
         drawListViewProgress(pb, painter, widget);
         return;
     }

@@ -28,6 +28,9 @@ and restart amarok
 bunzip2 default-theme.svg.bz2
 mkdir -p ~/.kde/share/apps/amarok/images
 cp default-theme.svg ~/.kde/share/apps/amarok/images/
+UPDATE:
+for recent versions of amarok (svn trunk) the name changed, so best make a symlink
+ln -s ~/.kde/share/apps/amarok/images/default-theme.svg ~/.kde/share/apps/amarok/images/default-theme-clean.svg
 kquitapp amarok
 rm -f /var/tmp/kdecache-$(whoami)/kpc/Amarok-pixmaps.*
 
