@@ -152,6 +152,7 @@ const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
 static QPointer<QWidget> dragWidget = NULL;
 static QPointer<QWidget> amarokContext = NULL;
+static QPointer<QWidget> amarokStatusBar = NULL;
 static QPointer<PrettyLabel> amarokMeta = NULL;
 static QPointer<QWidget> amarokLowerPart = NULL;
 static bool dragHadTrack = false;
@@ -474,6 +475,8 @@ Hacks::toggleAmarokCompact()
     if (!amarokLowerPart)
         return;
     amarokLowerPart->setVisible(!amarokLowerPart->isVisible());
+    if (amarokStatusBar)
+        amarokStatusBar->setVisible(!amarokStatusBar->isVisible());
     if (QToolButton *btn = qobject_cast<QToolButton*>(sender()))
         btn->setText(amarokLowerPart->isVisible() ? "-" : "+");
     if (QWidget *window = amarokLowerPart->window())
@@ -690,7 +693,7 @@ Hacks::add(QWidget *w)
             {
                 frame->setAttribute(Qt::WA_OpaquePaintEvent);
                 QList<QFrame*> list = frame->findChildren<QFrame*>();
-                QFrame *f;
+                QFrame *f = 0;
                 foreach (f, list)
                     if (f->inherits("KVBox")) break;
                 if (f)
@@ -756,6 +759,8 @@ Hacks::add(QWidget *w)
         }
         else if (w->inherits("Amarok::Slider"))
             w->installEventFilter(bespinHacks);
+        else if (w->inherits("StatusBar"))
+            amarokStatusBar = w;
     }
     
     if (Style::config.hack.messages && qobject_cast<QMessageBox*>(w))

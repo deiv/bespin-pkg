@@ -121,7 +121,7 @@ drawSBArrow(QStyle::SubControl sc, QPainter *painter, QStyleOptionSpinBox *optio
         }
 
         bool isEnabled = option->stepEnabled & sef;
-        bool hover = isEnabled && (option->activeSubControls == sc);
+        bool hover = isEnabled && (option->activeSubControls == (int)sc);
         bool sunken = hover && (option->state & QStyle::State_Sunken);
         
 

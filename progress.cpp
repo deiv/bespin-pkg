@@ -111,7 +111,7 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
 }
 
 void
-Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget) const
+Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *) const
 {   // TODO: widget doesn't set a state - make bug report!
     OPT_ENABLED;
 

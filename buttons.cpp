@@ -283,7 +283,7 @@ Style::drawButtonFrame(const QStyleOption * option,
 }
 
 void
-Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     OPT_ENABLED OPT_FOCUS OPT_HOVER;
     ASSURE_OPTION(btn, Button);

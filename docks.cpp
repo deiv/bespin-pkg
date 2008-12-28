@@ -32,7 +32,7 @@ Style::drawDockBg(const QStyleOption * option, QPainter * painter, const QWidget
 }
 
 void
-Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWidget *w) const
+Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
 
     ASSURE_OPTION(dwOpt, DockWidget);

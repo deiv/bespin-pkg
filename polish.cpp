@@ -761,6 +761,7 @@ Style::polish( QWidget * widget )
 void
 Style::unpolish( QApplication *app )
 {
+    Gradients::wipe();
     app->setPalette(QPalette());
 }
 

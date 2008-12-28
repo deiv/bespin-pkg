@@ -75,7 +75,10 @@ public:
 //    virtual void drawItemPixmap ( QPainter * painter, const QRect & rect, int alignment, const QPixmap & pixmap ) const; 
 
     void drawItemText(QPainter*, const QRect&, int alignment, const QPalette&, bool enabled,
-                      const QString &text, QPalette::ColorRole textRole = QPalette::NoRole, QRect *boundingRect = 0) const;
+                      const QString &text, QPalette::ColorRole textRole, QRect *boundingRect) const;
+    inline void drawItemText(QPainter *p, const QRect &r, int alignment, const QPalette &pal,
+                             bool enabled, const QString &text, QPalette::ColorRole textRole = QPalette::NoRole) const
+    { drawItemText(p, r, alignment, pal, enabled, text, textRole, NULL); }
 
     void drawPrimitive (PrimitiveElement elem, const QStyleOption *opt, QPainter *p, const QWidget *w = 0 ) const;
 
@@ -102,7 +105,8 @@ public:
 
     void polish( QWidget *w );
     void polish( QApplication * );
-    void polish( QPalette &pal, bool onInit = true );
+    void polish( QPalette &pal, bool onInit );
+    inline void polish(QPalette &pal) { polish(pal, true); }
 
     QSize sizeFromContents ( ContentsType type, const QStyleOption * option,
                                 const QSize & contentsSize, const QWidget * widget = 0 ) const;
