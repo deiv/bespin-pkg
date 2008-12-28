@@ -43,20 +43,21 @@ using namespace Bespin;
 
 ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
 {
-   if (!(parent->widget() && parent->windowId())) {
-      deleteLater();
-      return;
-   }
-   client = parent;
-   setCursor(QCursor(Qt::SizeFDiagCursor));
-   setFixedSize(CORNER_SIZE, CORNER_SIZE);
+    hide();
+    if (!(parent->widget() && parent->windowId())) {
+        deleteLater();
+        return;
+    }
+    client = parent;
+    setCursor(QCursor(Qt::SizeFDiagCursor));
+    setFixedSize(CORNER_SIZE, CORNER_SIZE);
 //    buffer = QPixmap(16,16);
-   setAttribute(Qt::WA_OpaquePaintEvent);
-   QPolygon triangle(3);
-   triangle.putPoints(0, 3, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE);
-   setMask ( triangle );
-   QTimer::singleShot(0, this, SLOT(hide()));
-   QTimer::singleShot(3000, this, SLOT(raise()));
+    setAttribute(Qt::WA_OpaquePaintEvent);
+    QPolygon triangle(3);
+    triangle.putPoints(0, 3, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE);
+    setMask ( triangle );
+    QTimer::singleShot(0, this, SLOT(hide()));
+    QTimer::singleShot(3000, this, SLOT(raise()));
 }
 
 void
