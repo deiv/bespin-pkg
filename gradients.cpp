@@ -338,11 +338,12 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
     // very dark colors won't make nice buttons =)
     QColor iC = c;
     int v = Colors::value(c);
-    if (v < 40)
+    const int minV = (type == Sunken) ? 70 : 40;
+    if (v < minV)
     {
         int h,s,a;
         c.getHsv(&h,&s,&v,&a);
-        iC.setHsv(h,s,50,a);
+        iC.setHsv(h,s,minV,a);
     }
     else if (v > 245 && type > Sunken) // glosses etc hate high value colors
     {

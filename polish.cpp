@@ -20,6 +20,7 @@
 // #include <QAbstractScrollArea>
 #include <QAbstractSlider>
 #include <QApplication>
+#include <QComboBox>
 #include <QtDebug>
 #include <QLabel>
 #include <QLayout>
@@ -577,8 +578,11 @@ Style::polish( QWidget * widget )
     }
     
     //BEGIN COMBOBOXES - hovering/animation                                                        -
-    else if (widget->inherits("QComboBox"))
+    else if (QComboBox *cb = qobject_cast<QComboBox*>(widget))
     {
+        if (cb->view())
+            cb->view()->setTextElideMode( Qt::ElideMiddle);
+
         if (IS_HTML_WIDGET)
             widget->setAttribute(Qt::WA_Hover);
         else
@@ -775,6 +779,8 @@ Style::unpolish( QWidget *widget )
     {
         XProperty::remove(widget->winId(), XProperty::winData);
         XProperty::remove(widget->winId(), XProperty::bgPics);
+        if (qobject_cast<QMenu *>(widget))
+            widget->clearMask();
     }
 
     if (qobject_cast<QAbstractButton*>(widget) || qobject_cast<QToolBar*>(widget) ||
