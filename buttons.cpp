@@ -334,24 +334,7 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     painter->save();
     if (hasFocus || (btn->features & QStyleOptionButton::DefaultButton))
-    {
-        QFont tmpFnt = painter->font();
-        tmpFnt.setBold(true);
-        QFontMetrics fm(tmpFnt);
-        QRect tr = fm.boundingRect ( btn->text );
-        if (!tr.isValid())
-            { painter->restore(); return; }
-        while (tr.width() > ir.width())
-        {
-            if (tmpFnt.pointSize() > -1)
-                tmpFnt.setPointSize(tmpFnt.pointSize()*ir.width()/tr.width());
-            else
-                tmpFnt.setPixelSize(tmpFnt.pixelSize()*ir.width()/tr.width());
-            fm = QFontMetrics(tmpFnt);
-            tr = fm.boundingRect ( btn->text );
-        }
-        painter->setFont(tmpFnt);
-    }
+        setBold(painter, btn->text);
 
     if (!flat && isEnabled)
     {

@@ -19,6 +19,7 @@
 #ifndef BESPIN_DRAW_H
 #define BESPIN_DRAW_H
 
+#include <cmath>
 #include <QPainter>
 
 #include "colors.h"
@@ -45,10 +46,19 @@ Dpi Style::dpi;
 // #define BESPIN_MNEMONIC Qt::TextShowMnemonic
 
 static inline void
-setBold(QPainter *p)
+setBold(QPainter *p, const QString &text = QString())
 {
     QFont fnt = p->font();
     fnt.setBold(true);
+    if (!text.isEmpty())
+    {
+        int wb = QFontMetrics(fnt).size(Qt::TextShowMnemonic, text).width();
+        if (wb)
+        {
+            int w = QFontMetrics(p->font()).size(Qt::TextShowMnemonic, text).width();
+            fnt.setStretch(lround(w*100.0/wb));
+        }
+    }
     p->setFont(fnt);
 }
 
@@ -58,7 +68,7 @@ setTitleFont(QPainter *p)
         QFont fnt = p->font();
         fnt.setWeight(QFont::Black);
 //         fnt.setUnderline(true);
-        fnt.setStretch(QFont::SemiExpanded);
+//         fnt.setStretch(QFont::SemiExpanded);
 #if QT_VERSION >= 0x040400
         fnt.setCapitalization(QFont::AllUppercase/*SmallCaps*/);
 #else
