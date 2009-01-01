@@ -21,6 +21,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
+#include <QMainWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -29,11 +30,14 @@
 #include <QPushButton>
 #include <QSplitter>
 #include <QSlider>
+#include <QStatusBar>
 #include <QStyle>
 #include <QStyleOption>
 #include <QStyleOptionGroupBox>
 #include <QStyleOptionSlider>
+#include <QToolBar>
 #include <QToolButton>
+#include <QUrl>
 
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusInterface>
@@ -150,9 +154,11 @@ static Hacks *bespinHacks = new Hacks;
 static Hacks::HackAppType *appType = 0;
 const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
+static QString amarokCoverArtUrl;
 static QPointer<QWidget> dragWidget = NULL;
 static QPointer<QWidget> amarokContext = NULL;
-static QPointer<QWidget> amarokStatusBar = NULL;
+static QPointer<QLabel> amarokCover = NULL;
+static QPointer<QStatusBar> amarokStatus = NULL;
 static QPointer<PrettyLabel> amarokMeta = NULL;
 static QPointer<QWidget> amarokLowerPart = NULL;
 static bool dragHadTrack = false;
@@ -291,8 +297,7 @@ isWindowDragWidget(QObject *o)
             qobject_cast<QGroupBox*>(o) ||
         
             (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled()) ||
-            o->inherits("QToolBar") ||
-            o->inherits("QDockWidget") ||
+            qobject_cast<QToolBar*>(o) || o->inherits("QDockWidget") ||
 //         o->inherits("QMainWindow") || // this is mostly useles... PLUS triggers problems
 
             ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
@@ -415,7 +420,12 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
                 const QRect rect( opt.rect.right()-40, 0, 40, slider->height() );
                 p.drawText( rect, Qt::AlignRight | Qt::AlignVCenter, QString::number( slider->value() ) + '%' );
             }
-            opt.rect.adjust(slider->height()*.877+4, 0, -44, 0);
+            QRect r = opt.rect;
+            opt.rect.setWidth(r.height()*.877);
+            QPixmap icon = slider->style()->standardPixmap(opt.sliderValue ? QStyle::SP_MediaVolume : QStyle::SP_MediaVolumeMuted, &opt, slider);
+            p.drawPixmap(opt.rect.topLeft(), icon);
+            opt.rect = r;
+            opt.rect.adjust(icon.width(), 0, -44, 0);
         }
         slider->style()->drawComplexControl(QStyle::CC_Slider, &opt, &p, slider);
         p.end();
@@ -464,6 +474,7 @@ Hacks::toggleAmarokContext()
     if (!amarokContext)
         return;
     amarokContext->setVisible(!amarokContext->isVisible());
+
     if (QToolButton *btn = qobject_cast<QToolButton*>(sender()))
         btn->setText(amarokContext->isVisibleTo(amarokContext->parentWidget()) ? "[|]" : "[||]");
 }
@@ -475,16 +486,27 @@ Hacks::toggleAmarokCompact()
     if (!amarokLowerPart)
         return;
     amarokLowerPart->setVisible(!amarokLowerPart->isVisible());
-    if (amarokStatusBar)
-        amarokStatusBar->setVisible(!amarokStatusBar->isVisible());
+
     if (QToolButton *btn = qobject_cast<QToolButton*>(sender()))
         btn->setText(amarokLowerPart->isVisible() ? "-" : "+");
+
     if (QWidget *window = amarokLowerPart->window())
     {
+        QWidget *statusContainer = amarokStatus;
+        if (statusContainer->parentWidget() && statusContainer->parentWidget()->inherits("KVBox"))
+            statusContainer = statusContainer->parentWidget();
+        
         if (amarokLowerPart->isVisible())
+        {
+            if (statusContainer) statusContainer->show();
             window->resize(amarokSize);
+        }
         else
-            { amarokSize = window->size(); window->resize(QSize(600, 2)); }
+        {
+            amarokSize = window->size();
+            if (statusContainer) statusContainer->hide();
+            window->resize(QSize(600, 2));
+        }
     }
 }
 
@@ -504,20 +526,20 @@ Hacks::setAmarokMetaInfo(int)
         QString tmp = reply.value().value("title").toString();
         if (!tmp.isEmpty() && tmp != "Unknown") {
             data << tmp;
-            toolTip += "<br>Title: " + tmp;
+            toolTip += "Title: " + tmp;
         }
 
         tmp = reply.value().value("artist").toString();
         if (!tmp.isEmpty() && tmp != "Unknown") {
             data << tmp;
-            toolTip += "Artist: " + tmp;
+            toolTip += "<br>by " + tmp;
         }
 
         QString tmp2;
         tmp = reply.value().value("album").toString();
         if (!tmp.isEmpty() && tmp != "Unknown") {
             tmp2 = tmp;
-            toolTip += "<br>Album: " + tmp;
+            toolTip += "<br><b>Album: " + tmp + "</b>";
         }
 
         tmp = reply.value().value("year").toString();
@@ -555,6 +577,25 @@ Hacks::setAmarokMetaInfo(int)
                 toolTip += "<br>" + tmp + "Hz";
             }
         }
+
+        if (amarokCover)
+        {
+            tmp = QUrl(reply.value().value("arturl").toString()).toLocalFile();
+            if (tmp != amarokCoverArtUrl)
+            {
+                amarokCoverArtUrl = tmp;
+                if (amarokCoverArtUrl.isEmpty())
+                {
+                    amarokCover->setPixmap(QPixmap());
+                    amarokCover->hide();
+                }
+                else
+                {
+                    amarokCover->setPixmap(QPixmap::fromImage(QImage(amarokCoverArtUrl).scaledToHeight(amarokCover->height(), Qt::SmoothTransformation)));
+                    amarokCover->show();
+                }
+            }
+        }
 //         comment: Hans Zimmer & James Newton Howard
 //         location: file:///home/music/ost/Hans%20Zimmer/The%20Dark%20Knight/01%20-%20Why%20So%20Serious.mp3
 //         mtime: 554000
@@ -584,15 +625,16 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     }
     else if (*appType == Amarok)
     {
+        if (e->type() == QEvent::Paint)
+            return paintAmarok(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
+
         if (e->type() == QEvent::PaletteChange)
         {
             if (o->objectName() == "MainToolbar")
                 { delete amarokDisplayBg; amarokDisplayBg = 0; }
             return false;
         }
-        if (e->type() != QEvent::Paint)
-            return false;
-        return paintAmarok(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
+        return false;
     }
 
     if (QMessageBox* box = qobject_cast<QMessageBox*>(o))
@@ -691,13 +733,25 @@ Hacks::add(QWidget *w)
             }
             if (Style::config.hack.amarokDisplay && frame->objectName() == "MainToolbar")
             {
+                if (QBoxLayout *box = qobject_cast<QBoxLayout*>(frame->layout()))
+                {
+                    amarokCover = new QLabel(frame);
+                    amarokCover->setMargin(3);
+                    box->addWidget(amarokCover);
+                }
+                
                 frame->setAttribute(Qt::WA_OpaquePaintEvent);
                 QList<QFrame*> list = frame->findChildren<QFrame*>();
+                QObjectList oList;
+                
                 QFrame *f = 0;
                 foreach (f, list)
                     if (f->inherits("KVBox")) break;
                 if (f)
+                {
                     list = f->findChildren<QFrame*>();
+                    oList = f->children();
+                }
                 foreach (f, list)
                     if (f->inherits("KHBox")) break;
                 if (f && f->layout())
@@ -709,11 +763,21 @@ Hacks::add(QWidget *w)
 //                     amarokMeta->setAlignment(Qt::AlignCenter);
                     QDBusConnection::sessionBus().connect("org.kde.amarok", "/Player",
                     "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)));
+                }
+                
+                QObject *o = 0;
+                foreach (o, oList)
+                    if (o->inherits("ProgressWidget")) break;
+
+                if (QWidget *pw = qobject_cast<QWidget*>(o))
+                if (pw->layout())
+                if (QBoxLayout *box = qobject_cast<QBoxLayout*>(pw->layout()))
+                {
                     QToolButton *btn = new QToolButton(f);
                     QFont fnt = btn->font(); fnt.setBold(true);
                     btn->setFont(fnt);
                     btn->setText(amarokContext && !amarokContext->isVisible() ? "[||]" : "[|]");
-//                     btn->setIcon(btn->style()->standardIcon(QStyle::SP_DesktopIcon, 0, btn));
+                    
                     btn->setToolTip("Toggle ContextView");
                     box->addWidget(btn);
                     connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokContext())); // TODO: bind toggle?
@@ -721,7 +785,7 @@ Hacks::add(QWidget *w)
                     btn = new QToolButton(f);
                     btn->setFont(fnt);
                     btn->setText("-");
-                    //                     btn->setIcon(btn->style()->standardIcon(QStyle::SP_DesktopIcon, 0, btn));
+                    
                     btn->setToolTip("Toggle comapct mode");
                     box->addWidget(btn);
                     connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokCompact())); // TODO: bind toggle?
@@ -751,16 +815,22 @@ Hacks::add(QWidget *w)
                 }
             }
         }
-        else if (qobject_cast<QAbstractButton*>(w) && w->inherits("SideBarButton"))
+        else if (QAbstractButton *btn = qobject_cast<QAbstractButton*>(w))
         {
-            w->setBackgroundRole(QPalette::Window);
-            w->setForegroundRole(QPalette::WindowText);
-            w->installEventFilter(bespinHacks);
+            if (w->inherits("SideBarButton"))
+            {
+                w->setBackgroundRole(QPalette::Window);
+                w->setForegroundRole(QPalette::WindowText);
+                w->installEventFilter(bespinHacks);
+            }
         }
+//         else if (QToolBar *bar = qobject_cast<QToolBar*>(w))
+//             if (bar->objectName() == "PlaylistToolBar")
+//                 bar->setToolButtonStyle(Qt::ToolButtonTextOnly);
         else if (w->inherits("Amarok::Slider"))
             w->installEventFilter(bespinHacks);
         else if (w->inherits("StatusBar"))
-            amarokStatusBar = w;
+            amarokStatus = qobject_cast<QStatusBar*>(w);
     }
     
     if (Style::config.hack.messages && qobject_cast<QMessageBox*>(w))

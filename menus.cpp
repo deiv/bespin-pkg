@@ -39,7 +39,7 @@ Style::drawMenuBarBg(const QStyleOption * option, QPainter * painter, const QWid
 
     if (config.menu.barGradient != Gradients::None)
         painter->fillRect(rect, Gradients::brush(c, rect.height(), Qt::Vertical, config.menu.barGradient));
-    else if (config.bg.mode == Scanlines)
+    else if (config.bg.mode == Scanlines && config.bg.structure < 5)
         painter->fillRect(rect, Gradients::structure(c, true));
     else if (config.menu.bar_role[Bg] != QPalette::Window)
         painter->fillRect(rect, c);

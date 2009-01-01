@@ -227,7 +227,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex" >
-         <number>9</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="Presets" >
          <layout class="QGridLayout" name="gridLayout_2" >
@@ -520,6 +520,26 @@
             <item>
              <property name="text" >
               <string>Barbershop</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Lochblech</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Fence</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Interference</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Sand</string>
              </property>
             </item>
            </widget>

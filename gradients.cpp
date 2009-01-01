@@ -427,7 +427,7 @@ const QPixmap
 &Gradients::structure(const QColor &oc, bool light)
 {
     QColor c = oc;
-    int v = Colors::value(c);
+//     int v = Colors::value(c);
     
     QPixmap *pix = _structure[light].object(c.rgb());
     if (pix)
@@ -456,22 +456,12 @@ const QPixmap
         p.setPen(Qt::NoPen);
         i = 100 + 2*(_bgIntensity - 100)/10;
         p.setBrush(c.light(i));
-        if (light) {
-            p.drawRect(0,0,16,16); p.drawRect(32,0,16,16);
-            p.drawRect(16,16,16,16); p.drawRect(48,16,16,16);
-            p.drawRect(0,32,16,16); p.drawRect(32,32,16,16);
-            p.drawRect(16,48,16,16); p.drawRect(48,48,16,16);
-        }
-        else {
-            p.drawRect(0,0,32,32);
-            p.drawRect(32,32,32,32);
-        }
+        p.drawRect(pix->rect());
         p.setBrush(c.dark(i));
         if (light) {
-            p.drawRect(16,0,16,16); p.drawRect(48,0,16,16);
-            p.drawRect(0,16,16,16); p.drawRect(32,16,16,16);
-            p.drawRect(16,32,16,16); p.drawRect(48,32,16,16);
-            p.drawRect(0,48,16,16); p.drawRect(32,48,16,16);
+            for (int j = 0; j < 64; j+=16)
+            for (i = bool(j%32)*16; i < 64; i+=32)
+                p.drawRect(i,j,16,16);
         }
         else {
             p.drawRect(32,0,32,32);
@@ -519,6 +509,61 @@ const QPixmap
         p.drawLine(0,128,128,0);
         p.drawLine(32,64,64,32);
         p.drawLine(0,32,32,0);
+        break;
+    case 6: // slots
+        p.setPen(Qt::NoPen);
+        i = 100 + 2*(_bgIntensity - 100)/10;
+        p.setBrush(c.light(i));
+        p.drawRect(pix->rect());
+        p.setBrush(c.dark(i));
+        p.setRenderHint(QPainter::Antialiasing);
+        for (int j = 0; j < 64; j+=8)
+        for (i = bool(j%16)*8; i < 64; i+=16)
+            p.drawEllipse(i,j,8,8);
+        break;
+    case 7: // fence
+        p.setPen(Qt::NoPen);
+        i = 100 + (_bgIntensity - 100)/4;
+        p.setBrush(c.light(i));
+        p.drawRect(pix->rect());
+        p.setPen(QPen(c.dark(i),2));
+        p.setBrush(Qt::NoBrush);
+        p.setRenderHint(QPainter::Antialiasing);
+        for (i = -48; i < 64; i+=16)
+            p.drawLine(i, 0, i+64, 64);
+        for (i = -48; i < 64; i+=16)
+            p.drawLine(i, 64, i+64, 0);
+        break;
+    case 8: // interference
+        p.setPen(Qt::NoPen);
+        i = 100 + (_bgIntensity - 100)/4;
+        p.setBrush(c.light(i));
+        p.drawRect(pix->rect());
+        p.setBrush(Qt::NoBrush);
+        p.setRenderHint(QPainter::Antialiasing);
+        c = c.dark(i);
+        for (i = 1; i < 6; ++i)
+        {
+            float r = i*sqrt(i)*64.0/(6*sqrt(6));
+            p.setPen(QPen(Colors::mid(c, oc, 6-i, i-1), 2));
+            p.drawEllipse(QPointF(32,32), r, r);
+            for (int x = 0; x < 65; x+=64)
+            for (int y = 0; y < 65; y+=64)
+                p.drawEllipse(QPointF(x,y), r, r);
+        }
+        break;
+    case 9: // sand
+        p.setPen(Qt::NoPen);
+        i = 100 + (_bgIntensity - 100)/4;
+        p.setBrush(c.light(i));
+        p.drawRect(pix->rect());
+        p.setBrush(Qt::NoBrush);
+        p.setPen(QPen(c.dark(i),2));
+        p.setRenderHint(QPainter::Antialiasing);
+        for (i = 1; i < 5; ++i)
+            p.drawEllipse(QPointF(0,0), i*64.0/5.0, i*64.0/5.0);
+        for (i = 1; i < 5; ++i)
+            p.drawEllipse(QPointF(64,64), i*64.0/5.0, i*64.0/5.0);
         break;
     }
     p.end();

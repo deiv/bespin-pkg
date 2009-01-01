@@ -216,7 +216,7 @@ Style::registerRoutines()
     registerPE(skip, PE_IndicatorToolBarSeparator);
     registerPE(skip, PE_PanelToolBar);
     registerCE(drawToolButtonLabel, CE_ToolButtonLabel);
-    if (config.bg.mode == Scanlines)
+    if (config.bg.mode == Scanlines && config.bg.mode < 5)
         registerCE(drawDockBg, CE_ToolBar);
     else
         registerCE(skip, CE_ToolBar);

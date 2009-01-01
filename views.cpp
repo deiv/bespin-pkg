@@ -92,7 +92,7 @@ Style::drawHeaderSection(const QStyleOption * option, QPainter * painter,
     else
         painter->drawTiledPixmap(r, Gradients::pix(c, s, o, gt));
 
-    if (o == Qt::Vertical)
+    if (o == Qt::Vertical && (!header || header->section < QStyleOptionHeader::End))
     {
         r.setLeft(r.right() - dpi.f1);
         painter->drawTiledPixmap(r, Gradients::pix(COLOR(config.view.header_role[Bg]), s, o, Gradients::Sunken));
