@@ -422,10 +422,14 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
             }
             QRect r = opt.rect;
             opt.rect.setWidth(r.height()*.877);
+            const bool hover = opt.state & QStyle::State_MouseOver;
+            opt.state |= QStyle::State_MouseOver;
             QPixmap icon = slider->style()->standardPixmap(opt.sliderValue ? QStyle::SP_MediaVolume : QStyle::SP_MediaVolumeMuted, &opt, slider);
+            if (!hover)
+                opt.state &= ~QStyle::State_MouseOver;
             p.drawPixmap(opt.rect.topLeft(), icon);
             opt.rect = r;
-            opt.rect.adjust(icon.width(), 0, -44, 0);
+            opt.rect.adjust(icon.width()+4, 0, -44, 0);
         }
         slider->style()->drawComplexControl(QStyle::CC_Slider, &opt, &p, slider);
         p.end();
@@ -591,7 +595,7 @@ Hacks::setAmarokMetaInfo(int)
                 }
                 else
                 {
-                    amarokCover->setPixmap(QPixmap::fromImage(QImage(amarokCoverArtUrl).scaledToHeight(amarokCover->height(), Qt::SmoothTransformation)));
+                    amarokCover->setPixmap(QPixmap::fromImage(QImage(amarokCoverArtUrl).scaledToHeight(amarokCover->height()-6, Qt::SmoothTransformation)));
                     amarokCover->show();
                 }
             }

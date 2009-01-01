@@ -107,8 +107,6 @@ Style::standardPixmap(StandardPixmap standardPixmap,
 //         SP_MediaSkipBackward    64  Icon indicating that media should skip backward.
 //         SP_MediaSeekForward 65  Icon indicating that media should seek forward.
 //         SP_MediaSeekBackward    66  Icon indicating that media should seek backward.
-//         SP_MediaVolume  67  Icon indicating a volume control.
-//         SP_MediaVolumeMuted
 
     case SP_DockWidgetCloseButton:
     case SP_TitleBarCloseButton:
@@ -138,8 +136,42 @@ Style::standardPixmap(StandardPixmap standardPixmap,
             shape = Shapes::restore(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarContextHelpButton:
-    {
         shape = Shapes::help(pm.rect(), config.newWinBtns);
+        goto paint;
+    case SP_MediaVolume:
+    case SP_MediaVolumeMuted:
+    {
+        {
+            QRectF r = pm.rect(); float d = r.width()/8.0;
+            r.adjust(d,d,-d,-d);
+            float x = r.width()/2.0, y = r.height()/2.0;
+            shape.moveTo(0, r.y() + y);
+            shape.quadTo(0,r.y() + y/2.0, x, r.y());
+            shape.quadTo(r.width() - x/2.0, r.y()+y, x, r.bottom());
+            shape.quadTo(0,r.bottom()-y/2.0, 0, r.y()+y);
+            if (standardPixmap == SP_MediaVolume)
+            {
+                r = pm.rect();
+                int st = -75, sw = 150;
+                shape.moveTo(x, y);
+                shape.arcTo(r, st, sw);
+                r.adjust(d,d,-d,-d);
+                shape.moveTo(x, y); shape.arcTo(r, st, sw);
+                d = r.width()/8.0; r.adjust(d,d,-d,-d);
+                shape.moveTo(x, y); shape.arcTo(r, st, sw);
+                d = r.width()/8.0; r.adjust(d,d,-d,-d);
+                shape.moveTo(x, y); shape.arcTo(r, st, sw);
+                shape.closeSubpath();
+            }
+            else
+            {
+                shape.moveTo(r.topLeft());
+                shape.lineTo(r.bottomRight());
+                shape.moveTo(r.topRight());
+                shape.lineTo(r.bottomLeft());
+                shape.closeSubpath();
+            }
+        }
 
 paint:
 
