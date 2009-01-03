@@ -54,12 +54,6 @@ typedef struct Config
     } chooser;
 
     bool fadeInactive;
-
-    struct hack
-    {
-        bool    messages, KHTMLView, treeViews, windowMovement, krunner, killThrobber,
-                amarokContext, amarokFrames, amarokDisplay;
-    } hack;
    
     struct input
     {

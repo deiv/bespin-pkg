@@ -28,6 +28,7 @@
 #include "animator/tab.h"
 #include "colors.h"
 #include "bespin.h"
+#include "hacks.h"
 #include "visualframe.h"
 #include "makros.h"
 #include "config.defaults"
@@ -90,15 +91,15 @@ Style::readSettings(const QSettings* settings)
         config.macStyle = readBool(MACSTYLE);
         config.fadeInactive = readBool(FADE_INACTIVE);
         // Hacks ==================================
-        config.hack.amarokContext = readBool(HACK_AMAROK_CONTEXT);
-        config.hack.amarokFrames = readBool(HACK_AMAROK_FRAMES);
-        config.hack.amarokDisplay = readBool(HACK_AMAROK_DISPLAY);
-        config.hack.messages = readBool(HACK_MESSAGES);
-        config.hack.KHTMLView = readBool(HACK_KHTMLVIEW);
-        config.hack.krunner= readBool(HACK_KRUNNER);
-        config.hack.treeViews = readBool(HACK_TREEVIEWS);
-        config.hack.windowMovement = readBool(HACK_WINDOWMOVE);
-        config.hack.killThrobber = readBool(HACK_THROBBER);
+        Hacks::config.amarokContext = readBool(HACK_AMAROK_CONTEXT);
+        Hacks::config.amarokFrames = readBool(HACK_AMAROK_FRAMES);
+        Hacks::config.amarokDisplay = readBool(HACK_AMAROK_DISPLAY);
+        Hacks::config.messages = readBool(HACK_MESSAGES);
+        Hacks::config.KHTMLView = readBool(HACK_KHTMLVIEW);
+        Hacks::config.krunner= readBool(HACK_KRUNNER);
+        Hacks::config.treeViews = readBool(HACK_TREEVIEWS);
+        Hacks::config.windowMovement = readBool(HACK_WINDOWMOVE);
+        Hacks::config.killThrobber = readBool(HACK_THROBBER);
         // PW Echo Char ===========================
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
         // TODO: redundant, kwin and afaik compiz can handle this
@@ -318,7 +319,7 @@ Style::readSettings(const QSettings* settings)
 //       config.btn.active_role[Bg] = QPalette::Highlight;
 //       config.btn.std_role[Fg] = config.btn.active_role[Fg] = QPalette::WindowText;
 
-        config.hack.messages = false;
+        Hacks::config.messages = false;
 
 //         config.progress.std_role[Bg] = config.progress.std_role[Fg] = QPalette::Window;
 

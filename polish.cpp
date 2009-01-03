@@ -72,6 +72,8 @@ static EventKiller eventKiller;
 
 using namespace Bespin;
 
+Hacks::Config Hacks::config;
+
 static inline void
 setBoldFont(QWidget *w, bool bold = true)
 {
@@ -484,7 +486,13 @@ Style::polish( QWidget * widget )
                     itemView->installEventFilter(this); // scrolldistance...
 //                     itemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-                if (!qobject_cast<QTreeView*>(itemView))
+                if (QTreeView* tv = qobject_cast<QTreeView*>(itemView))
+                {   // allow all treeviews to be animated! NOTICE: animation causes visual errors on non autofilling views...
+                    if (Hacks::config.treeViews && tv->viewport()->autoFillBackground() &&
+                    tv->viewport()->palette().color(tv->viewport()->backgroundRole()).alpha() > 200) // 255 would be perfect, though
+                    tv->setAnimated(true);
+                }
+                else
                 {   // Enable hover effects in listview, treeview hovering sucks, as the "tree" doesn't get an update
                     itemView->viewport()->setAttribute(Qt::WA_Hover);
                     if (widget->inherits("QHeaderView"))
@@ -538,7 +546,7 @@ Style::polish( QWidget * widget )
                 // of course plasma needs - again - a WORKAROUND, we seem to be unable to use bg/fg-role, are we?
                 !(appType == Plasma && widget->inherits("ToolButton")))
             {
-                if (config.hack.killThrobber && widget->inherits("KAnimatedButton"))
+                if (Hacks::config.killThrobber && widget->inherits("KAnimatedButton")) // TODO: get this into hacks
                 if (QMenuBar *mbar = qobject_cast<QMenuBar*>(widget->parentWidget()))
                 {   // this is konquerors throbber...
                     widget->hide();

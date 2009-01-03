@@ -886,16 +886,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
 #endif
             return false;
         }
-        
-        if (QTreeView* tv = qobject_cast<QTreeView*>(object))
-        {   // allow all treeviews to be animated!
-            if (config.hack.treeViews &&
-                tv->viewport()->autoFillBackground() &&
-                tv->viewport()->palette().color(tv->viewport()->backgroundRole()).alpha() > 200) // 255 would be perfect, though
-                // NOTICE: animation causes visual errors on non autofilling views...
-                tv->setAnimated(true);
-            return false;
-        }
         return false;
     }
     case QEvent::Hide:

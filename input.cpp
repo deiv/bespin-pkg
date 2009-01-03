@@ -87,8 +87,8 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
             Tile::setShape(Tile::Full & ~Tile::Top);
             QColor bg = FCOLOR(Base);
             int v = Colors::value(bg);
-            if (v < config.bg.minValue)
-                { int h,s,a; bg.getHsv(&h, &s, &v, &a); bg.setHsv(h,s,config.bg.minValue,a); }
+            if (v < 60)
+                { int h,s,a; bg.getHsv(&h, &s, &v, &a); bg.setHsv(h,s,60,a); }
             mask.render(r, painter, bg.light(110));
             Tile::reset();
         }
@@ -205,6 +205,7 @@ Style::drawComboBox(const QStyleOptionComplex * option,
     }
 
     // the frame
+    const Tile::Set &mask = masks.rect[round_];
     if ((cmb->subControls & SC_ComboBoxFrame) && cmb->frame)
     {
         if (cmb->editable)
@@ -213,7 +214,6 @@ Style::drawComboBox(const QStyleOptionComplex * option,
         {
             if (!ar.isNull())
             {
-                const Tile::Set &mask = masks.rect[round_];
                 // ground
                 animStep = Animator::Hover::step(widget);
                 if (listShown)
@@ -223,13 +223,18 @@ Style::drawComboBox(const QStyleOptionComplex * option,
                 c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover, reflective);
                 if (hasFocus)
                 {
-                    const int contrast = (config.btn.fullHover && animStep) ?
-                    Colors::contrast(btnBg(PAL, isEnabled, hasFocus, 0, true, reflective), FCOLOR(Highlight)):
-                    Colors::contrast(c, FCOLOR(Highlight));
-                    if (contrast > 10)
-                    {
+                    if (config.btn.backLightHover)
                         mask.outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), f3);
-                        c = Colors::mid(c, FCOLOR(Highlight), contrast/4, 1);
+                    else
+                    {
+                        const int contrast =  (config.btn.fullHover && animStep) ?
+                        Colors::contrast(btnBg(PAL, isEnabled, hasFocus, 0, true, reflective), FCOLOR(Highlight)):
+                        Colors::contrast(c, FCOLOR(Highlight));
+                        if (contrast > 10)
+                        {
+                            mask.outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), f3);
+                            c = Colors::mid(c, FCOLOR(Highlight), contrast/4, 1);
+                        }
                     }
                 }
 
@@ -244,11 +249,11 @@ Style::drawComboBox(const QStyleOptionComplex * option,
                         mask.render(r, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0,f3));
                         r = RECT.adjusted(f1, f1, -f1, -f2); // RESET 'r' !!!
                     }
-                    else if (config.btn.backLightHover && !hasFocus)
+                    else if (config.btn.backLightHover)
                     {   // we MUST use alpha blending as this crosses between combo and bg
                         QColor c2 = CCOLOR(btn.active, Bg);
                         c2.setAlpha(c2.alpha()*animStep/6);
-                        masks.rect[round_].outline(RECT, painter, c2, F(3));
+                        mask.outline(RECT, painter, c2, F(3));
                     }
                 }
             }
@@ -299,13 +304,14 @@ Style::drawComboBox(const QStyleOptionComplex * option,
             else
                 painter->setBrush( Colors::mid(FCOLOR(Base), FCOLOR(Text)) );
         }
+        else if (config.btn.backLightHover)
+            painter->setBrush(Colors::mid(c, CONF_COLOR(btn.std, Fg), 6-animStep, 3+animStep));
         else
         {
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
 //          ar.adjust(f2, f3, -f2, -f3);
-            masks.rect[round_].render(ar, painter, GRAD(chooser), Qt::Vertical, c,
-                                    RECT.height()-f2, QPoint(0,dpi.f4));
+            mask.render(ar, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0, F(4)));
             painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
         }
         if (upDown)

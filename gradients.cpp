@@ -338,7 +338,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
     // very dark colors won't make nice buttons =)
     QColor iC = c;
     int v = Colors::value(c);
-    const int minV = (type == Sunken) ? 70 : 40;
+    const int minV = (type == Sunken) ? 60 : 40;
     if (v < minV)
     {
         int h,s,a;

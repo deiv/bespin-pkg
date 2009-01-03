@@ -35,6 +35,11 @@ public:
     bool eventFilter( QObject *, QEvent *);
     static bool add(QWidget *w);
     static void remove(QWidget *w);
+    static struct Config
+    {
+        bool    messages, KHTMLView, treeViews, windowMovement, krunner, killThrobber,
+                amarokContext, amarokFrames, amarokDisplay;
+    } config;
 private:
     Q_DISABLE_COPY(Hacks)
 private slots:
