@@ -166,17 +166,22 @@ private:
 class ClickLabel : public QLabel {
 public:
     ClickLabel(QWidget *p = 0, Qt::WindowFlags f = 0) : QLabel(p,f) {}
-    void setPixmap(const QPixmap &pix)
+    void setPixmap(const QPixmap &pix, const QWidget *relative = 0)
     {
         QLabel::setPixmap(pix);
         resize(pix.size());
         QRect r = rect();
-        r.moveCenter(mapToGlobal(rect().center()));
         QRect desktop = QDesktopWidget().availableGeometry();
-        if (r.right() > desktop.right()) r.moveRight(desktop.right());
-        if (r.bottom() > desktop.bottom()) r.moveBottom(desktop.bottom());
-        if (r.left() < desktop.left()) r.moveLeft(desktop.left());
-        if (r.top() < desktop.top()) r.moveTop(desktop.top());
+        if (relative)
+        {
+            r.moveCenter(relative->mapToGlobal(relative->rect().center()));
+            if (r.right() > desktop.right()) r.moveRight(desktop.right());
+            if (r.bottom() > desktop.bottom()) r.moveBottom(desktop.bottom());
+            if (r.left() < desktop.left()) r.moveLeft(desktop.left());
+            if (r.top() < desktop.top()) r.moveTop(desktop.top());
+        }
+        else
+            r.moveCenter(desktop.center());
         move(r.topLeft());
     }
 protected:
@@ -239,7 +244,7 @@ private:
             { full->hide(); delete full; full = 0; }
         else
         {
-            full->setPixmap(QPixmap(url));
+            full->setPixmap(QPixmap(url), this);
             full->show();
         }
     }
