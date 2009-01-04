@@ -166,6 +166,19 @@ private:
 class ClickLabel : public QLabel {
 public:
     ClickLabel(QWidget *p = 0, Qt::WindowFlags f = 0) : QLabel(p,f) {}
+    void setPixmap(const QPixmap &pix)
+    {
+        QLabel::setPixmap(pix);
+        resize(pix.size());
+        QRect r = rect();
+        r.moveCenter(mapToGlobal(rect().center()));
+        QRect desktop = QDesktopWidget().availableGeometry();
+        if (r.right() > desktop.right()) r.moveRight(desktop.right());
+        if (r.bottom() > desktop.bottom()) r.moveBottom(desktop.bottom());
+        if (r.left() < desktop.left()) r.moveLeft(desktop.left());
+        if (r.top() < desktop.top()) r.moveTop(desktop.top());
+        move(r.topLeft());
+    }
 protected:
     void mousePressEvent(QMouseEvent * me)
     {
@@ -177,7 +190,7 @@ protected:
 
 class CoverLabel : public QLabel {
 public:
-    CoverLabel(QWidget *parent) : QLabel (parent) { full = 0; }
+    CoverLabel(QWidget *parent) : QLabel (parent) { full = 0; setMargin(3); }
     void setUrl(const QString &url)
     {
         if (this->url == url)
@@ -226,17 +239,7 @@ private:
             { full->hide(); delete full; full = 0; }
         else
         {
-            QPixmap pix(url);
-            full->setPixmap(pix);
-            full->resize(pix.size());
-            QRect r(QPoint(0,0), full->size());
-            r.moveCenter(mapToGlobal(rect().center()));
-            QRect desktop = QDesktopWidget().availableGeometry();
-            if (r.right() > desktop.right()) r.moveRight(desktop.right());
-            if (r.bottom() > desktop.bottom()) r.moveBottom(desktop.bottom());
-            if (r.left() < desktop.left()) r.moveLeft(desktop.left());
-            if (r.top() < desktop.top()) r.moveTop(desktop.top());
-            full->move(r.topLeft());
+            full->setPixmap(QPixmap(url));
             full->show();
         }
     }
@@ -252,6 +255,7 @@ class AmarokData {
         QPixmap *displayBg;
         QPointer<QWidget> lowerPart;
         QPointer<PrettyLabel> meta;
+        QSize size;
         QPointer<QStatusBar> status;
 };
 
@@ -583,7 +587,6 @@ Hacks::toggleAmarokContext()
         btn->setText(amarok->context->isVisibleTo(amarok->context->parentWidget()) ? "[|]" : "[||]");
 }
 
-static QSize amarokSize;
 void
 Hacks::toggleAmarokCompact()
 {
@@ -603,11 +606,11 @@ Hacks::toggleAmarokCompact()
         if (amarok->lowerPart->isVisible())
         {
             if (statusContainer) statusContainer->show();
-            window->resize(amarokSize);
+            window->resize(amarok->size);
         }
         else
         {
-            amarokSize = window->size();
+            amarok->size = window->size();
             if (statusContainer) statusContainer->hide();
             window->resize(QSize(600, 2));
         }
@@ -844,7 +847,6 @@ Hacks::add(QWidget *w)
                         }
                     }
                     amarok->cover = new CoverLabel(frame);
-                    amarok->cover->setMargin(3);
                     box->addWidget(amarok->cover);
                 }
                 
@@ -878,27 +880,35 @@ Hacks::add(QWidget *w)
                     if (o->inherits("ProgressWidget")) break;
 
                 if (QWidget *pw = qobject_cast<QWidget*>(o))
-                if (pw->layout())
-                if (QBoxLayout *box = qobject_cast<QBoxLayout*>(pw->layout()))
                 {
-                    QToolButton *btn = new QToolButton(f);
-                    QFont fnt = btn->font(); fnt.setBold(true);
-                    btn->setFont(fnt);
-                    btn->setText(amarok->context && !amarok->context->isVisible() ? "[||]" : "[|]");
+                    QList<QLabel*> lList = pw->findChildren<QLabel*>();
+                    if (lList.size() == 2)
+                    {
+                        lList.at(0)->setFont(QFont());
+                        lList.at(1)->hide();
+                    }
                     
-                    btn->setToolTip("Toggle ContextView");
-                    box->addWidget(btn);
-                    connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokContext())); // TODO: bind toggle?
+                    if (pw->layout())
+                    if (QBoxLayout *box = qobject_cast<QBoxLayout*>(pw->layout()))
+                    {
+                        QToolButton *btn = new QToolButton(f);
+                        QFont fnt = btn->font(); fnt.setBold(true);
+                        btn->setFont(fnt);
+                        btn->setText(amarok->context && !amarok->context->isVisible() ? "[||]" : "[|]");
 
-                    btn = new QToolButton(f);
-                    btn->setFont(fnt);
-                    btn->setText("-");
-                    
-                    btn->setToolTip("Toggle comapct mode");
-                    box->addWidget(btn);
-                    connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokCompact())); // TODO: bind toggle?
+                        btn->setToolTip("Toggle ContextView");
+                        box->addWidget(btn);
+                        connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokContext())); // TODO: bind toggle?
+
+                        btn = new QToolButton(f);
+                        btn->setFont(fnt);
+                        btn->setText("-");
+
+                        btn->setToolTip("Toggle comapct mode");
+                        box->addWidget(btn);
+                        connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokCompact())); // TODO: bind toggle?
+                    }
                 }
-                
                 frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
                 QPalette pal = frame->palette();
                 QColor c = pal.color(QPalette::Active, frame->foregroundRole());
