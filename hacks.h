@@ -22,6 +22,8 @@
 class QWidget;
 
 #include <QObject>
+#include <QDial>
+#include <QPointer>
 
 namespace Bespin
 {

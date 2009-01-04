@@ -897,26 +897,44 @@ Style::eventFilter( QObject *object, QEvent *ev )
         
     case QEvent::PaletteChange:
     {
-#define LACK_CONTRAST(_C1_, _C2_) Colors::contrast(pal.color(QPalette::Active, _C1_), pal.color(QPalette::Active, _C2_)) < 40
-#define HARD_CONTRAST(_C_) Colors::value(pal.color(QPalette::Active, _C_)) < 128 ? Qt::white : Qt::black
+        #define LACK_CONTRAST(_ROLE_, _C1_, _C2_) Colors::contrast(pal.color(_ROLE_, _C1_), pal.color(_ROLE_, _C2_)) < 40
+        #define HARD_CONTRAST(_ROLE_, _C_) Colors::value(pal.color(_ROLE_, _C_)) < 128 ? Qt::white : Qt::black
         QWidget * widget = qobject_cast<QWidget*>(object);
         if (!widget)
             return false;
-        
+        // NOTICE: THIS SUCKS!
+        // atm the palettes seem to have enough contrast (they pretend black on white) but end up like white on white
+        // i hav no idea what's going on here, but the situation is the same with all styles (i assume khtml assumes
+        // window == base == button == white, wtext == text == btext == black)
+        // this might also be Qt extra smart not setting equal palettes and mispaint as the widget has no own palette
+        // I HAVE NO IDEA :-(
+        // so for now i force a hard contrast for all elements - may not be the most fancy, but at least a usable solution
         if (widget->objectName() == "RenderFormElementWidget")
         {
                 QPalette pal = widget->palette();
-                if (LACK_CONTRAST(QPalette::Window, QPalette::WindowText))
-                    pal.setColor(QPalette::WindowText, HARD_CONTRAST(QPalette::Window));
-                if (LACK_CONTRAST(QPalette::Button, QPalette::ButtonText))
-                    pal.setColor(QPalette::ButtonText, HARD_CONTRAST(QPalette::Button));
-                if (LACK_CONTRAST(QPalette::Highlight, QPalette::HighlightedText))
-                    pal.setColor(QPalette::HighlightedText, HARD_CONTRAST(QPalette::Highlight));
-                if (LACK_CONTRAST(QPalette::Base, QPalette::Text))
-                    pal.setColor(QPalette::Text, HARD_CONTRAST(QPalette::Base));
+                for (int g = 0; g < 3; ++g)
+                {
+                    QPalette::ColorGroup group = (QPalette::ColorGroup)g;
+                    pal.setColor(group, QPalette::WindowText, HARD_CONTRAST(group, QPalette::Window));
+                    pal.setColor(group, QPalette::ButtonText, HARD_CONTRAST(group, QPalette::Button));
+                    pal.setColor(group, QPalette::HighlightedText, HARD_CONTRAST(group, QPalette::Highlight));
+                    pal.setColor(group, QPalette::Text, HARD_CONTRAST(group, QPalette::Base));
+                    pal.setColor(group, widget->foregroundRole(), HARD_CONTRAST(group, widget->backgroundRole()));
+                }
                 widget->removeEventFilter(this);
                 widget->setPalette(pal);
                 widget->installEventFilter(this);
+                if (QComboBox *box = qobject_cast<QComboBox*>(widget))
+                if (box->view())
+                {
+                    pal = box->view()->palette();
+                    for (int g = 0; g < 3; ++g)
+                    {
+                        QPalette::ColorGroup group = (QPalette::ColorGroup)g;
+                        pal.setColor(group, QPalette::Text, HARD_CONTRAST(group, QPalette::Base));
+                    }
+                    box->view()->setPalette(pal);
+                }
         }
         return false;
     }

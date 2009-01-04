@@ -18,6 +18,7 @@
 
 #include <QCoreApplication>
 #include <QDesktopWidget>
+#include <QDial>
 #include <QEvent>
 #include <QGroupBox>
 #include <QLabel>
@@ -62,6 +63,17 @@ using namespace Bespin;
 
 static const int DT = 4000;
 static const int FT = 500; // > 50!!!!
+
+class ProxyDial : public QDial
+{
+    public:
+        ProxyDial(QAbstractSlider *slider, QWidget *parent = 0) : QDial(parent)
+        {
+            setValue(slider->value());
+            connect (slider, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
+            connect (this, SIGNAL(valueChanged(int)), slider, SIGNAL(sliderMoved(int)));
+        }
+};
 
 class PrettyLabel : public QWidget
 {
@@ -498,6 +510,7 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
         opt.sliderPosition = slider->sliderPosition();
         opt.sliderValue = slider->value();
         QPainter p(slider); p.setClipRegion(pe->region());
+#if 0 // we have a space conserving dial now...
         if (slider->inherits("Amarok::VolumeSlider"))
         {
             //TODO: maybe volume icon...
@@ -517,6 +530,7 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
             opt.rect = r;
             opt.rect.adjust(icon.width()+4, 0, -44, 0);
         }
+#endif
         slider->style()->drawComplexControl(QStyle::CC_Slider, &opt, &p, slider);
         p.end();
         return true;
@@ -812,6 +826,23 @@ Hacks::add(QWidget *w)
                 ENSURE_INSTANCE;
                 if (QBoxLayout *box = qobject_cast<QBoxLayout*>(frame->layout()))
                 {
+                    QList<QSlider*> list = frame->findChildren<QSlider*>();
+                    foreach (QSlider *slider, list)
+                    {
+                        if (slider->inherits("Amarok::VolumeSlider"))
+                        {
+                            if (slider->parentWidget() && slider->parentWidget()->inherits("VolumeWidget"))
+                                slider->parentWidget()->hide();
+                            else
+                                slider->hide();
+                            ProxyDial *dial = new ProxyDial(slider, frame);
+                            dial->setRange(0, 100);
+                            dial->setPageStep(10);
+                            dial->setSingleStep(1);
+                            box->addWidget(dial);
+                            break;
+                        }
+                    }
                     amarok->cover = new CoverLabel(frame);
                     amarok->cover->setMargin(3);
                     box->addWidget(amarok->cover);

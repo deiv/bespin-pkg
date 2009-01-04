@@ -390,6 +390,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
     y += (t-ss)/2;
     --x; --y;
 
+#if 0 // connection line...
     if (!content || val == 1.0)
     {
         int y2 = y + ss/2;
@@ -399,6 +400,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
         else
             painter->drawLine(x, y2+1, x+(n-1)*s, y2+1);
     }
+#endif
 
     // cause most chunks will look the same we render ONE into a buffer and then just dump that multiple times...
     QPixmap renderPix(ss+2,ss+2);
