@@ -523,13 +523,27 @@ Client::repaint(QPainter &p)
 
     // title ==============
     if (isActive())
-    {   // emboss?!
+    {
+        // emboss?!
         int d = 0;
+        QColor dark = Colors::mid(bg, Qt::black, 2, 1), light = Colors::mid(bg, Qt::white);
         if (Colors::value(bg) < 110) // dark bg -> dark top borderline
-            { p.setPen(Colors::mid(bg, Qt::black, 2, 1)); d = -1; }
+            { p.setPen(dark); d = -1; }
         else // bright bg -> bright bottom borderline
-            { p.setPen(Colors::mid(bg, Qt::white)); d = 1; }
-        p.drawText ( label.translated(0,d), Qt::AlignCenter | Qt::TextSingleLine, _caption );
+            { p.setPen(light); d = 1; }
+        QRect tr;
+        p.drawText ( label.translated(0,d), Qt::AlignCenter | Qt::TextSingleLine, _caption, &tr );
+
+        if (maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
+            gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1))
+        {   // inactive window looks like active one...
+            int y = label.center().y();
+            p.setPen(d > 0 ? dark : light);
+            p.drawLine(label.x() + 40, y, tr.left() - 8, y);
+            p.drawLine(tr.right() + 8, y, label.right() - 40, y);
+            p.drawPixmap(label.x() + 8, y, Gradients::borderline(p.pen().color(), Gradients::Left));
+            p.drawPixmap(label.right() - 40, y, Gradients::borderline(p.pen().color(), Gradients::Right));
+        }
     }
     p.setPen(color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive()));
     p.drawText ( label, Qt::AlignCenter | Qt::TextSingleLine, _caption );
@@ -567,20 +581,6 @@ Client::repaint(QPainter &p)
             p.setPen(border);
             p.setBrush(Qt::NoBrush);
             p.drawRoundedRect ( widget()->rect(), 5, 5 );
-#if 0
-            p.drawLine(32+4, 0, width()-(32+5), 0);
-            p.drawLine(32+4, height()-1, width()-(32+5), height()-1);
-            p.drawLine(0, 32+4, 0, height()-(32+5));
-            p.drawLine(width()-1, 32+4, width()-1, height()-(32+5));
-            const QPixmap &top = Gradients::borderline(border, Gradients::Top);
-            p.drawPixmap(0,4,top); p.drawPixmap(width()-1,4,top);
-            const QPixmap &btm = Gradients::borderline(border, Gradients::Bottom);
-            p.drawPixmap(0,height()-(32+5),btm); p.drawPixmap(width()-1,height()-(32+5),btm);
-            const QPixmap &left = Gradients::borderline(border, Gradients::Left);
-            p.drawPixmap(4,0,left); p.drawPixmap(4,height()-1,left);
-            const QPixmap &right = Gradients::borderline(border, Gradients::Right);
-            p.drawPixmap(width()-(32+5),0,right); p.drawPixmap(width()-(32+5),height()-1,right);
-#endif
         }
     }
 }
