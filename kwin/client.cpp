@@ -538,11 +538,9 @@ Client::repaint(QPainter &p)
             gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1))
         {   // inactive window looks like active one...
             int y = label.center().y();
-            p.setPen(d > 0 ? dark : light);
-            p.drawLine(label.x() + 40, y, tr.left() - 8, y);
-            p.drawLine(tr.right() + 8, y, label.right() - 40, y);
-            p.drawPixmap(label.x() + 8, y, Gradients::borderline(p.pen().color(), Gradients::Left));
-            p.drawPixmap(label.right() - 40, y, Gradients::borderline(p.pen().color(), Gradients::Right));
+            QColor c = d > 0 ? dark : light;
+            p.drawPixmap(tr.x() - 38, y, Gradients::borderline(c, Gradients::Left));
+            p.drawPixmap(tr.right() + 6, y, Gradients::borderline(c, Gradients::Right));
         }
     }
     p.setPen(color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive()));
