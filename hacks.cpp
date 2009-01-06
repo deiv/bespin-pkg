@@ -69,6 +69,7 @@ class ProxyDial : public QDial
     public:
         ProxyDial(QAbstractSlider *slider, QWidget *parent = 0) : QDial(parent)
         {
+            setRange(slider->minimum(), slider->maximum()/*0, 100*/);
             setValue(slider->value());
             connect (slider, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
             connect (this, SIGNAL(valueChanged(int)), slider, SIGNAL(sliderMoved(int)));
@@ -844,7 +845,6 @@ Hacks::add(QWidget *w)
                             else
                                 slider->hide();
                             ProxyDial *dial = new ProxyDial(slider, frame);
-                            dial->setRange(0, 100);
                             dial->setPageStep(10);
                             dial->setSingleStep(1);
                             box->addWidget(dial);
