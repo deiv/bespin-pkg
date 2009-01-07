@@ -240,11 +240,12 @@ Client::eventFilter(QObject *o, QEvent *e)
                 if (buttons[i])
                 {
                     buttons[i]->setBg(buffer->copy(buttons[i]->geometry()));
-                    buttons[i]->update(); // enforce, button things it's independend
+                    buttons[i]->repaint(); // enforce, button thinks it's independend
                 }
 
             // finally draw the bg
             p.begin(widget());
+            p.setClipRegion(clip);
             p.drawPixmap(0,0,*buffer);
             p.end();
             delete buffer;
