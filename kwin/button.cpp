@@ -25,6 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <QPainter>
+#include <QX11Info>
 #include <netwm.h>
 #include <cmath>
 
@@ -43,7 +44,6 @@ Button::Button(Client *parent, Type type, bool left) : QWidget(parent->widget())
 client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
 {
     setAutoFillBackground(false);
-    setAttribute(Qt::WA_OpaquePaintEvent, false);
     setFixedSize(parent->buttonSize(), parent->buttonSize());
     setCursor(Qt::ArrowCursor);
     this->left = left;
@@ -309,6 +309,8 @@ void
 Button::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
+    if (!bgPix.isNull())
+        p.drawPixmap(0,0, bgPix);
     p.setRenderHint(QPainter::Antialiasing);
     p.setPen(Qt::NoPen);
     p.setBrush(color());

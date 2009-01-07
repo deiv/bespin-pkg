@@ -49,6 +49,7 @@ public:
     Button(Client *parent, Type type, bool left = false);
     static void init(int sz, bool leftMenu = false, bool fixedColors = false, bool round = true);
     bool isEnabled() const;
+    void setBg(const QPixmap &pix) { bgPix = pix; }
     inline bool type() {return _type;}
 protected:
     void enterEvent(QEvent *e);
@@ -65,6 +66,7 @@ private:
     Client *client;
     Type _type;
     int state, multiIdx, zoomTimer, zoomLevel;
+    QPixmap bgPix;
     static QPainterPath shape[NumTypes];
     static QString tip[NumTypes];
     static bool fixedColors;

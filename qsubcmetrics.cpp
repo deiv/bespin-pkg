@@ -439,35 +439,35 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
     switch (element)
     {
     case SE_PushButtonContents: // Area containing the label (icon with text or pixmap)
-        return visualRect(option->direction, RECT, RECT.adjusted(dpi.f4,dpi.f4,-dpi.f4,-dpi.f4));
-//    case SE_PushButtonFocusRect: // Area for the focus rect (usually larger than the contents rect)
+        return visualRect(option->direction, RECT, RECT.adjusted(F(4), F(4), -F(4), -F(4)));
+    case SE_PushButtonFocusRect: // Area for the focus rect (usually larger than the contents rect)
+        return RECT;
     case SE_CheckBoxContents: // Area for the state label
     case SE_ViewItemCheckIndicator: // Area for a view item's check mark
     case SE_CheckBoxIndicator: // Area for the state indicator (e.g., check mark)
     {
-        int h = dpi.Indicator;
+        const int h = dpi.Indicator;
+        const int shrink = config.btn.layer && (element != SE_CheckBoxContents) ? F(2) : 0;
         QRect r = RECT;
-        if (config.btn.layer)
-            r.setRect(r.x()+F(1), r.y() + ((r.height() - h) / 2), h-F(2), h);
-        else
-            r.setRect(r.x(), r.y() + ((r.height() - h) / 2)-F(1), h, h);
+        r.setRect(r.x()+shrink, r.y() + ((r.height() - h) / 2), h-shrink, h);
         if (element != SE_CheckBoxContents)
             return visualRect(option->direction, RECT, r);
-        int spacing = F(5);
+
+        const int spacing = F(5);
         r.setRect(r.right() + spacing, RECT.y(), RECT.width() - r.width() - spacing, RECT.height());
         return visualRect(option->direction, RECT, r);
     }
     case SE_RadioButtonIndicator: // Area for the state indicator
     case SE_RadioButtonContents: // Area for the label
     {
-        int h = dpi.ExclusiveIndicator;
+        const int h = dpi.ExclusiveIndicator;
         QRect r = RECT;
         r.setRect(r.x()+F(1), r.y() + ((r.height() - h) / 2), h, h);
 
         if (element == SE_RadioButtonIndicator)
             return visualRect(option->direction, RECT, r);
-            
-        int spacing = dpi.f5;
+
+        int spacing = F(5);
         r.setRect(r.right() + spacing, RECT.y(), RECT.width() - r.width() - spacing, RECT.height());
         return visualRect(option->direction, RECT, r);
     }

@@ -166,7 +166,7 @@ private:
 
 class ClickLabel : public QLabel {
 public:
-    ClickLabel(QWidget *p = 0, Qt::WindowFlags f = 0) : QLabel(p,f) {}
+    ClickLabel(QWidget *p = 0, Qt::WindowFlags f = 0) : QLabel(p,f) { setAttribute(Qt::WA_PaintOnScreen); }
     void setPixmap(const QPixmap &pix, const QWidget *relative = 0)
     {
         QLabel::setPixmap(pix);
@@ -196,7 +196,7 @@ protected:
 
 class CoverLabel : public QLabel {
 public:
-    CoverLabel(QWidget *parent) : QLabel (parent) { full = 0; setMargin(3); }
+    CoverLabel(QWidget *parent) : QLabel (parent) { full = 0; setMargin(3); setCursor(Qt::PointingHandCursor); }
     void setUrl(const QString &url)
     {
         if (this->url == url)
@@ -636,9 +636,9 @@ Hacks::setAmarokMetaInfo(int)
     {
 
         QString tmp = reply.value().value("title").toString();
-        if (!tmp.isEmpty() && tmp != "Unknown") {
-            data << tmp;
-            toolTip += "<b>Title: " + tmp + "</b>";
+        if (!tmp.isEmpty()) {
+            if (tmp != "Unknown") data << tmp;
+            toolTip += "<b>" + tmp + "</b>";
         }
 
         tmp = reply.value().value("artist").toString();

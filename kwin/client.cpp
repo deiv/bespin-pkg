@@ -143,6 +143,12 @@ Client::addButtons(const QString& s, int &sz, bool left)
         if (!buttons[type])
         {   // will be d'played d'abled in case
             buttons[type] = new Button(this, type, left);
+            if (!isPreview())
+            {
+                buttons[type]->setAttribute(Qt::WA_OpaquePaintEvent);
+                buttons[type]->setAttribute(Qt::WA_PaintOnScreen);
+                buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
+            }
             titleBar->addWidget(buttons[type], 0, Qt::AlignVCenter);
             sz += (buttonSize()+2);
         }
@@ -205,11 +211,44 @@ Client::eventFilter(QObject *o, QEvent *e)
     {
     case QEvent::Paint:
     {
-        QPainter p(widget());
-        p.setClipRegion(static_cast<QPaintEvent*>(e)->region());
+        QRegion clip = static_cast<QPaintEvent*>(e)->region();
+        QPainter p;
+        QPixmap *buffer = 0;
+        if (isPreview())
+            p.begin(widget());
+        else
+        {
+            // recollect button rects
+            for (int i = 0; i < 4; ++i)
+                if (buttons[i]) clip |= buttons[i]->geometry();
+
+            // kdecoration avoids QT's d'buffering to save (lots of) RAM, so we use or own little d'buffering here
+            // (with only temporary RAM allocation...)
+            buffer = new QPixmap(widget()->size());
+            p.begin(buffer);
+        }
+
+        p.setClipRegion(clip);
         p.setFont(options()->font());
         repaint(p);
         p.end();
+
+        if (buffer)
+        {
+            // dump button BGs
+            for (int i = 0; i < 4; ++i)
+                if (buttons[i])
+                {
+                    buttons[i]->setBg(buffer->copy(buttons[i]->geometry()));
+                    buttons[i]->update(); // enforce, button things it's independend
+                }
+
+            // finally draw the bg
+            p.begin(widget());
+            p.drawPixmap(0,0,*buffer);
+            p.end();
+            delete buffer;
+        }
         return true;
     }
     case QEvent::MouseButtonDblClick:
@@ -244,7 +283,7 @@ Client::init()
     widget()->setAutoFillBackground(false);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, !isPreview());
     widget()->setAttribute(Qt::WA_NoSystemBackground);
-    widget()->setAttribute(Qt::WA_PaintOnScreen, false);
+    widget()->setAttribute(Qt::WA_PaintOnScreen, !isPreview());
     widget()->installEventFilter(this);
 
     titleBar = new QHBoxLayout();
