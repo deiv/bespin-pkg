@@ -196,7 +196,7 @@ protected:
 
 class CoverLabel : public QLabel {
 public:
-    CoverLabel(QWidget *parent) : QLabel (parent) { full = 0; setMargin(3); setCursor(Qt::PointingHandCursor); }
+    CoverLabel(QWidget *parent) : QLabel (parent) { full = 0; setMargin(3); setCursor(Qt::PointingHandCursor); hide(); }
     void setUrl(const QString &url)
     {
         if (this->url == url)
@@ -255,14 +255,13 @@ private:
 
 class AmarokData {
     public:
-        AmarokData() : context(0), cover(0), displayBg(0), lowerPart(0), meta(0), status(0) {}
-        QPointer<QWidget> context;
+        AmarokData() : context(0), player(0), lowerPart(0), cover(0), meta(0), status(0), displayBg(0) {}
+        QPointer<QWidget> context, player, lowerPart;
         QPointer<CoverLabel> cover;
-        QPixmap *displayBg;
-        QPointer<QWidget> lowerPart;
         QPointer<PrettyLabel> meta;
-        QSize size;
         QPointer<QStatusBar> status;
+        QSize size;
+        QPixmap *displayBg;
 };
 
 static Hacks *bespinHacks = 0;
@@ -483,7 +482,7 @@ inline static bool
 paintAmarok(QWidget *w, QPaintEvent *pe)
 {
     if (QFrame *frame = qobject_cast<QFrame*>(w)) {
-    if (frame->objectName() == "MainToolbar")
+    if (frame == amarok->player)
     {
         if (!amarok->displayBg || amarok->displayBg->height() != frame->height())
         {
@@ -612,12 +611,22 @@ Hacks::toggleAmarokCompact()
         if (amarok->lowerPart->isVisible())
         {
             if (statusContainer) statusContainer->show();
+            if (amarok->player)
+                window->setMaximumHeight(0xffffff);
             window->resize(amarok->size);
         }
         else
         {
             amarok->size = window->size();
             if (statusContainer) statusContainer->hide();
+            if (amarok->player)
+            {
+                int h = amarok->player->height() + 4;
+                if (QMainWindow *mw = qobject_cast<QMainWindow*>(window))
+                if (mw->menuBar())
+                    h += mw->menuBar()->height();
+                window->setFixedHeight(h);
+            }
             window->resize(QSize(600, 2));
         }
     }
@@ -833,6 +842,7 @@ Hacks::add(QWidget *w)
             if (config.amarokDisplay && frame->objectName() == "MainToolbar")
             {
                 ENSURE_INSTANCE;
+                amarok->player = frame;
                 if (QBoxLayout *box = qobject_cast<QBoxLayout*>(frame->layout()))
                 {
                     QList<QSlider*> list = frame->findChildren<QSlider*>();
@@ -938,7 +948,7 @@ Hacks::add(QWidget *w)
                 }
             }
         }
-        else if (QAbstractButton *btn = qobject_cast<QAbstractButton*>(w))
+        else if (/*QAbstractButton *btn = */qobject_cast<QAbstractButton*>(w))
         {
             if (w->inherits("SideBarButton"))
             {
