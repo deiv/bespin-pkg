@@ -56,7 +56,7 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 
 #include <QtDebug>
 #include "colors.h"
-#include "bespin.h"
+#include "gradients.h"
 #include "hacks.h"
 
 using namespace Bespin;
@@ -196,7 +196,12 @@ protected:
 
 class CoverLabel : public QLabel {
 public:
-    CoverLabel(QWidget *parent) : QLabel (parent) { full = 0; setMargin(3); setCursor(Qt::PointingHandCursor); hide(); }
+    CoverLabel(QWidget *parent) : QLabel (parent)
+    {
+        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        full = 0; setMargin(3);
+        setCursor(Qt::PointingHandCursor); hide();
+    }
     void setUrl(const QString &url)
     {
         if (this->url == url)
@@ -236,6 +241,15 @@ protected:
             return;
         full = new ClickLabel(0, Qt::Window | Qt::X11BypassWindowManagerHint);
         updatePreview();
+    }
+    void resizeEvent (QResizeEvent *re)
+    {
+        QLabel::resizeEvent(re);
+        if (re->size().height() == re->oldSize().height())
+            return;
+        QString oldUrl = url;
+        url = QString();
+        setUrl(oldUrl);
     }
 private:
     void updatePreview()
@@ -487,11 +501,12 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
         if (!amarok->displayBg || amarok->displayBg->height() != frame->height())
         {
             delete amarok->displayBg;
+//             amarok->displayBg = new QPixmap(Gradients::pix(frame->palette().color(w->backgroundRole()), frame->height(), Qt::Vertical, Gradients::Glass));
             amarok->displayBg = new QPixmap(32, frame->height());
             QLinearGradient lg( 1, 0, 1, frame->height() );
             QColor c = frame->palette().color(w->backgroundRole());
-            lg.setColorAt(0, Colors::mid(c, Qt::white, 8, 1));
-            lg.setColorAt(1, Colors::mid(c, Qt::black, 8, 1));
+            lg.setColorAt(0, Colors::mid(c, Qt::white, 6, 1));
+            lg.setColorAt(.8, Colors::mid(c, Qt::black, 6, 1));
             QPainter p(amarok->displayBg);
             p.setBrush(lg); p.setPen(Qt::NoPen);
             p.drawRect(amarok->displayBg->rect());
