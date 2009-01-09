@@ -366,7 +366,7 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
             iconSize = QSize(iconExtent, iconExtent);
         }
         QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ? QIcon::Normal : QIcon::Disabled);
-        painter->drawPixmap(tr.left() + F(9), tr.center().y() - tabIcon.height() / 2 + F(1), tabIcon);
+        painter->drawPixmap(tr.left() + F(9), tr.center().y() - tabIcon.height() / 2, tabIcon);
         tr.setLeft(tr.left() + iconSize.width() + F(12));
         alignment = Qt::AlignLeft | Qt::AlignVCenter | BESPIN_MNEMONIC;
     }

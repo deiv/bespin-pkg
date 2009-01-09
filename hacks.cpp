@@ -963,7 +963,7 @@ Hacks::add(QWidget *w)
                 }
             }
         }
-        else if (/*QAbstractButton *btn = */qobject_cast<QAbstractButton*>(w))
+        else if (config.amarokDisplay && qobject_cast<QAbstractButton*>(w))
         {
             if (w->inherits("SideBarButton"))
             {
@@ -976,7 +976,7 @@ Hacks::add(QWidget *w)
 //         else if (QToolBar *bar = qobject_cast<QToolBar*>(w))
 //             if (bar->objectName() == "PlaylistToolBar")
 //                 bar->setToolButtonStyle(Qt::ToolButtonTextOnly);
-        else if (w->inherits("Amarok::Slider"))
+        else if (config.amarokDisplay && w->inherits("Amarok::Slider"))
             { ENSURE_INSTANCE; w->installEventFilter(bespinHacks); }
         else if (w->inherits("StatusBar"))
             amarok->status = qobject_cast<QStatusBar*>(w);
