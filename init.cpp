@@ -176,8 +176,13 @@ Style::readSettings(const QSettings* settings)
 
     // Background ===========================
     config.bg.minValue = readInt(BG_MINVALUE);
+    
     config.bg.mode = (BGMode) readInt(BG_MODE);
-    if (config.bg.mode > BevelH) config.bg.mode = BevelV;
+    if (appType == Opera && config.bg.mode > Scanlines)
+        config.bg.mode = Plain; // it doesn't work - at least atm - and breaks kwin appereance...
+    else if (config.bg.mode > BevelH)
+        config.bg.mode = BevelV;
+
     config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
     config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
     config.bg.modal.invert = (appType != KDM) && readBool(BG_MODAL_INVERT);

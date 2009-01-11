@@ -51,7 +51,10 @@ static XBar *instance = NULL;
 class DummyWidget : public QWidget
 {
 public:
-    DummyWidget( QWidget * parent = 0, Qt::WindowFlags f = 0 ) : QWidget(parent, Qt::X11BypassWindowManagerHint) {}
+    DummyWidget( QWidget * parent = 0, Qt::WindowFlags f = 0) : QWidget(parent, Qt::X11BypassWindowManagerHint)
+    {
+        Q_UNUSED(f);
+    }
 protected:
     void paintEvent(QPaintEvent *)
     {

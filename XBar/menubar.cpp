@@ -78,6 +78,7 @@ MenuBar::action(const QPoint &pos) const
 //    QGraphicsWidget::show();
 // }
 
+
 void
 MenuBar::hide()
 {
@@ -329,7 +330,7 @@ MenuBar::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 }
 
 void
-MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
     QRegion emptyArea(rect().toRect());
 

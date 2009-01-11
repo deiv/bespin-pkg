@@ -20,6 +20,7 @@ This library is distributed in the hope that it will be useful,
 #define MENUBAR_H
 
 #include <QGraphicsWidget>
+#include <QStyleOption>
 
 class XBar;
 class QStyleOptionMenuItem;
@@ -51,7 +52,14 @@ signals:
     void hovered(int);
     void triggered(int);
 protected:
-    void initStyleOption(QStyleOptionMenuItem *option, int idx = -1) const;
+    inline void initStyleOption(QStyleOption *option) const
+    {
+        if (QStyleOptionMenuItem *mopt = qstyleoption_cast<QStyleOptionMenuItem*>(option))
+            initStyleOption(mopt, -1);
+        else
+            QGraphicsWidget::initStyleOption(option);
+    }
+    void initStyleOption(QStyleOptionMenuItem *option, int idx) const;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *ev);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *ev);
     void hoverMoveEvent(QGraphicsSceneHoverEvent *ev);
