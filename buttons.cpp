@@ -134,8 +134,7 @@ Style::drawPushButtonBevel(const QStyleOption * option, QPainter * painter, cons
 }
 
 void
-Style::drawButtonFrame(const QStyleOption * option,
-                             QPainter * painter, const QWidget * widget) const
+Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     const int f1 = F(1), f2 = F(2);
     B_STATES
@@ -274,7 +273,7 @@ Style::drawButtonFrame(const QStyleOption * option,
 
         if (config.btn.bevelEnds && !isCheckbox)
         {   // and a bevel in case (e.g. for Aqua look)
-            QRect bevelRect = r; bevelRect.setWidth(dpi.f8);
+            QRect bevelRect = r; bevelRect.setWidth(F(8));
             masks.rect[round].render(bevelRect, painter, Gradients::bevel());
             bevelRect.moveTopRight(r.topRight());
             masks.rect[round].render(bevelRect, painter, Gradients::bevel(false));

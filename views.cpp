@@ -79,27 +79,31 @@ Style::drawHeaderSection(const QStyleOption * option, QPainter * painter,
 
     const Gradients::Type gt =  (header->sortIndicator != QStyleOptionHeader::None) ?
                                 config.view.sortingHeaderGradient : config.view.headerGradient;
-    QRect r = RECT;
-    if (o == Qt::Vertical)
-        r.setBottom(r.bottom()-1);
+
     if (hover)
     {
         const bool sort = (header->sortIndicator != QStyleOptionHeader::None);
         c = Colors::mid(c, sort ? CCOLOR(view.sortingHeader, Fg) : CCOLOR(view.header, Fg),10,1);
     }
     if (gt == Gradients::None)
-        painter->fillRect(r, c);
+        painter->fillRect(RECT, c);
     else
-        painter->drawTiledPixmap(r, Gradients::pix(c, s, o, gt));
+        painter->drawTiledPixmap(RECT, Gradients::pix(c, s, o, gt));
 
-    if (o == Qt::Vertical && (!header || header->section < QStyleOptionHeader::End))
+    if (o == Qt::Vertical)
     {
-        r.setLeft(r.right() - dpi.f1);
-        painter->drawTiledPixmap(r, Gradients::pix(COLOR(config.view.header_role[Bg]), s, o, Gradients::Sunken));
-        SAVE_PEN
-        painter->setPen(Colors::mid(FCOLOR(Base), Qt::black, 8, 1));
-        painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
-        RESTORE_PEN
+        if (!header || header->section < QStyleOptionHeader::End)
+        {
+            QRect r = RECT; r.setLeft(r.right() - F(1));
+            painter->drawTiledPixmap(r, Gradients::pix(CCOLOR(view.header, Bg), s, o, Gradients::Sunken));
+        }
+        if (Colors::value(CCOLOR(view.header, Bg)) > 90) // not on dark elements - looks just stupid...
+        {
+            SAVE_PEN
+            painter->setPen(Colors::mid(FCOLOR(Base), Qt::black, 6, 1));
+            painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
+            RESTORE_PEN
+        }
     }
 }
 

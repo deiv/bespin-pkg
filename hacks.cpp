@@ -214,10 +214,19 @@ public:
         {
             QImage img(url);
             img = img.scaledToHeight(height()-6, Qt::SmoothTransformation);
-            QImage alpha(img.size(), QImage::Format_Indexed8);
-            alpha.fill(180);
-            img.setAlphaChannel(alpha);
+            img = img.convertToFormat(QImage::Format_ARGB32);
+            const uchar *bits = img.bits();
+            QRgb *pixel = (QRgb*)(const_cast<uchar*>(bits));
+            int n = img.width() * img.height();
+            int r,g,b;
+            palette().color(foregroundRole()).getRgb(&r,&g,&b);
             
+            if (Colors::value(palette().color(foregroundRole())) > 128)
+                for (int i = 0; i < n; ++i) pixel[i] = qRgba(r,g,b, (200*qGray(pixel[i]))>>8);
+            else
+                for (int i = 0; i < n; ++i) pixel[i] = qRgba(r,g,b, (200*(255-qGray(pixel[i])))>>8);
+#if 0
+
             QPainterPath pp;
             pp.moveTo(0,0);
             pp.lineTo(img.rect().bottomLeft());
@@ -227,9 +236,23 @@ public:
             QPainter p(&img);
             p.setPen(Qt::NoPen); p.setBrush(QColor(255,255,255,55));
             p.drawPath(pp);
+            
+            p.setBrush(Qt::NoBrush);
+            p.setRenderHint(QPainter::Antialiasing);
+            p.setPen(QPen(QColor(0,0,0,90), 3));
+            p.drawLine(img.rect().topLeft(), img.rect().topRight());
+            p.setPen(QPen(QColor(0,0,0,90), 2));
+            p.drawLine(img.rect().topLeft(), img.rect().bottomLeft());
+            QPoint one(1,0);
+            p.drawLine(img.rect().topRight() + one, img.rect().bottomRight() + one);
+            p.setRenderHint(QPainter::Antialiasing, false);
+            p.setPen(Colors::mid(palette().color(backgroundRole()), Qt::white,4,1));
+            p.drawLine(img.rect().bottomLeft(), img.rect().bottomRight());
             p.end();
-
-            setPixmap(QPixmap::fromImage(img));
+#endif
+            QPixmap pix = QPixmap::fromImage(img);
+//             setAutoFillBackground(!pix.hasAlpha());
+            setPixmap(pix);
             show();
         }
         updatePreview();
