@@ -337,6 +337,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.showScrollButtons, "Scroll.ShowButtons", false);
     handleSettings(ui.sliderGroove, "Scroll.Groove", false);
     handleSettings(ui.gradScroll, "Scroll.Gradient", GradButton);
+    handleSettings(ui.invertGroove, SCROLL_INVERT_BG);
 
     handleSettings(ui.shadowIntensity, "ShadowIntensity", 100);
    

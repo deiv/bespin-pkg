@@ -4,7 +4,10 @@ find_package(KDE4 REQUIRED)
 include (KDE4Defaults)
 include(MacroOptionalAddSubdirectory)
 
-find_package(Plasma REQUIRED)
+if (KDE_VERSION_MINOR LESS 2)
+    message("(Harmless) note:\nYou're about to compile for the unstable Plasma ABI.\nUse KDE4.2 or above if you want this to be binary compatible for future releases\n\n")
+    find_package(Plasma REQUIRED)
+endif()
 
 add_definitions (${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
 include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})

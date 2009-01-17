@@ -358,9 +358,7 @@ Style::drawCheckBox(const QStyleOption * option, QPainter * painter,
 
     // the button -----------------
     QStyleOption copy = *option;
-    if (config.btn.layer == 1)
-        copy.rect.adjust(0,F(1),0,-F(2)); // get rect appereance again
-    else if (config.btn.layer == 0)
+    if (config.btn.layer == 0)
         copy.rect.adjust(F(1),F(1),-F(1),0); // get rect appereance again
     isCheckbox = true;
     drawButtonFrame(&copy, painter, widget);

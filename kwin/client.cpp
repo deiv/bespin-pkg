@@ -614,11 +614,25 @@ Client::repaint(QPainter &p)
         else if (borderSize)
         {   // static bool KWindowSystem::compositingActive();
             // frame ==============
-            const QColor border = Colors::mid(bg, color(ColorFont, true),5,2);
+            QPainterPath path;
+            int x,y,w,h;
+            widget()->rect().getRect(&x,&y,&w,&h);
+            const int cornerSize = 13;
+            path.arcMoveTo(x, y, cornerSize, cornerSize, 90);
+            path.arcTo(x, y, cornerSize, cornerSize, 90, 90);
+            path.arcTo(x, y+h-cornerSize, cornerSize, cornerSize, 2*90, 90);
+            path.arcTo(x+w-cornerSize, y+h-cornerSize, cornerSize, cornerSize, 3*90, 90);
+            path.arcTo(x+w-cornerSize, y, cornerSize, cornerSize, 0, 90);
+            path.closeSubpath();
+            
             p.setRenderHint( QPainter::Antialiasing, true );
-            p.setPen(border);
             p.setBrush(Qt::NoBrush);
-            p.drawRoundedRect ( widget()->rect(), 5, 5 );
+            int v = Colors::value(bg);
+            p.setPen(QPen(Colors::mid(bg,Qt::white,300-v,v),3));
+            p.drawPath(path);
+            
+            p.setPen(Colors::mid(bg, color(ColorFont, true),5,2));
+            p.drawPath(path);
         }
     }
 }

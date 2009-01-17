@@ -236,8 +236,8 @@ Style::drawScrollBar(const QStyleOptionComplex * option,
         }
     }
    
-    if (!isComboDropDownSlider && grooveIsSunken)
-        shadows.sunken[round_][isEnabled].render(groove, painter);
+//     if (!isComboDropDownSlider && grooveIsSunken)
+//         shadows.sunken[round_][isEnabled].render(groove, painter);
 
     isComboDropDownSlider = scrollAreaHovered_ = false;
     widgetStep = complexStep = 0;
@@ -295,6 +295,7 @@ Style::drawScrollBarButton(const QStyleOption * option, QPainter * painter,
 void
 Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
+    OPT_ENABLED;
     const bool horizontal = option->state & QStyle::State_Horizontal;
 
     if (isComboDropDownSlider)
@@ -318,10 +319,17 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
         painter->fillRect(RECT, FCOLOR(Window));
 
     const Groove::Mode gType = config.scroll.groove;
-    QColor bg = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 2 + gType*gType*gType, 1);
-    if (gType)
-        masks.rect[true].render(RECT, painter, Gradients::Sunken,
-                                horizontal ? Qt::Vertical : Qt::Horizontal, bg);
+    QColor bg = config.scroll.invertBg ?
+                Colors::mid(FCOLOR(WindowText), FCOLOR(Window), 2 + gType*gType*gType, 1):
+                Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 2 + gType*gType*gType, 1);
+    
+    if (gType == Groove::Groove)
+        masks.rect[true].render(RECT, painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
+    else if (gType)
+    {
+        masks.rect[true].render(RECT.adjusted(0,0,0,-F(2)), painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
+        shadows.sunken[round_][isEnabled].render(RECT, painter);
+    }
     else
     {
         SAVE_PEN;
