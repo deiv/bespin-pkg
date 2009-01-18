@@ -17,7 +17,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PLASMA_INCLUDE_DIR})
 set(xbar_SRCS menubar.cpp xbar.cpp taskbar.cpp)
 
 kde4_add_plugin(plasma_applet_xbar ${xbar_SRCS})
-target_link_libraries(plasma_applet_xbar kworkspace taskmanager ${KDE4_KDEUI_LIBS} ${PLASMA_LIBS} )
+if (KDE_VERSION_MINOR LESS 2)
+    target_link_libraries(plasma_applet_xbar kworkspace taskmanager ${KDE4_KDEUI_LIBS} ${PLASMA_LIBS} )
+else()
+    target_link_libraries(plasma_applet_xbar kworkspace taskmanager ${KDE4_KDEUI_LIBS} ${KDE4_PLASMA_LIBS} )
+endif()
 
 install(TARGETS plasma_applet_xbar DESTINATION ${PLUGIN_INSTALL_DIR})
 install(FILES plasma-applet-xbar.desktop DESTINATION ${SERVICES_INSTALL_DIR})
