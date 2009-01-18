@@ -194,6 +194,7 @@ protected:
     }
 };
 
+
 class CoverLabel : public QLabel {
 public:
     CoverLabel(QWidget *parent) : QLabel (parent)
@@ -215,6 +216,7 @@ public:
             QImage img(url);
             img = img.scaledToHeight(height()-6, Qt::SmoothTransformation);
             img = img.convertToFormat(QImage::Format_ARGB32);
+
             const uchar *bits = img.bits();
             QRgb *pixel = (QRgb*)(const_cast<uchar*>(bits));
             int n = img.width() * img.height();
@@ -225,7 +227,6 @@ public:
                 for (int i = 0; i < n; ++i) pixel[i] = qRgba(r,g,b, (200*qGray(pixel[i]))>>8);
             else
                 for (int i = 0; i < n; ++i) pixel[i] = qRgba(r,g,b, (200*(255-qGray(pixel[i])))>>8);
-#if 0
 
             QPainterPath pp;
             pp.moveTo(0,0);
@@ -234,25 +235,20 @@ public:
             pp.closeSubpath();
 
             QPainter p(&img);
-            p.setPen(Qt::NoPen); p.setBrush(QColor(255,255,255,55));
-            p.drawPath(pp);
-            
-            p.setBrush(Qt::NoBrush);
+            p.setPen(Qt::NoPen); p.setBrush(QColor(255,255,255,45));
             p.setRenderHint(QPainter::Antialiasing);
-            p.setPen(QPen(QColor(0,0,0,90), 3));
-            p.drawLine(img.rect().topLeft(), img.rect().topRight());
-            p.setPen(QPen(QColor(0,0,0,90), 2));
-            p.drawLine(img.rect().topLeft(), img.rect().bottomLeft());
-            QPoint one(1,0);
-            p.drawLine(img.rect().topRight() + one, img.rect().bottomRight() + one);
-            p.setRenderHint(QPainter::Antialiasing, false);
-            p.setPen(Colors::mid(palette().color(backgroundRole()), Qt::white,4,1));
-            p.drawLine(img.rect().bottomLeft(), img.rect().bottomRight());
-            p.end();
+            p.drawPath(pp);
+#if QT_VERSION >= 0x040400
+            pp = QPainterPath();
+            pp.addRect(img.rect());
+            pp.addRoundedRect(img.rect(),25,25,Qt::RelativeSize);
+            p.setCompositionMode(QPainter::CompositionMode_DestinationOut);
+            p.setBrush(Qt::black);
+            p.drawPath(pp);
 #endif
-            QPixmap pix = QPixmap::fromImage(img);
-//             setAutoFillBackground(!pix.hasAlpha());
-            setPixmap(pix);
+            p.end();
+
+            setPixmap(QPixmap::fromImage(img));
             show();
         }
         updatePreview();
@@ -502,20 +498,6 @@ hackMoveWindow(QWidget* w, QEvent *e)
 }
 
 inline static bool
-paintKrunner(QWidget *w, QPaintEvent *)
-{
-    // TODO: use paintevent clipping
-    if (w->isWindow()) {
-        QPainter p(w);
-        QStyleOption opt;
-        opt.initFrom ( w );
-        w->style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, w);
-        return true;
-    }
-    return false;
-}
-
-inline static bool
 paintAmarok(QWidget *w, QPaintEvent *pe)
 {
     if (QFrame *frame = qobject_cast<QFrame*>(w)) {
@@ -757,17 +739,7 @@ Hacks::setAmarokMetaInfo(int)
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
-    if ((*appType == KRunner))
-    {
-        if (e->type() == QEvent::Paint)
-            return paintKrunner(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
-        if (e->type() == QEvent::Show)
-        {
-            static_cast<QWidget*>(o)->setWindowOpacity( 80.0 );
-            return false;
-        }
-    }
-    else if (*appType == Amarok)
+    if (*appType == Amarok)
     {
         if (e->type() == QEvent::Paint)
             return paintAmarok(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
@@ -824,8 +796,6 @@ Hacks::add(QWidget *w)
         appType = new HackAppType((HackAppType)Unknown);
         if (qApp->inherits("GreeterApp")) // KDM segfaults on QCoreApplication::arguments()...
             *appType = KDM;
-        if (config.krunner && QCoreApplication::applicationName() == "krunner")
-            *appType = KRunner;
         else if (QCoreApplication::applicationName() == "dragonplayer")
             *appType = Dragon;
         else if (!QCoreApplication::arguments().isEmpty() &&
@@ -835,21 +805,7 @@ Hacks::add(QWidget *w)
             *appType = Amarok;
     }
 
-    if (*appType == KRunner)
-    {
-        if (QPushButton *btn = qobject_cast<QPushButton*>(w))
-            btn->setFlat ( true );
-        else if (w->isWindow())
-        {
-            ENSURE_INSTANCE;
-            w->setAttribute(Qt::WA_MacBrushedMetal);
-//             w->setAttribute(Qt::WA_NoSystemBackground);
-            w->installEventFilter(bespinHacks);
-        }
-        return true;
-    }
-
-    else if (*appType == Amarok)
+    if (*appType == Amarok)
     {
         if (!amarok) amarok = new AmarokData;
         if (QSplitter *splitter = qobject_cast<QSplitter*>(w))
