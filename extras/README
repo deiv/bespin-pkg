@@ -46,3 +46,14 @@ if you run amarok with a different color setup, you'll probably have to flush th
 order to update the button pixmaps :(
 
 ####################################################################################################
+
+macmenu:
+========
+a shellscript to toggle the macmenu (if you use the XBar plasmoid)
+usage is simple:
+macmenu on
+macmenu off
+will turn the cursor into a cross. just click the mainwindow you wish to turn support for on or off.
+you may guess when to call on or off ;-)
+
+

@@ -160,8 +160,6 @@ Style::drawScrollBar(const QStyleOptionComplex * option,
 
     //BEGIN real scrollbar painting                                                                -
    
-    OPT_ENABLED
-
     // Make a copy here and reset it for each primitive.
     QStyleOptionSlider optCopy = *scrollbar;
     State saveFlags = optCopy.state;
@@ -186,8 +184,7 @@ Style::drawScrollBar(const QStyleOptionComplex * option,
     if (needsPaint)
     {   // NOTICE the scrollbar bg is cached for sliding scrollers to gain speed
         // the cache also includes the groove
-        if (config.scroll.groove != Groove::Sunken)
-            { PAINT_ELEMENT(Groove); } // leave brackts, MACRO!
+        PAINT_ELEMENT(Groove);
         groove = optCopy.rect;
     }
     else
@@ -323,14 +320,7 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
                 Colors::mid(FCOLOR(WindowText), FCOLOR(Window), 2 + gType*gType*gType, 1):
                 Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 2 + gType*gType*gType, 1);
     
-    if (gType == Groove::Groove)
-        masks.rect[true].render(RECT, painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
-    else if (gType)
-    {
-        masks.rect[true].render(RECT.adjusted(0,0,0,-F(2)), painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
-        shadows.sunken[round_][isEnabled].render(RECT, painter);
-    }
-    else
+    if (gType == Groove::Line)
     {
         SAVE_PEN;
         painter->setPen(QPen(bg, F(1)));
@@ -341,12 +331,19 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
             painter->drawLine(c.x(), RECT.top(), c.x(), RECT.bottom());
         RESTORE_PEN;
     }
+    else if (gType == Groove::Groove)
+        masks.rect[true].render(RECT, painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
+    else
+    {
+        if (gType == Groove::SunkenGroove)
+            masks.rect[true].render(RECT.adjusted(0,0,0,-F(2)), painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
+        shadows.sunken[round_][isEnabled].render(RECT, painter);
+    }
     return;
 }
 
 void
-Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
-                                 const QWidget * widget) const
+Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
     const bool horizontal = option->state & QStyle::State_Horizontal;
@@ -414,7 +411,7 @@ Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
 #undef SCROLL_COLOR
    
     QRect r = RECT;
-    const int f1 = dpi.f1, f2 = dpi.f2;
+    const int f1 = F(1), f2 = F(2);
     const bool grooveIsSunken = config.scroll.groove >= Groove::Sunken;
 
     /// draw shadow
@@ -479,13 +476,9 @@ Style::drawScrollBarSlider(const QStyleOption * option, QPainter * painter,
 
     int dw, dh;
     if (horizontal)
-    {
-        dw = r.width()/8; dh = r.height()/4;
-    }
+        { dw = r.width()/8; dh = r.height()/4; }
     else
-    {
-        dw = r.width()/4; dh = r.height()/8;
-    }
+        { dw = r.width()/4; dh = r.height()/8; }
     r.adjust(dw, dh, -dw, -dh);
     masks.rect[false].render(r, painter, GRAD(scroll), o, c, size, QPoint(dw,dh));
 }
