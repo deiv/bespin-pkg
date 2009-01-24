@@ -425,17 +425,20 @@ Style::polish( QWidget * widget )
                 frame->setForegroundRole(QPalette::WindowText);
             }
         }
+        else if (frame->frameShape() != QFrame::NoFrame )
+        {
+            // Kill ugly line look (we paint our styled v and h lines instead ;)
+            if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
+                widget->installEventFilter(this);
 
-        // Kill ugly winblows frames... (qShadeBlablabla stuff)
-        else if (   frame->frameShape() == QFrame::Box ||
-                    frame->frameShape() == QFrame::Panel ||
-                    frame->frameShape() == QFrame::WinPanel)
-            frame->setFrameShape(QFrame::StyledPanel);
-
-        // Kill ugly line look (we paint our styled v and h lines instead ;)
-        else if (   frame->frameShape() == QFrame::HLine ||
-                    frame->frameShape() == QFrame::VLine)
-            widget->installEventFilter(this);
+            // Kill ugly winblows frames... (qShadeBlablabla stuff)
+            else if (frame->frameShape() != QFrame::StyledPanel)
+            {
+                frame->setFrameShape(QFrame::StyledPanel);
+                if ( frame->frameShape() == QFrame::Box )
+                    frame->setFrameShadow( QFrame::Plain );
+            }
+        }
 
         // scrollarea hovering
         if (qobject_cast<QAbstractScrollArea*>(frame)

@@ -136,9 +136,9 @@ public:
 protected:
     virtual void init(const QSettings *settings = 0L);
 
-    QColor btnBg(   const QPalette &pal, bool isEnabled, int hasFocus = false, int step = 0,
-                    bool fullHover = true, bool reflective = false) const;
-    QColor btnFg(const QPalette &pal, bool isEnabled, int hasFocus = false, int step = 0, bool flat = false) const;
+    QColor btnBg( const QPalette &pal, bool isEnabled, bool hasFocus = false, int step = 0,
+                  bool fullHover = true, bool reflective = false) const;
+    QColor btnFg(const QPalette &pal, bool isEnabled, bool hasFocus = false, int step = 0, bool flat = false) const;
 
     // element painting routines ===============
     void skip(const QStyleOption*, QPainter*, const QWidget*) const {}

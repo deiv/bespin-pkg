@@ -86,10 +86,13 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
             r.setTop(r.bottom()); r.setBottom(RECT.bottom()-F(2));
             Tile::setShape(Tile::Full & ~Tile::Top);
             QColor bg = FCOLOR(Base);
-            int v = Colors::value(bg);
-            if (v < 60)
-                { int h,s,a; bg.getHsv(&h, &s, &v, &a); bg.setHsv(h,s,60,a); }
-            mask.render(r, painter, bg.light(110));
+            int h,s,v,a;
+            bg.getHsv(&h, &s, &v, &a);
+            if (v < 60) v = 60;
+            v = (v * ( 100 + (250-v)/16 ) )/100;
+            v = CLAMP(v,0,255);
+            bg.setHsv(h,s,v,a);
+            mask.render(r, painter, bg);
             Tile::reset();
         }
     }
@@ -252,7 +255,7 @@ Style::drawComboBox(const QStyleOptionComplex * option,
                     else if (config.btn.backLightHover)
                     {   // we MUST use alpha blending as this crosses between combo and bg
                         QColor c2 = CCOLOR(btn.active, Bg);
-                        c2.setAlpha(c2.alpha()*animStep/6);
+                        c2.setAlpha(c2.alpha()*animStep/8);
                         mask.outline(RECT, painter, c2, F(3));
                     }
                 }

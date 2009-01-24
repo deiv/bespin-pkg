@@ -276,8 +276,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
     if (!(animStep || sunken))
         return;
        
-    const int f2 = F(2);
-    int size = RECT.height()+F(3);
+    int size = RECT.height() + F(3);
     Qt::Orientation o = Qt::Vertical;
     const bool vertical = verticalTabs(tab->shape);
     if (vertical)
@@ -293,10 +292,10 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
     if (sunken)
     {
         c = CCOLOR(tab.active, Bg);
-        if (config.tab.activeTabSunken)
-            vertical ?  rect.adjust(0, F(1), 0, -f2) : rect.adjust(f2, -F(1), -f2, 0);
+        if (config.tab.activeTabSunken && Colors::value(CCOLOR(tab.std, Bg)) < 164)
+            vertical ?  rect.adjust(0, F(1), 0, -F(2)) : rect.adjust(F(2), -F(1), -F(2), 0);
         else
-            vertical ? rect.adjust(-F(1), f2, F(1), -f2) : rect.adjust(f2, -F(1), -f2, F(1));
+            vertical ? rect.adjust(-F(1), F(2), F(1), -F(2)) : rect.adjust(F(2), -F(1), -F(2), F(1));
     }
     else
         c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 8-animStep, animStep);
@@ -309,7 +308,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
     masks.rect[true].render(rect, painter, gt, o, c, size, rect.topLeft());
     if (config.tab.activeTabSunken && sunken)
     {
-        rect.setBottom(rect.bottom()+f2);
+        rect.setBottom(rect.bottom() + F(2));
         shadows.sunken[true][true].render(rect, painter);
     }
 }
@@ -440,7 +439,7 @@ Style::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const 
         case QStyleOptionToolBoxV2::End:
             pf &= ~Tile::Top; // fallthrough
         default: // single
-            r.setBottom(r.bottom()-dpi.f2);
+            r.setBottom(r.bottom()-F(2));
         }
 
         // means we touch the displayed box bottom

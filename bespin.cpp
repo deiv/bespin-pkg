@@ -271,7 +271,7 @@ Style::~Style()
 #define PAL pal
 
 QColor
-Style::btnBg( const QPalette &pal, bool isEnabled, int hasFocus, int step, bool fullHover,
+Style::btnBg( const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool fullHover,
                     bool reflective) const
 {
 
@@ -279,7 +279,7 @@ Style::btnBg( const QPalette &pal, bool isEnabled, int hasFocus, int step, bool 
         return Colors::mid(Qt::black, FCOLOR(Window),5,100);
 
     QColor c = CCOLOR(btn.std, Bg);
-    if (hasFocus)
+    if (hasFocus && config.btn.active_role[Bg] != QPalette::Highlight)
         if (config.btn.layer)
             c = FCOLOR(Highlight);
         else
@@ -292,12 +292,14 @@ Style::btnBg( const QPalette &pal, bool isEnabled, int hasFocus, int step, bool 
 }
 
 QColor
-Style::btnFg(const QPalette &pal, bool isEnabled, int hasFocus, int step, bool flat) const
+Style::btnFg(const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool flat) const
 {
     if (!isEnabled)
         return FCOLOR(WindowText); //Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
 
-    QColor  fg1 = (config.btn.layer && hasFocus) ? FCOLOR(HighlightedText) : CCOLOR(btn.std, Fg),
+    if (!config.btn.layer || config.btn.active_role[Bg] == QPalette::Highlight)
+        hasFocus = false;
+    QColor  fg1 = hasFocus ? FCOLOR(HighlightedText) : CCOLOR(btn.std, Fg),
             fg2 = CCOLOR(btn.active, Fg);
     if (flat)
         { fg1 = FCOLOR(WindowText); fg2 = FCOLOR(Highlight); }

@@ -89,11 +89,11 @@ Style::drawPushButtonBevel(const QStyleOption * option, QPainter * painter, cons
     drawButtonFrame(option, painter, widget);
     if (btn->features & QStyleOptionButton::HasMenu)
     {
-        int sz = (RECT.height()-dpi.f6)/2;
+        int sz = (RECT.height()-F(6))/2;
         QRect rect = RECT;
-        rect.setLeft(RECT.right() - (dpi.f10+sz));
+        rect.setLeft(RECT.right() - (F(10)+sz));
         shadows.line[1][Plain].render(rect, painter);
-        rect.setLeft(rect.left() + dpi.f4);
+        rect.setLeft(rect.left() + F(4));
         rect.setWidth(sz);
         painter->save();
         const QColor c = Colors::mid(Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg)),
@@ -112,7 +112,7 @@ Style::drawPushButtonBevel(const QStyleOption * option, QPainter * painter, cons
         QRect r = RECT;
         const int h = r.height()/3;
         r.setTop(r.top() + h);
-        r.setLeft(r.x() + dpi.f10);
+        r.setLeft(r.x() + F(10));
         r.setWidth(h); r.setHeight(h);
 
         painter->save();
@@ -144,6 +144,9 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         { hover = false; animStep = 0; }
     else if (animStep < 0)
         animStep = HOVER_STEP;
+
+        // "Flash effect - is debatable"
+//     if (sunken) animStep = hover = sunken = 0;
         
 //    const bool toggled = !hover && (option->state & State_On);
     const bool round = !isCheckbox && (config.btn.round || (btn && btn->isCheckable()));
@@ -199,18 +202,23 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
                 iOff[0] = iOff[2] = F(3);
                 iOff[1] = iOff[3] = sunken ? F(3) : F(2);
             }
-            if (animStep && !hasFocus && config.btn.backLightHover)
-            {   // we MUST use alpha blending as this crosses between button and bg
-                QColor c2 = CCOLOR(btn.active, Bg); c2.setAlpha(c2.alpha()*animStep/10);
-                masks.rect[round].outline(RECT, painter, c2, F(3));
+
+            // we MUST use alpha blending as this crosses between button and bg
+            QColor c2 = Qt::transparent;
+            if (hasFocus)
+            {
+                if (config.btn.active_role[Bg] == QPalette::Highlight)
+                    { c2 = FCOLOR(Highlight); c2.setAlpha(212); }
             }
-//             if (hasFocus) {
-//                 QColor fc = fullHover ? iC : CCOLOR(btn.std, Bg);
-//                 const int contrast = Colors::contrast(fc, FCOLOR(Highlight));
-//                 r = RECT;
-//                 if (sunken) r.setBottom(r.bottom()-f1);
-//                 masks.rect[round].outline(r, painter, Colors::mid(fc, FCOLOR(Highlight), contrast/10, 1), dpi.f3);
-//             }
+            else if (animStep && config.btn.backLightHover)
+                { c2 = CCOLOR(btn.active, Bg); c2.setAlpha(c2.alpha()*animStep/8); }
+
+            if (c2 != Qt::transparent)
+            {
+                QRect r = RECT; if (config.btn.layer == 1) r.setBottom(r.bottom()-F(1));
+                masks.rect[round].outline(r, painter, c2, F(3));
+            }
+            // ---- alpha notice ----------
         }
         if (sunken)
             shadows.sunken[round][isEnabled].render(RECT, painter);
@@ -228,7 +236,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         if (hasFocus)
         {   // focus?
             if (!config.btn.cushion && sunken)
-                r.setBottom(r.bottom()-dpi.f1);
+                r.setBottom(r.bottom() - F(1));
             const int contrast = Colors::contrast(FCOLOR(Window), FCOLOR(Highlight));
             QColor fc = (config.btn.backLightHover && animStep) ? iC : FCOLOR(Window);
             fc = Colors::mid(fc, FCOLOR(Highlight), contrast/20, 1);
@@ -248,7 +256,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         {
             r.adjust(0, f1, 0, 0);
             shadows.raised[round][isEnabled][false].render(r, painter);
-            r.adjust(f2, f1, -f2, -dpi.f3);
+            r.adjust(f2, f1, -f2, -F(3));
         }
 
         // plate
@@ -315,9 +323,9 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
         painter->drawPixmap(visualPos(btn->direction, btn->rect, point), pixmap);
 
         if (btn->direction == Qt::LeftToRight)
-            ir.setLeft(ir.left() + pixw + dpi.f4);
+            ir.setLeft(ir.left() + pixw + F(4));
         else
-            ir.setWidth(ir.width() - (pixw + dpi.f4));
+            ir.setWidth(ir.width() - (pixw + F(4)));
     }
 
     if (btn->text.isEmpty())
@@ -568,9 +576,9 @@ Style::drawCheckLabel(const QStyleOption * option, QPainter * painter,
                           isEnabled ? QIcon::Normal : QIcon::Disabled);
       drawItemPixmap(painter, btn->rect, alignment, pix);
       if (btn->direction == Qt::RightToLeft)
-         textRect.setRight(textRect.right() - btn->iconSize.width() - dpi.f4);
+         textRect.setRight(textRect.right() - btn->iconSize.width() - F(4));
       else
-         textRect.setLeft(textRect.left() + btn->iconSize.width() + dpi.f4);
+         textRect.setLeft(textRect.left() + btn->iconSize.width() + F(4));
    }
    if (!btn->text.isEmpty())
       drawItemText(painter, textRect, alignment | BESPIN_MNEMONIC, PAL, isEnabled, btn->text, QPalette::WindowText);

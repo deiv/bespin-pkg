@@ -61,19 +61,19 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 
 using namespace Bespin;
 
-static const int DT = 4000;
-static const int FT = 500; // > 50!!!!
+static const int DT = 4000; // display duration
+static const int FT = 500; // fade duration > 50!!!!
 
 class ProxyDial : public QDial
 {
-    public:
-        ProxyDial(QAbstractSlider *slider, QWidget *parent = 0) : QDial(parent)
-        {
-            setRange(slider->minimum(), slider->maximum()/*0, 100*/);
-            setValue(slider->value());
-            connect (slider, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
-            connect (this, SIGNAL(valueChanged(int)), slider, SIGNAL(sliderMoved(int)));
-        }
+public:
+    ProxyDial(QAbstractSlider *slider, QWidget *parent = 0) : QDial(parent)
+    {
+        setRange(slider->minimum(), slider->maximum()/*0, 100*/);
+        setValue(slider->value());
+        connect (slider, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
+        connect (this, SIGNAL(valueChanged(int)), slider, SIGNAL(sliderMoved(int)));
+    }
 };
 
 class PrettyLabel : public QWidget
@@ -926,6 +926,8 @@ Hacks::add(QWidget *w)
                     c.setHsv(h,s,60);
                 pal.setColor(frame->foregroundRole(), pal.color(QPalette::Active, frame->backgroundRole()));
                 pal.setColor(frame->backgroundRole(), c);
+//                 pal.setColor(QPalette::Button, c);
+//                 pal.setColor(QPalette::ButtonText, pal.color(QPalette::Active, frame->foregroundRole()));
                 frame->setPalette(pal);
                 frame->installEventFilter(bespinHacks);
             }

@@ -175,14 +175,18 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
     dd->setHsv(h,cs,cv,a);
 }
 
+static const float p[2][3] = { {.25, .5, .8}, {.35, .42, 1.} };
+
 static inline QLinearGradient
 gl_ssGradient(const QColor &c, const QPoint &start, const QPoint &stop, bool glass = false)
 {
     QColor bb,dd; // b = d = c;
     gl_ssColors(c, &bb, &dd, glass);
     QLinearGradient lg(start, stop);
-    lg.setColorAt(0,bb); lg.setColorAt(glass ? 0.4 : 0.25,c);
-    lg.setColorAt(0.5, dd); lg.setColorAt(glass ? 1 : .80, bb);
+    lg.setColorAt(0, bb);
+    lg.setColorAt(p[glass][0], c);
+    lg.setColorAt(p[glass][1], dd);
+    lg.setColorAt(p[glass][2], bb);
 //     if (!glass)
 //         lg.setColorAt(1, Qt::white);
     return lg;
