@@ -16,12 +16,11 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <QComboBox>
 #include <QtDebug>
 #include <QEvent>
 #include <QFrame>
 #include <QMenuBar>
-#include <QStyleOptionComboBox>
+// #include <QStyleOptionTab>
 // #include <QTabBar>
 // #include <QTabWidget>
 #include "colors.h"
@@ -51,15 +50,19 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
     case SH_ScrollBar_ScrollWhenPointerLeavesControl:
         return true; // UIs are no ego shooters...
     case SH_TabBar_Alignment:
+//         if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
+//         if (tab->shape == QTabBar::RoundedSouth || tab->shape == QTabBar::TriangularSouth)
+//             return Qt::AlignRight;
 //         if (const QTabWidget *tab = qobject_cast<const QTabWidget*>(widget))
-//         if (tab->count() == 1)
+//         if (tab->tabPosition() == QTabWidget::South )
+//             return Qt::AlignRight;
 //             return Qt::AlignCenter;
 //         if (const QTabBar *tab = qobject_cast<const QTabBar*>(widget))
+//         if (tab->shape() == QTabBar::RoundedSouth || tab->shape() == QTabBar::TriangularSouth)
+//             return Qt::AlignRight;
 //         if (tab->count() == 1)
 //             return Qt::AlignCenter;
         return Qt::AlignLeft;
-//       return Qt::AlignRight;
-//       return Qt::AlignCenter;
     case SH_Header_ArrowAlignment:
         return Qt::AlignLeft; // we move it to text center though...
     case SH_Slider_SnapToValue:

@@ -185,7 +185,6 @@ MenuBar::initStyleOption(QStyleOptionMenuItem *option, int idx) const
         return;
 
     option->palette = palette();
-    option->fontMetrics = QFontMetrics(font());
     option->menuRect = rect().toRect();
     int idxdata = (d.openPopup < 0) ? ((d.hoverIndex+1) << 16) : 0;
     idxdata |= ((idx+1) & 0xffff);
@@ -207,10 +206,12 @@ MenuBar::initStyleOption(QStyleOptionMenuItem *option, int idx) const
     else
     {
         option->text = d.appTitle;
+        int lightX = QFontMetrics(option->font).xHeight();
         option->font.setWeight(QFont::Black);
 //         option->font.setCapitalization ( QFont::AllUppercase );
-        option->font.setPointSize(option->font.pointSize()*1.2);
+        option->font.setPointSize((option->font.pointSize()*lightX)/QFontMetrics(option->font).xHeight());
     }
+    option->fontMetrics = QFontMetrics(option->font);
 
     if (isEnabled() && action->isEnabled())
         option->state |= QStyle::State_Enabled;

@@ -104,5 +104,7 @@
 #define VIEW_SORTINGHEADERROLE "View.SortingHeaderRole", QPalette::Text
 #define VIEW_HEADERGRADIENT "View.HeaderGradient", Gradients::Button
 #define VIEW_SORTINGHEADERGRADIENT "View.SortingHeaderGradient", Gradients::Sunken
+#define VIEW_SHADE_ROLE "View.ShadeRole", QPalette::Text
+#define VIEW_SHADE_LEVEL "View.ShadeLevel", 3
 
 #endif // BESPIN_CONFIG_DEFAULTS

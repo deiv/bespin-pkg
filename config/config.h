@@ -49,7 +49,7 @@ private:
     Ui::Config ui;
 
     /** Just some functions to fill the comboboxes, not really of interest */
-    void generateColorModes(QComboBox *box);
+    void generateColorModes(QComboBox *box, QList<int> *roles = 0);
     void generateGradientTypes(QComboBox *box);
 
     QPalette *loadedPal;

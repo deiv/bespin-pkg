@@ -295,6 +295,8 @@ Style::readSettings(const QSettings* settings)
     readRole(view.sortingHeader, VIEW_SORTINGHEADERROLE);
     config.view.headerGradient = readGrad(VIEW_HEADERGRADIENT);
     config.view.sortingHeaderGradient = readGrad(VIEW_SORTINGHEADERGRADIENT);
+    config.view.shadeLevel = readInt(VIEW_SHADE_LEVEL);
+    config.view.shadeRole = (QPalette::ColorRole) iSettings->value(VIEW_SHADE_ROLE).toInt();
 
     // General ===========================
     config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;

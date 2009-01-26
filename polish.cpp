@@ -122,7 +122,7 @@ void Style::polish( QPalette &pal, bool onInit )
 
     // AlternateBase
     pal.setColor(QPalette::AlternateBase, mid(pal.color(QPalette::Active, QPalette::Base),
-                                              pal.color(QPalette::Active, QPalette::Text),15,1));
+                                              pal.color(QPalette::Active, config.view.shadeRole),100,config.view.shadeLevel));
     // highlight colors
     const int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
     const QColor grey(highlightGray,highlightGray,highlightGray);

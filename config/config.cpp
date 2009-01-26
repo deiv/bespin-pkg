@@ -217,6 +217,9 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateColorModes(ui.btnActiveRole);
     generateColorModes(ui.headerRole);
     generateColorModes(ui.headerSortingRole);
+    QList<int> roles; roles << 3 << 4 << 6;
+    generateColorModes(ui.viewShadingRole, &roles);
+    
     generateColorModes(ui.crMenu);
     generateColorModes(ui.kwinInactiveRole);
     generateColorModes(ui.kwinActiveRole);
@@ -348,10 +351,12 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.tabTransition, TAB_TRANSITION);
     handleSettings(ui.activeTabSunken, "Tab.ActiveTabSunken", false);
 
-    handleSettings(ui.headerRole, "View.HeaderRole", QPalette::Text);
-    handleSettings(ui.headerSortingRole, "View.SortingHeaderRole", QPalette::Text);
-    handleSettings(ui.headerGradient, "View.HeaderGradient", GradButton);
-    handleSettings(ui.headerSortingGradient, "View.SortingHeaderGradient", GradSunken);
+    handleSettings(ui.headerRole, VIEW_HEADERROLE);
+    handleSettings(ui.headerSortingRole, VIEW_SORTINGHEADERROLE);
+    handleSettings(ui.headerGradient, VIEW_HEADERGRADIENT);
+    handleSettings(ui.headerSortingGradient, VIEW_SORTINGHEADERGRADIENT);
+    handleSettings(ui.viewShadingRole, VIEW_SHADE_ROLE);
+    handleSettings(ui.viewShadeLevel, VIEW_SHADE_LEVEL);
 
     handleSettings(ui.kwinActiveGrad, KWIN_ACTIVE_GRADIENT);
     handleSettings(ui.kwinInactiveGrad, KWIN_INACTIVE_GRADIENT);
@@ -1200,13 +1205,22 @@ ensureIcons()
 
 /** The combobox filler you've read of several times before ;) */
 void
-Config::generateColorModes(QComboBox *box)
+Config::generateColorModes(QComboBox *box, QList<int> *wantedRoles)
 {
     ensureIcons();
     box->clear();
     box->setIconSize ( QSize(16,16) );
-    for (int i = 0; i < 8; ++i)
-        box->addItem(icons[i], roleStrings[i], roles[i]);
+    if (wantedRoles)
+    {
+        foreach (int i, *wantedRoles)
+            if (i < 8)
+                box->addItem(icons[i], roleStrings[i], roles[i]);
+    }
+    else
+    {
+        for (int i = 0; i < 8; ++i)
+            box->addItem(icons[i], roleStrings[i], roles[i]);
+    }
 }
 
 void
