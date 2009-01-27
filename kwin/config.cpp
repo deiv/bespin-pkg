@@ -121,6 +121,10 @@ Config::Config(QWidget* parent) : BConfig(parent)
     setContextHelp(ui.slickButtons, "The appereance of unhovered buttons. Morphs to icon on hover<br>\
     Dots and bricks look slick, but may be considered less usable, as unhovered buttons look all the same");
 
+    handleSettings(ui.titlePadding, "TitlePadding", 0);
+    setContextHelp(ui.inactGrad2, "<b>Titlebar padding</b><hr>\
+    How much additional space you want above and below the title text");
+
     /** if you call setContextHelp(.) with a combobox and pass a stringlist,
     the strings are attached to the combo entries and shown on select/hover */
 

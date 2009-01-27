@@ -257,7 +257,7 @@ bool Factory::readConfig()
     titleSize_[1] = fm.height() + 2;
     if (oldtitlesize != titleSize_[1]) ret = true;
     oldtitlesize = titleSize_[0];
-    titleSize_[0] = qMax(titleSize_[1] + 2, borderSize_);
+    titleSize_[0] = qMax(fm.height() + 4 + settings.value("TitlePadding", 0).toInt(), borderSize_);
     if (oldtitlesize != titleSize_[0]) ret = true;
 
     if (buttonSize_ != titleSize_[1])

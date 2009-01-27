@@ -562,6 +562,7 @@ Client::repaint(QPainter &p)
     }
 
     // title ==============
+    const QColor titleColor = color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive());
     if (isActive())
     {
         // emboss?!
@@ -578,12 +579,11 @@ Client::repaint(QPainter &p)
             gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1))
         {   // inactive window looks like active one...
             int y = label.center().y();
-            QColor c = d > 0 ? dark : light;
-            p.drawPixmap(tr.x() - 38, y, Gradients::borderline(c, Gradients::Left));
-            p.drawPixmap(tr.right() + 6, y, Gradients::borderline(c, Gradients::Right));
+            p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
+            p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
         }
     }
-    p.setPen(color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive()));
+    p.setPen(titleColor);
     p.drawText ( label, Qt::AlignCenter | Qt::TextSingleLine, _caption );
 
     // bar =========================
