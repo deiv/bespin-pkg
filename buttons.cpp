@@ -158,7 +158,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
 
     Gradients::Type gt = GRAD(btn);
 
-    QColor c = btnBg(PAL, isEnabled, hasFocus, animStep, fullHover, Gradients::isReflective(gt));
+    QColor c = btnBg(PAL, isEnabled, hasFocus, animStep, fullHover, Gradients::isTranslucent(gt));
     QColor iC = CCOLOR(btn.std, Bg);
 
     bool drawInner = false;
@@ -263,9 +263,8 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         masks.rect[round].render(r, painter, GRAD(btn), Qt::Vertical, c);
 
         // outline
-        int g = qGray(c.rgb());
-        if (g > 128 || Gradients::isReflective(GRAD(btn)))
-            masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter, Colors::mid(c, Qt::white, (isEnabled ? 6:9) * (255-g), 255), f1);
+        if (Gradients::isReflective(GRAD(btn)))
+            masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter, Colors::mid(c, Qt::white, (isEnabled ? 6:9) * (255-Colors::value(c)), 255), f1);
 
     }
     

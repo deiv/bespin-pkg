@@ -271,8 +271,7 @@ Style::~Style()
 #define PAL pal
 
 QColor
-Style::btnBg( const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool fullHover,
-                    bool reflective) const
+Style::btnBg( const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool fullHover, bool translucent) const
 {
 
     if (!isEnabled)
@@ -286,7 +285,7 @@ Style::btnBg( const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool
             c = Colors::mid(FCOLOR(Highlight), c, 1, 10 + Colors::contrast(FCOLOR(Highlight), c));
 
     if (fullHover && step)
-        c = Colors::mid(c, CCOLOR(btn.active, Bg), (config.btn.backLightHover ? (80-32*reflective) : 6) - step, step);
+        c = Colors::mid(c, CCOLOR(btn.active, Bg), (config.btn.backLightHover ? (translucent ? 48 : 72) : 6) - step, step);
 
     return c;
 }

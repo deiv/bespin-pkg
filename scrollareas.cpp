@@ -465,8 +465,8 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
 #if 1 // helps with black in black styles...
     if (!sunken && Gradients::isReflective(GRAD(btn)))
     {
-        const int g = qGray(bc.rgb());
-        masks.rect[round_].outline(r.adjusted(f1,0,-f1,0), painter, Colors::mid(c, Qt::white, 6*(255-g), 255), f1);
+        const int v = Colors::value(bc);
+        masks.rect[round_].outline(r.adjusted(f1,0,-f1,0), painter, Colors::mid(c, Qt::white, 6*(255-v), 255), f1);
     }
 #endif
 

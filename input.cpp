@@ -222,8 +222,8 @@ Style::drawComboBox(const QStyleOptionComplex * option,
                 if (listShown)
                     animStep = 6;
 
-                const bool reflective = Gradients::isReflective(GRAD(chooser));
-                c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover, reflective);
+                const bool translucent = Gradients::isTranslucent(GRAD(chooser));
+                c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover, translucent);
                 if (hasFocus)
                 {
                     if (config.btn.backLightHover)
@@ -231,7 +231,7 @@ Style::drawComboBox(const QStyleOptionComplex * option,
                     else
                     {
                         const int contrast =  (config.btn.fullHover && animStep) ?
-                        Colors::contrast(btnBg(PAL, isEnabled, hasFocus, 0, true, reflective), FCOLOR(Highlight)):
+                        Colors::contrast(btnBg(PAL, isEnabled, hasFocus, 0, true, translucent), FCOLOR(Highlight)):
                         Colors::contrast(c, FCOLOR(Highlight));
                         if (contrast > 10)
                         {

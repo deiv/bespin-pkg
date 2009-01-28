@@ -137,7 +137,7 @@ protected:
     virtual void init(const QSettings *settings = 0L);
 
     QColor btnBg( const QPalette &pal, bool isEnabled, bool hasFocus = false, int step = 0,
-                  bool fullHover = true, bool reflective = false) const;
+                  bool fullHover = true, bool translucent = false) const;
     QColor btnFg(const QPalette &pal, bool isEnabled, bool hasFocus = false, int step = 0, bool flat = false) const;
 
     // element painting routines ===============

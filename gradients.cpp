@@ -143,35 +143,35 @@ buttonGradient(const QColor &c, const QPoint &start, const QPoint &stop)
     lg.setColorAt(0.75, ic);
     return lg;
 }
-
+#include <QtDebug>
 inline static void
 gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
 {
-    int h,s,v,a, ch,cs,cv, delta, add;
-
+    int h,s,v,a;
     c.getHsv(&h,&s,&v,&a);
 
     // calculate the variation
-    add = (180-qGray(c.rgb()))/1;
+    int add = (180 - v ) / 1;
     if (add < 0)
         add = -add/2;
-    add /= (glass ? 16 : 512/qMax(Colors::value(c),1));
+    add /= glass ? 48 : 96;//(glass ? 48 : 512/qMax(v,1));
 
     // the brightest color (top)
-    cv = v+27+add;
+    int cv = v + 27 + add, ch = h, cs = s;
     if (cv > 255)
     {
-        delta = cv-255; cv = 255;
-        cs = s - delta; if (cs < 0) cs = 0;
-        ch = h - delta/2; if (ch < 0) ch = 360+ch;
+        int delta = cv - 255;
+        cv = 255;
+        cs = s - (glass?6:2)*delta;
+        if (cs < 0) cs = 0;
+        ch = h - 3*delta/2;
+        if (ch < 0) ch += 360;
     }
-    else
-        { ch = h; cs = s; }
     bb->setHsv(ch,cs,cv,a);
 
     // the darkest color (lower center)
     cv = v - 14 - add; if (cv < 0) cv = 0;
-    cs = s*(glass?13:10)/7; if (cs > 255) cs = 255;
+    cs = s*(glass ? 13 : 10)/7; if (cs > 255) cs = 255;
     dd->setHsv(h,cs,cv,a);
 }
 
@@ -349,12 +349,12 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         c.getHsv(&h,&s,&v,&a);
         iC.setHsv(h,s,minV,a);
     }
-    else if (v > 245 && type > Sunken) // glosses etc hate high value colors
+    else if (v > 240 && type > Sunken) // glosses etc hate high value colors
     {
         int h,s,a;
         c.getHsv(&h,&s,&v,&a);
-        s = 400*s/(400+v-245);
-        iC.setHsv(h,CLAMP(s,0,255),245,a);
+        s = 400*s/(400+v-240);
+        iC.setHsv(h,CLAMP(s,0,255),240,a);
     }
 
     // hash

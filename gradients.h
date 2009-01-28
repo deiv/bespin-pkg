@@ -67,7 +67,11 @@ brush(const QColor &c, int size, Qt::Orientation o, Type type  = Simple) {
 }
 
 inline const bool isReflective(Type type = Simple) {
-   return type > Button;
+   return type == Button || type == Metal;
+}
+
+inline const bool isTranslucent(Type type = Simple) {
+   return type > Sunken && type != Metal;
 }
 
 #ifndef BESPIN_DECO
