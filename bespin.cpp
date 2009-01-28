@@ -895,50 +895,60 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (widget->isModal())
             swapPalette(widget, this);
         return false;
-        
+#if 1
     case QEvent::PaletteChange:
     {
-        #define LACK_CONTRAST(_ROLE_, _C1_, _C2_) Colors::contrast(pal.color(_ROLE_, _C1_), pal.color(_ROLE_, _C2_)) < 40
-        #define HARD_CONTRAST(_ROLE_, _C_) Colors::value(pal.color(_ROLE_, _C_)) < 128 ? Qt::white : Qt::black
+        #define CONTRAST(_C1_, _C2_) Colors::contrast(pal.color(group, _C1_), pal.color(group, _C2_))
+        #define LACK_CONTRAST(_C1_, _C2_) (pal.color(group, _C1_).alpha() > 64 && Colors::contrast(pal.color(group, _C1_), pal.color(group, _C2_)) < 20)
+        #define HARD_CONTRAST(_C_) pal.color(group, _C_).alpha() < 64 ? Qt::red : (Colors::value(pal.color(group, _C_)) < 128 ? Qt::white : Qt::black)
         QWidget * widget = qobject_cast<QWidget*>(object);
         if (!widget)
             return false;
-        // NOTICE: THIS SUCKS!
-        // atm the palettes seem to have enough contrast (they pretend black on white) but end up like white on white
-        // i hav no idea what's going on here, but the situation is the same with all styles (i assume khtml assumes
-        // window == base == button == white, wtext == text == btext == black)
-        // this might also be Qt extra smart not setting equal palettes and mispaint as the widget has no own palette
-        // I HAVE NO IDEA :-(
-        // so for now i force a hard contrast for all elements - may not be the most fancy, but at least a usable solution
+        // i think, i hope i got it....
+        // 1. khtml sets buttontext, windowtext and text to the fg color - what leads to trouble if e.g. button doesn't contrast window
+        // 2. combolists need a special kick (but their palette seems ok, though it isn't...)
+        // 3. css causes more trouble - esp. with semitransparent colors...
         if (widget->objectName() == "RenderFormElementWidget")
         {
-                QPalette pal = widget->palette();
-                for (int g = 0; g < 3; ++g)
+            QPalette pal = widget->palette();
+            bool paletteChanged = false;
+            for (int g = 0; g < 3; ++g)
+            {
+                QPalette::ColorGroup group = (QPalette::ColorGroup)g;
+                if (LACK_CONTRAST(QPalette::Window, QPalette::WindowText))
                 {
-                    QPalette::ColorGroup group = (QPalette::ColorGroup)g;
-                    pal.setColor(group, QPalette::WindowText, HARD_CONTRAST(group, QPalette::Window));
-                    pal.setColor(group, QPalette::ButtonText, HARD_CONTRAST(group, QPalette::Button));
-                    pal.setColor(group, QPalette::HighlightedText, HARD_CONTRAST(group, QPalette::Highlight));
-                    pal.setColor(group, QPalette::Text, HARD_CONTRAST(group, QPalette::Base));
-                    pal.setColor(group, widget->foregroundRole(), HARD_CONTRAST(group, widget->backgroundRole()));
+                    paletteChanged = true;
+                    pal.setColor(group, QPalette::WindowText, HARD_CONTRAST(QPalette::Window));
                 }
+                if (LACK_CONTRAST(QPalette::Button, QPalette::ButtonText))
+                {
+                    paletteChanged = true;
+                    pal.setColor(group, QPalette::ButtonText, HARD_CONTRAST(QPalette::Button));
+                }
+                if (LACK_CONTRAST(QPalette::Base, QPalette::Text))
+                {
+                    paletteChanged = true;
+                    pal.setColor(group, QPalette::Text, HARD_CONTRAST(QPalette::Base));
+                }
+            }
+            
+            if (paletteChanged)
+            {
                 widget->removeEventFilter(this);
                 widget->setPalette(pal);
                 widget->installEventFilter(this);
+
+                // TODO: this might cause trouble with palettes with translucent backgrounds...
                 if (QComboBox *box = qobject_cast<QComboBox*>(widget))
                 if (box->view())
-                {
-                    pal = box->view()->palette();
-                    for (int g = 0; g < 3; ++g)
-                    {
-                        QPalette::ColorGroup group = (QPalette::ColorGroup)g;
-                        pal.setColor(group, QPalette::Text, HARD_CONTRAST(group, QPalette::Base));
-                    }
                     box->view()->setPalette(pal);
-                }
+            }
+
+            return false;
         }
         return false;
     }
+#endif
     case QEvent::ApplicationPaletteChange:
     {
         if (object == qApp && originalPalette)

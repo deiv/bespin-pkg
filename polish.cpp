@@ -762,6 +762,7 @@ Style::polish( QWidget * widget )
         widget->installEventFilter(this);
     }
 #endif
+#if 1
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors
     /// are set or KHtml does wrong OR (mainly) by html "designers"
     if (IS_HTML_WIDGET)
@@ -770,6 +771,7 @@ Style::polish( QWidget * widget )
         QEvent ev(QEvent::PaletteChange);
         eventFilter(widget, &ev);
     }
+#endif
 }
 #undef PAL
 
