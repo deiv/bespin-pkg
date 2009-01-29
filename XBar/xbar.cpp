@@ -74,7 +74,7 @@ XBar::XBar(QObject *parent, const QVariantList &args) : Plasma::Applet(parent, a
     dummy = 0;
     if (instance)
     {
-//         QMessageBox::warning ( 0, "Multiple XBar requests", "XBar shall be unique dummy text");
+        QMessageBox::warning ( 0, "Multiple XBar requests", "XBar shall be unique dummy text");
         qWarning("XBar, Do NOT load XBar more than once!");
         deleteLater();
     }
@@ -106,7 +106,7 @@ XBar::init()
     }
     if (!view()->inherits("PanelView"))
     {
-//         QMessageBox::warning ( 0, "XBar requires a Panel", "XBar shall be on panels dummy text");
+        QMessageBox::warning ( 0, "XBar requires a Panel", "XBar shall be on panels dummy text");
         qWarning("XBar, Do NOT use XBar on Desktop widgets!");
         deleteLater();
         return;
@@ -120,12 +120,16 @@ XBar::init()
     setMaximumSize(INT_MAX, INT_MAX);
 //     setFlag(ItemClipsChildrenToShape); setFlag(ItemClipsToShape);
     
-    d.taskbar = new TaskBar(this, dummy);
-    d.currentBar = d.taskbar;
     // TODO: use plasmoid popup and make this dynamic -> update all menubars...
     QSettings settings("Bespin", "XBar");
     settings.beginGroup("XBar");
     d.extraTitle = settings.value("WindowList", false).toBool();
+
+    if (settings.value("ShowTaskbar", true).toBool())
+        d.taskbar = new TaskBar(this, dummy);
+    else
+        d.taskbar = new MenuBar("", 0, this, dummy);
+    d.currentBar = d.taskbar;
     
     updatePalette();
     

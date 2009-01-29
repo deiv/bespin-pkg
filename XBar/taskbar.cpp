@@ -111,23 +111,23 @@ TaskAction::update()
 TaskBar::TaskBar(QGraphicsItem *parent, const QWidget *dummy) : MenuBar( QString(), 0, parent, dummy),
 dirty(true), isSqueezed(false)
 {
-   QMenu *sm = new QMenu;
-   sm->addAction("Lock Screen", this, SLOT(lock()));
-   sm->addAction("Leave...", this, SLOT(logout()));
-   
-   QAction *act = addAction("KDE 4");
-   QFont fnt = act->font();
-   fnt.setWeight(QFont::Black);
-   fnt.setPointSize(fnt.pointSize()*1.2);
-   act->setFont(fnt);
-   act->setMenu(sm);
+    QMenu *sm = new QMenu;
+    sm->addAction("Lock Screen", this, SLOT(lock()));
+    sm->addAction("Leave...", this, SLOT(logout()));
 
-   connect (TaskManager::TaskManager::self(), SIGNAL(taskAdded(TaskPtr)),
-            this, SLOT(addTask(TaskPtr)));
-   connect (TaskManager::TaskManager::self(), SIGNAL(taskRemoved(TaskPtr)),
-            this, SLOT(removeTask(TaskPtr)));
+    QAction *act = addAction("KDE 4");
+    QFont fnt = act->font();
+    fnt.setWeight(QFont::Black);
+    fnt.setPointSize(fnt.pointSize()*1.2);
+    act->setFont(fnt);
+    act->setMenu(sm);
 
-    taskTasks = new QMenu();
+    connect (TaskManager::TaskManager::self(), SIGNAL(taskAdded(TaskPtr)),
+                this, SLOT(addTask(TaskPtr)));
+    connect (TaskManager::TaskManager::self(), SIGNAL(taskRemoved(TaskPtr)),
+                this, SLOT(removeTask(TaskPtr)));
+
+        taskTasks = new QMenu();
 }
 
 void

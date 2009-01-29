@@ -344,10 +344,14 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     if (!flat && isEnabled)
     {
-        painter->setPen(bg.dark(120));
-        ir.translate(0,-1);
+        int d = 1;
+        if (Colors::value(bg) > 120)
+            painter->setPen(bg.light(120));
+        else
+            { d = -1; painter->setPen(bg.dark(120)); }
+        ir.translate(0,d);
         drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
-        ir.translate(0,1);
+        ir.translate(0,-d);
     }
 
     painter->setPen(fg);

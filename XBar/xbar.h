@@ -58,9 +58,8 @@ private:
     struct {
         MenuMap menus;
         QMenu windowList;
-        TaskBar *taskbar;
-        MenuBar *currentBar;
-        bool extraTitle;
+        MenuBar *taskbar, *currentBar;
+        bool extraTitle, showTaskBar;
     } d;
     static QTimer bodyCleaner;
 private slots:
