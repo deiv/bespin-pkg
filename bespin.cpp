@@ -725,6 +725,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
         else if (QTabBar *tabBar = qobject_cast<QTabBar*>(object))
         {
+            if (tabBar->testAttribute(Qt::WA_NoSystemBackground))
+                return false; // shall be translucent
             if (tabBar->parentWidget() && qobject_cast<QTabWidget*>(tabBar->parentWidget()))
                 return false; // no extra tabbar here please... ;)
             QPainter p(tabBar);

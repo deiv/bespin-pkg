@@ -82,8 +82,13 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
     // cause of scrollbars - kinda optimization
     if (config.bg.mode == Plain)
         return;
+
     if (!(widget && widget->isWindow()))
         return; // can't do anything here
+
+//     if (widget->testAttribute(Qt::WA_NoSystemBackground))
+//         return; // those shall be translucent - but sould be catched by Qt
+        
     if (PAL.brush(widget->backgroundRole()).style() > 1)
         return; // we'd cover a gradient/pixmap/whatever
 
