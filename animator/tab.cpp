@@ -272,8 +272,11 @@ TabInfo::rewind()
     	currentWidget->setUpdatesEnabled(false);
     delete curtain; curtain = 0; // get rid of curtain, and RESHOW CONTENT!
     if (currentWidget)
+    {
         currentWidget->setUpdatesEnabled(true);
-    tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space
+        currentWidget->update();
+    }
+    tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space    
 }
 
 void

@@ -165,13 +165,15 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
         cs = s - (glass?6:2)*delta;
         if (cs < 0) cs = 0;
         ch = h - 3*delta/2;
-        if (ch < 0) ch += 360;
+        while (ch < 0) ch += 360;
     }
     bb->setHsv(ch,cs,cv,a);
 
     // the darkest color (lower center)
-    cv = v - 14 - add; if (cv < 0) cv = 0;
-    cs = s*(glass ? 13 : 10)/7; if (cs > 255) cs = 255;
+    cv = v - 14 - add;
+    if (cv < 0) cv = 0;
+    cs = s*(glass ? 13 : 10)/7;
+    if (cs > 255) cs = 255;
     dd->setHsv(h,cs,cv,a);
 }
 
@@ -221,10 +223,11 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
     int dv = 4*(v-70)/45; // v == 70 -> dv = 0, v = 255 -> dv = 12
 //    int th = h + 400;
     int dh = qAbs((h % 120)-60)/6;
-    dkC.setHsv(h+dh, s, v - dv, a);
-    h -=dh; if (h < 0) h = 400 + h;
+    dkC.setHsv(CLAMP(h+dh,0,360), s, v - dv, a);
+    h -= dh+5;
+    if (h < 0) h += 360;
     dv = 12 - dv; // NOTICE 12 from above...
-    ltC.setHsv(h-5,s, qMin(v + dv,255), a);
+    ltC.setHsv(h, s, qMin(v + dv,255), a);
    
 //    int dc = Colors::value(c)/5; // how much darken/lighten we will
 //    QColor dkC = c.dark(100+sqrt(2*dc));
