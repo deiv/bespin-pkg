@@ -20,6 +20,7 @@ This library is distributed in the hope that it will be useful,
 #include <QAction>
 #include <QBasicTimer>
 #include <QDBusInterface>
+#include <QGraphicsLinearLayout>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
@@ -38,7 +39,7 @@ This library is distributed in the hope that it will be useful,
 static QBasicTimer mousePoll;
 static QPointF lastMousePos;
 
-MenuBar::MenuBar( const QString &service, qlonglong key, QGraphicsItem *parent, const QWidget *dummy) :
+MenuBar::MenuBar( const QString &service, qlonglong key, QGraphicsWidget *parent, const QWidget *dummy) :
 QGraphicsWidget(parent)
 {
     setFocusPolicy(Qt::NoFocus);
@@ -48,9 +49,20 @@ QGraphicsWidget(parent)
     d.service = service;
     d.key = key;
     d.widget = dummy;
+    if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(parent->layout()))
+        lLayout->insertItem(0, this);
 //    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 //    setObjectName( "XBarMenubar" );
 }
+
+#if 0
+MenuBar::~MenuBar()
+{
+    if (QGraphicsWidget *parentWidget = qobject_cast<QGraphicsWidget*>(parent()))
+    if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(parentWidget->layout()))
+        lLayout->removeItem(this);
+}
+#endif
 
 QAction *
 MenuBar::action(int idx) const

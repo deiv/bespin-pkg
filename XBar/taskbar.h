@@ -52,16 +52,15 @@ class TaskBar : public MenuBar
 {
     Q_OBJECT
 public:
-    TaskBar(QGraphicsItem *parent = 0, const QWidget *dummy = 0);
+    TaskBar(QGraphicsWidget *parent = 0, const QWidget *dummy = 0);
     void show();
 protected:
     void rightMouseButtonEvent(int idx, QGraphicsSceneMouseEvent *ev);
 private:
     bool dirty, isSqueezed;
     QMenu *taskTasks;
-private:
-    void validateSize();
 private slots:
+    void validateSize();
     void lock();
     void logout();
     void addTask(TaskPtr);

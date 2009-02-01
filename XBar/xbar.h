@@ -29,6 +29,7 @@ class QGraphicsLinearLayout;
 
 class MenuBar;
 class TaskBar;
+class QGraphicsLinearLayout;
 
 class XBar : public Plasma::Applet
 {
@@ -48,6 +49,7 @@ public slots:
         void init();
 protected:
     void wheelEvent(QGraphicsSceneWheelEvent *ev);
+    virtual QSizeF sizeHint ( Qt::SizeHint which, const QSizeF & constraint = QSizeF() ) const;
 private:
     void hide(MenuBar *item);
     void show(MenuBar *item);

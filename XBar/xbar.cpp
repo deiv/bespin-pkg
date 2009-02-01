@@ -24,7 +24,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
-#include <QHBoxLayout>
 #include <QMessageBox>
 #include <QPaintEvent>
 #include <QPainter>
@@ -36,7 +35,10 @@
 
 #include <kwindowsystem.h>
 
+#include <Plasma/Containment>
 #include <Plasma/Theme>
+
+#include <limits.h>
 
 // #include "button.h"
 #include "menubar.h"
@@ -104,20 +106,25 @@ XBar::init()
         QTimer::singleShot(100, this, SLOT(init()));
         return;
     }
-    if (!view()->inherits("PanelView"))
-    {
-        QMessageBox::warning ( 0, "XBar requires a Panel", "XBar shall be on panels dummy text");
-        qWarning("XBar, Do NOT use XBar on Desktop widgets!");
-        deleteLater();
-        return;
-    }
+    if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(containment()->layout()))
+        lLayout->setStretchFactor(this, 1000);
+//     if (!view()->inherits("PanelView"))
+//     {
+//         QMessageBox::warning ( 0, "XBar requires a Panel", "XBar shall be on panels dummy text");
+//         qWarning("XBar, Do NOT use XBar on Desktop widgets!");
+//         deleteLater();
+//         return;
+//     }
     dummy = new DummyWidget();
     dummy->setGeometry(5000,5000,1,1);
     dummy->show();
-    Plasma::Applet::init();
+    
+//     Plasma::Applet::init();
+    //TODO : Qt's bug??
     setAspectRatioMode(Plasma::IgnoreAspectRatio);
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setMaximumSize(INT_MAX, INT_MAX);
+
 //     setFlag(ItemClipsChildrenToShape); setFlag(ItemClipsToShape);
     
     // TODO: use plasmoid popup and make this dynamic -> update all menubars...
@@ -381,6 +388,14 @@ XBar::setOpenPopup(int idx)
         d.currentBar->setOpenPopup(idx + d.extraTitle);
         d.currentBar->update();
     }
+}
+
+QSizeF
+XBar::sizeHint ( Qt::SizeHint which, const QSizeF & constraint ) const
+{
+    if (d.currentBar)
+        return d.currentBar->sizeHint(which, constraint);
+    return Plasma::Applet::sizeHint(which, constraint);
 }
 
 void

@@ -108,7 +108,7 @@ TaskAction::update()
     emit changed();
 }
 
-TaskBar::TaskBar(QGraphicsItem *parent, const QWidget *dummy) : MenuBar( QString(), 0, parent, dummy),
+TaskBar::TaskBar(QGraphicsWidget *parent, const QWidget *dummy) : MenuBar( QString(), 0, parent, dummy),
 dirty(true), isSqueezed(false)
 {
     QMenu *sm = new QMenu;
@@ -116,10 +116,6 @@ dirty(true), isSqueezed(false)
     sm->addAction("Leave...", this, SLOT(logout()));
 
     QAction *act = addAction("KDE 4");
-    QFont fnt = act->font();
-    fnt.setWeight(QFont::Black);
-    fnt.setPointSize(fnt.pointSize()*1.2);
-    act->setFont(fnt);
     act->setMenu(sm);
 
     connect (TaskManager::TaskManager::self(), SIGNAL(taskAdded(TaskPtr)),
@@ -127,7 +123,7 @@ dirty(true), isSqueezed(false)
     connect (TaskManager::TaskManager::self(), SIGNAL(taskRemoved(TaskPtr)),
                 this, SLOT(removeTask(TaskPtr)));
 
-        taskTasks = new QMenu();
+    taskTasks = new QMenu();
 }
 
 void
@@ -222,8 +218,8 @@ TaskBar::addTask(TaskPtr task)
         addAction(taskAction);
     }
     connect (taskAction, SIGNAL(triggered(bool)), task.data(), SLOT(activateRaiseOrIconify()));
-    connect (task.data(), SIGNAL(changed()), taskAction, SLOT(validateSize()));
-    connect (task.data(), SIGNAL(changed()), taskAction, SLOT(update()));
+    connect (task.data(), SIGNAL(changed(::TaskManager::TaskChanges)), this, SLOT(validateSize()));
+    connect (task.data(), SIGNAL(changed(::TaskManager::TaskChanges)), taskAction, SLOT(update()));
     validateSize();
     update();
 //    void activated();
