@@ -69,9 +69,9 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
     if (isEnabled)
     {
         const Tile::Set &mask = masks.rect[false];
+        r.setBottom(r.bottom() - F(2));
         if (hasFocus)
         {
-            r.setBottom(r.bottom() - F(2));
             mask.render(r, painter, FCOLOR(Base).light(112));
             r.setBottom(r.bottom() + F(1));
             QColor h = FCOLOR(Highlight); h.setAlpha(102);
@@ -80,7 +80,9 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
         }
         else
         {
-            r.setBottom(r.y() + r.height()/2);
+//             r.setBottom(r.y() + r.height()/2);
+            mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
+#if 0
             Tile::setShape(Tile::Full & ~Tile::Bottom);
             mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
             r.setTop(r.bottom()); r.setBottom(RECT.bottom()-F(2));
@@ -94,6 +96,7 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
             bg.setHsv(h,s,v,a);
             mask.render(r, painter, bg);
             Tile::reset();
+#endif
         }
     }
     if (appType == GTK)

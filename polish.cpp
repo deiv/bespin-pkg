@@ -661,6 +661,8 @@ Style::polish( QWidget * widget )
     else if (qobject_cast<QTabBar *>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
+        widget->setBackgroundRole(config.tab.std_role[0]);
+        widget->setForegroundRole(config.tab.std_role[1]);
         // the eventfilter overtakes the widget painting to allow tabs ABOVE the tabbar
         widget->installEventFilter(this);
     }

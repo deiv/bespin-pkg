@@ -274,7 +274,7 @@ TabInfo::rewind()
     if (currentWidget)
     {
         currentWidget->setUpdatesEnabled(true);
-        currentWidget->update();
+        currentWidget->repaint();
     }
     tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space    
 }
