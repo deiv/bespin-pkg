@@ -122,8 +122,9 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
     bool translucent = false;
     if (c.alpha() < 255)
     {
+//         c.setAlpha(0);
 //         translucent = true;
-        c.setAlpha(255); // for the moment = Qt::transparent;
+        c.setAlpha(255); // for the moment...
     }
 
     if (config.bg.mode == Scanlines)
@@ -201,8 +202,8 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
         painter->drawPixmap(rect.x(), y-32, set.lCorner, s1-s2, 0,0,0);
         s1 = set.btmTile.width();
         s2 = qMin(s1, (rect.width())/2);
-        painter->drawTiledPixmap( rect.right() - s2, y , s2, rect.height()-h, set.btmTile );
-        painter->drawPixmap(rect.right() - s2, y-32, set.rCorner);
+        painter->drawTiledPixmap( rect.right() + 1 - s2, y , s2, rect.height()-h, set.btmTile );
+        painter->drawPixmap(rect.right() + 1 - s2, y-32, set.rCorner);
         painter->drawTiledPixmap( rect.x(), y-(128+32), rect.width(), 128, set.cornerTile );
         break;
     }

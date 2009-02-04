@@ -147,6 +147,13 @@ buttonGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 inline static void
 gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
 {
+#if 0
+    // this is a very trivial approach using shading. the output is poor
+    const int sum = c.red() + c.green() + c.blue() + 1;
+    const int fc = sum/255 + 1, fs = 3*255/sum;
+    *bb = Colors::mid(Qt::white, c, fs, fc);
+    *dd = Colors::mid(c, Qt::black, fc, fs);
+#else
     int h,s,v,a;
     c.getHsv(&h,&s,&v,&a);
 
@@ -175,6 +182,7 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
     cs = s*(glass ? 13 : 10)/7;
     if (cs > 255) cs = 255;
     dd->setHsv(h,cs,cv,a);
+#endif
 }
 
 static const float p[2][3] = { {.25, .5, .8}, {.35, .42, 1.} };
@@ -722,7 +730,7 @@ Gradients::bgSet(const QColor &c)
         set->topTile = QPixmap(32, 256);
         set->lCorner = QPixmap(128, 128);
         QColor c1, c2, c3;
-        if (c == Qt::transparent)
+        if (!c.alpha())
         {
             set->topTile.fill(Qt::transparent);
             set->lCorner.fill(Qt::transparent);
@@ -805,15 +813,34 @@ Gradients::bgSet(const QColor &c)
     }
     case BevelH:
     {
+        QColor c1, c3;
         set->topTile = QPixmap(256, 32);
-        set->btmTile = QPixmap(256, 32);
-        set->lCorner = QPixmap(256, 32);
-        set->rCorner = QPixmap(256, 32);
         set->cornerTile = QPixmap(32, 128);
+        if (!c.alpha())
+        {
+            set->topTile.fill(Qt::transparent);
+            set->cornerTile.fill(Qt::transparent);
+
+            int a = qAbs(_bgIntensity - 100)*3; a = CLAMP(a,0,255);
+            int v = (_bgIntensity < 100)*255;
+            c1 = QColor(v,v,v, a);
+            v = (!v)*255;
+            c3 = QColor(v,v,v, a);
+        }
+        else
+        {
+            c1 = c.dark(_bgIntensity);
+            c3 = c.light(_bgIntensity);
+        }
+
+        // this can save some time on alpha enabled pixmaps
+        set->btmTile = set->topTile.copy();
+        set->lCorner = set->topTile.copy();
+        set->rCorner = set->topTile.copy();
+
 
         lg = QLinearGradient(QPoint(0,0), QPoint(256, 0));
         QGradientStops stops;
-        const QColor c1 = c.dark(_bgIntensity);
 
         // left
         p.begin(&set->topTile);
@@ -830,25 +857,22 @@ Gradients::bgSet(const QColor &c)
         // left corner right corner
         QPixmap *pix, *blend;
         QPixmap *mask = new QPixmap(256,32);
+        mask->fill(Qt::transparent);
+        QPixmap fill = mask->copy();
+        lg = QLinearGradient(0,0, 0,32);
+        lg.setColorAt(1, Qt::white);
+        lg.setColorAt(0, Qt::transparent);
+        p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
+
         for (int cnr = 0; cnr < 2; ++cnr)
         {
             if (cnr)
-            {
-                pix = &set->rCorner; blend = &set->btmTile;
-            }
+                { pix = &set->rCorner; blend = &set->btmTile; }
             else
-            {
-                pix = &set->lCorner; blend = &set->topTile;
-            }
+                { pix = &set->lCorner; blend = &set->topTile; }
             pix->fill(c);
-            lg = QLinearGradient(0,0, 0,32);
-            lg.setColorAt(1, Qt::white);
-            lg.setColorAt(0, Qt::transparent);
-            
-            mask->fill(Qt::transparent);
-            p.begin(mask); p.fillRect(mask->rect(), lg); p.end();
 
-            QPixmap fill(mask->size());
+            fill.fill(Qt::transparent);
             p.begin(&fill); p.drawTiledPixmap(fill.rect(), *blend); p.end();
 
             fill = FX::applyAlpha(fill, *mask);
@@ -860,7 +884,7 @@ Gradients::bgSet(const QColor &c)
         }
         delete mask;
         lg = QLinearGradient(QPoint(0,0), QPoint(0, 128));
-        lg.setColorAt(0, c.light(_bgIntensity)); lg.setColorAt(1, c);
+        lg.setColorAt(0, c3); lg.setColorAt(1, c);
         p.begin(&set->cornerTile);
         p.fillRect(set->cornerTile.rect(), lg);
         p.drawTiledPixmap(set->cornerTile.rect(), _dither);
