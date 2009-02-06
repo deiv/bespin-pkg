@@ -31,7 +31,7 @@ verticalTabs(QTabBar::Shape shape)
 }
 
 void
-Style::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidget * widget) const
+Style::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     if (appType == GTK)
     {
@@ -96,8 +96,7 @@ if (baseHeight < 0) \
 }
 
 void
-Style::drawTabBar(const QStyleOption *option, QPainter *painter,
-                        const QWidget * widget) const
+Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(tbb, TabBarBase);
 
@@ -119,7 +118,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter,
         win = widget->window();
     }
 
-    QRect rect = RECT.adjusted(0, 0, 0, -dpi.f2);
+    QRect rect = RECT.adjusted(0, 0, 0, -F(2));
     int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
 
     QRect winRect;
@@ -159,8 +158,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter,
 static int animStep = -1;
 
 void
-Style::drawTab(const QStyleOption *option, QPainter *painter,
-                     const QWidget * widget) const
+Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(tab, Tab);
 
@@ -254,8 +252,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter,
 }
 
 void
-Style::drawTabShape(const QStyleOption *option, QPainter *painter,
-                          const QWidget *) const
+Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     ASSURE_OPTION(tab, Tab);
     OPT_SUNKEN
@@ -314,7 +311,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter,
 }
 
 void
-Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget *) const
+Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(tab, Tab);
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
@@ -380,8 +377,7 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
     }
     else if (animStep)
     {
-        cF = cF = CCOLOR(tab.std, Fg);
-        cB = Colors::mid(CCOLOR(tab.std, Bg ), CCOLOR(tab.active, Bg), 8-animStep, animStep);
+        cB = Colors::mid(cB, CCOLOR(tab.active, Bg), 8-animStep, animStep);
         if (Colors::contrast(CCOLOR(tab.active, Fg), cB) > Colors::contrast(cF, cB))
             cF = CCOLOR(tab.active, Fg);
     }
