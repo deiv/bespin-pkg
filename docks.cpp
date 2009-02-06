@@ -56,12 +56,12 @@ Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWid
         // adjust rect;
         const int bw = (dwOpt->closable +  dwOpt->floatable) * (16 + F(2));
         if (option->direction == Qt::LeftToRight)
-            rect.setRight(rect.right() - bw);
+            rect.adjust(F(2), 0, -bw, 0);
         else
-            rect.setLeft(rect.left() + bw);
+            rect.adjust(bw, 0, -F(2), 0);
 
         // text
-        const int itemtextopts = Qt::AlignBottom | Qt::AlignHCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
+        const int itemtextopts = Qt::AlignVCenter | Qt::AlignLeft /*Qt::AlignBottom | Qt::AlignHCenter*/ | Qt::TextSingleLine | Qt::TextHideMnemonic;
         QString title = dwOpt->title; // " " + dwOpt->title + " "; // good for underlining
         setTitleFont(painter);
         if (Colors::value(bg) < 100)
@@ -72,13 +72,16 @@ Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWid
         painter->setPen(hover ? FCOLOR(WindowText) : Colors::mid(bg, FCOLOR(WindowText), 1, 3));
         drawItemText(painter, rect, itemtextopts, PAL, isEnabled, title, QPalette::NoRole, &rect);
 
+#if 1
         // underline
+        rect.setBottom(RECT.bottom());
         Tile::PosFlags pf = Tile::Center;
         if (option->direction == Qt::LeftToRight)
-            { rect.setRight(RECT.right()); pf |= Tile::Left; }
-        else
             { rect.setLeft(RECT.left()); pf |= Tile::Right; }
+        else
+            { rect.setRight(RECT.right()); pf |= Tile::Left; }
         shadows.line[0][Sunken].render(rect, painter, pf, true);
+#endif
     }
     painter->restore();
 }
