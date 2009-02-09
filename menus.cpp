@@ -216,14 +216,10 @@ Style::drawMenuItem(const QStyleOption * option, QPainter * painter,
     const QStyleOptionMenuItem *menuitem = menuItem;
     int iconCol = config.menu.showIcons*menuitem->maxIconWidth;
 
-    if (config.menu.showIcons && !menuItem->icon.isNull())
+    if (isEnabled && config.menu.showIcons && !menuItem->icon.isNull())
     {
-        QRect vCheckRect =
-        visualRect(option->direction, r, QRect(r.x(), r.y(), iconCol, r.height()));
-        QIcon::Mode mode =
-        isEnabled ? (selected ? QIcon::Active : QIcon::Normal) : QIcon::Disabled;
-        QPixmap pixmap =
-        menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), mode, checked ? QIcon::On : QIcon::Off);
+        QRect vCheckRect = visualRect(option->direction, r, QRect(r.x(), r.y(), iconCol, r.height()));
+        const QPixmap &pixmap = menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), QIcon::Normal, checked ? QIcon::On : QIcon::Off);
 
         QRect pmr(QPoint(0, 0), pixmap.size());
         pmr.moveCenter(vCheckRect.center());
@@ -237,11 +233,11 @@ Style::drawMenuItem(const QStyleOption * option, QPainter * painter,
     int x, y, w, h;
     r.getRect(&x, &y, &w, &h);
     int tab = menuitem->tabWidth;
-    int cDim = (r.height() - dpi.f6);
+    int cDim = (r.height() - F(6));
     int xm = windowsItemFrame + iconCol + windowsItemHMargin;
     int xpos = r.x() + xm;
     QRect textRect(xpos, y + windowsItemVMargin,
-                    w - xm - menuItem->menuHasCheckableItems*(cDim+dpi.f7) - windowsRightBorder - tab + 1,
+                    w - xm - menuItem->menuHasCheckableItems*(cDim+F(7)) - windowsRightBorder - tab + 1,
                     h - 2 * windowsItemVMargin);
     QRect vTextRect = visualRect(option->direction, r, textRect);
     QString s = menuitem->text;
@@ -271,7 +267,7 @@ Style::drawMenuItem(const QStyleOption * option, QPainter * painter,
 
         Navi::Direction dir = (option->direction == Qt::RightToLeft) ? Navi::W : Navi::E;
         int dim = 5*r.height()/12;
-        xpos = r.right() - dpi.f4 - dim;
+        xpos = r.right() - F(4) - dim;
         QStyleOptionMenuItem tmpOpt = *menuItem;
         tmpOpt.rect = visualRect(option->direction, r, QRect(xpos, r.y() + (r.height() - dim)/2, dim, dim));
         painter->setBrush(Colors::mid(bg, fg, 1, 2));
@@ -280,7 +276,7 @@ Style::drawMenuItem(const QStyleOption * option, QPainter * painter,
     }
     else if (checkable)
     {   // Checkmark =============================
-        xpos = r.right() - dpi.f4 - cDim;
+        xpos = r.right() - F(4) - cDim;
         QStyleOptionMenuItem tmpOpt = *menuItem;
         tmpOpt.rect = QRect(xpos, r.y() + (r.height() - cDim)/2, cDim, cDim);
         tmpOpt.rect = visualRect(menuItem->direction, menuItem->rect, tmpOpt.rect);
@@ -310,24 +306,19 @@ Style::drawMenuItem(const QStyleOption * option, QPainter * painter,
 }
 
 void
-Style::drawMenuScroller(const QStyleOption * option, QPainter * painter,
-                              const QWidget *) const
+Style::drawMenuScroller(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
-   OPT_SUNKEN
-      
-   QPoint offset;
-   Navi::Direction dir = Navi::N;
-   QPalette::ColorRole bg = config.menu.std_role[0];
-   const QPixmap &gradient = Gradients::pix(PAL.color(QPalette::Active, bg),
-                                            RECT.height()*2, Qt::Vertical,
-                                            sunken ? Gradients::Sunken :
-                                            Gradients::Button);
-   if (option->state & State_DownArrow) {
-      offset = QPoint(0,RECT.height());
-      dir = Navi::S;
-   }
-   painter->drawTiledPixmap(RECT, gradient, offset);
-   drawArrow(dir, RECT, painter);
+    OPT_SUNKEN
+
+    QPoint offset;
+    Navi::Direction dir = Navi::N;
+    QPalette::ColorRole bg = config.menu.std_role[0];
+    const QPixmap &gradient = Gradients::pix(PAL.color(QPalette::Active, bg), 2*RECT.height(), Qt::Vertical,
+                                             sunken ? Gradients::Sunken : Gradients::Button);
+    if (option->state & State_DownArrow)
+        { offset = QPoint(0, RECT.height()); dir = Navi::S; }
+    painter->drawTiledPixmap(RECT, gradient, offset);
+    drawArrow(dir, RECT, painter);
 }
 
 //    case CE_MenuTearoff: // A menu item representing the tear off section of a QMenu

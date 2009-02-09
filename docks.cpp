@@ -56,9 +56,9 @@ Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWid
         // adjust rect;
         const int bw = (dwOpt->closable +  dwOpt->floatable) * (16 + F(2));
         if (option->direction == Qt::LeftToRight)
-            rect.adjust(F(2), 0, -bw, 0);
+            rect.adjust(F(8), 0, -bw, 0);
         else
-            rect.adjust(bw, 0, -F(2), 0);
+            rect.adjust(bw, 0, -F(8), 0);
 
         // text
         const int itemtextopts = Qt::AlignVCenter | Qt::AlignLeft /*Qt::AlignBottom | Qt::AlignHCenter*/ | Qt::TextSingleLine | Qt::TextHideMnemonic;

@@ -62,7 +62,7 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
     case CT_MenuBarItem:
     {   // A menu bar item, like the buttons in a QMenuBar
         const int h = contentsSize.height()+F(4);
-        return QSize(qMax(contentsSize.width()+F(18), h*8/5), h);
+        return QSize(qMax(contentsSize.width()+F(12), h*8/5), h);
     }
    case CT_MenuItem: // A menu item, like QMenuItem
         if HAVE_OPTION(menuItem, MenuItem)

@@ -96,9 +96,9 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
     case PM_MenuBarPanelWidth: // Frame width of a menubar, defaults to PM_DefaultFrameWidth
         return 0;
     case PM_MenuBarItemSpacing: // Spacing between menubar items
-        return F(6);
+        return 0; //F(2);
     case PM_MenuBarHMargin: // Spacing between menubar items and left/right of bar
-        return F(6);
+        return F(2);
     case PM_MenuBarVMargin: // Spacing between menubar items and top/bottom of bar
         return 0;
     case PM_ToolBarFrameWidth: // Width of the frame around toolbars

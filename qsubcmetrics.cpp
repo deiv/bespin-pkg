@@ -331,10 +331,8 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
 //             int fw = pixelMetric(PM_DefaultFrameWidth, tb, widget);
 //             ret = tb->rect.adjusted(fw,fw,-fw,0);
             ret = tb->rect;
-            if ((tb->features & // has an arrow
-                (QStyleOptionToolButton::Menu | QStyleOptionToolButton::PopupDelay)) ==
-                QStyleOptionToolButton::Menu)
-            {
+            if ((tb->features & (QStyleOptionToolButton::Menu | QStyleOptionToolButton::PopupDelay)) == QStyleOptionToolButton::Menu)
+            {   // has an arrow
                 int x = ret.right() - pixelMetric(PM_MenuButtonIndicator, tb, widget);
                 if (subControl == SC_ToolButton)
                     ret.setRight(x);
@@ -345,8 +343,8 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         }
         break;
    case CC_TitleBar: // A Title bar, like what is used in Q3Workspace
-      if (const QStyleOptionTitleBar *tb =
-          qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
+      if (const QStyleOptionTitleBar *tb = qstyleoption_cast<const QStyleOptionTitleBar *>(option))
+      {
          const int controlMargin = dpi.f3;
          const int controlHeight = tb->rect.height() - controlMargin*2;
          const int delta = controlHeight + 2*controlMargin;
