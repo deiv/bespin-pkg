@@ -58,7 +58,7 @@ namespace FX
 #endif
 
     bool blend(const QPixmap &upper, QPixmap &lower, double opacity = 0.5, int x = 0, int y = 0);
-//     void desaturate(QImage &img, const QColor &c);
+    void desaturate(QImage &img, const QColor &c);
     QPixmap fade(const QPixmap &pix, double percent);
     QPixmap tint(const QPixmap &mask, const QColor &color);
     QPixmap applyAlpha( const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect &rect = QRect(), const QRect &alphaRect = QRect());

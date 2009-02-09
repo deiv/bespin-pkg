@@ -266,7 +266,7 @@ FX::applyAlpha(const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect
     return pix;
 }
 
-#if 0
+#if 1
 // taken from QCommonStyle generatedIconPixmap - why oh why cannot KDE apps take this function into account...
 static inline uint qt_intensity(uint r, uint g, uint b)
 {

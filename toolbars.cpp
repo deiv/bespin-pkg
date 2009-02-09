@@ -169,20 +169,28 @@ Style::drawToolButtonLabel(const QStyleOption * option,
     {
 //         const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
         pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), /*isEnabled ? */QIcon::Normal/* : QIcon::Disabled*/, QIcon::Off);
-//         if (!isEnabled)
-//             pm = generatedIconPixmap ( QIcon::Disabled, pm, toolbutton );
+#if 0   // this is -in a way- the way it should be done..., but KIconLoader gives a shit on this or anything else
+        if (!isEnabled)
+            pm = generatedIconPixmap ( QIcon::Disabled, pm, toolbutton );
+#else
         if (!isEnabled)
         {
             QImage img(pm.width() + F(4), pm.height() + F(4), QImage::Format_ARGB32);
             img.fill(Qt::transparent);
             QPainter p(&img);
             p.setOpacity(0.4);
-            p.drawImage(F(4),F(4),pm.toImage().scaled(pm.size() - QSize(F(4),F(4)), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+#if 1 // blurring
+            p.drawImage(F(4),F(4), pm.toImage().scaled(pm.size() - QSize(F(4),F(4)), Qt::KeepAspectRatio, Qt::SmoothTransformation));
             p.end();
-//             FX::desaturate(img, FCOLOR(Window)); // nope - don't use 2 chained FX!
             FX::expblur(img, F(5));
+#else // desaturation (like def. Qt but with a little transparency)
+            p.drawImage(F(2), F(2), pm.toImage());
+            p.end();
+            FX::desaturate(img, FCOLOR(Window));
+#endif
             pm = QPixmap::fromImage(img);
         }
+#endif
         else if (step && !sunken && !pm.isNull())
             pm = icon(pm, step);
         pmSize = pm.size();

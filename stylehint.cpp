@@ -134,6 +134,8 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
     case SH_GroupBox_TextLabelColor:
         return QPalette::WindowText;
 ///    case SH_DialogButtons_DefaultButton: // Which button gets the default status in a dialog's button widget.
+    case SH_DialogButtonLayout:
+        return 2; //QDialogButtonBox::KdeLayout; 3//QDialogButtonBox::GnomeLayout 0//QDialogButtonBox::WinLayout 1//QDialogButtonBox::MacLayout
     case SH_DialogButtonBox_ButtonsHaveIcons:
         return false; // no way
     case SH_ToolBox_SelectedPageTitleBold:
