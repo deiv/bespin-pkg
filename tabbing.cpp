@@ -235,14 +235,13 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
             {
                 // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
                 index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
-                hoveredIndex = hover ? index :
-                tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
-                info = const_cast<Animator::IndexInfo*>
-                (Animator::HoverIndex::info(widget, hoveredIndex));
+                hoveredIndex = hover ? index : tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
+                info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, hoveredIndex));
             }
             if (info)
                 animStep = info->step(index);
-            if (hover && !animStep) animStep = 6;
+            if (hover && !animStep)
+                animStep = 6;
         }
         drawTabShape(&copy, painter, widget);
     }
@@ -387,7 +386,9 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
 //         cF = Colors::mid(cB, CCOLOR(tab.std, Fg), 1,4);
 //     }
 
-    if (isEnabled && Colors::value(cB) < 148)
+    if (!sunken || Colors::value(CCOLOR(tab.std, Bg)) < 164)
+        tr.translate(0,-F(1));
+    if (isEnabled && Colors::value(cB) < 148) // this is not the same...
     {   // dark background, let's paint an emboss
         painter->setPen(cB.dark(120));
         tr.moveTop(tr.top()-1);

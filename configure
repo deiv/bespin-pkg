@@ -35,26 +35,26 @@ find_qt() {
    fi
    [ "$QT_DIR" != "" ]
 }
-
+KDE=false
 ## Main code here...
 if cmake --version | grep "cmake version" > /dev/null 2>&1; then
-echo -e "\n\n==================== Bespin interactive configuration ====================\n
-Seems you have cmake.
-In addition to the style, you can have a KWin decoration,
-a mac-like menu plasmoid and config plugins IFF you have KDE....\n"
-KDE=true
-read -n1 -s -p "--> Do you want to compile with KDE support? [Y/n]"
-echo ""
-if [ "$REPLY" = "n" -o "$REPLY" = "N" ]; then
-   KDE=false
-   echo "Compiling Qt/qmake only..."
-else
-   mkdir build > /dev/null 2>&1
-   cd build
-   if ! cmake -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix` -DCMAKE_BUILD_TYPE=Release ..; then
-       exit
-   fi
-fi
+    echo -e "\n\n==================== Bespin interactive configuration ====================\n
+    Seems you have cmake.
+    In addition to the style, you can have a KWin decoration,
+    a mac-like menu plasmoid and config plugins IFF you have KDE....\n"
+    KDE=true
+    read -n1 -s -p "--> Do you want to compile with KDE support? [Y/n]"
+    echo ""
+    if [ "$REPLY" = "n" -o "$REPLY" = "N" ]; then
+        KDE=false
+        echo "Compiling Qt/qmake only..."
+    else
+        mkdir build > /dev/null 2>&1
+        cd build
+        if ! cmake -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix` -DCMAKE_BUILD_TYPE=Release ..; then
+            exit
+        fi
+    fi
 fi
 if $KDE; then
    echo -e "\nConfiguration succeeded...\n"
