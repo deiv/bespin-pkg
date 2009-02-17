@@ -95,6 +95,8 @@ static void
 #define registerCE(_FUNC_, _ELEM_) controlRoutine[QStyle::_ELEM_] = &Style::_FUNC_
 #define registerCC(_FUNC_, _ELEM_) complexRoutine[QStyle::_ELEM_] = &Style::_FUNC_
 
+extern void register_dialog_functions();
+
 // static void registerPE(char *S0, ...)
 // {
 //    register char *s;
@@ -110,6 +112,8 @@ static void
 void
 Style::registerRoutines()
 {
+    register_dialog_functions();
+    
     for (int i = 0; i < N_PE; ++i)
         primitiveRoutine[i] = 0;
     for (int i = 0; i < N_CE; ++i)
