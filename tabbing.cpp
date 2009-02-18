@@ -372,7 +372,8 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
     {
         cF = CCOLOR(tab.active, Fg);
         cB = CCOLOR(tab.active, Bg);
-        setBold(painter, tab->text);
+        if (config.tab.active_role[Bg] == config.tab.std_role[Bg])
+            setBold(painter, tab->text);
     }
     else if (animStep)
     {

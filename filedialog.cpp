@@ -55,7 +55,7 @@ session()
 }
 
 static QString
-dialog(QWidget *parent, const QString &cmd, const QStringList &args, const QString &dir )
+dialog(QWidget *parent, Session ses, const QStringList &args, const QString &dir )
 {
     QWidget modal;
     modal.setAttribute( Qt::WA_NoChildEventsForParent, true );
@@ -64,7 +64,7 @@ dialog(QWidget *parent, const QString &cmd, const QStringList &args, const QStri
     
     QProcess proc( &modal );
     proc.setWorkingDirectory( dir );
-    proc.start( cmd, args );
+    proc.start( ses == KDE ? "kdialog" : "zenity", args );
     proc.waitForFinished( -1 );
 
     QString result;
@@ -112,18 +112,23 @@ firstItem( const QStringList &list )
     return list.first();
 }
 
-static void
-append( QStringList &list, const QString &string, const QString &def = QString() )
+static QString
+path( const QString& dir )
 {
-    if ( !string.isEmpty() )
-        list << string;
-    else if ( !def.isNull() )
-        list << def;
+    QString s = dir;
+    if ( s.isEmpty() )
+        s = QDir::currentPath();
+    if ( !s.endsWith('/') )
+        s += '/';
+    return s;
 }
 
 static QString
 simpleFilter( const QString& filter )
 {
+    if ( filter.isEmpty() )
+        return "*";
+    
     QStringList list = filter.split( ';', QString::SkipEmptyParts );
     for ( int i = 0; i < list.count(); ++i )
     {
@@ -133,135 +138,130 @@ simpleFilter( const QString& filter )
 }
 
 #define PREPARE_KDE \
-cmd = "kdialog";\
 if ( parent ) args << "--attach" << QString::number( parent->winId() );\
 if ( !caption.isEmpty() ) args << "--title" << caption
 
 #define PREPARE_GNOME \
-cmd = "zenity";\
 if ( !caption.isEmpty() ) args << "--title=" + caption;\
 args << "--file-selection"
 
 static QString
 openFilename( QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options )
 {
-    Session ses = session();
-    if ( ses == Unkown || options & QFileDialog::DontUseNativeDialog )
-        return firstItem( qDialog( QFileDialog::ExistingFile, parent, caption, dir, filter, selectedFilter, options ) );
-    
-    QString cmd; QStringList args;
-    
-    if ( ses == KDE )
+    if ( Session ses = session() )
+    if ( !(options & QFileDialog::DontUseNativeDialog) )
     {
-        PREPARE_KDE;
-        args << "--getopenfilename"; append( args, dir, QDir::currentPath() ); append( args, simpleFilter(filter) );
+    
+        QStringList args;
+
+        if ( ses == KDE )
+        {
+            PREPARE_KDE;
+            args << "--getopenfilename" << path( dir ) << simpleFilter(filter);
+        }
+
+        else if ( ses == GNOME )
+        {
+            PREPARE_GNOME;
+    //         --file-filter='All | *'
+        }
+
+        QString filename = dialog( parent, ses, args, dir );
+        if ( !filename.isNull() )
+            return filename;
     }
 
-    else if ( ses == GNOME )
-    {
-        PREPARE_GNOME;
-//         --file-filter='All | *'
-    }
-
-    QString filename = dialog( parent, cmd, args, dir );
-
-    if ( filename.isNull() )
-        return firstItem( qDialog( QFileDialog::ExistingFile, parent, caption, dir, filter, selectedFilter, options ) );
-
-    return filename;
+    return firstItem( qDialog( QFileDialog::ExistingFile, parent, caption, dir, filter, selectedFilter, options ) );
 
 }
 
 static QStringList
 openFilenames(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options)
 {
-    Session ses = session();
-    if ( ses == Unkown || options & QFileDialog::DontUseNativeDialog )
-        return qDialog( QFileDialog::ExistingFiles, parent, caption, dir, filter, selectedFilter, options );
-
-    QString cmd; QStringList args;
-    args << "--multiple";
-    
-    char splitter = '\n';
-    if ( ses == KDE )
+    if ( Session ses = session() )
+    if ( !(options & QFileDialog::DontUseNativeDialog) )
     {
-        PREPARE_KDE;
-        args << "--separate-output" << "--getopenfilename";
-        append( args, dir, QDir::currentPath() ); append( args, simpleFilter(filter) );
+        QStringList args;
+        args << "--multiple";
+
+        char splitter = '\n';
+        if ( ses == KDE )
+        {
+            PREPARE_KDE;
+            args << "--separate-output" << "--getopenfilename" << path( dir ) << simpleFilter(filter);
+        }
+
+        else if ( ses == GNOME )
+        {
+            PREPARE_GNOME;
+            splitter = '|';
+        }
+
+        QString string = dialog( parent, ses, args, dir );
+        if ( !string.isNull() )
+            return string.split(splitter);
     }
 
-    else if ( ses == GNOME )
-    {
-        PREPARE_GNOME;
-        splitter = '|';
-    }
-
-    QString string = dialog( parent, cmd, args, dir );
-    if ( string.isNull() )
-        return qDialog( QFileDialog::ExistingFiles, parent, caption, dir, filter, selectedFilter, options );
-    
-    return string.split(splitter);
+    return qDialog( QFileDialog::ExistingFiles, parent, caption, dir, filter, selectedFilter, options );
 }
 
 
 static QString
 saveFilename(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options)
 {
-    Session ses = session();
-    if ( ses == Unkown || options & QFileDialog::DontUseNativeDialog )
-        return firstItem( qDialog( QFileDialog::AnyFile, parent, caption, dir, filter, selectedFilter, options ) );
-
-    QString cmd; QStringList args;
-    
-    if ( ses == KDE )
+    if ( Session ses = session() )
+    if ( !(options & QFileDialog::DontUseNativeDialog) )
     {
-        PREPARE_KDE;
-        args << "--getsavefilename"; append( args, dir + " ", QDir::currentPath() + " " ); append( args, simpleFilter(filter) );
+        QStringList args;
+
+        if ( ses == KDE )
+        {
+            PREPARE_KDE;
+            args << "--getsavefilename" << path( dir ) + " " << simpleFilter(filter);
+        }
+
+        else if ( ses == GNOME )
+        {
+            PREPARE_GNOME;
+            args << "--save";
+            if ( !( options & QFileDialog::DontConfirmOverwrite ) )
+                args << "--confirm-overwrite";
+        }
+
+        QString filename = dialog( parent, ses, args, dir );
+        if ( !filename.isNull() )
+            return filename;
     }
 
-    else if ( ses == GNOME )
-    {
-        PREPARE_GNOME;
-        args << "--save";
-        if ( !( options & QFileDialog::DontConfirmOverwrite ) )
-            args << "--confirm-overwrite";
-    }
-    
-    QString filename = dialog( parent, cmd, args, dir );
-    
-    if ( filename.isNull() )
-        return firstItem( qDialog( QFileDialog::AnyFile, parent, caption, dir, filter, selectedFilter, options ) );
-    
-    return filename;
+    return firstItem( qDialog( QFileDialog::AnyFile, parent, caption, dir, filter, selectedFilter, options ) );
 }
 
 static QString
 openDirectory( QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options options )
 {
-    Session ses = session();
-    if ( ses == Unkown || options & QFileDialog::DontUseNativeDialog )
-        return firstItem( qDialog( QFileDialog::DirectoryOnly, parent, caption, dir, QString(), 0, options ) );
-
-    QString cmd; QStringList args;
-
-    if ( ses == KDE )
+    if ( Session ses = session() )
+    if ( !(options & QFileDialog::DontUseNativeDialog) )
     {
-        PREPARE_KDE;
-        args << "--getexistingdirectory"; append( args, dir, QDir::currentPath() );
+        QStringList args;
+
+        if ( ses == KDE )
+        {
+            PREPARE_KDE;
+            args << "--getexistingdirectory" << path( dir);
+        }
+
+        else if ( ses == GNOME )
+        {
+            PREPARE_GNOME;
+            args << "--directory";
+        }
+
+        QString filename = dialog( parent, ses, args, dir );
+        if ( !filename.isNull() )
+            return filename;
     }
-
-    else if ( ses == GNOME )
-    {
-        PREPARE_GNOME;
-        args << "--directory";
-    }
-
-    QString filename = dialog( parent, cmd, args, dir );
-
-    if ( filename.isNull() )
-        return firstItem( qDialog( QFileDialog::DirectoryOnly, parent, caption, dir, QString(), 0, options ) );
     
-    return filename;
+    return firstItem( qDialog( QFileDialog::DirectoryOnly, parent, caption, dir, QString(), 0, options ) );
 }
 
 extern Q_GUI_EXPORT _qt_filedialog_open_filename_hook qt_filedialog_open_filename_hook;
