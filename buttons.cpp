@@ -291,8 +291,8 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
 void
 Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
-    OPT_ENABLED OPT_FOCUS OPT_HOVER;
     ASSURE_OPTION(btn, Button);
+    OPT_ENABLED OPT_FOCUS OPT_HOVER OPT_SUNKEN;
 
     QRect ir = btn->rect;
     uint tf = Qt::AlignCenter | BESPIN_MNEMONIC;
@@ -339,7 +339,7 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
     const QColor &bg = flat ? FCOLOR(Window) : (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
 
     painter->save();
-    if (hasFocus || (btn->features & QStyleOptionButton::DefaultButton))
+    if (!sunken && btn->features & QStyleOptionButton::DefaultButton)
         setBold(painter, btn->text);
 
     if (!flat && isEnabled)
