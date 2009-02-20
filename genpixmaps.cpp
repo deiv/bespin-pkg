@@ -134,7 +134,7 @@ relief(int size, bool enabled)
     p.setPen(QPen(BLACK(int(f*70)), F(1)));
     p.DRAW_ROUND_RECT(0, F(1)/2.0, size, size-.75*F(2), 99, 99);
     p.setPen(QPen(WHITE(int(f*35)), F(1)));
-    p.DRAW_ROUND_RECT(0, F(1), size, size-F(2), 99, 99);
+    p.DRAW_ROUND_RECT(0, F(1)/2.0, size, size-F(1), 99, 99);
 #if 0
     // the borders cross the pixmap boundings, thus they're too weak, thus we stregth them a bit
     const int d1 = 0.3*size, d2 = 0.7*size;
