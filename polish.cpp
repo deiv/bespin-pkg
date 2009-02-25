@@ -94,16 +94,6 @@ void Style::polish ( QApplication * app )
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
 
-static QColor
-mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
-{
-    int sum = (w1+w2);
-    return QColor(((w1*c1.red() + w2*c2.red())/sum) & 0xff,
-                 ((w1*c1.green() + w2*c2.green())/sum) & 0xff,
-                 ((w1*c1.blue() + w2*c2.blue())/sum) & 0xff,
-                 ((w1*c1.alpha() + w2*c2.alpha())/sum) & 0xff);
-}
-
 #undef PAL
 #define PAL pal
 
@@ -121,8 +111,9 @@ void Style::polish( QPalette &pal, bool onInit )
     }
 
     // AlternateBase
-    pal.setColor(QPalette::AlternateBase, mid(pal.color(QPalette::Active, QPalette::Base),
-                                              pal.color(QPalette::Active, config.view.shadeRole),100,config.view.shadeLevel));
+    pal.setColor(QPalette::AlternateBase, Colors::mid(pal.color(QPalette::Active, QPalette::Base),
+                                                      pal.color(QPalette::Active, config.view.shadeRole),
+                                                      100,config.view.shadeLevel));
     // highlight colors
     const int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
     const QColor grey(highlightGray,highlightGray,highlightGray);
@@ -137,10 +128,10 @@ void Style::polish( QPalette &pal, bool onInit )
         pal.setColor(QPalette::Light, QColor(240,240,240));
 
         // Link colors can not be set through qtconfig - and the colors suck
-        pal.setColor(QPalette::Link, mid(pal.color(QPalette::Active, QPalette::Text),
-                                         pal.color(QPalette::Active, QPalette::Highlight), 1, 8));
-        pal.setColor(QPalette::LinkVisited, mid(pal.color(QPalette::Active, QPalette::Text),
-                                                pal.color(QPalette::Active, QPalette::Highlight), 1, 4));
+        pal.setColor(QPalette::Link, Colors::mid(pal.color(QPalette::Active, QPalette::Text),
+                                                 pal.color(QPalette::Active, QPalette::Highlight), 1, 8));
+        pal.setColor(QPalette::LinkVisited, Colors::mid(pal.color(QPalette::Active, QPalette::Text),
+                                                        pal.color(QPalette::Active, QPalette::Highlight), 1, 4));
 
 #if QT_VERSION >= 0x040400
         // tooltip (NOTICE not configurable by qtconfig, kde can, let's see what we're gonna do on this...)
@@ -153,24 +144,24 @@ void Style::polish( QPalette &pal, bool onInit )
     if (config.fadeInactive)
     { // fade out inactive foreground and highlight colors...
         pal.setColor(QPalette::Inactive, QPalette::Highlight,
-                    mid(pal.color(QPalette::Active, QPalette::Highlight), grey, 2,1));
+                     Colors::mid(pal.color(QPalette::Active, QPalette::Highlight), grey, 2,1));
         pal.setColor(QPalette::Inactive, QPalette::WindowText,
-                    mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::WindowText), 1,4));
+                     Colors::mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::WindowText), 1,4));
         pal.setColor(QPalette::Inactive, QPalette::ButtonText,
-                    mid(pal.color(QPalette::Active, QPalette::Button), pal.color(QPalette::Active, QPalette::ButtonText), 1,4));
+                     Colors::mid(pal.color(QPalette::Active, QPalette::Button), pal.color(QPalette::Active, QPalette::ButtonText), 1,4));
         pal.setColor(QPalette::Inactive, QPalette::Text,
-                    mid(pal.color(QPalette::Active, QPalette::Base), pal.color(QPalette::Active, QPalette::Text), 1,4));
+                     Colors::mid(pal.color(QPalette::Active, QPalette::Base), pal.color(QPalette::Active, QPalette::Text), 1,4));
     }
 
     // fade disabled palette
     pal.setColor(QPalette::Disabled, QPalette::WindowText,
-                 mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::WindowText),2,1));
+                 Colors::mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::WindowText),2,1));
     pal.setColor(QPalette::Disabled, QPalette::Base,
-                 mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::Base),1,2));
+                 Colors::mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::Base),1,2));
     pal.setColor(QPalette::Disabled, QPalette::Text,
-                 mid(pal.color(QPalette::Active, QPalette::Base), pal.color(QPalette::Active, QPalette::Text)));
+                 Colors::mid(pal.color(QPalette::Active, QPalette::Base), pal.color(QPalette::Active, QPalette::Text)));
     pal.setColor(QPalette::Disabled, QPalette::AlternateBase,
-                 mid(pal.color(QPalette::Disabled, QPalette::Base), pal.color(QPalette::Disabled, QPalette::Text),15,1));
+                 Colors::mid(pal.color(QPalette::Disabled, QPalette::Base), pal.color(QPalette::Disabled, QPalette::Text),15,1));
 
     // more on tooltips... (we force some colors...)
     if (!onInit)
@@ -474,8 +465,8 @@ Style::polish( QWidget * widget )
                     if (!vp->autoFillBackground())
                     {
                         QPalette pal = itemView->palette();
-//                         mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::Base),6,1)
-                        #define ALT_BASE(_S_) mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
+//                         Colors::mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::Base),6,1)
+                        #define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
                         Colors::contrast(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase)), 10)
                         pal.setColor(QPalette::Active, QPalette::AlternateBase, ALT_BASE(QPalette::Active));
                         pal.setColor(QPalette::Inactive, QPalette::AlternateBase, ALT_BASE(QPalette::Inactive));

@@ -83,7 +83,7 @@ Style::drawHeaderSection(const QStyleOption * option, QPainter * painter,
     if (hover)
     {
         const bool sort = (header->sortIndicator != QStyleOptionHeader::None);
-        c = Colors::mid(c, sort ? CCOLOR(view.sortingHeader, Fg) : CCOLOR(view.header, Fg),10,1);
+        c = Colors::mid(c, sort ? CCOLOR(view.sortingHeader, Fg) : CCOLOR(view.header, Fg),8,1);
     }
     if (gt == Gradients::None)
         painter->fillRect(RECT, c);

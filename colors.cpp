@@ -25,89 +25,98 @@
 
 using namespace Bespin;
 
-const QColor &Colors::bg(const QPalette &pal, const QWidget *w) {
-   QPalette::ColorRole role;
-   if (!w)
-      role = QPalette::Window;
-   else if (w->parentWidget())
-      role = w->parentWidget()->backgroundRole();
-   else
-      role = w->backgroundRole();
-   
-   if (pal.brush(role).style() > 1)
-      return pal.color(role);
-   return QApplication::palette().color(role);
+const QColor &
+Colors::bg(const QPalette &pal, const QWidget *w)
+{
+    QPalette::ColorRole role;
+    if (!w)
+        role = QPalette::Window;
+    else if (w->parentWidget())
+        role = w->parentWidget()->backgroundRole();
+    else
+        role = w->backgroundRole();
+
+    if (pal.brush(role).style() > 1)
+        return pal.color(role);
+    return QApplication::palette().color(role);
 }
 
-int Colors::contrast(const QColor &a, const QColor &b) {
-   int ar,ag,ab,br,bg,bb;
-   a.getRgb(&ar,&ag,&ab);
-   b.getRgb(&br,&bg,&bb);
-   
-   int diff = 299*(ar-br) + 587*(ag-bg) + 114*(ab-bb);
-   diff = (diff < 0) ? -diff : 90*diff/100;
-   int perc = diff / 2550;
-   
-   diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
-      - (qMin(ar,br) + qMin(ag,bg) + qMin(ab,bb));
-   
-   perc += diff/765;
-   perc /= 2;
-   
-   return perc;
+int
+Colors::contrast(const QColor &a, const QColor &b)
+{
+    int ar,ag,ab,br,bg,bb;
+    a.getRgb(&ar,&ag,&ab);
+    b.getRgb(&br,&bg,&bb);
+
+    int diff = 299*(ar-br) + 587*(ag-bg) + 114*(ab-bb);
+    diff = (diff < 0) ? -diff : 90*diff/100;
+    int perc = diff / 2550;
+
+    diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
+        - (qMin(ar,br) + qMin(ag,bg) + qMin(ab,bb));
+
+    perc += diff/765;
+    perc /= 2;
+
+    return perc;
 }
 
-QPalette::ColorRole Colors::counterRole(QPalette::ColorRole role) {
-   switch (role) {
-   case QPalette::ButtonText: //8
-      return QPalette::Button;
-   case QPalette::WindowText: //0
-      return QPalette::Window;
-   case QPalette::HighlightedText: //13
-      return QPalette::Highlight;
-   case QPalette::Window: //10
-      return QPalette::WindowText;
-   case QPalette::Base: //9
-      return QPalette::Text;
-   case QPalette::Text: //6
-      return QPalette::Base;
-   case QPalette::Highlight: //12
-      return QPalette::HighlightedText;
-   case QPalette::Button: //1
-      return QPalette::ButtonText;
-   default:
-      return QPalette::Window;
-   }
+QPalette::ColorRole
+Colors::counterRole(QPalette::ColorRole role)
+{
+    switch (role) {
+    case QPalette::ButtonText: //8
+        return QPalette::Button;
+    case QPalette::WindowText: //0
+        return QPalette::Window;
+    case QPalette::HighlightedText: //13
+        return QPalette::Highlight;
+    case QPalette::Window: //10
+        return QPalette::WindowText;
+    case QPalette::Base: //9
+        return QPalette::Text;
+    case QPalette::Text: //6
+        return QPalette::Base;
+    case QPalette::Highlight: //12
+        return QPalette::HighlightedText;
+    case QPalette::Button: //1
+        return QPalette::ButtonText;
+    default:
+        return QPalette::Window;
+    }
 }
 
-bool Colors::counterRole(QPalette::ColorRole &from, QPalette::ColorRole &to,
-                         QPalette::ColorRole defFrom, QPalette::ColorRole defTo) {
-   switch (from) {
-   case QPalette::WindowText: //0
-      to = QPalette::Window; break;
-   case QPalette::Window: //10
-      to = QPalette::WindowText; break;
-   case QPalette::Base: //9
-      to = QPalette::Text; break;
-   case QPalette::Text: //6
-      to = QPalette::Base; break;
-   case QPalette::Button: //1
-      to = QPalette::ButtonText; break;
-   case QPalette::ButtonText: //8
-      to = QPalette::Button; break;
-   case QPalette::Highlight: //12
-      to = QPalette::HighlightedText; break;
-   case QPalette::HighlightedText: //13
-      to = QPalette::Highlight; break;
-   default:
-      from = defFrom;
-      to = defTo;
-      return false;
-   }
-   return true;
+bool
+Colors::counterRole(QPalette::ColorRole &from, QPalette::ColorRole &to, QPalette::ColorRole defFrom,
+                                                                        QPalette::ColorRole defTo)
+{
+    switch (from) {
+    case QPalette::WindowText: //0
+        to = QPalette::Window; break;
+    case QPalette::Window: //10
+        to = QPalette::WindowText; break;
+    case QPalette::Base: //9
+        to = QPalette::Text; break;
+    case QPalette::Text: //6
+        to = QPalette::Base; break;
+    case QPalette::Button: //1
+        to = QPalette::ButtonText; break;
+    case QPalette::ButtonText: //8
+        to = QPalette::Button; break;
+    case QPalette::Highlight: //12
+        to = QPalette::HighlightedText; break;
+    case QPalette::HighlightedText: //13
+        to = QPalette::Highlight; break;
+    default:
+        from = defFrom;
+        to = defTo;
+        return false;
+    }
+    return true;
 }
 
-QColor Colors::emphasize(const QColor &c, int value)
+QColor
+Colors::emphasize(const QColor &c, int value)
 {
     int h,s,v,a;
     QColor ret;
@@ -136,24 +145,26 @@ QColor Colors::emphasize(const QColor &c, int value)
     return ret;
 }
 
-bool Colors::haveContrast(const QColor &a, const QColor &b)
+bool
+Colors::haveContrast(const QColor &a, const QColor &b)
 {
-   int ar,ag,ab,br,bg,bb;
-   a.getRgb(&ar,&ag,&ab);
-   b.getRgb(&br,&bg,&bb);
-   
-   int diff = (299*(ar-br) + 587*(ag-bg) + 114*(ab-bb));
-   
-   if (qAbs(diff) < 91001)
-      return false;
-   
-   diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
-      - (qMin(ar,br) + qMin(ag,bg) + qMin(ab,bb));
-   
-   return (diff > 300);
+    int ar,ag,ab,br,bg,bb;
+    a.getRgb(&ar,&ag,&ab);
+    b.getRgb(&br,&bg,&bb);
+
+    int diff = (299*(ar-br) + 587*(ag-bg) + 114*(ab-bb));
+
+    if (qAbs(diff) < 91001)
+        return false;
+
+    diff = qMax(ar,br) + qMax(ag,bg) + qMax(ab,bb)
+        - (qMin(ar,br) + qMin(ag,bg) + qMin(ab,bb));
+
+    return (diff > 300);
 }
 
-QColor Colors::light(const QColor &c, int value)
+QColor
+Colors::light(const QColor &c, int value)
 {
     int h,s,v, a;
     c.getHsv(&h,&s,&v,&a);
@@ -177,19 +188,22 @@ QColor Colors::light(const QColor &c, int value)
 }
 
 QColor
-Colors::mid(const QColor &oc1, const QColor &c2, int w1, int w2)
+Colors::mid(const QColor &c1, const QColor &c2, int w1, int w2)
 {
     int sum = (w1+w2);
     if (!sum)
        return Qt::black;
-    QColor c1 = oc1;
+
     int r,g,b,a;
+#if 0
+    QColor c1 = oc1;
     b = value(c1);
     if (b < 70)
     {
         c1.getHsv(&r,&g,&b,&a);
         c1.setHsv(r,g,70,a);
     }
+#endif
     r = (w1*c1.red() + w2*c2.red())/sum; r = CLAMP(r,0,255);
     g = (w1*c1.green() + w2*c2.green())/sum; g = CLAMP(g,0,255);
     b = (w1*c1.blue() + w2*c2.blue())/sum; b = CLAMP(b,0,255);
@@ -197,7 +211,8 @@ Colors::mid(const QColor &oc1, const QColor &c2, int w1, int w2)
     return QColor(r,g,b,a);
 }
 
-int Colors::value(const QColor &c)
+int
+Colors::value(const QColor &c)
 {
     int v = c.red();
     if (c.green() > v) v = c.green();

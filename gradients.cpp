@@ -439,11 +439,8 @@ createDither()
 }
 
 const QPixmap
-&Gradients::structure(const QColor &oc, bool light)
+&Gradients::structure(const QColor &c, bool light)
 {
-    QColor c = oc;
-//     int v = Colors::value(c);
-    
     QPixmap *pix = _structure[light].object(c.rgb());
     if (pix)
         return *pix;
@@ -550,23 +547,25 @@ const QPixmap
             p.drawLine(i, 64, i+64, 0);
         break;
     case 8: // interference
+    {
         p.setPen(Qt::NoPen);
         i = 100 + (_bgIntensity - 100)/4;
         p.setBrush(c.light(i));
         p.drawRect(pix->rect());
         p.setBrush(Qt::NoBrush);
         p.setRenderHint(QPainter::Antialiasing);
-        c = c.dark(i);
+        QColor dc = c.dark(i);
         for (i = 1; i < 6; ++i)
         {
             float r = i*sqrt(i)*64.0/(6*sqrt(6));
-            p.setPen(QPen(Colors::mid(c, oc, 6-i, i-1), 2));
+            p.setPen(QPen(Colors::mid(dc, c, 6-i, i-1), 2));
             p.drawEllipse(QPointF(32,32), r, r);
             for (int x = 0; x < 65; x+=64)
             for (int y = 0; y < 65; y+=64)
                 p.drawEllipse(QPointF(x,y), r, r);
         }
         break;
+    }
     case 9: // sand
         p.setPen(Qt::NoPen);
         i = 100 + (_bgIntensity - 100)/4;
@@ -717,6 +716,7 @@ cornerMask(bool right = false)
 const BgSet &
 Gradients::bgSet(const QColor &c)
 {
+
     BgSet *set = _bgSet.object(c.rgb());
     if (set)
         return *set;
