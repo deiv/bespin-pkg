@@ -51,7 +51,7 @@ QGraphicsWidget(parent)
     d.widget = dummy;
     if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(parent->layout()))
         lLayout->insertItem(0, this);
-//    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+   setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
 //    setObjectName( "XBarMenubar" );
 }
 

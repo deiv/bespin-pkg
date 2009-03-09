@@ -122,7 +122,7 @@ XBar::init()
 //     Plasma::Applet::init();
     //TODO : Qt's bug??
     setAspectRatioMode(Plasma::IgnoreAspectRatio);
-    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
     setMaximumSize(INT_MAX, INT_MAX);
 
 //     setFlag(ItemClipsChildrenToShape); setFlag(ItemClipsToShape);
