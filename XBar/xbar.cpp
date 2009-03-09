@@ -395,7 +395,7 @@ XBar::sizeHint ( Qt::SizeHint which, const QSizeF & constraint ) const
 {
     if (d.currentBar)
         return d.currentBar->sizeHint(which, constraint);
-    return Plasma::Applet::sizeHint(which, constraint);
+    return QSizeF(1,1);
 }
 
 void

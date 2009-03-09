@@ -69,6 +69,7 @@ protected:
     void wheelEvent(QGraphicsSceneWheelEvent *);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget = 0 );
     inline virtual void show() { QGraphicsItem::show(); }
+    QSizeF sizeHint ( Qt::SizeHint which, const QSizeF & constraint ) const;
     void timerEvent(QTimerEvent *event);
 friend class XBar;
     inline QList<QAction*> &actions() { return d.actions; }
@@ -89,6 +90,7 @@ private:
         QList<QAction*> actions;
         QList<QRect> actionRects;
         QString service, appTitle;
+        QSizeF preferredSize;
         qlonglong key;
         int hoverIndex;
         int openPopup;

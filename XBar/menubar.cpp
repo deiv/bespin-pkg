@@ -51,7 +51,7 @@ QGraphicsWidget(parent)
     d.widget = dummy;
     if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(parent->layout()))
         lLayout->insertItem(0, this);
-   setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
+    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
 //    setObjectName( "XBarMenubar" );
 }
 
@@ -89,6 +89,16 @@ MenuBar::action(const QPoint &pos) const
 //    resize(sizeHint(Qt::PreferredSize));
 //    QGraphicsWidget::show();
 // }
+
+QSizeF
+MenuBar::sizeHint ( Qt::SizeHint which, const QSizeF & constraint ) const
+{
+    if ( which < Qt::MaximumSize )
+        return d.preferredSize;
+    return QSizeF( 1.67772e+07, 1.67772e+07 );
+    // this is broken...
+//     return QGraphicsWidget::sizeHint(which, constraint);
+}
 
 
 void
@@ -482,6 +492,7 @@ MenuBar::updateSize()
         h = qMax(h, r.height());
     }
 //    h += 4;
+    d.preferredSize = QSizeF( w, h );
     setMinimumSize(w, h);
 }
 
