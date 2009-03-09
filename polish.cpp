@@ -518,7 +518,7 @@ Style::polish( QWidget * widget )
             if (frame->lineWidth() == 1)
                 frame->setLineWidth(F(4)); // but must have enough indention
         }
-        else if (!widget->inherits("OverlayWidget"))
+        else if (!widget->inherits("KPIM::OverlayWidget"))
             VisualFrame::manage(frame);
     }
     //END FRAMES                                                                                   -
@@ -540,7 +540,7 @@ Style::polish( QWidget * widget )
                 // of course plasma needs - again - a WORKAROUND, we seem to be unable to use bg/fg-role, are we?
                 !(appType == Plasma && widget->inherits("ToolButton")))
             {
-                if (Hacks::config.killThrobber && widget->inherits("KAnimatedButton")) // TODO: get this into hacks
+                if (Hacks::config.killThrobber && widget->inherits("KAnimatedButton"))
                 if (QMenuBar *mbar = qobject_cast<QMenuBar*>(widget->parentWidget()))
                 {   // this is konquerors throbber...
                     widget->hide();
