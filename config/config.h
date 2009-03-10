@@ -40,7 +40,7 @@ public slots:
     void store();
     void restore();
     void restore(QTreeWidgetItem*, int);
-    void save(); // to store colors to qt configuration - in case
+    bool save(); // to store colors to qt configuration - in case
     void import();
     void saveAs();
 private:

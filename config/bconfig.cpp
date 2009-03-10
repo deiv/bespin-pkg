@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QSettings>
 #include <QSpinBox>
 #include <QTextBrowser>
@@ -16,14 +17,13 @@
 #include <QVBoxLayout>
 
 BConfigDialog::BConfigDialog(BConfig *config, uint btns, QWidget *parent) :
-QDialog(parent, Qt::Window) {
+QDialog(parent, Qt::Window), _config(config) {
    
    QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
    QWidget *btn;
    
    if (btns & Ok) {
       btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Ok );
-      connect(btn, SIGNAL(clicked(bool)), config, SLOT(save()));
       connect(btn, SIGNAL(clicked(bool)), this, SLOT(accept()));
       btn->setDisabled(true);
       connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
@@ -71,15 +71,28 @@ QDialog(parent, Qt::Window) {
 }
 
 
+void
+BConfigDialog::accept()
+{
+    if ( ( _config && _config->save() ) ||
+        QMessageBox::warning( this, "Close anyway?",
+        "<qt>Writing the config has failed. Do you want to close the dialog anyway?<hr>"
+        "<b>You will loose all setting changes if you click \"Close\"!</qt>",
+        QMessageBox::Cancel, QMessageBox::Close ) == QMessageBox::Close )
+        QDialog::accept();
+}
+
 BConfig::BConfig(QWidget *parent) : QWidget(parent) {
    infoItemHovered = infoDirty = false;
 }
 
-void BConfig::saveAs() {
-   QString filename = QFileDialog::getSaveFileName(parentWidget(),
-      tr("Save Configuration"), QDir::home().path(), tr("Config Files (*.conf *.ini)"));
-   QSettings settings(filename, QSettings::IniFormat);
-   _save(&settings, false);
+void
+BConfig::saveAs()
+{
+    QString filename = QFileDialog::getSaveFileName(parentWidget(),
+                       tr("Save Configuration"), QDir::home().path(), tr("Config Files (*.conf *.ini)"));
+    QSettings settings(filename, QSettings::IniFormat);
+    _save(&settings, false);
 }
 
 void BConfig::import() {
@@ -233,9 +246,11 @@ void BConfig::loadSettings(QSettings *settings, bool updateInit, bool merge) {
       delete settings;
 }
 
-void BConfig::save() {
-   QSettings settings(_qsetting[0], _qsetting[1]);
-   _save(&settings);
+bool
+BConfig::save()
+{
+    QSettings settings(_qsetting[0], _qsetting[1]);
+    return _save(&settings);
 }
 
 QVariant BConfig::variant(const QWidget *w) const {
@@ -285,35 +300,56 @@ bool BConfig::setVariant(QWidget *w, const QVariant &v) const {
    return true;
 }
 
-void BConfig::_save(QSettings *settings, bool makeDirty) {
-   
-   bool delSettings = false;
-   if (!settings) {
-      delSettings = true;
-      settings = new QSettings(_qsetting[0], _qsetting[1]);
-   }
-   
-   settings->beginGroup(_qsetting[2]);
-   
-   QMap<QWidget*, SettingInfo>::iterator i;
-   SettingInfo *info;
-   for (i = _settings.begin(); i != _settings.end(); ++i)
-   {
-      QVariant value = variant(i.key());
-      if (value.isValid()) {
-         info = &(i.value());
-         settings->setValue(info->entry, value);
-         if (makeDirty)
+bool
+BConfig::_save(QSettings *settings, bool makeDirty)
+{
+
+    bool delSettings = false;
+    if (!settings) {
+        delSettings = true;
+        settings = new QSettings(_qsetting[0], _qsetting[1]);
+    }
+
+    if ( !settings->isWritable() )
+    {
+        QMessageBox::critical( parentWidget(), "Cannot write :-(",
+                               QString ( "<qt>Sorry, the file<br><b>%1</b><br>could not be written<hr>"
+                               "On unix systems, you can test if you own this file:<br>"
+                               "<b>stat %1</b><br>"
+                               "In case, you can make it writable<br>"
+                               "<b>chmod +w %1</b><hr>"
+                               "Or (also on Windows) use a filemanager like Dolphin, Nautilus, "
+                               "TotalCommander or Explorer, navigate to the file, rightclick it and "
+                               "usually select \"Properties\"<br>"
+                               "In the dialog, find the permission section and ensure your avatar "
+                               "is allowed to write on it.<hr>"
+                               "<b>You do not need to close this configurator meanwhile!</b><br>"
+                               "Just retry saving afterwards.</qt>" ).arg( settings->fileName() ) );
+        return false;
+    }
+
+    settings->beginGroup(_qsetting[2]);
+
+    QMap<QWidget*, SettingInfo>::iterator i;
+    SettingInfo *info;
+    for (i = _settings.begin(); i != _settings.end(); ++i)
+    {
+        QVariant value = variant(i.key());
+        if (value.isValid()) {
+            info = &(i.value());
+            settings->setValue(info->entry, value);
+            if (makeDirty)
             info->savedValue = value;
-      }
-   }
-   settings->endGroup();
-   
-   if (delSettings)
-      delete settings;
-   
-   if (makeDirty)
-      emit changed(true);
+        }
+    }
+    settings->endGroup();
+
+    if (delSettings)
+        delete settings;
+
+    if (makeDirty)
+        emit changed(true);
+    return true;
 }
 
 bool BConfig::eventFilter ( QObject * o, QEvent * e) {

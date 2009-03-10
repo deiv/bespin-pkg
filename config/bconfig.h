@@ -88,12 +88,12 @@ protected:
     } SettingInfo;
     virtual bool eventFilter ( QObject * watched, QEvent * event );
     virtual void loadSettings(QSettings *settings = 0, bool updateInitValue = true, bool merge = false);
-    virtual void _save(QSettings *settings = 0, bool makeDirty = true);
+    virtual bool _save(QSettings *settings = 0, bool makeDirty = true);
 signals:
     void changed(bool);
     void changed();
 public slots:
-    virtual void save();
+    virtual bool save();
     virtual void defaults();
     virtual void reset();
     virtual void import();
@@ -124,7 +124,10 @@ public:
             Defaults = 16, Import = 32, Export = 64, All = 127
     };
     BConfigDialog(BConfig *config, uint btns = All, QWidget *parent = 0L);
+public slots:
+    void accept();
 private:
+    BConfig *_config;
     Q_DISABLE_COPY(BConfigDialog)
 };
 

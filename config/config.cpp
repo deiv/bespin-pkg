@@ -882,10 +882,11 @@ Config::restore(QTreeWidgetItem *item, int col)
     settings.endGroup();
 }
 
-void
+bool
 Config::save()
 {
-    BConfig::save();
+    if ( !BConfig::save() )
+        return false;
     /** store app presets */
     QSettings settings("Bespin", "Style");
     settings.beginGroup("PresetApps");
@@ -905,6 +906,7 @@ Config::save()
     /** save the palette loaded from store to qt configuration */
     if (loadedPal)
         savePalette(*loadedPal);
+    return true;
 }
 
 static QColor mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
