@@ -178,12 +178,13 @@ Style::drawToolButtonLabel(const QStyleOption * option,
             QImage img(pm.width() + F(4), pm.height() + F(4), QImage::Format_ARGB32);
             img.fill(Qt::transparent);
             QPainter p(&img);
-            p.setOpacity(0.4);
 #if 1 // blurring
+            p.setOpacity(0.4);
             p.drawImage(F(4),F(4), pm.toImage().scaled(pm.size() - QSize(F(4),F(4)), Qt::KeepAspectRatio, Qt::SmoothTransformation));
             p.end();
             FX::expblur(img, F(5));
 #else // desaturation (like def. Qt but with a little transparency)
+            p.setOpacity(0.7);
             p.drawImage(F(2), F(2), pm.toImage());
             p.end();
             FX::desaturate(img, FCOLOR(Window));

@@ -249,10 +249,9 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
                 else
                     sliderlen = maxlen;
 
-                    const int sliderstart =
-                            sliderPositionFromValue(scrollbar->minimum, scrollbar->maximum,
-                                                    scrollbar->sliderPosition, maxlen - sliderlen,
-                                                    scrollbar->upsideDown);
+                const int sliderstart = sliderPositionFromValue(scrollbar->minimum, scrollbar->maximum,
+                                                                scrollbar->sliderPosition, maxlen - sliderlen,
+                                                                scrollbar->upsideDown);
                 switch (subControl)
                 {
                 // between top/left button and slider
@@ -273,7 +272,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
                     if (scrollbar->orientation == Qt::Horizontal)
                         ret.setRect(sliderstart, 0, sliderlen, sbextent);
                     else
-                        ret.setRect(0, sliderstart, sbextent, sliderlen);
+                        ret.setRect(0, sliderstart, sbextent, sliderlen + F(1) );
                     break;
                 default:
                     break;
@@ -285,8 +284,8 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         break;
       
    case CC_Slider:
-      if (const QStyleOptionSlider *slider =
-          qstyleoption_cast<const QStyleOptionSlider *>(option)) {
+      if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
+      {
          int tickOffset = pixelMetric(PM_SliderTickmarkOffset, slider, widget);
          int thickness = pixelMetric(PM_SliderControlThickness, slider, widget);
          

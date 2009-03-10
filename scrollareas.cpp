@@ -461,12 +461,13 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     }
 
     QColor bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
+    bc.setAlpha(255); // CCOLOR(btn.std, Bg) pot. reintroduces translucency...
     masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size);
 #if 1 // helps with black in black styles...
     if (!sunken && Gradients::isReflective(GRAD(btn)))
     {
         const int v = Colors::value(bc);
-        masks.rect[round_].outline(r.adjusted(f1,0,-f1,0), painter, Colors::mid(c, Qt::white, 6*(255-v), 255), f1);
+        masks.rect[round_].outline(r.adjusted(f1,0,-f1,0), painter, Colors::mid(bc, Qt::white, 6*(255-v), 255), f1);
     }
 #endif
 
