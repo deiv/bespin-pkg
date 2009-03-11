@@ -151,7 +151,7 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
         // dynamically (creating an app wide atom) and make KDE dev use it...!
 //    case PM_ProgressBarChunkWidth: // Width of a chunk in a progress bar indicator
     case PM_SplitterWidth: // Width of a splitter
-        return F(9);
+        return F(8);
     case PM_TitleBarHeight: // Height of the title bar
     case PM_IndicatorWidth: // Width of a check box indicator
     case PM_IndicatorHeight: // Height of a checkbox indicator
