@@ -190,7 +190,10 @@ grabWidget(QWidget * root, QPixmap &pix)
                     p.drawPixmap(zero, pix, rect);
                     p.end();
                     const QPoint &pt = scrollarea->frameRect().topLeft();
-                    w->render(saPix, w->mapTo(scrollarea, pt), w->rect(), 0);
+                    QPainter::setRedirected( w, saPix/*, w->mapFrom(scrollarea, pt)*/ );
+                    w->repaint();
+                    QPainter::restoreRedirected( w );
+                    //w->render(saPix, w->mapTo(scrollarea, pt), w->rect(), 0);
                     p.begin(&pix);
                     p.drawPixmap(rect.topLeft(), *saPix);
                     p.end();

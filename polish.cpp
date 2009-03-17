@@ -648,6 +648,11 @@ Style::polish( QWidget * widget )
         Animator::Progress::manage(widget);
     }
 
+#if QT_VERSION >= 0x040500
+        else if ( widget->inherits( "QTabWidget" ) )
+            widget->installEventFilter( this );
+#endif
+
     //BEGIN Tab animation, painting override                                                       -
     else if (qobject_cast<QTabBar *>(widget))
     {

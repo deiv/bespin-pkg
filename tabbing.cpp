@@ -101,17 +101,22 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
     ASSURE_OPTION(tbb, TabBarBase);
 
     QWidget *win = 0;
+    // this has completely changed with recent KDE, KTabWidget doesn't call the style at all?!
     if (widget)
     {
-        if (widget->parentWidget() && qobject_cast<QTabWidget*>(widget->parentWidget()))
+        if ( widget->parentWidget() )
+        if ( qobject_cast<QTabWidget*>( widget->parentWidget() ) )
         {
+#if QT_VERSION < 0x040500
             // in general we don't want a tabbar on a tabwidget
             // that's nonsense, looks crap... and still used by some KDE apps
             // the konqueror / kdevelop guys however want the konqueror tabbar to look
             // somewhat like Bespin =)
             // so permit the proxystyle solution
             if (widget->parentWidget()->style() == this)
+#endif
                 return; // otherwise it's a proxystyle like on konqueror / kdevelop...
+
         }
         else if (qobject_cast<const QTabBar*>(widget))
             return; // usually we alter the paintevent by eventfiltering
