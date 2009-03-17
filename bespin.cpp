@@ -261,6 +261,7 @@ Style::registerRoutines()
 Style::Style() : QCommonStyle()
 {
     setObjectName(QLatin1String("Bespin"));
+    FX::init();
     init();
     registerRoutines();
 }
