@@ -56,19 +56,15 @@ scrollAncestor(QWidget *w, QWidget *root)
 // to get an idea about what the bg of out tabs looks like - seems as if we
 // need to paint it
 static QPixmap
-dumpBackground(QWidget *target, const QRect &r, const QStyle *style
-#ifdef QT_NO_XRENDER
-, bool _32bit = false
-#endif
-)
+dumpBackground(QWidget *target, const QRect &r, const QStyle *style, bool _32bit = false )
 {
     if (!target) return QPixmap();
     QPoint zero(0,0);
     QPixmap pix(r.size());
-#ifdef QT_NO_XRENDER
+
     if (_32bit)
         pix.fill(Qt::transparent);
-#endif
+
     QWidgetList widgets; widgets << target;
     QWidget *w = target->parentWidget();
     while (w)
@@ -190,7 +186,7 @@ grabWidget(QWidget * root, QPixmap &pix)
                     p.drawPixmap(zero, pix, rect);
                     p.end();
                     const QPoint &pt = scrollarea->frameRect().topLeft();
-                    QPainter::setRedirected( w, saPix/*, w->mapFrom(scrollarea, pt)*/ );
+                    QPainter::setRedirected( w, saPix, w->mapFrom(scrollarea, pt) );
                     w->repaint();
                     QPainter::restoreRedirected( w );
                     //w->render(saPix, w->mapTo(scrollarea, pt), w->rect(), 0);
@@ -316,11 +312,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 
     // prepare the pixmaps we use to pretend the animation
     QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
-    tabPix[1] = dumpBackground(sw, contentsRect, qApp->style()
-#ifdef QT_NO_XRENDER
-    , _transition == CrossFade // this helps the non render blender with ARGB pixmaps
-#endif
-    );
+    tabPix[1] = dumpBackground(sw, contentsRect, qApp->style(), !FX::usesXRender() && _transition == CrossFade );
 
     if (clock.isNull())
     {

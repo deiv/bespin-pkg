@@ -18,9 +18,11 @@
 
 #ifndef QT_NO_XRENDER
 #include <QX11Info>
-#else
-#include <QPainter>
+#include <QPaintEngine>
 #endif
+#include <QPainter>
+
+
 // #include <QPainter>
 // #include <QWidget>
 // #include <QtCore/QVarLengthArray>
@@ -191,42 +193,63 @@ FX::expblur( QImage &img, int radius )
 }
 // ======================================================
 
+static bool useRender = false;
+
+void
+FX::init()
+{
+#ifndef QT_NO_XRENDER
+    QPixmap pix(1,1);
+    QPainter p(&pix);
+    useRender = p.paintEngine()->type() == QPaintEngine::X11;
+    p.end();
+#endif
+}
+
+bool
+FX::usesXRender()
+{
+    return useRender;
+}
 
 bool
 FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
 {
     if (opacity == 0.0)
         return false; // haha...
-#ifndef QT_NO_XRENDER
-    OXPicture alpha = NULL;
-    if (opacity != 1.0)
+    if (useRender)
     {
-        XRenderColor c = {0,0,0, ushort(opacity * 0xffff) };
-        alpha = createFill (dpy, &c);
-        if (alpha == X::None)
-            return false;
+        OXPicture alpha = NULL;
+        if (opacity != 1.0)
+        {
+            XRenderColor c = {0,0,0, ushort(opacity * 0xffff) };
+            alpha = createFill (dpy, &c);
+            if (alpha == X::None)
+                return false;
+        }
+        XRenderComposite (dpy, PictOpOver, upper.x11PictureHandle(), alpha,
+                          lower.x11PictureHandle(), 0, 0, 0, 0, x, y,
+                          upper.width(), upper.height());
+        if (alpha)
+            XRenderFreePicture (dpy, alpha);
     }
-    XRenderComposite (dpy, PictOpOver, upper.x11PictureHandle(), alpha,
-                        lower.x11PictureHandle(), 0, 0, 0, 0, x, y,
-                        upper.width(), upper.height());
-    if (alpha)
-        XRenderFreePicture (dpy, alpha);
-#else
-    QPixmap tmp = upper;
-    QPainter p;
-    if (opacity != 1.0)
+    else
     {
-        tmp = upper.copy();
-        p.begin(&tmp);
-        p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-        p.fillRect(tmp.rect(), QColor(0,0,0, opacity*255.0));
+        QPixmap tmp = upper;
+        QPainter p;
+        if (opacity != 1.0)
+        {
+            tmp = upper.copy();
+            p.begin(&tmp);
+            p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+            p.fillRect(tmp.rect(), QColor(0,0,0, opacity*255.0));
+            p.end();
+        }
+        p.begin(&lower);
+        p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+        p.drawPixmap(x, y, tmp);
         p.end();
     }
-    p.begin(&lower);
-    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    p.drawPixmap(x, y, tmp);
-    p.end();
-#endif
    return true;
 }
 
@@ -252,17 +275,20 @@ FX::applyAlpha(const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect
     else
         pix = fromThisPix.copy(0,0,w,h); // cause slow depth conversion...
     pix.fill(Qt::transparent);
-#ifndef QT_NO_XRENDER
-    XRenderComposite( dpy, PictOpOver, toThisPix.x11PictureHandle(),
-                      fromThisPix.x11PictureHandle(), pix.x11PictureHandle(),
-                      sx, sy, ax, ay, 0, 0, w, h);
-#else
-    QPainter p(&pix);
-    p.drawPixmap(0, 0, toThisPix, sx, sy, w, h);
-    p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    p.drawPixmap(0, 0, fromThisPix, ax, ay, w, h);
-    p.end();
-#endif
+    if (useRender)
+    {
+        XRenderComposite( dpy, PictOpOver, toThisPix.x11PictureHandle(),
+                          fromThisPix.x11PictureHandle(), pix.x11PictureHandle(),
+                          sx, sy, ax, ay, 0, 0, w, h );
+    }
+    else
+    {
+        QPainter p(&pix);
+        p.drawPixmap(0, 0, toThisPix, sx, sy, w, h);
+        p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+        p.drawPixmap(0, 0, fromThisPix, ax, ay, w, h);
+        p.end();
+    }
     return pix;
 }
 
@@ -320,26 +346,26 @@ FX::tint(const QPixmap &mask, const QColor &color)
     QPixmap pix = mask.copy();
     pix.fill(Qt::transparent);
 
-#ifndef QT_NO_XRENDER
+    if (useRender)
+    {
+        Q2XRenderColor(c, color);
+        OXPicture tnt = createFill (dpy, &c);
+        if (tnt == X::None)
+            return pix;
 
-    Q2XRenderColor(c, color);
-    OXPicture tnt = createFill (dpy, &c);
-    if (tnt == X::None)
-        return pix;
+        XRenderComposite( dpy, PictOpOver, tnt, mask.x11PictureHandle(), pix.x11PictureHandle(),
+                          0, 0, 0, 0, 0, 0, mask.width(), mask.height());
+        XRenderFreePicture (dpy, tnt);
+    }
+    else
+    {
+        QPainter p(&pix);
+        p.setPen(Qt::NoPen); p.setBrush(color);
+        p.drawRect(pix.rect());
+        p.end();
+        pix = FX::applyAlpha(pix, mask);
+    }
 
-    XRenderComposite( dpy, PictOpOver, tnt, mask.x11PictureHandle(), pix.x11PictureHandle(),
-                      0, 0, 0, 0, 0, 0, mask.width(), mask.height());
-    XRenderFreePicture (dpy, tnt);
-    
-#else
-
-    QPainter p(&pix);
-    p.setPen(Qt::NoPen); p.setBrush(color);
-    p.drawRect(pix.rect());
-    p.end();
-    pix = FX::applyAlpha(pix, mask);
-    
-#endif
     return pix;
 }
 

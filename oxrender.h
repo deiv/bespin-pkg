@@ -57,6 +57,8 @@ namespace FX
     void setColor(XRenderColor &xc, QColor qc);
 #endif
 
+    void init();
+    bool usesXRender();
     bool blend(const QPixmap &upper, QPixmap &lower, double opacity = 0.5, int x = 0, int y = 0);
     void desaturate(QImage &img, const QColor &c);
     QPixmap fade(const QPixmap &pix, double percent);
