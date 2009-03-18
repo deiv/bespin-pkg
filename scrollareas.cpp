@@ -346,7 +346,8 @@ void
 Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
-    const bool horizontal = option->state & QStyle::State_Horizontal;
+    const bool horizontal = option->state & QStyle::State_Horizontal ||
+                            RECT.width() > RECT.height(); // at least opera doesn't propagate this
 
     if (isComboDropDownSlider)
     {   //gets a special slimmer and simpler look
