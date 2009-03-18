@@ -293,7 +293,8 @@ void
 Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
     OPT_ENABLED;
-    const bool horizontal = option->state & QStyle::State_Horizontal;
+    const bool horizontal = option->state & QStyle::State_Horizontal ||
+                            RECT.width() > RECT.height(); // at least opera doesn't propagate this
 
     if (isComboDropDownSlider)
     {   // get's a special solid groove
