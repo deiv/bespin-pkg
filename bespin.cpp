@@ -214,6 +214,9 @@ Style::registerRoutines()
     registerCE(drawToolboxTab, CE_ToolBoxTab);
     registerCE(drawToolboxTabShape, CE_ToolBoxTabShape);
     registerCE(drawToolboxTabLabel, CE_ToolBoxTabLabel);
+#if QT_VERSION >= 0x040500
+    registerPE(drawTabCloser, PE_IndicatorTabClose);
+#endif
     // toolbars.cpp
     registerCC(drawToolButton, CC_ToolButton);
     registerPE(drawToolButtonShape, PE_PanelButtonTool);

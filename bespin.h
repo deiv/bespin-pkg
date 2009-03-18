@@ -237,6 +237,9 @@ protected:
     void drawToolboxTab(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawToolboxTabShape(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawToolboxTabLabel(const QStyleOption*, QPainter*, const QWidget*) const;
+#if QT_VERSION >= 0x040500
+    void drawTabCloser(const QStyleOption*, QPainter*, const QWidget*) const;
+#endif
     // toolbars.cpp
     void drawToolButton(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
     void drawToolButtonShape(const QStyleOption*, QPainter*, const QWidget*) const;

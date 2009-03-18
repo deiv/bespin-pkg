@@ -57,7 +57,7 @@ Style::standardPixmap(StandardPixmap standardPixmap,
         isEnabled = option->state & State_Enabled;
         hover = isEnabled && (option->state & State_MouseOver);
     }
-   
+
     QRect rect; QPalette pal;
 //    const QStyleOptionTitleBar *opt =
 //       qstyleoption_cast<const QStyleOptionTitleBar *>(option);
@@ -90,8 +90,23 @@ Style::standardPixmap(StandardPixmap standardPixmap,
 
     switch (standardPixmap)
     {
-//         case SP_ArrowBack:
-//         case SP_ArrowLeft:
+    case SP_ArrowBack:
+    case SP_ArrowLeft:
+    {
+        QRect help = pm.rect();
+        shape.moveTo( help.topRight() );
+        shape.quadTo( help.left(), help.top(), help.left(), help.center().y() );
+        shape.quadTo( help.bottomLeft(), help.bottomRight() );
+        shape.closeSubpath();
+        help.translate(help.width()/2, 0);
+        QPainterPath sub;
+        sub.moveTo( help.topRight() );
+        sub.quadTo( help.left(), help.top(), help.left(), help.center().y() );
+        sub.quadTo( help.bottomLeft(), help.bottomRight() );
+        sub.closeSubpath();
+        shape = shape.subtracted(sub);
+        goto paint;
+    }
 //         case SP_ArrowRight:
 //         case SP_ArrowForward:
 //         case SP_MediaPlay:
@@ -110,8 +125,8 @@ Style::standardPixmap(StandardPixmap standardPixmap,
 
     case SP_DockWidgetCloseButton:
     case SP_TitleBarCloseButton:
-//     case SP_BrowserStop:
-//     case SP_MediaStop:
+    case SP_BrowserStop:
+    case SP_MediaStop:
         shape = Shapes::close(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMinButton:

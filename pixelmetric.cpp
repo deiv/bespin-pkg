@@ -145,10 +145,11 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
     case PM_TabBarTabShiftHorizontal: // Horizontal pixel shift when a tab is selected
         return 0;
     case PM_TabBarTabShiftVertical: // Vertical pixel shift when a tab is selected
+#if QT_VERSION >= 0x040500
+        return 0; // problem solved outside ;-)
+#else
         return F(4); // trying to trick KTabBar to place the close icon on a reasonable pos
-        //TODO the close icon solution looks ... debatable - find a way to hack it, or
-        // ==>> ground a general solution, convince TT to extend QStyle to allow adding new elements
-        // dynamically (creating an app wide atom) and make KDE dev use it...!
+#endif
 //    case PM_ProgressBarChunkWidth: // Width of a chunk in a progress bar indicator
     case PM_SplitterWidth: // Width of a splitter
         return F(8);

@@ -250,6 +250,23 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
         }
         drawTabShape(&copy, painter, widget);
     }
+#if QT_VERSION >= 0x040500
+    if HAVE_OPTION(tabV3, TabV3)
+    {
+        int d[4] = {0,0,0,0};
+        if (verticalTabs(tab->shape))
+        {
+            if ( tabV3->leftButtonSize.isValid() ) d[1] = tabV3->leftButtonSize.height() + F(2);
+            if ( tabV3->rightButtonSize.isValid() ) d[3] = -tabV3->rightButtonSize.height() - F(2);
+        }
+        else
+        {
+            if ( tabV3->leftButtonSize.isValid() ) d[0] = tabV3->leftButtonSize.width() + F(2);
+            if ( tabV3->rightButtonSize.isValid() ) d[2] = -tabV3->rightButtonSize.width() - F(2);
+        }
+        copy.rect.adjust( d[0], d[1], d[2], d[3] );
+    }
+#endif
     drawTabLabel(&copy, painter, widget);
     if (needRestore)
         painter->restore();
@@ -328,21 +345,11 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
     painter->save();
     QRect tr = RECT;
 
-    bool verticalTabs = false;
+    bool vertical = verticalTabs(tab->shape);
     bool east = false;
 
-    switch(tab->shape)
-    {
-    case QTabBar::RoundedEast: case QTabBar::TriangularEast:
-        east = true;
-    case QTabBar::RoundedWest: case QTabBar::TriangularWest:
-        verticalTabs = true;
-        break;
-    default:
-        break;
-    }
 
-    if (verticalTabs)
+    if (vertical)
     {
         int newX, newY, newRot;
         if (east)
@@ -407,6 +414,33 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
     painter->restore();
     animStep = -1;
 }
+
+#if QT_VERSION >= 0x040500
+void
+Style::drawTabCloser(const QStyleOption *option, QPainter *painter, const QWidget*) const
+{
+    OPT_SUNKEN OPT_HOVER
+    if (sunken) hover = false;
+    
+    QRect rect = RECT;
+    sunken ?
+        rect.adjust(F(5),F(3),-F(4),-F(6)) :
+        hover ?
+            rect.adjust(F(3),F(1),-F(2),-F(4)) :
+            rect.adjust(F(4),F(2),-F(3),-F(5));
+
+    painter->setRenderHint(QPainter::Antialiasing);
+
+    QColor c = Colors::mid( CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 3, 1+hover );
+    painter->setPen( QPen( c, F(3) ) );
+    painter->drawEllipse( rect );
+
+//     c = hover ? CCOLOR(tab.active, Fg) : Colors::mid( CCOLOR(tab.active, Bg), CCOLOR(tab.active, Fg) );
+//     painter->setPen( QPen( c, F(2) ) );
+//     rect.adjust(F(2),F(2),-F(2),-F(2));
+//     painter->drawEllipse( rect );
+}
+#endif
 
 void
 Style::drawToolboxTab(const QStyleOption *option, QPainter *painter, const QWidget * widget) const
