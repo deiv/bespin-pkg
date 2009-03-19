@@ -264,6 +264,9 @@ protected:
     void fillWithMask(QPainter *painter, const QPoint &xy, const QBrush &brush, const QPixmap &mask, QPoint offset = QPoint()) const;
 //private slots:
 //   void fakeMouse();
+
+protected slots:
+    QIcon standardIconImplementation(StandardPixmap , const QStyleOption *o = 0, const QWidget *w = 0 ) const;
    
 private:
     Q_DISABLE_COPY(Style)

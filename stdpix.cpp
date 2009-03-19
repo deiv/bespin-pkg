@@ -46,6 +46,50 @@ static inline uint qt_intensity(uint r, uint g, uint b)
     return (77 * r + 150 * g + 28 * b) / 255;
 }
 
+QIcon
+Style::standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget ) const
+{
+    QIcon icon;
+    QStyleOption copy = option ? *option : QStyleOption();
+
+    QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
+    if (widget)
+    {
+        copy.initFrom(widget);
+        bg = widget->backgroundRole(); fg = widget->foregroundRole();
+    }
+    else
+        copy.palette = qApp->palette();
+
+    copy.palette.setColor( QPalette::Disabled, bg, copy.palette.color(QPalette::Disabled, fg) );
+    copy.palette.setColor( QPalette::Active, bg, copy.palette.color(QPalette::Active, fg) );
+    copy.palette.setColor( QPalette::Inactive, bg, copy.palette.color(QPalette::Inactive, fg) );
+        
+    copy.rect.setRect(0,0,16,16);
+    icon.addPixmap( standardPixmap(standardIcon, &copy, widget ) );
+    copy.rect.setRect(0,0,22,22);
+    icon.addPixmap( standardPixmap(standardIcon, &copy, widget ) );
+    copy.rect.setRect(0,0,32,32);
+    icon.addPixmap( standardPixmap(standardIcon, &copy, widget ) );
+    return icon;
+}
+
+static
+QPainterPath arrow( const QRect &rect, bool right = false )
+{
+    int cy = rect.center().y();
+    int x1 = rect.right();
+    int s = -1;
+    if (right)
+        { s = 1; x1 = rect.left(); }
+
+    QPainterPath shape;
+    shape.moveTo( x1, rect.top() );
+    shape.quadTo( x1+s*(9*2*rect.width()/10), cy, x1, rect.bottom() );
+    shape.quadTo( x1-s*rect.width()/8, cy, x1, rect.top() );
+    return shape;
+}
+
 QPixmap
 Style::standardPixmap(StandardPixmap standardPixmap,
                             const QStyleOption * option, const QWidget * widget ) const
@@ -92,32 +136,31 @@ Style::standardPixmap(StandardPixmap standardPixmap,
     {
     case SP_ArrowBack:
     case SP_ArrowLeft:
+        shape = arrow( pm.rect() ).subtracted(arrow( pm.rect().translated(pm.rect().width()/2, 0) ));
+        goto paint;
+    case SP_ArrowRight:
+    case SP_ArrowForward:
+        shape = arrow( pm.rect(), true ).subtracted(arrow( pm.rect().translated(-pm.rect().width()/2, 0), true ));
+        goto paint;
+    case SP_MediaPlay:
+        shape = arrow( pm.rect(), true );
+        goto paint;
+    case SP_MediaPause:
+        shape = Shapes::unAboveBelow(pm.rect());
+        goto paint;
+    case SP_BrowserReload:
     {
-        QRect help = pm.rect();
-        shape.moveTo( help.topRight() );
-        shape.quadTo( help.left(), help.top(), help.left(), help.center().y() );
-        shape.quadTo( help.bottomLeft(), help.bottomRight() );
-        shape.closeSubpath();
-        help.translate(help.width()/2, 0);
-        QPainterPath sub;
-        sub.moveTo( help.topRight() );
-        sub.quadTo( help.left(), help.top(), help.left(), help.center().y() );
-        sub.quadTo( help.bottomLeft(), help.bottomRight() );
-        sub.closeSubpath();
-        shape = shape.subtracted(sub);
+        QRect rect = pm.rect();
+        int d5 = rect.height()/4;
+        rect.setWidth( 4*rect.width()/5 );
+        rect.setHeight( d5 );
+        rect.moveTop( rect.y() + d5 );
+        shape.addRoundRect( rect, 50, 50 );
+        rect.moveBottom( pm.rect().bottom() - d5 );
+        rect.moveRight( pm.rect().right() );
+        shape.addRoundRect( rect, 50, 50 );
         goto paint;
     }
-//         case SP_ArrowRight:
-//         case SP_ArrowForward:
-//         case SP_MediaPlay:
-//             shape.moveTo(pm.rect().center());
-//             shape.arcTo(pm.rect(), standardPixmap == SP_ArrowLeft ? 90 :270, 180);
-//             shape.closeSubpath();
-//             goto paint;
-//         case SP_MediaPause:
-//             shape = Shapes::unAboveBelow(pm.rect());
-//             goto paint;
-//         SP_BrowserReload    58  Icon indicating that the current page should be reloaded.
 //         SP_MediaSkipForward 63  Icon indicating that media should skip forward.
 //         SP_MediaSkipBackward    64  Icon indicating that media should skip backward.
 //         SP_MediaSeekForward 65  Icon indicating that media should seek forward.
