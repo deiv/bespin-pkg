@@ -82,11 +82,15 @@ public:
     PrettyLabel( const QStringList & data, QWidget * parent = 0, Qt::WindowFlags f = 0) :
     QWidget(parent, f), time(0), index(0), animTimer(0), animated(true)
     {
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
         QFont font; font.setBold(true); setFont(font);
+        setMinimumHeight( QFontMetrics(font).height() + 4 );
         setData(data, false);
     }
     void setData(const QStringList &data, bool upd = true)
     {
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        show();
         if (data == this->data)
             return;
         this->data = data.isEmpty() ? QStringList() << "" : data;
@@ -657,13 +661,13 @@ Hacks::setAmarokMetaInfo(int)
 {
     if (!amarok->meta)
         return;
+
     QDBusInterface org_kde_amarok( "org.kde.amarok", "/Player", "org.freedesktop.MediaPlayer");
     QDBusReply<QVariantMap> reply = org_kde_amarok.call("GetMetadata");
     QString toolTip;
     QStringList data;
     if (reply.isValid())
     {
-
         QString tmp = reply.value().value("title").toString();
         if (!tmp.isEmpty()) {
             if (tmp != "Unknown") data << tmp;
@@ -867,22 +871,7 @@ Hacks::add(QWidget *w)
                 foreach (f, list)
                     if (f->inherits("KVBox")) break;
                 if (f)
-                {
-                    list = f->findChildren<QFrame*>();
                     oList = f->children();
-                }
-                foreach (f, list)
-                    if (f->inherits("KHBox")) break;
-                if (f && f->layout())
-                if (QBoxLayout *box = qobject_cast<QBoxLayout*>(f->layout()))
-                {
-                    amarok->meta = new PrettyLabel(QStringList() << "Amarok² / Bespin edition" << "Click to toggle animation" << "Wheel to change item", f);
-                    box->insertWidget(0, amarok->meta);
-                    amarok->meta->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-//                     amarok->meta->setAlignment(Qt::AlignCenter);
-                    QDBusConnection::sessionBus().connect("org.kde.amarok", "/Player",
-                    "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)));
-                }
                 
                 QObject *o = 0;
                 foreach (o, oList)
@@ -890,6 +879,19 @@ Hacks::add(QWidget *w)
 
                 if (QWidget *pw = qobject_cast<QWidget*>(o))
                 {
+                    if ( QWidget *dad = pw->parentWidget() )
+                    if (QBoxLayout *box = qobject_cast<QBoxLayout*>(dad->layout()))
+                    {
+                        if ( box->itemAt(0)->widget() && box->itemAt(0)->widget() != o )
+                            box->itemAt(0)->widget()->hide();
+                        amarok->meta = new PrettyLabel(QStringList() << "Amarok² / Bespin edition" << "Click to toggle animation" << "Wheel to change item", f);
+                        box->insertWidget(0, amarok->meta);
+                        amarok->meta->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+//                     amarok->meta->setAlignment(Qt::AlignCenter);
+                        QDBusConnection::sessionBus().connect( "org.kde.amarok", "/Player",
+                                                               "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)) );
+                    }
+
                     QList<QLabel*> lList = pw->findChildren<QLabel*>();
                     if (lList.size() == 2)
                     {
