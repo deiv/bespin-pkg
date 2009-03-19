@@ -85,8 +85,8 @@ QPainterPath arrow( const QRect &rect, bool right = false )
 
     QPainterPath shape;
     shape.moveTo( x1, rect.top() );
-    shape.quadTo( x1+s*(9*2*rect.width()/10), cy, x1, rect.bottom() );
-    shape.quadTo( x1-s*rect.width()/8, cy, x1, rect.top() );
+    shape.quadTo( x1+s*18*rect.width()/10, cy, x1, rect.bottom() );
+    shape.quadTo( x1+s*rect.width()/5, cy, x1, rect.top() );
     return shape;
 }
 

@@ -27,7 +27,7 @@
 
 #define HOVER_STEP sunken ? 6 : ((appType == GTK || !widget) ? 6*hover : Animator::Hover::step(widget))
 
-static int animStep = -1;
+static struct AnimPair { const QWidget *widget; int step; } anim = {0,0};
 static bool isCheckbox = false;
 
 void
@@ -35,14 +35,18 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
 {
     ASSURE_OPTION(btn, Button);
     OPT_SUNKEN OPT_HOVER;
+    if ( widget && widget->inherits("WebView") )
+        widget = 0; // leads to false UnderMouse assumptions...
 
     QRect oldRect = btn->rect;
     QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
+    anim.widget = widget;
+    anim.step = HOVER_STEP;
+
     if (btn->features & QStyleOptionButton::Flat)
     {   // more like a toolbtn
         if (option->state & State_Enabled)
         {
-            animStep = HOVER_STEP;
             if (option->state & State_HasFocus)
                 masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
             if (sunken)
@@ -68,6 +72,7 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
     _btn->rect.adjust(F(6), F(4), -F(6), -F(4));
     drawPushButtonLabel(btn, painter, widget);
     _btn->rect = oldRect;
+    anim.widget = 0; anim.step = 0;
 }
 
 void
@@ -84,9 +89,12 @@ Style::drawPushButtonBevel(const QStyleOption * option, QPainter * painter, cons
 
     OPT_SUNKEN OPT_HOVER
 
-    animStep = HOVER_STEP;
+    bool resetAnim = false;
+    if ( !widget || widget != anim.widget )
+        { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
 
     drawButtonFrame(option, painter, widget);
+
     if (btn->features & QStyleOptionButton::HasMenu)
     {
         int sz = (RECT.height()-F(6))/2;
@@ -98,11 +106,14 @@ Style::drawPushButtonBevel(const QStyleOption * option, QPainter * painter, cons
         painter->save();
         const QColor c = Colors::mid(Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg)),
                                      Colors::mid(CCOLOR(btn.active, Bg), CCOLOR(btn.active, Fg)),
-                                     6-animStep, animStep);
+                                     6-anim.step, anim.step);
         painter->setPen(c); painter->setBrush(c);
         drawArrow(Navi::S, rect, painter);
         painter->restore();
     }
+    int animStep = anim.step;
+    if ( resetAnim )
+        { anim.widget = 0; anim.step = 0; }
     // toggle indicator
     ASSURE(widget);
     ASSURE_WIDGET(b, QAbstractButton);
@@ -140,10 +151,11 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
     B_STATES
 
     const QAbstractButton* btn = qobject_cast<const QAbstractButton*>(widget);
+    bool resetAnim = false;
     if (widget && !btn && widget->inherits("QAbstractItemView"))
-        { hover = false; animStep = 0; }
-    else if (animStep < 0)
-        animStep = HOVER_STEP;
+        { hover = false; anim.step = 0; }
+    else if ( !widget || widget != anim.widget )
+        { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
 
         // "Flash effect - is debatable"
 //     if (sunken) animStep = hover = sunken = 0;
@@ -158,7 +170,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
 
     Gradients::Type gt = GRAD(btn);
 
-    QColor c = btnBg(PAL, isEnabled, hasFocus, animStep, fullHover, Gradients::isTranslucent(gt));
+    QColor c = btnBg(PAL, isEnabled, hasFocus, anim.step, fullHover, Gradients::isTranslucent(gt));
     QColor iC = CCOLOR(btn.std, Bg);
 
     bool drawInner = false;
@@ -168,13 +180,13 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         drawInner = true;
         iC = CCOLOR(btn.active, Bg);
     }
-    else if (animStep)
+    else if ( anim.step )
     {
         if (!fullHover)
             drawInner = true;
 
         if (drawInner || config.btn.backLightHover)
-            iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
+            iC = Colors::mid(c, CCOLOR(btn.active, Bg), 6-anim.step, anim.step);
 
       // gtk HATES color inversion on labels, so we invert the nonlabled part...
 //       if (appType == GTK && !isCheckbox &&
@@ -210,8 +222,8 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
                 if (config.btn.active_role[Bg] == QPalette::Highlight)
                     { c2 = FCOLOR(Highlight); c2.setAlpha(212); }
             }
-            else if (animStep && config.btn.backLightHover)
-                { c2 = CCOLOR(btn.active, Bg); c2.setAlpha(c2.alpha()*animStep/8); }
+            else if ( anim.step  && config.btn.backLightHover )
+                { c2 = CCOLOR(btn.active, Bg); c2.setAlpha(c2.alpha()*anim.step/8); }
 
             if (c2 != Qt::transparent)
             {
@@ -238,12 +250,12 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
             if (!config.btn.cushion && sunken)
                 r.setBottom(r.bottom() - F(1));
             const int contrast = Colors::contrast(FCOLOR(Window), FCOLOR(Highlight));
-            QColor fc = (config.btn.backLightHover && animStep) ? iC : FCOLOR(Window);
+            QColor fc = ( config.btn.backLightHover && anim.step ) ? iC : FCOLOR(Window);
             fc = Colors::mid(fc, FCOLOR(Highlight), contrast/20, 1);
             lights.rect[round].render(r, painter, fc);
             r = RECT;
         }
-        else if (config.btn.backLightHover && animStep)
+        else if ( config.btn.backLightHover && anim.step )
             lights.rect[round].render(RECT, painter, iC); // backlight
 
         if (sunken && !config.btn.cushion)
@@ -286,10 +298,12 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
             masks.rect[round].render(bevelRect, painter, Gradients::bevel(false));
         }
     }
+    if ( resetAnim )
+        { anim.widget = 0; anim.step = 0; }
 }
 
 void
-Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget *) const
+Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(btn, Button);
     OPT_ENABLED OPT_FOCUS OPT_HOVER OPT_SUNKEN;
@@ -332,10 +346,13 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     // The TEXT ============================================
     const bool flat = btn->features & QStyleOptionButton::Flat;
-    const QColor fg = btnFg(PAL, isEnabled, hasFocus, animStep, flat);
+    bool resetAnim = false;
     if (config.btn.backLightHover)
-        { hover = 0; animStep = 0; }
+        { hover = 0; anim.widget = widget; anim.step = 0; }
+    else if ( !widget || widget != anim.widget )
+        { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
 
+    const QColor fg = btnFg(PAL, isEnabled, hasFocus, anim.step, flat);
     const QColor &bg = flat ? FCOLOR(Window) : (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
 
     painter->save();
@@ -358,7 +375,9 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
     painter->restore();
-    animStep = -1;
+    
+    if ( resetAnim )
+        { anim.widget = 0; anim.step = 0; }
 }
 
 void
@@ -366,26 +385,31 @@ Style::drawCheckBox(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
     B_STATES
+    if ( widget && widget->inherits("WebView") )
+        widget = 0;
 
     // the button -----------------
     QStyleOption copy = *option;
     if (config.btn.layer == 0)
         copy.rect.adjust(F(1),F(1),-F(1),0); // get rect appereance again
+    bool resetAnim = false;
     isCheckbox = true;
+    if (config.btn.backLightHover)
+        { hover = 0; anim.widget = widget; anim.step = 0; }
+    else if ( !widget || widget != anim.widget )
+        { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
     drawButtonFrame(&copy, painter, widget);
     isCheckbox = false;
 
     if (!(sunken || (option->state & State_Off)))
     {   // the checkmark -----------------
         painter->save();
-        if (config.btn.backLightHover)
-            { hover = 0; animStep = 0; }
         QPoint center = copy.rect.center();
         if (config.btn.checkType == Check::V && (option->state & State_On))
             center += QPoint(F(2), -F(2));
         else
             center += QPoint(0, -F(1));
-        painter->setBrush(btnFg(PAL, isEnabled, hasFocus, animStep));
+        painter->setBrush(btnFg(PAL, isEnabled, hasFocus, anim.step));
         const int d = F(5) - (bool(config.btn.checkType) + config.btn.layer) * F(1);
         copy.rect.adjust(d, d, -d, -d);
         if (copy.rect.width() > copy.rect.height())
@@ -396,12 +420,15 @@ Style::drawCheckBox(const QStyleOption * option, QPainter * painter,
         drawCheckMark(&copy, painter, config.btn.checkType);
         painter->restore();
     }
-    animStep = -1;
+    if ( resetAnim )
+        { anim.widget = 0; anim.step = 0; }
 }
 
 void
 Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
+    if ( widget && widget->inherits("WebView") )
+        widget = 0;
     B_STATES
 
     const int f1 = F(1);
@@ -517,8 +544,9 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
     r.setBottom(RECT.bottom());
     shadows.sunken[true][isEnabled].render(r, painter);
 
-    animStep = isOn ? 12 : HOVER_STEP;
-    if (animStep)
+    int animStep = isOn ? 12 : HOVER_STEP;
+
+    if (animStep > 0)
     {   // the drop ============================
         QColor c = Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg), 12-animStep, animStep);
         const int off = dpi.ExclusiveIndicator/4;
@@ -533,7 +561,6 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
 //         masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
 //     }
 #endif
-   animStep = -1;
 }
 
 //    case PE_FrameButtonBevel: // Panel frame for a button bevel
