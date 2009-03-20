@@ -24,6 +24,7 @@
 
 #include "bespin.h"
 #include "colors.h"
+#include "gradients.h"
 #include "paths.h"
 
 #include <QtDebug>
@@ -52,19 +53,9 @@ Style::standardIconImplementation(StandardPixmap standardIcon, const QStyleOptio
     QIcon icon;
     QStyleOption copy = option ? *option : QStyleOption();
 
-    QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
     if (widget)
-    {
         copy.initFrom(widget);
-        bg = widget->backgroundRole(); fg = widget->foregroundRole();
-    }
-    else
-        copy.palette = qApp->palette();
 
-    copy.palette.setColor( QPalette::Disabled, bg, copy.palette.color(QPalette::Disabled, fg) );
-    copy.palette.setColor( QPalette::Active, bg, copy.palette.color(QPalette::Active, fg) );
-    copy.palette.setColor( QPalette::Inactive, bg, copy.palette.color(QPalette::Inactive, fg) );
-        
     copy.rect.setRect(0,0,16,16);
     icon.addPixmap( standardPixmap(standardIcon, &copy, widget ) );
     copy.rect.setRect(0,0,22,22);
@@ -126,7 +117,7 @@ Style::standardPixmap(StandardPixmap standardPixmap,
     }
 
     const QDockWidget *dock = qobject_cast<const QDockWidget*>(widget);
-    const int sz = dock ? 14 : rect.width();
+    const int sz = dock ? 14 : rect.height();
     QPixmap pm(sz, sz);
     pm.fill(Qt::transparent);
     QPainter painter(&pm);
@@ -235,13 +226,15 @@ paint:
 
         QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
         if (widget)
-        {
-            bg = widget->backgroundRole();
-            fg = widget->foregroundRole();
-        }
-        const QColor c = Colors::mid(pal.color(bg), pal.color(fg), (!sunken)*(4-2*hover), 1);
+            { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
+            
+        const QColor c = Colors::mid(pal.color(bg), pal.color(fg), (!sunken)*(4-2*hover), 1 + (sz > 16)*20 );
         painter.setRenderHint ( QPainter::Antialiasing );
-        painter.setPen(Qt::NoPen); painter.setBrush(c);
+        painter.setPen(Qt::NoPen);
+        if (sz > 16)
+            painter.setBrush( Gradients::brush( c, sz, Qt::Vertical, Gradients::Glass ) );
+        else
+            painter.setBrush(c);
         painter.drawPath(shape);
         break;
     }

@@ -106,8 +106,17 @@ XBar::init()
         QTimer::singleShot(100, this, SLOT(init()));
         return;
     }
+    QWidget *panel = view()->window();
+    if ( panel )
+    {
+        QSizePolicy sp = panel->sizePolicy();
+        sp.setVerticalPolicy( QSizePolicy::Fixed );
+        panel->setSizePolicy( sp );
+    }
+    
     if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(containment()->layout()))
         lLayout->setStretchFactor(this, 1000);
+    
 //     if (!view()->inherits("PanelView"))
 //     {
 //         QMessageBox::warning ( 0, "XBar requires a Panel", "XBar shall be on panels dummy text");

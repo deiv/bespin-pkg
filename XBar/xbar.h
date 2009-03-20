@@ -48,7 +48,7 @@ public:
 public slots:
         void init();
 protected:
-    void wheelEvent(QGraphicsSceneWheelEvent *ev);
+    void wheelEvent( QGraphicsSceneWheelEvent *ev );
     virtual QSizeF sizeHint ( Qt::SizeHint which, const QSizeF & constraint = QSizeF() ) const;
 private:
     void hide(MenuBar *item);
