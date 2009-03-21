@@ -193,6 +193,7 @@ Style::drawComboBox(const QStyleOptionComplex * option,
 {
     ASSURE_OPTION(cmb, ComboBox);
     B_STATES
+    if ( widget->inherits("WebView") ) widget = 0;
 
     const int f1 = F(1), f2 = F(2), f3 = F(3);
     QRect ar, r = RECT.adjusted(f1, f1, -f1, -f2);
@@ -317,7 +318,7 @@ Style::drawComboBox(const QStyleOptionComplex * option,
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
 //          ar.adjust(f2, f3, -f2, -f3);
-            mask.render(ar, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0, F(4)));
+            mask.render(ar, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0, ar.y() - RECT.y()) );
             painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
         }
         if (upDown)

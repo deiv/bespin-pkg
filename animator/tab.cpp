@@ -110,6 +110,7 @@ dumpBackground(QWidget *target, const QRect &r, const QStyle *style, bool _32bit
     return pix;
 }
 
+
 // QPixmap::grabWidget(.) currently fails on the background offset,
 // so we use our own implementation
 static void
@@ -170,9 +171,16 @@ grabWidget(QWidget * root, QPixmap &pix)
             // scrollarea workaround
             if ((scrollarea = qobject_cast<QAbstractScrollArea*>(w)))
                 hasScrollAreas = true;
-            if (hasScrollAreas && !qobject_cast<QScrollBar*>(w) &&
-                (scrollarea = scrollAncestor(w, root)))
+            if ( hasScrollAreas && w != scrollarea && !qobject_cast<QScrollBar*>(w) && ( scrollarea = scrollAncestor(w, root) ) )
             {
+                // lately causes segfaults on QWidget::render() if painted through eventfilter
+                // and otherwise the redirected painting doesn't look different...
+                if ( w->objectName() == "qt_scrollarea_viewport" && w->parentWidget() && w->parentWidget()->inherits( "KHTMLView" ) )
+                    continue;
+                // repaints recursive...
+                if ( w->objectName() == "RenderFormElementWidget" )
+                    continue;
+                
                 QRect rect = scrollarea->frameRect();
                 if (rect.isValid())
                 {
@@ -186,10 +194,16 @@ grabWidget(QWidget * root, QPixmap &pix)
                     p.drawPixmap(zero, pix, rect);
                     p.end();
                     const QPoint &pt = scrollarea->frameRect().topLeft();
-                    QPainter::setRedirected( w, saPix, w->mapFrom(scrollarea, pt) );
-                    w->repaint();
-                    QPainter::restoreRedirected( w );
-                    //w->render(saPix, w->mapTo(scrollarea, pt), w->rect(), 0);
+#if 0
+                    if ( false )
+                    {
+                        QPainter::setRedirected( w, saPix, w->mapFrom(scrollarea, pt) );
+                        w->repaint();
+                        QPainter::restoreRedirected( w );
+                    }
+                    else
+#endif
+                        w->render(saPix, w->mapTo(scrollarea, pt), w->rect(), 0);
                     p.begin(&pix);
                     p.drawPixmap(rect.topLeft(), *saPix);
                     p.end();

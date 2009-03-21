@@ -362,12 +362,12 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
     }
 
     int alignment = Qt::AlignCenter | BESPIN_MNEMONIC;
-    if (!tab->icon.isNull())
+    if ( !tab->icon.isNull() )
     {
         QSize iconSize;
         if (const QStyleOptionTabV2 *tabV2 = qstyleoption_cast<const QStyleOptionTabV2*>(tab))
             iconSize = tabV2->iconSize;
-        if (!iconSize.isValid())
+        if ( !iconSize.isValid() )
         {
             int iconExtent = pixelMetric(PM_SmallIconSize);
             iconSize = QSize(iconExtent, iconExtent);
