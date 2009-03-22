@@ -193,7 +193,7 @@ Style::drawComboBox(const QStyleOptionComplex * option,
 {
     ASSURE_OPTION(cmb, ComboBox);
     B_STATES
-    if ( widget->inherits("WebView") ) widget = 0;
+    if ( widget && widget->inherits("WebView") ) widget = 0;
 
     const int f1 = F(1), f2 = F(2), f3 = F(3);
     QRect ar, r = RECT.adjusted(f1, f1, -f1, -f2);
