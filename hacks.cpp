@@ -89,8 +89,6 @@ public:
     }
     void setData(const QStringList &data, bool upd = true)
     {
-        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        show();
         if (data == this->data)
             return;
         this->data = data.isEmpty() ? QStringList() << "" : data;
@@ -880,16 +878,16 @@ Hacks::add(QWidget *w)
                 if (QWidget *pw = qobject_cast<QWidget*>(o))
                 {
                     if ( QWidget *dad = pw->parentWidget() )
-                    if (QBoxLayout *box = qobject_cast<QBoxLayout*>(dad->layout()))
+                    if ( QBoxLayout *box = qobject_cast<QBoxLayout*>(dad->layout()) )
+                    if ( box->itemAt(0)->widget() && box->itemAt(0)->widget() != o && box->itemAt(0)->widget()->layout() )
+                    if ( (box = qobject_cast<QHBoxLayout*>(box->itemAt(0)->widget()->layout())) )
                     {
-                        if ( box->itemAt(0)->widget() && box->itemAt(0)->widget() != o )
-                            box->itemAt(0)->widget()->hide();
                         amarok->meta = new PrettyLabel(QStringList() << "Amarok² / Bespin edition" << "Click to toggle animation" << "Wheel to change item", f);
-                        box->insertWidget(0, amarok->meta);
+                        box->addWidget(amarok->meta);
                         amarok->meta->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-//                     amarok->meta->setAlignment(Qt::AlignCenter);
+//                         amarok->meta->setAlignment(Qt::AlignCenter);
                         QDBusConnection::sessionBus().connect( "org.kde.amarok", "/Player",
-                                                               "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)) );
+                                                                "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)) );
                     }
 
                     QList<QLabel*> lList = pw->findChildren<QLabel*>();
