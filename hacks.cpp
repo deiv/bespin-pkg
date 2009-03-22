@@ -888,6 +888,7 @@ Hacks::add(QWidget *w)
 //                         amarok->meta->setAlignment(Qt::AlignCenter);
                         QDBusConnection::sessionBus().connect( "org.kde.amarok", "/Player",
                                                                 "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)) );
+                        box->addSpacing(22);
                     }
 
                     QList<QLabel*> lList = pw->findChildren<QLabel*>();
