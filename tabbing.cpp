@@ -161,6 +161,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
 }
 
 static int animStep = -1;
+static bool customColor = false;
 
 void
 Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
@@ -240,6 +241,10 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
             {
                 // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
                 index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
+                const QColor &fgColor = tbar->tabTextColor(index - 1);
+                if (fgColor.isValid() && fgColor != tbar->palette().color(QPalette::WindowText))
+                    customColor = true;
+
                 hoveredIndex = hover ? index : tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
                 info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, hoveredIndex));
             }
@@ -268,6 +273,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
     }
 #endif
     drawTabLabel(&copy, painter, widget);
+    customColor = false;
     if (needRestore)
         painter->restore();
 }
@@ -392,6 +398,12 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
         cB = Colors::mid(cB, CCOLOR(tab.active, Bg), 8-animStep, animStep);
         if (Colors::contrast(CCOLOR(tab.active, Fg), cB) > Colors::contrast(cF, cB))
             cF = CCOLOR(tab.active, Fg);
+    }
+    else if (customColor)
+    {
+        QFont fnt = painter->font();
+        fnt.setUnderline(true);
+        painter->setFont(fnt);
     }
 //     else
 //     {
