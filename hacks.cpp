@@ -874,6 +874,7 @@ Hacks::add(QWidget *w)
                 {
                     list = f->findChildren<QFrame*>();
                     oList = f->children();
+                    f = 0;
                     foreach (QFrame *runner, list)
                         if (runner->inherits("KHBox")) { f = runner; break; }
                     if (f)
@@ -887,11 +888,13 @@ Hacks::add(QWidget *w)
                 if (QWidget *pw = qobject_cast<QWidget*>(o))
                 {
                     if (!box && pw->parentWidget())
+                    {
                         box = qobject_cast<QBoxLayout*>(pw->parentWidget()->layout());
-                    if ( box && box->itemAt(0)->widget() && box->itemAt(0)->widget() != o && box->itemAt(0)->widget()->layout() )
-                        box = qobject_cast<QHBoxLayout*>(box->itemAt(0)->widget()->layout());
-                    else
-                        box = 0; // ensure this for later injection!
+                        if ( box && box->itemAt(0)->widget() && box->itemAt(0)->widget() != o && box->itemAt(0)->widget()->layout() )
+                            box = qobject_cast<QHBoxLayout*>(box->itemAt(0)->widget()->layout());
+                        else
+                            box = 0; // ensure this for later injection!
+                    }
 
                     QList<QLabel*> lList = pw->findChildren<QLabel*>();
                     if (lList.size() == 2)
@@ -901,7 +904,7 @@ Hacks::add(QWidget *w)
                     }
                     
                     if (pw->layout())
-                    if (QBoxLayout *box = qobject_cast<QBoxLayout*>(pw->layout()))
+                    if (QBoxLayout *box2 = qobject_cast<QBoxLayout*>(pw->layout()))
                     {
                         QToolButton *btn = new QToolButton(f);
                         QFont fnt = btn->font(); fnt.setBold(true);
@@ -909,7 +912,7 @@ Hacks::add(QWidget *w)
                         btn->setText(amarok->context && !amarok->context->isVisible() ? "[||]" : "[|]");
 
                         btn->setToolTip("Toggle ContextView");
-                        box->addWidget(btn);
+                        box2->addWidget(btn);
                         connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokContext())); // TODO: bind toggle?
 
                         btn = new QToolButton(f);
@@ -917,7 +920,7 @@ Hacks::add(QWidget *w)
                         btn->setText("-");
 
                         btn->setToolTip("Toggle comapct mode");
-                        box->addWidget(btn);
+                        box2->addWidget(btn);
                         connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokCompact())); // TODO: bind toggle?
                     }
                 }
