@@ -107,7 +107,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
         if ( widget->parentWidget() )
         if ( qobject_cast<QTabWidget*>( widget->parentWidget() ) )
         {
-#if QT_VERSION < 0x040500
+#if 1 // QT_VERSION < 0x040500
             // in general we don't want a tabbar on a tabwidget
             // that's nonsense, looks crap... and still used by some KDE apps
             // the konqueror / kdevelop guys however want the konqueror tabbar to look
