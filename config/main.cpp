@@ -55,6 +55,7 @@ usage(const char* appname)
 %s sshot <some_file.png> [preset] [width]\t\tSave a screenshot\n\
 %s load <some_preset>\t\t\t\tLoad a preset to current settings\n\
 %s import <some_config.bespin>\t\t\tImport an exported setting\n\
+%s update <some_config.bespin>\t\t\tLike import, but overrides existing\n\
 %s export <some_preset> <some_config.bespin>\tExport an imported setting\n\
 %s listStyles \t\t\t\t\tList all styles on this System\n",
 appname, appname, appname, appname, appname, appname, appname, appname, appname, appname );
@@ -63,7 +64,7 @@ appname, appname, appname, appname, appname, appname, appname, appname, appname,
 
 enum Mode
 {
-    Invalid = 0, Configure, Presets, Import, Export, Load, Demo, Try, Screenshot, ListStyles, Show
+    Invalid = 0, Configure, Presets, Import, Update, Export, Load, Demo, Try, Screenshot, ListStyles, Show
 };
 
 int
@@ -78,6 +79,7 @@ main(int argc, char *argv[])
         if (!qstrcmp( argv[1], "config" )) mode = Configure;
         else if (!qstrcmp( argv[1], "presets" )) mode = Presets;
         else if (!qstrcmp( argv[1], "import" )) mode = Import;
+        else if (!qstrcmp( argv[1], "update" )) mode = Update;
         else if (!qstrcmp( argv[1], "export" )) mode = Export;
         else if (!qstrcmp( argv[1], "demo" )) mode = Demo;
         else if (!qstrcmp( argv[1], "try" )) mode = Try;
@@ -111,6 +113,7 @@ main(int argc, char *argv[])
             return error("you lack <some_preset>");
         return Config::load(argv[2]);
     }
+    case Update:
     case Import:
     {
         if (argc < 3)
@@ -124,7 +127,7 @@ main(int argc, char *argv[])
                 error(QString("The file %1 does not exist").arg(argv[i]));
             }
             else {
-                if (Config::sImport(argv[i]).isNull())
+                if (Config::sImport(argv[i], mode == Update).isNull())
                     errors = true;
             }
         }

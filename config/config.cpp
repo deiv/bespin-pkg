@@ -719,7 +719,7 @@ blackListed(QString &key)
 }
 
 QString
-Config::sImport(const QString &filename)
+Config::sImport(const QString &filename, bool override)
 {
     if (!QFile::exists(filename))
         return QString();
@@ -736,10 +736,13 @@ Config::sImport(const QString &filename)
 
     QSettings store("Bespin", "Store");
 
-    int i = 2;
-    QStringList entries = store.childGroups();
-    while (entries.contains(storeName))
-        storeName = demandedName + '#' + QString::number(i++);
+    if (!override)
+    {
+        int i = 2;
+        QStringList entries = store.childGroups();
+        while (entries.contains(storeName))
+            storeName = demandedName + '#' + QString::number(i++);
+    }
 
     store.beginGroup(storeName);
     foreach (QString key, file.allKeys())

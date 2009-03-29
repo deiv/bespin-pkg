@@ -29,7 +29,7 @@ _bespin()
     cmd="${COMP_WORDS[1]}"
 
     # all options bespin-executable offers
-    opts="config demo export help import listStyles load presets show sshot try"
+    opts="config demo export help import update listStyles load presets show sshot try"
 
     case "${cmd}" in
         demo)
@@ -47,17 +47,12 @@ _bespin()
             fi
             return 0
             ;;
-        import)
+        import | update | try)
             COMPREPLY=( $(compgen -f -X '!*.bespin' -- "${cur}") \
                         $(compgen -d -- "${cur}") )
             return 0
             ;;
-        load)
-            local presets=$(bespin presets)
-            COMPREPLY=( $(compgen -W "${presets}" -- "${cur}") )
-            return 0
-            ;;
-        show)
+        load | show)
             local presets=$(bespin presets)
             COMPREPLY=( $(compgen -W "${presets}" -- "${cur}") )
             return 0
@@ -70,11 +65,6 @@ _bespin()
                 local presets=$(bespin presets)
                 COMPREPLY=( $(compgen -W "${presets}" -- "${cur}") )
             fi
-            return 0
-            ;;
-        try)
-            COMPREPLY=( $(compgen -f -X '!*.bespin' -- "${cur}") \
-                        $(compgen -d -- "${cur}") )
             return 0
             ;;
 
