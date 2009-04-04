@@ -58,7 +58,7 @@ usage(const char* appname)
 %s update <some_config.bespin>\t\t\tLike import, but overrides existing\n\
 %s export <some_preset> <some_config.bespin>\tExport an imported setting\n\
 %s listStyles \t\t\t\t\tList all styles on this System\n",
-appname, appname, appname, appname, appname, appname, appname, appname, appname, appname );
+appname, appname, appname, appname, appname, appname, appname, appname, appname, appname, appname );
    return 1;
 }
 
