@@ -204,7 +204,7 @@ Style::drawMenuItem(const QStyleOption * option, QPainter * painter,
             bg = Colors::mid(COLOR(ROLE[Bg]), COLOR(ROLE[Fg]), 1, 2);
             fg = COLOR(ROLE[Bg]);
         }
-        if (config.menu.itemGradient == Gradients::Glass || config.menu.itemGradient == Gradients::Gloss)
+        if (!config.menu.roundSelect)
             Tile::setShape(Tile::Top|Tile::Bottom|Tile::Center);
         masks.rect[round_].render( r, painter, sunken ? Gradients::Sunken : config.menu.itemGradient, Qt::Vertical, bg);
         if (sunken && config.menu.itemSunken)

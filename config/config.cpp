@@ -321,6 +321,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 
     handleSettings(ui.crMenuActive, MENU_ACTIVEROLE);
     handleSettings(ui.menuRound, MENU_ROUND);
+    handleSettings(ui.menuRoundSelect, "Menu.RoundSelect", true);
     handleSettings(ui.menuGlas, MENU_GLASSY);
     handleSettings(ui.gradMenuItem, MENU_ITEMGRADIENT);
     handleSettings(ui.showMenuIcons, MENU_SHOWICONS);

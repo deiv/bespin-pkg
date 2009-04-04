@@ -272,6 +272,10 @@ Style::readSettings(const QSettings* settings)
     //--------
     config.menu.round = readBool(MENU_ROUND);
     config.menu.itemGradient = readGrad(MENU_ITEMGRADIENT);
+    config.menu.roundSelect = iSettings->value("Menu.RoundSelect",
+                                              !(config.menu.itemGradient == Gradients::Glass ||
+                                              config.menu.itemGradient == Gradients::Gloss)).toBool();
+    
     if (appType == GTK)
     {
         config.menu.glassy = false;
