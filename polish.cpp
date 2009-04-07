@@ -548,8 +548,16 @@ Style::polish( QWidget * widget )
                     mbar->setCornerWidget(NULL);
                 }
 
-                widget->setBackgroundRole(QPalette::Window);
-                widget->setForegroundRole(QPalette::WindowText);
+                if (QWidget *dad = widget->parentWidget())
+                {
+                    widget->setBackgroundRole(dad->backgroundRole());
+                    widget->setForegroundRole(dad->foregroundRole());
+                }
+                else
+                {
+                    widget->setBackgroundRole(QPalette::Window);
+                    widget->setForegroundRole(QPalette::WindowText);
+                }
             }
             Animator::Hover::manage(widget);
         }
