@@ -540,18 +540,22 @@ Style::polish( QWidget * widget )
                 // of course plasma needs - again - a WORKAROUND, we seem to be unable to use bg/fg-role, are we?
                 !(appType == Plasma && widget->inherits("ToolButton")))
             {
-                if (Hacks::config.killThrobber && widget->inherits("KAnimatedButton"))
-                if (QMenuBar *mbar = qobject_cast<QMenuBar*>(widget->parentWidget()))
-                {   // this is konquerors throbber...
-                    widget->hide();
-                    widget->setParent(mbar->parentWidget());
-                    mbar->setCornerWidget(NULL);
-                }
-
                 if (QWidget *dad = widget->parentWidget())
                 {
-                    widget->setBackgroundRole(dad->backgroundRole());
-                    widget->setForegroundRole(dad->foregroundRole());
+                    if (QMenuBar *mbar = qobject_cast<QMenuBar*>(dad))
+                    {
+                        if (Hacks::config.killThrobber && widget->inherits("KAnimatedButton"))
+                        {   // this is konquerors throbber...
+                            widget->hide();
+                            widget->setParent(mbar->parentWidget());
+                            mbar->setCornerWidget(NULL);
+                        }
+                    }
+                    else
+                    {
+                        widget->setBackgroundRole(dad->backgroundRole());
+                        widget->setForegroundRole(dad->foregroundRole());
+                    }
                 }
                 else
                 {
@@ -720,11 +724,15 @@ Style::polish( QWidget * widget )
 #endif
 
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
-    QMenuBar *mbar = qobject_cast<QMenuBar *>(widget);
-    if (mbar && !((appType == QtDesigner) && mbar->inherits("QDesignerMenuBar")))
-        MacMenu::manage(mbar);
+    if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
+    {
+        widget->setBackgroundRole(config.menu.bar_role[Bg]);
+        widget->setForegroundRole(config.menu.bar_role[Fg]);
+        if (!((appType == QtDesigner) && mbar->inherits("QDesignerMenuBar")))
+            MacMenu::manage(mbar);
+    }   
 
-    bool isTopContainer = (mbar || qobject_cast<QToolBar *>(widget));
+    bool isTopContainer = qobject_cast<QToolBar *>(widget);
 #ifdef QT3_SUPPORT
     isTopContainer = isTopContainer || widget->inherits("Q3ToolBar");
 #endif

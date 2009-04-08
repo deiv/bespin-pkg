@@ -138,8 +138,7 @@ icon(QPixmap &pix, int step)
 }
 #include <QtDebug>
 void
-Style::drawToolButtonLabel(const QStyleOption * option,
-                                 QPainter * painter, const QWidget *widget) const
+Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(toolbutton, ToolButton);
     OPT_ENABLED OPT_SUNKEN
@@ -150,7 +149,15 @@ Style::drawToolButtonLabel(const QStyleOption * option,
                             !toolbutton->text.isEmpty() ||
                             toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
 
-    QPalette::ColorRole role = widget ? widget->foregroundRole() : QPalette::WindowText;
+    QPalette::ColorRole role = QPalette::WindowText;
+    if (widget)
+    {
+        role = widget->foregroundRole();
+        if (role == QPalette::ButtonText &&
+            widget->parentWidget() && widget->parentWidget()->inherits("QMenu"))
+            role = config.menu.std_role[Fg]; // this is a f**** KMenu Header
+    }
+
     if (justText)
     {   // the most simple way
         painter->setPen(Colors::mid(PAL.color(role), FCOLOR(Highlight), 6-step, step));
