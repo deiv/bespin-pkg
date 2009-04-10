@@ -487,7 +487,7 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
         Gradients::Type gt = Gradients::None;
         if (round)
         {
-        // TODO: obsolete now
+            // TODO: obsolete now
             if (appType == KRunner)
                 return; // ahhh... this has annoyed me from the beginning on...
             gt = hover ? Gradients::Button : Gradients::Sunken;
@@ -513,16 +513,20 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
         // try to convince the itemview to use the proper fg color, WORKAROUND (kcategorizedview, mainly)
         painter->setPen(FCOLOR(HighlightedText));
     }
+    else
+    {
 #if QT_VERSION >= 0x040400
 #warning Compiling with Qt4.4 - do NOT use with lower versions
-    else if (item->backgroundBrush.style() != Qt::NoBrush)
-    {
-        QPoint oldBO = painter->brushOrigin();
-        painter->setBrushOrigin(item->rect.topLeft());
-        painter->fillRect(item->rect, item->backgroundBrush);
-        painter->setBrushOrigin(oldBO);
-    }
+        if (item->backgroundBrush.style() != Qt::NoBrush)
+        {
+            QPoint oldBO = painter->brushOrigin();
+            painter->setBrushOrigin(item->rect.topLeft());
+            painter->fillRect(item->rect, item->backgroundBrush);
+            painter->setBrushOrigin(oldBO);
+        } else
 #endif
-    else if (item->features & QStyleOptionViewItemV2::Alternate)
-        painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
+        if (item->features & QStyleOptionViewItemV2::Alternate)
+            painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
+        painter->setPen(COLOR(fg)); // reset the painter for normal items. our above workaround otherwise might kill things...
+    }
 }
