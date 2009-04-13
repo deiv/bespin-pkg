@@ -185,6 +185,10 @@ static const int decoration_size = 9;
 void
 Style::drawBranch(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
 {
+
+    if ( !RECT.isValid() )
+        return;
+    
     SAVE_PEN;
     int mid_h = RECT.x() + RECT.width() / 2;
     int mid_v = RECT.y() + RECT.height() / 2;

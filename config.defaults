@@ -36,6 +36,7 @@
 #define BG_TOOLTIP_ROLE "Bg.TooltipRole", QPalette::WindowText
 
 #define BTN_CHECKTYPE "Btn.CheckType", 0
+#define BTN_DISABLED_TOOLS "Btn.DisabledToolStyle", 0
 #define BTN_GRADIENT "Btn.Gradient", Gradients::Button
 #define BTN_BACKLIGHTHOVER "Btn.BackLightHover", false
 #define BTN_LAYER "Btn.Layer", 0

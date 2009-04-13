@@ -311,6 +311,16 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.backlightHover, "Btn.BacklightHover", false);
     handleSettings(ui.btnRound, "Btn.Round", false);
     handleSettings(ui.btnBevelEnds, BTN_BEVEL_ENDS);
+    handleSettings(ui.disabledToolbuttonStyle, BTN_DISABLED_TOOLS);
+    setContextHelp(ui.disabledToolbuttonStyle, "<b>Disabled Toolbuttons</b><hr>\
+    Qt has a \"standard\" way to gray out disabled toolbuttons, which can be altered by the style.\
+    KDE provides several FX on icons to indicate disabled (tool)buttons but those won't apply to\
+    Qt-only applications.<br>\
+    As KDE for a while ignored it's own settings as well, i started to override the disabled\
+    appereance and while at it introduced blurring ;-P<br>\
+    Now that KDE actually allows me again to choose an effect, you can select to leave the icon FX\
+    untouched (what will result in different disabled looks for Qt and KDE applications), force the\
+    Qt desaturation or the former Bespin (forced - sorry everyone) blurring.");
    
     handleSettings(ui.gradChoose, "Chooser.Gradient", GradSunken);
 
@@ -371,11 +381,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Overwrites the painting routines of QMessageBoxes for a custom appereance.<br>\
     Also removes the Window decoration but allows you to drag around the window by\
     clicking anywhere.");
-
+/*
     handleSettings(ui.hackKrunner, HACK_KRUNNER);
     setContextHelp(ui.btnRole, "<b>KRunner</b><hr>\
     You'll get a window colored glass look and flat buttons.<br>");
-
+*/
     handleSettings(ui.hackKHtml, HACK_KHTMLVIEW);
     setContextHelp(ui.hackKHtml, "<b>Konqueror HTML window</b><hr>\
     By default, Konquerors HTML view has no frame around, but you may force a sunken\

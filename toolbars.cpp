@@ -150,8 +150,10 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
                             toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
 
     QPalette::ColorRole role = QPalette::WindowText;
+    QPalette::ColorRole bgRole = QPalette::Window;
     if (widget)
     {
+        bgRole = widget->backgroundRole();
         role = widget->foregroundRole();
         if (role == QPalette::ButtonText &&
             widget->parentWidget() && widget->parentWidget()->inherits("QMenu"))
@@ -174,28 +176,32 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     if (!toolbutton->icon.isNull())
     {
+        const int style = config.btn.disabledToolStyle;
 //         const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
-        pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), /*isEnabled ? */QIcon::Normal/* : QIcon::Disabled*/, QIcon::Off);
+        pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), isEnabled || style ? QIcon::Normal : QIcon::Disabled, QIcon::Off);
 #if 0   // this is -in a way- the way it should be done..., but KIconLoader gives a shit on this or anything else
         if (!isEnabled)
             pm = generatedIconPixmap ( QIcon::Disabled, pm, toolbutton );
 #else
-        if (!isEnabled)
+        if (!isEnabled && style)
         {
             QImage img(pm.width() + F(4), pm.height() + F(4), QImage::Format_ARGB32);
             img.fill(Qt::transparent);
             QPainter p(&img);
-#if 1 // blurring
-            p.setOpacity(0.5);
-            p.drawImage(F(3),F(3), pm.toImage().scaled(pm.size() - QSize(F(2),F(2)), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-            p.end();
-            FX::expblur(img, F(3));
-#else // desaturation (like def. Qt but with a little transparency)
-            p.setOpacity(0.7);
-            p.drawImage(F(2), F(2), pm.toImage());
-            p.end();
-            FX::desaturate(img, FCOLOR(Window));
-#endif
+            if (style > 1) // blurring
+            {
+                p.setOpacity(0.5);
+                p.drawImage(F(3),F(3), pm.toImage().scaled(pm.size() - QSize(F(2),F(2)), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                p.end();
+                FX::expblur(img, F(3));
+            }
+            else // desaturation (like def. Qt but with a little transparency)
+            {
+                p.setOpacity(0.7);
+                p.drawImage(F(2), F(2), pm.toImage());
+                p.end();
+                FX::desaturate(img, COLOR(bgRole));
+            }
             pm = QPixmap::fromImage(img);
         }
 #endif

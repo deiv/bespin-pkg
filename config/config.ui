@@ -228,7 +228,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>9</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -999,23 +999,53 @@
             </property>
            </widget>
           </item>
+          <item row="10" column="0">
+           <widget class="QLabel" name="label_24">
+            <property name="text">
+             <string>Disabled Toolbuttons</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="0">
+           <spacer name="verticalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="9" column="0">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="1" colspan="3">
+           <widget class="QComboBox" name="disabledToolbuttonStyle">
+            <item>
+             <property name="text">
+              <string>Qt/KDE natives</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Desaturated (Qt standard)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Blurred</string>
+             </property>
+            </item>
+           </widget>
+          </item>
          </layout>
-         <zorder>gradButton</zorder>
-         <zorder>label_20</zorder>
-         <zorder>sunkenButtons</zorder>
-         <zorder>label_26</zorder>
-         <zorder>btnRole</zorder>
-         <zorder>label_16</zorder>
-         <zorder>btnActiveRole</zorder>
-         <zorder>btnRound</zorder>
-         <zorder>backlightHover</zorder>
-         <zorder>fullButtonHover</zorder>
-         <zorder>cushion</zorder>
-         <zorder>btnBevelEnds</zorder>
-         <zorder>ambientLight</zorder>
-         <zorder>line</zorder>
-         <zorder>horizontalSpacer_7</zorder>
-         <zorder>label_10</zorder>
         </widget>
         <widget class="QWidget" name="Tabs">
          <layout class="QGridLayout" name="gridLayout_22">
@@ -2206,35 +2236,28 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="hackKrunner">
-            <property name="text">
-             <string>Override KRunner appereance</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QCheckBox" name="hackWindowMove">
             <property name="text">
              <string>Allow easy window dragging by clicking empty spaces (X11 only)</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="3" column="0">
            <widget class="QCheckBox" name="hackTreeViews">
             <property name="text">
              <string>Animate all treeviews</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="5" column="0">
            <widget class="QCheckBox" name="killThrobber">
             <property name="text">
              <string>Konqueror: Hide throbber (animated icon)</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
+          <item row="8" column="0">
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -2247,7 +2270,7 @@
             </property>
            </spacer>
           </item>
-          <item row="8" column="0">
+          <item row="7" column="0">
            <widget class="QGroupBox" name="groupBox_13">
             <property name="title">
              <string>Amarok</string>
@@ -2280,7 +2303,7 @@
             </layout>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="4" column="0">
            <widget class="QCheckBox" name="hackKHtml">
             <property name="text">
              <string>Konqueror: Sunken html frame</string>

@@ -239,6 +239,7 @@ Style::readSettings(const QSettings* settings)
 
     // Buttons ===========================
     config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
+    config.btn.disabledToolStyle = readInt(BTN_DISABLED_TOOLS);
     config.btn.round = readBool(BTN_ROUND);
     GRAD(btn) = readGrad(BTN_GRADIENT);
     if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
