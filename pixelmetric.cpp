@@ -121,8 +121,14 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
         return F(8);
     case PM_TabBarBaseHeight: // Height of the area between the tab bar and the tab pages
     case PM_TabBarBaseOverlap: { // Number of pixels the tab bar overlaps the tab bar base
+    // appears using a tabbar + base inside a tabwidget is no more the default way 'nowerdays
+        return 0;
+#if 0
         if (!widget)
-            return F(16);
+            return 0;// F(16);
+//             if (tw->styleSheet().isEmpty())
+//                     return false;
+//         if ( !(tw->styleSheet().contains("pane", Qt::CaseInsensitive) && tw->styleSheet().contains("border", Qt::CaseInsensitive)) )
         const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget);
         if (qobject_cast<const QTabWidget*>(widget) && !widget->children().isEmpty())
         {
@@ -131,7 +137,7 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
                     { tabBar = (QTabBar*)obj; break; }
         }
         if (!tabBar || !tabBar->isVisible())
-            return F(16);
+            return 0; //F(16);
         if (const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
         {
             if (twf->shape == QTabBar::RoundedEast || twf->shape == QTabBar::TriangularEast ||
@@ -139,6 +145,7 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
                 return tabBar->width();
         }
         return tabBar->height();
+#endif
     }
     case PM_TabBarScrollButtonWidth: //
         return F(16);

@@ -739,14 +739,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
             {   // no extra tabbar here please... unless the border is StyleShitted away ;)
                 if (tw->styleSheet().isEmpty())
                     return false;
-                if ( !(tw->styleSheet().contains("pane") && tw->styleSheet().contains("border")) )
+                if ( !(tw->styleSheet().contains("pane", Qt::CaseInsensitive) && tw->styleSheet().contains("border", Qt::CaseInsensitive)) )
                     return false;
             }
-
+            
             QPainter p(tabBar);
             QStyleOptionTabBarBase opt;
             opt.initFrom(tabBar);
-            if (QWidget *window = tabBar->window())
+            if (QWidget *window = tabBar->parentWidget())
             {
                 opt.tabBarRect = window->rect();
                 opt.tabBarRect.moveTopLeft(tabBar->mapFrom(window, opt.tabBarRect.topLeft()));
