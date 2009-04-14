@@ -242,8 +242,17 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
                 // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
                 index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
                 const QColor &fgColor = tbar->tabTextColor(index - 1);
-                if (fgColor.isValid() && fgColor != tbar->palette().color(QPalette::WindowText))
-                    customColor = true;
+                const QColor &stdFgColor = tbar->palette().color(tbar->foregroundRole());
+                if (fgColor.isValid() && fgColor != stdFgColor)
+                {
+                    // sometimes... MANY times devs just set the tabTextColor to QPalette::WindowText,
+                    // because it's defined that it has to be this. Qt provides all these colo roles just
+                    // to waste space and time... ...
+                    if (fgColor == tbar->palette().color(QPalette::WindowText))
+                        const_cast<QTabBar*>(tbar)->setTabTextColor(index - 1, stdFgColor); // fixed
+                    else // nope, this is really a custom color that will likley contrast just enough with QPalette::Window...
+                        customColor = true;
+                }
 
                 hoveredIndex = hover ? index : tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
                 info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, hoveredIndex));
