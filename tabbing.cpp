@@ -242,7 +242,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
                 // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
                 index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
                 const QColor &fgColor = tbar->tabTextColor(index - 1);
-                const QColor &stdFgColor = tbar->palette().color(tbar->foregroundRole());
+                const QColor &stdFgColor = CCOLOR(tab.std, Fg); // tbar->palette().color(tbar->foregroundRole());
                 if (fgColor.isValid() && fgColor != stdFgColor)
                 {
                     // sometimes... MANY times devs just set the tabTextColor to QPalette::WindowText,
