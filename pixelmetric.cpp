@@ -121,20 +121,23 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
         return F(8);
     case PM_TabBarBaseHeight: // Height of the area between the tab bar and the tab pages
     case PM_TabBarBaseOverlap: { // Number of pixels the tab bar overlaps the tab bar base
-    // appears using a tabbar + base inside a tabwidget is no more the default way 'nowerdays
-        return 0;
-#if 0
+//         return 0;
+    // ... but yesterday it was...
+#if 1
         if (!widget)
-            return 0;// F(16);
-//             if (tw->styleSheet().isEmpty())
-//                     return false;
-//         if ( !(tw->styleSheet().contains("pane", Qt::CaseInsensitive) && tw->styleSheet().contains("border", Qt::CaseInsensitive)) )
+            return F(16);
+
         const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget);
-        if (qobject_cast<const QTabWidget*>(widget) && !widget->children().isEmpty())
+        if (const QTabWidget *tw = qobject_cast<const QTabWidget*>(widget))
         {
-            foreach(QObject *obj, widget->children())
-                if (qobject_cast<QTabBar*>(obj))
-                    { tabBar = (QTabBar*)obj; break; }
+            if (tw->styleSheet().contains("pane", Qt::CaseInsensitive) && tw->styleSheet().contains("border", Qt::CaseInsensitive))
+                return 0;
+            if (!tw->children().isEmpty())
+            {
+                foreach(QObject *obj, widget->children())
+                    if (qobject_cast<QTabBar*>(obj))
+                        { tabBar = (QTabBar*)obj; break; }
+            }
         }
         if (!tabBar || !tabBar->isVisible())
             return 0; //F(16);
