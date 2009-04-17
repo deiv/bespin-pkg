@@ -128,6 +128,7 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
             return F(16);
 
         const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget);
+        if (!tabBar)
         if (const QTabWidget *tw = qobject_cast<const QTabWidget*>(widget))
         {
             if (tw->styleSheet().contains("pane", Qt::CaseInsensitive) && tw->styleSheet().contains("border", Qt::CaseInsensitive))

@@ -138,7 +138,7 @@ Style::readSettings(const QSettings* settings)
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
         // TODO: redundant, kwin and afaik compiz can handle this
         config.menu.opacity = readInt(MENU_OPACITY);
-        config.menu.showIcons = readBool(MENU_SHOWICONS);
+        config.menu.showIcons = appType == Opera || readBool(MENU_SHOWICONS);
         config.menu.shadow = readBool(MENU_SHADOW);
 
         config.newWinBtns = true; // this is a kwin deco setting, TODO: read from there?
