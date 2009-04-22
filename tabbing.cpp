@@ -190,7 +190,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
         }
     }
 
-   
+
     // paint shape and label
     QStyleOptionTab copy = *tab;
     // NOTICE: workaround for e.g. konsole,

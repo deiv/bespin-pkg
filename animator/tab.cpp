@@ -180,6 +180,8 @@ grabWidget(QWidget * root, QPixmap &pix)
                 // repaints recursive...
                 if ( w->objectName() == "RenderFormElementWidget" )
                     continue;
+//                if ( w->metaObject()->className() == "KOrg::MonthGraphicsView" )
+//                    continue;
                 
                 QRect rect = scrollarea->frameRect();
                 if (rect.isValid())

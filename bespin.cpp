@@ -29,6 +29,7 @@
 #include <QMenuBar>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QStyleOptionTabWidgetFrame>
 #include <QStylePlugin>
 #include <QScrollBar>
 #include <QToolButton>
@@ -755,6 +756,24 @@ Style::eventFilter( QObject *object, QEvent *ev )
             p.end();
             return false;
         }
+#if  QT_VERSION >= 0x040500
+        else if ( QTabWidget *tw = qobject_cast<QTabWidget*>( object ) )
+        {
+            // those don't paint frames and rely on the tabbar, which we ruled and rule out (looks weird with e.g. cornerwidgets...)
+            if (tw->documentMode())
+            {
+                QPainter p(tw);
+                QStyleOptionTabBarBase opt;
+                opt.initFrom(tw);
+                opt.rect.setHeight(pixelMetric( PM_TabBarBaseHeight, &opt, tw ));
+                opt.tabBarRect = tw->rect();
+                drawTabBar(&opt, &p, NULL);
+                p.end();
+                return true; // don't let it paint weird stuff on the cornerwidgets etc.
+            }
+            return false;
+        }
+#endif
 #if 0// doesn't work. sth. weakens the fist sector -> TODO: make KUrlNavigator make use of custom style elements
         else if (object->inherits("KUrlNavigator"))
         {
@@ -864,7 +883,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (!widget)
             return false;
 
-#if QT_VERSION >= 0x040500
+#if  0 // QT_VERSION >= 0x040500
             if ( QTabWidget *tw = qobject_cast<QTabWidget*>( object ) )
                 tw->setDocumentMode( false ); // force painting a bg here instead on the tabbar
             // fall through, this could be a modal window as well...

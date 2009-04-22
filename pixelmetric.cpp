@@ -121,7 +121,6 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
         return F(8);
     case PM_TabBarBaseHeight: // Height of the area between the tab bar and the tab pages
     case PM_TabBarBaseOverlap: { // Number of pixels the tab bar overlaps the tab bar base
-//         return 0;
     // ... but yesterday it was...
 #if 1
         if (!widget)
@@ -131,7 +130,8 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
         if (!tabBar)
         if (const QTabWidget *tw = qobject_cast<const QTabWidget*>(widget))
         {
-            if (tw->styleSheet().contains("pane", Qt::CaseInsensitive) && tw->styleSheet().contains("border", Qt::CaseInsensitive))
+            if ( tw->styleSheet().contains("pane", Qt::CaseInsensitive) &&
+                 tw->styleSheet().contains("border", Qt::CaseInsensitive))
                 return 0;
             if (!tw->children().isEmpty())
             {
@@ -142,7 +142,8 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
         }
         if (!tabBar || !tabBar->isVisible())
             return 0; //F(16);
-        if (const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
+        if (const QStyleOptionTabWidgetFrame *twf =
+            qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
         {
             if (twf->shape == QTabBar::RoundedEast || twf->shape == QTabBar::TriangularEast ||
                 twf->shape == QTabBar::RoundedWest || twf->shape == QTabBar::TriangularWest)
