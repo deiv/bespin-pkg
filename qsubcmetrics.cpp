@@ -80,33 +80,31 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         ASSURE_OPTION(cb, ComboBox) ret;
         int x,y,wi,he;
         cb->rect.getRect(&x,&y,&wi,&he);
-        int margin = cb->editable ? 1 : config.btn.fullHover ? dpi.f2 : dpi.f4;
+        int fh = cb->fontMetrics.ascent() + F(2);
+        int margin = cb->editable ? 1 : config.btn.fullHover ? F(2) : F(4);
 
         switch (subControl)
         {
         case SC_ComboBoxFrame:
-            ret = cb->rect;
+            ret.setRect(x, y, wi+2*margin, he+2*margin);
             break;
          case SC_ComboBoxArrow:
-            he = cb->fontMetrics.ascent() + F(2);
-//             he -= 2*margin;
-            x += wi; wi = (int)(he*1.1); //1.618
+            x += wi; wi = (int)(fh*1.1); //1.618
             x -= margin + wi;
-//             y += margin;
-            y += (cb->rect.height() - he + 1)/2;
-            ret.setRect(x, y, wi, he);
+            y += (he - fh + 1)/2;
+            ret.setRect(x, y, wi, fh);
             break;
         case SC_ComboBoxEditField:
-            wi -= (int)((he - 2*margin)/1.1) + 3*margin;
+            wi -= (int)(fh*1.1) + 2*margin;
             ret.setRect(x+margin, y+margin, wi, he - 2*margin);
             break;
         case SC_ComboBoxListBoxPopup:
-            ret = cb->rect;
-            if (!cb->editable)
-            { // shorten for the arrow
-                wi -= (int)((he - 2*margin)/1.1) + margin;
-                ret.setRect(x + margin, y, wi, he);
+            if (const QComboBox *box = qobject_cast<const QComboBox*>(widget))
+            if (box->count() <= box->maxVisibleItems())
+            {   // shorten for the arrow
+                wi -= (int)((fh - 2*margin)/1.1) + 3*margin;
             }
+            ret.setRect(x + margin, y, wi, he);
             break;
         default:
             break;
