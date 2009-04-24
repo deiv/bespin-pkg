@@ -50,6 +50,8 @@ static inline uint qt_intensity(uint r, uint g, uint b)
 QIcon
 Style::standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget ) const
 {
+    return QStyle::standardIconImplementation(standardIcon, option, widget);
+#if 0
     QIcon icon;
     QStyleOption copy = option ? *option : QStyleOption();
 
@@ -63,6 +65,7 @@ Style::standardIconImplementation(StandardPixmap standardIcon, const QStyleOptio
     copy.rect.setRect(0,0,32,32);
     icon.addPixmap( standardPixmap(standardIcon, &copy, widget ) );
     return icon;
+#endif
 }
 
 static
@@ -125,6 +128,7 @@ Style::standardPixmap(StandardPixmap standardPixmap,
 
     switch (standardPixmap)
     {
+#if 0
     case SP_ArrowBack:
     case SP_ArrowLeft:
         shape = arrow( pm.rect() ).subtracted(arrow( pm.rect().translated(pm.rect().width()/2, 0) ));
@@ -152,6 +156,7 @@ Style::standardPixmap(StandardPixmap standardPixmap,
         shape.addRoundRect( rect, 50, 50 );
         goto paint;
     }
+#endif
 //         SP_MediaSkipForward 63  Icon indicating that media should skip forward.
 //         SP_MediaSkipBackward    64  Icon indicating that media should skip backward.
 //         SP_MediaSeekForward 65  Icon indicating that media should seek forward.
@@ -231,9 +236,11 @@ paint:
         const QColor c = Colors::mid(pal.color(bg), pal.color(fg), (!sunken)*(4-2*hover), 1 + (sz > 16)*20 );
         painter.setRenderHint ( QPainter::Antialiasing );
         painter.setPen(Qt::NoPen);
+#if 0
         if (sz > 16)
             painter.setBrush( Gradients::brush( c, sz, Qt::Vertical, Gradients::Glass ) );
         else
+#endif
             painter.setBrush(c);
         painter.drawPath(shape);
         break;
