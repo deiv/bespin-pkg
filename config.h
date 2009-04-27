@@ -78,6 +78,8 @@ typedef struct Config
         int opacity;
     } menu;
 
+    int mnemonic;
+    
     struct progress
     {
         Gradients::Type gradient;

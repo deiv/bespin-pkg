@@ -310,6 +310,11 @@ Style::readSettings(const QSettings* settings)
     config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);
     config.menu.activeItemSunken = config.menu.itemSunken || readBool(MENU_ACTIVEITEMSUNKEN);
 
+    if (readBool(SHOW_MNEMONIC))
+        config.mnemonic = Qt::TextShowMnemonic;
+    else
+        config.mnemonic = Qt::TextHideMnemonic;
+
     // Progress ===========================
     GRAD(progress) = readGrad(PROGRESS_GRADIENT);
     config.progress.std_role[Bg] =  (QPalette::ColorRole) readInt(PROGRESS_ROLE_BG);

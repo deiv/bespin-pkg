@@ -42,8 +42,7 @@ Dpi Style::dpi;
 
 #define B_STATES OPT_SUNKEN OPT_ENABLED OPT_HOVER OPT_FOCUS
 
-#define BESPIN_MNEMONIC Qt::TextHideMnemonic
-// #define BESPIN_MNEMONIC Qt::TextShowMnemonic
+#define BESPIN_MNEMONIC config.mnemonic
 
 static inline void
 setBold(QPainter *p, const QString &text = QString())

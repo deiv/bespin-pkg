@@ -84,6 +84,8 @@
 #define MENU_ITEM_SUNKEN "Menu.ItemSunken", false
 #define MENU_ACTIVEITEMSUNKEN "Menu.ActiveItemSunken", false
 
+#define SHOW_MNEMONIC "ShowMnemonic", false
+
 #define PROGRESS_GRADIENT "Progress.Gradient", Gradients::Button
 #define PROGRESS_ROLE_BG "Progress.RoleBg", QPalette::WindowText
 #define PROGRESS_ROLE_FG "Progress.RoleFg", QPalette::Window
