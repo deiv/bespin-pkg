@@ -982,6 +982,8 @@ isBrowser(const QString &s)
    !s.compare("safari", Qt::CaseInsensitive); // just in case ;)
 }
 
+static const QString kwin_sep = QString(" %1 ").arg(QChar(0x2013));
+
 QString
 Client::trimm(const QString &string)
 {
@@ -1007,6 +1009,8 @@ Client::trimm(const QString &string)
     // "the kde application to burn cds and dvds" ...
     else if (ret.contains(" - "))
         ret = ret.section(" - ", 0, -2, QString::SectionSkipEmpty );
+    else if (ret.contains(kwin_sep)) // newer kwin versions use this uf8 dash (stupid idea?)
+        ret = ret.section(kwin_sep, 0, -2, QString::SectionSkipEmpty );
 
     KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
     QString appName(info.windowClassName());
@@ -1038,7 +1042,7 @@ Client::trimm(const QString &string)
         if (i > -1)
             ret = ret.mid(i, appName.length());
     }
-
+    
     // in general, remove leading and ending blanks...
     ret = ret.trimmed();
     
