@@ -148,6 +148,9 @@ Client::addButtons(const QString& s, int &sz, bool left)
                 buttons[type]->setAttribute(Qt::WA_OpaquePaintEvent);
                 buttons[type]->setAttribute(Qt::WA_PaintOnScreen);
                 buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
+#if QT_VERSION >= 0x040500
+                buttons[type]->setAttribute(Qt::WA_TranslucentBackground);
+#endif
             }
             titleBar->addWidget(buttons[type], 0, Qt::AlignVCenter);
             sz += (buttonSize()+2);
@@ -239,7 +242,8 @@ Client::eventFilter(QObject *o, QEvent *e)
             for (int i = 0; i < 4; ++i)
                 if (buttons[i])
                 {
-                    buttons[i]->setBg(buffer->copy(buttons[i]->geometry()));
+                    if (clip.contains(buttons[i]->geometry()))
+                        buttons[i]->setBg(buffer->copy(buttons[i]->geometry()));
                     buttons[i]->repaint(); // enforce, button thinks it's independend
                 }
 
@@ -941,6 +945,56 @@ Client::showWindowMenu(const QPoint &p)
    QPoint gp = widget()->mapToGlobal(QPoint(width()-200, 0));
    if (ip.x() > gp.x()) ip.setX(gp.x());
    KDecoration::showWindowMenu(ip);
+}
+
+void
+Client::tileWindow(bool more, bool vertical)
+{
+    int state = 0, s = 0, ext = 0, flags = (1<<14);
+    KDecoration::MaximizeMode mode = KDecoration::MaximizeVertical;
+
+    /*
+    The low byte of data.l[0] contains the gravity to use; it may contain any value allowed
+    for the WM_SIZE_HINTS.win_gravity property: NorthWest (1), North (2), NorthEast (3),
+        West (4), Center (5), East (6), SouthWest (7), South (8), SouthEast (9) and Static (10).
+        A gravity of 0 indicates that the Window Manager should use the gravity specified in
+        WM_SIZE_HINTS.win_gravity. The bits 8 to 11 indicate the presence of x, y, width and height.
+        The bits 12 to 15 indicate the source (see the section called Source indication in requests),
+        so 0001 indicates the application and 0010 indicates a Pager or a Taskbar.
+        The remaining bits should be set to zero.
+        */
+
+    if (vertical)
+    {
+        s = KWindowSystem::workArea().height();
+        state = s/height();
+        flags |= 1<<11;
+        ext = borderSize + titleSize;
+        mode = KDecoration::MaximizeHorizontal;
+    }
+    else
+    {
+        s = KWindowSystem::workArea().width();
+        state = s/width();
+        flags |= 1<<10;
+        ext = 2*borderSize;
+    }
+
+    
+    if (more)
+        ++state;
+    else if (state < 3)
+    {
+        maximize(KDecoration::MaximizeFull);
+        return;
+    }
+    else
+        --state;
+
+    s = s/state - ext;
+    maximize(mode);
+    NETRootInfo rootinfo(QX11Info::display(), NET::WMMoveResize );
+    rootinfo.moveResizeWindowRequest(windowId(), flags, 0, 0, s, s);
 }
 
 void
