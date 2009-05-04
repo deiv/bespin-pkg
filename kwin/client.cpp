@@ -979,8 +979,6 @@ Client::tileWindow(bool more, bool vertical)
         ++state;
     else if (state > 1)
         --state;
-    else
-        return;
 
     sz /= state; 
 
