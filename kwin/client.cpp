@@ -950,9 +950,7 @@ Client::showWindowMenu(const QPoint &p)
 void
 Client::tileWindow(bool more, bool vertical)
 {
-    int state = 0, s = 0, ext = 0, flags = (1<<14);
-    KDecoration::MaximizeMode mode = KDecoration::MaximizeVertical;
-
+    int state = 0, sz = 0, flags = (1<<14);
     /*
     The low byte of data.l[0] contains the gravity to use; it may contain any value allowed
     for the WM_SIZE_HINTS.win_gravity property: NorthWest (1), North (2), NorthEast (3),
@@ -966,35 +964,28 @@ Client::tileWindow(bool more, bool vertical)
 
     if (vertical)
     {
-        s = KWindowSystem::workArea().height();
-        state = s/height();
+        sz = KWindowSystem::workArea().height();
+        state = lround((double)sz/height());
         flags |= 1<<11;
-        ext = borderSize + titleSize;
-        mode = KDecoration::MaximizeHorizontal;
     }
     else
     {
-        s = KWindowSystem::workArea().width();
-        state = s/width();
+        sz = KWindowSystem::workArea().width();
+        state = lround((double)sz/width());
         flags |= 1<<10;
-        ext = 2*borderSize;
     }
 
-    
     if (more)
         ++state;
-    else if (state < 3)
-    {
-        maximize(KDecoration::MaximizeFull);
-        return;
-    }
-    else
+    else if (state > 1)
         --state;
+    else
+        return;
 
-    s = s/state - ext;
-    maximize(mode);
+    sz /= state; 
+
     NETRootInfo rootinfo(QX11Info::display(), NET::WMMoveResize );
-    rootinfo.moveResizeWindowRequest(windowId(), flags, 0, 0, s, s);
+    rootinfo.moveResizeWindowRequest(windowId(), flags, 0, 0, sz, sz);
 }
 
 void
