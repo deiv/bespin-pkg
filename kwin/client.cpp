@@ -36,6 +36,9 @@
 
 #include <kwindowinfo.h>
 #include <kwindowsystem.h>
+#include <netwm.h>
+
+#include <cmath>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/shape.h>
