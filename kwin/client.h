@@ -90,7 +90,7 @@ protected:
     inline int buttonSize() const { return _factory->buttonSize(); }
     void repaint(QPainter &p);
     inline int slickButtons() const { return _factory->slickButtons(); }
-    void tileWindow(bool more, bool vertical);
+    void tileWindow(bool more, bool vertical, bool mirrorGravity);
 private:
     Q_DISABLE_COPY(Client)
     void updateTitleLayout( const QSize& s );

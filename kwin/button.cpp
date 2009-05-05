@@ -385,7 +385,7 @@ Button::wheelEvent(QWheelEvent *e)
 {
     if ((_type == Max || _type == Restore) && isEnabled())
     {
-        client->tileWindow(e->delta() < 0, e->modifiers() & Qt::ControlModifier);
+        client->tileWindow(e->delta() < 0, e->modifiers() & Qt::ControlModifier, !left);
         return;
     }
 

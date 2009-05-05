@@ -948,11 +948,12 @@ Client::showWindowMenu(const QPoint &p)
 }
 
 void
-Client::tileWindow(bool more, bool vertical)
+Client::tileWindow(bool more, bool vertical, bool mirrorGravity)
 {
-    const int tiles = 4;
-    int state = 0, sz = 0, flags = (1<<14);
+    const int tiles = 6;
+    int state = 0, sz = 0, flags = (mirrorGravity ? 3 : 1) | (1<<14);
     bool change = false;
+    MaximizeMode mode;
     /*
     The low byte of data.l[0] contains the gravity to use; it may contain any value allowed
     for the WM_SIZE_HINTS.win_gravity property: NorthWest (1), North (2), NorthEast (3),
@@ -971,6 +972,7 @@ Client::tileWindow(bool more, bool vertical)
         state = lround((double)tiles*height()/sz);
         change = (qAbs(height()-state*sz/tiles) < 0.05*sz);
         flags |= 1<<11;
+        mode = MaximizeVertical;
     }
     else
     {
@@ -979,6 +981,7 @@ Client::tileWindow(bool more, bool vertical)
         state = lround((double)tiles*width()/sz);
         change = (qAbs(width()-state*sz/tiles) < 0.05*sz);
         flags |= 1<<10;
+        mode = MaximizeHorizontal;
     }
 
     if (change)
@@ -991,6 +994,11 @@ Client::tileWindow(bool more, bool vertical)
 
     if (!state)
         return;
+    if (state == tiles)
+    {
+        maximize(mode);
+        return;
+    }
 
     sz = state*sz/tiles;
 
