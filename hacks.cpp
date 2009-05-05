@@ -810,6 +810,7 @@ Hacks::add(QWidget *w)
     if (*appType == Amarok)
     {
         if (!amarok) amarok = new AmarokData;
+
         if (QSplitter *splitter = qobject_cast<QSplitter*>(w))
         {
             splitter->setChildrenCollapsible(true);
@@ -824,10 +825,11 @@ Hacks::add(QWidget *w)
             {
                 QWidget *splitterKid = w;
                 
-                while (splitterKid->parentWidget() && !qobject_cast<QSplitter*>(splitterKid->parentWidget()))
+                while (splitterKid->parentWidget() &&
+                       !(qobject_cast<QSplitter*>(splitterKid->parentWidget()) || splitterKid->inherits("KVBox")) )
                     splitterKid = splitterKid->parentWidget();
                 
-                if (qobject_cast<QSplitter*>(splitterKid->parentWidget()))
+                if (qobject_cast<QSplitter*>(splitterKid->parentWidget()) || splitterKid->inherits("KVBox"))
                 {
                     if (config.amarokDisplay)
                         amarok->context = splitterKid;
