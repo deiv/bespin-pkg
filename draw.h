@@ -47,6 +47,9 @@ Dpi Style::dpi;
 static inline void
 setBold(QPainter *p, const QString &text = QString())
 {
+    if (p->font().pointSize() < 1)  // ignore pixelsize fonts for reports of bad visual quality (#2787384)
+        return;
+    
     QFont fnt = p->font();
     fnt.setBold(true);
     if (!text.isEmpty())
@@ -64,20 +67,21 @@ setBold(QPainter *p, const QString &text = QString())
 static inline void
 setTitleFont(QPainter *p)
 {
-        QFont fnt = p->font();
-        fnt.setWeight(QFont::Black);
+    if (p->font().pointSize() < 1) // ignore pixelsize fonts for reports of bad visual quality (#2787384)
+        return;
+    
+    QFont fnt = p->font();
+    fnt.setWeight(QFont::Black);
 //         fnt.setUnderline(true);
 //         fnt.setStretch(QFont::SemiExpanded);
 #if QT_VERSION >= 0x040400
-        fnt.setCapitalization(QFont::AllUppercase/*SmallCaps*/);
+    fnt.setCapitalization(QFont::AllUppercase/*SmallCaps*/);
 #else
-        title = title.toUpper();
+    title = title.toUpper();
 #endif
-        if (fnt.pointSize() > -1)
-            fnt.setPointSize(9*fnt.pointSize()/10);
-        else
-            fnt.setPixelSize(9*fnt.pixelSize()/10);
-        p->setFont(fnt);
+    fnt.setPointSize(9*fnt.pointSize()/10);
+
+    p->setFont(fnt);
 }
 
 #endif // BESPIN_DRAW_H
