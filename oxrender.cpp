@@ -212,6 +212,18 @@ FX::usesXRender()
     return useRender;
 }
 
+static Picture _blendPicture = X::None;
+static XRenderColor _blendColor = {0,0,0, 0xffff };
+static Picture blendPicture(double opacity)
+{
+    _blendColor.alpha = ushort(opacity * 0xffff);
+    if (_blendPicture == X::None)
+        _blendPicture = createFill (dpy, &_blendColor);
+    else
+        XRenderFillRectangle(dpy, PictOpSrc, _blendPicture, &_blendColor, 0, 0, 1, 1);
+    return _blendPicture;
+}
+
 bool
 FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
 {
@@ -219,19 +231,10 @@ FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
         return false; // haha...
     if (useRender)
     {
-        OXPicture alpha = NULL;
-        if (opacity != 1.0)
-        {
-            XRenderColor c = {0,0,0, ushort(opacity * 0xffff) };
-            alpha = createFill (dpy, &c);
-            if (alpha == X::None)
-                return false;
-        }
+        OXPicture alpha = (opacity == 1.0) ? NULL : blendPicture(opacity);
         XRenderComposite (dpy, PictOpOver, upper.x11PictureHandle(), alpha,
                           lower.x11PictureHandle(), 0, 0, 0, 0, x, y,
                           upper.width(), upper.height());
-        if (alpha)
-            XRenderFreePicture (dpy, alpha);
     }
     else
     {

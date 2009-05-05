@@ -120,11 +120,18 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
     }
 
     bool translucent = false;
+
     if (c.alpha() < 255)
     {
-//         c.setAlpha(0);
-//         translucent = true;
-        c.setAlpha(255); // for the moment...
+#if QT_VERSION >= 0x040500
+        if ( widget->testAttribute(Qt::WA_TranslucentBackground))
+        {
+            c = Qt::transparent;/*.setAlpha(0);*/
+            translucent = true;
+        }
+        else
+#endif  
+            c.setAlpha(255); // for the moment...
     }
 
     if (config.bg.mode == Scanlines)

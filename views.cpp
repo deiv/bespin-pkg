@@ -134,11 +134,11 @@ Style::drawHeaderLabel(const QStyleOption * option, QPainter * painter, const QW
     painter->save();
 
     // this works around a possible Qt bug?!?
-    QFont tmpFnt = painter->font(); tmpFnt.setBold(option->state & State_On);
+    bool bold = (option->state & State_On);
     const QColor *bg, *fg;
     if (header->sortIndicator != QStyleOptionHeader::None)
     {
-        tmpFnt.setBold(true);
+        bold = true;
         bg = &CCOLOR(view.sortingHeader, Bg);
         fg = &CCOLOR(view.sortingHeader, Fg);
     }
@@ -147,7 +147,8 @@ Style::drawHeaderLabel(const QStyleOption * option, QPainter * painter, const QW
         bg = &CCOLOR(view.header, Bg);
         fg = &CCOLOR(view.header, Fg);
     }
-    painter->setFont(tmpFnt);
+    if (bold)
+        setBold(painter);
 
     if (isEnabled)
     {   // dark background, let's paint an emboss

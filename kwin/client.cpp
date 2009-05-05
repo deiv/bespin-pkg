@@ -151,9 +151,6 @@ Client::addButtons(const QString& s, int &sz, bool left)
                 buttons[type]->setAttribute(Qt::WA_OpaquePaintEvent);
                 buttons[type]->setAttribute(Qt::WA_PaintOnScreen);
                 buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
-#if QT_VERSION >= 0x040500
-                buttons[type]->setAttribute(Qt::WA_TranslucentBackground);
-#endif
             }
             titleBar->addWidget(buttons[type], 0, Qt::AlignVCenter);
             sz += (buttonSize()+2);

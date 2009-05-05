@@ -36,9 +36,9 @@ Colors::bg(const QPalette &pal, const QWidget *w)
     else
         role = w->backgroundRole();
 
-    if (pal.brush(role).style() > 1)
+//     if (pal.brush(role).style() > 1)
         return pal.color(role);
-    return QApplication::palette().color(role);
+//     return QApplication::palette().color(role);
 }
 
 int

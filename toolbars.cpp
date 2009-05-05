@@ -98,8 +98,7 @@ Style::drawToolButton(const QStyleOptionComplex * option,
 }
 
 void
-Style::drawToolButtonShape(const QStyleOption * option,
-                                 QPainter * painter, const QWidget * widget) const
+Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     OPT_ENABLED;
 
@@ -107,10 +106,15 @@ Style::drawToolButtonShape(const QStyleOption * option,
         return;
 
     const bool isOn = option->state & State_On;
-    const QColor &c = Colors::bg(PAL, widget);
     if (isOn)
     {
-        masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
+        if (widget && widget->testAttribute(Qt::WA_StyleSheet))
+            masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, QColor(128,128,128,128));
+        else
+        {
+            const QColor &c = Colors::bg(PAL, widget);
+            masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
+        }
         shadows.sunken[true][true].render(RECT, painter);
     }
 }
@@ -163,9 +167,8 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
     if (justText)
     {   // the most simple way
         painter->setPen(Colors::mid(PAL.color(role), FCOLOR(Highlight), 6-step, step));
-        QFont fnt = toolbutton->font;
-        if (sunken) fnt.setBold(true);
-        painter->setFont(fnt);
+        if (sunken)
+            setBold(painter, toolbutton->text);
         drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, toolbutton->text);
         return;
     }

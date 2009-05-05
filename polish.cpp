@@ -77,6 +77,8 @@ Hacks::Config Hacks::config;
 static inline void
 setBoldFont(QWidget *w, bool bold = true)
 {
+    if (w->font().pointSize() < 1)
+        return;
     QFont fnt = w->font();
     fnt.setBold(bold);
     w->setFont(fnt);
@@ -99,7 +101,10 @@ void Style::polish ( QApplication * app )
 
 void Style::polish( QPalette &pal, bool onInit )
 {
-    QColor c = pal.color(QPalette::Active, QPalette::Background);
+    QColor c = pal.color(QPalette::Active, QPalette::Window);
+#if 0 // this is dangerous! QT_VERSION >= 0x040500
+    c.setAlpha(128);
+#endif
     if (config.bg.mode > Plain)
     {
         int h,s,v,a;
@@ -107,8 +112,8 @@ void Style::polish( QPalette &pal, bool onInit )
         if (v < config.bg.minValue) // very dark colors won't make nice backgrounds ;)
             c.setHsv(h, s, config.bg.minValue, a);
 //         c.setAlpha(128);
-        pal.setColor( QPalette::Window, c );
     }
+    pal.setColor( QPalette::Window, c );
 
     // AlternateBase
     pal.setColor(QPalette::AlternateBase, Colors::mid(pal.color(QPalette::Active, QPalette::Base),
@@ -316,6 +321,10 @@ Style::polish( QWidget * widget )
     {
         QPalette pal = widget->palette();
 
+#if 0 // this is dangerous! QT_VERSION >= 0x040500
+        if (!widget->testAttribute(Qt::WA_TranslucentBackground))
+            widget->setAttribute(Qt::WA_TranslucentBackground);
+#endif
         if (config.bg.mode > Plain)
             widget->setAttribute(Qt::WA_StyledBackground);
 
@@ -354,11 +363,11 @@ Style::polish( QWidget * widget )
 #endif
         }
         //END Popup menu handling                                                                  -
-
+# if 0
         /// WORKAROUND for krunner's white flicker showup bg...
         else if (appType == KRunner && widget->inherits("Interface"))
             widget->setAttribute(Qt::WA_NoSystemBackground);
-
+#endif
         /// WORKAROUND Qt color bug, uses daddies palette and FGrole, but TooltipBase as background
         else if (widget->inherits("QWhatsThat"))
             widget->setPalette(QToolTip::palette()); // so this is Qt bug WORKAROUND
