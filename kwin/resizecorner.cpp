@@ -52,7 +52,8 @@ ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
     setCursor(QCursor(Qt::SizeFDiagCursor));
     setFixedSize(CORNER_SIZE, CORNER_SIZE);
 //    buffer = QPixmap(16,16);
-    setAttribute(Qt::WA_OpaquePaintEvent);
+//     setAttribute(Qt::WA_OpaquePaintEvent);
+    setAutoFillBackground(true);
     QPolygon triangle(3);
     triangle.putPoints(0, 3, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE);
     setMask ( triangle );
@@ -78,10 +79,10 @@ ResizeCorner::raise()
 void
 ResizeCorner::setColor(const QColor &c)
 {
-   if (c.value() > 100)
-      fg = c.dark(130);
-   else
-      fg = c.light(120);
+    if (c.value() > 100)
+        fg = c.dark(130);
+    else
+        fg = c.light(120);
 }
 
 void

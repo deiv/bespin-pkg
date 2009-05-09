@@ -882,12 +882,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
         QWidget * widget = qobject_cast<QWidget*>(object);
         if (!widget)
             return false;
-
-#if  0 // QT_VERSION >= 0x040500
-            if ( QTabWidget *tw = qobject_cast<QTabWidget*>( object ) )
-                tw->setDocumentMode( false ); // force painting a bg here instead on the tabbar
-            // fall through, this could be a modal window as well...
-#endif
         
         if (widget->isModal())
         {

@@ -102,8 +102,8 @@ void Style::polish ( QApplication * app )
 void Style::polish( QPalette &pal, bool onInit )
 {
     QColor c = pal.color(QPalette::Active, QPalette::Window);
-#if 0 // this is dangerous! QT_VERSION >= 0x040500
-    c.setAlpha(128);
+#if QT_VERSION >= 0x040500 // this is dangerous!
+//     c.setAlpha(128);
 #endif
     if (config.bg.mode > Plain)
     {

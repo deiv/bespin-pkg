@@ -161,7 +161,8 @@ Style::readSettings(const QSettings* settings)
                 cmd = "KDM"; // KDM segfaults on QCoreApplication::arguments()...
             else if (cmd.isEmpty() && !QCoreApplication::arguments().isEmpty())
                 cmd = QCoreApplication::arguments().at(0).section('/', -1);
-            qPreset = iSettings->value(cmd, QString()).toString();
+            if (!cmd.isEmpty())
+                qPreset = iSettings->value(cmd, QString()).toString();
             if (qPreset.isEmpty() && appType == GTK)
                 qPreset = iSettings->value("GTK", QString()).toString();
             iSettings->endGroup();
