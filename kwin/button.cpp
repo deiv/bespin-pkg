@@ -319,7 +319,6 @@ void
 Button::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
-    p.fillRect(rect(), Qt::green);
     if (!bgPix.isNull())
         p.drawPixmap(0,0, bgPix);
 

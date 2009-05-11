@@ -149,10 +149,10 @@ Client::addButtons(const QString& s, int &sz, bool left)
             // optimizes, but breaks with recent KDE/X/nvidia? combinations...
             if (!isPreview())
             {
-//                 buttons[type]->setAutoFillBackground(false);
-                buttons[type]->setAttribute(Qt::WA_OpaquePaintEvent);
+//                 buttons[type]->setAutoFillBackground(true);
+//                 buttons[type]->setAttribute(Qt::WA_OpaquePaintEvent);
 //                 buttons[type]->setAttribute(Qt::WA_PaintOnScreen);
-//                 buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
+                buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
             }
             titleBar->addWidget(buttons[type], 0, Qt::AlignVCenter);
             sz += (buttonSize()+2);
