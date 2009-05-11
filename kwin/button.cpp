@@ -44,6 +44,7 @@ Button::Button(Client *parent, Type type, bool left) : QWidget(parent->widget())
 client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
 {
     setAutoFillBackground(false);
+    setAttribute(Qt::WA_Hover, true);
 
     setFixedSize(parent->buttonSize(), parent->buttonSize());
     setCursor(Qt::ArrowCursor);
@@ -158,35 +159,43 @@ Button::init(int sz, bool leftMenu, bool fColors, bool round)
 void
 Button::enterEvent(QEvent *)
 {
-   if (!isEnabled()) return;
-   
-	state |= Hovered; zoomOut = false;
-	zoomLevel += 2;
-	if (zoomLevel > 6) {
-      zoomLevel = 6;
-		if (zoomTimer) killTimer(zoomTimer);
-		zoomTimer = 0;
-		return;
-	}
-   repaint();
-	if (!zoomTimer) zoomTimer = startTimer ( 50 );
+    if (!isEnabled())
+        return;
+
+    state |= Hovered; zoomOut = false;
+    zoomLevel += 2;
+    if (zoomLevel > 6)
+    {
+        zoomLevel = 6;
+        if (zoomTimer)
+            killTimer(zoomTimer);
+        zoomTimer = 0;
+        return;
+    }
+    repaint();
+    if (!zoomTimer)
+        zoomTimer = startTimer ( 50 );
 }
 
 void
 Button::leaveEvent(QEvent *)
 {
-   if (!isEnabled()) return;
-   
-	state &= ~Hovered; zoomOut = true;
-	--zoomLevel;
-	if (zoomLevel < 0) {
-      zoomLevel = 0;
-		if (zoomTimer) killTimer(zoomTimer);
-		zoomTimer = 0;
-		return;
-	}
-   repaint();
-	if (!zoomTimer) zoomTimer = startTimer ( 50 );
+    if (!isEnabled())
+        return;
+
+    state &= ~Hovered; zoomOut = true;
+    --zoomLevel;
+    if (zoomLevel < 0)
+    {
+        zoomLevel = 0;
+        if (zoomTimer)
+            killTimer(zoomTimer);
+        zoomTimer = 0;
+        return;
+    }
+    repaint();
+    if (!zoomTimer)
+        zoomTimer = startTimer ( 50 );
 }
 
 void
@@ -310,6 +319,7 @@ void
 Button::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
+    p.fillRect(rect(), Qt::green);
     if (!bgPix.isNull())
         p.drawPixmap(0,0, bgPix);
 
@@ -359,19 +369,19 @@ Button::paintEvent(QPaintEvent *)
 void
 Button::timerEvent ( QTimerEvent * )
 {
-	if (zoomOut) {
-		--zoomLevel;
-		if (zoomLevel < 1) {
-			killTimer(zoomTimer); zoomTimer = 0;
-		}
-	}
-	else {
-		zoomLevel += 2;
-		if (zoomLevel > 5) {
-			killTimer(zoomTimer); zoomTimer = 0;
-		}
-	}
-	repaint();
+    if (zoomOut)
+    {
+        --zoomLevel;
+        if (zoomLevel < 1)
+            { killTimer(zoomTimer); zoomTimer = 0; }
+    }
+    else
+    {
+        zoomLevel += 2;
+        if (zoomLevel > 5)
+            { killTimer(zoomTimer); zoomTimer = 0; }
+    }
+    repaint();
 }
 
 #define CYCLE_ON multiIdx += d;\

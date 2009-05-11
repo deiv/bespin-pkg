@@ -146,10 +146,11 @@ Client::addButtons(const QString& s, int &sz, bool left)
         if (!buttons[type])
         {   // will be d'played d'abled in case
             buttons[type] = new Button(this, type, left);
+            // optimizes, but breaks with recent KDE/X/nvidia? combinations...
             if (!isPreview())
             {
-                widget()->setAutoFillBackground(true);
-//                 buttons[type]->setAttribute(Qt::WA_OpaquePaintEvent);
+//                 buttons[type]->setAutoFillBackground(false);
+                buttons[type]->setAttribute(Qt::WA_OpaquePaintEvent);
 //                 buttons[type]->setAttribute(Qt::WA_PaintOnScreen);
 //                 buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
             }
@@ -288,7 +289,7 @@ Client::init()
     _caption = isPreview() ? (isActive() ? "Active Window" : "Inactive Window") : trimm(caption());
     widget()->setAutoFillBackground(false);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, !isPreview());
-    widget()->setAttribute(Qt::WA_NoSystemBackground);
+//     widget()->setAttribute(Qt::WA_NoSystemBackground);
     widget()->setAttribute(Qt::WA_PaintOnScreen, !isPreview());
     widget()->installEventFilter(this);
 
