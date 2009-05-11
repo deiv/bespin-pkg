@@ -125,9 +125,12 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             break;
         case SC_GroupBoxContents:
         {
-            int top = (groupBox->features & QStyleOptionFrameV2::Flat) ? F(3) : F(6);
+            int top = 0;
+            if (groupBox->subControls & SC_GroupBoxCheckBox)
+                top = dpi.ExclusiveIndicator;
             if (!groupBox->text.isEmpty())
-                top += groupBox->fontMetrics.height();
+                top = qMax(top, groupBox->fontMetrics.height());
+            top += (groupBox->features & QStyleOptionFrameV2::Flat) ? F(3) : F(6);
             ret = groupBox->rect.adjusted(F(3), top, -F(3), -F(5));
             break;
         }
@@ -144,7 +147,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             QFontMetrics fontMetrics = groupBox->fontMetrics;
             const bool flat = groupBox->features & QStyleOptionFrameV2::Flat;
             int h = fontMetrics.height() + F(3);
-            int tw = fontMetrics.size(BESPIN_MNEMONIC, groupBox->text + QLatin1Char(' ')).width();
+            int tw = fontMetrics.size(BESPIN_MNEMONIC, groupBox->text.toUpper() + QLatin1Char(' ')).width();
             int marg = flat ? 0 : F(3);
             Qt::Alignment align;
         

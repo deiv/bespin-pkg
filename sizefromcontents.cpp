@@ -150,7 +150,7 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
     case CT_TabBarTab: // A tab on a tab bar, like QTabBar
         if HAVE_OPTION(tab, Tab)
         {
-            int add = F(8);
+            int add = F(9);
             switch (tab->shape)
             {
             case QTabBar::RoundedNorth: case QTabBar::TriangularNorth:
@@ -161,7 +161,7 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
                 return contentsSize + QSize(0, add);
             }
         }
-        return contentsSize + QSize(F(8), F(6));
+        return contentsSize + QSize(F(9), F(9));
     case CT_TabWidget: // A tab widget, like QTabWidget
         return contentsSize + QSize(F(8),F(6));
     case CT_ToolButton:
