@@ -48,7 +48,7 @@ protected:
    void paintEvent ( QPaintEvent * );
 private:
    bool eventFilter(QObject *obj, QEvent *e);
-   Client *client; QColor fg;
+   Client *client;
 };
 
 } // namespace
