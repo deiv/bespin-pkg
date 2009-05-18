@@ -88,12 +88,13 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
 
 //     if (widget->testAttribute(Qt::WA_NoSystemBackground))
 //         return; // those shall be translucent - but sould be catched by Qt
-        
-    if (PAL.brush(widget->backgroundRole()).style() > 1)
+
+    const QPalette &pal = widget->palette();
+    if (pal.brush(widget->backgroundRole()).style() > 1)
         return; // we'd cover a gradient/pixmap/whatever
 
     // glassy Modal dialog/Popup menu ==========
-    QColor c = PAL.color(widget->backgroundRole());
+    QColor c = pal.color(widget->backgroundRole());
     if (c == Qt::transparent) // plasma uses this
         return;
 
@@ -120,19 +121,29 @@ Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
     }
 
     bool translucent = false;
+#if 0
+    const int alpha = 148;
 
-    if (c.alpha() < 255)
+    if (c.alpha() == 0xff && /*config.bg.opacity*/ alpha < 0xff)
+        c.setAlpha(alpha);
+#endif    
+    if (c.alpha() < 0xff)
     {
 #if QT_VERSION >= 0x040500
         if ( widget->testAttribute(Qt::WA_TranslucentBackground))
-        {
-            c = Qt::transparent;/*.setAlpha(0);*/
             translucent = true;
-        }
         else
 #endif  
-            c.setAlpha(255); // for the moment...
+            c.setAlpha(0xff);
     }
+
+#if 0
+    if (translucent)
+    {
+        painter->fillRect(widget->rect(), c);
+        c = Qt::transparent;
+    }
+#endif
 
     if (config.bg.mode == Scanlines)
     {

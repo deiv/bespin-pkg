@@ -53,6 +53,7 @@
 #define HACK_AMAROK_CONTEXT "Hack.AmarokContext", false
 #define HACK_AMAROK_DISPLAY "Hack.AmarokDisplay", false
 #define HACK_AMAROK_FRAMES "Hack.AmarokFrames", false
+#define HACK_AMAROK_LISTVIEW "Hack.AmarokListView", false
 #define HACK_MESSAGES "Hack.Messages", false
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false
 #define HACK_KRUNNER "Hack.KRunner", false

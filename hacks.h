@@ -40,7 +40,7 @@ public:
     static struct Config
     {
         bool    messages, KHTMLView, treeViews, windowMovement, krunner, killThrobber,
-                amarokContext, amarokFrames, amarokDisplay;
+                amarokContext, amarokFrames, amarokDisplay, amarokListView;
     } config;
 private:
     Q_DISABLE_COPY(Hacks)

@@ -16,6 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QAbstractItemView>
 #include <QCoreApplication>
 #include <QDesktopWidget>
 #include <QDial>
@@ -820,6 +821,26 @@ Hacks::add(QWidget *w)
         }
         else if (QFrame *frame = qobject_cast<QFrame*>(w))
         {
+            if (config.amarokListView)
+            if (QAbstractItemView *view = qobject_cast<QAbstractItemView*>(w))
+            {
+//                 QWidget *runner = w;
+//                 while ((runner = runner->parentWidget()))
+//                 {
+//                     if (qobject_cast<QSplitter*>(runner))
+//                     {
+                        QWidget *viewport = view->viewport();
+                        if (view->testAttribute(Qt::WA_SetPalette))
+                            view->setPalette(QPalette());
+                        if (viewport && (viewport->testAttribute(Qt::WA_SetPalette) || !viewport->autoFillBackground()))
+                        {
+                            viewport->setAutoFillBackground(true);
+                            viewport->setPalette(QPalette());
+                        }
+//                         break;
+//                     }
+//                 }
+            }
             if ((config.amarokContext || config.amarokDisplay)
                 && w->inherits("Context::ContextView"))
             {

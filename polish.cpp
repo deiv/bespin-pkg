@@ -102,9 +102,7 @@ void Style::polish ( QApplication * app )
 void Style::polish( QPalette &pal, bool onInit )
 {
     QColor c = pal.color(QPalette::Active, QPalette::Window);
-#if QT_VERSION >= 0x040500 // this is dangerous!
-//     c.setAlpha(128);
-#endif
+
     if (config.bg.mode > Plain)
     {
         int h,s,v,a;
@@ -321,12 +319,20 @@ Style::polish( QWidget * widget )
     {
         QPalette pal = widget->palette();
 
-#if 0 // this is dangerous! QT_VERSION >= 0x040500
-        if (!widget->testAttribute(Qt::WA_TranslucentBackground))
+        /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
+        /// also doesn't work bgs get transparent and applying this to everythign causes funny sideeffects...
+#if 0 //QT_VERSION >= 0x040500
+        if (!(/*config.bg.opacity = 0xff ||*/ widget->inherits("QDesktopWidget") || widget->testAttribute(Qt::WA_TranslucentBackground)))
+        {
             widget->setAttribute(Qt::WA_TranslucentBackground);
+        }
 #endif
         if (config.bg.mode > Plain)
+        {
+//             widget->removeEventFilter(this);
+//             widget->installEventFilter(this);
             widget->setAttribute(Qt::WA_StyledBackground);
+        }
 
 //         widget->setAttribute(Qt::WA_MacBrushedMetal);
 //         widget->setAttribute(Qt::WA_StyledBackground);
@@ -455,11 +461,11 @@ Style::polish( QWidget * widget )
                 // force this here, hoping it won't cause to many problems - and make a bug report
                 if (QWidget *vp = itemView->viewport())
                 {
-                    if (vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
+                    if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
                     {
-                        qDebug() << "BESPIN works around a visual problem in" << itemView << ", please contact thomas.luebking 'at' web.de";
+//                         qDebug() << "BESPIN works around a visual problem in" << itemView << ", please contact thomas.luebking 'at' web.de";
                         QPalette pal = itemView->palette();
-                        if (vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)
+                        if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)
                         {
                             pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
                             pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Inactive, QPalette::Window));

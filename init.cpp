@@ -126,7 +126,8 @@ Style::readSettings(const QSettings* settings)
         config.fadeInactive = readBool(FADE_INACTIVE);
         // Hacks ==================================
         Hacks::config.amarokContext = readBool(HACK_AMAROK_CONTEXT);
-        Hacks::config.amarokFrames = readBool(HACK_AMAROK_FRAMES);
+        Hacks::config.amarokListView = readBool(HACK_AMAROK_LISTVIEW);
+        Hacks::config.amarokFrames = Hacks::config.amarokListView ? false : readBool(HACK_AMAROK_FRAMES);
         Hacks::config.amarokDisplay = readBool(HACK_AMAROK_DISPLAY);
         Hacks::config.messages = readBool(HACK_MESSAGES);
         Hacks::config.KHTMLView = readBool(HACK_KHTMLVIEW);

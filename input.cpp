@@ -72,11 +72,14 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
         r.setBottom(r.bottom() - F(2));
         if (hasFocus)
         {
-            mask.render(r, painter, FCOLOR(Base).light(112));
+            QColor c = FCOLOR(Base);
+            if (Colors::value(c) < 100)
+                c = c.light(112);
+            mask.render(r, painter, c);
             r.setBottom(r.bottom() + F(1));
-            QColor h = FCOLOR(Highlight); h.setAlpha(102);
+            c = FCOLOR(Highlight); c.setAlpha(102);
 //          Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
-            mask.outline(r, painter, h, F(3));
+            mask.outline(r, painter, c, F(3));
         }
         else
         {

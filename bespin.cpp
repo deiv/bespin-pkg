@@ -717,6 +717,15 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::Move:
         return false; // just for performance - they can occur really often
     case QEvent::Paint:
+#if 0  //00
+        if (QWidget *window = qobject_cast<QWidget*>(object))
+        if (window->isWindow())
+        {
+            QPainter p(window);
+            drawWindowBg(0, &p, window);
+            return false;
+        }
+#endif
         if (QFrame *frame = qobject_cast<QFrame*>(object))
         {
             if ((frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine) &&
