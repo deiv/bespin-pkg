@@ -216,45 +216,41 @@ Client::eventFilter(QObject *o, QEvent *e)
     {
     case QEvent::Paint:
     {
+        const bool useInternalDoubleBuffering = !isPreview();
         QRegion clip = static_cast<QPaintEvent*>(e)->region();
-        QPainter p;
-        QPixmap *buffer = 0;
-        if (isPreview())
-            p.begin(widget());
-        else
-        {
-            // recollect button rects
-            for (int i = 0; i < 4; ++i)
-                if (buttons[i]) clip |= buttons[i]->geometry();
 
-            // kdecoration avoids QT's d'buffering to save (lots of) RAM, so we use or own little d'buffering here
-            // (with only temporary RAM allocation...)
-            buffer = new QPixmap(widget()->size());
-            p.begin(buffer);
-        }
-
+        QPainter p(widget());
         p.setClipRegion(clip);
         p.setFont(options()->font());
         repaint(p);
         p.end();
 
-        if (buffer)
+        if (useInternalDoubleBuffering)
         {
+
+            clip = top;
+            // recollect button rects
+            for (int i = 0; i < 4; ++i)
+                if (buttons[i])
+                    clip |= buttons[i]->geometry();
+
+            // fill buffer
+            QPixmap buffer(top.size());
+            p.begin(&buffer);
+            p.setClipping(false);
+            p.setClipRegion(clip);
+            p.setFont(options()->font());
+            repaint(p);
+            p.end();
+            
             // dump button BGs
             for (int i = 0; i < 4; ++i)
                 if (buttons[i])
                 {
-                    if (clip.contains(buttons[i]->geometry()))
-                        buttons[i]->setBg(buffer->copy(buttons[i]->geometry()));
+                    buttons[i]->setBg(buffer.copy(buttons[i]->geometry()));
                     buttons[i]->repaint(); // enforce, button thinks it's independend
                 }
 
-            // finally draw the bg
-            p.begin(widget());
-            p.setClipRegion(clip);
-            p.drawPixmap(0,0,*buffer);
-            p.end();
-            delete buffer;
         }
         return true;
     }
@@ -581,8 +577,9 @@ Client::repaint(QPainter &p)
         QRect tr;
         p.drawText ( label.translated(0,d), Qt::AlignCenter | Qt::TextSingleLine, _caption, &tr );
 
-        if (maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
-            gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1))
+        if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
+             maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
+             gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1) )
         {   // inactive window looks like active one...
             int y = label.center().y();
             p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
