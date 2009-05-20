@@ -88,7 +88,8 @@ if (scrollbar->subControls & SC_ScrollBar##_E_)\
 
 static bool isComboDropDownSlider, scrollAreaHovered_;
 static int complexStep, widgetStep;
-static const bool round_ = true;
+#define round_ config.scroll.fatSlider
+// static const bool round_ = true;
 
 static QPixmap *scrollBgCache = 0;
 static QTimer cacheCleaner;

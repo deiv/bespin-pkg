@@ -94,7 +94,7 @@ typedef struct Config
     {
         Gradients::Type gradient;
         Groove::Mode groove;
-        bool showButtons, invertBg;
+        bool showButtons, invertBg, fatSlider;
     } scroll;
 
     float shadowIntensity;

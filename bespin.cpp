@@ -587,9 +587,9 @@ swapPalette(QWidget *widget, Style *style)
 //     originalPalette = 0;
     // looks complex? IS!
     // reason nr. 1: stylesheets. they're nasty and qt operates on the app palette here
-    // reason nr. 2: some idiot must have spread the idea that pal.setColor(backgroundRole(), Qt::transparent) is a great
-    // idea instead of just using setAutoFillBackground(true), preserving all colors and just not using them.
-    // hey, why not call qt to paint some nothing.... *grrrr* i'm angry... again!
+    // reason nr. 2: some idiot must have spread the idea that pal.setColor(backgroundRole(), Qt::transparent)
+    // is a great idea instead of just using setAutoFillBackground(false), preserving all colors and just not
+    // using them. hey, why not call Qt to paint some nothing.... *grrrr*
     
     QMap<QWidget*, QString> shits;
     QList<QWidget*> kids = widget->findChildren<QWidget*>();
@@ -618,7 +618,7 @@ swapPalette(QWidget *widget, Style *style)
             fixViewport = false;
             hasShit = false;
             
-            // NOTE: WORKAROUND for dolphin and probably others: see polish.cpp
+            // NOTE: WORKAROUND for amarok and probably others: see polish.cpp
             if (QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(kid) )
             if (QWidget *vp = area->viewport())
             if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() == 0)
@@ -641,8 +641,11 @@ swapPalette(QWidget *widget, Style *style)
             {
                 group = groups[i];
                 
-                if (solidBase && !fixViewport) // changing bg color is useless and it's worthless to calculate the fg color
+                if (solidBase && !fixViewport)
+                {
                     pal.setColor(group, QPalette::WindowText, solidBase->palette().color(group, solidBase->foregroundRole()));
+                    pal.setColor(group, QPalette::Window, solidBase->palette().color(group, solidBase->backgroundRole()));
+                }
                 else
                 {
                     c1 = pal.color(group, QPalette::Window);
@@ -948,6 +951,22 @@ Style::eventFilter( QObject *object, QEvent *ev )
         QWidget * widget = qobject_cast<QWidget*>(object);
         if (!widget)
             return false;
+        if (widget->isWindow())
+        {
+            qDebug() << "window just changed its palette" << widget << widget->palette().color(QPalette::WindowText);
+            // talk to kwin about colors, gradients, etc.
+            Qt::WindowFlags ignore =    Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::ToolTip |
+            Qt::SplashScreen | Qt::Desktop |
+            Qt::X11BypassWindowManagerHint;// | Qt::FramelessWindowHint; <- could easily change mind...?!
+            ignore &= ~Qt::Dialog; // erase dialog, it's in drawer et al. but takes away window as well
+            
+            if (!(widget->windowFlags() & ignore)) {    // this can be expensive, so avoid for popups, combodrops etc.
+                setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
+                XProperty::remove(widget->winId(), XProperty::bgPics);
+            }
+            return false;
+        }
+        
         // i think, i hope i got it....
         // 1. khtml sets buttontext, windowtext and text to the fg color - what leads to trouble if e.g. button doesn't contrast window
         // 2. combolists need a special kick (but their palette seems ok, though it isn't...)
@@ -959,6 +978,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
             for (int g = 0; g < 3; ++g)
             {
                 QPalette::ColorGroup group = (QPalette::ColorGroup)g;
+                if (pal.color(group, QPalette::Window).alpha() < 64)
+                    pal.setColor(group, QPalette::Window, qApp->palette().color(group, QPalette::Window));
                 if (LACK_CONTRAST(QPalette::Window, QPalette::WindowText))
                 {
                     paletteChanged = true;

@@ -228,7 +228,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>9</number>
+         <number>6</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -1733,7 +1733,7 @@
         </widget>
         <widget class="QWidget" name="Scrollbars">
          <layout class="QGridLayout" name="gridLayout_20">
-          <item row="0" column="0">
+          <item row="1" column="0">
            <layout class="QHBoxLayout">
             <item>
              <widget class="QLabel" name="label_18">
@@ -1763,7 +1763,7 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QLabel" name="label_42">
@@ -1803,14 +1803,14 @@
             </item>
            </layout>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QCheckBox" name="showScrollButtons">
             <property name="text">
              <string>Show scrollbar buttons</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <spacer name="verticalSpacer_2">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -1823,7 +1823,7 @@
             </property>
            </spacer>
           </item>
-          <item row="5" column="0">
+          <item row="6" column="0">
            <widget class="QGroupBox" name="groupBox_4">
             <property name="title">
              <string>Progressbars</string>
@@ -1885,7 +1885,7 @@
             </layout>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
            <spacer name="verticalSpacer_6">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -1898,10 +1898,17 @@
             </property>
            </spacer>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QCheckBox" name="invertGroove">
             <property name="text">
              <string>Invert groove</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="slimSlider">
+            <property name="text">
+             <string>Slim sliders</string>
             </property>
            </widget>
           </item>
@@ -2297,6 +2304,13 @@
               <widget class="QCheckBox" name="hackAmarokDisplay">
                <property name="text">
                 <string>&quot;Bespinify&quot; display (the bar on the top)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QCheckBox" name="hackAmarokListview">
+               <property name="text">
+                <string>Force traditional Listviews (Playlist, Collection, etc.)</string>
                </property>
               </widget>
              </item>

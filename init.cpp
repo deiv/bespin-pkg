@@ -325,6 +325,7 @@ Style::readSettings(const QSettings* settings)
     // ScrollStuff ===========================
     GRAD(scroll) = readGrad(SCROLL_GRADIENT);
     config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
+    config.scroll.fatSlider = !readBool(SCROLL_SLIM_SLIDER);
     config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
     config.scroll.invertBg = readBool(SCROLL_INVERT_BG);
 
@@ -412,7 +413,7 @@ void Style::initMetrics()
    dpi.f20 = SCALE(20); dpi.f32 = SCALE(32);
    dpi.f80 = SCALE(80);
    
-   dpi.ScrollBarExtent = SCALE((config.scroll.groove > Groove::Groove ? 15 : 17) - config.btn.fullHover);
+   dpi.ScrollBarExtent = SCALE((config.scroll.groove > Groove::Groove ? 15 : 17) - config.btn.fullHover - 2*!config.scroll.fatSlider);
    dpi.ScrollBarSliderMin = SCALE(40);
    dpi.SliderThickness = SCALE(20);
    dpi.SliderControl = SCALE(20);

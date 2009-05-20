@@ -716,7 +716,6 @@ cornerMask(bool right = false)
 const BgSet &
 Gradients::bgSet(const QColor &c)
 {
-
     BgSet *set = _bgSet.object(c.rgb());
     if (set)
         return *set;
@@ -939,18 +938,18 @@ void Gradients::init() {
 }
 
 void Gradients::wipe() {
-   for (int i = 0; i < 2; ++i)
-      for (int j = 0; j < Gradients::TypeAmount; ++j)
-         gradients[i][j].clear();
+    for (int i = 0; i < 2; ++i)
+        for (int j = 0; j < Gradients::TypeAmount; ++j)
+            gradients[i][j].clear();
 #ifndef BESPIN_DECO
-   _bgSet.clear();
-   _btnAmbient.clear();
-   _tabShadow.clear();
-   _groupLight.clear();
-   _structure[0].clear(); _structure[1].clear();
+    _bgSet.clear();
+    _btnAmbient.clear();
+    _tabShadow.clear();
+    _groupLight.clear();
+    _structure[0].clear(); _structure[1].clear();
 #else
-   for (int i = 0; i < 4; ++i)
-      _borderline[i].clear();
+    for (int i = 0; i < 4; ++i)
+        _borderline[i].clear();
 #endif
 }
 

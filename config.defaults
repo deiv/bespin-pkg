@@ -93,6 +93,7 @@
 
 #define SCROLL_GRADIENT "Scroll.Gradient", Gradients::Cloudy
 #define SCROLL_SHOWBUTTONS "Scroll.ShowButtons", false
+#define SCROLL_SLIM_SLIDER "Scroll.SlimSlider", false
 #define SCROLL_GROOVE "Scroll.Groove", 0
 #define SCROLL_INVERT_BG "Scroll.InvertBg", false
 

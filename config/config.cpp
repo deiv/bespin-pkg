@@ -352,6 +352,9 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.sliderGroove, "Scroll.Groove", false);
     handleSettings(ui.gradScroll, "Scroll.Gradient", GradButton);
     handleSettings(ui.invertGroove, SCROLL_INVERT_BG);
+    handleSettings(ui.slimSlider, SCROLL_SLIM_SLIDER);
+    setContextHelp(ui.slimSlider, "<b>Slim slider</b><hr>\
+    This will reduce the thickness of scrollbars by 2 pixel and in addition apply a more rectangular shape.");
 
     handleSettings(ui.shadowIntensity, "ShadowIntensity", 100);
    
@@ -377,7 +380,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.kwinInactiveText, KWIN_INACTIVE_TEXT_ROLE);
 
     handleSettings(ui.hackMessages, HACK_MESSAGES);
-    setContextHelp(ui.btnRole, "<b>Messageboxes</b><hr>\
+    setContextHelp(ui.hackMessages, "<b>Messageboxes</b><hr>\
     Overwrites the painting routines of QMessageBoxes for a custom appereance.<br>\
     Also removes the Window decoration but allows you to drag around the window by\
     clicking anywhere.");
@@ -447,6 +450,14 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     be configurable, pretty much like KMail currently is.<br>\
     BUT THIS SUCKS!<br>\
     I do not want an overheaded alien application where i'm told what UI elements i need where - Sorry :(" );
+
+    handleSettings(ui.hackAmarokListview, HACK_AMAROK_LISTVIEW);
+    setContextHelp(ui.hackAmarokListview, "<b>Traditional Listviews</b><hr>\
+    Amarok uses lists with a window background. Unfortunately the foreground color role is hardcoded\
+    (to the wrong value...) Therefore you might (depending on your color scheme) end up with white text\
+    on a bright ground :-(<br/>\
+    Check this to make e.g. the collection browser, the playlis etc. look like a normal list with a solid\
+    background." );
 
     /** setContextHelp(.) attaches a context help string to a widget on your form */
     setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\

@@ -393,8 +393,10 @@ Style::polish( QWidget * widget )
                                         Qt::X11BypassWindowManagerHint;// | Qt::FramelessWindowHint; <- could easily change mind...?!
             ignore &= ~Qt::Dialog; // erase dialog, it's in drawer et al. but takes away window as well
             
-            if (!(widget->windowFlags() & ignore)) // this can be expensive, so avoid for popups, combodrops etc.
+            if (!(widget->windowFlags() & ignore)) { // this can be expensive, so avoid for popups, combodrops etc.
                 setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
+                widget->installEventFilter(this); // catch palette changes for deco
+            }
         }
 
     }
@@ -541,6 +543,8 @@ Style::polish( QWidget * widget )
     //BEGIN PUSHBUTTONS - hovering/animation                                                       -
     else if (qobject_cast<QAbstractButton*>(widget))
     {
+//         widget->setBackgroundRole(config.btn.std_role[Bg]);
+//         widget->setForegroundRole(config.btn.std_role[Fg]);
         if (widget->inherits("QToolBoxButton") || IS_HTML_WIDGET )
             widget->setAttribute(Qt::WA_Hover); // KHtml
         else
