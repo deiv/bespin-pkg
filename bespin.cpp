@@ -953,7 +953,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         if (widget->isWindow())
         {
-            qDebug() << "window just changed its palette" << widget << widget->palette().color(QPalette::WindowText);
             // talk to kwin about colors, gradients, etc.
             Qt::WindowFlags ignore =    Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::ToolTip |
             Qt::SplashScreen | Qt::Desktop |
