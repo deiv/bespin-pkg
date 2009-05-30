@@ -250,6 +250,8 @@ Client::eventFilter(QObject *o, QEvent *e)
                     buttons[i]->setBg(buffer.copy(buttons[i]->geometry()));
                     buttons[i]->repaint(); // enforce, button thinks it's independend
                 }
+            if (corner)
+                corner->repaint();
 
         }
         return true;
@@ -303,7 +305,10 @@ Client::init()
     gType[1] = Gradients::Button;
 
     if (config()->resizeCorner && isResizable())
+    {
         corner = new ResizeCorner(this);
+        corner->setAttribute(Qt::WA_NoSystemBackground);
+    }
     reset(63);
 }
 

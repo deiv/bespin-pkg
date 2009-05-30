@@ -34,6 +34,8 @@
 #include "fixx11h.h"
 #endif
 
+#include <QtDebug>
+
 #include "client.h"
 #include "resizecorner.h"
 
@@ -44,7 +46,8 @@ using namespace Bespin;
 ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
 {
     hide();
-    if (!(parent->widget() && parent->windowId())) {
+    if (!(parent->widget() && parent->windowId()))
+    {
         deleteLater();
         return;
     }
@@ -54,27 +57,37 @@ ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
 //    buffer = QPixmap(16,16);
 //     setAttribute(Qt::WA_NoSystemBackground);
 //     setAttribute(Qt::WA_OpaquePaintEvent); // lately broken, above works
-    setAutoFillBackground(true);
+//     setAutoFillBackground(true);
     QPolygon triangle(3);
     triangle.putPoints(0, 3, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE);
     setMask ( triangle );
-    QTimer::singleShot(0, this, SLOT(hide()));
-    QTimer::singleShot(3000, this, SLOT(raise()));
+//     QTimer::singleShot(0, this, SLOT(hide()));
+//     QTimer::singleShot(3000, this, SLOT(raise()));
+    raise();
+    installEventFilter(this);
+    show();
 }
 
 void
 ResizeCorner::raise()
 {
-   WId root, daddy = 0;
-   WId *kids = 0L;
-   uint numKids = 0;
-   XQueryTree(QX11Info::display(), client->windowId(), &root, &daddy, &kids, &numKids);
-   if (daddy)
-      XReparentWindow( QX11Info::display(), winId(), daddy, 0, 0 );
-   show();
-   move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
-   client->widget()->removeEventFilter(this);
-   client->widget()->installEventFilter(this);
+    WId root, daddy = 0;
+    WId *kids = 0L;
+    uint numKids = 0;
+    XQueryTree(QX11Info::display(), client->windowId(), &root, &daddy, &kids, &numKids);
+    /*
+    while (numKids)
+    {
+        root = kids[--numKids];
+        if (root != winId())
+            break;
+    }
+    */
+    if (daddy)
+        XReparentWindow( QX11Info::display(), winId(), daddy, 0, 0 );
+    move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
+    client->widget()->removeEventFilter(this);
+    client->widget()->installEventFilter(this);
 }
 
 void
@@ -97,25 +110,51 @@ ResizeCorner::move ( int x, int y )
 bool
 ResizeCorner::eventFilter(QObject *obj, QEvent *e)
 {
-   if ( obj != parent() ) return false;
+    if (obj == this && e->type() == QEvent::ZOrderChange)
+    {
+        removeEventFilter(this);
+        raise();
+        installEventFilter(this);
+        return false;
+    }
 
-   if ( e->type() == QEvent::Resize)
-      move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
+    if ( obj == parent() && e->type() == QEvent::Resize)
+        move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
 
-   return false;
+    return false;
 }
+
+static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
 
 void
 ResizeCorner::mousePressEvent ( QMouseEvent *mev )
 {
-   if (mev->button() == Qt::LeftButton)
-      client->performWindowOperation(KDecoration::ResizeOp);
-   else if (mev->button() == Qt::RightButton) {
-      hide(); QTimer::singleShot(5000, this, SLOT(show()));
-   }
-   else if (mev->button() == Qt::MidButton) {
-      hide();
-   }
+    if (mev->button() == Qt::LeftButton)
+    {
+        // complex way to say: client->performWindowOperation(KDecoration::ResizeOp);
+        // stolen... errr "adapted!" from QSizeGrip
+        QX11Info info;
+        QPoint p = mev->globalPos();
+        XEvent xev;
+        xev.xclient.type = ClientMessage;
+        xev.xclient.message_type = netMoveResize;
+        xev.xclient.display = QX11Info::display();
+        xev.xclient.window = client->windowId();
+        xev.xclient.format = 32;
+        xev.xclient.data.l[0] = p.x();
+        xev.xclient.data.l[1] = p.y();
+        xev.xclient.data.l[2] = 4; // _NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHTMove
+        xev.xclient.data.l[3] = Button1;
+        xev.xclient.data.l[4] = 0;
+        XUngrabPointer(QX11Info::display(), QX11Info::appTime());
+        XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
+                    SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+    }
+        
+    else if (mev->button() == Qt::RightButton)
+        { hide(); QTimer::singleShot(5000, this, SLOT(show())); }
+    else if (mev->button() == Qt::MidButton)
+        hide();
 }
 
 void
@@ -127,7 +166,7 @@ ResizeCorner::mouseReleaseEvent ( QMouseEvent * )
 void
 ResizeCorner::paintEvent ( QPaintEvent * )
 {
-//    QPainter p(this); p.setBrush(fg); p.setPen(Qt::NoPen);
-//    p.drawRect(rect());
-//    p.end();
+   QPainter p(this); p.setBrush(palette().color(backgroundRole())); p.setPen(Qt::NoPen);
+   p.drawRect(rect());
+   p.end();
 }
