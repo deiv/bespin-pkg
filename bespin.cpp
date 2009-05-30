@@ -517,6 +517,8 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 void
 Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
 {
+    if (!FX::usesXRender())
+        return;
     // this is important because KDE apps may alter the original palette any time
     const QPalette &pal = originalPalette ? *originalPalette : palette;
 
