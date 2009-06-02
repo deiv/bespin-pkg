@@ -301,7 +301,11 @@ class AmarokData {
             if (lowerPart) lowerPart->show();
             if (dial && dial->client) dial->client->show();
             if (status) status->show();
-            if (player) player->setAttribute(Qt::WA_OpaquePaintEvent, false);
+            if (player)
+            {
+                player->setAttribute(Qt::WA_OpaquePaintEvent, false);
+                player->setPalette(QPalette());
+            }
 
             #define deleteDeferred(_thing_) if (_thing_) { _thing_->hide(); _thing_->deleteLater(); } //
             deleteDeferred(cover);
