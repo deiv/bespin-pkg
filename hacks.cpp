@@ -70,11 +70,13 @@ class ProxyDial : public QDial
 public:
     ProxyDial(QAbstractSlider *slider, QWidget *parent = 0) : QDial(parent)
     {
+        client = slider;
         setRange(slider->minimum(), slider->maximum()/*0, 100*/);
         setValue(slider->value());
         connect (slider, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
         connect (this, SIGNAL(valueChanged(int)), slider, SIGNAL(sliderMoved(int)));
     }
+    QPointer<QAbstractSlider> client;
 };
 
 class PrettyLabel : public QWidget
@@ -291,13 +293,32 @@ private:
 
 class AmarokData {
     public:
-        AmarokData() : context(0), player(0), lowerPart(0), cover(0), meta(0), status(0), displayBg(0) {}
+        AmarokData() :  context(0), player(0), lowerPart(0), cover(0), meta(0),
+                        status(0), displayBg(0), dial(0), toggleContext(0), toggleCompact(0) {}
+        ~AmarokData()
+        {
+            if (context) context->show();
+            if (lowerPart) lowerPart->show();
+            if (dial && dial->client) dial->client->show();
+            if (status) status->show();
+            if (player) player->setAttribute(Qt::WA_OpaquePaintEvent, false);
+
+            #define deleteDeferred(_thing_) if (_thing_) { _thing_->hide(); _thing_->deleteLater(); } //
+            deleteDeferred(cover);
+            deleteDeferred(meta);
+            deleteDeferred(dial);
+            deleteDeferred(toggleContext);
+            deleteDeferred(toggleCompact);
+            delete displayBg;
+        }
         QPointer<QWidget> context, player, lowerPart;
         QPointer<CoverLabel> cover;
         QPointer<PrettyLabel> meta;
         QPointer<QStatusBar> status;
         QSize size;
         QPixmap *displayBg;
+        QPointer<ProxyDial> dial;
+        QPointer<QToolButton> toggleContext, toggleCompact;
 };
 
 static Hacks *bespinHacks = 0;
@@ -742,7 +763,7 @@ Hacks::setAmarokMetaInfo(int)
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
-    if (*appType == Amarok)
+    if (*appType == Amarok && amarok)
     {
         if (e->type() == QEvent::Paint)
             return paintAmarok(static_cast<QWidget*>(o), static_cast<QPaintEvent*>(e));
@@ -852,8 +873,8 @@ Hacks::add(QWidget *w)
                 
                 if (qobject_cast<QSplitter*>(splitterKid->parentWidget()) || splitterKid->inherits("KVBox"))
                 {
-                    if (config.amarokDisplay)
-                        amarok->context = splitterKid;
+//                     if (config.amarokDisplay)
+                    amarok->context = splitterKid;
                     if (config.amarokContext)
                         splitterKid->hide();
                 }
@@ -864,24 +885,30 @@ Hacks::add(QWidget *w)
                 amarok->player = frame;
                 if (QBoxLayout *box = qobject_cast<QBoxLayout*>(frame->layout()))
                 {
-                    QList<QSlider*> list = frame->findChildren<QSlider*>();
-                    foreach (QSlider *slider, list)
+                    if (!amarok->dial)
                     {
-                        if (slider->inherits("Amarok::VolumeSlider"))
+                        QList<QSlider*> list = frame->findChildren<QSlider*>();
+                        foreach (QSlider *slider, list)
                         {
-                            if (slider->parentWidget() && slider->parentWidget()->inherits("VolumeWidget"))
-                                slider->parentWidget()->hide();
-                            else
-                                slider->hide();
-                            ProxyDial *dial = new ProxyDial(slider, frame);
-                            dial->setPageStep(10);
-                            dial->setSingleStep(1);
-                            box->addWidget(dial);
-                            break;
+                            if (slider->inherits("Amarok::VolumeSlider"))
+                            {
+                                if (slider->parentWidget() && slider->parentWidget()->inherits("VolumeWidget"))
+                                    slider->parentWidget()->hide();
+                                else
+                                    slider->hide();
+                                amarok->dial = new ProxyDial(slider, frame);
+                                amarok->dial->setPageStep(10);
+                                amarok->dial->setSingleStep(1);
+                                box->addWidget(amarok->dial);
+                                break;
+                            }
                         }
                     }
-                    amarok->cover = new CoverLabel(frame);
-                    box->addWidget(amarok->cover);
+                    if (!amarok->cover)
+                    {
+                        amarok->cover = new CoverLabel(frame);
+                        box->addWidget(amarok->cover);
+                    }
                 }
                 
                 frame->setAttribute(Qt::WA_OpaquePaintEvent);
@@ -929,26 +956,33 @@ Hacks::add(QWidget *w)
                     if (pw->layout())
                     if (QBoxLayout *box2 = qobject_cast<QBoxLayout*>(pw->layout()))
                     {
-                        QToolButton *btn = new QToolButton(f);
-                        QFont fnt = btn->font(); fnt.setBold(true);
-                        btn->setFont(fnt);
-                        btn->setText(amarok->context && !amarok->context->isVisible() ? "[||]" : "[|]");
+                        QFont fnt;
+                        if (!amarok->toggleContext)
+                        {
+                            amarok->toggleContext = new QToolButton(f);
+                            fnt = amarok->toggleContext->font(); fnt.setBold(true);
+                            amarok->toggleContext->setFont(fnt);
+                            amarok->toggleContext->setText(amarok->context && !amarok->context->isVisible() ? "[||]" : "[|]");
 
-                        btn->setToolTip("Toggle ContextView");
-                        box2->addWidget(btn);
-                        connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokContext())); // TODO: bind toggle?
+                            amarok->toggleContext->setToolTip("Toggle ContextView");
+                            box2->addWidget(amarok->toggleContext);
+                            connect (amarok->toggleContext, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokContext())); // TODO: bind toggle?
+                        }
 
-                        btn = new QToolButton(f);
-                        btn->setFont(fnt);
-                        btn->setText("-");
+                        if (!amarok->toggleCompact)
+                        {
+                            amarok->toggleCompact = new QToolButton(f);
+                            amarok->toggleCompact->setFont(fnt);
+                            amarok->toggleCompact->setText("-");
 
-                        btn->setToolTip("Toggle comapct mode");
-                        box2->addWidget(btn);
-                        connect (btn, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokCompact())); // TODO: bind toggle?
+                            amarok->toggleCompact->setToolTip("Toggle comapct mode");
+                            box2->addWidget(amarok->toggleCompact);
+                            connect (amarok->toggleCompact, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokCompact())); // TODO: bind toggle?
+                        }
                     }
                 }
 
-                if (box)
+                if (box && !amarok->meta)
                 {
                     amarok->meta = new PrettyLabel(QStringList() << "Amarok² / Bespin edition" << "Click to toggle animation" << "Wheel to change item", f);
                     box->addWidget(amarok->meta);
@@ -1039,8 +1073,16 @@ Hacks::add(QWidget *w)
 }
 
 void
-Hacks::remove(QWidget *w) {
+Hacks::remove(QWidget *w)
+{
     w->removeEventFilter(bespinHacks);
     if (w->inherits("KHTMLView"))
         static_cast<QFrame*>(w)->setFrameStyle(QFrame::NoFrame);
+}
+
+void
+Hacks::releaseApp()
+{
+    delete bespinHacks; bespinHacks = 0L;
+    delete amarok; amarok = 0L;
 }

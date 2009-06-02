@@ -131,7 +131,7 @@ VisualFrame::release(QFrame *frame)
       VDebug ("test" << vf);
       if (vf->parent() == frame) {
          VDebug (frame << "matches" << vf << "... releasing");
-         delete vf;
+         vf->hide(); vf->deleteLater();
       }
    }
 }

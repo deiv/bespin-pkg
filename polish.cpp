@@ -811,6 +811,7 @@ Style::polish( QWidget * widget )
 void
 Style::unpolish( QApplication *app )
 {
+    Hacks::releaseApp();
     Gradients::wipe();
     app->setPalette(QPalette());
 }

@@ -85,6 +85,10 @@ ResizeCorner::raise()
     */
     if (daddy)
         XReparentWindow( QX11Info::display(), winId(), daddy, 0, 0 );
+//     else
+//     {
+//         XReparentWindow( QX11Info::display(), winId(), client->windowId(), 0, 0 );
+//     }
     move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
     client->widget()->removeEventFilter(this);
     client->widget()->installEventFilter(this);

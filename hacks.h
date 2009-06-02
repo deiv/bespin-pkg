@@ -36,6 +36,7 @@ public:
     enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM, Amarok };
     bool eventFilter( QObject *, QEvent *);
     static bool add(QWidget *w);
+    static void releaseApp();
     static void remove(QWidget *w);
     static struct Config
     {
