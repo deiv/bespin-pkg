@@ -326,6 +326,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 
     handleSettings(ui.pwEchoChar, "Input.PwEchoChar", 0x26AB);
 
+    handleSettings(ui.showMnemonics, SHOW_MNEMONIC);
     handleSettings(ui.leftHanded, "LeftHanded", false);
     handleSettings(ui.macStyle, "MacStyle", true);
 
@@ -734,6 +735,7 @@ blackListed(QString &key)
         key == "FadeInactive" || // or dimmed inactive wins
         key == "Tab.Duration" || key == "Tab.Transition" || // or tab trans settings
         key == "MacStyle" || // or macfeeling
+        key == "ShowMnemonics" || // or macfeeling
         key == "Menu.Opacity" || // or menu opacity (interferes with e.g. kwin/compiz)
         key == "LeftHanded" || // or flanders mode
         key == "Scroll.ShowButtons" || // or the scrollbar look
@@ -1115,6 +1117,7 @@ Config::store3( const QString &string, bool addItem )
     /** Clear unwanted keys*/
     settings.remove("LeftHanded");
     settings.remove("MacStyle");
+    settings.remove("ShowMnemonics");
     settings.remove("Scroll.ShowButtons");
     settings.remove("Tab.Duration");
     settings.remove("Tab.Transition");
