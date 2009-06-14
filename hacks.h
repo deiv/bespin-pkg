@@ -47,6 +47,7 @@ private:
     Q_DISABLE_COPY(Hacks)
 private slots:
     void setAmarokMetaInfo(int);
+    void swapAmarokPalette();
     void toggleAmarokContext();
     void toggleAmarokCompact();
 };

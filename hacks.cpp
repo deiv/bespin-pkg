@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDesktopWidget>
 #include <QDial>
+#include <QDockWidget>
 #include <QEvent>
 #include <QGroupBox>
 #include <QLabel>
@@ -38,9 +39,11 @@
 #include <QStyleOption>
 #include <QStyleOptionGroupBox>
 #include <QStyleOptionSlider>
+#include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
 #include <QUrl>
+#include <QWidgetAction>
 
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusInterface>
@@ -62,6 +65,7 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 
 using namespace Bespin;
 
+#define ENSURE_INSTANCE if (!bespinHacks) bespinHacks = new Hacks
 static const int DT = 4000; // display duration
 static const int FT = 500; // fade duration > 50!!!!
 
@@ -73,10 +77,19 @@ public:
         client = slider;
         setRange(slider->minimum(), slider->maximum()/*0, 100*/);
         setValue(slider->value());
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
         connect (slider, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
         connect (this, SIGNAL(valueChanged(int)), slider, SIGNAL(sliderMoved(int)));
     }
     QPointer<QAbstractSlider> client;
+protected:
+    void resizeEvent(QResizeEvent *re)
+    {
+        if (width() != height())
+            setFixedWidth(height());
+        else
+            QDial::resizeEvent(re);
+    }
 };
 
 class PrettyLabel : public QWidget
@@ -315,6 +328,7 @@ class AmarokData {
             deleteDeferred(toggleCompact);
             delete displayBg;
         }
+        QList<QPointer<QDockWidget> > docks;
         QPointer<QWidget> context, player, lowerPart;
         QPointer<CoverLabel> cover;
         QPointer<PrettyLabel> meta;
@@ -467,7 +481,7 @@ isWindowDragWidget(QObject *o)
             qobject_cast<QGroupBox*>(o) ||
         
             (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled()) ||
-            qobject_cast<QToolBar*>(o) || o->inherits("QDockWidget") ||
+            qobject_cast<QToolBar*>(o) || qobject_cast<QDockWidget*>(o) ||
 //         o->inherits("QMainWindow") || // this is mostly useles... PLUS triggers problems
 
             ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
@@ -514,7 +528,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
 
     // preserve dock / toolbar internal move float trigger on dock titles =================
     if (w->cursor().shape() != Qt::ArrowCursor ||
-        (mev->pos().y() < 12 && w->inherits("QDockWidget")))
+        (mev->pos().y() < 12 && qobject_cast<QDockWidget*>(w)))
         return false;
 
 //     QMouseEvent rel(QEvent::MouseButtonRelease, mev->pos(), mev->button(),
@@ -525,19 +539,190 @@ hackMoveWindow(QWidget* w, QEvent *e)
     return true;
 }
 
+void
+Hacks::swapAmarokPalette()
+{
+    if (!amarok->player)
+        return;
+    QPalette pal = amarok->player->palette();
+    QColor c = pal.color(QPalette::Active, amarok->player->foregroundRole());
+    int h,s,v; c.getHsv(&h,&s,&v);
+    if (v < 60)
+        c.setHsv(h,s,60);
+    pal.setColor(amarok->player->foregroundRole(), pal.color(QPalette::Active, amarok->player->backgroundRole()));
+    pal.setColor(amarok->player->backgroundRole(), c);
+    //                 pal.setColor(QPalette::Button, c);
+    //                 pal.setColor(QPalette::ButtonText, pal.color(QPalette::Active, frame->foregroundRole()));
+    amarok->player->setPalette(pal);
+}
+
+static void
+hackAmarokPlayer(QWidget *frame)
+{
+//     const bool oldSchool = qobject_cast<QFrame*>(frame);
+    ENSURE_INSTANCE;
+    QLayout *layout = 0;
+    if (qobject_cast<QBoxLayout*>(frame->layout()))
+        layout = frame->layout();
+    else
+    {
+        QList<QWidgetAction*> list = frame->findChildren<QWidgetAction*>();
+        if (!list.isEmpty() && list.first()->defaultWidget())
+        {
+            frame = list.first()->defaultWidget();
+            layout = frame->layout();
+        }
+    }
+    amarok->player = frame;
+    if (layout)
+    {
+        layout->setContentsMargins(0, 0, 0, 0);
+        if (!amarok->dial)
+        {
+            QList<QSlider*> list = frame->findChildren<QSlider*>();
+            foreach (QSlider *slider, list)
+            {
+                if (slider->inherits("Amarok::VolumeSlider"))
+                {
+                    if (slider->parentWidget() && slider->parentWidget()->inherits("VolumeWidget"))
+                        slider->parentWidget()->hide();
+                    else
+                        slider->hide();
+                    amarok->dial = new ProxyDial(slider, frame);
+                    amarok->dial->setPageStep(10);
+                    amarok->dial->setSingleStep(1);
+                    if (QBoxLayout *box = qobject_cast<QBoxLayout*>(layout))
+                    {
+                        QLayoutItem *item = box->itemAt(box->count()-1);
+                        if (item)
+                        {
+                            if (item->layout())
+                                box->setStretchFactor(item->layout(), 100);
+                            else if (item->widget())
+                                box->setStretchFactor(item->widget(), 100);
+                        }
+                    }
+                    layout->addWidget(amarok->dial);
+                    layout->setAlignment(amarok->dial, Qt::AlignRight);
+                    break;
+                }
+            }
+        }
+        if (!amarok->cover)
+        {
+            amarok->cover = new CoverLabel(frame);
+            layout->addWidget(amarok->cover);
+            layout->setAlignment(amarok->cover, Qt::AlignRight);
+        }
+    }
+    
+    frame->setAttribute(Qt::WA_OpaquePaintEvent);
+    QList<QFrame*> list = frame->findChildren<QFrame*>();
+    QObjectList oList;
+    QBoxLayout *box = 0;
+    QFrame *f = 0;
+    
+    foreach (QFrame *runner, list)
+        if (runner->inherits("KVBox")) { f = runner; break; }
+        
+    if (f)
+    {
+        list = f->findChildren<QFrame*>();
+        oList = f->children();
+        f = 0;
+        foreach (QFrame *runner, list)
+            if (runner->inherits("KHBox")) { f = runner; break; }
+            if (f)
+                box = qobject_cast<QBoxLayout*>(f->layout());
+    }
+
+    QObject *o = 0;
+    foreach (o, oList)
+        if (o->inherits("ProgressWidget")) break;
+    
+    if (QWidget *pw = qobject_cast<QWidget*>(o))
+    {
+        if (!box && pw->parentWidget())
+        {
+            box = qobject_cast<QBoxLayout*>(pw->parentWidget()->layout());
+            if ( box && box->itemAt(0)->widget() && box->itemAt(0)->widget() != o && box->itemAt(0)->widget()->layout() )
+                box = qobject_cast<QHBoxLayout*>(box->itemAt(0)->widget()->layout());
+            else
+                box = 0; // ensure this for later injection!
+        }
+        
+        QList<QLabel*> lList = pw->findChildren<QLabel*>();
+        if (lList.size() == 2)
+        {
+            lList.at(0)->setFont(QFont());
+            lList.at(1)->hide();
+        }
+        
+        if (pw->layout())
+            if (QBoxLayout *box2 = qobject_cast<QBoxLayout*>(pw->layout()))
+            {
+                QFont fnt;
+                if (!amarok->toggleContext)
+                {
+                    amarok->toggleContext = new QToolButton(f);
+                    fnt = amarok->toggleContext->font(); fnt.setBold(true);
+                    amarok->toggleContext->setFont(fnt);
+                    amarok->toggleContext->setText(amarok->context && !amarok->context->isVisible() ? "[||]" : "[|]");
+                    
+                    amarok->toggleContext->setToolTip("Toggle ContextView");
+                    box2->addWidget(amarok->toggleContext);
+                    bespinHacks->connect(amarok->toggleContext, SIGNAL(clicked(bool)), SLOT(toggleAmarokContext())); // TODO: bind toggle?
+//                     bespinHacks->connect(amarok->toggleContext, SIGNAL(clicked(bool)), SLOT(toggleAmarokFreedom())); // TODO: bind toggle?
+                }
+                
+                if (!amarok->toggleCompact)
+                {
+                    amarok->toggleCompact = new QToolButton(f);
+                    amarok->toggleCompact->setFont(fnt);
+                    amarok->toggleCompact->setText("-");
+                    
+                    amarok->toggleCompact->setToolTip("Toggle comapct mode");
+                    box2->addWidget(amarok->toggleCompact);
+                    bespinHacks->connect(amarok->toggleCompact, SIGNAL(clicked(bool)), SLOT(toggleAmarokCompact())); // TODO: bind toggle?
+                }
+            }
+    }
+    
+    if (box && !amarok->meta)
+    {
+        amarok->meta = new PrettyLabel(QStringList() << "Amarok² / Bespin edition" << "Click to toggle animation" << "Wheel to change item", f);
+        box->addWidget(amarok->meta);
+        amarok->meta->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        //                         amarok->meta->setAlignment(Qt::AlignCenter);
+        QDBusConnection::sessionBus().connect( "org.kde.amarok", "/Player",
+                                               "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)) );
+                                               box->addSpacing(22);
+    }
+    QTimer::singleShot(300, bespinHacks, SLOT(swapAmarokPalette()));
+///     frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    frame->installEventFilter(bespinHacks);
+}
+
 inline static bool
 paintAmarok(QWidget *w, QPaintEvent *pe)
 {
-    if (QFrame *frame = qobject_cast<QFrame*>(w)) {
-    if (frame == amarok->player)
+    if (w == amarok->player)
     {
-        if (!amarok->displayBg || amarok->displayBg->height() != frame->height())
+        if (!amarok->displayBg || amarok->displayBg->height() != w->height())
         {
             delete amarok->displayBg;
 //             amarok->displayBg = new QPixmap(Gradients::pix(frame->palette().color(w->backgroundRole()), frame->height(), Qt::Vertical, Gradients::Glass));
-            amarok->displayBg = new QPixmap(32, frame->height());
-            QLinearGradient lg( 1, 0, 1, frame->height() );
-            QColor c = frame->palette().color(w->backgroundRole());
+            amarok->displayBg = new QPixmap(32, w->height());
+            QLinearGradient lg( 1, 0, 1, w->height() );
+            QColor c = w->palette().color(w->backgroundRole());
+#if 0
+            // gloss
+            lg.setColorAt(0, Colors::mid(c, Qt::white, 6, 1));
+            lg.setColorAt(.49, c);
+            lg.setColorAt(.5, Colors::mid(c, Qt::black, 6, 1));
+            lg.setColorAt(1, c);
+#endif
+            // smooth
             lg.setColorAt(0, Colors::mid(c, Qt::white, 6, 1));
             lg.setColorAt(.8, Colors::mid(c, Qt::black, 6, 1));
             QPainter p(amarok->displayBg);
@@ -548,8 +733,6 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
         QPainter p(w); p.setClipRegion(pe->region());
         p.drawTiledPixmap(w->rect(), *amarok->displayBg); p.end();
         return true;
-    }
-    return false;
     }
     
     if (QSlider *slider = qobject_cast<QSlider*>(w)) {
@@ -567,27 +750,6 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
         opt.sliderPosition = slider->sliderPosition();
         opt.sliderValue = slider->value();
         QPainter p(slider); p.setClipRegion(pe->region());
-#if 0 // we have a space conserving dial now...
-        if (slider->inherits("Amarok::VolumeSlider"))
-        {
-            //TODO: maybe volume icon...
-            if (slider->testAttribute(Qt::WA_UnderMouse))
-            {
-                const QRect rect( opt.rect.right()-40, 0, 40, slider->height() );
-                p.drawText( rect, Qt::AlignRight | Qt::AlignVCenter, QString::number( slider->value() ) + '%' );
-            }
-            QRect r = opt.rect;
-            opt.rect.setWidth(r.height()*.877);
-            const bool hover = opt.state & QStyle::State_MouseOver;
-            opt.state |= QStyle::State_MouseOver;
-            QPixmap icon = slider->style()->standardPixmap(opt.sliderValue ? QStyle::SP_MediaVolume : QStyle::SP_MediaVolumeMuted, &opt, slider);
-            if (!hover)
-                opt.state &= ~QStyle::State_MouseOver;
-            p.drawPixmap(opt.rect.topLeft(), icon);
-            opt.rect = r;
-            opt.rect.adjust(icon.width()+4, 0, -44, 0);
-        }
-#endif
         slider->style()->drawComplexControl(QStyle::CC_Slider, &opt, &p, slider);
         p.end();
         return true;
@@ -643,12 +805,31 @@ Hacks::toggleAmarokContext()
 void
 Hacks::toggleAmarokCompact()
 {
+    QToolButton *btn = qobject_cast<QToolButton*>(sender());
+    if (btn)
+        btn->setText(amarok->size.isValid() ? "-" : "+");
+    
     if (!amarok->lowerPart)
+    {
+        if (!btn)
+            return;
+        if (QWidget *window = btn->window())
+        {
+            if (!amarok->size.isValid())
+            {
+                amarok->size = window->size();
+                window->resize(QSize(600, 2));
+            }
+            else
+            {
+                window->resize(amarok->size);
+                amarok->size = QSize();
+            }
+        }
         return;
+    }
+    
     amarok->lowerPart->setVisible(!amarok->lowerPart->isVisible());
-
-    if (QToolButton *btn = qobject_cast<QToolButton*>(sender()))
-        btn->setText(amarok->lowerPart->isVisible() ? "-" : "+");
 
     if (QWidget *window = amarok->lowerPart->window())
     {
@@ -701,7 +882,7 @@ Hacks::setAmarokMetaInfo(int)
         tmp = reply.value().value("artist").toString();
         if (!tmp.isEmpty() && tmp != "Unknown") {
             data << tmp;
-            toolTip += "<br>by " + tmp;
+            toolTip += " by " + tmp;
         }
 
         QString tmp2;
@@ -775,9 +956,21 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         if (e->type() == QEvent::PaletteChange)
         {
             if (o->objectName() == "MainToolbar")
-                { delete amarok->displayBg; amarok->displayBg = 0; }
+            {
+                delete amarok->displayBg; amarok->displayBg = 0;
+//                 o->removeEventFilter(this);
+//                 swapAmarokPalette(static_cast<QWidget*>(o));
+//                 o->installEventFilter(this);
+            }
             return false;
         }
+#if 0
+        if (e->type() == QEvent::MouseButtonPress)
+        {
+            qDebug() << "BESPIN" << o;
+            return false;
+        }
+#endif
         return false;
     }
 
@@ -815,7 +1008,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 
     return false;
 }
-#define ENSURE_INSTANCE if (!bespinHacks) bespinHacks = new Hacks
+
 bool
 Hacks::add(QWidget *w)
 {
@@ -836,6 +1029,8 @@ Hacks::add(QWidget *w)
     if (*appType == Amarok)
     {
         if (!amarok) amarok = new AmarokData;
+//         ENSURE_INSTANCE;
+//         w->installEventFilter(bespinHacks);
 
         if (QSplitter *splitter = qobject_cast<QSplitter*>(w))
         {
@@ -843,6 +1038,18 @@ Hacks::add(QWidget *w)
             if (splitter->parentWidget() && splitter->parentWidget()->parentWidget() &&
                 splitter->parentWidget()->parentWidget()->inherits("MainWindow"))
                 amarok->lowerPart = splitter;
+        }
+        else if (config.amarokDisplay && qobject_cast<QToolBar*>(w) && w->objectName() == "MainToolbar")
+            hackAmarokPlayer(w);
+        else if (QDockWidget *dock = qobject_cast<QDockWidget*>(w))
+        {
+            dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+            if (dock->objectName() == "Context dock")
+                amarok->context = dock;
+//             if (dock->titleBarWidget())
+//                 dock->titleBarWidget()->show();
+//             amarok->docks.removeAll(dock);
+//             amarok->docks << dock;
         }
         else if (QFrame *frame = qobject_cast<QFrame*>(w))
         {
@@ -866,7 +1073,7 @@ Hacks::add(QWidget *w)
 //                     }
 //                 }
             }
-            if ((config.amarokContext || config.amarokDisplay)
+            if (!amarok->context && (config.amarokContext || config.amarokDisplay)
                 && w->inherits("Context::ContextView"))
             {
                 QWidget *splitterKid = w;
@@ -884,132 +1091,7 @@ Hacks::add(QWidget *w)
                 }
             }
             if (config.amarokDisplay && frame->objectName() == "MainToolbar")
-            {
-                ENSURE_INSTANCE;
-                amarok->player = frame;
-                if (QBoxLayout *box = qobject_cast<QBoxLayout*>(frame->layout()))
-                {
-                    if (!amarok->dial)
-                    {
-                        QList<QSlider*> list = frame->findChildren<QSlider*>();
-                        foreach (QSlider *slider, list)
-                        {
-                            if (slider->inherits("Amarok::VolumeSlider"))
-                            {
-                                if (slider->parentWidget() && slider->parentWidget()->inherits("VolumeWidget"))
-                                    slider->parentWidget()->hide();
-                                else
-                                    slider->hide();
-                                amarok->dial = new ProxyDial(slider, frame);
-                                amarok->dial->setPageStep(10);
-                                amarok->dial->setSingleStep(1);
-                                box->addWidget(amarok->dial);
-                                break;
-                            }
-                        }
-                    }
-                    if (!amarok->cover)
-                    {
-                        amarok->cover = new CoverLabel(frame);
-                        box->addWidget(amarok->cover);
-                    }
-                }
-                
-                frame->setAttribute(Qt::WA_OpaquePaintEvent);
-                QList<QFrame*> list = frame->findChildren<QFrame*>();
-                QObjectList oList;
-                QBoxLayout *box = 0;
-                QFrame *f = 0;
-                
-                foreach (QFrame *runner, list)
-                    if (runner->inherits("KVBox")) { f = runner; break; }
-
-                if (f)
-                {
-                    list = f->findChildren<QFrame*>();
-                    oList = f->children();
-                    f = 0;
-                    foreach (QFrame *runner, list)
-                        if (runner->inherits("KHBox")) { f = runner; break; }
-                    if (f)
-                        box = qobject_cast<QBoxLayout*>(f->layout());
-                }
-
-                QObject *o = 0;
-                foreach (o, oList)
-                    if (o->inherits("ProgressWidget")) break;
-
-                if (QWidget *pw = qobject_cast<QWidget*>(o))
-                {
-                    if (!box && pw->parentWidget())
-                    {
-                        box = qobject_cast<QBoxLayout*>(pw->parentWidget()->layout());
-                        if ( box && box->itemAt(0)->widget() && box->itemAt(0)->widget() != o && box->itemAt(0)->widget()->layout() )
-                            box = qobject_cast<QHBoxLayout*>(box->itemAt(0)->widget()->layout());
-                        else
-                            box = 0; // ensure this for later injection!
-                    }
-
-                    QList<QLabel*> lList = pw->findChildren<QLabel*>();
-                    if (lList.size() == 2)
-                    {
-                        lList.at(0)->setFont(QFont());
-                        lList.at(1)->hide();
-                    }
-                    
-                    if (pw->layout())
-                    if (QBoxLayout *box2 = qobject_cast<QBoxLayout*>(pw->layout()))
-                    {
-                        QFont fnt;
-                        if (!amarok->toggleContext)
-                        {
-                            amarok->toggleContext = new QToolButton(f);
-                            fnt = amarok->toggleContext->font(); fnt.setBold(true);
-                            amarok->toggleContext->setFont(fnt);
-                            amarok->toggleContext->setText(amarok->context && !amarok->context->isVisible() ? "[||]" : "[|]");
-
-                            amarok->toggleContext->setToolTip("Toggle ContextView");
-                            box2->addWidget(amarok->toggleContext);
-                            connect (amarok->toggleContext, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokContext())); // TODO: bind toggle?
-                        }
-
-                        if (!amarok->toggleCompact)
-                        {
-                            amarok->toggleCompact = new QToolButton(f);
-                            amarok->toggleCompact->setFont(fnt);
-                            amarok->toggleCompact->setText("-");
-
-                            amarok->toggleCompact->setToolTip("Toggle comapct mode");
-                            box2->addWidget(amarok->toggleCompact);
-                            connect (amarok->toggleCompact, SIGNAL(clicked(bool)), bespinHacks, SLOT(toggleAmarokCompact())); // TODO: bind toggle?
-                        }
-                    }
-                }
-
-                if (box && !amarok->meta)
-                {
-                    amarok->meta = new PrettyLabel(QStringList() << "Amarok² / Bespin edition" << "Click to toggle animation" << "Wheel to change item", f);
-                    box->addWidget(amarok->meta);
-                    amarok->meta->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-                    //                         amarok->meta->setAlignment(Qt::AlignCenter);
-                    QDBusConnection::sessionBus().connect( "org.kde.amarok", "/Player",
-                                                           "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)) );
-                    box->addSpacing(22);
-                }
-                
-                frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-                QPalette pal = frame->palette();
-                QColor c = pal.color(QPalette::Active, frame->foregroundRole());
-                int h,s,v; c.getHsv(&h,&s,&v);
-                if (v < 60)
-                    c.setHsv(h,s,60);
-                pal.setColor(frame->foregroundRole(), pal.color(QPalette::Active, frame->backgroundRole()));
-                pal.setColor(frame->backgroundRole(), c);
-//                 pal.setColor(QPalette::Button, c);
-//                 pal.setColor(QPalette::ButtonText, pal.color(QPalette::Active, frame->foregroundRole()));
-                frame->setPalette(pal);
-                frame->installEventFilter(bespinHacks);
-            }
+                hackAmarokPlayer(frame);
             else if (config.amarokFrames)
             {
                 QWidget *runner = w;
@@ -1037,7 +1119,14 @@ Hacks::add(QWidget *w)
 //             if (bar->objectName() == "PlaylistToolBar")
 //                 bar->setToolButtonStyle(Qt::ToolButtonTextOnly);
         else if (config.amarokDisplay && w->inherits("Amarok::Slider"))
-            { ENSURE_INSTANCE; w->installEventFilter(bespinHacks); }
+        {
+            ENSURE_INSTANCE;
+//             QSizePolicy pol = w->sizePolicy();
+//             pol.setHorizontalPolicy(QSizePolicy::Expanding);
+//             pol.setHorizontalStretch(100);
+//             w->setSizePolicy(pol);
+            w->installEventFilter(bespinHacks);
+        }
         else if (w->inherits("StatusBar"))
             amarok->status = qobject_cast<QStatusBar*>(w);
     }
