@@ -56,9 +56,12 @@
 using namespace Bespin;
 
 Client::Client(KDecorationBridge *b, Factory *f) :
-KDecoration(b, f), retry(0),
+KDecoration(b, f), retry(0), myActiveChangeTimer(0),
 topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
-bgMode(1), _factory(f), corner(0) { }
+bgMode(1), _factory(f), corner(0)
+{
+    myButtonOpacity = isActive() ? 100 : 0;
+}
 
 Client::~Client(){
 //    delete corner;
@@ -95,6 +98,7 @@ Client::activeChange()
 {
     if (gType[0] != gType[1])
         updateTitleLayout(widget()->size());
+    fadeButtons();
     if (bgMode > 1)
     {
         updateStylePixmaps();
@@ -256,6 +260,10 @@ Client::eventFilter(QObject *o, QEvent *e)
         }
         return true;
     }
+    case QEvent::Enter:
+    case QEvent::Leave:
+        fadeButtons();
+        return false;
     case QEvent::MouseButtonDblClick:
         titlebarDblClickOperation();
         return true;
@@ -270,6 +278,21 @@ Client::eventFilter(QObject *o, QEvent *e)
         return false;
     }
     return false;
+}
+
+
+void
+Client::fadeButtons()
+{
+//     if ()
+    {
+        if (!myActiveChangeTimer)
+        {
+            myActiveChangeTimer = startTimer(40);
+            QTimerEvent te(myActiveChangeTimer);
+            timerEvent(&te);
+        }
+    }
 }
 
 static const unsigned long
@@ -1010,16 +1033,52 @@ Client::tileWindow(bool more, bool vertical, bool mirrorGravity)
     rootinfo.moveResizeWindowRequest(windowId(), flags, 0, 0, sz - 2*borderSize, sz - (borderSize + titleSize));
 }
 
+
 void
-Client::activate() {
-   if (QAction *act = qobject_cast<QAction*>(sender())) {
-      bool ok; int id = act->data().toUInt(&ok);
-      if (ok) {
-         KWindowSystem::activateWindow( id );
-         return;
-      }
-   }
-   KWindowSystem::activateWindow( windowId() );
+Client::timerEvent(QTimerEvent *te)
+{
+    if (te->timerId() != myActiveChangeTimer)
+    {
+        KDecoration::timerEvent(te);
+        return;
+    }
+    if (isActive() || widget()->underMouse())
+    {
+        myButtonOpacity += 25;
+        if (myButtonOpacity > 99)
+        {
+            killTimer(myActiveChangeTimer);
+            myActiveChangeTimer = 0;
+            myButtonOpacity = 100;
+        }
+    }
+    else
+    {
+        myButtonOpacity -= 10;
+        if (myButtonOpacity < 1)
+        {
+            killTimer(myActiveChangeTimer);
+            myActiveChangeTimer = 0;
+            myButtonOpacity = 0;
+        }
+    }
+    for (int i = 0; i < 4; ++i)
+        if (buttons[i])
+            buttons[i]->repaint();
+}
+
+void
+Client::activate()
+{
+    if (QAction *act = qobject_cast<QAction*>(sender()))
+    {
+        bool ok; int id = act->data().toUInt(&ok);
+        if (ok) {
+            KWindowSystem::activateWindow( id );
+            return;
+        }
+    }
+    KWindowSystem::activateWindow( windowId() );
 }
 
 void

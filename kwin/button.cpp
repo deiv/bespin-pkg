@@ -312,6 +312,7 @@ Button::color() const
         c = Colors::mid(bg, c, 6-zoomLevel, 4);
     else
         c = Colors::mid(bg, c, 6, 1);
+    c.setAlpha(c.alpha()*client->buttonOpacity()/100);
     return c;
 }
 
@@ -330,30 +331,27 @@ Button::paintEvent(QPaintEvent *)
     float fx, fy;
     if (state & Sunken)
         fx = fy = .75;
+    else if (slick == 2)
+    {
+        if (!zoomLevel)
+        {
+            const float s = width()/5.0;
+            p.drawRoundRect(s, 2*s, 3*s, s);
+            p.end(); return;
+        }
+//             6/(b/a-1) = x
+        fx = (9+zoomLevel)/15.0;
+        fy = (1.5+zoomLevel)/7.5;
+        }
     else if (slick)
     {
-        if (slick == 2)
+        if (!zoomLevel)
         {
-            if (!zoomLevel)
-            {
-                const float s = width()/5.0;
-                p.drawRoundRect(s, 2*s, 3*s, s);
-                p.end(); return;
-            }
-//             6/(b/a-1) = x
-            fx = (9+zoomLevel)/15.0;
-            fy = (1.5+zoomLevel)/7.5;
+            const float s = height()/3.0;
+            p.drawEllipse(QRectF(s, s, s, s));
+            p.end(); return;
         }
-        else
-        {
-            if (!zoomLevel)
-            {
-                const float s = height()/3.0;
-                p.drawEllipse(QRectF(s, s, s, s));
-                p.end(); return;
-            }
-            fx = fy = (3+zoomLevel)/9.0;
-        }
+        fx = fy = (3+zoomLevel)/9.0;
     }
     else
         fx = fy = (18 + zoomLevel)/24.0;

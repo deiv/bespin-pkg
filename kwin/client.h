@@ -83,22 +83,27 @@ signals:
     void shadeChanged(bool);
 protected:
     bool eventFilter(QObject *o, QEvent *e);
+    void timerEvent(QTimerEvent *te);
 protected:
     friend class Button;
     /// works like options()->color(.), but allows per window settings to match the window itself
     QColor color(ColorType type, bool active=true) const;
+    inline int buttonOpacity() const { return myButtonOpacity; }
     inline int buttonSize() const { return _factory->buttonSize(); }
     void repaint(QPainter &p);
     inline int slickButtons() const { return _factory->slickButtons(); }
     void tileWindow(bool more, bool vertical, bool mirrorGravity);
 private:
     Q_DISABLE_COPY(Client)
+    void fadeButtons();
     void updateTitleLayout( const QSize& s );
     void updateButtonCorner(bool right = false);
     
     QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
     Button *buttons[4];
     int borderSize, titleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
+    int myButtonOpacity;
+    int myActiveChangeTimer;
     Picture topTile, btmTile, cnrTile, lCorner, rCorner;
     uint bgMode;
     Gradients::Type gType[2];

@@ -100,6 +100,7 @@ ResizeCorner::setColor(const QColor &c)
     QColor bgc = (c.value() > 100) ? c.dark(130) : c.light(120);
     QPalette pal = palette();
     pal.setColor(backgroundRole(), bgc);
+//     pal.setBrush(foregroundRole(), QBrush(c, Qt::Dense3Pattern));
     setPalette(pal);
 }
 
@@ -170,7 +171,11 @@ ResizeCorner::mouseReleaseEvent ( QMouseEvent * )
 void
 ResizeCorner::paintEvent ( QPaintEvent * )
 {
-   QPainter p(this); p.setBrush(palette().color(backgroundRole())); p.setPen(Qt::NoPen);
+   QPainter p(this);
+   p.setPen(Qt::NoPen);
+   p.setBrush(palette().color(backgroundRole()));
    p.drawRect(rect());
+//    p.setBrush(palette().brush(foregroundRole()));
+//    p.drawRect(rect());
    p.end();
 }
