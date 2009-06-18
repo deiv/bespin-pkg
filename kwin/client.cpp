@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////
 // client.cpp
 // -------------------
-// Oxygen window decoration for KDE
+// Bespin window decoration for KDE
 // -------------------
-// Copyright (c) 2008 Thomas Lübking <baghira-style@gmx.net>
+// Copyright (c) 2008/2009 Thomas Lübking <baghira-style@gmx.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -262,7 +262,8 @@ Client::eventFilter(QObject *o, QEvent *e)
     }
     case QEvent::Enter:
     case QEvent::Leave:
-        fadeButtons();
+        if (!isActive())
+            fadeButtons();
         return false;
     case QEvent::MouseButtonDblClick:
         titlebarDblClickOperation();
