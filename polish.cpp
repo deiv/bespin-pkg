@@ -824,8 +824,10 @@ Style::unpolish( QWidget *widget )
 
     if (widget->isWindow())
     {
+#ifdef Q_WS_X11
         XProperty::remove(widget->winId(), XProperty::winData);
         XProperty::remove(widget->winId(), XProperty::bgPics);
+#endif
         if (qobject_cast<QMenu *>(widget))
             widget->clearMask();
     }

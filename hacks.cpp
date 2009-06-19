@@ -967,7 +967,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 #if 0
         if (e->type() == QEvent::MouseButtonPress)
         {
-            qDebug() << "BESPIN" << o;
+            qDebug() << "BESPIN" << o << o->parent();
             return false;
         }
 #endif
@@ -1155,6 +1155,11 @@ Hacks::add(QWidget *w)
         w->installEventFilter(bespinHacks);
         return true;
     }
+#if 0
+    ENSURE_INSTANCE;
+    w->removeEventFilter(bespinHacks);
+    w->installEventFilter(bespinHacks);
+#endif
 
 //    if (config.hack.konsole)
 //    if (w->inherits("Konsole::TerminalDisplay")) {

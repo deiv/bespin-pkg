@@ -533,7 +533,6 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     data.inactiveButton = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 1, 2).rgba();
     data.activeButton = CCOLOR(kwin.active, Fg).rgba();
     
-    // XProperty actually handles the non X11 case, but we avoid overhead ;)
     if (widget)
         XProperty::set<uint>(widget->winId(), XProperty::winData, (uint*)&data, XProperty::WORD, 9);
     else

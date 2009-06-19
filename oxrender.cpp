@@ -212,6 +212,7 @@ FX::usesXRender()
     return useRender;
 }
 
+#ifndef QT_NO_XRENDER
 static Picture _blendPicture = X::None;
 static XRenderColor _blendColor = {0,0,0, 0xffff };
 static Picture blendPicture(double opacity)
@@ -223,12 +224,14 @@ static Picture blendPicture(double opacity)
         XRenderFillRectangle(dpy, PictOpSrc, _blendPicture, &_blendColor, 0, 0, 1, 1);
     return _blendPicture;
 }
+#endif
 
 bool
 FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
 {
     if (opacity == 0.0)
         return false; // haha...
+#ifndef QT_NO_XRENDER
     if (useRender)
     {
         OXPicture alpha = (opacity == 1.0) ? NULL : blendPicture(opacity);
@@ -237,6 +240,7 @@ FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
                           upper.width(), upper.height());
     }
     else
+#endif
     {
         QPixmap tmp = upper;
         QPainter p;
@@ -277,6 +281,7 @@ FX::applyAlpha(const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect
         pix = QPixmap(w, h);
     else
         pix = fromThisPix.copy(0,0,w,h); // cause slow depth conversion...
+#ifndef QT_NO_XRENDER
     pix.fill(Qt::transparent);
     if (useRender)
     {
@@ -285,6 +290,7 @@ FX::applyAlpha(const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect
                           sx, sy, ax, ay, 0, 0, w, h );
     }
     else
+#endif
     {
         QPainter p(&pix);
         p.drawPixmap(0, 0, toThisPix, sx, sy, w, h);
@@ -349,6 +355,7 @@ FX::tint(const QPixmap &mask, const QColor &color)
     QPixmap pix = mask.copy();
     pix.fill(Qt::transparent);
 
+#ifndef QT_NO_XRENDER
     if (useRender)
     {
         Q2XRenderColor(c, color);
@@ -361,6 +368,7 @@ FX::tint(const QPixmap &mask, const QColor &color)
         XRenderFreePicture (dpy, tnt);
     }
     else
+#endif
     {
         QPainter p(&pix);
         p.setPen(Qt::NoPen); p.setBrush(color);
