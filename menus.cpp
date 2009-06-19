@@ -26,7 +26,7 @@ static const bool round_ = true;
 void
 Style::drawMenuBarBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
-    if (appType == Plasma)
+    if (appType == Plasma || appType == BEshell)
         return;
 
     QRect rect = RECT;

@@ -440,6 +440,8 @@ Style::init(const QSettings* settings)
         appType = KDM;
     else if (QCoreApplication::applicationName() == "dolphin")
         appType = Dolphin;
+    else if (QCoreApplication::applicationName() == "be.shell")
+        appType = BEshell;
     else if (QCoreApplication::applicationName() == "plasma" || QCoreApplication::applicationName() == "plasma-desktop")
         appType = Plasma;
     else if (QCoreApplication::applicationName() == "krunner")

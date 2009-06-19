@@ -517,6 +517,7 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 void
 Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
 {
+#ifdef Q_WS_X11
     if (!FX::usesXRender())
         return;
     // this is important because KDE apps may alter the original palette any time
@@ -550,11 +551,9 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     data.activeButton = CCOLOR(kwin.active, Fg).rgba();
     
     // XProperty actually handles the non X11 case, but we avoid overhead ;)
-#ifdef Q_WS_X11
     if (widget)
         XProperty::set<uint>(widget->winId(), XProperty::winData, (uint*)&data, XProperty::WORD, 9);
     else
-#endif
     {   // dbus solution, currently for gtk
         QByteArray ba(36, 'a');
         uint *ints = (uint*)ba.data();
@@ -576,6 +575,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 #endif
         bespinDeco.call(QDBus::NoBlock, "styleByPid", pid, ba);
     }
+#endif // X11
 }
 
 static const
@@ -953,9 +953,11 @@ Style::eventFilter( QObject *object, QEvent *ev )
         QWidget * widget = qobject_cast<QWidget*>(object);
         if (!widget)
             return false;
+
+#ifdef Q_WS_X11
+        // talk to kwin about colors, gradients, etc.
         if (widget->isWindow())
         {
-            // talk to kwin about colors, gradients, etc.
             Qt::WindowFlags ignore =    Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::ToolTip |
             Qt::SplashScreen | Qt::Desktop |
             Qt::X11BypassWindowManagerHint;// | Qt::FramelessWindowHint; <- could easily change mind...?!
@@ -967,6 +969,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
             return false;
         }
+#endif
         
         // i think, i hope i got it....
         // 1. khtml sets buttontext, windowtext and text to the fg color - what leads to trouble if e.g. button doesn't contrast window
