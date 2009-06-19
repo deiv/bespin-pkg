@@ -53,23 +53,6 @@
 
 #include <QtDebug>
 
-/**============= extern C stuff ==========================*/
-class BespinStylePlugin : public QStylePlugin
-{
-public:
-    QStringList keys() const {
-        return QStringList() << "Bespin";
-    }
-
-    QStyle *create(const QString &key) {
-        if (key == "bespin")
-            return new Bespin::Style;
-        return 0;
-    }
-};
-
-Q_EXPORT_PLUGIN2(Bespin, BespinStylePlugin)
-/**=========================================================*/
 
 using namespace Bespin;
 
@@ -1055,3 +1038,20 @@ Style::standardPalette () const
 
 #undef PAL
 
+/**============= extern C stuff ==========================*/
+class BespinStylePlugin : public QStylePlugin
+{
+public:
+    QStringList keys() const {
+        return QStringList() << "Bespin";
+    }
+
+    QStyle *create(const QString &key) {
+        if (key == "bespin")
+            return new Bespin::Style;
+        return 0;
+    }
+};
+
+Q_EXPORT_PLUGIN2(Bespin, BespinStylePlugin)
+/**=========================================================*/
