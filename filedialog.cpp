@@ -22,6 +22,10 @@
 #include <QStringList>
 #include <QProcess>
 
+#ifdef Q_WS_WIN
+#define Q_GUI_EXPORT
+#endif
+
 class Q_GUI_EXPORT QApplicationPrivate
 {
     public:

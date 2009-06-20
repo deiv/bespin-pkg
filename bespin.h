@@ -56,7 +56,10 @@ typedef struct
 
 
 class
-Q_GUI_EXPORT Style : public QCommonStyle
+#ifndef Q_WS_WIN
+Q_GUI_EXPORT
+#endif
+Style : public QCommonStyle
 {
     Q_OBJECT
     Q_CLASSINFO ("X-KDE-CustomElements", "true")
