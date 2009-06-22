@@ -41,14 +41,13 @@
 #if QT_VERSION < 0x040400
 #include <unistd.h>
 #endif
+#include "macmenu.h"
 #include "xproperty.h"
 #endif
 
 #include "visualframe.h"
 #include "bespin.h"
 #include "hacks.h"
-
-#include "macmenu.h"
 
 #include "animator/hover.h"
 #include "animator/aprogress.h"
@@ -747,8 +746,10 @@ Style::polish( QWidget * widget )
     {
         widget->setBackgroundRole(config.menu.bar_role[Bg]);
         widget->setForegroundRole(config.menu.bar_role[Fg]);
+#ifdef Q_WS_X11
         if (!((appType == QtDesigner) && mbar->inherits("QDesignerMenuBar")))
             MacMenu::manage(mbar);
+#endif
     }   
 
     bool isTopContainer = qobject_cast<QToolBar *>(widget);
@@ -841,8 +842,10 @@ Style::unpolish( QWidget *widget )
     }
     if (QFrame *frame = qobject_cast<QFrame *>(widget))
         VisualFrame::release(frame);
+#ifdef Q_WS_X11
     if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
         MacMenu::release(mbar);
+#endif
 
     Animator::Hover::release(widget);
     Animator::Progress::release(widget);

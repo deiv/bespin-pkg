@@ -444,13 +444,9 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     <b>RANT:</b><br>\
     Amarok uses overheaded svg theming, but (though possible) custom theming isn't wanted, ending up\
     with the UI halfwise themed by the system style and a static svg theme.<br>\
-    Allthough many ppl. mourned you shall not be allowed to redesign the UI (simple using QDockWIdget\
-    - like dolphis does) or even toggle elements (many ppl. seem to have low interest in a permanent\
-    plasma center and handling collapsed splitters isn't too much fun either).<br>\
-    I like Amarok alot. I don't even mind the debatable new playlist look - especially as it's sayd to\
-    be configurable, pretty much like KMail currently is.<br>\
-    BUT THIS SUCKS!<br>\
-    I do not want an overheaded alien application where i'm told what UI elements i need where - Sorry :(" );
+    <br>UPDATE:</b><br>\
+    Well, guess what - starting with Amarok 2.1.1 you're officially allowed to configure the UI layout ;-P<br>\
+    Thanks to all Amarok Developers, it sucks much less now <b>=D</b>" );
 
     handleSettings(ui.hackAmarokListview, HACK_AMAROK_LISTVIEW);
     setContextHelp(ui.hackAmarokListview, "<b>Traditional Listviews</b><hr>\
@@ -1213,8 +1209,8 @@ static const char* roleStrings[] =
    "Button", "Button Text",
    "Highlight", "Highlighted Text"
 };
-static void
-ensureIcons()
+
+static void ensureIcons()
 {
     if (haveIcons)
         return;

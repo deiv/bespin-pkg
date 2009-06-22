@@ -45,11 +45,12 @@
 #include <QUrl>
 #include <QWidgetAction>
 
+#ifdef Q_WS_X11
+
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>
 
-#ifdef Q_WS_X11
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include "fixx11h.h"
@@ -694,9 +695,11 @@ hackAmarokPlayer(QWidget *frame)
         box->addWidget(amarok->meta);
         amarok->meta->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         //                         amarok->meta->setAlignment(Qt::AlignCenter);
+#ifdef Q_WS_X11
         QDBusConnection::sessionBus().connect( "org.kde.amarok", "/Player",
                                                "org.freedesktop.MediaPlayer", "CapsChange", bespinHacks, SLOT(setAmarokMetaInfo(int)) );
                                                box->addSpacing(22);
+#endif
     }
     QTimer::singleShot(300, bespinHacks, SLOT(swapAmarokPalette()));
 ///     frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
@@ -864,6 +867,7 @@ Hacks::toggleAmarokCompact()
 void
 Hacks::setAmarokMetaInfo(int)
 {
+#ifdef Q_WS_X11
     if (!amarok->meta)
         return;
 
@@ -943,6 +947,7 @@ Hacks::setAmarokMetaInfo(int)
     amarok->meta->setData(data);
     if (!toolTip.isEmpty())
         amarok->meta->setToolTip(toolTip);
+#endif
 }
 
 bool
