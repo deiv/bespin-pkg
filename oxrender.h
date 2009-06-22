@@ -16,14 +16,13 @@
    Boston, MA 02110-1301, USA.
  */
 
-#ifndef Q_WS_X11
-#define QT_NO_XRENDER #
-#endif
-
 #ifndef OXRENDER_H
 #define OXRENDER_H
 
 #include <QPixmap>
+#ifndef Q_WS_X11
+#define QT_NO_XRENDER #
+#endif
 // #include <QVector>
 #ifndef QT_NO_XRENDER
 

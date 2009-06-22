@@ -16,15 +16,15 @@
    Boston, MA 02110-1301, USA.
  */
 
-#ifndef Q_WS_X11
-#define QT_NO_XRENDER #
-#endif
-
-#ifndef QT_NO_XRENDER
-#include <QX11Info>
-#include <QPaintEngine>
-#endif
 #include <QPainter>
+#ifdef Q_WS_X11
+    #ifndef QT_NO_XRENDER
+        #include <QX11Info>
+        #include <QPaintEngine>
+    #endif
+#else
+    #define QT_NO_XRENDER #
+#endif
 
 
 // #include <QPainter>
