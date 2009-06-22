@@ -23,6 +23,7 @@
 #include <QProcess>
 
 #ifdef Q_WS_WIN
+#undef Q_GUI_EXPORT
 #define Q_GUI_EXPORT
 #endif
 
@@ -141,9 +142,14 @@ simpleFilter( const QString& filter )
     return list.join(" ");
 }
 
+#ifdef Q_WS_X11
 #define PREPARE_KDE \
 if ( parent ) args << "--attach" << QString::number( parent->winId() );\
 if ( !caption.isEmpty() ) args << "--title" << caption
+#else
+#define PREPARE_KDE \
+if ( !caption.isEmpty() ) args << "--title" << caption
+#endif
 
 #define PREPARE_GNOME \
 if ( !caption.isEmpty() ) args << "--title=" + caption;\
