@@ -461,6 +461,10 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
 #else
     ASSURE_OPTION(item, ViewItemV2);
 #endif
+
+    if (widget && widget->inherits("KUrlButton"))
+        return;
+
     OPT_HOVER
 
     const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);

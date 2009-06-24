@@ -553,6 +553,17 @@ Style::polish( QWidget * widget )
                 if (widget->parentWidget() &&
                     widget->parentWidget()->inherits("KPIM::StatusbarProgressWidget"))
                     pbtn->setFlat(true);
+
+                // NOTICE WORKAROUND - this widget paints no bg, uses foregroundcolor() to paint the text...
+                // and has - of course - foregroundRole() == QPalette::ButtonText
+                // TODO: inform Peter Penz <peter.penz@gmx.at> or *cough* Aaron J. Seigo <aseigo@kde.org> and really fix this
+                if (pbtn->inherits("KUrlButton"))
+                {
+                    pbtn->setBackgroundRole(QPalette::Window);
+                    pbtn->setForegroundRole(QPalette::WindowText);
+                    pbtn->setCursor(Qt::PointingHandCursor);
+                    pbtn->installEventFilter(this);
+                }
             }
             else if (widget->inherits("QToolButton") &&
                 // of course plasma needs - again - a WORKAROUND, we seem to be unable to use bg/fg-role, are we?
@@ -598,14 +609,6 @@ Style::polish( QWidget * widget )
             pal.setColor(QPalette::Inactive, QPalette::ButtonText, pal.color(QPalette::Inactive, QPalette::WindowText));
             pal.setColor(QPalette::Disabled, QPalette::ButtonText, pal.color(QPalette::Disabled, QPalette::WindowText));
             widget->setPalette(pal);
-        }
-        // NOTICE WORKAROUND - this widget paints no bg, uses foregroundcolor() to paint the text...
-        // and has - of course - foregroundRole() == QPalette::ButtonText
-        // TODO: inform Peter Penz <peter.penz@gmx.at> or *cough* Aaron J. Seigo <aseigo@kde.org> and really fix this
-        if (widget->inherits("KUrlButton"))
-        {
-            widget->setBackgroundRole(QPalette::Window);
-            widget->setForegroundRole(QPalette::WindowText);
         }
     }
     

@@ -29,6 +29,7 @@
 #include <QMenuBar>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPushButton>
 #include <QStyleOptionTabWidgetFrame>
 #include <QStylePlugin>
 #include <QScrollBar>
@@ -803,6 +804,36 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
 #endif
         return false;
+
+    case QEvent::Enter:
+    case QEvent::Leave:
+        if (object->inherits("KUrlButton"))
+        {
+            QWidget *w = static_cast<QWidget*>(object);
+            w->setCursor(Qt::PointingHandCursor);
+            if (QWidget *navigator = w->parentWidget())
+            {
+                QList<QPushButton*> btns = navigator->findChildren<QPushButton*>();
+                QList<QPushButton*>::const_iterator i = btns.constEnd();
+                while (i != btns.constBegin())
+                {
+                    --i;
+                    if ((*i)->inherits("KUrlButton"))
+                    {
+                        if (*i == w)
+                        {
+                            w->setCursor(Qt::ArrowCursor);
+                            return false;
+                        }
+                        break;
+                    }
+                }
+            }
+            QFont fnt = w->font();
+            fnt.setUnderline(ev->type() == QEvent::Enter);
+            w->setFont(fnt);
+            return false;
+        }
 
     case QEvent::Resize:
         
