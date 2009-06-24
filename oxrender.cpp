@@ -285,8 +285,8 @@ FX::applyAlpha(const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect
         pix = QPixmap(w, h);
     else
         pix = fromThisPix.copy(0,0,w,h); // cause slow depth conversion...
-#ifndef QT_NO_XRENDER
     pix.fill(Qt::transparent);
+#ifndef QT_NO_XRENDER
     if (useRender)
     {
         XRenderComposite( dpy, PictOpOver, toThisPix.x11PictureHandle(),
