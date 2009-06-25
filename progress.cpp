@@ -65,7 +65,7 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
             r.setRight(r.left() + w);
         shadows.raised[false][isEnabled][false].render(r, painter);
         r.adjust(f2, f2, -f2, -f2);
-#if 0
+#if 1
     if (widget)
     {
         QPixmap buffer(widget->size());
@@ -99,7 +99,7 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
         else if (tr.width() <= r.width()) // paint on used part
             tr = r;
         else
-        {   // paint cenetered
+        {   // paint centered
             tr = RECT;
             drawItemText(painter, tr.adjusted(-1, -1, -1, -1), Qt::AlignCenter, PAL, isEnabled, cb->text, bg);
             drawItemText(painter, tr.adjusted(1, 1, 1, 1), Qt::AlignCenter, PAL, isEnabled, cb->text, bg);
@@ -163,6 +163,7 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
 {
     ASSURE_OPTION(pb, ProgressBar);
     OPT_HOVER
+
     if ((widget && qobject_cast<const QAbstractItemView*>(widget)) || (appType == KGet && !widget))
     {   // kinda inline progress in itemview (but unfortunately kget doesn't send a widget)
         drawListViewProgress(pb, painter, widget);
