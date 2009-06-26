@@ -544,6 +544,7 @@ Style::polish( QWidget * widget )
     {
 //         widget->setBackgroundRole(config.btn.std_role[Bg]);
 //         widget->setForegroundRole(config.btn.std_role[Fg]);
+        widget->setAttribute(Qt::WA_Hover, false); // KHtml
         if (widget->inherits("QToolBoxButton") || IS_HTML_WIDGET )
             widget->setAttribute(Qt::WA_Hover); // KHtml
         else
@@ -556,13 +557,17 @@ Style::polish( QWidget * widget )
 
                 // NOTICE WORKAROUND - this widget paints no bg, uses foregroundcolor() to paint the text...
                 // and has - of course - foregroundRole() == QPalette::ButtonText
-                // TODO: inform Peter Penz <peter.penz@gmx.at> or *cough* Aaron J. Seigo <aseigo@kde.org> and really fix this
+                // TODO: inform Peter Penz <peter.penz@gmx.at> and really fix this
                 if (pbtn->inherits("KUrlButton"))
                 {
                     pbtn->setBackgroundRole(QPalette::Window);
-                    pbtn->setForegroundRole(QPalette::WindowText);
+                    pbtn->setForegroundRole(QPalette::Link);
+                    QPalette pal = pbtn->palette();
+                    pal.setColor(QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::Window));
+                    pbtn->setPalette(pal);
                     pbtn->setCursor(Qt::PointingHandCursor);
                     pbtn->installEventFilter(this);
+                    widget->setAttribute(Qt::WA_Hover);
                 }
             }
             else if (widget->inherits("QToolButton") &&
@@ -592,7 +597,8 @@ Style::polish( QWidget * widget )
                     widget->setForegroundRole(QPalette::WindowText);
                 }
             }
-            Animator::Hover::manage(widget);
+            if (!widget->testAttribute(Qt::WA_Hover))
+                Animator::Hover::manage(widget);
         }
 
         // NOTICE WORKAROUND - this widget uses the style to paint the bg, but hardcodes the fg...

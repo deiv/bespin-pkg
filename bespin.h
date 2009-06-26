@@ -135,8 +135,8 @@ public:
 
     // STATICS
     static void drawExclusiveCheck(const QStyleOption*, QPainter*, const QWidget*);
-    static void drawArrow(Navi::Direction, const QRect&, QPainter*);
-    static void drawSolidArrow(Navi::Direction, const QRect&, QPainter*);
+    static void drawArrow(Navi::Direction, const QRect&, QPainter*, const QWidget *w = 0);
+    static void drawSolidArrow(Navi::Direction, const QRect&, QPainter*, const QWidget *w = 0);
 
 protected:
     virtual void init(const QSettings *settings = 0L);
@@ -210,10 +210,10 @@ protected:
 
 #define INDI_ARROW(_D_)\
     inline void\
-    drawSolidArrow##_D_(const QStyleOption * option, QPainter * painter, const QWidget *) const\
+    drawSolidArrow##_D_(const QStyleOption * option, QPainter * painter, const QWidget *w) const\
     {\
         const int dx = option->rect.width()/8, dy = option->rect.height()/8;\
-        drawSolidArrow(Navi::_D_, option->rect.adjusted(dx,dy,-dx,-dy), painter);\
+        drawSolidArrow(Navi::_D_, option->rect.adjusted(dx,dy,-dx,-dy), painter, w);\
     }
     INDI_ARROW(N) INDI_ARROW(S) INDI_ARROW(E) INDI_ARROW(W)
 #undef INDI_ARROW

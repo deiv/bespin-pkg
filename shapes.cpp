@@ -176,7 +176,7 @@ Style::drawExclusiveCheck(const QStyleOption * option, QPainter * painter, const
 points[0] = _P1_; points[1] = _P2_; points[2] = _P3_;
 
 /**static!*/ void
-Style::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter)
+Style::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter, const QWidget *w)
 {
     // create an appropriate rect and move it to center of desired rect
     int s = qMin(rect.width(), rect.height());
@@ -235,13 +235,27 @@ Style::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter)
     RESTORE_ANTIALIAS
 }
 
+extern bool isUrlNaviButtonArrow;
+
 /**static!*/ void
-Style::drawSolidArrow(Navi::Direction dir, const QRect &rect, QPainter *painter)
+Style::drawSolidArrow(Navi::Direction dir, const QRect &rect, QPainter *painter, const QWidget *w)
 {
+    if (isUrlNaviButtonArrow)
+    {
+        if ( painter->brush() != Qt::NoBrush &&
+             (!w || painter->brush().color().rgb() == w->palette().color(QPalette::HighlightedText).rgb()) &&
+             painter->brush().color().alpha() < 255 )
+            dir = Navi::S;
+        if (w)
+        {
+            painter->setBrush(w->palette().color(QPalette::WindowText));
+            painter->setPen(w->palette().color(QPalette::WindowText));
+        }
+    }
     bool hadNoBrush = painter->brush() == Qt::NoBrush;
     if (hadNoBrush)
         painter->setBrush(painter->pen().brush());
-    drawArrow(dir, rect, painter);
+    drawArrow(dir, rect, painter, w);
     if (hadNoBrush)
         painter->setBrush(Qt::NoBrush);
 }

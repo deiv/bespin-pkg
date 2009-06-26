@@ -462,7 +462,7 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
     ASSURE_OPTION(item, ViewItemV2);
 #endif
 
-    if (widget && widget->inherits("KUrlButton"))
+    if (widget && widget->inherits("KUrlButton") && !widget->inherits("KFilePlacesSelector"))
         return;
 
     OPT_HOVER

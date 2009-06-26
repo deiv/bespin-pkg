@@ -713,6 +713,8 @@ bar4popup(QMenu *menu)
     return NULL;
 }
 
+bool isUrlNaviButtonArrow = false;
+
 bool
 Style::eventFilter( QObject *object, QEvent *ev )
 {
@@ -787,6 +789,15 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 return true; // don't let it paint weird stuff on the cornerwidgets etc.
             }
             return false;
+        }
+        else if ( qobject_cast<QPushButton*>(object) && object->inherits("KUrlButton"))
+        {
+            isUrlNaviButtonArrow = true;
+            object->removeEventFilter(this);
+            QCoreApplication::sendEvent(object, ev);
+            object->installEventFilter(this);
+            isUrlNaviButtonArrow = false;
+            return true;
         }
 #endif
 #if 0// doesn't work. sth. weakens the fist sector -> TODO: make KUrlNavigator make use of custom style elements
@@ -965,6 +976,12 @@ Style::eventFilter( QObject *object, QEvent *ev )
 #else
             menu->move(menu->pos()-QPoint(0,dpi.f2));
 #endif
+            return false;
+        }
+        if (QPushButton *pbtn = qobject_cast<QPushButton*>(widget))
+        if (pbtn->inherits("KUrlButton") && pbtn->text() == "/")
+        {
+            pbtn->setText("/.");
             return false;
         }
         return false;
