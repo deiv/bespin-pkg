@@ -45,9 +45,9 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
         masks.rect[false].render(RECT, painter, COLOR(fg));
         r.adjust(1, 1, -1, -1);
         if (cb->direction == Qt::LeftToRight)
-            r.setLeft(r.right() - w);
-        else
             r.setRight(r.left() + w);
+        else
+            r.setLeft(r.right() - w);
         masks.rect[false].render(r, painter, COLOR(bg));
         return;
     }
