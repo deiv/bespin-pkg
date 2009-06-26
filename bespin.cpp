@@ -714,6 +714,22 @@ bar4popup(QMenu *menu)
 }
 
 bool isUrlNaviButtonArrow = false;
+static bool isLastNavigatorButton(const QWidget *w)
+{
+    if (QWidget *navigator = w->parentWidget())
+    {
+        QList<QPushButton*> btns = navigator->findChildren<QPushButton*>();
+        QList<QPushButton*>::const_iterator i = btns.constEnd();
+        while (i != btns.constBegin())
+        {
+            --i;
+            if ((*i)->inherits("KUrlButton"))
+                return (*i == w);
+        }
+    }
+    return false;
+}
+
 
 bool
 Style::eventFilter( QObject *object, QEvent *ev )
@@ -790,14 +806,24 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
             return false;
         }
-        else if ( qobject_cast<QPushButton*>(object) && object->inherits("KUrlButton"))
+        else if ( QWidget *w = qobject_cast<QPushButton*>(object))
         {
-            isUrlNaviButtonArrow = true;
-            object->removeEventFilter(this);
-            QCoreApplication::sendEvent(object, ev);
-            object->installEventFilter(this);
-            isUrlNaviButtonArrow = false;
-            return true;
+            if (object->inherits("KUrlButton"))
+            {
+                isUrlNaviButtonArrow = true;
+                object->removeEventFilter(this);
+                if (isLastNavigatorButton(w))
+                {
+                    if (w->foregroundRole() != QPalette::WindowText)
+                        w->setForegroundRole(QPalette::WindowText);
+                }
+                else if (w->foregroundRole() != QPalette::Link)
+                    w->setForegroundRole(QPalette::Link);
+                QCoreApplication::sendEvent(object, ev);
+                object->installEventFilter(this);
+                isUrlNaviButtonArrow = false;
+                return true;
+            }
         }
 #endif
 #if 0// doesn't work. sth. weakens the fist sector -> TODO: make KUrlNavigator make use of custom style elements
@@ -822,26 +848,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             QWidget *w = static_cast<QWidget*>(object);
             w->setCursor(Qt::PointingHandCursor);
-            if (QWidget *navigator = w->parentWidget())
-            {
-                QList<QPushButton*> btns = navigator->findChildren<QPushButton*>();
-                QList<QPushButton*>::const_iterator i = btns.constEnd();
-                while (i != btns.constBegin())
-                {
-                    --i;
-                    if ((*i)->inherits("KUrlButton"))
-                    {
-                        if (*i == w)
-                        {
-                            w->setCursor(Qt::ArrowCursor);
-                            return false;
-                        }
-                        break;
-                    }
-                }
-            }
             QFont fnt = w->font();
-            fnt.setUnderline(ev->type() == QEvent::Enter);
+            if (isLastNavigatorButton(w))
+            {
+                w->setCursor(Qt::ArrowCursor);
+                fnt.setUnderline(false);
+            }
+            else
+                fnt.setUnderline(ev->type() == QEvent::Enter);
             w->setFont(fnt);
             return false;
         }
@@ -979,9 +993,10 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
         if (QPushButton *pbtn = qobject_cast<QPushButton*>(widget))
-        if (pbtn->inherits("KUrlButton") && pbtn->text() == "/")
+        if (pbtn->inherits("KUrlButton"))
         {
-            pbtn->setText("/.");
+            if (pbtn->text() == "/")
+                pbtn->setText("/.");
             return false;
         }
         return false;
