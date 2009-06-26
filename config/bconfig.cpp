@@ -2,6 +2,7 @@
 #include "bconfig.h"
 #include <QApplication>
 #include <QAbstractSlider>
+#include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -102,19 +103,19 @@ void BConfig::import() {
    loadSettings(&settings, false);
 }
 
-QVariant BConfig::defaultValue(QWidget *w) const {
+QVariant BConfig::defaultValue(QObject *w) const {
    return _settings.value(w).defaultValue;
 }
 
-QVariant BConfig::initialValue(QWidget *w) const {
+QVariant BConfig::initialValue(QObject *w) const {
    return _settings.value(w).initialValue;
 }
 
-QVariant BConfig::savedValue(QWidget *w) const {
+QVariant BConfig::savedValue(QObject *w) const {
    return _settings.value(w).savedValue;
 }
 
-void BConfig::handleSettings(QWidget *w, QString entry, QVariant value) {
+void BConfig::handleSettings(QObject *w, QString entry, QVariant value) {
    SettingInfo info;
    info.defaultValue = value;
    info.initialValue = info.savedValue = QVariant();
@@ -122,6 +123,8 @@ void BConfig::handleSettings(QWidget *w, QString entry, QVariant value) {
    _settings[w] = info;
    if (qobject_cast<QAbstractButton*>(w))
       connect (w, SIGNAL(toggled(bool)), this, SLOT(checkDirty()));
+   else if (qobject_cast<QButtonGroup*>(w))
+       connect (w, SIGNAL(buttonClicked(int)), this, SLOT(checkDirty()));
    else if (qobject_cast<QComboBox*>(w))
       connect (w, SIGNAL(currentIndexChanged(int)), this, SLOT(checkDirty()));
    else if (qobject_cast<QAbstractSlider*>(w) || qobject_cast<QSpinBox*>(w))
@@ -134,7 +137,7 @@ void BConfig::setDefaultContextInfo(QString info) {
    _defaultContextInfo = info;
 }
 
-void BConfig::setContextHelp(QWidget *w, QString help) {
+void BConfig::setContextHelp(QObject *w, QString help) {
    _contextHelps[w] = help;
    w->installEventFilter(this);
 }
@@ -154,45 +157,45 @@ void BConfig::setInfoBrowser(QTextBrowser *browser) {
 
 void BConfig::checkDirty()
 {
-   bool dirty = false;
-   QMap<QWidget*, SettingInfo>::iterator i;
-   for (i = _settings.begin(); i != _settings.end(); ++i)
-   {
+    bool dirty = false;
+    QMap<QObject*, SettingInfo>::iterator i;
+    for (i = _settings.begin(); i != _settings.end(); ++i)
+    {
 //       if (!sender() || (sender() == i.key()))
 //       {
-         SettingInfo *info = &(i.value());
-         dirty = dirty || variant(i.key()) != info->savedValue;
+            SettingInfo *info = &(i.value());
+            dirty = dirty || variant(i.key()) != info->savedValue;
          
-         if (/*sender() ||*/ dirty)
-            break;
+            if (/*sender() ||*/ dirty)
+                break;
 //       }
-   }
-   emit changed(dirty);
-   if (dirty) emit changed();
+    }
+    emit changed(dirty);
+    if (dirty) emit changed();
 }
 
 void BConfig::reset() {
-   QMap<QWidget*, SettingInfo>::iterator i;
-   for (i = _settings.begin(); i != _settings.end(); ++i)
-   {
-      if (sender() == i.key())
-      {
-         setVariant(i.key(), (&(i.value()))->defaultValue);
-         break;
-      }
-   }
+    QMap<QObject*, SettingInfo>::iterator i;
+    for (i = _settings.begin(); i != _settings.end(); ++i)
+    {
+        if (sender() == i.key())
+        {
+            setVariant(i.key(), (&(i.value()))->defaultValue);
+            break;
+        }
+    }
 }
 
 void BConfig::defaults() {
-   QMap<QWidget*, SettingInfo>::iterator i;
-   for (i = _settings.begin(); i != _settings.end(); ++i)
-   {
-      if (sender() == i.key())
-      {
-         setVariant(i.key(), (&(i.value()))->defaultValue);
-         break;
-      }
-   }
+    QMap<QObject*, SettingInfo>::iterator i;
+    for (i = _settings.begin(); i != _settings.end(); ++i)
+    {
+        if (sender() == i.key())
+        {
+            setVariant(i.key(), (&(i.value()))->defaultValue);
+            break;
+        }
+    }
 }
 
 void BConfig::setComboListInfo(int index) {
@@ -229,7 +232,7 @@ void BConfig::loadSettings(QSettings *settings, bool updateInit, bool merge) {
    
    settings->beginGroup(_qsetting[2]);
    
-   QMap<QWidget*, SettingInfo>::iterator i;
+   QMap<QObject*, SettingInfo>::iterator i;
    SettingInfo *info; QVariant value;
    for (i = _settings.begin(); i != _settings.end(); ++i)
    {
@@ -253,7 +256,7 @@ BConfig::save()
     return _save(&settings);
 }
 
-QVariant BConfig::variant(const QWidget *w) const {
+QVariant BConfig::variant(const QObject *w) const {
    if (const QComboBox *box = qobject_cast<const QComboBox*>(w)) {
       if (box->itemData(box->currentIndex()).isValid())
          return box->itemData(box->currentIndex());
@@ -261,6 +264,8 @@ QVariant BConfig::variant(const QWidget *w) const {
    }
    else if (const QCheckBox *box = qobject_cast<const QCheckBox*>(w))
       return box->isChecked();
+   else if (const QButtonGroup *group = qobject_cast<const QButtonGroup*>(w))
+       return group->checkedId();
    else if (const QAbstractSlider *slider = qobject_cast<const QAbstractSlider*>(w))
       return slider->value();
    else if (const QSpinBox *spin = qobject_cast<const QSpinBox*>(w))
@@ -274,7 +279,7 @@ QVariant BConfig::variant(const QWidget *w) const {
    return QVariant();
 }
 
-bool BConfig::setVariant(QWidget *w, const QVariant &v) const {
+bool BConfig::setVariant(QObject *w, const QVariant &v) const {
    if (QComboBox *box = qobject_cast<QComboBox*>(w)) {
       int idx = box->findData(v);
       if (idx == -1) {
@@ -282,6 +287,11 @@ bool BConfig::setVariant(QWidget *w, const QVariant &v) const {
          if (idx >= box->count()) idx = box->count()-1;
       }
       box->setCurrentIndex(idx);
+   }
+   else if (QButtonGroup *group = qobject_cast<QButtonGroup*>(w))
+   {
+        if (QAbstractButton *btn = group->button(v.toInt()))
+            btn->setChecked(true);
    }
    else if (QCheckBox *box = qobject_cast<QCheckBox*>(w))
       box->setChecked(v.toBool());
@@ -330,7 +340,7 @@ BConfig::_save(QSettings *settings, bool makeDirty)
 
     settings->beginGroup(_qsetting[2]);
 
-    QMap<QWidget*, SettingInfo>::iterator i;
+    QMap<QObject*, SettingInfo>::iterator i;
     SettingInfo *info;
     for (i = _settings.begin(); i != _settings.end(); ++i)
     {
@@ -373,7 +383,7 @@ bool BConfig::eventFilter ( QObject * o, QEvent * e) {
                     return false;
                 }
         }
-        QMap<QWidget*, QString>::iterator i;
+        QMap<QObject*, QString>::iterator i;
         for (i = _contextHelps.begin(); i != _contextHelps.end(); ++i)
             if (o == i.key())
             {

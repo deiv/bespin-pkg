@@ -58,10 +58,7 @@ using namespace Bespin;
 Client::Client(KDecorationBridge *b, Factory *f) :
 KDecoration(b, f), retry(0), myActiveChangeTimer(0),
 topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
-bgMode(1), _factory(f), corner(0)
-{
-    myButtonOpacity = isActive() ? 100 : 0;
-}
+bgMode(1), _factory(f), corner(0), myButtonOpacity(0) { }
 
 Client::~Client(){
 //    delete corner;
@@ -285,7 +282,7 @@ Client::eventFilter(QObject *o, QEvent *e)
 void
 Client::fadeButtons()
 {
-//     if ()
+    if (config()->hideInactiveButtons)
     {
         if (!myActiveChangeTimer)
         {
@@ -594,6 +591,7 @@ Client::repaint(QPainter &p)
 
     // title ==============
     const QColor titleColor = color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive());
+    const int tf = config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
     if (isActive())
     {
         // emboss?!
@@ -604,19 +602,24 @@ Client::repaint(QPainter &p)
         else // bright bg -> bright bottom borderline
             { p.setPen(light); d = 1; }
         QRect tr;
-        p.drawText ( label.translated(0,d), Qt::AlignCenter | Qt::TextSingleLine, _caption, &tr );
+        p.drawText ( label.translated(0,d), tf, _caption, &tr );
 
-        if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
-             maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
-             gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1) )
-        {   // inactive window looks like active one...
-            int y = label.center().y();
-            p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
-            p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
+        if (!config()->hideInactiveButtons)
+        {
+            if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
+                maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
+                gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1) )
+            {   // inactive window looks like active one...
+                int y = label.center().y();
+                if ( !(tf & Qt::AlignLeft) )
+                    p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
+                if ( !(tf & Qt::Right) )
+                    p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
+            }
         }
     }
     p.setPen(titleColor);
-    p.drawText ( label, Qt::AlignCenter | Qt::TextSingleLine, _caption );
+    p.drawText ( label, tf, _caption );
 
     // bar =========================
     if (bgMode != 1)
@@ -720,6 +723,7 @@ Client::reset(unsigned long changed)
 
     if (changed & SettingButtons)
     {
+        myButtonOpacity = (isActive() || !config()->hideInactiveButtons) ? 100 : 0;
         for (int i = 0; i < 4; ++i)
             { delete buttons[i]; buttons[i] = 0; }
         titleBar->removeItem(titleSpacer);
@@ -882,17 +886,25 @@ Client::updateButtonCorner(bool right)
 void
 Client::updateTitleLayout( const QSize& )
 {
+    int dl = buttonSpaceLeft, dr = buttonSpaceRight;
+    if (config()->titleAlign == Qt::AlignHCenter)
+        dl = dr = buttonSpace;
     if (bgMode != 1 && (gType[0] || gType[1]))
     {
         if (buttonSpaceLeft <= buttonSpaceRight)
+        {
             updateButtonCorner(true);
-        label.setRect(buttonSpaceLeft + titleSize, 0, width()-(buttonSpace+2*titleSize), titleSize);
+            dr += titleSize;
+        }
+        else
+            dl += titleSize;
+
     }
     else
-    {
-        int d = buttonSpace + 8;
-        label = QRect(d, 0, width()-2*d, titleSize);
-    }
+        { dl += 8; dr += 8; }
+
+    label.setRect(dl, 0, width()-(dl+dr), titleSize);
+
     if (!label.isValid())
         label = QRect();
 }

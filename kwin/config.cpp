@@ -115,15 +115,26 @@ Config::Config(QWidget* parent) : BConfig(parent)
     <b>F</b>: Toggle 'Keep Above'<br>\
     <b>B</b>: Toggle 'Keep Below'<br>\
     <b>L</b>: Toggle Shade (The window is shrinked into the titlebar)<br>\
-    <b>_</b>: Some space");
+    <b>!</b>: Window Info<br>\
+    <b>E</b>: Window List");
 
     handleSettings(ui.slickButtons, "SlickButtons", 0);
     setContextHelp(ui.slickButtons, "The appereance of unhovered buttons. Morphs to icon on hover<br>\
     Dots and bricks look slick, but may be considered less usable, as unhovered buttons look all the same");
 
     handleSettings(ui.titlePadding, "TitlePadding", 0);
-    setContextHelp(ui.inactGrad2, "<b>Titlebar padding</b><hr>\
+    setContextHelp(ui.titlePadding, "<b>Titlebar padding</b><hr>\
     How much additional space you want above and below the title text");
+
+    handleSettings(ui.inactiveButtons, "InactiveButtons", false);
+    setContextHelp(ui.inactiveButtons, "<b>Show inactive Buttons</b><hr>\
+    By default no buttons are shown on inactive windows but fade in and out.<br>You can force them to be visible here.");
+
+    QButtonGroup *btngrp = new QButtonGroup(this);
+    btngrp->addButton(ui.titleLeft, Qt::AlignLeft);
+    btngrp->addButton(ui.titleCenter, Qt::AlignHCenter);
+    btngrp->addButton(ui.titleRight, Qt::AlignRight);
+    handleSettings(btngrp, "TitleAlign", Qt::AlignHCenter);
 
     /** if you call setContextHelp(.) with a combobox and pass a stringlist,
     the strings are attached to the combo entries and shown on select/hover */

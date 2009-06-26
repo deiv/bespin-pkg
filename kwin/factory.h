@@ -44,8 +44,8 @@ typedef struct _WindowData WindowData;
 
 typedef struct
 {
-    bool forceUserColors, trimmCaption, resizeCorner;
-    int slickButtons;
+    bool forceUserColors, trimmCaption, resizeCorner, hideInactiveButtons;
+    int slickButtons, titleAlign;
     Gradients::Type gradient[2][2];
 } Config;
 

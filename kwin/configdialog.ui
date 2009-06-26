@@ -1,320 +1,483 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>Config</class>
- <widget class="QWidget" name="Config" >
-  <property name="geometry" >
+ <widget class="QWidget" name="Config">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>528</width>
-    <height>289</height>
+    <width>681</width>
+    <height>213</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Bespin KWin Client Config</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" >
-   <item row="0" column="0" colspan="6" >
-    <widget class="QTextBrowser" name="onlinehelp" >
-     <property name="frameShape" >
+  <layout class="QGridLayout" name="gridLayout_7">
+   <item row="0" column="1">
+    <widget class="QTextBrowser" name="onlinehelp">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="lineWidth" >
+     <property name="lineWidth">
       <number>0</number>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2" >
-    <layout class="QVBoxLayout" name="verticalLayout_3" >
-     <item>
-      <widget class="QCheckBox" name="forceUserColors" >
-       <property name="text" >
-        <string>Ignore style color hints</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout" >
-       <item>
-        <widget class="QLabel" name="label_5" >
-         <property name="text" >
-          <string>Title padding</string>
+   <item row="0" column="0">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Look</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Active window</string>
          </property>
-         <property name="alignment" >
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Base gradient</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="actGrad">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Simple</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Button</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Sunken</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Gloss</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Glass</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Metal</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Cloudy</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Deco gradient</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="actGrad2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Sunken</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Button</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Glassy</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Inactive window</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Base gradient</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="inactGrad">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Simple</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Button</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Sunken</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Gloss</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Glass</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Metal</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Cloudy</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Deco gradient</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="inactGrad2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Sunken</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Button</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Glassy</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="forceUserColors">
+         <property name="text">
+          <string>Ignore style color hints</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QSpinBox" name="titlePadding" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+       <item row="2" column="0" colspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Unhovered Buttons look like</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="slickButtons">
+           <item>
+            <property name="text">
+             <string>Scaled icons</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Dots</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Bricks</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>81</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="Seite">
+      <attribute name="title">
+       <string>Layout</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="0" column="0" colspan="4">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Title align</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="1">
+           <widget class="QRadioButton" name="titleLeft">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QRadioButton" name="titleCenter">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5">
+           <widget class="QRadioButton" name="titleRight">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Titlebar padding</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="titlePadding">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="suffix" >
+         <property name="suffix">
           <string>px</string>
          </property>
-         <property name="maximum" >
+         <property name="maximum">
           <number>10</number>
          </property>
         </widget>
        </item>
+       <item row="1" column="2" colspan="2">
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>244</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Multibutton Order</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" colspan="2">
+        <widget class="QLineEdit" name="multibutton"/>
+       </item>
+       <item row="2" column="3">
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>152</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="1">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
-     </item>
-    </layout>
-   </item>
-   <item row="1" column="2" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>Active</string>
-     </property>
-     <property name="alignment" >
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Tricks</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="trimmTitle">
+         <property name="text">
+          <string>Trimm title</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="resizeCorner">
+         <property name="text">
+          <string>Show resize grip</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="inactiveButtons">
+         <property name="text">
+          <string>Show buttons for inactive windows</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
-   </item>
-   <item row="1" column="3" >
-    <layout class="QVBoxLayout" name="verticalLayout_2" >
-     <item>
-      <widget class="QComboBox" name="actGrad" >
-       <item>
-        <property name="text" >
-         <string>None</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Simple</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Button</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Sunken</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Gloss</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Glass</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Metal</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Cloudy</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="actGrad2" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-         <horstretch>1</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <item>
-        <property name="text" >
-         <string>None</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Sunken</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Button</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Glassy</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="1" column="4" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Inactive</string>
-     </property>
-     <property name="alignment" >
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="5" >
-    <layout class="QVBoxLayout" name="verticalLayout" >
-     <item>
-      <widget class="QComboBox" name="inactGrad" >
-       <item>
-        <property name="text" >
-         <string>None</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Simple</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Button</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Sunken</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Gloss</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Glass</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Metal</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Cloudy</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="inactGrad2" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-         <horstretch>1</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <item>
-        <property name="text" >
-         <string>None</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Sunken</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Button</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Glassy</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0" colspan="6" >
-    <layout class="QHBoxLayout" name="horizontalLayout_2" >
-     <item>
-      <widget class="QCheckBox" name="trimmTitle" >
-       <property name="text" >
-        <string>Trimm title</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="resizeCorner" >
-       <property name="text" >
-        <string>Show resize grip</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer" >
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_4" >
-       <property name="font" >
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text" >
-        <string>Unhovered Buttons</string>
-       </property>
-       <property name="alignment" >
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="slickButtons" >
-       <item>
-        <property name="text" >
-         <string>Scaled icons</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Dots</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Bricks</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="0" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
-      <string>Multibutton Order</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1" colspan="5" >
-    <widget class="QLineEdit" name="multibutton" />
    </item>
   </layout>
  </widget>

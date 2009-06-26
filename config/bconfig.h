@@ -19,7 +19,7 @@ public:
     *
     * @param w The widget of interest
     */
-    virtual QVariant defaultValue(QWidget *w) const;
+    virtual QVariant defaultValue(QObject *w) const;
 
     /**
     * Handle the settings for a QWidget
@@ -28,21 +28,21 @@ public:
     * @param entry The String that is used as key in the config file
     * @param defaultValue The value the setting should have by default (i.e. if the user yet did not set one)
     */
-    virtual void handleSettings(QWidget *w, const QString entry, QVariant defaultValue);
+    virtual void handleSettings(QObject *w, const QString entry, QVariant defaultValue);
 
     /**
     * Query the initial value of a handled Widget (the value that was read from the config by loadSettings() or the default value if the entry wasn't set yet)
     *
     * @param w The widget of interest
     */
-    virtual QVariant initialValue(QWidget *w) const;
+    virtual QVariant initialValue(QObject *w) const;
 
     /**
     * Query the currently saved value - same as initialValue() *unless* save() has been called
     *
     * @param w The widget of interest
     */
-    virtual QVariant savedValue(QWidget *w) const;
+    virtual QVariant savedValue(QObject *w) const;
 
     /**
     * Set the (richtext) string that should be displayd as help when the config widget is hovered
@@ -50,7 +50,7 @@ public:
     * @param w The widget of interest
     * @param help the help string
     */
-    virtual void setContextHelp(QWidget *w, QString help);
+    virtual void setContextHelp(QObject *w, QString help);
 
     /**
     * Same as above, but allows to set a string for each entry of a combobox
@@ -105,12 +105,12 @@ private slots:
     void setComboListInfo(int index);
 private:
     Q_DISABLE_COPY(BConfig)
-    QVariant variant(const QWidget *w) const;
-    bool setVariant(QWidget *w, const QVariant &v) const;
+    QVariant variant(const QObject *w) const;
+    bool setVariant(QObject *w, const QVariant &v) const;
     bool infoItemHovered, infoDirty;
     QTextBrowser *_infoBrowser;
-    QMap<QWidget*, SettingInfo> _settings;
-    QMap<QWidget*, QString> _contextHelps;
+    QMap<QObject*, SettingInfo> _settings;
+    QMap<QObject*, QString> _contextHelps;
     QMap<QComboBox*, QStringList> _comboHelps;
     QString _qsetting[3];
     QString _defaultContextInfo;
