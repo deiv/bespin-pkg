@@ -354,7 +354,7 @@ Style::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
     painter->save();
     painter->setClipRect(editRect);
 
-    if (!cb->currentIcon.isNull())
+    if (!(cb->currentIcon.isNull() || cb->iconSize.isNull()))
     {   // icon ===============================================
         QIcon::Mode mode = isEnabled ? QIcon::Normal : QIcon::Disabled;
         QPixmap pixmap = cb->currentIcon.pixmap(cb->iconSize, mode);

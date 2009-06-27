@@ -624,6 +624,9 @@ Style::polish( QWidget * widget )
         if (cb->view())
             cb->view()->setTextElideMode( Qt::ElideMiddle);
 
+        if (cb->parentWidget() && cb->parentWidget()->inherits("KUrlNavigator"))
+            cb->setIconSize(QSize(0,0));
+
         if (IS_HTML_WIDGET)
             widget->setAttribute(Qt::WA_Hover);
         else
