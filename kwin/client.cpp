@@ -1115,10 +1115,12 @@ static bool
 isBrowser(const QString &s)
 {
    return !s.compare("konqueror", Qt::CaseInsensitive) ||
-   !s.compare("opera", Qt::CaseInsensitive) ||
-   !s.compare("firefox", Qt::CaseInsensitive) ||
-   !s.compare("mozilla", Qt::CaseInsensitive) ||
-   !s.compare("safari", Qt::CaseInsensitive); // just in case ;)
+          !s.compare("opera", Qt::CaseInsensitive) ||
+          !s.compare("arora", Qt::CaseInsensitive) ||
+          !s.compare("firefox", Qt::CaseInsensitive) ||
+          !s.compare("mozilla", Qt::CaseInsensitive) ||
+          !s.compare("chrome", Qt::CaseInsensitive) ||
+          !s.compare("safari", Qt::CaseInsensitive); // just in case ;)
 }
 
 static const QString kwin_sep = QString(" %1 ").arg(QChar(0x2013));
