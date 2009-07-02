@@ -558,7 +558,7 @@ Style::polish( QWidget * widget )
                 // NOTICE WORKAROUND - this widget paints no bg, uses foregroundcolor() to paint the text...
                 // and has - of course - foregroundRole() == QPalette::ButtonText
                 // TODO: inform Peter Penz <peter.penz@gmx.at> and really fix this
-                if (pbtn->inherits("KUrlButton"))
+                if (pbtn->inherits("KUrlButton") || pbtn->inherits("BreadcrumbItemButton"))
                 {
                     pbtn->setBackgroundRole(QPalette::Window);
                     pbtn->setForegroundRole(QPalette::Link);

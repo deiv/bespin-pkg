@@ -18,6 +18,7 @@
 
 #include <QApplication>
 #include <QAbstractItemView>
+#include <QPushButton>
 #include <QTreeView>
 #include "draw.h"
 
@@ -462,8 +463,13 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
     ASSURE_OPTION(item, ViewItemV2);
 #endif
 
-    if (widget && widget->inherits("KUrlButton") && !widget->inherits("KFilePlacesSelector"))
-        return;
+    if (widget && qobject_cast<const QPushButton*>(widget))
+    {
+        if (widget->inherits("KUrlButton") && !widget->inherits("KFilePlacesSelector"))
+            return;
+        if (widget->inherits("BreadcrumbItemButton"))
+            return;
+    }
 
     OPT_HOVER
 

@@ -714,7 +714,7 @@ bar4popup(QMenu *menu)
 }
 
 bool isUrlNaviButtonArrow = false;
-static bool isLastNavigatorButton(const QWidget *w)
+static bool isLastNavigatorButton(const QWidget *w, const char *className)
 {
     if (QWidget *navigator = w->parentWidget())
     {
@@ -723,7 +723,7 @@ static bool isLastNavigatorButton(const QWidget *w)
         while (i != btns.constBegin())
         {
             --i;
-            if ((*i)->inherits("KUrlButton"))
+            if ((*i)->inherits(className))
                 return (*i == w);
         }
     }
@@ -806,13 +806,16 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
             return false;
         }
-        else if ( QWidget *w = qobject_cast<QPushButton*>(object))
+        else if (QPushButton *w = qobject_cast<QPushButton*>(object))
         {
-            if (object->inherits("KUrlButton"))
+            bool b = false;
+            if ((b = object->inherits("KUrlButton")) || object->inherits("BreadcrumbItemButton"))
             {
                 isUrlNaviButtonArrow = true;
                 object->removeEventFilter(this);
-                if (isLastNavigatorButton(w))
+                if (w->text() == "/")
+                    w->setText("/.");
+                if (isLastNavigatorButton(w, b?"KUrlButton":"BreadcrumbItemButton"))
                 {
                     if (w->foregroundRole() != QPalette::WindowText)
                         w->setForegroundRole(QPalette::WindowText);
@@ -844,12 +847,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
 
     case QEvent::Enter:
     case QEvent::Leave:
-        if (object->inherits("KUrlButton"))
+    {
+        bool b = false;
+        if ((b = object->inherits("KUrlButton")) || object->inherits("BreadcrumbItemButton"))
         {
             QWidget *w = static_cast<QWidget*>(object);
             w->setCursor(Qt::PointingHandCursor);
             QFont fnt = w->font();
-            if (isLastNavigatorButton(w))
+            if (isLastNavigatorButton(w, b?"KUrlButton":"BreadcrumbItemButton"))
             {
                 w->setCursor(Qt::ArrowCursor);
                 fnt.setUnderline(false);
@@ -859,7 +864,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             w->setFont(fnt);
             return false;
         }
-
+    }
     case QEvent::Resize:
         
         if (config.menu.round && qobject_cast<QMenu*>(object)
@@ -990,13 +995,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
 #else
             menu->move(menu->pos()-QPoint(0,dpi.f2));
 #endif
-            return false;
-        }
-        if (QPushButton *pbtn = qobject_cast<QPushButton*>(widget))
-        if (pbtn->inherits("KUrlButton"))
-        {
-            if (pbtn->text() == "/")
-                pbtn->setText("/.");
             return false;
         }
         return false;

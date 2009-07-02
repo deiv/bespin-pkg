@@ -245,7 +245,7 @@ Style::drawSolidArrow(Navi::Direction dir, const QRect &rect, QPainter *painter,
         if ( painter->brush() != Qt::NoBrush &&
              (!w || painter->brush().color().rgb() == w->palette().color(QPalette::HighlightedText).rgb()) &&
              painter->brush().color().alpha() < 255 )
-            dir = Navi::S;
+            dir = (dir == Navi::W) ? Navi::SW : Navi::SE;
         if (w)
         {
             painter->setBrush(w->palette().color(QPalette::WindowText));

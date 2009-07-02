@@ -136,7 +136,7 @@ protected:
                 p.setPen(c);
             }
         }
-        p.drawText(rect(), Qt::AlignCenter | Qt::TextHideMnemonic | Qt::TextSingleLine, data.at(index));
+        p.drawText(rect(), Qt::AlignCenter | Qt::TextSingleLine, data.at(index));
         p.end();
     }
     void mouseReleaseEvent( QMouseEvent * me )
