@@ -135,7 +135,7 @@
        </item>
        <item>
         <property name="text">
-         <string>Silder</string>
+         <string>Slider</string>
         </property>
        </item>
        <item>
@@ -228,7 +228,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>7</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -669,7 +669,7 @@
           <item row="5" column="0" colspan="5">
            <widget class="QCheckBox" name="fadeInactive">
             <property name="text">
-             <string>Dim inactve window foreground</string>
+             <string>Dim inactive window foreground</string>
             </property>
            </widget>
           </item>
