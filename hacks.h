@@ -33,7 +33,7 @@ class Hacks : public QObject
    Q_OBJECT
 public:
     Hacks() {}
-    enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM, Amarok };
+    enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM, Amarok, KMix };
     bool eventFilter( QObject *, QEvent *);
     static bool add(QWidget *w);
     static void releaseApp();
@@ -47,6 +47,7 @@ private:
     Q_DISABLE_COPY(Hacks)
 private slots:
     void setAmarokMetaInfo(int);
+    void setKmixMask(int);
     void swapAmarokPalette();
     void toggleAmarokContext();
     void toggleAmarokCompact();

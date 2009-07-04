@@ -37,11 +37,15 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
         if HAVE_OPTION(cb, ComboBox)
         {
             int hgt = contentsSize.height();
+            int d = F(2);
             if ( cb->frame )
+            {
                 hgt += (cb->editable || config.btn.fullHover) ? F(2) : F(4);
+                d = F(10);
+            }
 //             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
 //                 hgt += F(2);
-            return QSize(contentsSize.width()+F(10)+(int)(hgt/1.1), hgt);
+            return QSize(contentsSize.width() + d +( int)(hgt/1.1), hgt);
         }
 //    case CT_DialogButtons: //
 //       return QSize((contentsSize.width()+16 < 80) ? 80 : contentsSize.width()+16, contentsSize.height()+10);

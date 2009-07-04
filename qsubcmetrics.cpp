@@ -81,7 +81,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         int x,y,wi,he;
         cb->rect.getRect(&x,&y,&wi,&he);
         int fh = cb->fontMetrics.ascent() + F(2);
-        int margin = cb->editable ? 1 : config.btn.fullHover ? F(2) : F(4);
+        int margin = cb->frame ? (cb->editable ? 1 : config.btn.fullHover ? F(2) : F(4)) : 0;
 
         switch (subControl)
         {
@@ -447,7 +447,8 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
     case SE_PushButtonContents: // Area containing the label (icon with text or pixmap)
         return visualRect(option->direction, RECT, RECT.adjusted(F(4), F(4), -F(4), -F(4)));
     case SE_PushButtonFocusRect: // Area for the focus rect (usually larger than the contents rect)
-        return RECT;
+    case SE_LineEditContents:
+        return RECT.adjusted(F(2),0,-F(2),0);
     case SE_CheckBoxContents: // Area for the state label
     case SE_ViewItemCheckIndicator: // Area for a view item's check mark
     case SE_CheckBoxIndicator: // Area for the state indicator (e.g., check mark)

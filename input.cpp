@@ -191,8 +191,7 @@ static int animStep = -1;
 static bool round_ = true;
 
 void
-Style::drawComboBox(const QStyleOptionComplex * option,
-                          QPainter * painter, const QWidget * widget) const
+Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(cmb, ComboBox);
     B_STATES
@@ -200,13 +199,12 @@ Style::drawComboBox(const QStyleOptionComplex * option,
 
     const int f1 = F(1), f2 = F(2), f3 = F(3);
     QRect ar, r = RECT.adjusted(f1, f1, -f1, -f2);
-    const QComboBox* combo = widget ? qobject_cast<const QComboBox*>(widget) : 0;
+    const QComboBox *combo = widget ? qobject_cast<const QComboBox*>(widget) : 0;
     QColor c = CONF_COLOR(btn.std, Bg);
 
     const bool listShown = combo && combo->view() && ((QWidget*)(combo->view()))->isVisible();
     if (listShown) // this messes up hover
-        hover = hover ||
-                QRect(widget->mapToGlobal(RECT.topLeft()), RECT.size()).contains(QCursor::pos());
+        hover = hover || QRect(widget->mapToGlobal(RECT.topLeft()), RECT.size()).contains(QCursor::pos());
 
     if (isEnabled && (cmb->subControls & SC_ComboBoxArrow) && (!combo || combo->count() > 0))
     {   // do we have an arrow?
@@ -344,8 +342,7 @@ Style::drawComboBox(const QStyleOptionComplex * option,
 
 
 void
-Style::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
-                               const QWidget * widget) const
+Style::drawComboBoxLabel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(cb, ComboBox);
     OPT_ENABLED
@@ -360,8 +357,7 @@ Style::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
         QPixmap pixmap = cb->currentIcon.pixmap(cb->iconSize, mode);
         QRect iconRect(editRect);
         iconRect.setWidth(cb->iconSize.width() + 4);
-        iconRect = alignedRect( QApplication::layoutDirection(), Qt::AlignLeft | Qt::AlignVCenter,
-                                iconRect.size(), editRect);
+        iconRect = alignedRect( cb->direction, Qt::AlignLeft | Qt::AlignVCenter, iconRect.size(), editRect);
 //       if (cb->editable)
 //          painter->fillRect(iconRect, opt->palette.brush(QPalette::Base));
         drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
@@ -391,7 +387,10 @@ Style::drawComboBoxLabel(const QStyleOption * option, QPainter * painter,
             editRect.adjust(F(3),0, -F(3), 0);
             painter->setPen(btnFg(PAL, isEnabled, hasFocus, animStep));
         }
-        drawItemText(painter, editRect, Qt::AlignCenter, PAL, isEnabled, cb->currentText);
+        int tf = Qt::AlignCenter;
+        if ( !((cb->subControls & SC_ComboBoxFrame) && cb->frame) )
+            tf = Qt::AlignVCenter | (cb->direction == Qt::LeftToRight ? Qt::AlignLeft : Qt::AlignRight);
+        drawItemText(painter, editRect, tf, PAL, isEnabled, cb->currentText);
     }
     painter->restore();
     animStep = -1;
