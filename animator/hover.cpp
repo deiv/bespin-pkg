@@ -194,7 +194,7 @@ play(area->horizontalScrollBar(), _DIR_);\
 if (area->verticalScrollBar()->isVisible())\
 play(area->verticalScrollBar(), _DIR_)
 
-#define isAttachedScrollbar (kid->parent() == object)\
+#define isAttachedScrollbar (kid && kid->parent() == object)\
 if ((sb = qobject_cast<QScrollBar*>(kid)))
 
 bool
