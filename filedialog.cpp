@@ -18,7 +18,6 @@
 
 #include <QApplication>
 #include <QFileDialog>
-#include <QFileInfo>
 #include <QString>
 #include <QStringList>
 #include <QProcess>
@@ -216,7 +215,7 @@ openFilenames(QWidget *parent, const QString &caption, const QString &dir, const
     return qDialog( QFileDialog::ExistingFiles, parent, caption, dir, filter, selectedFilter, options );
 }
 
-#include <QtDebug>
+
 static QString
 saveFilename(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options)
 {
