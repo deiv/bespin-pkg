@@ -496,6 +496,9 @@ Style::polish( QWidget * widget )
                     itemView->installEventFilter(this); // scrolldistance...
 //                     itemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+#if QT_VERSION >= 0x040500
+                itemView->viewport()->setAttribute(Qt::WA_Hover);
+#endif
                 if (QTreeView* tv = qobject_cast<QTreeView*>(itemView))
                 {   // allow all treeviews to be animated! NOTICE: animation causes visual errors on non autofilling views...
                     if (Hacks::config.treeViews && tv->viewport()->autoFillBackground() &&
