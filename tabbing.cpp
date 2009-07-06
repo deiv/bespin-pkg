@@ -246,7 +246,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
                 if (fgColor.isValid() && fgColor != stdFgColor)
                 {
                     // sometimes... MANY times devs just set the tabTextColor to QPalette::WindowText,
-                    // because it's defined that it has to be this. Qt provides all these colo roles just
+                    // because it's defined that it has to be this. Qt provides all these color roles just
                     // to waste space and time... ...
                     if (fgColor == tbar->palette().color(QPalette::WindowText))
                         const_cast<QTabBar*>(tbar)->setTabTextColor(index - 1, stdFgColor); // fixed

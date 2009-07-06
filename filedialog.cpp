@@ -18,6 +18,7 @@
 
 #include <QApplication>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QString>
 #include <QStringList>
 #include <QProcess>
@@ -215,7 +216,7 @@ openFilenames(QWidget *parent, const QString &caption, const QString &dir, const
     return qDialog( QFileDialog::ExistingFiles, parent, caption, dir, filter, selectedFilter, options );
 }
 
-
+#include <QtDebug>
 static QString
 saveFilename(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options)
 {
@@ -227,7 +228,7 @@ saveFilename(QWidget *parent, const QString &caption, const QString &dir, const 
         if ( ses == KDE )
         {
             PREPARE_KDE;
-            args << "--getsavefilename" << path( dir ) + " " << simpleFilter(filter);
+            args << "--getsavefilename" << (dir.isEmpty() ? QDir::currentPath() + "/ " : dir) << simpleFilter(filter);
         }
 
         else if ( ses == GNOME )
