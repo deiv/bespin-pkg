@@ -11,7 +11,7 @@ Bugs: http://sourceforge.net/tracker/?atid=976907&group_id=201276&func=browse
 Package: kde-style-bespin
 Architecture: any
 Depends: ${shlibs:Depends}
-Conflicts: kde4-style-bespin, kwin4-style-bespin
+Conflicts: kde4-style-bespin, kwin4-style-bespin, plasma-widget-xbar
 Description: A very glossy Qt4/KDE4 window decoration
  Bespin is a window decoration for KDE4, the name is nothing about quantum
  mechanics, but just refers to cloud city (StarWars Episode V: The Empire

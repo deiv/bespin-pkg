@@ -1,20 +1,46 @@
 Bespin Qt widget style, KWin decoration and stuff
 
-Preface:
-========
-If you want to compile the KDE relative stuff (KWin deco, mac-a-like menubar - just anything beyond
-the style and a config dialog) * you'll NEED cmake >= 2.4 *
-                               ----------------------------
+Requirements:
+=============
+In order to compile you'll need at least
+- A c++ compiler, GCC is strongly suggested
+- Qt4.3 modules Core, Gui (and DBus on supporting systems) on OSX, Windows or X11 (alphabetical order...)
+
+Linux/X11 Packages: (the actual names may differ, watch out for version numbers)
+--------------------
+° libX11 (you have...)
+° libX11-dev
+° libQt4 (...probably...)
+° libQt4-dev
+° [libXRender] (...this as well)
+° [libXRender-dev]
+(XRender is not really required, but a little more performant and you definitivey want it in combination with the KWin deco)
+
+If you want the KWin decoration or the XBar plasmoid (mac-a-like menubar)
+- cmake >= 2.4
+- KDE4
+
+Packages:
+---------
+° kdelibs (likely...)
+° kdelibs-dev
+° kdebase (...you already have these)
+° kdebase-dev
+° libplasma [only if this isn't included in kdebase...]
+° libplasma-dev [...resp. kdebase-dev anyway]
+
+
+
 
 Installation Instructions
 =========================
 
 -- Content ----------------
-
 a) YOU HAVE CMAKE
 b) YOU DON'T HAVE CMAKE
-c) YOU HAVE ABSOLUTELY NO IDEA
-d) YOU STILL HAVE TROUBLE
+c) YOU WANT A .DEB PACKAGE (-> ./builddeb.sh)
+d) YOU HAVE ABSOLUTELY NO IDEA
+e) YOU STILL HAVE TROUBLE
 
 ----------------------------
 
@@ -52,6 +78,7 @@ make && sudo make install
 but remember you'll be asked for the root password to install as long as your user isn't permitted
 to NOPASSWD in visudo - or you are allready root (i discourage BOTH as permanent setup...)
 
+-----------
 
 b) YOU DON'T HAVE CMAKE =====================================================================
 
@@ -82,7 +109,17 @@ make && sudo make install
 but remember you'll be asked for the root password to install as long as your user isn't permitted
 to NOPASSWD in visudo - or you are allready root (i discourage BOTH as permanent setup...)
 
-c) YOU HAVE ABSOLUTELY NO IDEA ==============================================================
+-----------
+
+c) YOU WANT A .DEB PACKAGE =================================================================
+
+You can directly create debian/ubuntu packages by using the builddep.sh script, which will
+create a package named kde-style-bespin that can be installed using the dpkg command.
+This requires the debhelper scripts beyound _cmake_ and _all_libs_mentioned_above_ to be installed!
+
+-----------
+
+d) YOU HAVE ABSOLUTELY NO IDEA ==============================================================
 
 If you don't know anything about your environment or cmake or stuff, you can call the config script
 provided with Bespin
@@ -108,6 +145,8 @@ If you don't know it: Ask your admin for help
 make && sudo make install
 but remember you'll be asked for the root password to install as long as your user isn't permitted
 to NOPASSWD in visudo - or you are allready root (i discourage BOTH as permanent setup...)
+
+-----------
 
 d) YOU STILL HAVE TROUBLE ====================================================================
 
