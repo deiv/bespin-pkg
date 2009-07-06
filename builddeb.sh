@@ -5,3 +5,5 @@ cat debian/changelog.in | sed "s/##DATE##/`date +%Y%m%d`/g" | sed "s/##RDATE##/`
 debuild -b
 fakeroot debian/rules clean
 rm -Rf debian
+#blind change to force update
+
