@@ -2,13 +2,13 @@
 .SH "NAME"
 bespin \- the Bespin style configurator
 .SH "SYNOPSIS"
-.B bespin presets | demo [style] | show <some_preset> | try <some_config.bespin> | sshot <some_file.png> [preset] [width]  | load <some_preset> | import <some_config.bespin> | export <some_preset> <some_config.bespin> | listStyles
+.B bespin presets | demo [style] | show <some_preset> | try <some_config.bespin> | sshot <some_file.png> [preset] [width]  | load <some_preset> | import <some_config.bespin> | update <some_config.bespin> | export <some_preset> <some_config.bespin> | listStyles
 .SH "DESCRIPTION"
-This manual page documents briefly the
+This manual page briefly documents the
 .B bespin
 command.
 .PP 
-\fBbespin\fP is a program that configure the Bespin Qt4 widget style.
+\fBbespin\fP is a program to configure the Bespin Qt4 widget style or manage the presets w/o GUI.
 .SH "FUNCTION LETTERS"
 .TP 
 .B [config]
@@ -34,12 +34,15 @@ Load a preset to current settings
 .TP 
 .B import <some_config.bespin>
 Import an exported setting
+.TP
+.B update <some_config.bespin>
+Like import, but overrides existing
 .TP 
 .B export <some_preset> <some_config.bespin>
 Export an imported setting
 .TP 
 .B listStyles
-List all styles on this System
+List all Qt UI styles installed on this System
 .SH "AUTHOR"
 bespin was written by Thomas L\[:u]bking
 .PP 
