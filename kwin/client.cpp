@@ -337,6 +337,7 @@ void
 Client::maximizeChange()
 {
     reset(SettingBorder);
+    emit maximizeChanged(maximizeMode() == MaximizeFull);
 }
 
 #define PARTIAL_MOVE 0

@@ -79,6 +79,7 @@ public slots:
     void activate();
     void throwOnDesktop();
 signals:
+    void maximizeChanged(bool);
     void stickyChanged(bool);
     void shadeChanged(bool);
 protected:

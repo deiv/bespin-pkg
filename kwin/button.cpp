@@ -53,18 +53,18 @@ client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
     if (type == Multi)
     {
         _type = client->factory()->multiButtons().at(0);
-        connect (client, SIGNAL (keepAboveChanged(bool)),
-                    this, SLOT (clientStateChanged(bool)));
-        connect (client, SIGNAL (keepBelowChanged(bool)),
-                    this, SLOT (clientStateChanged(bool)));
-        connect (client, SIGNAL (stickyChanged(bool)),
-                    this, SLOT (clientStateChanged(bool)));
-        connect (client, SIGNAL (shadeChanged(bool)),
-                    this, SLOT (clientStateChanged(bool)));
+        connect(client, SIGNAL(keepAboveChanged(bool)), SLOT(clientStateChanged(bool)));
+        connect(client, SIGNAL(keepBelowChanged(bool)), SLOT(clientStateChanged(bool)));
+        connect(client, SIGNAL(stickyChanged(bool)), SLOT(clientStateChanged(bool)));
+        connect(client, SIGNAL(shadeChanged(bool)), SLOT(clientStateChanged(bool)));
         clientStateChanged(false);
     }
     else
+    {
         _type = type;
+        if (type == Max)
+            connect(client, SIGNAL(maximizeChanged(bool)), SLOT(maximizeChanged(bool)) );
+    }
 
 // 	setToolTip(tip);
 }
@@ -199,6 +199,13 @@ Button::leaveEvent(QEvent *)
 }
 
 void
+Button::maximizeChanged(bool maximized)
+{
+    _type = maximized ? Restore : Max;
+    repaint();
+}
+
+void
 Button::mousePressEvent ( QMouseEvent * event )
 {
     if (!isEnabled()) return;
@@ -239,7 +246,6 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
     case Max:
         if (client->isMaximizable ())
         {
-            _type = Restore;
             //TODO support alt/ctrl click?!
     //          KDecorationDefines::MaximizeMode mode;
     //          MaximizeRestore    The window is not maximized in any direction.
@@ -250,7 +256,6 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
         }
         break;
     case Restore:
-        _type = Max;
         client->maximize(event->button());
         break;
     case Menu:

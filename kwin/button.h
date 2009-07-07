@@ -72,6 +72,7 @@ private:
     static bool fixedColors;
 private slots:
     void clientStateChanged(bool);
+    void maximizeChanged(bool);
 };
 
 } //namespace
