@@ -941,7 +941,6 @@ Client::resize( const QSize& s )
 void
 Client::shadeChange()
 {
-   KDecoration::toggleOnAllDesktops();
    emit shadeChanged(isSetShade());
 }
 
