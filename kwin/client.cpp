@@ -1118,6 +1118,7 @@ isBrowser(const QString &s)
           !s.compare("opera", Qt::CaseInsensitive) ||
           !s.compare("arora", Qt::CaseInsensitive) ||
           !s.compare("firefox", Qt::CaseInsensitive) ||
+          !s.compare("rekonq", Qt::CaseInsensitive) ||
           !s.compare("leechcraft", Qt::CaseInsensitive) ||
           !s.compare("mozilla", Qt::CaseInsensitive) ||
           !s.compare("chrome", Qt::CaseInsensitive) ||
