@@ -59,18 +59,18 @@ const QPixmap& pix(const QColor &c,
                    Type type = Simple);
 
 /** wrapper to support Type::None */
-inline const QBrush
+inline QBrush
 brush(const QColor &c, int size, Qt::Orientation o, Type type  = Simple) {
    if (type == None)
       return QBrush(c);
    return QBrush(pix(c, size, o, type));
 }
 
-inline const bool isReflective(Type type = Simple) {
+inline bool isReflective(Type type = Simple) {
    return type == Button || type == Metal;
 }
 
-inline const bool isTranslucent(Type type = Simple) {
+inline bool isTranslucent(Type type = Simple) {
    return type > Sunken && type != Metal;
 }
 

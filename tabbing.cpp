@@ -104,8 +104,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
     // this has completely changed with recent KDE, KTabWidget doesn't call the style at all?!
     if (widget)
     {
-        if ( widget->parentWidget() )
-        if ( qobject_cast<QTabWidget*>( widget->parentWidget() ) )
+        if (widget->parentWidget() && qobject_cast<QTabWidget*>(widget->parentWidget()))
         {
 #if 1 // QT_VERSION < 0x040500
             // in general we don't want a tabbar on a tabwidget
@@ -347,7 +346,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
 }
 
 void
-Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
     ASSURE_OPTION(tab, Tab);
     OPT_SUNKEN OPT_ENABLED OPT_HOVER

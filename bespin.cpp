@@ -290,11 +290,13 @@ Style::btnBg( const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool
 
     QColor c = CCOLOR(btn.std, Bg);
     if (hasFocus && config.btn.active_role[Bg] != QPalette::Highlight)
+    {
         if (config.btn.layer)
             c = FCOLOR(Highlight);
         else
             c = Colors::mid(FCOLOR(Highlight), c, 1, 10 + Colors::contrast(FCOLOR(Highlight), c));
-
+    }
+    
     if (fullHover && step)
         c = Colors::mid(c, CCOLOR(btn.active, Bg), (config.btn.backLightHover ? (translucent ? 48 : 72) : 6) - step, step);
 

@@ -71,6 +71,7 @@ Includes Design Ideas by\
 <hr>\
 Visit <a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>";
 
+#if 0
 static const char* defInfo2 =
 "<div align=\"center\">\
 <img src=\":/bespin.png\"/><br>\
@@ -88,6 +89,7 @@ static const char* defInfo3 =
 Activating these hacks...\
 </p>\
 ";
+#endif
 
 /** Intenal class for the PW Char entry - not of interest */
 

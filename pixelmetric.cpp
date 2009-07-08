@@ -73,13 +73,15 @@ int Style::pixelMetric ( PixelMetric pm, const QStyleOption * option, const QWid
 //    case PM_SliderTickmarkOffset: // The offset between the tickmarks and the slider
     case PM_SliderSpaceAvailable:
     {   // The available space for the slider to move
-        if (!widget)
-            return 0;
-        if ( const QSlider *slider = qobject_cast<const QSlider*>(widget))
-        if (slider->orientation() == Qt::Horizontal)
-            return (widget->width() - dpi.SliderControl);
-        else
-            return (widget->height() - dpi.SliderControl);
+        if (widget)
+        if (const QSlider *slider = qobject_cast<const QSlider*>(widget))
+        {
+            if (slider->orientation() == Qt::Horizontal)
+                return (widget->width() - dpi.SliderControl);
+            else
+                return (widget->height() - dpi.SliderControl);
+        }
+        return 0;
     }
     case QStyle::PM_DockWidgetTitleBarButtonMargin:
         return 0;//F(0);

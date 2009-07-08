@@ -76,8 +76,7 @@ static QPainterPath glasPath;
 static QSize glasSize;
 
 void
-Style::drawWindowBg(const QStyleOption * option, QPainter * painter,
-                          const QWidget * widget) const
+Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widget) const
 {
     // cause of scrollbars - kinda optimization
     if (config.bg.mode == Plain)

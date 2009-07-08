@@ -176,7 +176,7 @@ Style::drawExclusiveCheck(const QStyleOption * option, QPainter * painter, const
 points[0] = _P1_; points[1] = _P2_; points[2] = _P3_;
 
 /**static!*/ void
-Style::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter, const QWidget *w)
+Style::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter, const QWidget*)
 {
     // create an appropriate rect and move it to center of desired rect
     int s = qMin(rect.width(), rect.height());

@@ -56,9 +56,9 @@
 using namespace Bespin;
 
 Client::Client(KDecorationBridge *b, Factory *f) :
-KDecoration(b, f), retry(0), myActiveChangeTimer(0),
+KDecoration(b, f), retry(0), myButtonOpacity(0), myActiveChangeTimer(0),
 topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
-bgMode(1), _factory(f), corner(0), myButtonOpacity(0) { }
+bgMode(1), _factory(f), corner(0) { }
 
 Client::~Client(){
 //    delete corner;
