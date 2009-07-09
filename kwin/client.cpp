@@ -151,9 +151,9 @@ Client::addButtons(const QString& s, int &sz, bool left)
             if (!isPreview())
             {
 //                 buttons[type]->setAutoFillBackground(true);
-//                 buttons[type]->setAttribute(Qt::WA_OpaquePaintEvent);
+                buttons[type]->setAttribute(Qt::WA_OpaquePaintEvent);
 //                 buttons[type]->setAttribute(Qt::WA_PaintOnScreen);
-                buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
+//                 buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
             }
             titleBar->addWidget(buttons[type], 0, Qt::AlignVCenter);
             sz += (buttonSize()+2);
@@ -224,6 +224,13 @@ Client::eventFilter(QObject *o, QEvent *e)
         p.setClipRegion(clip);
         p.setFont(options()->font());
         repaint(p);
+#if 0
+        if (QPaintDevice *pd = QPainter::redirected(widget()))
+        if (pd->depth() == 32)
+        {
+            qDebug() << "BESPIN, ARGB paint";
+        }
+#endif
         p.end();
 
         if (useInternalDoubleBuffering)
@@ -245,11 +252,17 @@ Client::eventFilter(QObject *o, QEvent *e)
             p.end();
             
             // dump button BGs
+            QPoint dxy;
+            QPaintDevice *pd = QPainter::redirected(widget(), &dxy);
             for (int i = 0; i < 4; ++i)
                 if (buttons[i])
                 {
                     buttons[i]->setBg(buffer.copy(buttons[i]->geometry()));
+                    if (pd)
+                        QPainter::setRedirected(buttons[i], pd, buttons[i]->geometry().topLeft() + dxy);
                     buttons[i]->repaint(); // enforce, button thinks it's independend
+                    if (pd)
+                        QPainter::restoreRedirected(buttons[i]);
                 }
             if (corner)
                 corner->repaint();
@@ -936,7 +949,7 @@ Client::resize( const QSize& s )
 
     setMask(mask);
     
-    widget()->repaint(); // force! there're painting errors otherwise
+    widget()->update(); // force! there're painting errors otherwise
 }
 
 void
