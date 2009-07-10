@@ -45,7 +45,12 @@ Progress::timerEvent(QTimerEvent * event)
             continue; // not a progressbar - shouldn't be in items, btw...
 
         if (pb->maximum() != 0 || pb->minimum() != 0 || pb->paintingActive() || !pb->isVisible())
+        {
+            pb->setAttribute(Qt::WA_OpaquePaintEvent, false);
             continue; // no paint necessary
+        }
+
+        pb->setAttribute(Qt::WA_OpaquePaintEvent);
 
         ++iter.value();
 

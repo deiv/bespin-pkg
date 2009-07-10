@@ -171,6 +171,8 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
     }
 
     // groove + contents ======
+    if (widget && widget->testAttribute(Qt::WA_OpaquePaintEvent))
+        erase(option, painter, widget);
     step = Animator::Progress::step(widget);
     drawProgressBarGroove(pb, painter, widget);
     drawProgressBarContents(pb, painter, widget);
@@ -195,8 +197,7 @@ drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
 
 #if NEW_PROGRESS
 void
-Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
-                               const QWidget * widget, bool content) const
+Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QWidget *widget, bool content) const
 {
     if (appType == GTK && !content)
         return; // looks really crap
@@ -290,7 +291,6 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
     }
     p.end();
 
-
     if (vertical) // x is in fact y!
         for (int i = 0; i < nn; ++i)
             { painter->drawPixmap(y,x, renderPix); x+=d; }
@@ -337,8 +337,7 @@ Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
 }
 #else
 void
-Style::drawProgressBarGC(const QStyleOption * option, QPainter * painter,
-                               const QWidget * widget, bool content) const
+Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QWidget *widget, bool content) const
 {
     if (appType == GTK && !content)
         return; // looks really crap

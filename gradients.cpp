@@ -579,6 +579,24 @@ const QPixmap
         for (i = 1; i < 5; ++i)
             p.drawEllipse(QPointF(64,64), i*64.0/5.0, i*64.0/5.0);
         break;
+    case 10: // planks
+    {
+        i = 100 + (_bgIntensity - 100)/2;
+        QLinearGradient lg(pix->rect().topLeft(), pix->rect().topRight());
+        QColor shadow = c.dark(i);
+        QColor light = c.light(i);
+        lg.setColorAt(0.0, light);
+        lg.setColorAt(0.5, light);
+        lg.setColorAt(0.50001, shadow);
+        lg.setColorAt(0.6, light);
+        lg.setColorAt(0.64, shadow);
+        lg.setColorAt(0.64001, light);
+        lg.setColorAt(1.0, light);
+        p.setBrush(lg);
+        p.setPen(Qt::NoPen);
+        p.drawRect(pix->rect());
+        break;
+    }
     }
     p.end();
 
