@@ -48,8 +48,13 @@ static inline uint qt_intensity(uint r, uint g, uint b)
 }
 
 QIcon
-Style::standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget ) const
+Style::standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const
 {
+    if (!option)
+    {
+        QStyleOption opt; opt.rect.setRect(0,0,64,64);
+        return QStyle::standardIconImplementation(standardIcon, &opt, widget);
+    }
     return QStyle::standardIconImplementation(standardIcon, option, widget);
 #if 0
     QIcon icon;
@@ -85,8 +90,7 @@ QPainterPath arrow( const QRect &rect, bool right = false )
 }
 
 QPixmap
-Style::standardPixmap(StandardPixmap standardPixmap,
-                            const QStyleOption * option, const QWidget * widget ) const
+Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option, const QWidget *widget ) const
 {
     bool sunken = false, isEnabled = false, hover = false;
     if (option)
@@ -128,7 +132,7 @@ Style::standardPixmap(StandardPixmap standardPixmap,
 
     switch (standardPixmap)
     {
-#if 0
+#if 1
     case SP_ArrowBack:
     case SP_ArrowLeft:
         shape = arrow( pm.rect() ).subtracted(arrow( pm.rect().translated(pm.rect().width()/2, 0) ));
@@ -146,9 +150,9 @@ Style::standardPixmap(StandardPixmap standardPixmap,
     case SP_BrowserReload:
     {
         QRect rect = pm.rect();
-        int d5 = rect.height()/4;
+        int d5 = rect.height()/5;
         rect.setWidth( 4*rect.width()/5 );
-        rect.setHeight( d5 );
+        rect.setHeight( rect.height()/4 );
         rect.moveTop( rect.y() + d5 );
         shape.addRoundRect( rect, 50, 50 );
         rect.moveBottom( pm.rect().bottom() - d5 );
@@ -232,13 +236,13 @@ paint:
         QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
         if (widget)
             { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
-            
-        const QColor c = Colors::mid(pal.color(bg), pal.color(fg), (!sunken)*(4-2*hover), 1 + (sz > 16)*20 );
+
+        const QColor c = Colors::mid(pal.color(fg), pal.color(bg), (sz > 16) ? 16 : 2, sunken ? 2 : (hover ? 4 : 2) );
         painter.setRenderHint ( QPainter::Antialiasing );
         painter.setPen(Qt::NoPen);
 #if 0
         if (sz > 16)
-            painter.setBrush( Gradients::brush( c, sz, Qt::Vertical, Gradients::Glass ) );
+            painter.setBrush( Gradients::brush( c, sz, Qt::Vertical, config.btn.gradient ) );
         else
 #endif
             painter.setBrush(c);
