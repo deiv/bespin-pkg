@@ -197,6 +197,7 @@ play(area->verticalScrollBar(), _DIR_)
 #define isAttachedScrollbar (kid && kid->parent() == object)\
 if ((sb = qobject_cast<QScrollBar*>(kid)))
 
+
 bool
 Hover::eventFilter( QObject* object, QEvent *e )
 {

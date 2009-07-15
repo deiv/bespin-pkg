@@ -800,16 +800,10 @@ Style::polish( QWidget * widget )
         pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
         widget->setPalette(pal);
     }
-#if 0
-    if (widget->inherits("KUrlNavigator") && widget->layout())
-    {
-        widget->layout()->setSpacing(8);
-        widget->layout()->setContentsMargins( 0, 0, 0, 0 );
-        QList<QAbstractButton*> tbl = widget->findChildren<QAbstractButton*>();
-        foreach (QAbstractButton *btn, tbl)
-            btn->setIconSize(QSize(16,16));
-        widget->installEventFilter(this);
-    }
+#if 1
+    ///
+    if (widget->inherits("QWebView")) // to update the scrollbars
+        widget->setAttribute(Qt::WA_Hover);
 #endif
 #if 1
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors

@@ -104,22 +104,22 @@ Style::clearScrollbarCache()
 }
 
 void
-Style::drawScrollBar(const QStyleOptionComplex * option,
-                           QPainter * painter, const QWidget * widget) const
+Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
 
     ASSURE_OPTION(scrollbar, Slider);
 
     cPainter = painter;
     bool useCache = false, needsPaint = true;
+    const bool isWebKit = widget && widget->inherits("WebView"); // ouchhh...
 
     // we paint the slider bg ourselves, as otherwise a frame repaint would be
     // triggered (for no sense)
-    if (!widget ) // fallback ===========
+    if (!widget) // fallback ===========
         painter->fillRect(RECT, FCOLOR(Window));
-
+    
     else if (widget->testAttribute(Qt::WA_OpaquePaintEvent))
-    {   /// fake a transparent bg (real transparency leads to frame painting overhead)
+    {   /// fake a transparent bg (real transparency leads to frame22 painting overhead)
         // i.e. we erase the bg with the window background or any autofilled element between
         
         if (widget->parentWidget() && widget->parentWidget()->parentWidget() &&
@@ -148,13 +148,17 @@ Style::drawScrollBar(const QStyleOptionComplex * option,
                     delete scrollBgCache;
                     scrollBgCache = new QPixmap(RECT.size());
                     cPainter = new QPainter(scrollBgCache);
-//                     if (config.bg.mode > Scanlines) cPainter->translate(tl);
                 }
                 else
                     needsPaint = false;
             }
             if (needsPaint)
-                erase(option, cPainter, widget);
+            {
+                QPoint offset(0,0);
+                if (isWebKit && option->state & QStyle::State_Horizontal)
+                    offset.setY(RECT.height() - widget->height());
+                erase(option, cPainter, widget, &offset);
+            }
         }
     }
     // =================
@@ -173,12 +177,12 @@ Style::drawScrollBar(const QStyleOptionComplex * option,
     else
     {
         widgetStep = Animator::Hover::step(widget);
-        scrollAreaHovered_ = scrollAreaHovered(widget);
+        scrollAreaHovered_ = !isWebKit && scrollAreaHovered(widget);
     }
     
     SubControls hoverControls = scrollbar->activeSubControls &
                                 (SC_ScrollBarSubLine | SC_ScrollBarAddLine | SC_ScrollBarSlider);
-    const Animator::ComplexInfo *info = Animator::HoverComplex::info(widget, hoverControls);
+    const Animator::ComplexInfo *info = isWebKit ? 0L : Animator::HoverComplex::info(widget, hoverControls);
     /// ================
 
     QRect groove;

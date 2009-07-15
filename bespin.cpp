@@ -483,7 +483,7 @@ Style::fillWithMask(QPainter *painter, const QPoint &xy,
 }
 
 void
-Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widget, const QPoint *offset) const
 {
     const QWidget *grampa = widget;
     while ( !(grampa->isWindow() ||
@@ -491,6 +491,8 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
         grampa = grampa->parentWidget();
 
     QPoint tl = widget->mapFrom(const_cast<QWidget*>(grampa), QPoint());
+    if (offset)
+        tl += *offset;
     painter->save();
     painter->setPen(Qt::NoPen);
     
@@ -511,7 +513,8 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 //         tmpOpt.rect = QRect(tl, widget->size());
         tmpOpt.palette = grampa->palette();
         painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
-        if (config.bg.mode > Scanlines) painter->translate(tl);
+        if (config.bg.mode > Scanlines)
+            painter->translate(tl);
         drawWindowBg(&tmpOpt, painter, grampa);
     }
     painter->restore();
@@ -808,6 +811,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
             return false;
         }
+#endif
         else if (QPushButton *w = qobject_cast<QPushButton*>(object))
         {
             bool b = false;
@@ -830,21 +834,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 return true;
             }
         }
-#endif
-#if 0// doesn't work. sth. weakens the fist sector -> TODO: make KUrlNavigator make use of custom style elements
-        else if (object->inherits("KUrlNavigator"))
-        {
-            QList<QComboBox*> lel = object->findChildren<QComboBox*>();
-            if (!lel.isEmpty() && lel.first()->isVisible())
-                return false;
-            QWidget *w = static_cast<QWidget*>(object);
-            QStyleOption opt; opt.initFrom(w);
-            QPainter p(w);
-            drawLineEditFrame(&opt, &p, w);
-            p.end();
-            return true;
-        }
-#endif
         return false;
 
     case QEvent::Enter:
