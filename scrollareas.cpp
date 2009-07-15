@@ -111,7 +111,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
 
     cPainter = painter;
     bool useCache = false, needsPaint = true;
-    const bool isWebKit = widget && widget->inherits("WebView"); // ouchhh...
+    const bool isWebKit = widget && widget->inherits("QWebView"); // ouchhh...
 
     // we paint the slider bg ourselves, as otherwise a frame repaint would be
     // triggered (for no sense)
