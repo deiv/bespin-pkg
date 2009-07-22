@@ -149,7 +149,28 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
         goto paint;
     case SP_BrowserReload:
     {
-        QRect rect = pm.rect();
+        QRectF rect = pm.rect();
+        const float s = rect.width()/3.0;
+        QPointF c = rect.center();
+        QRectF box(rect.x(), c.y()-s/2, s, s);
+
+        shape.arcMoveTo(rect, 90);
+        shape.arcTo(rect, 90, 90);
+        shape.arcTo(box, 180, 180);
+        shape.arcTo(rect.adjusted(s,s,-s,-s), 180, -90);
+        box.moveTo(c.x()-s/2, rect.y());
+        shape.arcTo(box, -90, 180);
+        shape.closeSubpath();
+
+        shape.arcMoveTo(rect, -90);
+        shape.arcTo(rect, -90, 90);
+        box.moveBottomRight(QPointF(rect.right(), c.y()+s/2));
+        shape.arcTo(box, 0, 180);
+        shape.arcTo(rect.adjusted(s,s,-s,-s), 0, -90);
+        box.moveBottomRight(QPointF(c.x()+s/2, rect.bottom()));
+        shape.arcTo(box, 90, 180);
+        shape.closeSubpath();
+/*
         int d5 = rect.height()/5;
         rect.setWidth( 4*rect.width()/5 );
         rect.setHeight( rect.height()/4 );
@@ -158,6 +179,7 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
         rect.moveBottom( pm.rect().bottom() - d5 );
         rect.moveRight( pm.rect().right() );
         shape.addRoundRect( rect, 50, 50 );
+        */
         goto paint;
     }
 #endif

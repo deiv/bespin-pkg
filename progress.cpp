@@ -183,7 +183,10 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
     step = -1;
 }
 
-// a nice round embedded chunk
+
+#if NEW_PROGRESS
+
+//
 static inline void
 drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
 {
@@ -195,7 +198,6 @@ drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
     p->drawEllipse(x,y+1,s+2,s);
 }
 
-#if NEW_PROGRESS
 void
 Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QWidget *widget, bool content) const
 {
@@ -206,15 +208,16 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
     const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(pb);
 
     bool reverse = option->direction == Qt::RightToLeft;
-    if (pb2 && pb2->invertedAppearance) reverse = !reverse;
+    if (pb2 && pb2->invertedAppearance)
+        reverse = !reverse;
     const bool vertical = (pb2 && pb2->orientation == Qt::Vertical);
-    const bool busy = pb->maximum == 0 && pb->minimum == 0;
 
+    const bool busy = pb->maximum == 0 && pb->minimum == 0;
     int x,y,l,t;
     RECT.getRect(&x,&y,&l,&t);
 
     if (vertical) // swap width & height...
-        { int h = x; x = y; y = h; h = l; l = t; t = h; }
+        { int h = x; x = y; y = h; l = RECT.height(); t = RECT.width(); }
 
     double val = 0.0;
     if (busy && content)
@@ -229,83 +232,63 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
     // maybe there's nothing to do for us
     if (content)
         { if (val == 0.0) return; }
-    else
-    {
-        masks.rect[true].render(RECT, painter, Gradients::brush(Colors::mid(FCOLOR(Window), Qt::black, 8,1),
-                                                              t, vertical ? Qt::Horizontal : Qt::Vertical, Gradients::Sunken));
-        if (val == 1.0)
-            return;
-    }
+    else if (val == 1.0)
+        return;
 
-
-    int d = 5*t/4; if (!d) return;
-    int n = (l-F(12))/d; if (!n) return;
+    // calculate chunk dimensions - minimal 16px or space for 10 chunks, maximal the progress thickness
+    int s = qMin(qMax(l/10, F(16)), t);
+    if (!s) return;
     
-    
+    int n = l/s;
+    if (!n) return;
     if (vertical || reverse)
     {
         x = vertical ? RECT.bottom() : RECT.right();
-        x -= (l - n*d)/2+d;
-        d = -d;
+        x -= (l - n*s)/2 + s;
+        s = -s;
     }
     else
-        x += (l - n*d)/2;
+        x += l - (l - n*s)/2; // reverse painting!
+    y += (t-s)/2;
+    --x; --y;
 
     // cause most chunks will look the same we render ONE into a buffer and then just dump that multiple times...
-    QPixmap renderPix; Qt::Orientation o = Qt::Vertical; int s = t-F(6);
-    QRect disc;
-    if (vertical)
-    {
-        renderPix = QPixmap(t, 5*t/4); o = Qt::Horizontal;
-        disc = QRect(F(3), (renderPix.height()-s)/2, s, s);
-    }
-    else
-    {
-        renderPix = QPixmap(5*t/4, t);
-        disc = QRect((renderPix.width()-s)/2, F(3), s, s);
-    }
-
+    QPixmap renderPix(s+2,s+2);
+    renderPix.fill(Qt::transparent);
     QPainter p(&renderPix);
-    p.setBrush(Gradients::brush(Colors::mid(FCOLOR(Window), Qt::black, 8,1), t, o, Gradients::Sunken));
-    p.setPen(Qt::NoPen);
-    p.drawRect(renderPix.rect());
-    p.setBrush(Gradients::pix(FCOLOR(Window), t, Qt::Vertical, Gradients::Simple));
-    p.setPen(QColor(0,0,0,40));
     p.setRenderHint(QPainter::Antialiasing);
-    p.drawEllipse(disc);
 
+    // draw a chunk
     int nn = (val < 0) ? 0 : int(n*val);
-    int h = disc.width()/4+1;
-    disc.adjust(h, h, -h, -h);
-    p.setBrushOrigin(disc.topLeft());
-    p.setBrush(Gradients::brush(content ? CCOLOR(progress.std, Fg) : CCOLOR(progress.std, Bg), disc.height(), Qt::Vertical, GRAD(progress) ));
-    p.setPen(Qt::NoPen);
-    p.drawEllipse(disc);
-
-    if (!content)
+    if (content)
+        p.setBrush(Gradients::brush(CCOLOR(progress.std, Fg), s, Qt::Vertical, GRAD(progress) ));
+    else
     {   // this is the "not-yet-done" part - in case we're currently painting it...
         if (busy)
             nn = n;
         else
-            { x += nn*d; nn = n - nn; }
+            { x += nn*s; nn = n - nn; }
+        const QColor c = CCOLOR(progress.std, Bg);
+        p.setBrush(Gradients::brush(c, s, Qt::Vertical, GRAD(progress) ));
     }
+    p.setBrushOrigin(0,1);
+    drawShape(&p, s);
     p.end();
 
     if (vertical) // x is in fact y!
-        for (int i = 0; i < nn; ++i)
-            { painter->drawPixmap(y,x, renderPix); x+=d; }
+        for (int i = 0; i < nn; ++i) { painter->drawPixmap(y,x, renderPix); x+=s; }
     else // x is as expected... - gee my math teacher was actually right: "always label the axis!"
-        for (int i = 0; i < nn; ++i)
-            { painter->drawPixmap(x,y, renderPix); x+=d; }
+        for (int i = 0; i < nn; ++i) { painter->drawPixmap(x,y, renderPix); x+=s; }
 
     // if we're painting the actual progress, ONE chunk may be "semifinished" - that's done below
     if (content)
     {
         bool b = (nn < n);
+//       x+=2; y+=2; ss-=2;
         if (busy)
         {   // the busy indicator has always a semifinished item, but we need to calculate which first
             b = true;
-            val = -val; nn = int(n*val); x += nn*d;
+            val = -val; nn = int(n*val); x += nn*s;
             double o = n*val - nn;
             if (o < .5)
                 val += o/n;
@@ -325,17 +308,28 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
                 painter->save();
                 painter->setRenderHint(QPainter::Antialiasing);
                 painter->setBrush(Gradients::brush(c, s, Qt::Vertical, GRAD(progress) ));
-                painter->setPen(Qt::NoPen);
-                disc.moveTop(y + (renderPix.height()-disc.height())/2);
-                disc.moveLeft(x + (renderPix.width()-disc.width())/2);
-                painter->setBrushOrigin(disc.topLeft());
-                painter->drawEllipse(disc);
+                painter->setBrushOrigin(0, y);
+                drawShape(painter, s, x, y, false);
                 painter->restore();
             }
         }
     }
 }
+
 #else
+
+// a nice round embedded chunk
+static inline void
+drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
+{
+    s -= 2;
+    p->setPen(QPen(QColor(0,0,0,50),2));
+    p->drawEllipse(x+1,y+2,s,s);
+    p->setBrush(Qt::NoBrush);
+    p->setPen(QPen(QColor(255,255,255, outline ? 30 : 15),1));
+    p->drawEllipse(x,y+1,s+2,s);
+}
+
 void
 Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QWidget *widget, bool content) const
 {
@@ -373,10 +367,10 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
     else if (val == 1.0)
         return;
 
-    // calculate chunk dimensions - you don't wanna know and i forgot... ;-P
-    int s = qMin(qMax(l / 10, F(16)), t /*16*t/10*/);
+    // calculate chunk dimensions - minimal 16px or space for 10 chunks, maximal the progress thickness
+    int s = qMin(qMax(l/10, F(16)), t);
     if (!s) return;
-    int ss = (10*s)/16;
+    int ss = (3*s)/4;
     int n = l/s;
     if (!n) return;
     if (vertical || reverse)
@@ -468,6 +462,7 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
     }
 }
 #endif
+
 void
 Style::drawProgressBarLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {

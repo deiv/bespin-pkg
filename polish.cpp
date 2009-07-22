@@ -801,8 +801,8 @@ Style::polish( QWidget * widget )
         widget->setPalette(pal);
     }
 #if 1
-    ///
-    if (widget->inherits("QWebView")) // to update the scrollbars
+    /// to update the scrollbars
+    if (widget->inherits("QWebView"))
         widget->setAttribute(Qt::WA_Hover);
 #endif
 #if 1
