@@ -68,6 +68,8 @@ Style::drawHeaderSection(const QStyleOption * option, QPainter * painter,
     QColor c =  (header->sortIndicator != QStyleOptionHeader::None) ?
                                         COLOR(config.view.sortingHeader_role[Bg]) :
                                         COLOR(config.view.header_role[Bg]);
+    if (Colors::value(c) < 50)
+        { int h,s,v,a; c.getHsv(&h, &s, &v, &a); c.setHsv(h, s, 50, a); }
 
     if (appType == GTK)
         sunken = option->state & State_HasFocus;
