@@ -19,6 +19,7 @@
 #include <QStyleOptionTitleBar>
 #include <QApplication>
 #include <QDockWidget>
+#include <QImageReader>
 #include <QPainter>
 #include <QPen>
 
@@ -50,6 +51,28 @@ static inline uint qt_intensity(uint r, uint g, uint b)
 QIcon
 Style::standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const
 {
+    if (appType == Arora && !config.appDataPath.isEmpty())
+    {
+        QString file = config.appDataPath;
+        switch (standardIcon)
+        {
+        case SP_BrowserReload:
+            file += "/reload.png"; break;
+        case SP_ArrowBack:
+        case SP_ArrowLeft:
+            file += "/prev.png"; break;
+        case SP_ArrowRight:
+        case SP_ArrowForward:
+            file += "/next.png"; break;
+        case SP_BrowserStop:
+            file += "/stop.png"; break;
+        default:
+            goto no_broser_icon;
+        }
+        if (QImageReader(file).canRead())
+            return QIcon(file);
+    }
+no_broser_icon:
     if (!option)
     {
         QStyleOption opt; opt.rect.setRect(0,0,64,64);

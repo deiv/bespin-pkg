@@ -167,6 +167,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
 {
     ASSURE_OPTION(tab, Tab);
 
+#if 0 // solid bg now, but kep in case ;-)
     // do we have to exclude the scrollers?
     bool needRestore = false;
     if (widget && qobject_cast<const QTabBar*>(widget))
@@ -188,7 +189,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
             painter->setClipRegion(clipRgn);
         }
     }
-
+#endif
 
     // paint shape and label
     QStyleOptionTab copy = *tab;
@@ -252,8 +253,10 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
                     else // nope, this is really a custom color that will likley contrast just enough with QPalette::Window...
                         customColor = true;
                 }
-
-                hoveredIndex = hover ? index : tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
+                if (hover)
+                    hoveredIndex = index;
+                else if (widget->underMouse())
+                    hoveredIndex = tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
                 info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, hoveredIndex));
             }
             if (info)
@@ -282,8 +285,10 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
 #endif
     drawTabLabel(&copy, painter, widget);
     customColor = false;
+#if 0
     if (needRestore)
         painter->restore();
+#endif
 }
 
 void

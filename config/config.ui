@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>819</width>
-    <height>437</height>
+    <height>439</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -150,6 +150,11 @@
        </item>
        <item>
         <property name="text">
+         <string>Applcation Specific</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>Hacks</string>
         </property>
        </item>
@@ -228,7 +233,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>9</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -2248,6 +2253,139 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="AppSpecific">
+         <layout class="QGridLayout" name="gridLayout_28">
+          <item row="0" column="0">
+           <widget class="QGroupBox" name="groupBox_15">
+            <property name="title">
+             <string>Arora</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_27">
+             <item row="0" column="0" colspan="2">
+              <widget class="QLabel" name="label_38">
+               <property name="text">
+                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Skinnig support:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;place icons as &lt;span style=&quot; font-weight:600;&quot;&gt;stop.png&lt;/span&gt;, &lt;span style=&quot; font-weight:600;&quot;&gt;reload.png&lt;/span&gt;, &lt;span style=&quot; font-weight:600;&quot;&gt;prev.png&lt;/span&gt; and &lt;span style=&quot; font-weight:600;&quot;&gt;next.png&lt;/span&gt; into the path selected below&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLineEdit" name="aroraPath"/>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="aroraPathChooser">
+               <property name="text">
+                <string>Select...</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QGroupBox" name="groupBox_16">
+            <property name="title">
+             <string>Konqueror</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_26">
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="hackKHtml">
+               <property name="text">
+                <string>Sunken html frame</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QCheckBox" name="killThrobber">
+               <property name="text">
+                <string>Hide throbber (animated icon)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QGroupBox" name="groupBox_13">
+            <property name="title">
+             <string>Amarok</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_24">
+             <item row="1" column="0">
+              <widget class="QCheckBox" name="hackAmarokFrames">
+               <property name="text">
+                <string>Remove frames around all splitter children</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QCheckBox" name="hackAmarokDisplay">
+               <property name="text">
+                <string>&quot;Bespinify&quot; display (the bar on the top)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QCheckBox" name="hackAmarokListview">
+               <property name="text">
+                <string>Force traditional Listviews (Playlist, Collection, etc.)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QCheckBox" name="hackAmarokContext">
+               <property name="text">
+                <string>Hide context view</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <spacer name="verticalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="3" column="0">
+           <spacer name="verticalSpacer_10">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="Hacks">
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
@@ -2272,13 +2410,6 @@
            </widget>
           </item>
           <item row="5" column="0">
-           <widget class="QCheckBox" name="killThrobber">
-            <property name="text">
-             <string>Konqueror: Hide throbber (animated icon)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -2291,56 +2422,22 @@
             </property>
            </spacer>
           </item>
-          <item row="7" column="0">
-           <widget class="QGroupBox" name="groupBox_13">
-            <property name="title">
-             <string>Amarok</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_24">
-             <item row="1" column="0">
-              <widget class="QCheckBox" name="hackAmarokFrames">
-               <property name="text">
-                <string>Remove frames around all splitter children</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="hackAmarokContext">
-               <property name="text">
-                <string>Hide context view</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QCheckBox" name="hackAmarokDisplay">
-               <property name="text">
-                <string>&quot;Bespinify&quot; display (the bar on the top)</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QCheckBox" name="hackAmarokListview">
-               <property name="text">
-                <string>Force traditional Listviews (Playlist, Collection, etc.)</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="hackKHtml">
-            <property name="text">
-             <string>Konqueror: Sunken html frame</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </widget>
+      </item>
+      <item row="1" column="1">
+       <spacer name="verticalSpacer_11">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

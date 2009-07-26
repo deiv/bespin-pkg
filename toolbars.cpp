@@ -24,29 +24,51 @@
 static int step = 0;
 
 void
-Style::drawToolButton(const QStyleOptionComplex * option,
-                            QPainter * painter, const QWidget * widget) const
+Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
+    ASSURE_OPTION(toolbutton, ToolButton);
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
 
-    if (widget && widget->parentWidget() && qobject_cast<QTabBar*>(widget->parent()))
-    {   // special handling for the tabbar scrollers ------------------------------
-        QColor c = widget->parentWidget()->palette().color(config.tab.std_role[0]);
-        QColor c2 = widget->parentWidget()->palette().color(config.tab.std_role[1]);
-        if (sunken)
+    // special handling for the tabbar scrollers ------------------------------
+    if (toolbutton->features & QStyleOptionToolButton::Arrow &&
+        widget && widget->parentWidget() && qobject_cast<QTabBar*>(widget->parentWidget()))
+    {
+        QWidget *tabbar = widget->parentWidget();
+        QColor bg = tabbar->palette().color(config.tab.std_role[Bg]),
+               fg = tabbar->palette().color(config.tab.std_role[Fg]);
+        Qt::Orientation o = Qt::Vertical;
+        QRect r = RECT; int dy2 = 0;
+        Tile::Position pos = Tile::Right;
+        switch (toolbutton->arrowType)
         {
-            int dy = (RECT.height()-RECT.width())/2;
-            QRect r = RECT.adjusted(dpi.f2,dy,-dpi.f2,-dy);
-            masks.rect[true].render(r, painter, Gradients::Sunken, Qt::Vertical, c);
+            case Qt::RightArrow:
+                pos = Tile::Left; // fall through
+            default:
+            case Qt::LeftArrow:
+                r.adjust(0, F(2), 0, -F(4));
+                dy2 = F(2);
+                break;
+            case Qt::UpArrow:
+                r.adjust(F(2), 0, -F(2), 0);
+                pos = Tile::Bottom; o = Qt::Horizontal; break;
+            case Qt::DownArrow:
+                r.adjust(F(2), 0, -F(2), -F(2));
+                dy2 = F(2);
+                pos = Tile::Top; o = Qt::Horizontal; break;
         }
-        painter->save();
-        painter->setPen( isEnabled ? c2 : Colors::mid(c, c2) );
+        Tile::setShape(Tile::Full & ~pos);
+        masks.rect[true].render(r, painter, sunken ? Gradients::Sunken : Gradients::None, o, bg);
+        Tile::setShape(Tile::Ring & ~pos);
+        if (dy2)
+            r.setBottom(r.bottom() + dy2);
+        shadows.sunken[true][true].render(r, painter);
+        Tile::reset();
+        QPen oldPen = painter->pen();
+        painter->setPen( !isEnabled ? Colors::mid(bg, fg, 3,2) : (hover ? FCOLOR(Highlight) : fg) );
         drawToolButtonLabel(option, painter, widget);
-        painter->restore();
+        painter->setPen(oldPen);
         return;
     } // --------------------------------------------------------------------
-
-    ASSURE_OPTION(toolbutton, ToolButton);
 
     QRect button = subControlRect(CC_ToolButton, toolbutton, SC_ToolButton, widget);
     State bflags = toolbutton->state;
@@ -150,8 +172,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
     // Arrow type always overrules and is always shown
     const bool hasArrow = toolbutton->features & QStyleOptionToolButton::Arrow;
     const bool justText = (!hasArrow && toolbutton->icon.isNull()) &&
-                            !toolbutton->text.isEmpty() ||
-                            toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
+                            !toolbutton->text.isEmpty() || toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
 
     QPalette::ColorRole role = QPalette::WindowText;
     QPalette::ColorRole bgRole = QPalette::Window;

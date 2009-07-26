@@ -119,6 +119,8 @@ Style::readSettings(const QSettings* settings)
         iSettings = new QSettings("Bespin", "Style");
         iSettings->beginGroup("Style");
         //BEGIN read some user personal settings (i.e. not preset related)
+        if (appType == Arora)
+            config.appDataPath = iSettings->value("App.Arora.Path", "").toString();
         // flanders
         config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
         // item single vs. double click, wizard appereance
@@ -432,26 +434,35 @@ Style::init(const QSettings* settings)
 {
     QTime time; time.start();
     // various workarounds... ==========================
+    appType = Unknown;
     if (getenv("OPERA_LD_PRELOAD"))
         appType = Opera;
     else if (!qApp->inherits("KApplication") && getenv("GTK_QT_ENGINE_ACTIVE"))
         { appType = GTK; /*qWarning("BESPIN: Detected GKT+ application");*/ }
     else if (qApp->inherits("GreeterApp"))
         appType = KDM;
-    else if (QCoreApplication::applicationName() == "dolphin")
-        appType = Dolphin;
-    else if (QCoreApplication::applicationName() == "be.shell")
-        appType = BEshell;
-    else if (QCoreApplication::applicationName() == "plasma" || QCoreApplication::applicationName() == "plasma-desktop")
-        appType = Plasma;
-    else if (QCoreApplication::applicationName() == "krunner")
-        appType = KRunner;
-    else if (QCoreApplication::applicationName() == "kget")
-        appType = KGet;
-    else if (QCoreApplication::applicationName() == "Designer")
-        appType = QtDesigner;
     else
-        appType = Unknown;
+    {
+        QString appName = QCoreApplication::applicationName();
+        if (appName == "dolphin")
+            appType = Dolphin;
+        else if (appName == "be.shell")
+            appType = BEshell;
+        else if (appName == "plasma" || appName == "plasma-desktop")
+            appType = Plasma;
+        else if (appName == "krunner")
+            appType = KRunner;
+        else if (appName == "kget")
+            appType = KGet;
+        else if (appName == "Designer")
+            appType = QtDesigner;
+        else if (appName.isEmpty() && !QCoreApplication::arguments().isEmpty())
+        {
+            appName = QCoreApplication::arguments().at(0).section('/', -1);
+            if (appName == "arora")
+                appType = Arora;
+        }
+    }
     // ==========================
     readSettings(settings);
     initMetrics();

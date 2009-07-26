@@ -21,9 +21,9 @@ Boston, MA 02110-1301, USA.
 #include <QDir>
 #include <QSettings>
 #include <QTimer>
-#include <QDialogButtonBox>
-#include <QInputDialog>
-#include <QMessageBox>
+// #include <QDialogButtonBox>
+// #include <QInputDialog>
+// #include <QMessageBox>
 #include <QPainter>
 #include <QProcess>
 #include <QValidator>
@@ -276,6 +276,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     ui.pwEchoChar->lineEdit()-> setValidator(new UniCharValidator(ui.pwEchoChar->lineEdit()));
     connect (ui.pwEchoChar->lineEdit(), SIGNAL(returnPressed()), this, SLOT (learnPwChar()));
     ui.pwEchoChar->setInsertPolicy(QComboBox::NoInsert);
+
+    connect(ui.aroraPathChooser, SIGNAL(clicked()), this, SLOT(selectAroraPath()));
    
    
     /** connection between the bgmode and the structure combo - not of interest*/
@@ -381,6 +383,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.kwinInactiveRole, KWIN_INACTIVE_ROLE);
     handleSettings(ui.kwinActiveText, KWIN_ACTIVE_TEXT_ROLE);
     handleSettings(ui.kwinInactiveText, KWIN_INACTIVE_TEXT_ROLE);
+
+    handleSettings(ui.aroraPath, "App.Arora.Path", "");
 
     handleSettings(ui.hackMessages, HACK_MESSAGES);
     setContextHelp(ui.hackMessages, "<b>Messageboxes</b><hr>\
@@ -833,6 +837,12 @@ Config::import()
             ui.store->sortItems(0, Qt::AscendingOrder);
         }
     }
+}
+
+void
+Config::selectAroraPath()
+{
+    ui.aroraPath->setText(QFileDialog::getExistingDirectory(this, "Select a path to your Arora icons"));
 }
 
 void

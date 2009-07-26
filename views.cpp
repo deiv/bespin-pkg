@@ -1,5 +1,5 @@
 /* Bespin widget style for Qt4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
+   Copyright (C) 2007-2009 Thomas Luebking <thomas.luebking@web.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public

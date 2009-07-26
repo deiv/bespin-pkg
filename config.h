@@ -27,6 +27,7 @@ namespace Bespin
 
 typedef struct Config
 {
+    QString appDataPath;
     struct bg
     {
         BGMode mode;
