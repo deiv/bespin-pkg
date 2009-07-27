@@ -399,6 +399,21 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
         tr.setLeft(tr.left() + iconSize.width() + F(12));
         alignment = Qt::AlignLeft | Qt::AlignVCenter | BESPIN_MNEMONIC;
     }
+#if QT_VERSION >= 0x040500
+    if HAVE_OPTION(tabV3, TabV3)
+    {
+        if (vertical)
+        {
+            tr.setLeft(tr.left() + tabV3->leftButtonSize.height());
+            tr.setRight(tr.right() - tabV3->rightButtonSize.height());
+        }
+        else
+        {
+            tr.setLeft(tr.left() + tabV3->leftButtonSize.width());
+            tr.setRight(tr.right() - tabV3->rightButtonSize.width());
+        }
+    }
+#endif
 
     // color adjustment
     QColor cF = CCOLOR(tab.std, Fg), cB = CCOLOR(tab.std, Bg);

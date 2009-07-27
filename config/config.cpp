@@ -385,6 +385,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.kwinInactiveText, KWIN_INACTIVE_TEXT_ROLE);
 
     handleSettings(ui.aroraPath, "App.Arora.Path", "");
+    setContextHelp(ui.aroraPath, "<b>Skinnig support</b><hr>\
+    Place icons named<br>\
+    - stop.png<br>\
+    - reload.png<br>\
+    - prev.png<br>\
+    - next.png<br>\
+    into the selected path");
 
     handleSettings(ui.hackMessages, HACK_MESSAGES);
     setContextHelp(ui.hackMessages, "<b>Messageboxes</b><hr>\
@@ -842,7 +849,9 @@ Config::import()
 void
 Config::selectAroraPath()
 {
-    ui.aroraPath->setText(QFileDialog::getExistingDirectory(this, "Select a path to your Arora icons"));
+    QString dir = QFileDialog::getExistingDirectory(this, "Select a path to your Arora icons", ui.aroraPath->text());
+    if (!dir.isEmpty())
+        ui.aroraPath->setText(dir);
 }
 
 void

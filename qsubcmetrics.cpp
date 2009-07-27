@@ -611,6 +611,33 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
             }
             return r;
         }
+#if QT_VERSION >= 0x040500
+    case QStyle::SE_TabBarTabLeftButton:
+    case QStyle::SE_TabBarTabRightButton:
+        if HAVE_OPTION(tab, TabV3)
+        {
+            QSize sz = (element == SE_TabBarTabLeftButton) ? tab->leftButtonSize : tab->rightButtonSize;
+            QRect r;
+            if (verticalTabs(tab->shape))
+            {
+                if (sz.width() > RECT.width() - F(4))
+                    sz.setWidth(RECT.width() - F(4));
+                r.setRect(RECT.x() + (RECT.width()-(sz.width()+1))/2, RECT.y()+F(3), sz.width(), sz.height());
+                if (element == SE_TabBarTabRightButton)
+                    r.moveBottom(RECT.bottom() - F(4));
+            }
+            else
+            {
+                if (sz.height() > RECT.height() - F(4))
+                    sz.setHeight(RECT.height() - F(4));
+                r.setRect(RECT.x() + F(4), RECT.y() + (RECT.height()-(sz.height()+1))/2, sz.width(), sz.height());
+                if (element == SE_TabBarTabRightButton)
+                    r.moveRight(RECT.right() - F(4));
+            }
+            return visualRect(tab->direction, RECT, r);
+        }
+//     case QStyle::SE_TabBarTabText:
+#endif
     case SE_TabWidgetTabPane: //
         return RECT;//.adjusted(-dpi.f8, 0, dpi.f8, 0);
 //     case SE_ItemViewItemFocusRect:
