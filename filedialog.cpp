@@ -59,15 +59,20 @@ session()
     return Unkown;
 }
 
+#define MODAL_DIALOG 1
 static QString
 dialog(QWidget *parent, Session ses, const QStringList &args, const QString &dir )
 {
+#if MODAL_DIALOG
     QWidget modal;
     modal.setAttribute( Qt::WA_NoChildEventsForParent, true );
     modal.setParent( parent, Qt::Window );
     QApplicationPrivate::enterModal( &modal );
-    
     QProcess proc( &modal );
+#else
+    QProcess proc( parent );
+#endif
+
     proc.setWorkingDirectory( dir );
     proc.start( ses == KDE ? "kdialog" : "zenity", args );
     proc.waitForFinished( -1 );
@@ -79,8 +84,10 @@ dialog(QWidget *parent, Session ses, const QStringList &args, const QString &dir
         if ( result.isNull() )
             result = "";
     }
-
+    
+#if MODAL_DIALOG
     QApplicationPrivate::leaveModal( &modal );
+#endif
     return result;
 }
 
@@ -132,7 +139,7 @@ static QString
 simpleFilter( const QString& filter )
 {
     if ( filter.isEmpty() )
-        return "*";
+        return "*.*";
     
     QStringList list = filter.split( ';', QString::SkipEmptyParts );
     for ( int i = 0; i < list.count(); ++i )
@@ -144,11 +151,11 @@ simpleFilter( const QString& filter )
 
 #ifdef Q_WS_X11
 #define PREPARE_KDE \
-if ( parent ) args << "--attach" << QString::number( parent->winId() );\
-if ( !caption.isEmpty() ) args << "--title" << caption
+if ( !caption.isEmpty() ) args << "--title" << caption; \
+if ( parent ) args << "--attach" << QString::number( parent->winId() );
 #else
 #define PREPARE_KDE \
-if ( !caption.isEmpty() ) args << "--title" << caption
+if ( !caption.isEmpty() ) args << "--title" << caption;
 #endif
 
 #define PREPARE_GNOME \

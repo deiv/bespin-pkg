@@ -27,7 +27,7 @@
 #ifndef BESPIN_H
 #define BESPIN_H
 
-#include <QMap>
+#include <QHash>
 #include <QVector>
 #include <kdecorationfactory.h>
 #include "../gradients.h"
@@ -79,10 +79,15 @@ protected:
     friend class BespinDecoAdaptor;
     void learn(qint64 pid, QByteArray data);
     void forget(qint64 pid);
+protected:
+    friend class Client;
+    BgSet *bgSet(const QColor &c, bool vertical, int intensity, qint64 *hash = 0);
+    void kickBgSet(qint64 hash);
 private:
     bool readConfig();
 private:
-    QMap<qint64, WindowData*> _decoInfos;
+    QHash<qint64, WindowData*> _decoInfos;
+    QHash<qint64, BgSet*> _bgSets;
     static bool initialized_;
     static bool slickButtons_;
     static int buttonSize_, borderSize_, titleSize_[2];

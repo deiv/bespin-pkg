@@ -521,6 +521,31 @@ Factory::supports( Ability ability ) const
 	};
 }
 
+BgSet *
+Factory::bgSet(const QColor &c, bool vertical, int intensity, qint64 *hashPtr)
+{
+    qint64 hash = (qint64(c.rgba()) << 32) | (int(vertical) << 31) | (intensity & 0xfffffff);
+    if (hashPtr)
+        *hashPtr = hash;
+    
+    BgSet *set = _bgSets.value(hash, 0);
+    if (!set)
+        set = Gradients::bgSet(c, vertical?Gradients::BevelV:Gradients::BevelH , intensity);
+    _bgSets.insert(hash, set);
+    return set;
+}
+
+void
+Factory::kickBgSet(qint64 hash)
+{
+    QHash<qint64, BgSet*>::iterator i = _bgSets.find(hash);
+    if (i != _bgSets.end())
+    {
+        delete i.value(); i.value() = 0;
+        _bgSets.erase(i);
+    }
+}
+
 void
 Factory::learn(qint64 pid, QByteArray data)
 {
@@ -544,21 +569,18 @@ Factory::learn(qint64 pid, QByteArray data)
 void
 Factory::forget(qint64 pid)
 {
-    QMap<qint64, WindowData*>::iterator i = _decoInfos.find(pid);
-    if (i == _decoInfos.end())
-        return;
-    
-    delete i.value(); i.value() = 0;
-    _decoInfos.erase(i);
+    QHash<qint64, WindowData*>::iterator i = _decoInfos.find(pid);
+    if (i != _decoInfos.end())
+    {
+        delete i.value(); i.value() = 0;
+        _decoInfos.erase(i);
+    }
 }
 
 WindowData*
 Factory::decoInfo(qint64 pid)
 {
-    QMap<qint64, WindowData*>::iterator i = _decoInfos.find(pid);
-    if (i == _decoInfos.end())
-        return false;
-    return i.value();
+    return _decoInfos.value(pid, 0);
 }
 
 #include "dbus.moc"

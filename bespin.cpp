@@ -525,8 +525,6 @@ void
 Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
 {
 #ifdef Q_WS_X11
-    if (!FX::usesXRender())
-        return;
     // this is important because KDE apps may alter the original palette any time
     const QPalette &pal = originalPalette ? *originalPalette : palette;
 

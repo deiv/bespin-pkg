@@ -58,9 +58,16 @@ using namespace Bespin;
 Client::Client(KDecorationBridge *b, Factory *f) :
 KDecoration(b, f), retry(0), myButtonOpacity(0), myActiveChangeTimer(0),
 topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
-bgMode(1), _factory(f), corner(0) { }
+bgMode(1), _factory(f), corner(0), bg(0) { }
 
-Client::~Client(){
+Client::~Client()
+{
+    if (bg)
+    {
+        if (! --bg->set->clients)
+            _factory->kickBgSet(bg->hash);
+        delete bg;
+    }
 //    delete corner;
 //    delete [] buttons;
 //    delete titleBar;
@@ -70,21 +77,57 @@ Client::~Client(){
 void
 Client::updateStylePixmaps()
 {
+    topTile = btmTile = cnrTile = lCorner = rCorner = 0;
     if (WindowPics *pics = (WindowPics*)XProperty::get<Picture>(windowId(), XProperty::bgPics, XProperty::LONG, 5))
     {
-        topTile = pics->topTile;
-        btmTile = pics->btmTile;
-        cnrTile = pics->cnrTile;
-        lCorner = pics->lCorner;
-        rCorner = pics->rCorner;
-        widget()->update();
+        if ((topTile = pics->topTile))
+        {
+            if (bg)
+            {
+                if (! --bg->set->clients)
+                    _factory->kickBgSet(bg->hash);
+                delete bg;
+                bg = 0;
+            }
+            btmTile = pics->btmTile;
+            cnrTile = pics->cnrTile;
+            lCorner = pics->lCorner;
+            rCorner = pics->rCorner;
+        }
+        else
+        {
+            qint64 hash = 0;
+            /// NOTICE style encodes the intensity in btmTile!
+            BgSet *set = _factory->bgSet(colors[isActive()][0], bgMode==2, pics->btmTile, &hash);
+            if (!bg)
+            {
+                ++set->clients;
+                bg = new Bg;
+                bg->hash = hash;
+                bg->set = set;
+            }
+            else if (bg->hash != hash)
+            {
+                if (! --bg->set->clients)
+                    _factory->kickBgSet(bg->hash);
+                ++set->clients;
+                bg->set = set;
+                bg->hash = hash;
+            }
+            topTile = set->topTile.x11PictureHandle();
+            btmTile = set->btmTile.x11PictureHandle();
+            cnrTile = set->cornerTile.x11PictureHandle();
+            lCorner = set->lCorner.x11PictureHandle();
+            rCorner = set->rCorner.x11PictureHandle();
+        }
     }
+    if (topTile)
+        widget()->update();
     else
     {
-        topTile = btmTile = cnrTile = lCorner = rCorner = 0;
-        if ((!retry || sender()) && retry < 100)
+        if ((!retry || sender()) && retry < 50)
         {
-            QTimer::singleShot(100, this, SLOT(updateStylePixmaps()));
+            QTimer::singleShot(100+10*retry, this, SLOT(updateStylePixmaps()));
             ++retry;
         }
     }
@@ -168,7 +211,7 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     // this may be a bug but is annoying at least - TODO: kwin bug report?
     if (maximizeMode() == MaximizeFull)
     {
-        left = right = bottom = options()->moveResizeMaximizedWindows() ? 4 : 0;
+        left = right = bottom = options()->moveResizeMaximizedWindows() ? qMin(4, _factory->borderSize()) : 0;
         top = _factory->titleSize(true);
     }
     else
@@ -707,7 +750,7 @@ Client::reset(unsigned long changed)
         if (maximizeMode() == MaximizeFull)
         {
             if (options()->moveResizeMaximizedWindows())
-                borderSize = 4;
+                borderSize = qMin(4, _factory->borderSize());
             else
             {
                 borderSize = 0;

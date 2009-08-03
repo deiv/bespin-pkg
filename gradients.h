@@ -29,14 +29,20 @@
 
 namespace Bespin {
 
-#ifndef BESPIN_DECO
 class BgSet {
 public:
-   BgSet(){}
-   QPixmap topTile, btmTile;
-   QPixmap cornerTile, lCorner, rCorner;
-};
+    BgSet()
+    {
+#ifdef BESPIN_DECO
+        clients = 0;
 #endif
+    }
+    QPixmap topTile, btmTile;
+    QPixmap cornerTile, lCorner, rCorner;
+#ifdef BESPIN_DECO
+    uint clients;
+#endif
+};
 
 namespace Gradients {
 
@@ -46,7 +52,7 @@ enum Type {
 };
 
 enum BgMode {
-   BevelV = 2, BevelH, LightV, LightH
+   BevelV = 2, BevelH
 };
 
 enum Position { Top = 0, Bottom, Left, Right };
@@ -95,6 +101,7 @@ const BgSet &bgSet(const QColor &c);
 void init(BgMode mode, int structure = 0, int bgBevelIntesity = 110, int btnBevelSize = 16, bool force = false);
 #else
 void init();
+BgSet *bgSet(const QColor &c, BgMode mode, int bgBevelIntesity = 110);
 #endif
 
 const QPixmap &borderline(const QColor &c, Position pos);

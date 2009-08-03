@@ -419,7 +419,6 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
 }
 
 #ifndef BESPIN_DECO
-#include <QDebug>
 static QPixmap _dither;
 
 static inline void
@@ -710,6 +709,8 @@ Gradients::shadow(int height, bool bottom)
     return nullPix;
 }
 
+#endif
+
 static inline QPixmap *
 cornerMask(bool right = false)
 {
@@ -731,13 +732,20 @@ cornerMask(bool right = false)
     return alpha;
 }
 
-const BgSet &
+#ifndef BESPIN_DECO
+const BgSet&
 Gradients::bgSet(const QColor &c)
 {
     BgSet *set = _bgSet.object(c.rgb());
     if (set)
         return *set;
     set = new BgSet;
+#else
+BgSet*
+Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
+{
+    BgSet *set = new BgSet;
+#endif
     QLinearGradient lg;
     QPainter p;
     switch (_mode)
@@ -775,13 +783,17 @@ Gradients::bgSet(const QColor &c)
         p.begin(&set->topTile);
         stops << QGradientStop(0, c1) << QGradientStop(1, c);
         lg.setStops(stops); p.fillRect(set->topTile.rect(), lg); stops.clear();
+#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->topTile.rect(), _dither);
+#endif
         p.end();
         // Bottom Tile
         p.begin(&set->btmTile);
         stops << QGradientStop(0, c) << QGradientStop(1, c3);
         lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg); stops.clear();
+#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->btmTile.rect(), _dither);
+#endif
         p.end();
 
         if (Colors::value(c) > 244)
@@ -801,7 +813,9 @@ Gradients::bgSet(const QColor &c)
         lg.setStops(stops);
         p.fillRect(set->cornerTile.rect(), lg);
         stops.clear();
+#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->cornerTile.rect(), _dither);
+#endif
         p.end();
         // Left Corner, right corner
         QPixmap *mask, *pix;
@@ -822,7 +836,9 @@ Gradients::bgSet(const QColor &c)
 
             p.begin(pix);
             p.drawPixmap(0,0, fill);
+#ifndef BESPIN_DECO
             p.drawTiledPixmap(pix->rect(), _dither);
+#endif
             p.end();
             delete mask;
         }
@@ -863,13 +879,17 @@ Gradients::bgSet(const QColor &c)
         p.begin(&set->topTile);
         stops << QGradientStop(0, c1) << QGradientStop(1, c);
         lg.setStops(stops); p.fillRect(set->topTile.rect(), lg); stops.clear();
+#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->topTile.rect(), _dither);
+#endif
         p.end();
         // right
         p.begin(&set->btmTile);
         stops << QGradientStop(0, c) << QGradientStop(1, c1);
         lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg); stops.clear();
+#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->btmTile.rect(), _dither);
+#endif
         p.end();
         // left corner right corner
         QPixmap *pix, *blend;
@@ -896,7 +916,9 @@ Gradients::bgSet(const QColor &c)
 
             p.begin(pix);
             p.drawPixmap(0,0, fill);
+#ifndef BESPIN_DECO
             p.drawTiledPixmap(pix->rect(), _dither);
+#endif
             p.end();
         }
         delete mask;
@@ -904,17 +926,24 @@ Gradients::bgSet(const QColor &c)
         lg.setColorAt(0, c3); lg.setColorAt(1, c);
         p.begin(&set->cornerTile);
         p.fillRect(set->cornerTile.rect(), lg);
+#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->cornerTile.rect(), _dither);
+#endif
         p.end();
         break;
     }
     default:
         break;
     }
+#ifndef BESPIN_DECO
     _bgSet.insert(c.rgba(), set, costs(set));
     return *set;
+#else
+    return set;
+#endif
 }
 
+#ifndef BESPIN_DECO
 static bool _initialized = false;
 
 void

@@ -387,10 +387,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.aroraPath, "App.Arora.Path", "");
     setContextHelp(ui.aroraPath, "<b>Skinnig support</b><hr>\
     Place icons named<br>\
-    - stop.png<br>\
-    - reload.png<br>\
-    - prev.png<br>\
-    - next.png<br>\
+    - <b>stop.png</b><br>\
+    - <b>reload.png</b><br>\
+    - <b>prev.png</b><br>\
+    - <b>next.png</b><br>\
     into the selected path");
 
     handleSettings(ui.hackMessages, HACK_MESSAGES);

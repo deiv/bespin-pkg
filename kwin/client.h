@@ -43,6 +43,12 @@ namespace Bespin
 class Button;
 class ResizeCorner;
 
+class Bg {
+public:
+    qint64 hash;
+    BgSet *set;
+};
+
 class Client : public KDecoration
 {
     Q_OBJECT
@@ -116,6 +122,7 @@ private:
     QPainterPath buttonCorner;
     QString _caption;
     ResizeCorner *corner;
+    Bg *bg;
 };
 
 

@@ -25,6 +25,7 @@
 #include "draw.h"
 
 #ifdef Q_WS_X11
+#include "oxrender.h"
 #include "xproperty.h"
 #else
 #define QT_NO_XRENDER #
@@ -165,11 +166,20 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     {
         uint decoDim = *decoDimP;
         WindowPics pics;
-        pics.topTile = set.topTile.x11PictureHandle();
-        pics.btmTile = set.btmTile.x11PictureHandle();
-        pics.cnrTile = set.cornerTile.x11PictureHandle();
-        pics.lCorner = set.lCorner.x11PictureHandle();
-        pics.rCorner = set.rCorner.x11PictureHandle();
+        if (FX::usesXRender())
+        {
+            pics.topTile = set.topTile.x11PictureHandle();
+            pics.btmTile = set.btmTile.x11PictureHandle();
+            pics.cnrTile = set.cornerTile.x11PictureHandle();
+            pics.lCorner = set.lCorner.x11PictureHandle();
+            pics.rCorner = set.rCorner.x11PictureHandle();
+        }
+        else
+        {
+            pics.topTile = pics.cnrTile = pics.lCorner = pics.rCorner = 0;
+            /// NOTICE encoding the bg gradient intensity in the btmTile Pic!!
+            pics.btmTile = config.bg.intensity;
+        }
         XProperty::set<Picture>(widget->winId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
         rect.adjust(-((decoDim >> 24) & 0xff), -((decoDim >> 16) & 0xff), (decoDim >> 8) & 0xff, decoDim & 0xff);
     }
