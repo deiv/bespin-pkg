@@ -34,33 +34,36 @@ enum Side { North, South, West, East };
 enum Type {Sunken, Plain, Raised};
 }
 
+class VisualFrame;
 class VisualFramePart : public QWidget
 {
     Q_OBJECT
 public:
-    VisualFramePart(QWidget *window, QFrame *parent, VFrame::Side side);
+    VisualFramePart(QWidget *window, QFrame *parent, VisualFrame *vFrame, VFrame::Side side);
     VisualFramePart(){};
-    void paintEvent ( QPaintEvent * event );
-    inline const QFrame *frame() const {return _frame;}
+    inline const QFrame *frame() const { return _frame; }
 protected:
 //    void enterEvent ( QEvent * event ) { passDownEvent(event, event->globalPos()); }
 //    void leaveEvent ( QEvent * event ) { passDownEvent(event, event->globalPos()); }
     void mouseDoubleClickEvent ( QMouseEvent * event );
-    void mouseMoveEvent ( QMouseEvent * event );
-    void mousePressEvent ( QMouseEvent * event );
-    void mouseReleaseEvent ( QMouseEvent * event );
-    void wheelEvent ( QWheelEvent * event );
+    void mouseMoveEvent(QMouseEvent*);
+    void mousePressEvent(QMouseEvent*);
+    void mouseReleaseEvent(QMouseEvent*);
+    void paintEvent(QPaintEvent*);
+    void wheelEvent(QWheelEvent*);
 private:
     Q_DISABLE_COPY(VisualFramePart)
     QFrame *_frame; // parent, to avoid nasty casting
+    VisualFrame *_vFrame;
     VFrame::Side _side;
     void passDownEvent(QEvent *ev, const QPoint &gMousePos);
 };
 
-class VisualFrame : public QObject {
+class VisualFrame : public QObject
+{
     Q_OBJECT
 public:
-    bool eventFilter ( QObject * o, QEvent * ev );
+    inline const QRect &frameRect() const { return _frameRect; }
     static void setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer);
     static bool manage(QFrame *frame);
     static void release(QFrame *frame);
@@ -70,15 +73,18 @@ public slots:
     void raise();
     void update();
     void repaint();
+protected:
+    bool eventFilter(QObject*, QEvent*);
 private:
     Q_DISABLE_COPY(VisualFrame)
     VisualFrame( QFrame *parent );
 //    ~VisualFrame();
     void updateShape();
     QFrame *_frame; // parent, to avoid nasty casting
-    QFrame::Shape _style;
     QWidget *_window;
+    QFrame::Shape _style;
     VisualFramePart *top, *bottom, *left, *right;
+    QRect _frameRect;
     bool hidden;
 private slots:
     void correctPosition();

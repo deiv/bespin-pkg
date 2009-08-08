@@ -448,7 +448,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
         return visualRect(option->direction, RECT, RECT.adjusted(F(4), F(4), -F(4), -F(4)));
     case SE_PushButtonFocusRect: // Area for the focus rect (usually larger than the contents rect)
     case SE_LineEditContents:
-        return RECT.adjusted(F(2),0,-F(2),0);
+        return RECT.adjusted(F(2),0,-F(2),-F(1));
     case SE_CheckBoxContents: // Area for the state label
     case SE_ViewItemCheckIndicator: // Area for a view item's check mark
     case SE_CheckBoxIndicator: // Area for the state indicator (e.g., check mark)

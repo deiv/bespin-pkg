@@ -378,60 +378,78 @@ triggerWMMove(const QWidget *w, const QPoint &p)
 inline static bool
 hackMessageBox(QMessageBox* box, QEvent *e)
 {
-   switch (e->type()) {
-   case QEvent::Paint: {
-      int s = qMin(164, 3*box->height()/2);
-      QStyleOption opt; opt.rect = QRect(0,0,s,s); opt.palette = box->palette();
-      QStyle::StandardPixmap logo = (QStyle::StandardPixmap)0;
-      switch (box->icon()){
-      case QMessageBox::NoIcon:
-      default:
-         break;
-      case QMessageBox::Question:
-         logo = QStyle::SP_MessageBoxQuestion; break;
-      case QMessageBox::Information:
-         logo = QStyle::SP_MessageBoxInformation; break;
-      case QMessageBox::Warning:
-         logo = QStyle::SP_MessageBoxWarning; break;
-      case QMessageBox::Critical:
-         logo = QStyle::SP_MessageBoxCritical; break;
-      }
-      QPixmap icon = box->style()->standardPixmap ( logo, &opt, box );
-      QPainter p(box);
-      if (logo) {
-         const int y = (box->height()-s)/2 - qMax(0,(box->height()-164)/3);
-         p.drawPixmap(-s/3,y, icon);
-      }
-      p.setPen(Colors::mid(box->palette().color(QPalette::Window),
-                           box->palette().color(QPalette::WindowText)));
-      p.drawRect(box->rect().adjusted(0,0,-1,-1));
-      p.end();
-      return true;
-   }
-   case QEvent::MouseButtonPress: {
-      QMouseEvent *mev = static_cast<QMouseEvent*>(e);
-      if (mev->button() == Qt::LeftButton)
-         triggerWMMove(box, mev->globalPos());
-      return false;
-   }
-   case QEvent::Show: {
-      QLabel *icon = box->findChild<QLabel*>("qt_msgboxex_icon_label");
-      if (icon) {
-         icon->setPixmap(QPixmap());
-         icon->setFixedSize(box->height()/3,10);
-      }
-      QLabel *text = box->findChild<QLabel*>("qt_msgbox_label");
-      if (text) {
-         text->setAutoFillBackground(true);
-         QPalette pal = text->palette();
-         QColor c = pal.color(QPalette::Base);
-         c.setAlpha(220);
-         pal.setColor(QPalette::Base, c);
-         text->setPalette(pal);
-         text->setBackgroundRole(QPalette::Base);
-         text->setForegroundRole(QPalette::Text);
-         if (!text->text().contains("<h2>")) {
-            QString head = "<qt><h2>" + box->windowTitle() + "</h2>";
+    switch (e->type())
+    {
+    case QEvent::Paint:
+    {
+        int s = qMin(164, 3*box->height()/2);
+        QStyleOption opt; opt.rect = QRect(0,0,s,s); opt.palette = box->palette();
+        QStyle::StandardPixmap logo = (QStyle::StandardPixmap)0;
+        switch (box->icon())
+        {
+        case QMessageBox::NoIcon:
+        default:
+            break;
+        case QMessageBox::Question:
+            logo = QStyle::SP_MessageBoxQuestion; break;
+        case QMessageBox::Information:
+            logo = QStyle::SP_MessageBoxInformation; break;
+        case QMessageBox::Warning:
+            logo = QStyle::SP_MessageBoxWarning; break;
+        case QMessageBox::Critical:
+            logo = QStyle::SP_MessageBoxCritical; break;
+        }
+        QPixmap icon = box->style()->standardPixmap ( logo, &opt, box );
+        QPainter p(box);
+        if (logo)
+        {
+            const int y = (box->height()-s)/2 - qMax(0,(box->height()-164)/3);
+            p.drawPixmap(-s/3,y, icon);
+        }
+        p.setPen(Colors::mid(box->palette().color(QPalette::Window), box->palette().color(QPalette::WindowText)));
+        p.drawRect(box->rect().adjusted(0,0,-1,-1));
+        p.end();
+        return true;
+    }
+    case QEvent::MouseButtonPress:
+    {
+        QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+        if (mev->button() == Qt::LeftButton)
+            triggerWMMove(box, mev->globalPos());
+        return false;
+    }
+    case QEvent::Show:
+    {
+        if (box->layout())
+            box->layout()->setSpacing(8);
+        if (QLabel *icon = box->findChild<QLabel*>("qt_msgboxex_icon_label"))
+        {
+            icon->setPixmap(QPixmap());
+            icon->setFixedSize(box->height()/3,10);
+        }
+        if (QLabel *text = box->findChild<QLabel*>("qt_msgbox_label"))
+        {
+            text->setAutoFillBackground(true);
+            QPalette pal = text->palette();
+            QColor c = pal.color(QPalette::Base);
+            c.setAlpha(220);
+            pal.setColor(QPalette::Base, c);
+            text->setPalette(pal);
+            text->setBackgroundRole(QPalette::Base);
+            text->setForegroundRole(QPalette::Text);
+//             text->setContentsMargins(16, 8, 16, 8);
+            text->setMargin(8);
+            text->setFrameStyle ( QFrame::StyledPanel | QFrame::Sunken );
+            text->setLineWidth ( 0 );
+            if (!text->text().contains("<h2>"))
+            {
+                if (box->windowTitle().isEmpty())
+                {
+                    QFont bold = text->font(); bold.setBold(true); text->setFont(bold);
+                }
+                else
+                {
+                    QString head = "<qt><h2>" + box->windowTitle() + "</h2>";
 //             switch (box->icon()){
 //             case QMessageBox::NoIcon:
 //             default:
@@ -445,35 +463,39 @@ hackMessageBox(QMessageBox* box, QEvent *e)
 //             case QMessageBox::Critical:
 //                head = "<qt><h2>Error!</h2>"; break;
 //             }
-            QString newText = text->text();
-            newText.replace(QRegExp("^(<qt>)*"), head);
-            if (!newText.endsWith("</qt>")) newText.append("</qt>");
-            text->setText(newText);
-//             text->setMargin(4);
-         }
-         text->setFrameStyle ( QFrame::StyledPanel | QFrame::Sunken );
-         text->setLineWidth ( 0 );
-      }
-      QLabel *info = box->findChild<QLabel*>("qt_msgbox_informativelabel");
-      if (info) {
-         info->setAutoFillBackground(true);
-         QPalette pal = info->palette();
-         QColor c = pal.color(QPalette::Base);
-         c.setAlpha(220);
-         pal.setColor(QPalette::Base, c);
-         c = Colors::mid(pal.color(QPalette::Base), pal.color(QPalette::Text),1,3);
-         pal.setColor(QPalette::Text, c);
-         info->setPalette(pal);
-         info->setBackgroundRole(QPalette::Base);
-         info->setForegroundRole(QPalette::Text);
-         info->setMargin(4);
-      }
-      return false;
-   }
-   default:
-      return false;
-   }
-   return false;
+                    QString newText = text->text();
+                    if (newText.contains("<qt>"))
+                    {
+                        newText.replace(QRegExp("^(<qt>)*"), head);
+                        if (!newText.endsWith("</qt>"))
+                            newText.append("</qt>");
+                    }
+                    else
+                        newText.prepend(head);
+                    text->setText(newText);
+                }
+            }
+        }
+        if (QLabel *info = box->findChild<QLabel*>("qt_msgbox_informativelabel"))
+        {
+            info->setAutoFillBackground(true);
+            QPalette pal = info->palette();
+            QColor c = pal.color(QPalette::Base);
+            c.setAlpha(220);
+            pal.setColor(QPalette::Base, c);
+            c = Colors::mid(pal.color(QPalette::Base), pal.color(QPalette::Text),1,3);
+            pal.setColor(QPalette::Text, c);
+            info->setPalette(pal);
+            info->setBackgroundRole(QPalette::Base);
+            info->setForegroundRole(QPalette::Text);
+            info->setMargin(4);
+        }
+        return false;
+    }
+    default:
+        return false;
+    }
+    return false;
 }
 
 static bool
