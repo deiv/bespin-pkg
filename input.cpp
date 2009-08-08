@@ -48,11 +48,10 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
 {
     // spinboxes and combos allready have a lineedit as global frame
     // TODO: exclude Q3Combo??
-    if (qstyleoption_cast<const QStyleOptionFrame *>(option) &&
-        static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1)
+    if (qstyleoption_cast<const QStyleOptionFrame*>(option) && static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1)
     {
-        if (widget && widget->parentWidget() && ( qobject_cast<QComboBox*>(widget->parentWidget()) ||
-            widget->parentWidget()->inherits("QAbstractSpinBox")))
+        if (widget && widget->parentWidget() &&
+            ( qobject_cast<QComboBox*>(widget->parentWidget()) || widget->parentWidget()->inherits("QAbstractSpinBox")))
             return;
         painter->fillRect(RECT, FCOLOR(Base));
         return;
@@ -81,6 +80,8 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
 //          Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
             mask.outline(r, painter, c, F(3));
         }
+        else if (r.height() > 2*option->fontMetrics.height()) // no lineEdit... like some input frames in QWebKit
+            mask.render(r, painter, FCOLOR(Base));
         else
         {
 //             r.setBottom(r.y() + r.height()/2);
