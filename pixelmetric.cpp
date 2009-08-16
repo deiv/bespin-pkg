@@ -204,7 +204,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_DefaultLayoutSpacing: //
         return F(4);
     case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize
-        return 22;
+        return config.btn.toolConnected ? 16 : 22;
     case PM_SmallIconSize: // Default small icon size
         return 16;
     case PM_LargeIconSize: // Default large icon size

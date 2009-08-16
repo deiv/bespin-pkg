@@ -178,7 +178,7 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
         else
             h = contentsSize.height() + F(6);
         if (config.btn.toolConnected)
-            h += F(2);
+            h += F(4);
             
         w = qMax(contentsSize.width()+F(4), h*4/3-F(4)); // 4/3 - 16/9
     //      w = contentsSize.width()+F(8);
