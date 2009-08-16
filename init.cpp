@@ -265,6 +265,8 @@ Style::readSettings(const QSettings* settings)
     // Choosers ===========================
     GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
 
+    config.btn.toolConnected = readBool(BTN_CONNECTED_TOOLS);
+
     // kwin - yes i let the style control the deco, iff the deco permits, though :)
     config.kwin.gradient[0] = readGrad(KWIN_INACTIVE_GRADIENT);
     config.kwin.gradient[1] = readGrad(KWIN_ACTIVE_GRADIENT);

@@ -58,11 +58,12 @@ session()
     if (qSession == "gnome") return GNOME;
     return Unkown;
 }
-
+// #include <QtDebug>
 #define MODAL_DIALOG 1
 static QString
 dialog(QWidget *parent, Session ses, const QStringList &args, const QString &dir )
 {
+//     qDebug() << parent << args;
 #if MODAL_DIALOG
     QWidget modal;
     modal.setAttribute( Qt::WA_NoChildEventsForParent, true );
@@ -75,7 +76,7 @@ dialog(QWidget *parent, Session ses, const QStringList &args, const QString &dir
 
     proc.setWorkingDirectory( dir );
     proc.start( ses == KDE ? "kdialog" : "zenity", args );
-    proc.waitForFinished( -1 );
+    proc.waitForFinished( -1 /*5*60*1000*/ );
 
     QString result;
     if ( proc.error() == QProcess::UnknownError )
@@ -139,7 +140,7 @@ static QString
 simpleFilter( const QString& filter )
 {
     if ( filter.isEmpty() )
-        return "*.*";
+        return "*";
     
     QStringList list = filter.split( ';', QString::SkipEmptyParts );
     for ( int i = 0; i < list.count(); ++i )

@@ -16,7 +16,8 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <QAbstractButton>
+#include <QToolBar>
+#include <QToolButton>
 #include "oxrender.h"
 #include "draw.h"
 #include "animator/hover.h"
@@ -86,7 +87,7 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
     step = Animator::Hover::step(widget);
 
     // frame around whole button
-    if (option->state & State_On)
+    if (config.btn.toolConnected || option->state & State_On)
     {
         QStyleOption tool(0);
         tool.palette = toolbutton->palette;
@@ -122,22 +123,89 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
 void
 Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-    OPT_ENABLED;
+    OPT_ENABLED OPT_SUNKEN
+
+    QRect rect = RECT;
+    if (config.btn.toolConnected && widget && widget->parentWidget() &&
+        !widget->inherits("QDockWidgetTitleButton"))
+    {
+        OPT_HOVER
+        const bool round = config.btn.round;
+
+        if (!hover)
+            sunken = sunken || (option->state & State_On);
+        
+        if (hover && !sunken)
+            sunken = false;
+        
+        QColor c = Colors::bg(PAL, widget);
+        if (isEnabled && !sunken)
+        {
+            if (Colors::value(c) < 50)
+                { int h,s,v,a; c.getHsv(&h, &s, &v, &a); c.setHsv(h, s, 50, a); }
+            c = Colors::mid(c, FCOLOR(WindowText), 8*6, step);
+        }
+
+        // shape
+        const int d = 1;
+        int pf = Tile::Full;
+        Qt::Orientation o = Qt::Horizontal;
+        if (QToolBar *tb = qobject_cast<QToolBar*>(widget->parentWidget()))
+            o = tb->orientation();
+        QRect geo = widget->geometry();
+        if (o == Qt::Horizontal)
+        {
+            if (qobject_cast<QToolButton*>(widget->parentWidget()->childAt(geo.x()-d, geo.y())))
+                pf &= ~Tile::Left;
+            if (qobject_cast<QToolButton*>(widget->parentWidget()->childAt(geo.right()+d, geo.y())))
+                pf &= ~Tile::Right;
+        }
+        else
+        {
+            if (qobject_cast<QToolButton*>(widget->parentWidget()->childAt(geo.x(), geo.y()-d)))
+                pf &= ~Tile::Top;
+            if (qobject_cast<QToolButton*>(widget->parentWidget()->childAt(geo.x(), geo.bottom()+d)))
+                pf &= ~Tile::Bottom;
+        }
+        
+        Tile::setShape(pf);
+        // shadow
+        if (pf & Tile::Top)
+            rect.adjust(0, F(1), 0, 0);
+        shadows.raised[round][true][false].render(rect, painter);
+        
+        // plate
+        rect.adjust((pf & Tile::Left) ? F(2) : 0, (pf & Tile::Top) ? F(1) : 0,
+                    (pf & Tile::Right) ? -F(1) : 0, (pf & Tile::Bottom) ? -F(3) : 0);
+        
+        masks.rect[round].render(rect, painter, GRAD(btn), (o == Qt::Horizontal) ? Qt::Vertical : Qt::Horizontal, c);
+        
+        // outline
+        if (Gradients::isReflective(GRAD(btn)))
+        {
+            rect.adjust((pf & Tile::Left) ? F(1) : 0, (pf & Tile::Top) ? F(1) : 0,
+                        (pf & Tile::Right) ? -F(1) : 0, (pf & Tile::Bottom) ? -F(1) : 0);
+            const int ratio = 6 * (255-Colors::value(c));
+            masks.rect[round].outline(rect, painter, Colors::mid(c, Qt::white, ratio, 255), F(1));
+        }
+        Tile::reset();
+    }
+    else
+        sunken = (option->state & State_On);
 
     if (!isEnabled)
         return;
 
-    const bool isOn = option->state & State_On;
-    if (isOn)
+    if (sunken)
     {
         if (widget && widget->testAttribute(Qt::WA_StyleSheet))
-            masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, QColor(128,128,128,128));
+            masks.rect[true].render(rect, painter, Gradients::Sunken, Qt::Vertical, QColor(128,128,128,128));
         else
         {
             const QColor &c = Colors::bg(PAL, widget);
-            masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, c);
+            masks.rect[true].render(rect, painter, Gradients::Sunken, Qt::Vertical, c);
         }
-        shadows.sunken[true][true].render(RECT, painter);
+        shadows.sunken[true][true].render(rect, painter);
     }
 }
 
@@ -162,7 +230,7 @@ icon(QPixmap &pix, int step)
     FX::blend(scaledIcon, emptyIcon, quote);
     return emptyIcon;
 }
-#include <QtDebug>
+
 void
 Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -229,7 +297,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
             pm = QPixmap::fromImage(img);
         }
 #endif
-        else if (step && !sunken && !pm.isNull())
+        else if (step && !(config.btn.toolConnected || sunken || pm.isNull()))
             pm = icon(pm, step);
         pmSize = pm.size();
     }
@@ -285,8 +353,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
 }
 
 void
-Style::drawToolBarHandle(const QStyleOption * option, QPainter * painter,
-                               const QWidget *) const
+Style::drawToolBarHandle(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
 
     OPT_HOVER
@@ -321,7 +388,7 @@ Style::drawToolBarHandle(const QStyleOption * option, QPainter * painter,
     painter->drawEllipse(rect);
     if (line)
     {
-        const int f1 = dpi.f1;
+        const int f1 = F(1);
         rect.adjust(f1,f1,-f1,-f1);
         painter->setBrush(Gradients::pix(c, rect.height(), Qt::Vertical, Gradients::Sunken));
         rect.translate(-dx,-dy);

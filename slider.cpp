@@ -66,14 +66,12 @@ Style::drawSlider(const QStyleOptionComplex *option, QPainter *painter, const QW
         int ticks = slider->tickPosition;
         if (ticks != QSlider::NoTicks)
         {
-
             int available = pixelMetric(PM_SliderSpaceAvailable, slider, widget);
             int interval = slider->tickInterval;
             if (interval < 1) interval = slider->pageStep;
             if (interval)
             {
-//             const int thickness =
-//                pixelMetric(PM_SliderControlThickness, slider, widget);
+//             const int thickness = pixelMetric(PM_SliderControlThickness, slider, widget);
                 const int len =
                 pixelMetric(PM_SliderLength, slider, widget);
                 const int fudge = len / 2;
@@ -132,100 +130,33 @@ while (v <= slider->maximum) { \
         grooveOpt.rect = groove;
 
         const Groove::Mode gType = config.scroll.groove;
-        if (gType) config.scroll.groove = Groove::Groove;
+        if (gType)
+            config.scroll.groove = Groove::Groove;
         drawScrollBarGroove(&grooveOpt, painter, widget);
         config.scroll.groove = gType;
-#if 0   // NOTICE would be thermometer...
-        painter->save();
 
-        QRect r;
-        const QColor c = Colors::mid(FCOLOR(Window), CONF_COLOR(progress.std, 0), 3,1);
-        if ( slider->orientation == Qt::Horizontal ) {
-
-            int y = groove.center().y();
-            painter->setPen(FCOLOR(Window).dark(115));
-            painter->drawLine(groove.x(),y,groove.right(),y);
-            ++y;
-            painter->setPen(FCOLOR(Window).light(108));
-            painter->drawLine(groove.x(),y,groove.right(),y);
-
-            // the "temperature"
-            if (slider->sliderPosition != ground &&
-                slider->maximum > slider->minimum) {
-                --y;
-
-                int groundX = groove.width() * (ground - slider->minimum) /
-                (slider->maximum - slider->minimum);
-                bool rightSide = slider->sliderPosition > ground;
-
-                if (slider->upsideDown) {
-                rightSide = !rightSide;
-                groundX = groove.right() - groundX;
-                }
-                else
-                groundX += groove.left();
-
-                if (rightSide) {
-                groove.setLeft(groundX);
-                groove.setRight(handle.center().x());
-                }
-                else {
-                groove.setLeft(handle.center().x());
-                groove.setRight(groundX);
-                }
-                painter->setPen(c.dark(115));
-                painter->drawLine(groove.x(), y, groove.right(), y);
-                ++y;
-                painter->setPen(c.light(108));
-                painter->drawLine(groove.x(), y, groove.right(), y);
+#if 0
+        // thermometer, #2
+        if (slider->minimum == 0 && slider->sliderPosition != slider->minimum)
+        {
+            SAVE_PEN;
+            painter->setPen(QPen(FCOLOR(Highlight), gType ? F(2) : F(1)));
+            if ( slider->orientation == Qt::Horizontal )
+            {
+                const int y = groove.center().y() + (gType ? 1 : 0);
+                bool ltr = slider->direction == Qt::LeftToRight;
+                if (slider->upsideDown) ltr = !ltr;
+                const int x2 = ltr ? groove.left() + F(4) : groove.right() - F(4);
+                painter->drawLine(handle.center().x(), y, x2, y);
             }
-        }
-        else { // Vertical
-
-            int x = groove.center().x();
-            painter->setPen(FCOLOR(Window).dark(115));
-            painter->drawLine(x, groove.y(), x, groove.bottom());
-            ++x;
-            painter->setPen(FCOLOR(Window).light(108));
-            painter->drawLine(x, groove.y(), x, groove.bottom());
-
-            // the "temperature"
-            if (slider->sliderPosition != ground &&
-                slider->maximum > slider->minimum) {
-                --x;
-
-                int groundY = groove.height() * (ground - slider->minimum) /
-                (slider->maximum - slider->minimum);
-                bool upside = slider->sliderPosition > ground;
-
-                if (slider->upsideDown) {
-                upside = !upside;
-                groundY = groove.bottom() - groundY;
-                }
-                else
-                groundY += groove.top();
-
-                if (upside) {
-                groove.setBottom(handle.center().y());
-                groove.setTop(groundY);
-                }
-                else {
-                groove.setBottom(groundY);
-                groove.setTop(handle.center().y());
-                }
-
-                painter->setPen(c.dark(115));
-                painter->drawLine(x, groove.y(), x, groove.bottom());
-                ++x;
-                painter->setPen(c.light(108));
-                painter->drawLine(x, groove.y(), x, groove.bottom());
-
+            else
+            {
+                const int x = groove.center().x();
+                const int y2 = slider->upsideDown ? groove.bottom() - F(4) : groove.top() + F(4);
+                painter->drawLine(x, handle.center().y(), x, y2);
             }
-            // for later (cosmetic)
-            if (!slider->upsideDown)
-                handle.translate(dpi.f6, 0);
+            RESTORE_PEN;
         }
-        painter->restore();
 #endif
     }
 
@@ -241,17 +172,14 @@ while (v <= slider->maximum) { \
             step = 6;
         else if (isEnabled)
         {
-            const Animator::ComplexInfo *info =
-                Animator::HoverComplex::info(widget, slider->activeSubControls & SC_SliderHandle);
-            if (info && (   info->fades[Animator::In] & SC_SliderHandle ||
-                            info->fades[Animator::Out] & SC_SliderHandle))
+            const Animator::ComplexInfo *info = Animator::HoverComplex::info(widget, slider->activeSubControls & SC_SliderHandle);
+            if (info && ( info->fades[Animator::In] & SC_SliderHandle || info->fades[Animator::Out] & SC_SliderHandle ))
                 step = info->step(SC_SliderHandle);
             if (hover && !step)
                 step = 6;
         }
 
-    drawSliderHandle(handle, option, painter, step);
-
+        drawSliderHandle(handle, option, painter, step);
     }
 }
 

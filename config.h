@@ -43,6 +43,7 @@ typedef struct Config
     struct btn
     {
         int disabledToolStyle;
+        bool toolConnected;
         int layer;
         Check::Type checkType;
         bool cushion, fullHover, backLightHover, ambientLight, bevelEnds, round;

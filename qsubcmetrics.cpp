@@ -290,37 +290,33 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
          int tickOffset = pixelMetric(PM_SliderTickmarkOffset, slider, widget);
          int thickness = pixelMetric(PM_SliderControlThickness, slider, widget);
          
-         switch (subControl) {
-         case SC_SliderHandle: {
+         switch (subControl)
+         {
+         case SC_SliderHandle:
+         {
             int sliderPos = 0;
             int len = pixelMetric(PM_SliderLength, slider, widget);
             bool horizontal = slider->orientation == Qt::Horizontal;
-            sliderPos =
-               sliderPositionFromValue(slider->minimum, slider->maximum,
-                                       slider->sliderPosition,
-                                       (horizontal ? slider->rect.width() :
-                                        slider->rect.height()) - len,
-                                       slider->upsideDown);
+            sliderPos = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition,
+                                                (horizontal ? RECT.width() : RECT.height()) - len, slider->upsideDown);
             if (horizontal)
-               ret.setRect(slider->rect.x() + sliderPos, slider->rect.y() + tickOffset, len, thickness);
+               ret.setRect(RECT.x() + sliderPos, RECT.y() + tickOffset, len, thickness);
             else
-               ret.setRect(slider->rect.x() + tickOffset, slider->rect.y() + sliderPos, thickness, len);
+                ret.setRect(RECT.x() + tickOffset, RECT.y() + sliderPos, thickness, len);
             break;
          }
-         case SC_SliderGroove: {
-            const int d = (thickness-dpi.f2)/3;
+         case SC_SliderGroove:
+         {
+            const int d = (thickness-F(2))/3;
             if (slider->orientation == Qt::Horizontal)
-               ret.setRect(slider->rect.x(), slider->rect.y() + tickOffset + d,
-                           slider->rect.width(), thickness-(2*d+dpi.f2));
+               ret.setRect(RECT.x(), RECT.y() + tickOffset + d, RECT.width(), thickness-(2*d+F(2)));
             else
-               ret.setRect(slider->rect.x() + tickOffset + d + dpi.f1,
-                           slider->rect.y(), thickness-(2*d+dpi.f1),
-                           slider->rect.height());
+               ret.setRect(RECT.x() + tickOffset + d + F(1), RECT.y(), thickness-(2*d+F(1)), RECT.height());
             break;
          }
          default:
             break;
-         ret = visualRect(slider->direction, slider->rect, ret);
+         ret = visualRect(slider->direction, RECT, ret);
          }
       }
       break;
