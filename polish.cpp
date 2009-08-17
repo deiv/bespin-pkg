@@ -37,10 +37,10 @@
 
 #include "colors.h"
 
-#ifdef Q_WS_X11
-#if QT_VERSION < 0x040400
 #include <unistd.h>
-#endif
+#include <cmath>
+
+#ifdef Q_WS_X11
 #include "macmenu.h"
 #include "xproperty.h"
 #endif
@@ -130,10 +130,22 @@ void Style::polish( QPalette &pal, bool onInit )
         pal.setColor(QPalette::Light, QColor(240,240,240));
 
         // Link colors can not be set through qtconfig - and the colors suck
-        pal.setColor(QPalette::Link, Colors::mid(pal.color(QPalette::Active, QPalette::Text),
-                                                 pal.color(QPalette::Active, QPalette::Highlight), 1, 8));
-        pal.setColor(QPalette::LinkVisited, Colors::mid(pal.color(QPalette::Active, QPalette::Text),
-                                                        pal.color(QPalette::Active, QPalette::Highlight), 1, 4));
+        QColor link = pal.color(QPalette::Active, QPalette::Highlight);
+        const int vwt = Colors::value(pal.color(QPalette::Active, QPalette::Window));
+        const int vt = Colors::value(pal.color(QPalette::Active, QPalette::Base));
+        int h,s,v; link.getHsv(&h,&s,&v);
+        s = sqrt(s/255.0)*255.0;
+        if (vwt > 200 && vt > 200)
+            v = 3*v/4;
+        else if (vwt < 85 && vt < 85)
+            v = qMin(255, 7*v/6);
+        link.setHsv(h, s, v);
+        
+        pal.setColor(QPalette::Link, link);
+
+        link = Colors::mid(link, Colors::mid(pal.color(QPalette::Active, QPalette::Text),
+                                             pal.color(QPalette::Active, QPalette::WindowText)), 4, 1);
+        pal.setColor(QPalette::LinkVisited, link);
 
 #if QT_VERSION >= 0x040400
         // tooltip (NOTICE not configurable by qtconfig, kde can, let's see what we're gonna do on this...)
