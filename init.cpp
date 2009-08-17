@@ -266,6 +266,9 @@ Style::readSettings(const QSettings* settings)
     GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
 
     config.btn.toolConnected = readBool(BTN_CONNECTED_TOOLS);
+    config.btn.toolSunken = false;
+    if (config.btn.toolConnected)
+        config.btn.toolSunken = readBool(BTN_SUNKEN_TOOLS);
 
     // kwin - yes i let the style control the deco, iff the deco permits, though :)
     config.kwin.gradient[0] = readGrad(KWIN_INACTIVE_GRADIENT);

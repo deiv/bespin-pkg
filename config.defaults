@@ -48,6 +48,7 @@
 #define BTN_AMBIENTLIGHT "Btn.AmbientLight", true
 #define BTN_BEVEL_ENDS "Btn.BevelEnds", false
 #define BTN_ROUND "Btn.Round", false
+#define BTN_SUNKEN_TOOLS "Btn.ToolSunken", false
    
 #define CHOOSER_GRADIENT "Chooser.Gradient", Gradients::Sunken
 

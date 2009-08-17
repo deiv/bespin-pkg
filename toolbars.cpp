@@ -130,18 +130,15 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         !widget->inherits("QDockWidgetTitleButton"))
     {
         OPT_SUNKEN
-        const bool round = false; //config.btn.round;
+        const bool round = config.btn.toolSunken;
         
         QColor c = (option->state & State_On) ? FCOLOR(Highlight) : Colors::bg(PAL, widget);
-        if (isEnabled && !sunken)
+        if (Colors::value(c) < 50)
+            { int h,s,v,a; c.getHsv(&h, &s, &v, &a); c.setHsv(h, s, 50, a); }
+        if (step)
         {
-            if (Colors::value(c) < 50)
-                { int h,s,v,a; c.getHsv(&h, &s, &v, &a); c.setHsv(h, s, 50, a); }
-            if (step)
-            {
-                QColor dest = (option->state & State_On) ? Colors::bg(PAL, widget) : FCOLOR(Highlight);
-                c = Colors::mid(c, dest, 18-step, step);
-            }
+            QColor dest = (option->state & State_On) ? Colors::bg(PAL, widget) : FCOLOR(Highlight);
+            c = Colors::mid(c, dest, 18-step, step);
         }
 
         // shape
@@ -165,29 +162,41 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
             if (qobject_cast<QToolButton*>(widget->parentWidget()->childAt(geo.x(), geo.bottom()+d)))
                 pf &= ~Tile::Bottom;
         }
-        
+
+        // paint
+        Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(btn);
+        o = (o == Qt::Horizontal) ? Qt::Vertical : Qt::Horizontal;
         Tile::setShape(pf);
-        // shadow
-        if (pf & Tile::Top)
-            rect.adjust(0, F(1), 0, 0);
-        shadows.raised[round][true][false].render(rect, painter);
-        
-        // plate
-        rect.adjust((pf & Tile::Left) ? F(2) : 0, (pf & Tile::Top) ? F(1) : 0,
-                    (pf & Tile::Right) ? -F(1) : 0, (pf & Tile::Bottom) ? -F(3) : 0);
-        
-        masks.rect[round].render(rect, painter, sunken ? Gradients::Sunken : GRAD(btn),
-                                 (o == Qt::Horizontal) ? Qt::Vertical : Qt::Horizontal, c);
-#if 0
-        // outline
-        if (Gradients::isReflective(GRAD(btn)))
+        if (config.btn.toolSunken)
         {
-            rect.adjust((pf & Tile::Left) ? F(1) : 0, (pf & Tile::Top) ? F(1) : 0,
-                        (pf & Tile::Right) ? -F(1) : 0, (pf & Tile::Bottom) ? -F(1) : 0);
-            const int ratio = 6 * (255-Colors::value(c));
-            masks.rect[round].outline(rect, painter, Colors::mid(c, Qt::white, ratio, 255), F(1));
+            if (pf & Tile::Bottom)
+                rect.setBottom(rect.bottom()-F(2));
+            masks.rect[round].render(rect, painter, gt, o, c);
+            shadows.sunken[round][true].render(RECT, painter);
         }
+        else
+        {
+            // shadow
+            if (pf & Tile::Top)
+                rect.adjust(0, F(1), 0, 0);
+            shadows.raised[round][true][false].render(rect, painter);
+            
+            // plate
+            rect.adjust((pf & Tile::Left) ? F(2) : 0, (pf & Tile::Top) ? F(1) : 0,
+                        (pf & Tile::Right) ? -F(1) : 0, (pf & Tile::Bottom) ? -F(3) : 0);
+                        
+            masks.rect[round].render(rect, painter, gt, o, c);
+#if 0
+            // outline
+            if (Gradients::isReflective(GRAD(btn)))
+            {
+                rect.adjust((pf & Tile::Left) ? F(1) : 0, (pf & Tile::Top) ? F(1) : 0,
+                (pf & Tile::Right) ? -F(1) : 0, (pf & Tile::Bottom) ? -F(1) : 0);
+                const int ratio = 6 * (255-Colors::value(c));
+                masks.rect[round].outline(rect, painter, Colors::mid(c, Qt::white, ratio, 255), F(1));
+            }
 #endif
+        }
         Tile::reset();
     }
     else if (isEnabled && (option->state & State_On))
@@ -247,9 +256,15 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
             role = config.menu.std_role[Fg]; // this is a f**** KMenu Header
     }
 
+    QColor text = PAL.color(role);
+    if (config.btn.toolConnected && (option->state & State_On))
+        text = FCOLOR(HighlightedText);
+
     if (justText)
     {   // the most simple way
-        painter->setPen(Colors::mid(PAL.color(role), FCOLOR(Highlight), 6-step, step));
+        if (!config.btn.toolConnected)
+            text = Colors::mid(text, FCOLOR(Highlight), 6-step, step);
+        painter->setPen(text);
         if (sunken)
             setBold(painter, toolbutton->text);
         drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, toolbutton->text);
@@ -298,10 +313,9 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     if (!(toolbutton->text.isEmpty() || toolbutton->toolButtonStyle == Qt::ToolButtonIconOnly))
     {
-        QColor c = PAL.color(role);
-        if (pm.isNull())
-            c = Colors::mid(c, FCOLOR(Highlight), 6-step, step);
-        painter->setPen(c);
+        if (!config.btn.toolConnected && pm.isNull())
+            text = Colors::mid(text, FCOLOR(Highlight), 6-step, step);
+        painter->setPen(text);
             
 //         QFont fnt = toolbutton->font;
 //         fnt.setStretch(QFont::SemiCondensed);
