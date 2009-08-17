@@ -23,6 +23,7 @@
 #include "animator/hover.h"
 
 static int step = 0;
+static bool connected = false;
 
 void
 Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
@@ -85,9 +86,10 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
     hover = isEnabled && (bflags & (State_Sunken | State_On | State_Raised | State_HasFocus));
 
     step = Animator::Hover::step(widget);
+    connected = (config.btn.toolConnected && widget && widget->parentWidget() && qobject_cast<QToolBar*>(widget->parentWidget()));
 
     // frame around whole button
-    if (config.btn.toolConnected || option->state & State_On)
+    if (connected || option->state & State_On)
     {
         QStyleOption tool(0);
         tool.palette = toolbutton->palette;
@@ -118,6 +120,8 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
    QStyleOptionToolButton label = *toolbutton;
    label.rect = button;
    drawToolButtonLabel(&label, painter, widget);
+   step = 0;
+   connected = false;
 }
 
 void
@@ -126,8 +130,7 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
     OPT_ENABLED
 
     QRect rect = RECT;
-    if (config.btn.toolConnected && widget && widget->parentWidget() &&
-        !widget->inherits("QDockWidgetTitleButton"))
+    if (connected && widget && widget->parentWidget())
     {
         OPT_SUNKEN
         const bool round = config.btn.toolSunken;
@@ -257,12 +260,12 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
     }
 
     QColor text = PAL.color(role);
-    if (config.btn.toolConnected && (option->state & State_On))
+    if (connected && (option->state & State_On))
         text = FCOLOR(HighlightedText);
 
     if (justText)
     {   // the most simple way
-        if (!config.btn.toolConnected)
+        if (!connected)
             text = Colors::mid(text, FCOLOR(Highlight), 6-step, step);
         painter->setPen(text);
         if (sunken)
@@ -306,14 +309,14 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
             pm = QPixmap::fromImage(img);
         }
 #endif
-        else if (step && !(config.btn.toolConnected || sunken || pm.isNull()))
+        else if (step && !(connected || sunken || pm.isNull()))
             pm = icon(pm, step);
         pmSize = pm.size();
     }
 
     if (!(toolbutton->text.isEmpty() || toolbutton->toolButtonStyle == Qt::ToolButtonIconOnly))
     {
-        if (!config.btn.toolConnected && pm.isNull())
+        if (!connected && pm.isNull())
             text = Colors::mid(text, FCOLOR(Highlight), 6-step, step);
         painter->setPen(text);
             
