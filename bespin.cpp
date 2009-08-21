@@ -965,7 +965,10 @@ Style::eventFilter( QObject *object, QEvent *ev )
             if (config.bg.modal.invert)
                 swapPalette(widget, this);
             if (config.bg.modal.glassy)
+            {
+                widget->setAttribute(Qt::WA_StyledBackground);
                 widget->setAttribute(Qt::WA_MacBrushedMetal);
+            }
 #ifdef Q_WS_X11
             setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
 #endif

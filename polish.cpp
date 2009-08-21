@@ -513,8 +513,9 @@ Style::polish( QWidget * widget )
 #endif
                 if (QTreeView* tv = qobject_cast<QTreeView*>(itemView))
                 {   // allow all treeviews to be animated! NOTICE: animation causes visual errors on non autofilling views...
-                    if (Hacks::config.treeViews && tv->viewport()->autoFillBackground() &&
-                    tv->viewport()->palette().color(tv->viewport()->backgroundRole()).alpha() > 200) // 255 would be perfect, though
+                    if (Hacks::config.treeViews &&
+                        tv->viewport()->autoFillBackground() &&
+                        tv->viewport()->palette().color(tv->viewport()->backgroundRole()).alpha() > 200) // 255 would be perfect, though
                     tv->setAnimated(true);
                 }
                 else

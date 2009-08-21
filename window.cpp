@@ -79,10 +79,6 @@ static QSize glasSize;
 void
 Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widget) const
 {
-    // cause of scrollbars - kinda optimization
-    if (config.bg.mode == Plain)
-        return;
-
     if (!(widget && widget->isWindow()))
         return; // can't do anything here
 
@@ -119,6 +115,10 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         painter->restore();
         return;
     }
+
+    // cause of scrollbars - kinda optimization
+    if (config.bg.mode == Plain)
+        return;
 
     bool translucent = false;
 #if 0
