@@ -453,7 +453,7 @@ Style::init(const QSettings* settings)
             appType = Dolphin;
         else if (appName == "be.shell")
             appType = BEshell;
-        else if (appName == "plasma" || appName == "plasma-desktop")
+        else if (appName == "plasma" || appName.startsWith("plasma-"))
             appType = Plasma;
         else if (appName == "krunner")
             appType = KRunner;
