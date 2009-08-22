@@ -291,7 +291,7 @@ Style::drawTree(const QStyleOptionComplex *option, QPainter *painter, const QWid
 
     QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
     if (widget)
-    { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
+        { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
     QColor  cLine = Colors::mid( COLOR(bg), COLOR(fg), 40, 1),
             cIndi = Colors::mid( COLOR(bg), COLOR(fg), 6, 1),
             cIndiOpen = Colors::mid( COLOR(bg), COLOR(fg) );
@@ -455,9 +455,8 @@ Style::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidg
     painter->restore();
 }
 
-
 void
-Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
+Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
 #if QT_VERSION >= 0x040400
     ASSURE_OPTION(item, ViewItemV4);
@@ -478,13 +477,35 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
     const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
     hover = hover && (!view || view->selectionMode() != QAbstractItemView::NoSelection);
     const bool selected = item->state & QStyle::State_Selected;
+    const QWidget *viewport = 0;
+    if (view)
+        viewport = view->viewport();
+    else if (!widget && painter->device())
+    {   // search the widget from the painter =P
+        if (painter->device()->devType() == QInternal::Widget)
+            widget = static_cast<QWidget*>(painter->device());
+        else
+        {
+            QPaintDevice *dev = QPainter::redirected(painter->device());
+            if (dev && dev->devType() == QInternal::Widget)
+                widget = static_cast<QWidget*>(dev);
+        }
+        if (widget && widget->objectName() == "qt_scrollarea_viewport")
+            viewport = widget;
+    }
+
     QPalette::ColorRole bg = QPalette::Base, fg = QPalette::Text;
-    if (view && view->viewport())
-        { bg = view->viewport()->backgroundRole(); fg = view->viewport()->foregroundRole(); }
+    if (viewport)
+    {
+        if (viewport->autoFillBackground())
+            { bg = viewport->backgroundRole(); fg = viewport->foregroundRole(); }
+        else
+            { bg = QPalette::Window; fg = QPalette::WindowText; }
+    }
     else if (widget)
         { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
 
-   // this could just leads to cluttered listviews...?!
+   // this could just leads to cluttered listviews...?!^
 //    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
 //    if (cg == QPalette::Normal && !(item->state & QStyle::State_Active))
 //       cg = QPalette::Inactive;
@@ -497,8 +518,25 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
         const bool single =  tree || view && view->selectionMode() == QAbstractItemView::SingleSelection;
         bool round = !tree; // looks ultimatly CRAP!
 #if QT_VERSION >= 0x040400
-        if  (item->viewItemPosition != QStyleOptionViewItemV4::OnlyOne)
-            round = false;
+        switch (item->viewItemPosition)
+        {
+            default:
+            case QStyleOptionViewItemV4::Invalid:
+                if (round) round = (bg == QPalette::Window);
+                break;
+            case QStyleOptionViewItemV4::OnlyOne:
+                break;
+            case QStyleOptionViewItemV4::Beginning:
+                if (round) Tile::setShape(Tile::Full & ~Tile::Left);
+                break;
+            case QStyleOptionViewItemV4::Middle:
+                round = false; break;
+            case QStyleOptionViewItemV4::End:
+                if (round) Tile::setShape(Tile::Full & ~Tile::Left);
+                break;
+        }
+//         if  (item->viewItemPosition != QStyleOptionViewItemV4::OnlyOne)
+//             round = false;
 #endif
 
         Gradients::Type gt = Gradients::None;
@@ -507,7 +545,11 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
             // TODO: obsolete now
             if (appType == KRunner)
                 return; // ahhh... this has annoyed me from the beginning on...
-            gt = hover ? Gradients::Button : Gradients::Sunken;
+
+            if (bg != QPalette::Window)
+                gt = hover ? Gradients::Button : Gradients::Sunken;
+            else if (selected)
+                gt = Gradients::Button;
         }
         else if (selected && single)
             gt =  Gradients::Button;
@@ -515,25 +557,32 @@ Style::drawItem(const QStyleOption * option, QPainter * painter, const QWidget *
         if (gt == Gradients::None)
         {
             const int contrast = qMax(1, Colors::contrast(FCOLOR(Highlight), COLOR(fg)));
-            const QColor high = selected ? FCOLOR(Highlight) :
-                                Colors::mid(COLOR(bg), FCOLOR(Highlight), 100/contrast, 4);
-            painter->fillRect(RECT, high);
+            const QColor high = selected ? FCOLOR(Highlight) : Colors::mid(COLOR(bg), FCOLOR(Highlight), 100/contrast, 4);
+            if (round)
+                masks.rect[true].render(RECT, painter, high);
+            else
+                painter->fillRect(RECT, high);
         }
         else
         {
             const QPixmap &fill = Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical, gt);
             if (round)
+            {
                 masks.rect[true].render(RECT, painter, fill);
+                if (selected && bg == QPalette::Window)
+                    shadows.sunken[true][true].render(RECT, painter);
+            }
             else
                 painter->drawTiledPixmap(RECT, fill);
         }
         // try to convince the itemview to use the proper fg color, WORKAROUND (kcategorizedview, mainly)
-        painter->setPen(FCOLOR(HighlightedText));
+        if (selected)
+            painter->setPen(FCOLOR(HighlightedText));
+        Tile::reset();
     }
     else
     {
 #if QT_VERSION >= 0x040400
-#warning Compiling with Qt4.4 - do NOT use with lower versions
         if (item->backgroundBrush.style() != Qt::NoBrush)
         {
             QPoint oldBO = painter->brushOrigin();
