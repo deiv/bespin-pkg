@@ -335,7 +335,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
             vertical ? rect.adjust(-F(1), F(2), F(1), -F(2)) : rect.adjust(F(2), -F(1), -F(2), F(1));
     }
     else
-        c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 8-animStep, animStep);
+        c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 10-animStep, animStep);
 
     Gradients::Type gt = GRAD(tab);
     // active tab has same color as inactive one, we must do sth. on the gradient...
