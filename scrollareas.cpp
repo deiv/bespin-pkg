@@ -353,20 +353,21 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
 {
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
     const bool horizontal = option->state & QStyle::State_Horizontal ||
-                            RECT.width() > RECT.height(); // at least opera doesn't propagate this
+                             // at least opera doesn't propagate this
+                             RECT.width() > RECT.height();
 
     if (isComboDropDownSlider)
     {   //gets a special slimmer and simpler look
-        QRect r;
+        QRect r = RECT;
         if (horizontal)
         {
             const int d = RECT.height()/3;
-            r = RECT.adjusted(F(2), d, -F(2), -d);
+            r.adjust(F(2), d, -F(2), -d);
         }
         else
         {
             const int d = RECT.width()/3;
-            r = RECT.adjusted(d, F(2), -d, -F(2));
+            r.adjust(d, F(2), -d, -F(2));
         }
         painter->save();
         painter->setPen(Qt::NoPen);
@@ -395,7 +396,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
 
     // --> we need to paint a slider
 
-    /// COLOR: the hover indicator (inside area)
+    // COLOR: the hover indicator (inside area)
 #define SCROLL_COLOR(_X_) btnBg(PAL, true, false, _X_, true, Gradients::isReflective(GRAD(scroll)))
     if (scrollAreaHovered_ && !widgetStep)
         widgetStep = 6;
@@ -421,7 +422,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     const int f1 = F(1), f2 = F(2);
     const bool grooveIsSunken = config.scroll.groove >= Groove::Sunken;
 
-    /// draw shadow
+    // draw shadow
     // clip away innper part of shadow - hey why paint invisible alpha stuff =D   --------
     bool hadClip = painter->hasClipping();
     QRegion oldClip;
@@ -455,16 +456,14 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         painter->setClipRegion(RECT);
     painter->setClipping(hadClip);
 
-    /// the always shown base
-    Qt::Orientation o; int size; Tile::PosFlags pf;
+    // the always shown base
+    Qt::Orientation o = Qt::Horizontal;
+    int size = r.width();
+    Tile::PosFlags pf = Tile::Left | Tile::Right;
     if (horizontal)
     {
         o = Qt::Vertical; size = r.height();
         pf = Tile::Top | Tile::Bottom;
-    }
-    else {
-        o = Qt::Horizontal; size = r.width();
-        pf = Tile::Left | Tile::Right;
     }
 
     QColor bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
@@ -478,15 +477,15 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     }
 #endif
 
-    /// the hover indicator (in case...)
+    // the hover indicator (in case...)
     if (config.btn.fullHover || !(hover || complexStep || widgetStep))
         return;
 
-    int dw, dh;
+    int dw = r.width(), dh = r.height();
     if (horizontal)
-        { dw = r.width()/8; dh = r.height()/4; }
+        { dw /= 8; dh /= 4; }
     else
-        { dw = r.width()/4; dh = r.height()/8; }
+        { dw /= 4; dh /= 8; }
     r.adjust(dw, dh, -dw, -dh);
     masks.rect[false].render(r, painter, GRAD(scroll), o, c, size, QPoint(dw,dh));
 }
