@@ -108,7 +108,9 @@ void Style::polish( QPalette &pal, bool onInit )
         c.getHsv(&h,&s,&v,&a);
         if (v < config.bg.minValue) // very dark colors won't make nice backgrounds ;)
             c.setHsv(h, s, config.bg.minValue, a);
-//         c.setAlpha(128);
+// #if BESPIN_ARGB_WINDOWS
+//         c.setAlpha(config.bg.opacity);
+// #endif
     }
     pal.setColor( QPalette::Window, c );
 
@@ -332,8 +334,9 @@ Style::polish( QWidget * widget )
 
         /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
         /// also doesn't work bgs get transparent and applying this to everythign causes funny sideeffects...
-#if 0 //QT_VERSION >= 0x040500
-        if (!(/*config.bg.opacity = 0xff ||*/ widget->inherits("QDesktopWidget") || widget->testAttribute(Qt::WA_TranslucentBackground)))
+#if BESPIN_ARGB_WINDOWS
+        if (!(config.bg.opacity == 0xff || widget->inherits("QDesktopWidget") ||
+              widget->testAttribute(Qt::WA_TranslucentBackground)))
         {
             widget->setAttribute(Qt::WA_TranslucentBackground);
         }
@@ -661,7 +664,11 @@ Style::polish( QWidget * widget )
         if (widget->inherits("QScrollBar"))
         {
             // TODO: find a general catch for the plasma problem
-            if (appType == Plasma) // yes - i currently don't know how to detect those things otherwise
+            if ((appType == Plasma) // yes - i currently don't know how to detect those things otherwise
+#if BESPIN_ARGB_WINDOWS
+                || (config.bg.opacity != 0xff)
+#endif
+                )
                 widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
             else
             {

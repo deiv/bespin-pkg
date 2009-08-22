@@ -123,12 +123,14 @@ main(int argc, char *argv[])
         {
             if (!QFile::exists(argv[i]))
             {
-                errors = true;
-                error(QString("The file %1 does not exist").arg(argv[i]));
+                return error(QString("The file %1 does not exist").arg(argv[i]));
             }
             else {
                 if (Config::sImport(argv[i], mode == Update).isNull())
+                {
+                    error(QString("Importing file %1 failed").arg(argv[i]));
                     errors = true;
+                }
             }
         }
         return errors;
@@ -184,7 +186,7 @@ main(int argc, char *argv[])
         if (title.isEmpty())
             title = "Bespin Demo";
 
-        char *preset;
+        char *preset = 0;
         if (mode == Show)
         {
             if (argc < 3)

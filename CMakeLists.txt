@@ -5,6 +5,7 @@ add_definitions( ${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} -DQT3_SUPPORT )
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules )
 
+option(ENABLE_ARGB "Enable translucent windows" OFF)
 option(ENABLE_KDE "Enable Bespin support for KDE4" ON)
 option(ENABLE_KWIN "Build Bespin KWin decoration" ON)
 option(ENABLE_XBAR "Enable the XBar plasmoid (Mac-Alike-Menubar)" ON)
@@ -12,6 +13,13 @@ option(ENABLE_XBAR "Enable the XBar plasmoid (Mac-Alike-Menubar)" ON)
 if (ENABLE_KDE)
     find_package(KDE4)
 endif (ENABLE_KDE)
+
+if (ENABLE_ARGB)
+    message (STATUS "WARNING: *** ARGB windows are experimental, performance might suffer ***")
+    add_definitions ( -DBESPIN_ARGB_WINDOWS=1 )
+else (KDE4_FOUND)
+    add_definitions ( -DBESPIN_ARGB_WINDOWS=0 )
+endif (ENABLE_ARGB)
 
 find_package(X11)
 

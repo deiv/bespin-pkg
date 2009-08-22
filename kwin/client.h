@@ -97,7 +97,7 @@ protected:
     QColor color(ColorType type, bool active=true) const;
     inline int buttonOpacity() const { return myButtonOpacity; }
     inline int buttonSize() const { return _factory->buttonSize(); }
-    void repaint(QPainter &p);
+    void repaint(QPainter &p, bool paintTitle = true);
     inline int slickButtons() const { return _factory->slickButtons(); }
     void tileWindow(bool more, bool vertical, bool mirrorGravity);
 private:

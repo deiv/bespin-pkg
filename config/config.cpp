@@ -296,6 +296,19 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     "3" is the default value for this entry*/
     handleSettings(ui.bgMode, BG_MODE);
     handleSettings(ui.bgIntensity, BG_INTENSITY);
+#if BESPIN_ARGB_WINDOWS
+    handleSettings(ui.bgOpacity, BG_OPACITY);
+    setContextHelp(ui.bgOpacity, "<b>Window Opacity</b><hr>\
+    Yes, it means you can have translucent windows, BUT:<br>\
+    - It's highly experimental (XP)<br>\
+    - Setting this < 255 will likely impact performance<br>\
+    - You need a running COMPOSITE manager<br>\
+    - And that's currently not tested at runtime");
+#else
+    ui.bgOpacity->hide();
+    ui.bgOpacityLabel->hide();
+    ui.bgOpacityNumber->hide();
+#endif
     handleSettings(ui.fadeInactive, FADE_INACTIVE);
     handleSettings(ui.structure, BG_STRUCTURE);
     handleSettings(ui.modalGlas, BG_MODAL_GLASSY);

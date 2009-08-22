@@ -96,7 +96,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_DockWidgetHandleExtent: // Width of the handle in a horizontal dock window and the height of the handle in a vertical dock window
         return F(6);
     case PM_DockWidgetFrameWidth: // Frame width of a dock window
-        return 0; // F(1)
+        return 0; //F(1);
     case PM_MenuBarPanelWidth: // Frame width of a menubar, defaults to PM_DefaultFrameWidth
         return 0;
     case PM_MenuBarItemSpacing: // Spacing between menubar items

@@ -32,6 +32,7 @@
 #define BG_MODAL_GLASSY "Bg.Modal.Glassy", true
 #define BG_MODAL_OPACITY "Bg.Modal.Opacity", 80
 #define BG_MODAL_INVERT "Bg.Modal.Invert", true
+#define BG_OPACITY "Bg.Opacity", 0xff
 #define BG_STRUCTURE "Bg.Structure", 0
 #define BG_TOOLTIP_ROLE "Bg.TooltipRole", QPalette::WindowText
 

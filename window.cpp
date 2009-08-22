@@ -83,7 +83,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         return; // can't do anything here
 
 //     if (widget->testAttribute(Qt::WA_NoSystemBackground))
-//         return; // those shall be translucent - but sould be catched by Qt
+//         return; // those shall be translucent - but should be catched by Qt
 
     const QPalette &pal = widget->palette();
     if (pal.brush(widget->backgroundRole()).style() > 1)
@@ -93,6 +93,21 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     QColor c = pal.color(widget->backgroundRole());
     if (c == Qt::transparent) // plasma uses this
         return;
+
+#if BESPIN_ARGB_WINDOWS
+    if (config.bg.opacity < c.alpha())
+        c.setAlpha(config.bg.opacity);
+#endif
+    bool translucent = false;
+    if (c.alpha() < 0xff)
+    {
+#if QT_VERSION >= 0x040500
+        if (widget->testAttribute(Qt::WA_TranslucentBackground))
+            translucent = true;
+        else
+#endif
+            c.setAlpha(0xff);
+    }
 
     if (widget->testAttribute(Qt::WA_MacBrushedMetal))
     {   // we just kinda abuse this mac only attribute... ;P
@@ -107,7 +122,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         }
         painter->save();
         painter->setPen(Qt::NoPen);
-        if (c.alpha() < 255)
+        if (c.alpha() < 0xff)
             painter->setBrush(QColor(255,255,255,32));
         else
             painter->setBrush(c.light(115-Colors::value(c)/20));
@@ -120,24 +135,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     if (config.bg.mode == Plain)
         return;
 
-    bool translucent = false;
-#if 0
-    const int alpha = 148;
-
-    if (c.alpha() == 0xff && /*config.bg.opacity*/ alpha < 0xff)
-        c.setAlpha(alpha);
-#endif    
-    if (c.alpha() < 0xff)
-    {
-#if QT_VERSION >= 0x040500
-        if ( widget->testAttribute(Qt::WA_TranslucentBackground))
-            translucent = true;
-        else
-#endif  
-            c.setAlpha(0xff);
-    }
-
-#if 0
+#if BESPIN_ARGB_WINDOWS
     if (translucent)
     {
         painter->fillRect(widget->rect(), c);

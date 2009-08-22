@@ -49,6 +49,11 @@ static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStri
         pal.setColor(group, (QPalette::ColorRole) i, list.at(i));
 }
 
+static int clamp(int x, int l, int u)
+{
+    return CLAMP(x,l,u);
+}
+
 static QStringList colors(const QPalette &pal, QPalette::ColorGroup group)
 {
     QStringList list;
@@ -147,7 +152,7 @@ Style::readSettings(const QSettings* settings)
         config.newWinBtns = true; // this is a kwin deco setting, TODO: read from there?
         
         Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));
-        Animator::Tab::setDuration(CLAMP(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));
+        Animator::Tab::setDuration(clamp(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));
         //END personal settings
         //NOTICE we do not end group here, but below. this way it's open if we don't make use of presets
         
@@ -224,7 +229,10 @@ Style::readSettings(const QSettings* settings)
     config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
     config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
     config.bg.modal.invert = (appType != KDM) && readBool(BG_MODAL_INVERT);
-    config.bg.intensity = CLAMP(100+readInt(BG_INTENSITY),30,300);
+    config.bg.intensity = clamp(100+readInt(BG_INTENSITY), 30, 300);
+#if BESPIN_ARGB_WINDOWS
+    config.bg.opacity = appType == KWin ? 0xff : clamp(readInt(BG_OPACITY), 0, 0xff);
+#endif
     readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 
 #if 0
@@ -250,7 +258,7 @@ Style::readSettings(const QSettings* settings)
         GRAD(btn) = Gradients::None;
 
     config.btn.backLightHover = readBool(BTN_BACKLIGHTHOVER);
-    config.btn.layer = CLAMP(readInt(BTN_LAYER), 0, 2);
+    config.btn.layer = clamp(readInt(BTN_LAYER), 0, 2);
     config.btn.fullHover = config.btn.backLightHover || readBool(BTN_FULLHOVER);
 
     if (config.btn.layer == 2) config.btn.cushion = true;
@@ -461,6 +469,8 @@ Style::init(const QSettings* settings)
             appType = KGet;
         else if (appName == "Designer")
             appType = QtDesigner;
+        else if (appName == "kwin")
+            appType = KWin;
         else if (appName.isEmpty() && !QCoreApplication::arguments().isEmpty())
         {
             appName = QCoreApplication::arguments().at(0).section('/', -1);

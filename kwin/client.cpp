@@ -291,7 +291,7 @@ Client::eventFilter(QObject *o, QEvent *e)
             p.setClipping(false);
             p.setClipRegion(clip);
             p.setFont(options()->font());
-            repaint(p);
+            repaint(p, false);
             p.end();
             
             // dump button BGs
@@ -455,8 +455,15 @@ Client::minimumSize() const
 }
 
 #define DUMP_PICTURE(_PREF_, _PICT_)\
-XRenderComposite(QX11Info::display(), PictOpSrc, _PICT_, 0, _PREF_##Buffer.x11PictureHandle(),\
-0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);
+if (bg.alpha() != 0xff){\
+    _PREF_##Buffer.detach();\
+    _PREF_##Buffer.fill(Qt::transparent);\
+    XRenderComposite(QX11Info::display(), PictOpOver, _PICT_, 0, _PREF_##Buffer.x11PictureHandle(),\
+    0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);\
+}\
+else\
+    XRenderComposite(QX11Info::display(), PictOpSrc, _PICT_, 0, _PREF_##Buffer.x11PictureHandle(),\
+    0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);\
 
 #if QT_VERSION < 0x040400
 // NOTICE: this is no really working substitute, as r.width() >> rx and roundness has only 100 deg...
@@ -464,7 +471,7 @@ XRenderComposite(QX11Info::display(), PictOpSrc, _PICT_, 0, _PREF_##Buffer.x11Pi
 #endif
 
 void
-Client::repaint(QPainter &p)
+Client::repaint(QPainter &p, bool paintTitle)
 {
     if (!Factory::initialized())
         return;
@@ -533,7 +540,8 @@ Client::repaint(QPainter &p)
             if (bgMode == 2)
             {
                 p.drawRect(left); p.drawRect(right);
-                
+                if (bg.alpha() != 0xff)
+                    { p.drawRect(top); p.drawRect(bottom); }
 #define tbWidth 32
 #define tbHeight 256
 #define lrcWidth 128
@@ -544,7 +552,7 @@ Client::repaint(QPainter &p)
                 s1 -= s2;
                 DUMP_PICTURE(tb, topTile);
                 p.drawTiledPixmap( 0, 0, width(), s2, tbBuffer, 0, s1 );
-                if (Colors::value(bg) < 245)
+                if (Colors::value(bg) < 245 && bg.alpha() == 0xff)
                 {   // no sense otherwise
                     const int w = width()/4 - 128;
                     if (w > 0)
@@ -580,6 +588,8 @@ Client::repaint(QPainter &p)
 #define lrcHeight 32
                 p.drawRect(top); // can be necessary for flat windows
                 p.drawRect(bottom);
+                if (bg.alpha() != 0xff)
+                    { p.drawRect(left); p.drawRect(right); }
                 int s1 = tbWidth;
                 int s2 = qMin(s1, (width()+1)/2);
                 const int h = qMin(128+32, height()/8);
@@ -619,7 +629,7 @@ Client::repaint(QPainter &p)
 //       p.drawLine(0,titleSize-1,width(),titleSize-1);
 
             Gradients::Type titleGradient = gType[isActive()];
-            if (titleGradient && label.width())
+            if (paintTitle && titleGradient && label.width())
             {   // nice deco
                 p.setRenderHint( QPainter::Antialiasing );
                 bg = color(ColorTitleBlend, isActive());
@@ -635,7 +645,7 @@ Client::repaint(QPainter &p)
     }
 
     
-    if (isShade())
+    if (paintTitle && isShade())
     {   // splitter
         QColor bg2 = color(ColorTitleBlend, isActive());
         p.setPen(Colors::mid(bg, Qt::black, 3, 1));
@@ -647,6 +657,8 @@ Client::repaint(QPainter &p)
     }
 
     // title ==============
+    if (paintTitle)
+    {
     const QColor titleColor = color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive());
     const int tf = config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
     if (isActive())
@@ -677,6 +689,7 @@ Client::repaint(QPainter &p)
     }
     p.setPen(titleColor);
     p.drawText ( label, tf, _caption );
+    }
 
     // bar =========================
     if (bgMode != 1)

@@ -548,16 +548,30 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
         data.style = (((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff));
         QColor bg = pal.color(QPalette::Inactive, QPalette::Window);
         bg = bg.light(115-Colors::value(bg)/20);
+#if BESPIN_ARGB_WINDOWS
+        bg.setAlpha(config.bg.opacity);
+#endif
         data.inactiveWindow = bg.rgba();
         bg = pal.color(QPalette::Active, QPalette::Window);
         bg = bg.light(115-Colors::value(bg)/20);
         data.activeWindow = bg.rgba();
+#if BESPIN_ARGB_WINDOWS
+        bg.setAlpha(config.bg.opacity);
+#endif
     }
     else
     {
         data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
-        data.inactiveWindow = pal.color(QPalette::Inactive, QPalette::Window).rgba();
-        data.activeWindow = pal.color(QPalette::Active, QPalette::Window).rgba();
+        QColor bg = pal.color(QPalette::Inactive, QPalette::Window);
+#if BESPIN_ARGB_WINDOWS
+        bg.setAlpha(config.bg.opacity);
+#endif
+        data.inactiveWindow = bg.rgba();
+        bg = pal.color(QPalette::Active, QPalette::Window);
+#if BESPIN_ARGB_WINDOWS
+        bg.setAlpha(config.bg.opacity);
+#endif
+        data.activeWindow = bg.rgba();
     }
     data.inactiveDeco = CCOLOR(kwin.inactive, Bg).rgba();
     data.activeDeco = CCOLOR(kwin.active, Bg).rgba();
@@ -757,7 +771,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::Move:
         return false; // just for performance - they can occur really often
     case QEvent::Paint:
-#if 0  //00
+#if BESPIN_ARGB_WINDOWS
+        if (config.bg.opacity != 0xff)
         if (QWidget *window = qobject_cast<QWidget*>(object))
         if (window->isWindow())
         {
