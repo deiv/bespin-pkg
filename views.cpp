@@ -505,6 +505,14 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
     else if (widget)
         { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
 
+    bool strongSelect = false;
+    if (bg == QPalette::Window)
+    {
+        strongSelect = true;
+        if (config.bg.modal.invert && widget && widget->window()->isModal())
+            { bg = QPalette::WindowText; fg = QPalette::Window; }
+    }
+
    // this could just leads to cluttered listviews...?!^
 //    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
 //    if (cg == QPalette::Normal && !(item->state & QStyle::State_Active))
@@ -522,7 +530,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         {
             default:
             case QStyleOptionViewItemV4::Invalid:
-                if (round) round = (bg == QPalette::Window);
+                if (round) round = strongSelect;
                 break;
             case QStyleOptionViewItemV4::OnlyOne:
                 break;
@@ -546,7 +554,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
             if (appType == KRunner)
                 return; // ahhh... this has annoyed me from the beginning on...
 
-            if (bg != QPalette::Window)
+            if (!strongSelect)
                 gt = hover ? Gradients::Button : Gradients::Sunken;
             else if (selected)
                 gt = Gradients::Button;
@@ -569,7 +577,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
             if (round)
             {
                 masks.rect[true].render(RECT, painter, fill);
-                if (selected && bg == QPalette::Window)
+                if (selected && strongSelect)
                     shadows.sunken[true][true].render(RECT, painter);
             }
             else
@@ -578,6 +586,8 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         // try to convince the itemview to use the proper fg color, WORKAROUND (kcategorizedview, mainly)
         if (selected)
             painter->setPen(FCOLOR(HighlightedText));
+        else
+            painter->setPen(COLOR(fg));
         Tile::reset();
     }
     else
@@ -593,6 +603,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
 #endif
         if (item->features & QStyleOptionViewItemV2::Alternate)
             painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
-        painter->setPen(COLOR(fg)); // reset the painter for normal items. our above workaround otherwise might kill things...
+        // reset the painter for normal items. our above workaround otherwise might kill things...
+        painter->setPen(COLOR(fg));
     }
 }
