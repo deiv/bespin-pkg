@@ -529,7 +529,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 //     if ( widget->windowFlags() & (Qt::SubWindow | Qt::X11BypassWindowManagerHint | Qt::FramelessWindowHint |
 //                                   (Qt::CustomizeWindowHint & ~Qt::WindowTitleHint)) )
 //         return;
-    if (appType == Plasma && !FX::usesXRender())
+    if ((appType == KWin) || (appType == Plasma && !FX::usesXRender()))
         return;
 //         qDebug() << widget;
 //         &&
@@ -543,36 +543,28 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 
     // the title region in the center
     WindowData data;
-    if (widget && widget->testAttribute(Qt::WA_MacBrushedMetal))
+    const bool glassy = (widget && widget->testAttribute(Qt::WA_MacBrushedMetal));
+    QColor bg = pal.color(QPalette::Inactive, QPalette::Window);
+    if (glassy)
     {
         data.style = (((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff));
-        QColor bg = pal.color(QPalette::Inactive, QPalette::Window);
         bg = bg.light(115-Colors::value(bg)/20);
-#if BESPIN_ARGB_WINDOWS
-        bg.setAlpha(config.bg.opacity);
-#endif
-        data.inactiveWindow = bg.rgba();
-        bg = pal.color(QPalette::Active, QPalette::Window);
-        bg = bg.light(115-Colors::value(bg)/20);
-        data.activeWindow = bg.rgba();
-#if BESPIN_ARGB_WINDOWS
-        bg.setAlpha(config.bg.opacity);
-#endif
     }
     else
-    {
         data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
-        QColor bg = pal.color(QPalette::Inactive, QPalette::Window);
 #if BESPIN_ARGB_WINDOWS
-        bg.setAlpha(config.bg.opacity);
+    bg.setAlpha(config.bg.opacity);
 #endif
-        data.inactiveWindow = bg.rgba();
-        bg = pal.color(QPalette::Active, QPalette::Window);
+    data.inactiveWindow = bg.rgba();
+    
+    bg = pal.color(QPalette::Active, QPalette::Window);
+    if (glassy)
+        bg = bg.light(115-Colors::value(bg)/20);
 #if BESPIN_ARGB_WINDOWS
-        bg.setAlpha(config.bg.opacity);
+    bg.setAlpha(config.bg.opacity);
 #endif
-        data.activeWindow = bg.rgba();
-    }
+    data.activeWindow = bg.rgba();
+
     data.inactiveDeco = CCOLOR(kwin.inactive, Bg).rgba();
     data.activeDeco = CCOLOR(kwin.active, Bg).rgba();
     data.inactiveText = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window), CCOLOR(kwin.text, Bg)).rgba();

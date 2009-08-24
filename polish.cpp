@@ -335,11 +335,10 @@ Style::polish( QWidget * widget )
         /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
         /// also doesn't work bgs get transparent and applying this to everythign causes funny sideeffects...
 #if BESPIN_ARGB_WINDOWS
-        if (!(config.bg.opacity == 0xff || widget->inherits("QDesktopWidget") ||
-              widget->testAttribute(Qt::WA_TranslucentBackground)))
-        {
+        if (!(  config.bg.opacity == 0xff || // opaque
+                widget->windowType() == Qt::Desktop || // makes no sense + QDesktopWidget is often misused
+                widget->testAttribute(Qt::WA_TranslucentBackground)))
             widget->setAttribute(Qt::WA_TranslucentBackground);
-        }
 #endif
         if (config.bg.mode > Plain)
         {
