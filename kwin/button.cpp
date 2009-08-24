@@ -381,7 +381,7 @@ Button::timerEvent ( QTimerEvent * )
     {
         zoomLevel += 2;
         if (zoomLevel > 5)
-            { killTimer(zoomTimer); zoomTimer = 0; }
+            { zoomLevel = 6; killTimer(zoomTimer); zoomTimer = 0; }
     }
     repaint();
 }
