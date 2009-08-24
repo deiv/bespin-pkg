@@ -236,7 +236,7 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
         return;
 
     // calculate chunk dimensions - minimal 16px or space for 10 chunks, maximal the progress thickness
-    int s = qMin(qMax(l/10, F(16)), t);
+    int s = qMin(qMax(l/15, F(16)), t);
     if (!s) return;
     
     int n = l/s;
@@ -368,7 +368,7 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
         return;
 
     // calculate chunk dimensions - minimal 16px or space for 10 chunks, maximal the progress thickness
-    int s = qMin(qMax(l/10, F(16)), t);
+    int s = qMin(qMax(l/10, F(16)), qMin(t, F(20)));
     if (!s) return;
     int ss = (3*s)/4;
     int n = l/s;

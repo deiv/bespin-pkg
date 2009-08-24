@@ -66,8 +66,8 @@ Progress::timerEvent(QTimerEvent * event)
         else if (*step == -1)
             *step = l/36-1;
 
-        int s = qMin(qMax(l / 10, 16), t/*16*t/10*/);
-        int ss = (10*s)/16;
+        int s = qMin(qMax(l / 10, 16), qMin(t, 20));
+        int ss = (3*s)/4;
         int n = l/s;
         if ( pb->orientation() == Qt::Vertical)
             { x = pb->rect().bottom(); x -= (l - n*s)/2 + ss; /*s = -s;*/ }

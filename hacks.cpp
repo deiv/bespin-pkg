@@ -1005,7 +1005,7 @@ Hacks::setKmixMask(int)
     if (pb->value() == pb->minimum())
     {
         const int sz = qMin(pb->width(), pb->height());
-        mask = QRegion( (pb->width()-sz)/2, (pb->height()-sz)/2, sz, sz, QRegion::Ellipse );
+        mask = QRegion( 0/*(pb->width()-sz)/2*/, (pb->height()-sz)/2, sz, sz, QRegion::Ellipse );
     }
     else
     {
@@ -1055,7 +1055,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
             if (pb->value() == pb->minimum())
             {
                 int sz = qMin(pb->width(), pb->height());
-                QRect r((pb->width()-sz)/2+1, (pb->height()-sz)/2+1, sz-1, sz-1);
+                QRect r(/*(pb->width()-sz)/2+*/1, (pb->height()-sz)/2+1, sz-1, sz-1);
                 p.setRenderHint(QPainter::Antialiasing);
                 p.drawEllipse(r);
                 p.setBrush(QColor(255,255,255,128));
