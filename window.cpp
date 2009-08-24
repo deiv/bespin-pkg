@@ -135,14 +135,6 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     if (config.bg.mode == Plain)
         return;
 
-#if BESPIN_ARGB_WINDOWS
-    if (translucent)
-    {
-        painter->fillRect(widget->rect(), c);
-        c = Qt::transparent;
-    }
-#endif
-
     if (config.bg.mode == Scanlines)
     {
         const bool light = (widget->windowFlags() & ((Qt::Tool | Qt::Popup) & ~Qt::Window));
@@ -154,6 +146,13 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         return;
     }
 
+    #if BESPIN_ARGB_WINDOWS
+    if (translucent)
+    {
+        painter->fillRect(widget->rect(), c);
+        c = Qt::transparent;
+    }
+    #endif
 
     // Complex part ===================
     const BgSet &set = Gradients::bgSet(c);

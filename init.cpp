@@ -232,6 +232,8 @@ Style::readSettings(const QSettings* settings)
     config.bg.intensity = clamp(100+readInt(BG_INTENSITY), 30, 300);
 #if BESPIN_ARGB_WINDOWS
     config.bg.opacity = (appType == KWin ? 0xff : clamp(readInt(BG_OPACITY), 0, 0xff));
+    if (config.bg.opacity != 0xff)
+        Animator::Tab::setTransition(Animator::Jump);
 #endif
     readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 

@@ -440,11 +440,13 @@ createDither()
 const QPixmap
 &Gradients::structure(const QColor &c, bool light)
 {
-    QPixmap *pix = _structure[light].object(c.rgb());
+    QPixmap *pix = _structure[light].object(c.rgba());
     if (pix)
         return *pix;
     
     pix = new QPixmap(64, 64);
+    if (c.alpha() != 0xff)
+        pix->fill(Qt::transparent);
 
     QPainter p(pix);
     int i;
@@ -452,7 +454,8 @@ const QPixmap
     {
     default:
     case 0: // scanlines
-        pix->fill( c.light(_bgIntensity).rgb() );
+        p.setPen(Qt::NoPen); p.setBrush( c.light(_bgIntensity) );
+        p.drawRect(pix->rect()); p.setBrush( Qt::NoBrush );
         i = 100 + (light?6:3)*(_bgIntensity - 100)/10;
         p.setPen(c.light(i));
         for ( i = 1; i < 64; i += 4 ) {
@@ -464,8 +467,8 @@ const QPixmap
             p.drawLine( 0, i, 63, i );
         break;
     case 1: //checkboard
-        p.setPen(Qt::NoPen);
         i = 100 + 2*(_bgIntensity - 100)/10;
+        p.setPen(Qt::NoPen);
         p.setBrush(c.light(i));
         p.drawRect(pix->rect());
         p.setBrush(c.dark(i));
@@ -481,7 +484,8 @@ const QPixmap
         break;
     case 2:  // fat scans
         i = (_bgIntensity - 100);
-        pix->fill( c.light(100+3*i/10).rgb() );
+        p.setPen(Qt::NoPen);
+        p.setBrush( c.light(100+3*i/10) );
         p.setPen(QPen(light ? c.light(100+i/10) : c, 2));
         p.setBrush( c.dark(100+2*i/10) );
         p.drawRect(-3,8,70,8);
@@ -491,7 +495,8 @@ const QPixmap
         break;
     case 3: // "blue"print
         i = (_bgIntensity - 100);
-        pix->fill( c.dark(100+i/10).rgb() );
+        p.setPen(Qt::NoPen); p.setBrush( c.dark(100+i/10) );
+        p.drawRect(pix->rect()); p.setBrush( Qt::NoBrush );
         p.setPen(c.light(100+(light?4:2)*i/10));
         for ( i = 0; i < 64; i += 16 )
             p.drawLine( 0, i, 63, i );
@@ -500,7 +505,8 @@ const QPixmap
         break;
     case 4: // verticals
         i = (_bgIntensity - 100);
-        pix->fill( c.light(100+i).rgb() );
+        p.setPen(Qt::NoPen); p.setBrush( c.light(100+i) );
+        p.drawRect(pix->rect()); p.setBrush( Qt::NoBrush );
         p.setPen(c.light(100+(light?6:3)*i/10));
         for ( i = 1; i < 64; i += 4 ) {
             p.drawLine( i, 0, i, 63 );
@@ -512,7 +518,8 @@ const QPixmap
         break;
     case 5: // diagonals
         i = 100 + (_bgIntensity - 100)/4;
-        pix->fill( c.light(i).rgb() );
+        p.setPen(Qt::NoPen); p.setBrush( c.light(i) );
+        p.drawRect(pix->rect()); p.setBrush( Qt::NoBrush );
         p.setPen(QPen(c.dark(i), 11));
         p.setRenderHint(QPainter::Antialiasing);
         p.drawLine(-64,64,64,-64);
@@ -599,7 +606,7 @@ const QPixmap
     }
     p.end();
 
-    if (_structure[light].insert(c.rgb(), pix, costs(pix)))
+    if (_structure[light].insert(c.rgba(), pix, costs(pix)))
         return *pix;
     return nullPix;
 }

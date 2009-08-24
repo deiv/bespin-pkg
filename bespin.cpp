@@ -769,7 +769,18 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (window->isWindow())
         {
             QPainter p(window);
-            drawWindowBg(0, &p, window);
+            if (config.bg.mode == Plain)
+            {
+                p.setPen(Qt::NoPen);
+                QColor c = window->palette().color(QPalette::Window);
+                c.setAlpha(config.bg.opacity);
+                p.setBrush(c);
+                p.setPen(Qt::NoPen);
+                p.drawRect(window->rect());
+                p.end();
+            }
+            else
+                drawWindowBg(0, &p, window);
             return false;
         }
 #endif
