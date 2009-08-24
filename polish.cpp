@@ -782,7 +782,7 @@ Style::polish( QWidget * widget )
         widget->setBackgroundRole(config.menu.bar_role[Bg]);
         widget->setForegroundRole(config.menu.bar_role[Fg]);
 #ifdef Q_WS_X11
-        if (!((appType == QtDesigner) && mbar->inherits("QDesignerMenuBar")))
+        if (!((appType == KDevelop) || (appType == QtDesigner) && mbar->inherits("QDesignerMenuBar")))
             MacMenu::manage(mbar);
 #endif
     }   

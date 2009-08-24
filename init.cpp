@@ -469,6 +469,8 @@ Style::init(const QSettings* settings)
             appType = KGet;
         else if (appName == "Designer")
             appType = QtDesigner;
+        else if (appName == "kdevelop")
+            appType = KDevelop;
         else if (appName == "kwin")
             appType = KWin;
         else if (appName.isEmpty() && !QCoreApplication::arguments().isEmpty())
