@@ -516,7 +516,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
         }
         else
         {
-            r.setRect(x + dpi.f5, y, h / 2, h / 2 - margin * 2);
+            r.setRect(x + F(5), y, h / 2, h / 2 - margin * 2);
             r = visualRect(option->direction, option->rect, r);
         }
         return r;
@@ -526,32 +526,36 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
     case SE_TabWidgetRightCorner:
         if HAVE_OPTION(twf, TabWidgetFrame)
         {
-            int off = 0, x = 0, y = 0;
+            const QSize &bar = twf->tabBarSize;
+            const QSize &corner = (element == SE_TabWidgetLeftCorner) ? twf->leftCornerWidgetSize : twf->rightCornerWidgetSize;
+            bool vertical = false;
+            QRect ret;
+            
             switch (twf->shape)
             {
-            case QTabBar::RoundedSouth:
-            case QTabBar::TriangularSouth:
-                y = twf->rect.bottom() - twf->tabBarSize.height();
             case QTabBar::RoundedNorth:
             case QTabBar::TriangularNorth:
-                off = twf->tabBarSize.height()/4;
-                if (element == SE_TabWidgetRightCorner)
-                x = twf->rect.right() - twf->tabBarSize.height();
-                break;
-            case QTabBar::RoundedEast:
-            case QTabBar::TriangularEast:
-                x = twf->rect.right() - twf->tabBarSize.width();
+                ret.setRect(RECT.x()+F(2), RECT.y(), corner.width(), bar.height()); break;
+            case QTabBar::RoundedSouth:
+            case QTabBar::TriangularSouth:
+                ret.setRect(RECT.x()+F(2), RECT.bottom()-bar.height(), corner.width(), bar.height()); break;
             case QTabBar::RoundedWest:
             case QTabBar::TriangularWest:
-                off = twf->tabBarSize.width()/4;
-                if (element == SE_TabWidgetRightCorner)
-                y = twf->rect.bottom() - twf->tabBarSize.width();
-            default:
-                break;
+                vertical = true;
+                ret.setRect(RECT.x(), RECT.y()+F(2), bar.width(), corner.height()); break;
+            case QTabBar::RoundedEast:
+            case QTabBar::TriangularEast:
+                vertical = true;
+                ret.setRect(RECT.right()-bar.width(), RECT.y()+F(2), bar.width(), corner.height()); break;
             }
-            off -= F(2); x +=off; y += off;
-            off = 2*(off+F(4));
-            return QRect(x,y,off,off);
+            if (element == SE_TabWidgetRightCorner)
+            {
+                if (vertical)
+                    ret.moveBottom(RECT.bottom()-F(2));
+                else
+                    ret.moveRight(RECT.right()-F(2));
+            }
+            return ret;
         }
     case SE_TabWidgetTabBar:
     {
