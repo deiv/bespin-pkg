@@ -279,7 +279,7 @@ private:
     int elementId(const QString &string) const;
     void generatePixmaps();
     void initMetrics();
-    void readSettings(const QSettings *settings = 0L);
+    void readSettings(const QSettings *settings = 0L, QString appName = QString());
     void registerRoutines();
     static bool isSpecialFrame(const QWidget *w);
     void erase(const QStyleOption*, QPainter*, const QWidget*, const QPoint *off = 0) const;

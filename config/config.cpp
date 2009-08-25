@@ -297,17 +297,19 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.bgMode, BG_MODE);
     handleSettings(ui.bgIntensity, BG_INTENSITY);
 #if BESPIN_ARGB_WINDOWS
-    handleSettings(ui.bgOpacity, BG_OPACITY);
-    setContextHelp(ui.bgOpacity, "<b>Window Opacity</b><hr>\
+    handleSettings(ui.argbOpacity, BG_OPACITY);
+    setContextHelp(ui.argbSupport, "<b>Window Opacity</b><hr>\
     Yes, it means you can have translucent windows, BUT:<br>\
-    - It's highly experimental (XP)<br>\
-    - Setting this < 255 will likely impact performance<br>\
+    - It's highly experimental<br>\
+    - Setting opacity < 255 will likely impact performance<br>\
     - You need a running COMPOSITE manager<br>\
     - And that's currently not tested at runtime");
+    handleSettings(ui.argbBlacklist, ARGB_BLACKLIST);
+    setContextHelp(ui.argbBlacklist, "<b>Blacklist</b><hr>\
+    Some apps just don't work too god with this. Add them to a comma separated list here.");
+    handleSettings(ui.argbGlassy, ARGB_GLASSY);
 #else
-    ui.bgOpacity->hide();
-    ui.bgOpacityLabel->hide();
-    ui.bgOpacityNumber->hide();
+    ui.argbSupport->hide();
 #endif
     handleSettings(ui.fadeInactive, FADE_INACTIVE);
     handleSettings(ui.structure, BG_STRUCTURE);
@@ -754,6 +756,7 @@ blackListed(QString &key)
 {
     return
         key.startsWith("Hack.") || // don't im/export hacks
+        key.startsWith("ARGB.") || // don't im/export ARGB stuff
         key == "FadeInactive" || // or dimmed inactive wins
         key == "Tab.Duration" || key == "Tab.Transition" || // or tab trans settings
         key == "MacStyle" || // or macfeeling

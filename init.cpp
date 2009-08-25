@@ -111,7 +111,7 @@ Style::removeAppEventFilter()
 }
 
 void
-Style::readSettings(const QSettings* settings)
+Style::readSettings(const QSettings* settings, QString appName)
 {
     bool delSettings = false;
 
@@ -233,7 +233,14 @@ Style::readSettings(const QSettings* settings)
 #if BESPIN_ARGB_WINDOWS
     config.bg.opacity = (appType == KWin ? 0xff : clamp(readInt(BG_OPACITY), 0, 0xff));
     if (config.bg.opacity != 0xff)
+    {
+        QStringList blacklist = iSettings->value(ARGB_BLACKLIST).toString().split(',', QString::SkipEmptyParts);
+        if (blacklist.contains(appName))
+            config.bg.opacity = 0xff;
+        else
+            config.bg.glassy = readBool(ARGB_GLASSY);
         Animator::Tab::setTransition(Animator::Jump);
+    }
 #endif
     readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 
@@ -450,6 +457,7 @@ Style::init(const QSettings* settings)
     QTime time; time.start();
     // various workarounds... ==========================
     appType = Unknown;
+    QString appName;
     if (getenv("OPERA_LD_PRELOAD"))
         appType = Opera;
     else if (!qApp->inherits("KApplication") && getenv("GTK_QT_ENGINE_ACTIVE"))
@@ -458,7 +466,7 @@ Style::init(const QSettings* settings)
         appType = KDM;
     else
     {
-        QString appName = QCoreApplication::applicationName();
+        appName = QCoreApplication::applicationName();
         if (appName == "dolphin")
             appType = Dolphin;
         else if (appName == "be.shell")
@@ -483,7 +491,7 @@ Style::init(const QSettings* settings)
         }
     }
     // ==========================
-    readSettings(settings);
+    readSettings(settings, appName);
     initMetrics();
     generatePixmaps();
     Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,

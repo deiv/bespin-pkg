@@ -317,7 +317,8 @@ Style::polish( QWidget * widget )
 //         qDebug() << "BESPIN" << widget;
 
 #ifdef MOUSEDEBUG
-   widget->installEventFilter(this);
+    widget->removeEventFilter(this);
+    widget->installEventFilter(this);
 #endif
 
     // NONONONONO!!!!! ;)
@@ -339,11 +340,16 @@ Style::polish( QWidget * widget )
                 widget->windowType() == Qt::Desktop || // makes no sense + QDesktopWidget is often misused
                 widget->testAttribute(Qt::WA_TranslucentBackground)))
             widget->setAttribute(Qt::WA_TranslucentBackground);
+        if (config.bg.opacity != 0xff && config.bg.glassy)
+            widget->setAttribute(Qt::WA_MacBrushedMetal);
 #endif
         if (config.bg.mode > Plain)
         {
-//             widget->removeEventFilter(this);
-//             widget->installEventFilter(this);
+            if (config.bg.opacity != 0xff)
+            {
+                widget->removeEventFilter(this);
+                widget->installEventFilter(this);
+            }
             widget->setAttribute(Qt::WA_StyledBackground);
         }
 
@@ -368,6 +374,7 @@ Style::polish( QWidget * widget )
                 setBoldFont(menu);
             
             // eventfiltering to reposition MDI windows and correct distance to menubars
+            menu->removeEventFilter(this);
             menu->installEventFilter(this);
 #if 0
             /// NOTE this was intended to be for some menu mock from nuno where the menu
@@ -397,8 +404,11 @@ Style::polish( QWidget * widget )
         else
         {
             if (config.bg.modal.invert || config.bg.modal.glassy || config.bg.modal.opacity < 100)
-            // the modality isn't necessarily set yet, so we catch it on QEvent::Show
+            {
+                // the modality isn't necessarily set yet, so we catch it on QEvent::Show
+                widget->removeEventFilter(this);
                 widget->installEventFilter(this); /// modal dialogs
+            }
 
             // talk to kwin about colors, gradients, etc.
             Qt::WindowFlags ignore =    Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::ToolTip |
@@ -408,6 +418,7 @@ Style::polish( QWidget * widget )
             
             if (!(widget->windowFlags() & ignore)) { // this can be expensive, so avoid for popups, combodrops etc.
                 setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
+                widget->removeEventFilter(this);
                 widget->installEventFilter(this); // catch palette changes for deco
             }
         }
@@ -450,7 +461,10 @@ Style::polish( QWidget * widget )
         {
             // Kill ugly line look (we paint our styled v and h lines instead ;)
             if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
+            {
+                widget->removeEventFilter(this);
                 widget->installEventFilter(this);
+            }
 
             // Kill ugly winblows frames... (qShadeBlablabla stuff)
             else if (frame->frameShape() != QFrame::StyledPanel)
@@ -507,8 +521,11 @@ Style::polish( QWidget * widget )
                 }
 
                 if (itemView->inherits("KCategorizedView"))
+                {
+                    itemView->removeEventFilter(this);
                     itemView->installEventFilter(this); // scrolldistance...
 //                     itemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+                }
 
 #if QT_VERSION >= 0x040500
                 itemView->viewport()->setAttribute(Qt::WA_Hover);
@@ -584,6 +601,7 @@ Style::polish( QWidget * widget )
                     pal.setColor(QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::Window));
                     pbtn->setPalette(pal);
                     pbtn->setCursor(Qt::PointingHandCursor);
+                    pbtn->removeEventFilter(this);
                     pbtn->installEventFilter(this);
                     widget->setAttribute(Qt::WA_Hover);
                 }
@@ -653,6 +671,7 @@ Style::polish( QWidget * widget )
     //BEGIN SLIDERS / SCROLLBARS / SCROLLAREAS - hovering/animation                                -
     else if (qobject_cast<QAbstractSlider*>(widget))
     {
+        widget->removeEventFilter(this);
         widget->installEventFilter(this); // finish animation
         
         widget->setAttribute(Qt::WA_Hover);
@@ -714,7 +733,10 @@ Style::polish( QWidget * widget )
 
 #if QT_VERSION >= 0x040500
         else if ( widget->inherits( "QTabWidget" ) )
+        {
+            widget->removeEventFilter(this);
             widget->installEventFilter( this );
+        }
 #endif
 
     //BEGIN Tab animation, painting override                                                       -
@@ -724,6 +746,7 @@ Style::polish( QWidget * widget )
         widget->setBackgroundRole(config.tab.std_role[0]);
         widget->setForegroundRole(config.tab.std_role[1]);
         // the eventfilter overtakes the widget painting to allow tabs ABOVE the tabbar
+        widget->removeEventFilter(this);
         widget->installEventFilter(this);
     }
 #if 0 // until kwin provides better shaodws
@@ -829,6 +852,7 @@ Style::polish( QWidget * widget )
     /// are set or KHtml does wrong OR (mainly) by html "designers"
     if (IS_HTML_WIDGET)
     {   // the eventfilter watches palette changes and ensures contrasted foregrounds...
+        widget->removeEventFilter(this);
         widget->installEventFilter(this);
         QEvent ev(QEvent::PaletteChange);
         eventFilter(widget, &ev);

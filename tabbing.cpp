@@ -351,7 +351,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
 }
 
 void
-Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
+Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget*widget) const
 {
     ASSURE_OPTION(tab, Tab);
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
