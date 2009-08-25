@@ -99,11 +99,12 @@ void
 Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(tbb, TabBarBase);
-
     QWidget *win = 0;
     // this has completely changed with recent KDE, KTabWidget doesn't call the style at all?!
     if (widget)
     {
+        if (widget->inherits("QLabel"))
+            return; // KDevelop does that... weird. (and of course /after/ painting the label string...)
         if (widget->parentWidget() && qobject_cast<QTabWidget*>(widget->parentWidget()))
         {
 #if 1 // QT_VERSION < 0x040500
@@ -351,7 +352,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
 }
 
 void
-Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget*widget) const
+Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
     ASSURE_OPTION(tab, Tab);
     OPT_SUNKEN OPT_ENABLED OPT_HOVER

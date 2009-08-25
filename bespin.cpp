@@ -803,6 +803,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             if (tabBar->testAttribute(Qt::WA_NoSystemBackground))
                 return false; // shall be translucent
+            if (!tabBar->drawBase())
+                return false;
             if (QTabWidget *tw = qobject_cast<QTabWidget*>(tabBar->parentWidget()))
             {   // no extra tabbar here please... unless the border is StyleShitted away ;)
                 if (tw->styleSheet().isEmpty())
@@ -810,7 +812,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 if ( !(tw->styleSheet().contains("pane", Qt::CaseInsensitive) && tw->styleSheet().contains("border", Qt::CaseInsensitive)) )
                     return false;
             }
-            
+
             QPainter p(tabBar);
             QStyleOptionTabBarBase opt;
             opt.initFrom(tabBar);

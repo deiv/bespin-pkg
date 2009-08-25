@@ -757,6 +757,7 @@ blackListed(QString &key)
     return
         key.startsWith("Hack.") || // don't im/export hacks
         key.startsWith("ARGB.") || // don't im/export ARGB stuff
+        key == "Bg.Opacity" || // or dimmed inactive wins
         key == "FadeInactive" || // or dimmed inactive wins
         key == "Tab.Duration" || key == "Tab.Transition" || // or tab trans settings
         key == "MacStyle" || // or macfeeling
