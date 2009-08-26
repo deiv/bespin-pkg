@@ -338,11 +338,11 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
         RESTORE_PEN;
     }
     else if (gType == Groove::Groove)
-        masks.rect[true].render(RECT, painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
+        masks.rect[round_].render(RECT, painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
     else
     {
         if (gType == Groove::SunkenGroove)
-            masks.rect[true].render(RECT.adjusted(0,0,0,-F(2)), painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
+            masks.rect[round_].render(RECT.adjusted(0,0,0,-F(2)), painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
         shadows.sunken[round_][isEnabled].render(RECT, painter);
     }
     return;
