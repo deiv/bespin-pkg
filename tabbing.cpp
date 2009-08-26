@@ -239,6 +239,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
             int index = -1, hoveredIndex = -1;
             if (widget)
             if (const QTabBar* tbar = qobject_cast<const QTabBar*>(widget))
+            if (tbar->drawBase())
             {
                 // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
                 index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
@@ -293,7 +294,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
 }
 
 void
-Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget *) const
+Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(tab, Tab);
     OPT_SUNKEN
@@ -327,8 +328,12 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         rect.adjust(F(1), F(3), -F(1), -F(4));
 
     QColor c;
+    bool noBase = false;
     if (sunken)
     {
+        if (const QTabBar *bar = qobject_cast<const QTabBar*>(widget))
+        if (!bar->drawBase())
+            noBase = true;
         c = CCOLOR(tab.active, Bg);
         if (config.tab.activeTabSunken && Colors::value(CCOLOR(tab.std, Bg)) < 164)
             vertical ?  rect.adjust(0, F(1), 0, -F(2)) : rect.adjust(F(2), -F(1), -F(2), 0);
@@ -344,7 +349,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         gt = (gt == Gradients::Sunken) ? Gradients::Simple : Gradients::Sunken;
         
     masks.rect[true].render(rect, painter, gt, o, c, size, rect.topLeft());
-    if (config.tab.activeTabSunken && sunken)
+    if ((config.tab.activeTabSunken || noBase) && sunken)
     {
         rect.setBottom(rect.bottom() + F(2));
         shadows.sunken[true][true].render(rect, painter);
