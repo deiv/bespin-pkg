@@ -137,9 +137,10 @@ void Style::polish( QPalette &pal, bool onInit )
         const int vt = Colors::value(pal.color(QPalette::Active, QPalette::Base));
         int h,s,v; link.getHsv(&h,&s,&v);
         s = sqrt(s/255.0)*255.0;
-        if (vwt > 200 && vt > 200)
+
+        if (vwt > 128 && vt > 128)
             v = 3*v/4;
-        else if (vwt < 85 && vt < 85)
+        else if (vwt < 128 && vt < 128)
             v = qMin(255, 7*v/6);
         link.setHsv(h, s, v);
         
@@ -590,9 +591,8 @@ Style::polish( QWidget * widget )
                     widget->parentWidget()->inherits("KPIM::StatusbarProgressWidget"))
                     pbtn->setFlat(true);
 
-                // NOTICE WORKAROUND - this widget paints no bg, uses foregroundcolor() to paint the text...
-                // and has - of course - foregroundRole() == QPalette::ButtonText
-                // TODO: inform Peter Penz <peter.penz@gmx.at> and really fix this
+                // HACK around "weird" original appearance ;-P
+                // also see eventFilter
                 if (pbtn->inherits("KUrlButton") || pbtn->inherits("BreadcrumbItemButton"))
                 {
                     pbtn->setBackgroundRole(QPalette::Window);
@@ -610,28 +610,22 @@ Style::polish( QWidget * widget )
                 // of course plasma needs - again - a WORKAROUND, we seem to be unable to use bg/fg-role, are we?
                 !(appType == Plasma && widget->inherits("ToolButton")))
             {
+                QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
                 if (QWidget *dad = widget->parentWidget())
                 {
+                    bg = dad->backgroundRole();
+                    fg = dad->foregroundRole();
+
                     if (QMenuBar *mbar = qobject_cast<QMenuBar*>(dad))
-                    {
-                        if (Hacks::config.killThrobber && widget->inherits("KAnimatedButton"))
-                        {   // this is konquerors throbber...
-                            widget->hide();
-                            widget->setParent(mbar->parentWidget());
-                            mbar->setCornerWidget(NULL);
-                        }
-                    }
-                    else
-                    {
-                        widget->setBackgroundRole(dad->backgroundRole());
-                        widget->setForegroundRole(dad->foregroundRole());
+                    if (Hacks::config.killThrobber && widget->inherits("KAnimatedButton"))
+                    {   // this is konquerors throbber...
+                        widget->hide();
+                        widget->setParent(mbar->parentWidget());
+                        mbar->setCornerWidget(NULL);
                     }
                 }
-                else
-                {
-                    widget->setBackgroundRole(QPalette::Window);
-                    widget->setForegroundRole(QPalette::WindowText);
-                }
+                widget->setBackgroundRole(bg);
+                widget->setForegroundRole(fg);
             }
             if (!widget->testAttribute(Qt::WA_Hover))
                 Animator::Hover::manage(widget);
@@ -740,11 +734,14 @@ Style::polish( QWidget * widget )
 #endif
 
     //BEGIN Tab animation, painting override                                                       -
-    else if (qobject_cast<QTabBar *>(widget))
+    else if (QTabBar *bar = qobject_cast<QTabBar *>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
-        widget->setBackgroundRole(config.tab.std_role[0]);
-        widget->setForegroundRole(config.tab.std_role[1]);
+        if (bar->drawBase())
+        {
+            widget->setBackgroundRole(config.tab.std_role[0]);
+            widget->setForegroundRole(config.tab.std_role[1]);
+        }
         // the eventfilter overtakes the widget painting to allow tabs ABOVE the tabbar
         widget->removeEventFilter(this);
         widget->installEventFilter(this);
