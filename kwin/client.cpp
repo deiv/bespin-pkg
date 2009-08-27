@@ -266,14 +266,14 @@ Client::eventFilter(QObject *o, QEvent *e)
         QPainter p(widget());
         p.setClipRegion(clip);
         p.setFont(options()->font());
-        repaint(p);
 #if 0
         if (QPaintDevice *pd = QPainter::redirected(widget()))
-        if (pd->depth() == 32)
+        if (pd && pd->depth() == 32)
         {
             qDebug() << "BESPIN, ARGB paint";
-        }
+    }
 #endif
+        repaint(p);
         p.end();
 
         if (useInternalDoubleBuffering)
@@ -448,10 +448,7 @@ Client::mousePosition( const QPoint& p ) const
 QSize
 Client::minimumSize() const
 {
-//     if (_small)
     return QSize(buttonSpaceLeft + buttonSpaceRight + 2*borderSize, titleSize + borderSize);
-//     else
-//         return QSize(2*buttonSpace+3*titleSize, titleSize + borderSize);
 }
 
 #define DUMP_PICTURE(_PREF_, _PICT_)\
@@ -771,11 +768,13 @@ Client::reset(unsigned long changed)
                     corner->hide();
             }
             titleSize = _factory->titleSize(true);
+            titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
         }
         else
         {
             borderSize = _factory->borderSize();
             titleSize = _factory->titleSize(_small);
+            titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
             if (corner)
                 corner->show();
         }
