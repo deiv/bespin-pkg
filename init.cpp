@@ -231,7 +231,10 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.bg.modal.invert = (appType != KDM) && readBool(BG_MODAL_INVERT);
     config.bg.intensity = clamp(100+readInt(BG_INTENSITY), 30, 300);
 #if BESPIN_ARGB_WINDOWS
-    config.bg.opacity = (appType == KWin ? 0xff : clamp(readInt(BG_OPACITY), 0, 0xff));
+    if (appType == KWin || appType == Plasma)
+        config.bg.opacity = 0xff;
+    else
+        config.bg.opacity = clamp(readInt(BG_OPACITY), 0, 0xff);
     if (config.bg.opacity != 0xff)
     {
         QStringList blacklist = iSettings->value(ARGB_BLACKLIST).toString().split(',', QString::SkipEmptyParts);
