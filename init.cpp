@@ -244,6 +244,8 @@ Style::readSettings(const QSettings* settings, QString appName)
             config.bg.glassy = readBool(ARGB_GLASSY);
         Animator::Tab::setTransition(Animator::Jump);
     }
+#else
+    config.bg.opacity = 0xff;
 #endif
     readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 
