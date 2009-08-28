@@ -249,9 +249,12 @@ Style::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QW
     }
     if (config.sunkenGroups)
     {
+#if BESPIN_ARGB_WINDOWS
         if (config.bg.opacity != 0xff)
             masks.rect[false].render( RECT.adjusted(0,0,0,-F(2)), painter, QColor(0,0,0,48) );
-        else if (config.bg.mode == Scanlines)
+        else
+#endif
+            if (config.bg.mode == Scanlines)
             masks.rect[false].render(   RECT.adjusted(0,0,0,-F(2)), painter,
                                         Gradients::structure(FCOLOR(Window).darker(108)),
                                         widget ? widget->mapTo(widget->window(), RECT.topLeft()) :
