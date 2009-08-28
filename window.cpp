@@ -123,7 +123,10 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         painter->save();
         painter->setPen(Qt::NoPen);
         if (c.alpha() < 0xff)
-            painter->setBrush(QColor(255,255,255,32));
+        {
+            const int v = Colors::value(c);
+            painter->setBrush(QColor(255,255,255,v/(8-v/70)));
+        }
         else
             painter->setBrush(c.light(115-Colors::value(c)/20));
         painter->drawPath(glasPath);
