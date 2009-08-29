@@ -278,38 +278,27 @@ Client::eventFilter(QObject *o, QEvent *e)
 
         if (useInternalDoubleBuffering)
         {
-
-            clip = top;
-            // recollect button rects
+            QPixmap buffer;
+            if (color(ColorTitleBar, isActive()).alpha() == 0xff)
+            {   // buffer titlebar
+                buffer = QPixmap(top.size());
+                p.begin(&buffer);
+                p.setClipping(false);
+                p.setClipRegion(top);
+                p.setFont(options()->font());
+                repaint(p, false);
+                p.end();
+            }
             for (int i = 0; i < 4; ++i)
                 if (buttons[i])
-                    clip |= buttons[i]->geometry();
-
-            // fill buffer
-            QPixmap buffer(top.size());
-            p.begin(&buffer);
-            p.setClipping(false);
-            p.setClipRegion(clip);
-            p.setFont(options()->font());
-            repaint(p, false);
-            p.end();
-            
-            // dump button BGs
-//             QPoint dxy;
-//             QPaintDevice *pd = QPainter::redirected(widget(), &dxy);
-            for (int i = 0; i < 4; ++i)
-                if (buttons[i])
-                {
-                    buttons[i]->setBg(buffer.copy(buttons[i]->geometry()));
-//                     if (pd)
-//                         QPainter::setRedirected(buttons[i], pd, buttons[i]->geometry().topLeft() + dxy);
-                    buttons[i]->repaint(); // enforce, button thinks it's independend
-//                     if (pd)
-//                         QPainter::restoreRedirected(buttons[i]);
+                {   // dump button BGs unless ARGB
+                    buttons[i]->setBg(buffer.isNull()?buffer:buffer.copy(buttons[i]->geometry()));
+                    // enforce repaint, button thinks it's independend
+                    buttons[i]->repaint();
                 }
+            
             if (corner)
                 corner->repaint();
-
         }
         return true;
     }
