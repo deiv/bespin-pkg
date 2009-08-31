@@ -340,7 +340,12 @@ Style::polish( QWidget * widget )
         if (!(  config.bg.opacity == 0xff || // opaque
                 widget->windowType() == Qt::Desktop || // makes no sense + QDesktopWidget is often misused
                 widget->testAttribute(Qt::WA_TranslucentBackground)))
+        {
             widget->setAttribute(Qt::WA_TranslucentBackground);
+            // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
+            // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
+            widget->move(10000,10000);
+        }
         if (config.bg.opacity != 0xff && config.bg.glassy)
             widget->setAttribute(Qt::WA_MacBrushedMetal);
 #endif
