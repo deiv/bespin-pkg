@@ -226,9 +226,6 @@ Style::readSettings(const QSettings* settings, QString appName)
     else if (config.bg.mode > BevelH)
         config.bg.mode = BevelV;
 
-    config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
-    config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
-    config.bg.modal.invert = (appType != KDM) && readBool(BG_MODAL_INVERT);
     config.bg.intensity = clamp(100+readInt(BG_INTENSITY), 30, 300);
 #if BESPIN_ARGB_WINDOWS
     if (appType == KWin || appType == Plasma)
@@ -247,6 +244,11 @@ Style::readSettings(const QSettings* settings, QString appName)
 #else
     config.bg.opacity = 0xff;
 #endif
+
+    config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
+    config.bg.modal.opacity = readInt(BG_MODAL_OPACITY)*255/config.bg.opacity;
+    config.bg.modal.invert = (appType != KDM) && readBool(BG_MODAL_INVERT);
+
     readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 
 #if 0
