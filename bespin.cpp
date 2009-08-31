@@ -531,12 +531,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 //         return;
     if ((appType == KWin) || (appType == Plasma && !FX::usesXRender()))
         return;
-//         qDebug() << widget;
-//         &&
-//                                 (widget->inherits("KXMessages") ||
-//                                  widget->inherits("KSelectionWatcher::Private") ||
-//                                  ))
-//         return;
+    // offending widgets: inherits("KXMessages"), inherits("KSelectionWatcher::Private") - unfortunately internal
 
     // this is important because KDE apps may alter the original palette any time
     const QPalette &pal = originalPalette ? *originalPalette : palette;
@@ -565,14 +560,26 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 #endif
     data.activeWindow = bg.rgba();
 
-    data.inactiveDeco = CCOLOR(kwin.inactive, Bg).rgba();
-    data.activeDeco = CCOLOR(kwin.active, Bg).rgba();
-    data.inactiveText = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window), CCOLOR(kwin.text, Bg)).rgba();
-    data.activeText = CCOLOR(kwin.text, Fg).rgba();
-//     const QColor bg_inact = (gt[0] != Gradients::None && config.kwin.active_role == config.kwin.inactive_role) ?
-//     Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 2, 1) :    ;
-    data.inactiveButton = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 1, 2).rgba();
-    data.activeButton = CCOLOR(kwin.active, Fg).rgba();
+    if (glassy)
+    {
+        data.inactiveDeco = pal.color(QPalette::Inactive, QPalette::Window).rgba();
+        data.activeDeco = pal.color(QPalette::Active, QPalette::Window).rgba();
+        data.inactiveText = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window),
+                                        pal.color(QPalette::Inactive, QPalette::WindowText)).rgba();
+        data.activeText = pal.color(QPalette::Active, QPalette::WindowText).rgba();
+        data.inactiveButton = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window),
+                                          pal.color(QPalette::Inactive, QPalette::WindowText),2,1).rgba();
+        data.activeButton = pal.color(QPalette::Active, QPalette::WindowText).rgba();
+    }
+    else
+    {
+        data.inactiveDeco = CCOLOR(kwin.inactive, Bg).rgba();
+        data.activeDeco = CCOLOR(kwin.active, Bg).rgba();
+        data.inactiveText = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window), CCOLOR(kwin.text, Bg)).rgba();
+        data.activeText = CCOLOR(kwin.text, Fg).rgba();
+        data.inactiveButton = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 1, 2).rgba();
+        data.activeButton = CCOLOR(kwin.active, Fg).rgba();
+    }
     
     if (widget)
         XProperty::set<uint>(widget->winId(), XProperty::winData, (uint*)&data, XProperty::WORD, 9);

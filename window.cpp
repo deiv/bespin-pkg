@@ -109,8 +109,9 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
             c.setAlpha(0xff);
     }
 
+    // we just kinda abuse this mac only attribute... ;P
     if (widget->testAttribute(Qt::WA_MacBrushedMetal))
-    {   // we just kinda abuse this mac only attribute... ;P
+    {
         if (widget->size() != glasSize)
         {
             const QRect &wr = widget->rect();
@@ -122,13 +123,14 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         }
         painter->save();
         painter->setPen(Qt::NoPen);
+        const int v = Colors::value(c);
         if (c.alpha() < 0xff)
         {
-            const int v = Colors::value(c);
-            painter->setBrush(QColor(255,255,255,v/(8-v/70)));
+            const int alpha = c.alpha()*v / (255*(7-v/80));
+            painter->setBrush(QColor(255,255,255,alpha));
         }
         else
-            painter->setBrush(c.light(115-Colors::value(c)/20));
+            painter->setBrush(c.light(115-v/20));
         painter->drawPath(glasPath);
         painter->restore();
         return;
