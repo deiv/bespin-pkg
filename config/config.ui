@@ -233,7 +233,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -456,71 +456,6 @@
         </widget>
         <widget class="QWidget" name="Windows">
          <layout class="QGridLayout" name="gridLayout_29">
-          <item row="0" column="0" colspan="5">
-           <widget class="QGroupBox" name="argbSupport">
-            <property name="title">
-             <string>Translucent Windows (eXPerimental!)</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_19">
-             <item row="0" column="0">
-              <widget class="QLabel" name="bgOpacityLabel">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Opacity</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QSlider" name="argbOpacity">
-               <property name="maximum">
-                <number>255</number>
-               </property>
-               <property name="value">
-                <number>255</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QLabel" name="bgOpacityNumber">
-               <property name="text">
-                <string>255</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_39">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Exclude</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1" colspan="2">
-              <widget class="QLineEdit" name="argbBlacklist"/>
-             </item>
-             <item row="2" column="0" colspan="2">
-              <widget class="QCheckBox" name="argbGlassy">
-               <property name="text">
-                <string>Glas Look</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="1" column="0" colspan="2">
            <widget class="QLabel" name="label">
             <property name="font">
@@ -687,7 +622,7 @@
           <item row="3" column="0" colspan="5">
            <widget class="QCheckBox" name="sunkenGroups">
             <property name="text">
-             <string>Sunken Groupboxes... (Ye know... the Apple thing...)</string>
+             <string>Sunken Groupboxes</string>
             </property>
            </widget>
           </item>
@@ -763,7 +698,7 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="0" colspan="5">
+          <item row="7" column="0" colspan="5">
            <widget class="QGroupBox" name="groupBox_7">
             <property name="title">
              <string>Modal Dialogs</string>
@@ -845,7 +780,7 @@
             </layout>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="8" column="0">
            <widget class="QLabel" name="label_7">
             <property name="font">
              <font>
@@ -861,10 +796,10 @@
             </property>
            </widget>
           </item>
-          <item row="7" column="1" colspan="2">
+          <item row="8" column="1" colspan="2">
            <widget class="QComboBox" name="tooltipRole"/>
           </item>
-          <item row="7" column="3" colspan="2">
+          <item row="8" column="3" colspan="2">
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -877,7 +812,7 @@
             </property>
            </spacer>
           </item>
-          <item row="8" column="0" colspan="3">
+          <item row="9" column="0" colspan="3">
            <spacer>
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -889,6 +824,71 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="6" column="0" colspan="5">
+           <widget class="QGroupBox" name="argbSupport">
+            <property name="title">
+             <string>Translucent Windows (eXPerimental!)</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_19">
+             <item row="0" column="0">
+              <widget class="QLabel" name="bgOpacityLabel">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Opacity</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSlider" name="argbOpacity">
+               <property name="maximum">
+                <number>255</number>
+               </property>
+               <property name="value">
+                <number>255</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="bgOpacityNumber">
+               <property name="text">
+                <string>255</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_39">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Exclude</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1" colspan="2">
+              <widget class="QLineEdit" name="argbBlacklist"/>
+             </item>
+             <item row="2" column="0" colspan="2">
+              <widget class="QCheckBox" name="argbGlassy">
+               <property name="text">
+                <string>Glas Look</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </widget>
