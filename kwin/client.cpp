@@ -263,16 +263,17 @@ Client::eventFilter(QObject *o, QEvent *e)
         const bool useInternalDoubleBuffering = !isPreview();
         QRegion clip = static_cast<QPaintEvent*>(e)->region();
 
+#if 0
+        QPaintDevice *dev = QPainter::redirected(widget());
+        if (dev && dev->devType() == QInternal::Widget)
+        qDebug() << static_cast<QWidget*>(dev) << static_cast<QWidget*>(dev)->geometry();
+        else if (dev && dev->devType() == QInternal::Pixmap)
+        qDebug() << "Pixmap" << static_cast<QPixmap*>(dev)->size();
+#endif
+
         QPainter p(widget());
         p.setClipRegion(clip);
         p.setFont(options()->font());
-#if 0
-        if (QPaintDevice *pd = QPainter::redirected(widget()))
-        if (pd && pd->depth() == 32)
-        {
-            qDebug() << "BESPIN, ARGB paint";
-    }
-#endif
         repaint(p);
         p.end();
 
