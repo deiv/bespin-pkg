@@ -820,43 +820,30 @@ Client::reset(unsigned long changed)
         }
         else if (!config()->forceUserColors)
         {
-            KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
-#if 0 // thought wine couldn't configure colors, but can - leave that and maybe query wine settings for colors?
-            if (info.windowClassClass() == "Wine")
-            {   // this is a Wine window, make ungly win grey (everything 'bout win is ugly... ;-)
-                QColor winGrey(192,192,192);
-                colors[0][ColorTitleBlend] = colors[0][ColorTitleBar] = winGrey;
-                colors[1][ColorTitleBlend] = colors[1][ColorTitleBar] = Qt::black;
-                colors[0][ColorButtonBg] = colors[0][ColorFont] = Colors::mid(winGrey, QColor(0,0,0));
-                colors[1][ColorButtonBg] = colors[1][ColorFont] = Qt::white;
-                bgMode = 1;
+//             KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
+            WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
+            if (!data)
+            {
+                long int *pid = XProperty::get<long int>(windowId(), XProperty::pid, XProperty::LONG);
+                if (pid)
+                    if ((data = factory()->decoInfo(*pid)))
+                        XProperty::set<uint>(windowId(), XProperty::winData, (uint*)data, XProperty::WORD, 9);
             }
-            else
-#endif
-            {   // nope, but maybe stylecontrolled
-                WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
-                if (!data)
-                {
-                    long int *pid = XProperty::get<long int>(windowId(), XProperty::pid, XProperty::LONG);
-                    if (pid)
-                        data = factory()->decoInfo(*pid);
-                }
 
-                if (data)
-                {
-                    def = false;
-                    colors[0][ColorTitleBar].setRgba(data->inactiveWindow);
-                    colors[1][ColorTitleBar].setRgba(data->activeWindow);
-                    colors[0][ColorTitleBlend].setRgba(data->inactiveDeco);
-                    colors[1][ColorTitleBlend].setRgba(data->activeDeco);
-                    colors[0][ColorFont].setRgba(data->inactiveText);
-                    colors[1][ColorFont].setRgba(data->activeText);
-                    colors[0][ColorButtonBg].setRgba(data->inactiveButton);
-                    colors[1][ColorButtonBg].setRgba(data->activeButton);
-                    bgMode = ((data->style >> 16) & 0xff);
-                    gType[0] = (Gradients::Type)((data->style >> 8) & 0xff);
-                    gType[1] = (Gradients::Type)(data->style & 0xff);
-                }
+            if (data)
+            {
+                def = false;
+                colors[0][ColorTitleBar].setRgba(data->inactiveWindow);
+                colors[1][ColorTitleBar].setRgba(data->activeWindow);
+                colors[0][ColorTitleBlend].setRgba(data->inactiveDeco);
+                colors[1][ColorTitleBlend].setRgba(data->activeDeco);
+                colors[0][ColorFont].setRgba(data->inactiveText);
+                colors[1][ColorFont].setRgba(data->activeText);
+                colors[0][ColorButtonBg].setRgba(data->inactiveButton);
+                colors[1][ColorButtonBg].setRgba(data->activeButton);
+                bgMode = ((data->style >> 16) & 0xff);
+                gType[0] = (Gradients::Type)((data->style >> 8) & 0xff);
+                gType[1] = (Gradients::Type)(data->style & 0xff);
             }
         }
         if (def)
