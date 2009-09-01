@@ -123,6 +123,7 @@ private:
     QString _caption;
     ResizeCorner *corner;
     Bg *bg;
+    bool dirty[2];
 };
 
 

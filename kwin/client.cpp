@@ -274,6 +274,12 @@ Client::eventFilter(QObject *o, QEvent *e)
         QPainter p(widget());
         p.setClipRegion(clip);
         p.setFont(options()->font());
+        // WORKAROUND a bug in QPaintEngine + QPainter::setRedirected
+        if (dirty[isActive()])
+        {
+            dirty[isActive()] = false;
+            repaint(p, false);
+        }
         repaint(p);
         p.end();
 
@@ -348,6 +354,7 @@ void
 Client::init()
 {
     createMainWidget();
+    dirty[0] = dirty[1] = true;
     NET::WindowType type = windowType( supported_types );
     _small = type == NET::Utility || type == NET::Menu || type == NET::Toolbar;
 
@@ -898,6 +905,9 @@ Client::reset(unsigned long changed)
         }
     }
 
+    // WORKAROUND a bug apparently in QPaintEngine which seems to
+    // fail to paint IMAGE_RGB -> QPixmap -> device while device is redirected
+    dirty[0] = dirty[1] = true;
     if (changed)
         activeChange(); // handles bg pixmaps in case and triggers update
    
