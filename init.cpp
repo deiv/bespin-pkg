@@ -246,7 +246,9 @@ Style::readSettings(const QSettings* settings, QString appName)
 #endif
 
     config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
-    config.bg.modal.opacity = readInt(BG_MODAL_OPACITY)*255/config.bg.opacity;
+    config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
+    if (config.bg.opacity)
+        config.bg.modal.opacity = 255*config.bg.modal.opacity/config.bg.opacity;
     config.bg.modal.invert = (appType != KDM) && readBool(BG_MODAL_INVERT);
 
     readRole(bg.tooltip, BG_TOOLTIP_ROLE);
