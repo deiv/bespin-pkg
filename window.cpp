@@ -79,6 +79,39 @@ static QSize glasSize;
 static QPixmap *rings = 0L;
 #include <QTimer>
 static QTimer ringResetTimer;
+static inline void
+createRingPix(int alpha)
+{
+    QPainterPath ringPath;
+    ringPath.addEllipse(0,0,200,200);
+    ringPath.addEllipse(30,30,140,140);
+
+    ringPath.addEllipse(210,10,230,230);
+    ringPath.addEllipse(218,18,214,214);
+    ringPath.addEllipse(226,26,198,198);
+    ringPath.addEllipse(234,34,182,182);
+    ringPath.addEllipse(300,100,50,50);
+
+    ringPath.addEllipse(100,96,160,160);
+    ringPath.addEllipse(108,104,144,144);
+    ringPath.addEllipse(116,112,128,128);
+    ringPath.addEllipse(122,120,112,112);
+
+    ringPath.addEllipse(250,160,200,200);
+    ringPath.addEllipse(280,190,140,140);
+    ringPath.addEllipse(310,220,80,80);
+
+    rings = new QPixmap(450,360);
+    rings->fill(Qt::transparent);
+    QPainter p(rings);
+    QColor white(255,255,255,(alpha+16)*112/255);
+    p.setPen(white);
+    white.setAlpha(24*(alpha+16)/255);
+    p.setBrush(white);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.drawPath(ringPath);
+    p.end();
+}
 void
 Style::resetRingPix()
 {
@@ -122,37 +155,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     {
         if (!rings)
         {
-            qWarning("create ring");
-            QPainterPath ringPath;
-            ringPath.addEllipse(0,0,200,200);
-            ringPath.addEllipse(30,30,140,140);
-
-            ringPath.addEllipse(210,10,230,230);
-            ringPath.addEllipse(218,18,214,214);
-            ringPath.addEllipse(226,26,198,198);
-            ringPath.addEllipse(234,34,182,182);
-            ringPath.addEllipse(300,100,50,50);
-
-            ringPath.addEllipse(100,96,160,160);
-            ringPath.addEllipse(108,104,144,144);
-            ringPath.addEllipse(116,112,128,128);
-            ringPath.addEllipse(122,120,112,112);
-
-            ringPath.addEllipse(250,160,200,200);
-            ringPath.addEllipse(280,190,140,140);
-            ringPath.addEllipse(310,220,80,80);
-
-            rings = new QPixmap(450,360);
-            rings->fill(Qt::transparent);
-            QPainter p(rings);
-            QColor white(255,255,255,(config.bg.opacity+16)*112/255);
-            p.setPen(white);
-            white.setAlpha(24*(config.bg.opacity+16)/255);
-            p.setBrush(white);
-            p.setRenderHint(QPainter::Antialiasing);
-            p.drawPath(ringPath);
-            p.end();
-
+            createRingPix(config.bg.opacity);
             disconnect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
             connect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
         }
