@@ -76,6 +76,16 @@ Style::drawWindowFrame(const QStyleOption * option, QPainter * painter, const QW
 static QPainterPath glasPath;
 static QSize glasSize;
 
+static QPixmap *rings = 0L;
+#include <QTimer>
+static QTimer ringResetTimer;
+void
+Style::resetRingPix()
+{
+    ringResetTimer.stop();
+    delete rings; rings = 0L;
+}
+
 void
 Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widget) const
 {
@@ -108,6 +118,46 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
 #endif
             c.setAlpha(0xff);
     }
+    if (config.bg.ringOverlay)
+    {
+        if (!rings)
+        {
+            qWarning("create ring");
+            QPainterPath ringPath;
+            ringPath.addEllipse(0,0,200,200);
+            ringPath.addEllipse(30,30,140,140);
+
+            ringPath.addEllipse(210,10,230,230);
+            ringPath.addEllipse(218,18,214,214);
+            ringPath.addEllipse(226,26,198,198);
+            ringPath.addEllipse(234,34,182,182);
+            ringPath.addEllipse(300,100,50,50);
+
+            ringPath.addEllipse(100,96,160,160);
+            ringPath.addEllipse(108,104,144,144);
+            ringPath.addEllipse(116,112,128,128);
+            ringPath.addEllipse(122,120,112,112);
+
+            ringPath.addEllipse(250,160,200,200);
+            ringPath.addEllipse(280,190,140,140);
+            ringPath.addEllipse(310,220,80,80);
+
+            rings = new QPixmap(450,360);
+            rings->fill(Qt::transparent);
+            QPainter p(rings);
+            QColor white(255,255,255,(config.bg.opacity+16)*112/255);
+            p.setPen(white);
+            white.setAlpha(24*(config.bg.opacity+16)/255);
+            p.setBrush(white);
+            p.setRenderHint(QPainter::Antialiasing);
+            p.drawPath(ringPath);
+            p.end();
+
+            disconnect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
+            connect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
+        }
+        ringResetTimer.start(5000);
+    }
 
     // we just kinda abuse this mac only attribute... ;P
     if (widget->testAttribute(Qt::WA_MacBrushedMetal))
@@ -132,13 +182,21 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         else
             painter->setBrush(c.light(115-v/20));
         painter->drawPath(glasPath);
+
+        if (config.bg.ringOverlay)
+            painter->drawPixmap(widget->width()-450, 0, *rings);
+
         painter->restore();
         return;
     }
 
     // cause of scrollbars - kinda optimization
     if (config.bg.mode == Plain)
+    {
+        if (config.bg.ringOverlay)
+            painter->drawPixmap(widget->width()-450, 0, *rings);
         return;
+    }
 
     if (config.bg.mode == Scanlines)
     {
@@ -151,13 +209,13 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         return;
     }
 
-    #if BESPIN_ARGB_WINDOWS
+#if BESPIN_ARGB_WINDOWS
     if (translucent)
     {
         painter->fillRect(widget->rect(), c);
         c = Qt::transparent;
     }
-    #endif
+#endif
 
     // Complex part ===================
     const BgSet &set = Gradients::bgSet(c);
@@ -241,6 +299,8 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     default:
         break;
     }
+    if (config.bg.ringOverlay)
+        painter->drawPixmap(widget->width()-450, 0, *rings);
 }
 
 void

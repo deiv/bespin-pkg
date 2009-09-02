@@ -328,6 +328,7 @@ public:
 private slots:
     void clearScrollbarCache();
     void removeAppEventFilter();
+    void resetRingPix();
 };
 
 } // namespace Bespin

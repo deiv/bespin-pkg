@@ -785,7 +785,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 p.setBrush(c);
                 p.drawRect(window->rect());
             }
-            if (config.bg.mode != Plain || glassy)
+            if (config.bg.mode != Plain || glassy || config.bg.ringOverlay)
                 drawWindowBg(0, &p, window);
             p.end();
             return false;

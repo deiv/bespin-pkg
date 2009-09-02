@@ -31,7 +31,7 @@ typedef struct Config
     struct bg
     {
         BGMode mode;
-        bool glassy;
+        bool glassy, ringOverlay;
         int structure, intensity, minValue, opacity;
         struct
         {
