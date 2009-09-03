@@ -239,27 +239,36 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
             int index = -1, hoveredIndex = -1;
             if (widget)
             if (const QTabBar* tbar = qobject_cast<const QTabBar*>(widget))
-            if (tbar->drawBase())
             {
                 // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
                 index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
+
+                // sometimes... MANY times devs just set the tabTextColor to QPalette::WindowText,
+                // because it's defined that it has to be this. Qt provides all these color roles just
+                // to waste space and time... ...
                 const QColor &fgColor = tbar->tabTextColor(index - 1);
                 const QColor &stdFgColor = CCOLOR(tab.std, Fg); // tbar->palette().color(tbar->foregroundRole());
                 if (fgColor.isValid() && fgColor != stdFgColor)
                 {
-                    // sometimes... MANY times devs just set the tabTextColor to QPalette::WindowText,
-                    // because it's defined that it has to be this. Qt provides all these color roles just
-                    // to waste space and time... ...
                     if (fgColor == tbar->palette().color(QPalette::WindowText))
                         const_cast<QTabBar*>(tbar)->setTabTextColor(index - 1, stdFgColor); // fixed
                     else // nope, this is really a custom color that will likley contrast just enough with QPalette::Window...
+                    {
                         customColor = true;
+                        if (appType == Konversation)
+                            painter->setPen(fgColor);
+                    }
                 }
-                if (hover)
-                    hoveredIndex = index;
-                else if (widget->underMouse())
-                    hoveredIndex = tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
-                info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, hoveredIndex));
+                
+                if (tbar->drawBase())
+                {
+                    if (hover)
+                        hoveredIndex = index;
+                    else if (widget->underMouse())
+                        hoveredIndex = tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
+                    info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, hoveredIndex));
+                }
+                
             }
             if (info)
                 animStep = info->step(index);
@@ -438,6 +447,8 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
     }
     else if (customColor)
     {
+        if (appType == Konversation)
+            cF = painter->pen().color();
         QFont fnt = painter->font();
         fnt.setUnderline(true);
         painter->setFont(fnt);

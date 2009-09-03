@@ -480,6 +480,8 @@ Style::init(const QSettings* settings)
         appName = QCoreApplication::applicationName();
         if (appName == "dolphin")
             appType = Dolphin;
+        if (appName == "konversation")
+            appType = Konversation;
         else if (appName == "be.shell")
             appType = BEshell;
         else if (appName == "plasma" || appName.startsWith("plasma-"))
