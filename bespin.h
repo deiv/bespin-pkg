@@ -147,6 +147,7 @@ protected:
 
     // element painting routines ===============
     void skip(const QStyleOption*, QPainter*, const QWidget*) const {}
+    inline void erase(const QStyleOption *o, QPainter *p, const QWidget *w) const { erase(o,p,w,0L); }
     // buttons.cpp
     void drawButtonFrame(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawPushButton(const QStyleOption*, QPainter*, const QWidget*) const;
@@ -282,7 +283,7 @@ private:
     void readSettings(const QSettings *settings = 0L, QString appName = QString());
     void registerRoutines();
     static bool isSpecialFrame(const QWidget *w);
-    void erase(const QStyleOption*, QPainter*, const QWidget*, const QPoint *off = 0) const;
+    void erase(const QStyleOption*, QPainter*, const QWidget*, const QPoint *off) const;
     void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
     void setupDecoFor(QWidget *w, const QPalette &pal, int mode, const Gradients::Type (&gt)[2]);
 private:
