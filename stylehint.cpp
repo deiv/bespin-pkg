@@ -31,8 +31,7 @@ using namespace Bespin;
 
 static const QStyle::StyleHint SH_KCustomStyleElement = (QStyle::StyleHint)0xff000001;
 
-int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget * widget,
-                            QStyleHintReturn * returnData ) const
+int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData ) const
 {
     switch (hint)
     {
@@ -50,7 +49,8 @@ int Style::styleHint( StyleHint hint, const QStyleOption * option, const QWidget
     case SH_ScrollBar_ScrollWhenPointerLeavesControl:
         return true; // UIs are no ego shooters...
     case SH_TabBar_Alignment:
-//         if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
+//         if (const QStyleOptionTabV3 *tab = qstyleoption_cast<const QStyleOptionTabV3*>(option))
+//             return (tab->documentMode ? Qt::AlignLeft : Qt::AlignCenter);
 //         if (tab->shape == QTabBar::RoundedSouth || tab->shape == QTabBar::TriangularSouth)
 //             return Qt::AlignRight;
 //         if (const QTabWidget *tab = qobject_cast<const QTabWidget*>(widget))

@@ -147,6 +147,8 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
                     connect(&cacheCleaner, SIGNAL(timeout()), this, SLOT(clearScrollbarCache()));
                     delete scrollBgCache;
                     scrollBgCache = new QPixmap(RECT.size());
+                    if (config.bg.opacity != 0xff)
+                        scrollBgCache->fill(Qt::transparent);
                     cPainter = new QPainter(scrollBgCache);
                 }
                 else

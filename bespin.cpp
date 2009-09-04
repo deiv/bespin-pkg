@@ -495,28 +495,32 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
         tl += *offset;
     painter->save();
     painter->setPen(Qt::NoPen);
-    
-    if (!grampa->isWindow())
-    {   // we may encounter apps that have semi or *cough* fully *cough* amarok *cough*
-        // transparent backgrounds instead of none... ;-)
-        painter->setBrush(grampa->window()->palette().color(QPalette::Window));
-        painter->drawRect(option->rect);
-    } // (semi) catched! (for about 98% of all cases...)
-    painter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
-    painter->setBrushOrigin(tl);
-    painter->drawRect(option->rect);
 
-    if (grampa->isWindow())
+    const QBrush &brush = grampa->palette().brush(grampa->backgroundRole());
+
+    // we may encounter apps that have semi or *cough* fully *cough* amarok *cough*
+    // transparent backgrounds instead of none... ;-)
+    const bool needBase = brush.style() > Qt::DiagCrossPattern || brush.color().alpha() < 0xff;
+
+    if (grampa->isWindow() || needBase)
     {   // means we need to paint the global bg as well
         painter->setClipRect(option->rect, Qt::IntersectClip);
         QStyleOption tmpOpt = *option;
-//         tmpOpt.rect = QRect(tl, widget->size());
+        //         tmpOpt.rect = QRect(tl, widget->size());
         tmpOpt.palette = grampa->palette();
-        painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
-        if (config.bg.mode > Scanlines)
+        if (config.bg.opacity == 0xff || config.bg.mode == Plain)
+            painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
+        if (config.bg.mode > Plain)
             painter->translate(tl);
         drawWindowBg(&tmpOpt, painter, grampa);
     }
+    if (!grampa->isWindow())
+    {
+        painter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
+        painter->setBrushOrigin(tl);
+        painter->drawRect(option->rect);
+    }
+
     painter->restore();
 }
 

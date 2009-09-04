@@ -681,11 +681,7 @@ Style::polish( QWidget * widget )
         if (widget->inherits("QScrollBar"))
         {
             // TODO: find a general catch for the plasma problem
-            if ((appType == Plasma) // yes - i currently don't know how to detect those things otherwise
-#if BESPIN_ARGB_WINDOWS
-                || (config.bg.opacity != 0xff)
-#endif
-                )
+            if (appType == Plasma) // yes - i currently don't know how to detect those things otherwise
                 widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
             else
             {

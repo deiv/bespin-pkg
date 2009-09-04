@@ -1170,22 +1170,13 @@ Hacks::add(QWidget *w)
             if (config.amarokListView)
             if (QAbstractItemView *view = qobject_cast<QAbstractItemView*>(w))
             {
-//                 QWidget *runner = w;
-//                 while ((runner = runner->parentWidget()))
-//                 {
-//                     if (qobject_cast<QSplitter*>(runner))
-//                     {
-                        QWidget *viewport = view->viewport();
-                        if (view->testAttribute(Qt::WA_SetPalette))
-                            view->setPalette(QPalette());
-                        if (viewport && (viewport->testAttribute(Qt::WA_SetPalette) || !viewport->autoFillBackground()))
-                        {
-                            viewport->setAutoFillBackground(true);
-                            viewport->setPalette(QPalette());
-                        }
-//                         break;
-//                     }
-//                 }
+                view->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+                view->setPalette(QPalette());
+                if (QWidget *viewport = view->viewport())
+                {
+                    viewport->setAutoFillBackground(true);
+                    viewport->setPalette(QPalette());
+                }
             }
             if (!amarok->context && (config.amarokContext || config.amarokDisplay)
                 && w->inherits("Context::ContextView"))
