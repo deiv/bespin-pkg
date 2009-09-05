@@ -182,7 +182,7 @@ Style::registerRoutines()
     registerCE(drawProgressBarContents, CE_ProgressBarContents);
     registerCE(drawProgressBarLabel, CE_ProgressBarLabel);
     // scrollareas.cpp
-    registerPE(skip, PE_PanelScrollAreaCorner);
+    registerPE(drawScrollAreaCorner, PE_PanelScrollAreaCorner);
     registerCC(drawScrollBar, CC_ScrollBar);
     registerCE(drawScrollBarAddLine, CE_ScrollBarAddLine);
     registerCE(drawScrollBarSubLine, CE_ScrollBarSubLine);

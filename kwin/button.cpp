@@ -253,6 +253,7 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
     //          MaximizeHorizontal    The window is maximized horizontally.
     //          MaximizeFull
             client->maximize(event->button());
+//             client->setFullscreen(true);
         }
         break;
     case Restore:

@@ -66,11 +66,13 @@ public:
     inline Gradients::Type gradient() {return gType[isActive()];}
     inline void iconChange() {} // no icon!
     void init();
+    
     void maximizeChange();
     QSize minimumSize() const;
     KDecorationDefines::Position mousePosition( const QPoint& p ) const;
     void reset(unsigned long changed);
     void resize( const QSize& s );
+    void setFullscreen(bool);
     void showDesktopMenu(const QPoint &p);
     void showInfo(const QPoint &p);
     void showWindowList(const QPoint &p);
@@ -81,9 +83,9 @@ public:
     void shadeChange();
     inline Factory *factory() {return _factory;}
 public slots:
-    void updateStylePixmaps();
     void activate();
     void throwOnDesktop();
+    void updateStylePixmaps();
 signals:
     void maximizeChanged(bool);
     void stickyChanged(bool);

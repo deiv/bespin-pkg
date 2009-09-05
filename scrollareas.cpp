@@ -104,6 +104,14 @@ Style::clearScrollbarCache()
 }
 
 void
+Style::drawScrollAreaCorner(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
+    // ouchhh...!
+    if (widget && widget->inherits("QWebView"))
+        erase(option, painter, widget);
+}
+
+void
 Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
 

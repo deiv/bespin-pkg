@@ -192,6 +192,7 @@ protected:
 
     void drawProgressBarLabel(const QStyleOption*, QPainter*, const QWidget*) const;
     // scrollareas.cpp
+    void drawScrollAreaCorner(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawScrollBar(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
     void drawScrollBarButton(const QStyleOption*, QPainter*, const QWidget* , bool) const;
     inline void

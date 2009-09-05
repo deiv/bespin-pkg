@@ -995,6 +995,17 @@ Client::resize( const QSize& s )
 }
 
 void
+Client::setFullscreen(bool on)
+{
+    unsigned long state = KWindowInfo(windowId(), 0, NET::WMState).state();
+    if (on)
+        state |= NET::FullScreen;
+    else
+        state &= ~NET::FullScreen;
+    KWindowSystem::setState(windowId(), state);
+}
+
+void
 Client::shadeChange()
 {
    emit shadeChanged(isSetShade());
