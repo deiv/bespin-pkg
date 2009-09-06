@@ -66,7 +66,7 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
         shadows.raised[false][isEnabled][false].render(r, painter);
         r.adjust(f2, f2, -f2, -f2);
 #if 1
-    if (widget)
+    if (widget && config.bg.opacity == 0xff)
     {
         QPixmap buffer(widget->size());
         QPainter bp(&buffer);
