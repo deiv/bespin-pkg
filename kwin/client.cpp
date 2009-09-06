@@ -379,10 +379,7 @@ Client::init()
     gType[1] = Gradients::Button;
 
     if (config()->resizeCorner && isResizable())
-    {
         corner = new ResizeCorner(this);
-        corner->setAttribute(Qt::WA_NoSystemBackground);
-    }
     reset(63);
 }
 

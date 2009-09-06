@@ -39,7 +39,8 @@
 #include "client.h"
 #include "resizecorner.h"
 
-#define CORNER_SIZE 12
+#define CORNER_SIZE 10
+#define CORNER_OFFSET 2
 
 using namespace Bespin;
 
@@ -54,12 +55,13 @@ ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
     client = parent;
     setCursor(QCursor(Qt::SizeFDiagCursor));
     setFixedSize(CORNER_SIZE, CORNER_SIZE);
-//    buffer = QPixmap(16,16);
-//     setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_PaintOnScreen);
 //     setAttribute(Qt::WA_OpaquePaintEvent); // lately broken, above works
-//     setAutoFillBackground(true);
     QPolygon triangle(3);
     triangle.putPoints(0, 3, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE);
+//     QPolygon hook(4);
+//     hook.putPoints(0, 4, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE, 3*CORNER_SIZE/4, 3*CORNER_SIZE/4);
     setMask ( triangle );
 //     QTimer::singleShot(0, this, SLOT(hide()));
 //     QTimer::singleShot(3000, this, SLOT(raise()));
@@ -100,7 +102,6 @@ ResizeCorner::setColor(const QColor &c)
     QColor bgc = (c.value() > 100) ? c.dark(130) : c.light(120);
     QPalette pal = palette();
     pal.setColor(backgroundRole(), bgc);
-//     pal.setBrush(foregroundRole(), QBrush(c, Qt::Dense3Pattern));
     setPalette(pal);
 }
 
@@ -124,7 +125,7 @@ ResizeCorner::eventFilter(QObject *obj, QEvent *e)
     }
 
     if ( obj == parent() && e->type() == QEvent::Resize)
-        move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
+        move(client->width() - (CORNER_SIZE+CORNER_OFFSET), client->height() - (CORNER_SIZE+CORNER_OFFSET));
 
     return false;
 }
