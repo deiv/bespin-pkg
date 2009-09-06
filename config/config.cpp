@@ -296,6 +296,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     "3" is the default value for this entry*/
     handleSettings(ui.bgMode, BG_MODE);
     handleSettings(ui.bgIntensity, BG_INTENSITY);
+    handleSettings(ui.ringOverlay, BG_RING_OVERLAY);
 #if BESPIN_ARGB_WINDOWS
     handleSettings(ui.argbOpacity, BG_OPACITY);
     setContextHelp(ui.argbSupport, "<b>Window Opacity</b><hr>\
