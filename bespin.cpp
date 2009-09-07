@@ -835,7 +835,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             QPainter p(tabBar);
             QStyleOptionTabBarBase opt;
             opt.initFrom(tabBar);
-            if (QWidget *window = tabBar->parentWidget())
+            if (QWidget *window = tabBar->window())
             {
                 opt.tabBarRect = window->rect();
                 opt.tabBarRect.moveTopLeft(tabBar->mapFrom(window, opt.tabBarRect.topLeft()));
