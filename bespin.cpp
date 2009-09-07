@@ -654,6 +654,13 @@ swapPalette(QWidget *widget, Style *style)
             solidBase = 0;
             fixViewport = false;
             hasShit = false;
+
+            if (kid->inherits("KUrlButton") || kid->inherits("BreadcrumbItemButton"))
+            {   // we mess up with it during painting
+                pal.setColor(QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::Window));
+                kid->setPalette(pal);
+                continue;
+            }
             
             // NOTE: WORKAROUND for amarok and probably others: see polish.cpp
             if (QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(kid) )

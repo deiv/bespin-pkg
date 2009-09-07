@@ -123,6 +123,25 @@ void Style::polish( QPalette &pal, bool onInit )
     const QColor grey(highlightGray,highlightGray,highlightGray);
     pal.setColor(QPalette::Disabled, QPalette::Highlight, grey);
 
+    // Link colors can not be set through qtconfig - and the colors suck
+    QColor link = pal.color(QPalette::Active, QPalette::Highlight);
+    const int vwt = Colors::value(pal.color(QPalette::Active, QPalette::Window));
+    const int vt = Colors::value(pal.color(QPalette::Active, QPalette::Base));
+    int h,s,v; link.getHsv(&h,&s,&v);
+    s = sqrt(s/255.0)*255.0;
+    
+    if (vwt > 128 && vt > 128)
+        v = 3*v/4;
+    else if (vwt < 128 && vt < 128)
+        v = qMin(255, 7*v/6);
+    link.setHsv(h, s, v);
+    
+    pal.setColor(QPalette::Link, link);
+    
+    link = Colors::mid(link, Colors::mid(pal.color(QPalette::Active, QPalette::Text),
+                                         pal.color(QPalette::Active, QPalette::WindowText)), 4, 1);
+                                         pal.setColor(QPalette::LinkVisited, link);
+
     if (onInit)
     {
         // dark, light & etc are tinted... no good:
@@ -130,25 +149,6 @@ void Style::polish( QPalette &pal, bool onInit )
         pal.setColor(QPalette::Mid, QColor(100,100,100));
         pal.setColor(QPalette::Midlight, QColor(220,220,220));
         pal.setColor(QPalette::Light, QColor(240,240,240));
-
-        // Link colors can not be set through qtconfig - and the colors suck
-        QColor link = pal.color(QPalette::Active, QPalette::Highlight);
-        const int vwt = Colors::value(pal.color(QPalette::Active, QPalette::Window));
-        const int vt = Colors::value(pal.color(QPalette::Active, QPalette::Base));
-        int h,s,v; link.getHsv(&h,&s,&v);
-        s = sqrt(s/255.0)*255.0;
-
-        if (vwt > 128 && vt > 128)
-            v = 3*v/4;
-        else if (vwt < 128 && vt < 128)
-            v = qMin(255, 7*v/6);
-        link.setHsv(h, s, v);
-        
-        pal.setColor(QPalette::Link, link);
-
-        link = Colors::mid(link, Colors::mid(pal.color(QPalette::Active, QPalette::Text),
-                                             pal.color(QPalette::Active, QPalette::WindowText)), 4, 1);
-        pal.setColor(QPalette::LinkVisited, link);
 
 #if QT_VERSION >= 0x040400
         // tooltip (NOTICE not configurable by qtconfig, kde can, let's see what we're gonna do on this...)
