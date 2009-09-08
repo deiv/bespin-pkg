@@ -21,33 +21,55 @@
 #include "draw.h"
 
 void
-Style::drawDockBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-    painter->save();
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Gradients::structure(FCOLOR(Window), true));
-    painter->translate(RECT.topLeft());
-    painter->drawRect(RECT);
-    painter->restore();
+    bool needRestore = false;
+    if (config.bg.mode == Scanlines)
+    {
+        painter->save(); needRestore = true;
+        
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(Gradients::structure(FCOLOR(Window), true));
+        painter->translate(RECT.topLeft());
+        painter->drawRect(RECT);
+    }
+    
+    const QDockWidget *dw = qobject_cast<const QDockWidget*>(widget);
+    if (dw && dw->isFloating())
+    {
+        if (!needRestore) painter->save();
+
+        painter->setPen(Colors::mid(FCOLOR(Window), Qt::black, 3,1));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(RECT.adjusted(0,0,-1,-1));
+
+        painter->restore(); needRestore = false;
+    }
+    if (needRestore) painter->restore();
 }
 
 void
-Style::drawDockTitle(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
 
     ASSURE_OPTION(dock, DockWidget);
     
-    const QColor bg = FCOLOR(Window);
+    QColor bg = FCOLOR(Window);
+    bg.setAlpha(config.bg.opacity);
 
     painter->save();
 
     if (dock->floatable || dock->movable)
     {
-        painter->setPen(bg.dark(120));
-        painter->drawLine(RECT.topLeft(), RECT.topRight());
+        const QDockWidget *dw = qobject_cast<const QDockWidget*>(widget);
+        if ( !(dw && dw->isFloating()) )
+        {
+            painter->setPen(bg.dark(120));
+            painter->drawLine(RECT.topLeft(), RECT.topRight());
 
-        painter->setPen(bg.light(114));
-        painter->drawLine(RECT.left(), RECT.y()+1, RECT.right(), RECT.y()+1);
+            painter->setPen(bg.light(114));
+            painter->drawLine(RECT.left(), RECT.y()+1, RECT.right(), RECT.y()+1);
+        }
     }
 
     if (dock->title.isEmpty())

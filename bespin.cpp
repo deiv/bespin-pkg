@@ -142,10 +142,7 @@ Style::registerRoutines()
     registerPE(skip, PE_Q3DockWindowSeparator);
     registerCE(skip, CE_Q3DockWindowEmptyArea);
 #endif
-    if (config.bg.mode == Scanlines)
-        registerPE(drawDockBg, PE_FrameDockWidget);
-    else
-        registerPE(skip, PE_FrameDockWidget);
+    registerPE(drawDockBg, PE_FrameDockWidget);
     registerCE(drawDockTitle, CE_DockWidgetTitle);
     registerCC(drawMDIControls, CC_MdiControls);
     registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
