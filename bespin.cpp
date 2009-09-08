@@ -511,8 +511,7 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
         tmpOpt.palette = grampa->palette();
         if (config.bg.opacity == 0xff || config.bg.mode == Plain)
             painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
-        if (config.bg.mode > Plain)
-            painter->translate(tl);
+        painter->translate(tl);
         drawWindowBg(&tmpOpt, painter, grampa);
     }
     if (!grampa->isWindow())

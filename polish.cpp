@@ -349,7 +349,7 @@ Style::polish( QWidget * widget )
         if (config.bg.opacity != 0xff && config.bg.glassy)
             widget->setAttribute(Qt::WA_MacBrushedMetal);
 #endif
-        if (config.bg.mode > Plain)
+        if (config.bg.mode > Plain || config.bg.opacity != 0xff || config.bg.ringOverlay)
         {
             if (config.bg.opacity != 0xff)
             {
@@ -358,9 +358,6 @@ Style::polish( QWidget * widget )
             }
             widget->setAttribute(Qt::WA_StyledBackground);
         }
-
-//         widget->setAttribute(Qt::WA_MacBrushedMetal);
-//         widget->setAttribute(Qt::WA_StyledBackground);
 
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
