@@ -20,7 +20,6 @@
 #include "draw.h"
 #include "animator/hoverindex.h"
 
-
 inline static bool
 verticalTabs(QTabBar::Shape shape)
 {

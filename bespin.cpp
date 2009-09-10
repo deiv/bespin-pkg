@@ -818,8 +818,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             if (tabBar->testAttribute(Qt::WA_NoSystemBackground))
                 return false; // shall be translucent
-            if (!tabBar->drawBase())
-                return false;
+//             if (!tabBar->drawBase())
+//                 return false;
             if (QTabWidget *tw = qobject_cast<QTabWidget*>(tabBar->parentWidget()))
             {   // no extra tabbar here please... unless the border is StyleShitted away ;)
                 if (tw->styleSheet().isEmpty())
@@ -847,9 +847,27 @@ Style::eventFilter( QObject *object, QEvent *ev )
             if (tw->documentMode())
             {
                 QPainter p(tw);
-                QStyleOptionTabBarBase opt;
+                QStyleOptionTabBarBaseV2 opt;
                 opt.initFrom(tw);
-                opt.rect.setHeight(pixelMetric( PM_TabBarBaseHeight, &opt, tw ));
+                opt.documentMode = true;
+                const int thickness = pixelMetric( PM_TabBarBaseHeight, &opt, tw );
+                switch (tw->tabPosition())
+                {
+                    default:
+                    case QTabWidget::North:
+                        opt.rect.setBottom(opt.rect.top() + thickness);
+                        opt.shape = QTabBar::RoundedNorth; break;
+                    case QTabWidget::South:
+                        opt.rect.setTop(opt.rect.bottom() - thickness);
+                        opt.shape = QTabBar::RoundedSouth; break;
+                    case QTabWidget::West:
+                        opt.rect.setRight(opt.rect.left() + thickness);
+                        opt.shape = QTabBar::RoundedWest; break;
+                    case QTabWidget::East:
+                        opt.rect.setLeft(opt.rect.right() - thickness);
+                        opt.shape = QTabBar::RoundedEast; break;
+                }
+
                 opt.tabBarRect = tw->rect();
                 drawTabBar(&opt, &p, NULL);
                 p.end();
