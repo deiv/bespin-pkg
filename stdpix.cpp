@@ -143,7 +143,7 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
     else
     {
         rect = QRect(0,0,14,14);
-        pal = qApp->palette();
+        pal = widget ? widget->palette() : qApp->palette();
     }
 
     const QDockWidget *dock = qobject_cast<const QDockWidget*>(widget);
@@ -284,7 +284,10 @@ paint:
 
         const QColor c = Colors::mid(pal.color(fg), pal.color(bg), (sz > 16) ? 16 : 2, sunken ? 2 : (hover ? 4 : 2) );
         painter.setRenderHint ( QPainter::Antialiasing );
-        painter.setPen(Qt::NoPen);
+        if (sz > 16)
+            painter.setPen(pal.color(bg));
+        else
+            painter.setPen(Qt::NoPen);
 #if 0
         if (sz > 16)
             painter.setBrush( Gradients::brush( c, sz, Qt::Vertical, config.btn.gradient ) );
