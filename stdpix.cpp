@@ -146,6 +146,10 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
         pal = widget ? widget->palette() : qApp->palette();
     }
 
+    QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
+    if (widget)
+        { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
+
     const QDockWidget *dock = qobject_cast<const QDockWidget*>(widget);
     const int sz = dock ? 14 : rect.height();
     QPixmap pm(sz, sz);
@@ -218,11 +222,9 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
         shape = Shapes::close(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMinButton:
-//     case SP_ArrowDown:
         shape = Shapes::min(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMaxButton:
-//     case SP_ArrowUp:
         shape = Shapes::max(pm.rect(), config.newWinBtns);
         goto paint;
     case SP_TitleBarMenuButton:
@@ -241,6 +243,17 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
     case SP_TitleBarContextHelpButton:
         shape = Shapes::help(pm.rect(), config.newWinBtns);
         goto paint;
+    case SP_ArrowDown:
+    case SP_ArrowUp:
+    case SP_FileDialogToParent: //  30
+    {
+        const float d = sz/2.0;
+        shape = arrow( pm.rect()).subtracted(arrow( pm.rect().translated(d, 0)));
+        painter.translate(d, d);
+        painter.rotate(standardPixmap == SP_ArrowDown ? -90 : 90);
+        painter.translate(-d, -d);
+        goto paint;
+    }
     case SP_MediaVolume:
     case SP_MediaVolumeMuted:
     {
@@ -277,11 +290,6 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
         }
 
 paint:
-
-        QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
-        if (widget)
-            { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
-
         const QColor c = Colors::mid(pal.color(fg), pal.color(bg), (sz > 16) ? 16 : 2, sunken ? 2 : (hover ? 4 : 2) );
         painter.setRenderHint ( QPainter::Antialiasing );
         if (sz > 16)
@@ -358,20 +366,76 @@ paint:
 //    case SP_DriveCDIcon: //  18   
 //    case SP_DriveDVDIcon: //  19   
 //    case SP_DriveNetIcon: //  20   
-//    case SP_DirOpenIcon: //  21   
-//    case SP_DirClosedIcon: //  22   
-//    case SP_DirLinkIcon: //  23   
+//     case SP_DirOpenIcon: //  21
+//     case SP_DirClosedIcon: //  22
+//     case SP_DirLinkIcon: //  23
+//         break;
+    case SP_FileDialogNewFolder: //  31
+    {
+        const float t = rect.width()/8.0;
+        const float half = rect.width()/2.0;
+        const float third = rect.width()/3.0;
+        painter.setPen(QPen(Colors::mid(pal.color(bg), pal.color(fg)), t/2.0));
+        painter.setBrush(Qt::NoBrush);
+        painter.setRenderHint ( QPainter::Antialiasing );
+        QRectF mother(t/2.0,t/2.0,half,half);
+        painter.drawArc(mother, 10*16,80*16);
+        painter.drawArc(mother, 270*16,80*16);
+        mother.adjust(t,t,-t,-t);
+        painter.drawEllipse(mother);
+
+        QRectF child(sz-third,sz-third,third,third);
+        painter.drawArc(child, 75*16,110*16);
+        child.adjust(t,t,-t,-t);
+        painter.drawEllipse(child);
+
+        QRectF baby(sz-third,t/2.0,third,third);
+//         painter.drawArc(baby, 110*16,110*16);
+//         baby.adjust(t,t,-t,-t);
+        QPointF c = baby.center();
+        painter.drawLine(baby.x(), c.y(), baby.right(), c.y());
+        painter.drawLine(c.x(), baby.y(), c.x(), baby.bottom());
+
+        painter.drawLine(mother.center(), child.center());
+        break;
+    }
 //    case SP_FileIcon: //  24   
-//    case SP_FileLinkIcon: //  25   
+//    case SP_FileLinkIcon: //  25
+
 //    case SP_FileDialogStart: //  28   
-//    case SP_FileDialogEnd: //  29   
-//    case SP_FileDialogToParent: //  30   
-//    case SP_FileDialogNewFolder: //  31   
-//    case SP_FileDialogDetailedView: //  32   
+//    case SP_FileDialogEnd: //  29
+
+    case SP_FileDialogDetailedView: //  32
+    {
+        const float t = rect.width()/8.0;
+        painter.setPen(QPen(Colors::mid(pal.color(bg), pal.color(fg)), t));
+        painter.setBrush(Qt::NoBrush);
+        painter.setRenderHint ( QPainter::Antialiasing );
+        float y = t;
+        while (y <= rect.height()-t)
+        {
+            painter.drawPoint(t, y); painter.drawLine(3*t, y, rect.right(), y);
+            y += 2*t;
+        }
+        break;
+    }
 //    case SP_FileDialogInfoView: //  33   
 //    case SP_FileDialogContentsView: //  34   
-//    case SP_FileDialogListView: //  35   
-//    case SP_FileDialogBack: //  36   
+    case SP_FileDialogListView: //  35
+    {
+        QRectF r(0,0,sz/3.0,sz/3.0);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(Colors::mid(pal.color(bg), pal.color(fg)));
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.drawEllipse(r);
+        r.moveRight(pm.rect().right()); painter.drawEllipse(r);
+        r.moveBottom(pm.rect().bottom()); painter.drawEllipse(r);
+        r.moveLeft(pm.rect().left()); painter.drawEllipse(r);
+        break;
+    }
+//     case SP_FileDialogBack: //  36
+//         break;
+
     case SP_ToolBarHorizontalExtensionButton: //  26  Extension button for horizontal toolbars
     case SP_ToolBarVerticalExtensionButton: //  27  Extension button for vertical toolbars
         painter.setPen(Qt::NoPen);
