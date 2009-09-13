@@ -173,7 +173,10 @@ MacMenu::activate(QMenuBar *menu)
     // register the menu via dbus
     QStringList entries;
     foreach (QAction* action, menu->actions())
-        entries << action->text();
+    {
+        if (!action->isSeparator())
+            entries << action->text();
+    }
     
     xbar->call(QDBus::NoBlock, "registerMenu", service, (qlonglong)menu, title, entries);
     // TODO cause of now async call, the following should - maybe - attached to the above?!!
@@ -361,6 +364,8 @@ MacMenu::menuClosed()
 void
 MacMenu::changeAction(QMenuBar *menu, QActionEvent *ev)
 {
+    if (ev->action()->isSeparator())
+        return;
     int idx;
     if (ev->type() == QEvent::ActionAdded)
     {
