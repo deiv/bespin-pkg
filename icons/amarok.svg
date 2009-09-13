@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg4776"
+   sodipodi:version="0.32"
+   inkscape:version="0.46+devel"
+   width="128"
+   height="128"
+   version="1.0"
+   sodipodi:docname="amarok.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <metadata
+     id="metadata4781">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4779">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective4783" />
+  </defs>
+  <sodipodi:namedview
+     inkscape:window-height="921"
+     inkscape:window-width="1022"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     showgrid="false"
+     inkscape:zoom="3.609375"
+     inkscape:cx="64"
+     inkscape:cy="64"
+     inkscape:window-x="24"
+     inkscape:window-y="37"
+     inkscape:current-layer="svg4776" />
+  <path
+     style="opacity:1;fill:#1a1a1a;stroke:none"
+     d="M 107.9719,1.4257122 C 94.895358,12.165492 82.223469,19.597483 72.684832,29.514531 L 56.84086,30.218707 37.476006,47.901362 29.025888,48.918505 C 22.25898,57.914724 11.775514,61.562073 2.267181,65.075444 6.3393655,70.779676 6.6208596,75.752708 19.910715,83.970847 18.670458,88.280005 15.684715,89.843798 12.595103,92.303602 27.453483,111.91406 49.669182,137.70987 92.049685,121.40956 90.396865,120.93546 91.777148,97.549423 93.575401,79.902272 95.19125,64.045119 101.36661,58.660981 126.20225,46.336525 L 123.15081,38.082011 C 117.55302,39.986495 112.66391,44.332825 105.3508,40.233662 104.35511,30.740921 113.89033,22.573248 116.18729,11.440667 113.44871,6.8392209 110.71047,1.5883626 107.9719,1.4257122 z M 67.247024,37.651681 C 68.589372,37.700987 70.057126,37.969835 71.589446,38.512342 70.903519,42.327561 69.0724,45.455374 62.904602,49.270594 L 52.14635,59.011702 C 50.056552,57.696631 54.270994,37.175061 67.247024,37.651681 z"
+     id="rect4787" />
+</svg>
