@@ -526,13 +526,21 @@ void
 Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
 {
 #ifdef Q_WS_X11
-    // WORKAROUND the raster graphicssystem destructor & some special virtual widget
 //     if ( widget->windowFlags() & (Qt::SubWindow | Qt::X11BypassWindowManagerHint | Qt::FramelessWindowHint |
 //                                   (Qt::CustomizeWindowHint & ~Qt::WindowTitleHint)) )
 //         return;
-    if ((appType == KWin) || (appType == Plasma && !FX::usesXRender()))
+    if ((appType == KWin))
         return;
-    // offending widgets: inherits("KXMessages"), inherits("KSelectionWatcher::Private") - unfortunately internal
+    // WORKAROUND the raster graphicssystem destructor & some special virtual widget
+    if (widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
+    {
+        qDebug() << "BESPIN: Not exporting decoration hints for " << widget;
+        return;
+    }
+//     if (widget && !FX::usesXRender())
+//     {   // offending widgets: inherits("KXMessages"), inherits("KSelectionWatcher::Private") - unfortunately internal
+    //             if (daddy->inherits("KSelectionWatcher") || daddy->inherits("KSelectionOwner"))
+//     }
 
     // this is important because KDE apps may alter the original palette any time
     const QPalette &pal = originalPalette ? *originalPalette : palette;
