@@ -125,6 +125,8 @@ QAction *
 MenuBar::addAction(const QString & text, int idx, QMenu *menu)
 {
     QAction *ret = new QAction(text, this);
+    if (text == "<XBAR_SEPARATOR/>")
+        ret->setSeparator(true);
     addAction(ret, idx);
     ret->setMenu(menu);
     return ret;
@@ -175,7 +177,10 @@ MenuBar::changeAction(int idx, const QString & text)
         return;
     }
 
-    d.actions.at(idx)->setText(text);
+    QAction *act = d.actions.at(idx);
+    act->setText(text);
+    if (text == "<XBAR_SEPARATOR/>")
+        act->setSeparator(true);
     d.actionRects[idx] = QRect();
     updateSize();
 }
@@ -365,6 +370,8 @@ MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidge
     for (int i = 0; i <  d.actions.count(); ++i)
     {
         action = d.actions.at(i);
+        if (action->isSeparator())
+            continue;
         adjustedActionRect = d.actionRects.at(i);
         if (adjustedActionRect.isEmpty() || !action->isVisible())
             continue;
@@ -478,6 +485,8 @@ MenuBar::updateSize()
     for (int i = 0; i < d.actions.count(); ++i)
     {
         action = d.actions.at(i);
+        if (action->isSeparator())
+            continue;
         r = d.actionRects.at(i);
         if (!r.isValid())
         {
