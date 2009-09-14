@@ -29,6 +29,8 @@ This library is distributed in the hope that it will be useful,
 #include <QStyle>
 #include <QStyleOptionMenuItem>
 
+#include <kglobalsettings.h>
+
 #include <Plasma/Applet>
 
 #include "menubar.h"
@@ -52,6 +54,7 @@ QGraphicsWidget(parent)
     if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(parent->layout()))
         lLayout->insertItem(0, this);
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+//     setFont();
 //    setObjectName( "XBarMenubar" );
 }
 
@@ -226,7 +229,7 @@ MenuBar::initStyleOption(QStyleOptionMenuItem *option, int idx) const
         return;
 
     QAction *action = d.actions.at(idx);
-    option->font = action->font();
+    option->font = KGlobalSettings::menuFont(); //action->font();
     option->icon = action->icon();
     if (idx)
         option->text = action->text();

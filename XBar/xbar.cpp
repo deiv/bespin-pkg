@@ -146,7 +146,7 @@ XBar::init()
     else
         d.taskbar = new MenuBar("", 0, this, dummy);
     d.currentBar = d.taskbar;
-    
+
     updatePalette();
     
     show(d.taskbar);
