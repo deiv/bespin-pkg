@@ -278,7 +278,7 @@ Client::eventFilter(QObject *o, QEvent *e)
         if (dirty[isActive()])
         {
             dirty[isActive()] = false;
-            repaint(p, false);
+            repaint(p, bgMode < 2 && gType[isActive()]);
         }
         repaint(p);
         p.end();
@@ -613,13 +613,19 @@ Client::repaint(QPainter &p, bool paintTitle)
         case 1:
         {   // scanlines, fallback
             p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
-            p.fillRect(top, Gradients::brush(bg, titleSize, Qt::Vertical, config()->gradient[0][isActive()]));
-            p.setPen(Colors::mid(bg, Qt::black,6,1));
-            p.drawLine(borderSize,titleSize-1,width()-borderSize,titleSize-1);
-//       p.setPen(Colors::mid(bg, Qt::white,6,1));
-//       p.drawLine(0,titleSize-1,width(),titleSize-1);
+            const Gradients::Type gradient = config()->gradient[0][isActive()];
+            if (gradient == Gradients::None)
+                p.drawRect(top);
+            else
+            {
+                p.fillRect(top, Gradients::brush(bg, titleSize, Qt::Vertical, gradient));
+                p.setPen(Colors::mid(bg, Qt::black,6,1));
+                p.drawLine(borderSize,titleSize-1,width()-borderSize,titleSize-1);
+//                 p.setPen(Colors::mid(bg, Qt::white,6,1));
+//                 p.drawLine(0,titleSize-1,width(),titleSize-1);
+            }
 
-            Gradients::Type titleGradient = gType[isActive()];
+            const Gradients::Type titleGradient = gType[isActive()];
             if (paintTitle && titleGradient && label.width())
             {   // nice deco
                 p.setRenderHint( QPainter::Antialiasing );
