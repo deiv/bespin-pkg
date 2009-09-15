@@ -34,7 +34,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8.3195532"
-     inkscape:cx="32"
+     inkscape:cx="17.39585"
      inkscape:cy="32"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -42,12 +42,15 @@
      inkscape:grid-bbox="true"
      inkscape:window-width="1600"
      inkscape:window-height="962"
-     inkscape:window-x="174"
-     inkscape:window-y="107"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
-       id="grid3165" />
+       id="grid3165"
+       empspacing="5"
+       visible="true"
+       enabled="true" />
   </sodipodi:namedview>
   <metadata
      id="metadata2388">
@@ -65,7 +68,7 @@
      id="layer1"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     style="opacity:0.66">
+     style="opacity:1">
     <path
        d=""
        id="path2829" />
