@@ -77,6 +77,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
     hover = option->state & State_Selected;
     Animator::IndexInfo *info = 0;
     int step = 0;
+    QFont pFont = painter->font();
     if (sunken)
         step = 6;
     else
@@ -84,6 +85,8 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         if (const QMenuBar* mbar = qobject_cast<const QMenuBar*>(widget))
         {
             QAction *action = mbar->actionAt(RECT.topLeft()); // is the action for this item!
+            if (action && action->font().bold())
+                setBold(painter, mbi->text);
             QAction *activeAction = mbar->activeAction();
             info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, (long int)activeAction));
             if (info && (!(activeAction && activeAction->menu()) || activeAction->menu()->isHidden()))
@@ -141,6 +144,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         drawItemPixmap(painter,r, alignment, pix);
     else
         drawItemText(painter, r, alignment, mbi->palette, isEnabled, mbi->text, (hover || step > 3) ? fg : fg2);
+    painter->setFont(pFont);
 }
 
 static const int windowsItemFrame   = 1; // menu item frame width
