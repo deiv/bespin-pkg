@@ -526,21 +526,21 @@ void
 Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
 {
 #ifdef Q_WS_X11
-//     if ( widget->windowFlags() & (Qt::SubWindow | Qt::X11BypassWindowManagerHint | Qt::FramelessWindowHint |
-//                                   (Qt::CustomizeWindowHint & ~Qt::WindowTitleHint)) )
-//         return;
     if ((appType == KWin))
         return;
+
     // WORKAROUND the raster graphicssystem destructor & some special virtual widget
-    if (widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
+    // as we now only set this on the show event, this should not occur anyway, but let's keep it safe
+    if (!FX::usesXRender() && widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
     {
+        //NOTICE esp. when using the raster engine some "virtual" widgets segfault in their destructor
+        // as the winId() call below will unexpectedly generate a native window
+        // known offending widgets:
+        // inherits("KXMessages"), inherits("KSelectionWatcher::Private") inherits("KSelectionOwner::Private")
+        // unfortunately the latter two are internal (and thus don't propagate their class through moc)
         qDebug() << "BESPIN: Not exporting decoration hints for " << widget;
         return;
     }
-//     if (widget && !FX::usesXRender())
-//     {   // offending widgets: inherits("KXMessages"), inherits("KSelectionWatcher::Private") - unfortunately internal
-    //             if (daddy->inherits("KSelectionWatcher") || daddy->inherits("KSelectionOwner"))
-//     }
 
     // this is important because KDE apps may alter the original palette any time
     const QPalette &pal = originalPalette ? *originalPalette : palette;
@@ -774,6 +774,14 @@ static bool isLastNavigatorButton(const QWidget *w, const char *className)
     }
     return false;
 }
+
+// settings the property can be expensive, so avoid for popups, combodrops etc.
+// NOTICE:
+// Qt::Dialog must be erased as it's in drawer et al. but takes away window as well
+// Qt::FramelessWindowHint shall /not/ be ignored as the window could change it's opinion while being visible
+static const
+Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::SubWindow |
+Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
 
 bool
@@ -1020,20 +1028,24 @@ Style::eventFilter( QObject *object, QEvent *ev )
         QWidget * widget = qobject_cast<QWidget*>(object);
         if (!widget)
             return false;
-        
-        if (widget->isModal())
+
+        // talk to kwin about colors, gradients, etc.
+        if (widget->isWindow() && !(widget->windowFlags() & ignoreForDecoHints))
         {
-            if (config.bg.modal.invert)
-                swapPalette(widget, this);
-            if (config.bg.modal.glassy)
-            {
-                widget->setAttribute(Qt::WA_StyledBackground);
-                widget->setAttribute(Qt::WA_MacBrushedMetal);
+            if (widget->isModal())
+            { // setup some special stuff for modal windows
+                if (config.bg.modal.invert)
+                    swapPalette(widget, this);
+                if (config.bg.modal.glassy)
+                {
+                    widget->setAttribute(Qt::WA_StyledBackground);
+                    widget->setAttribute(Qt::WA_MacBrushedMetal);
+                }
+                widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
             }
 #ifdef Q_WS_X11
             setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
 #endif
-            widget->setWindowOpacity( config.bg.modal.opacity/100.0 );
             return false;
         }
         if (QMenu * menu = qobject_cast<QMenu*>(widget))
@@ -1083,17 +1095,10 @@ Style::eventFilter( QObject *object, QEvent *ev )
 
 #ifdef Q_WS_X11
         // talk to kwin about colors, gradients, etc.
-        if (widget->isWindow())
+        if (widget->isWindow() && !(widget->windowFlags() & ignoreForDecoHints))
         {
-            Qt::WindowFlags ignore =    Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::ToolTip |
-            Qt::SplashScreen | Qt::Desktop |
-            Qt::X11BypassWindowManagerHint;// | Qt::FramelessWindowHint; <- could easily change mind...?!
-            ignore &= ~Qt::Dialog; // erase dialog, it's in drawer et al. but takes away window as well
-            
-            if (!(widget->windowFlags() & ignore)) {    // this can be expensive, so avoid for popups, combodrops etc.
-                setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
-                XProperty::remove(widget->winId(), XProperty::bgPics);
-            }
+            setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
+            XProperty::remove(widget->winId(), XProperty::bgPics);
             return false;
         }
 #endif

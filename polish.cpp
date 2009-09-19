@@ -339,6 +339,7 @@ Style::polish( QWidget * widget )
 #if BESPIN_ARGB_WINDOWS
         if (!(  config.bg.opacity == 0xff || // opaque
                 widget->windowType() == Qt::Desktop || // makes no sense + QDesktopWidget is often misused
+                widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) || // makes no sense
                 widget->testAttribute(Qt::WA_TranslucentBackground)))
         {
             widget->setAttribute(Qt::WA_TranslucentBackground);
@@ -406,26 +407,20 @@ Style::polish( QWidget * widget )
 #endif
         else
         {
-            if (config.bg.modal.invert || config.bg.modal.glassy || config.bg.modal.opacity < 100)
-            {
-                // the modality isn't necessarily set yet, so we catch it on QEvent::Show
-                widget->removeEventFilter(this);
-                widget->installEventFilter(this); /// modal dialogs
-            }
-
             // talk to kwin about colors, gradients, etc.
             Qt::WindowFlags ignore =    Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::ToolTip |
                                         Qt::SplashScreen | Qt::Desktop |
                                         Qt::X11BypassWindowManagerHint;// | Qt::FramelessWindowHint; <- could easily change mind...?!
             ignore &= ~Qt::Dialog; // erase dialog, it's in drawer et al. but takes away window as well
-            
-            if (!(widget->windowFlags() & ignore)) { // this can be expensive, so avoid for popups, combodrops etc.
-                setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
+            // this can be expensive, so avoid for popups, combodrops etc.
+            if (!(widget->windowFlags() & ignore))
+            {
+                if (widget->isVisible())
+                    setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
                 widget->removeEventFilter(this);
-                widget->installEventFilter(this); // catch palette changes for deco
+                widget->installEventFilter(this); // catch show event and palette changes for deco
             }
         }
-
     }
     //END Window handling                                                                          -
 
