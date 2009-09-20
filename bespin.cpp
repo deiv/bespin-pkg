@@ -506,8 +506,16 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
         QStyleOption tmpOpt = *option;
         //         tmpOpt.rect = QRect(tl, widget->size());
         tmpOpt.palette = grampa->palette();
-        if (config.bg.opacity == 0xff || config.bg.mode == Plain)
-            painter->fillRect(option->rect, grampa->palette().brush(QPalette::Window));
+
+        if (config.bg.opacity == 0xff || tmpOpt.palette.brush(QPalette::Window).style() > 1)
+            painter->fillRect(tmpOpt.rect, tmpOpt.palette.brush(QPalette::Window));
+        else
+        {
+            QColor c = tmpOpt.palette.color(QPalette::Window);
+            c.setAlpha(config.bg.opacity);
+            painter->fillRect(tmpOpt.rect, c);
+        }
+        
         painter->translate(tl);
         drawWindowBg(&tmpOpt, painter, grampa);
     }
