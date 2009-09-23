@@ -509,7 +509,7 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 
         if (config.bg.opacity == 0xff || tmpOpt.palette.brush(QPalette::Window).style() > 1)
             painter->fillRect(tmpOpt.rect, tmpOpt.palette.brush(QPalette::Window));
-        else
+        else if (config.bg.mode == Plain)
         {
             QColor c = tmpOpt.palette.color(QPalette::Window);
             c.setAlpha(config.bg.opacity);
