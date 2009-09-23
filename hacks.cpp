@@ -311,7 +311,7 @@ private:
 class AmarokData {
     public:
         AmarokData() :  context(0), player(0), lowerPart(0), cover(0), meta(0),
-                        status(0), displayBg(0), dial(0), toggleContext(0), toggleCompact(0) {}
+        status(0), displayBg(0), dial(0), toggleContext(0), toggleCompact(0), mainWindow(0) {}
         ~AmarokData()
         {
             if (context) context->show();
@@ -332,7 +332,7 @@ class AmarokData {
             deleteDeferred(toggleCompact);
             delete displayBg;
         }
-        QList<QPointer<QDockWidget> > docks;
+        QList<QPointer<QDockWidget> > docks, visibleDocks;
         QPointer<QWidget> context, player, lowerPart;
         QPointer<CoverLabel> cover;
         QPointer<PrettyLabel> meta;
@@ -341,6 +341,7 @@ class AmarokData {
         QPixmap *displayBg;
         QPointer<ProxyDial> dial;
         QPointer<QToolButton> toggleContext, toggleCompact;
+        QPointer<QMainWindow> mainWindow;
 };
 
 static Hacks *bespinHacks = 0;
@@ -693,12 +694,13 @@ hackAmarokPlayer(QWidget *frame)
                     amarok->toggleContext = new QToolButton(f);
                     fnt = amarok->toggleContext->font(); fnt.setBold(true);
                     amarok->toggleContext->setFont(fnt);
-                    amarok->toggleContext->setText(amarok->context && !amarok->context->isVisible() ? "[||]" : "[|]");
-                    
-                    amarok->toggleContext->setToolTip("Toggle ContextView");
+                    if (amarok->context)
+                    {
+                        amarok->toggleContext->setText(amarok->context->isVisible() ? "[|]" : "[||]");
+                        amarok->toggleContext->setToolTip("Toggle ContextView");
+                        bespinHacks->connect(amarok->toggleContext, SIGNAL(clicked(bool)), SLOT(toggleAmarokContext()));
+                    }
                     box2->addWidget(amarok->toggleContext);
-                    bespinHacks->connect(amarok->toggleContext, SIGNAL(clicked(bool)), SLOT(toggleAmarokContext())); // TODO: bind toggle?
-//                     bespinHacks->connect(amarok->toggleContext, SIGNAL(clicked(bool)), SLOT(toggleAmarokFreedom())); // TODO: bind toggle?
                 }
                 
                 if (!amarok->toggleCompact)
@@ -709,7 +711,7 @@ hackAmarokPlayer(QWidget *frame)
                     
                     amarok->toggleCompact->setToolTip("Toggle comapct mode");
                     box2->addWidget(amarok->toggleCompact);
-                    bespinHacks->connect(amarok->toggleCompact, SIGNAL(clicked(bool)), SLOT(toggleAmarokCompact())); // TODO: bind toggle?
+                    bespinHacks->connect(amarok->toggleCompact, SIGNAL(clicked(bool)), SLOT(toggleAmarokCompact()));
                 }
             }
     }
@@ -836,55 +838,86 @@ Hacks::toggleAmarokCompact()
     QToolButton *btn = qobject_cast<QToolButton*>(sender());
     if (btn)
         btn->setText(amarok->size.isValid() ? "-" : "+");
-    
-    if (!amarok->lowerPart)
-    {
-        if (!btn)
-            return;
-        if (QWidget *window = btn->window())
-        {
-            if (!amarok->size.isValid())
-            {
-                amarok->size = window->size();
-                window->resize(QSize(600, 2));
-            }
-            else
-            {
-                window->resize(amarok->size);
-                amarok->size = QSize();
-            }
-        }
-        return;
-    }
-    
-    amarok->lowerPart->setVisible(!amarok->lowerPart->isVisible());
 
-    if (QWidget *window = amarok->lowerPart->window())
+    bool compact;
+
+    if (amarok->mainWindow)
+    {
+        if (amarok->visibleDocks.isEmpty())
+        {
+            foreach (QDockWidget *dock, amarok->docks)
+                if (dock && dock->isVisibleTo(amarok->mainWindow))
+                {
+                    amarok->visibleDocks << dock;
+                    dock->hide();
+                }
+                compact = true;
+        }
+        else
+        {
+            foreach (QDockWidget *dock, amarok->visibleDocks)
+                if (dock) dock->show();
+                amarok->visibleDocks.clear();
+            compact = false;
+        }
+    }
+    else
+    {
+        if (!amarok->lowerPart)
+        {
+            if (!btn)
+                return;
+            if (QWidget *window = btn->window())
+            {
+                if (!amarok->size.isValid())
+                {
+                    amarok->size = window->size();
+                    window->resize(QSize(600, 2));
+                }
+                else
+                {
+                    window->resize(amarok->size);
+                    amarok->size = QSize();
+                }
+            }
+            return;
+        }
+    
+        amarok->lowerPart->setVisible(!amarok->lowerPart->isVisible());
+        compact = amarok->lowerPart->isVisible();
+
+    }
+
+    QWidget *window = amarok->mainWindow;
+    if (!window && amarok->lowerPart)
+        window = amarok->lowerPart->window();
+    if (window)
     {
         QWidget *statusContainer = amarok->status;
         if (statusContainer->parentWidget() && statusContainer->parentWidget()->inherits("KVBox"))
             statusContainer = statusContainer->parentWidget();
         
-        if (amarok->lowerPart->isVisible())
+        if (compact)
+        {
+            amarok->size = window->size();
+            if (statusContainer)
+                statusContainer->hide();
+            if (amarok->player)
+            {
+                int h = amarok->player->height() + 4;
+                if (QMainWindow *mw = qobject_cast<QMainWindow*>(window))
+                    if (mw->menuBar())
+                        h += mw->menuBar()->height();
+                    window->setFixedHeight(h);
+            }
+            window->resize(QSize(600, 2));
+        }
+        else
         {
             if (statusContainer) statusContainer->show();
             if (amarok->player)
                 window->setMaximumHeight(0xffffff);
             window->resize(amarok->size);
-        }
-        else
-        {
-            amarok->size = window->size();
-            if (statusContainer) statusContainer->hide();
-            if (amarok->player)
-            {
-                int h = amarok->player->height() + 4;
-                if (QMainWindow *mw = qobject_cast<QMainWindow*>(window))
-                if (mw->menuBar())
-                    h += mw->menuBar()->height();
-                window->setFixedHeight(h);
-            }
-            window->resize(QSize(600, 2));
         }
     }
 }
@@ -1157,13 +1190,11 @@ Hacks::add(QWidget *w)
             hackAmarokPlayer(w);
         else if (QDockWidget *dock = qobject_cast<QDockWidget*>(w))
         {
+            if (!amarok->mainWindow)
+                amarok->mainWindow = qobject_cast<QMainWindow*>(dock->parentWidget());
             dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-            if (dock->objectName() == "Context dock")
-                amarok->context = dock;
-//             if (dock->titleBarWidget())
-//                 dock->titleBarWidget()->show();
-//             amarok->docks.removeAll(dock);
-//             amarok->docks << dock;
+            if (!amarok->docks.contains(dock))
+                amarok->docks << dock;
         }
         else if (QFrame *frame = qobject_cast<QFrame*>(w))
         {
@@ -1178,8 +1209,9 @@ Hacks::add(QWidget *w)
                     viewport->setPalette(QPalette());
                 }
             }
-            if (!amarok->context && (config.amarokContext || config.amarokDisplay)
-                && w->inherits("Context::ContextView"))
+            if (!(amarok->context || amarok->mainWindow) &&
+                (config.amarokContext || config.amarokDisplay) &&
+                w->inherits("Context::ContextView"))
             {
                 QWidget *splitterKid = w;
                 
