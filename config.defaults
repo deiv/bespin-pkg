@@ -26,7 +26,7 @@
 #define FADE_INACTIVE "FadeInactive", false
 #define SUNKEN_GROUPS "SunkenGroups", false
 
-#define ARGB_BLACKLIST "ARGB.Blacklist", "smplayer,amarok,dragonplayer"
+#define ARGB_BLACKLIST "ARGB.Blacklist", "smplayer,amarok,dragonplayer,vlc,vlc-wrapper,kscreenlocker"
 #define ARGB_GLASSY "ARGB.Glassy", false
 
 #define BG_INTENSITY "Bg.Intensity", 10
