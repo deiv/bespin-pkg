@@ -266,7 +266,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
     if (justText)
     {   // the most simple way
         if (!connected)
-            text = Colors::mid(text, FCOLOR(Highlight), 6-step, step);
+            text = Colors::mid(text, FCOLOR(Link), 6-step, step);
         painter->setPen(text);
         if (sunken)
             setBold(painter, toolbutton->text);
@@ -317,7 +317,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
     if (!(toolbutton->text.isEmpty() || toolbutton->toolButtonStyle == Qt::ToolButtonIconOnly))
     {
         if (!connected && pm.isNull())
-            text = Colors::mid(text, FCOLOR(Highlight), 6-step, step);
+            text = Colors::mid(text, FCOLOR(Link), 6-step, step);
         painter->setPen(text);
             
 //         QFont fnt = toolbutton->font;
