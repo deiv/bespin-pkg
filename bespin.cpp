@@ -312,7 +312,7 @@ Style::btnFg(const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool 
     QColor  fg1 = hasFocus ? FCOLOR(HighlightedText) : CCOLOR(btn.std, Fg),
             fg2 = CCOLOR(btn.active, Fg);
     if (flat)
-        { fg1 = FCOLOR(WindowText); fg2 = FCOLOR(Highlight); }
+        { fg1 = FCOLOR(WindowText); fg2 = FCOLOR(Link); }
 
     if (!flat && config.btn.backLightHover)
         return fg1;
