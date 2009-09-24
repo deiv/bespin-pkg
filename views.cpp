@@ -52,11 +52,11 @@ Style::drawHeader(const QStyleOption *option, QPainter *painter, const QWidget *
 }
 
 void
-Style::drawHeaderSection(const QStyleOption * option, QPainter * painter,
-                               const QWidget *) const
+Style::drawHeaderSection(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
     OPT_SUNKEN OPT_HOVER
     const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option);
+    const bool sorting = header && (header->sortIndicator != QStyleOptionHeader::None);
 
     Qt::Orientation o = Qt::Vertical; int s = RECT.height();
     if (header && header->orientation == Qt::Vertical)
@@ -65,9 +65,8 @@ Style::drawHeaderSection(const QStyleOption * option, QPainter * painter,
         s = RECT.width();
     }
 
-    QColor c =  (header->sortIndicator != QStyleOptionHeader::None) ?
-                                        COLOR(config.view.sortingHeader_role[Bg]) :
-                                        COLOR(config.view.header_role[Bg]);
+    QColor c =  sorting ? COLOR(config.view.sortingHeader_role[Bg]) : COLOR(config.view.header_role[Bg]);
+
     if (Colors::value(c) < 50)
         { int h,s,v,a; c.getHsv(&h, &s, &v, &a); c.setHsv(h, s, 50, a); }
 
@@ -80,14 +79,11 @@ Style::drawHeaderSection(const QStyleOption * option, QPainter * painter,
         return;
     }
 
-    const Gradients::Type gt =  (header->sortIndicator != QStyleOptionHeader::None) ?
-                                config.view.sortingHeaderGradient : config.view.headerGradient;
+    const Gradients::Type gt = sorting ? config.view.sortingHeaderGradient : config.view.headerGradient;
 
     if (hover)
-    {
-        const bool sort = (header->sortIndicator != QStyleOptionHeader::None);
-        c = Colors::mid(c, sort ? CCOLOR(view.sortingHeader, Fg) : CCOLOR(view.header, Fg),8,1);
-    }
+        c = Colors::mid(c, sorting ? CCOLOR(view.sortingHeader, Fg) : CCOLOR(view.header, Fg),8,1);
+
     if (gt == Gradients::None)
         painter->fillRect(RECT, c);
     else
