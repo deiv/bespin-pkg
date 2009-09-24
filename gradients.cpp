@@ -75,7 +75,7 @@ hash(int size, const QColor &c, int *sloppyAdd)
         (((frameSize + (size - frameBase)/sizeSloppyness) & 0x1ff) << 23) |
         (((c.red() >> 2) & 0x3f) << 17) |
         (((c.green() >> 2) & 0x3f) << 11 ) |
-        ((c.blue() >> 2) & 0x3f << 5) |
+        (((c.blue() >> 2) & 0x3f) << 5 ) |
         ((c.alpha() >> 3) & 0x1f);
 
     return magicNumber;
