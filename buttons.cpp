@@ -35,11 +35,22 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
 {
     ASSURE_OPTION(btn, Button);
     OPT_SUNKEN OPT_HOVER;
-    if ( widget && widget->inherits("WebView") )
-        widget = 0; // leads to false UnderMouse assumptions...
 
     QRect oldRect = btn->rect;
     QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
+    if ( widget && widget->inherits("QWebView") )
+    {
+        if (!isCheckbox)
+        {   // paints hardcoded black text bypassing the style?! grrr...
+            if (Colors::value(CCOLOR(btn.std, Bg)) < 100)
+                _btn->palette.setColor(config.btn.std_role[Bg], QColor(230,230,230,255));
+            _btn->palette.setColor(config.btn.std_role[Fg], Qt::black);
+            if (Colors::value(CCOLOR(btn.active, Bg)) < 100)
+                _btn->palette.setColor(config.btn.active_role[Bg], Qt::white);
+            _btn->palette.setColor(config.btn.active_role[Fg], Qt::black);
+        }
+        widget = 0; // leads to false UnderMouse assumptions...
+    }
     anim.widget = widget;
     anim.step = HOVER_STEP;
 
@@ -385,7 +396,7 @@ Style::drawCheckBox(const QStyleOption * option, QPainter * painter,
                           const QWidget * widget) const
 {
     B_STATES
-    if ( widget && widget->inherits("WebView") )
+    if ( widget && widget->inherits("QWebView") )
         widget = 0;
 
     // the button -----------------
@@ -427,7 +438,7 @@ Style::drawCheckBox(const QStyleOption * option, QPainter * painter,
 void
 Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-    if ( widget && widget->inherits("WebView") )
+    if ( widget && widget->inherits("QWebView") )
         widget = 0;
     B_STATES
 

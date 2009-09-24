@@ -196,7 +196,20 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
 {
     ASSURE_OPTION(cmb, ComboBox);
     B_STATES
-    if ( widget && widget->inherits("WebView") ) widget = 0;
+    if ( widget && widget->inherits("WebView") )
+    {
+        if (!cmb->editable)
+        {   // paints hardcoded black text bypassing the style?! grrr...
+            QStyleOptionComboBox *_cmb = const_cast<QStyleOptionComboBox*>(cmb);
+            if (Colors::value(CCOLOR(btn.std, Bg)) < 100)
+                _cmb->palette.setColor(config.btn.std_role[Bg], QColor(230,230,230,255));
+            _cmb->palette.setColor(config.btn.std_role[Fg], Qt::black);
+            if (Colors::value(CCOLOR(btn.active, Bg)) < 100)
+                _cmb->palette.setColor(config.btn.active_role[Bg], Qt::white);
+            _cmb->palette.setColor(config.btn.active_role[Fg], Qt::black);
+        }
+        widget = 0;
+    }
 
     const int f1 = F(1), f2 = F(2), f3 = F(3);
     QRect ar, r = RECT.adjusted(f1, f1, -f1, -f2);
