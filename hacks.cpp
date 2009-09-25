@@ -581,6 +581,12 @@ Hacks::swapAmarokPalette()
     //                 pal.setColor(QPalette::Button, c);
     //                 pal.setColor(QPalette::ButtonText, pal.color(QPalette::Active, frame->foregroundRole()));
     amarok->player->setPalette(pal);
+#define UNSET(_W_) if (amarok->_W_) amarok->_W_->setPalette(QPalette())
+    UNSET(meta);
+    UNSET(dial);
+    UNSET(toggleContext);
+    UNSET(toggleCompact);
+    UNSET(cover);
 }
 
 static void
