@@ -36,6 +36,9 @@
 #define DEBUG //
 #endif
 #include <QtDebug>
+
+QStyle *VisualFrame::ourStyle = 0L;
+
 using namespace VFrame;
 
 static QRegion corner[4];
@@ -434,6 +437,8 @@ QWidget(parent), _frame(frame), _vFrame(vFrame), _side(side)
 void
 VisualFramePart::paintEvent ( QPaintEvent * event )
 {
+    if (!_vFrame->style())
+        return;
     QPainter p(this);
     p.setClipRegion(event->region(), Qt::IntersectClip);
     QStyleOption opt; Type t;
@@ -481,7 +486,7 @@ VisualFramePart::paintEvent ( QPaintEvent * event )
         opt.rect.moveTopRight(QPoint(width()-1, -sizes[t][North]));
         break;
     }
-    style()->drawPrimitive(QStyle::PE_Frame, &opt, &p, this);
+    _vFrame->style()->drawPrimitive(QStyle::PE_Frame, &opt, &p, this);
     p.end();
 }
 

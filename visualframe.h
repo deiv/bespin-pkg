@@ -67,6 +67,8 @@ public:
     static void setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer);
     static bool manage(QFrame *frame);
     static void release(QFrame *frame);
+    static void setStyle(QStyle *style) { ourStyle = style; };
+    inline static QStyle *style() { return ourStyle; };
 public slots:
     void show();
     void hide();
@@ -86,6 +88,7 @@ private:
     VisualFramePart *top, *bottom, *left, *right;
     QRect _frameRect;
     bool hidden;
+    static QStyle *ourStyle;
 private slots:
     void correctPosition();
 };
