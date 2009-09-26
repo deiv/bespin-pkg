@@ -14,7 +14,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="media-skip-backwards.svg">
+   sodipodi:docname="edit-clear-list.svg"
+   inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/media-skip-backward.png"
+   inkscape:export-xdpi="33.75"
+   inkscape:export-ydpi="33.75">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -32,9 +35,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="6.6015625"
-     inkscape:cx="64"
-     inkscape:cy="63.92426"
+     inkscape:zoom="1.5117188"
+     inkscape:cx="144.42437"
+     inkscape:cy="38.40088"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -69,9 +72,29 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       id="rect2816"
-       transform="translate(0,924.36218)"
+       sodipodi:type="star"
        style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 19.25,8 5.5,0 C 30.9825,8 36,13.0175 36,19.249999 L 36,108.75 C 36,114.9825 30.9825,120 24.75,120 l -5.5,0 C 13.0175,120 8,114.9825 8,108.75 L 8,19.249999 C 8,13.0175 13.0175,8 19.25,8 z M 102.53125,7.15625 C 87.95932,7.5252789 57.644727,22.265901 36,37.4375 l 0,52.9375 c 25.174479,17.92653 62.050631,35.31035 72,29.625 15.51918,-8.8681 15.93959,-102.7128 0.5,-111.71875 -1.44746,-0.8443078 -3.48198,-1.1879766 -5.96875,-1.125 z" />
+       id="path2814"
+       sodipodi:sides="3"
+       sodipodi:cx="52"
+       sodipodi:cy="48"
+       sodipodi:r1="64.498062"
+       sodipodi:r2="32.249031"
+       sodipodi:arg1="1.0516502"
+       sodipodi:arg2="2.0988478"
+       inkscape:flatsided="true"
+       inkscape:rounded="0.16"
+       inkscape:randomized="0"
+       d="M 84.000001,104 C 68.480826,112.8681 -12.57701,65.586864 -12.497423,47.712814 -12.417835,29.838764 69.057834,-16.718763 84.497422,-7.7128135 99.93701,1.2931363 99.519176,95.131899 84.000001,104 z"
+       transform="matrix(0.77213437,0,0,1,45.84338,940.36218)" />
+    <rect
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect2816"
+       width="28"
+       height="112"
+       x="8"
+       y="932.36218"
+       rx="11.25"
+       ry="11.249999" />
   </g>
 </svg>
