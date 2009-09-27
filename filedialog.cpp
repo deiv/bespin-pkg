@@ -56,6 +56,10 @@ session()
     QString qSession = env;
     if (qSession == "kde4") return KDE;
     if (qSession == "gnome") return GNOME;
+    env = getenv("KDE_FULL_SESSION");
+    if (!env) return Unkown;
+    qSession = env;
+    if (qSession == "true") return KDE;
     return Unkown;
 }
 // #include <QtDebug>
