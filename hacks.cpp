@@ -555,7 +555,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
 
     // preserve dock / toolbar internal move float trigger on dock titles =================
     if (w->cursor().shape() != Qt::ArrowCursor ||
-        (mev->pos().y() < 12 && qobject_cast<QDockWidget*>(w)))
+        (mev->pos().y() < w->fontMetrics().height()+4 && qobject_cast<QDockWidget*>(w)))
         return false;
 
 //     QMouseEvent rel(QEvent::MouseButtonRelease, mev->pos(), mev->button(),

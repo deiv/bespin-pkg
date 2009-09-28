@@ -34,8 +34,7 @@ Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *
         painter->drawRect(RECT);
     }
     
-    const QDockWidget *dw = qobject_cast<const QDockWidget*>(widget);
-    if (dw && dw->isFloating())
+    if (widget && widget->isWindow())
     {
         if (!needRestore) painter->save();
 
@@ -51,33 +50,24 @@ Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *
 void
 Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-
     ASSURE_OPTION(dock, DockWidget);
     
     QColor bg = FCOLOR(Window);
     bg.setAlpha(config.bg.opacity);
-
-    painter->save();
-
-    if (dock->floatable || dock->movable)
+    const bool floating = widget && widget->isWindow();
+#if 0
+    if ((dock->floatable || dock->movable) && !floating)
     {
-        const QDockWidget *dw = qobject_cast<const QDockWidget*>(widget);
-        if ( !(dw && dw->isFloating()) )
-        {
-            painter->setPen(bg.dark(120));
-            painter->drawLine(RECT.topLeft(), RECT.topRight());
-
-            painter->setPen(bg.light(114));
-            painter->drawLine(RECT.left(), RECT.y()+1, RECT.right(), RECT.y()+1);
-        }
+        Tile::setShape(Tile::Full & ~Tile::Bottom);
+        masks.rect[true].render(RECT, painter, Gradients::light(RECT.height()));
+        Tile::reset();
     }
-
+#endif
     if (dock->title.isEmpty())
-        { painter->restore(); return; }
-        
-    OPT_ENABLED OPT_HOVER
-    QRect textRect, rect = RECT;
-    // adjust rect;
+        return;
+
+    OPT_ENABLED
+    QRect rect = RECT;
     const int bw = (dock->closable +  dock->floatable) * (16 + F(2));
     if (option->direction == Qt::LeftToRight)
         rect.adjust(F(8), 0, -bw, 0);
@@ -85,29 +75,15 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
         rect.adjust(bw, 0, -F(8), 0);
 
     // text
-    const int itemtextopts = Qt::AlignVCenter | Qt::AlignLeft /*Qt::AlignBottom | Qt::AlignHCenter*/ | Qt::TextSingleLine | Qt::TextHideMnemonic;
-    QString title = dock->title; // " " + dock->title + " "; // good for underlining
-    setTitleFont(painter);
-    if (Colors::value(bg) < 100)
-    {   // emboss
-        painter->setPen(Colors::mid(bg, Qt::black, 1, 4));
-        drawItemText(painter, rect.adjusted(0,-1,0,-1), itemtextopts, PAL, isEnabled, title);
-    }
-    painter->setPen(hover ? FCOLOR(WindowText) : Colors::mid(bg, FCOLOR(WindowText), 1, 3));
-    drawItemText(painter, rect, itemtextopts, PAL, isEnabled, title, QPalette::NoRole, &rect);
+    const int itemtextopts = Qt::AlignCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
 
-#if 1
-    // underline
-    rect.setBottom(RECT.bottom());
-    Tile::PosFlags pf = Tile::Center;
-    if (option->direction == Qt::LeftToRight)
-        { rect.setLeft(RECT.left()); pf |= Tile::Right; }
+    QPen pen = painter->pen();
+    if (floating && widget->isActiveWindow())
+        painter->setPen(FCOLOR(WindowText));
     else
-        { rect.setRight(RECT.right()); pf |= Tile::Left; }
-    shadows.line[0][Sunken].render(rect, painter, pf, true);
-#endif
-
-    painter->restore();
+        painter->setPen(Colors::mid(bg, FCOLOR(WindowText), 2, 1+isEnabled));
+    drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dock->title);
+    painter->setPen(pen);
 }
 
 void
