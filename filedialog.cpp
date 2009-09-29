@@ -85,7 +85,7 @@ dialog(QWidget *parent, Session ses, const QStringList &args, const QString &dir
     QString result;
     if ( proc.error() == QProcess::UnknownError )
     {
-        result = proc.readAllStandardOutput().trimmed();
+        result = QString::fromLocal8Bit(proc.readAllStandardOutput().trimmed().data());
         if ( result.isNull() )
             result = "";
     }
