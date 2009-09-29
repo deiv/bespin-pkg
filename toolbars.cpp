@@ -130,7 +130,9 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
     OPT_ENABLED
 
     QRect rect = RECT;
-    if (connected && widget && widget->parentWidget())
+    if (connected && widget)
+    {
+    if (QToolBar *tb = qobject_cast<QToolBar*>(widget->parentWidget()))
     {
         OPT_SUNKEN
         const bool round = config.btn.toolSunken;
@@ -147,22 +149,20 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         // shape
         const int d = 1;
         int pf = Tile::Full;
-        Qt::Orientation o = Qt::Horizontal;
-        if (QToolBar *tb = qobject_cast<QToolBar*>(widget->parentWidget()))
-            o = tb->orientation();
+        Qt::Orientation o = tb->orientation();
         QRect geo = widget->geometry();
         if (o == Qt::Horizontal)
         {
-            if (qobject_cast<QToolButton*>(widget->parentWidget()->childAt(geo.x()-d, geo.y())))
+            if (qobject_cast<QToolButton*>(tb->childAt(geo.x()-d, geo.y())))
                 pf &= ~Tile::Left;
-            if (qobject_cast<QToolButton*>(widget->parentWidget()->childAt(geo.right()+d, geo.y())))
+            if (qobject_cast<QToolButton*>(tb->childAt(geo.right()+d, geo.y())))
                 pf &= ~Tile::Right;
         }
         else
         {
-            if (qobject_cast<QToolButton*>(widget->parentWidget()->childAt(geo.x(), geo.y()-d)))
+            if (qobject_cast<QToolButton*>(tb->childAt(geo.x(), geo.y()-d)))
                 pf &= ~Tile::Top;
-            if (qobject_cast<QToolButton*>(widget->parentWidget()->childAt(geo.x(), geo.bottom()+d)))
+            if (qobject_cast<QToolButton*>(tb->childAt(geo.x(), geo.bottom()+d)))
                 pf &= ~Tile::Bottom;
         }
 
@@ -201,6 +201,7 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
 #endif
         }
         Tile::reset();
+    }
     }
     else if (isEnabled && (option->state & State_On))
     {
