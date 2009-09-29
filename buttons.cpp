@@ -287,7 +287,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
 
         // outline
         if (Gradients::isReflective(GRAD(btn)))
-            masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter, Colors::mid(c, Qt::white, (isEnabled ? 6:9) * (255-Colors::value(c)), 255), f1);
+            masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter, c.lighter(120), f1);
 
     }
     
