@@ -20,6 +20,11 @@
 #include <QStyleOptionDockWidget>
 #include "draw.h"
 
+static struct {
+    QPainterPath path;
+    QSize size;
+} glas;
+
 void
 Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -55,12 +60,24 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
     QColor bg = FCOLOR(Window);
     bg.setAlpha(config.bg.opacity);
     const bool floating = widget && widget->isWindow();
-#if 0
-    if ((dock->floatable || dock->movable) && !floating)
+#if 1
+    if ((dock->floatable || dock->movable))
     {
-        Tile::setShape(Tile::Full & ~Tile::Bottom);
-        masks.rect[true].render(RECT, painter, Gradients::light(RECT.height()));
-        Tile::reset();
+        if (glas.size != RECT.size())
+        {
+            glas.path = QPainterPath();
+            glas.path.moveTo(RECT.topLeft());
+            glas.path.lineTo(RECT.topRight());
+            glas.path.quadTo(RECT.center()/2, RECT.bottomLeft());
+        }
+        painter->save();
+        painter->setPen(Qt::NoPen);
+        painter->setRenderHint(QPainter::Antialiasing, false);
+        const int v = Colors::value(bg);
+        const int alpha = bg.alpha()*v / (255*(7-v/80));
+        painter->setBrush(QColor(255,255,255,alpha));
+        painter->drawPath(glas.path);
+        painter->restore();
     }
 #endif
     if (dock->title.isEmpty())
