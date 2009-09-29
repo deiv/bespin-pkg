@@ -23,7 +23,8 @@
 static struct {
     QPainterPath path;
     QSize size;
-} glas;
+    bool ltr;
+} glas = {QPainterPath(), QSize(), true};
 
 void
 Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
@@ -63,20 +64,35 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
 #if 1
     if ((dock->floatable || dock->movable))
     {
-        if (glas.size != RECT.size())
+        if (!floating)
         {
-            glas.path = QPainterPath();
-            glas.path.moveTo(RECT.topLeft());
-            glas.path.lineTo(RECT.topRight());
-            glas.path.quadTo(RECT.center()/2, RECT.bottomLeft());
+            bool ltr = !widget || widget->mapTo(widget->window(), QPoint(0,0)).x() < 3;
+            if (glas.size != RECT.size() || ltr != glas.ltr)
+            {
+                glas.ltr = ltr;
+                glas.size = RECT.size();
+                glas.path = QPainterPath();
+                if (ltr)
+                {
+                    glas.path.moveTo(RECT.topLeft());
+                    glas.path.lineTo(RECT.topRight());
+                    glas.path.quadTo(RECT.center()/2, RECT.bottomLeft());
+                }
+                else
+                {
+                    glas.path.moveTo(RECT.topRight());
+                    glas.path.lineTo(RECT.topLeft());
+                    glas.path.quadTo(RECT.center()/2, RECT.bottomRight());
+                }
+            }
         }
         painter->save();
         painter->setPen(Qt::NoPen);
-        painter->setRenderHint(QPainter::Antialiasing, false);
+        painter->setRenderHint(QPainter::Antialiasing);
         const int v = Colors::value(bg);
         const int alpha = bg.alpha()*v / (255*(7-v/80));
         painter->setBrush(QColor(255,255,255,alpha));
-        painter->drawPath(glas.path);
+        floating ? painter->drawRect(RECT.adjusted(0,0,0,-RECT.height()/2)) : painter->drawPath(glas.path);
         painter->restore();
     }
 #endif
