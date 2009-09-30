@@ -130,10 +130,9 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
     OPT_ENABLED
 
     QRect rect = RECT;
-    if (connected && widget)
+    if (connected)
     {
-    if (QToolBar *tb = qobject_cast<QToolBar*>(widget->parentWidget()))
-    {
+        QToolBar *tb = static_cast<QToolBar*>(widget->parentWidget()); // guaranteed by "connected", see above
         OPT_SUNKEN
         const bool round = config.btn.toolSunken;
         
@@ -189,19 +188,19 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
                         (pf & Tile::Right) ? -F(1) : 0, (pf & Tile::Bottom) ? -F(3) : 0);
                         
             masks.rect[round].render(rect, painter, gt, o, c);
-#if 0
+
             // outline
             if (Gradients::isReflective(GRAD(btn)))
             {
-                rect.adjust((pf & Tile::Left) ? F(1) : 0, (pf & Tile::Top) ? F(1) : 0,
-                (pf & Tile::Right) ? -F(1) : 0, (pf & Tile::Bottom) ? -F(1) : 0);
-                const int ratio = 6 * (255-Colors::value(c));
-                masks.rect[round].outline(rect, painter, Colors::mid(c, Qt::white, ratio, 255), F(1));
+                rect.adjust((pf & Tile::Left) ? F(1) : 0,
+                            (pf & Tile::Top) ? F(1) : 0,
+                            (pf & Tile::Right) ? -F(1) : 0,
+                            (pf & Tile::Bottom) ? -F(1) : 0);
+                masks.rect[round].outline(rect, painter, c.lighter(120), F(1));
             }
-#endif
+
         }
         Tile::reset();
-    }
     }
     else if (isEnabled && (option->state & State_On))
     {
