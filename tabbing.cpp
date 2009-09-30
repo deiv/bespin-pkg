@@ -259,7 +259,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
                     }
                 }
                 
-                if (tbar->drawBase())
+//                 if (tbar->drawBase()) // == false?!
                 {
                     if (hover)
                         hoveredIndex = index;
@@ -311,7 +311,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
 
     if (appType == GTK)
     {
-        rect.translate(0, F(3));
+        rect.adjust(0, F(3), 0, 0 );
         sunken = option->state & State_Selected;
     }
     else if (tab->position == QStyleOptionTab::OnlyOneTab)
@@ -323,7 +323,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
     if (!(animStep || sunken))
         return;
        
-    int size = RECT.height() + F(3);
+    int size = rect.height() + F(3);
     Qt::Orientation o = Qt::Vertical;
     const bool vertical = verticalTabs(tab->shape);
     if (vertical)
