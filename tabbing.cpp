@@ -258,8 +258,9 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
                             painter->setPen(fgColor);
                     }
                 }
-                
-//                 if (tbar->drawBase()) // == false?!
+#if QT_VERSION >= 0x040500
+                if (!tbar->documentMode() || tbar->drawBase())
+#endif
                 {
                     if (hover)
                         hoveredIndex = index;
