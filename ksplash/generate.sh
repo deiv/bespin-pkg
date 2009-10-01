@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ $# != 2 ]; then
     echo "usage: $0 <width> <height>"
