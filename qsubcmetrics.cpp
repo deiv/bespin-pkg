@@ -136,7 +136,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         }
         case SC_GroupBoxCheckBox:
         {
-            if (!config.sunkenGroups)
+            if (!(config.sunkenGroups || groupBox->features & QStyleOptionFrameV2::Flat))
                 ret = groupBox->rect.adjusted(F(7), F(7), 0, 0);
             ret.setWidth(dpi.ExclusiveIndicator);
             ret.setHeight(dpi.ExclusiveIndicator);
@@ -146,16 +146,16 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         {
             QFontMetrics fontMetrics = groupBox->fontMetrics;
             const bool flat = groupBox->features & QStyleOptionFrameV2::Flat;
-            int h = fontMetrics.height() + F(3);
-            int tw = fontMetrics.size(BESPIN_MNEMONIC, groupBox->text.toUpper() + QLatin1Char(' ')).width();
-            int marg = flat ? 0 : F(3);
+            const int h = fontMetrics.height() + F(3);
+            const int tw = fontMetrics.size(BESPIN_MNEMONIC, groupBox->text.toUpper() + QLatin1Char(' ')).width();
+            const int marg = flat ? 0 : F(3);
             Qt::Alignment align;
         
             if (flat || config.sunkenGroups)
             {
                 int left = marg;
                 if (groupBox->subControls & SC_GroupBoxCheckBox)
-                    left += dpi.ExclusiveIndicator;
+                    left += dpi.ExclusiveIndicator + flat*F(3);
                 ret = groupBox->rect.adjusted(left, 0, -marg, 0);
                 align = Qt::AlignLeft | Qt::AlignVCenter;
             }
@@ -521,7 +521,8 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
         }
         return r;
     }
-//    case SE_HeaderLabel: //  
+    case SE_HeaderLabel: //
+        return RECT;
     case SE_TabWidgetLeftCorner:
     case SE_TabWidgetRightCorner:
         if HAVE_OPTION(twf, TabWidgetFrame)
