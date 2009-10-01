@@ -198,7 +198,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_FormLayoutWrapPolicy:
         return 0; //  QFormLayout::RowWrapPolicy
     case SH_FormLayoutFieldGrowthPolicy:
-        return 0; // QFormLayout::FieldsStayAtSizeHint / ExpandingFieldsGrow / AllNonFixedFieldsGrow
+        return config.macStyle ? 0 : 1; // QFormLayout::FieldsStayAtSizeHint / ExpandingFieldsGrow / AllNonFixedFieldsGrow
     case SH_FormLayoutFormAlignment:
         return (Qt::AlignHCenter | Qt::AlignTop); // (Qt::AlignLeft | Qt::AlignTop)
     case SH_FormLayoutLabelAlignment:
