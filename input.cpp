@@ -376,10 +376,10 @@ Style::drawComboBoxLabel(const QStyleOption *option, QPainter *painter, const QW
 //          painter->fillRect(iconRect, opt->palette.brush(QPalette::Base));
         drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
 
-        if (cb->direction == Qt::RightToLeft)
-            editRect.translate(-4 - cb->iconSize.width(), 0);
+        if (cb->direction == Qt::LeftToRight)
+            editRect.setLeft(editRect.left() + cb->iconSize.width() + 4);
         else
-            editRect.translate(cb->iconSize.width() + 4, 0);
+            editRect.setRight(editRect.right() - (cb->iconSize.width() + 4));
     }
     
     if (!cb->currentText.isEmpty() && !cb->editable)
