@@ -116,11 +116,11 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
     else
     {   // plain frame
         //horizontal
-        shadows.line[false][Sunken].render(RECT, painter, Tile::Full, false);
-        shadows.line[false][Sunken].render(RECT, painter, Tile::Full, true);
+        shadows.line[0][Sunken].render(RECT, painter, Tile::Full, false);
+        shadows.line[0][Sunken].render(RECT, painter, Tile::Full, true);
         //vertical
-        shadows.line[true][Sunken].render(RECT, painter, Tile::Full, false);
-        shadows.line[true][Sunken].render(RECT, painter, Tile::Full, true);
+        shadows.line[1][Sunken].render(RECT, painter, Tile::Full, false);
+        shadows.line[1][Sunken].render(RECT, painter, Tile::Full, true);
     }
     if (hasFocus)
     {

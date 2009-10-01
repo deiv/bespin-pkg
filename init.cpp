@@ -204,7 +204,7 @@ Style::readSettings(const QSettings* settings, QString appName)
             {   // KDE replaces the palette after styling with an unpolished own version, breaking presets...
                 originalPalette = new QPalette(qApp->palette());
             }
-            // must be for all apps - KDE does some freaky stuff between the qapp and kapp constructor...
+            // must be for all apps - KDE does some freaky stuff between the qApp and KApp constructor...
             qApp->installEventFilter(this);
             QTimer::singleShot(10000, this, SLOT(removeAppEventFilter()));
         }
@@ -511,14 +511,14 @@ Style::init(const QSettings* settings)
     generatePixmaps();
     Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
                     config.bg.structure, config.bg.intensity, F(8));
-    int f2 = F(2), f4 = F(4);
+    int f1 = F(1), f3 = F(3), f4 = F(4);
     QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
-    inner.adjust(f4,f4,-f4,-dpi.f1); outer.adjust(0,0,0,dpi.f3);
+    inner.adjust(f4,f4,-f4,-f1); outer.adjust(0,0,0,F(2));
     VisualFrame::setGeometry(QFrame::Sunken, inner, outer);
-    inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
-    inner.adjust(f2,f2,-f2,-f2); outer.adjust(-f2,-f2,f2,f2);
+    inner.setRect(0,0,100,100); outer.setRect(0,0,100,100);
+    inner.adjust(1,1,-1,-1); outer.adjust(-1,-1,1,1);
     VisualFrame::setGeometry(QFrame::Plain, inner, outer);
-    inner = QRect(0,0,100,100); outer = QRect(0,0,100,100);
-    inner.adjust(f2,f2,-f2,0); outer.adjust(-f2,-f2,f2,0);
+    inner.setRect(0,0,100,100); outer.setRect(0,0,100,100);
+    inner.adjust(f1,f1,-f1,0); outer.adjust(-f3,-f3,f3,0);
     VisualFrame::setGeometry(QFrame::Raised, inner, outer);
 }

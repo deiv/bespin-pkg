@@ -89,7 +89,7 @@ VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect 
    sizes[t][East] = outer.right() - inner.right();
    sizes[t][West] = inner.x() - outer.x();
    extends[t][North] = -outer.y();
-   extends[t][South] = outer.bottom() - 99; 
+   extends[t][South] = outer.bottom() - 99;
    extends[t][East] = outer.right() - 99;
    extends[t][West] = -outer.x();
 }
@@ -238,7 +238,7 @@ VisualFrame::correctPosition()
 
     // mask
     int x,y,r,b;
-    rect.getRect(&x, &y, &r, &b); r += (x+1); b += (y+1);
+    rect.getRect(&x, &y, &r, &b); r += x; b += y;
     QRegion mask(_frame->QWidget::rect());// _frame->mask().isEmpty() ? _frame->rect() : _frame->mask();
     mask -= corner[North].translated(x, y); // tl
     QRect br = corner[South].boundingRect();
@@ -284,16 +284,19 @@ VisualFrame::show()
         return;
 
     QWidget *window = _frame;
-    while (window->parentWidget() && !(window->isWindow() || window->inherits("QMdiSubWindow") ||
-                                       (window != _frame && window->inherits("QAbstractScrollArea"))))
+    while (window->parentWidget())
     {
         window->removeEventFilter(this);
         window->installEventFilter(this);
         window = window->parentWidget();
+        if ((window->isWindow() || window->inherits("QMdiSubWindow") ||
+            (window != _frame && window->inherits("QAbstractScrollArea"))))
+            break;
     }
 
     if (window != _window)
     {
+        _window = window;
         _window->installEventFilter(&stdChildAdd);
         PARTS(setParent(_window));
         _window->removeEventFilter(&stdChildAdd);
@@ -481,7 +484,7 @@ VisualFramePart::paintEvent ( QPaintEvent * event )
         opt.rect.moveTopLeft(QPoint(0, -sizes[t][North]));
         break;
     case East:
-        opt.rect.setWidth(opt.rect.width() + extends[t][West]);
+        opt.rect.setWidth(opt.rect.width() + extends[t][East]);
         opt.rect.setHeight(opt.rect.height() + sizes[t][North] + sizes[t][South]);
         opt.rect.moveTopRight(QPoint(width()-1, -sizes[t][North]));
         break;
