@@ -331,6 +331,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.backlightHover, "Btn.BacklightHover", false);
     handleSettings(ui.btnRound, "Btn.Round", false);
     handleSettings(ui.btnBevelEnds, BTN_BEVEL_ENDS);
+
+    handleSettings(ui.connectedToolbuttons, BTN_CONNECTED_TOOLS);
+    handleSettings(ui.toolbuttonLayer, BTN_SUNKEN_TOOLS);
+//     handleSettings(ui.toolbuttonGradient, BTN_CONNECTED_TOOLS);
     handleSettings(ui.disabledToolbuttonStyle, BTN_DISABLED_TOOLS);
     setContextHelp(ui.disabledToolbuttonStyle, "<b>Disabled Toolbuttons</b><hr>\
     Qt has a \"standard\" way to gray out disabled toolbuttons, which can be altered by the style.\
