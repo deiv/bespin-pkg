@@ -85,6 +85,7 @@ setBoldFont(QWidget *w, bool bold = true)
 
 void Style::polish ( QApplication * app )
 {
+    VisualFrame::setStyle(this);
     QPalette pal = app->palette();
     polish(pal);
     QPalette *opal = originalPalette;
@@ -752,41 +753,9 @@ Style::polish( QWidget * widget )
     }
     /// hover some leftover widgets
     else if (widget->inherits("QAbstractSpinBox") || widget->inherits("QSplitterHandle") ||
-        widget->inherits("QDockWidget") || widget->inherits("QWorkspaceTitleBar") ||
+        /*widget->inherits("QDockWidget") ||*/ widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("Q3DockWindowResizeHandle"))
         widget->setAttribute(Qt::WA_Hover);
-#if 0 // does not work for all plasma versions...
-    else if (appType == KRunner && widget->inherits("KLineEdit") &&
-             widget->parentWidget() && widget->parentWidget()->inherits("KHistoryComboBox"))
-    {
-        // KRunner needs a little help...
-        // 1. normal painting seems buggy
-        // 2. normal painting looks debatable, as the styled lineedit can easily break the plasma theme look...
-        QWidget *window = widget->window();
-        QList<QLabel*> lables = window->findChildren<QLabel*>();
-        if (!lables.isEmpty())
-        {   // this is my ticket to hell...
-            // i want the lineedit use the plasma theme fg color
-            // a) we have no access to plasma themes from here (... as i do no way intend to link plasma)
-            // b) krunner only plasmafies some lables, but not our lineedit
-            // c) krunner sets QPalette::WindowText, but lineedits hardcode QPalette::Text
-            // => i just look for the lables, take their palette,
-            // map the WindowText color to the Text color and put the palette on the lineedit
-            // (font adjustment is just for fun - and looks better + is more readable, especially on
-            // default "white-on-black")
-            // DRAWBACK: currently this will NOT survice plasma theme changes - i'd have to
-            // monitor the label for palette changes.. we'll see (the proper fixes would be in
-            // qlineedit - don't hardcode fg - and krunner - plasmafy all widgets)
-            QPalette pal = lables.at(0)->palette();
-            pal.setColor(QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
-            pal.setColor(QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
-            pal.setColor(QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::Window));
-            pal.setColor(QPalette::Highlight, pal.color(QPalette::Active, QPalette::WindowText));
-            widget->setPalette(pal);
-            QFont fnt = widget->font(); fnt.setBold(true); widget->setFont(fnt);
-        }
-    }
-#endif
 
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
     if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
@@ -854,6 +823,7 @@ Style::polish( QWidget * widget )
 void
 Style::unpolish( QApplication *app )
 {
+    VisualFrame::setStyle(0L);
     Hacks::releaseApp();
     Gradients::wipe();
     app->setPalette(QPalette());
