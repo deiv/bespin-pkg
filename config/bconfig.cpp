@@ -8,6 +8,7 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFileDialog>
+#include <QGroupBox>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QSettings>
@@ -121,7 +122,7 @@ void BConfig::handleSettings(QObject *w, QString entry, QVariant value) {
    info.initialValue = info.savedValue = QVariant();
    info.entry = entry;
    _settings[w] = info;
-   if (qobject_cast<QAbstractButton*>(w))
+   if (qobject_cast<QAbstractButton*>(w) || qobject_cast<QGroupBox*>(w))
       connect (w, SIGNAL(toggled(bool)), this, SLOT(checkDirty()));
    else if (qobject_cast<QButtonGroup*>(w))
        connect (w, SIGNAL(buttonClicked(int)), this, SLOT(checkDirty()));
@@ -264,6 +265,8 @@ QVariant BConfig::variant(const QObject *w) const {
    }
    else if (const QCheckBox *box = qobject_cast<const QCheckBox*>(w))
       return box->isChecked();
+   else if (const QGroupBox *box = qobject_cast<const QGroupBox*>(w))
+       return box->isCheckable() && box->isChecked();
    else if (const QButtonGroup *group = qobject_cast<const QButtonGroup*>(w))
        return group->checkedId();
    else if (const QAbstractSlider *slider = qobject_cast<const QAbstractSlider*>(w))
@@ -295,6 +298,8 @@ bool BConfig::setVariant(QObject *w, const QVariant &v) const {
    }
    else if (QCheckBox *box = qobject_cast<QCheckBox*>(w))
       box->setChecked(v.toBool());
+   else if (QGroupBox *box = qobject_cast<QGroupBox*>(w))
+       box->setChecked(v.toBool());
    else if (QAbstractSlider *slider = qobject_cast<QAbstractSlider*>(w))
       slider->setValue(v.toInt());
    else if (QSpinBox *spin = qobject_cast<QSpinBox*>(w))
