@@ -21,7 +21,7 @@
 #include <QAbstractSlider>
 #include <QApplication>
 #include <QComboBox>
-#include <QtDebug>
+#include <QDockWidget>
 #include <QLabel>
 #include <QLayout>
 #include <QLCDNumber>
@@ -34,6 +34,8 @@
 #include <QToolBar>
 #include <QToolTip>
 #include <QTreeView>
+
+#include <QtDebug>
 
 #include "colors.h"
 
@@ -740,19 +742,22 @@ Style::polish( QWidget * widget )
         widget->removeEventFilter(this);
         widget->installEventFilter(this);
     }
-    else if (config.bg.docks.invert && widget->inherits("QDockWidget"))
+    else if (config.bg.docks.invert)
     {
-        QPalette pal = widget->palette();
-        QColor c = pal.color(QPalette::Window);
-        pal.setColor(QPalette::Window, pal.color(QPalette::WindowText));
-        pal.setColor(QPalette::WindowText, c);
-        widget->setPalette(pal);
-        widget->setAutoFillBackground(true);
-//         if (config.bg.docks.shape)
-//         {
-//             widget->removeEventFilter(this);
-//             widget->installEventFilter(this); // shape corners... but kwin will refuse shadows then...
-//         }
+        if (QDockWidget *dock = qobject_cast<QDockWidget*>(widget))
+        {
+            if (dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable))
+            {
+                QPalette pal = dock->palette();
+                QColor c = pal.color(QPalette::Window);
+                pal.setColor(QPalette::Window, pal.color(QPalette::WindowText));
+                pal.setColor(QPalette::WindowText, c);
+                dock->setPalette(pal);
+                dock->setAutoFillBackground(true);
+            }
+//             connect (widget, SIGNAL(featuresChanged(QDockWidget::DockWidgetFeatures)),
+//                     this, SLOT(dockFeaturesChanged(QDockWidget::DockWidgetFeatures)));
+        }
     }
     else if (widget->inherits("KFadeWidgetEffect"))
     {   // interfers with our animation, is slower and cannot handle non plain backgrounds
