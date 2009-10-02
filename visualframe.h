@@ -41,7 +41,7 @@ class VisualFramePart : public QWidget
 public:
     VisualFramePart(QWidget *window, QFrame *parent, VisualFrame *vFrame, VFrame::Side side);
     VisualFramePart(){};
-    inline const QFrame *frame() const { return _frame; }
+    inline const QFrame *frame() const { return myFrame; }
 protected:
 //    void enterEvent ( QEvent * event ) { passDownEvent(event, event->globalPos()); }
 //    void leaveEvent ( QEvent * event ) { passDownEvent(event, event->globalPos()); }
@@ -53,7 +53,7 @@ protected:
     void wheelEvent(QWheelEvent*);
 private:
     Q_DISABLE_COPY(VisualFramePart)
-    QFrame *_frame; // parent, to avoid nasty casting
+    QFrame *myFrame; // parent, to avoid nasty casting
     VisualFrame *_vFrame;
     VFrame::Side _side;
     void passDownEvent(QEvent *ev, const QPoint &gMousePos);
@@ -63,7 +63,7 @@ class VisualFrame : public QObject
 {
     Q_OBJECT
 public:
-    inline const QRect &frameRect() const { return _frameRect; }
+    inline const QRect &frameRect() const { return myFrameRect; }
     static void setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer);
     static bool manage(QFrame *frame);
     static void release(QFrame *frame);
@@ -82,11 +82,11 @@ private:
     VisualFrame( QFrame *parent );
 //    ~VisualFrame();
     void updateShape();
-    QFrame *_frame; // parent, to avoid nasty casting
-    QWidget *_window;
-    QFrame::Shape _style;
+    QFrame *myFrame; // parent, to avoid nasty casting
+    QWidget *myWindow;
+    QFrame::Shape myStyle;
     VisualFramePart *top, *bottom, *left, *right;
-    QRect _frameRect;
+    QRect myFrameRect;
     bool hidden;
     static QStyle *ourStyle;
 private slots:

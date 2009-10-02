@@ -155,10 +155,10 @@ top(0), bottom(0), left(0), right(0), hidden(true)
    }
    
    // create frame elements
-   _frame = parent;
-   _frame->installEventFilter(this);
-   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
-   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+   myFrame = parent;
+   myFrame->installEventFilter(this);
+   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
+   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
    updateShape();
 }
 
@@ -174,15 +174,15 @@ top(0), bottom(0), left(0), right(0), hidden(true)
 void
 VisualFrame::updateShape()
 {
-   _style = _frame->frameShape();
-   if (_style != QFrame::StyledPanel) {
+   myStyle = myFrame->frameShape();
+   if (myStyle != QFrame::StyledPanel) {
       delete top; top = 0L;
       delete bottom; bottom = 0L;
       delete left; left = 0L;
       delete right; right = 0L;
 
-      QWidget *runner = _frame->parentWidget();
-      while (runner && runner != _window) {
+      QWidget *runner = myFrame->parentWidget();
+      while (runner && runner != myWindow) {
          runner->removeEventFilter(this);
          runner = runner->parentWidget();
       }
@@ -190,19 +190,19 @@ VisualFrame::updateShape()
       return;
    }
 
-   // we start out with _window == _frame, the actual parent widget is recalculated on each show()
+   // we start out with myWindow == myFrame, the actual parent widget is recalculated on each show()
    // to capture e.g. dock floats etc.
-   _window = _frame;
-   _window->installEventFilter(&stdChildAdd);
-   top = new VisualFramePart(_window, _frame, this, North);
-   bottom = new VisualFramePart(_window, _frame, this, South);
-   left = new VisualFramePart(_window, _frame, this, West);
-   right = new VisualFramePart(_window, _frame, this, East);
-   _window->removeEventFilter(&stdChildAdd);
+   myWindow = myFrame;
+   myWindow->installEventFilter(&stdChildAdd);
+   top = new VisualFramePart(myWindow, myFrame, this, North);
+   bottom = new VisualFramePart(myWindow, myFrame, this, South);
+   left = new VisualFramePart(myWindow, myFrame, this, West);
+   right = new VisualFramePart(myWindow, myFrame, this, East);
+   myWindow->removeEventFilter(&stdChildAdd);
 
    // manage events
    top->installEventFilter(this);
-   if (_frame->isVisible())
+   if (myFrame->isVisible())
       show();
    else
       hide();
@@ -231,15 +231,15 @@ void
 VisualFrame::correctPosition()
 {
     if (hidden) return;
-    if (_style != QFrame::StyledPanel) return;
+    if (myStyle != QFrame::StyledPanel) return;
 
-    VFrame::Type t = type(_frame->frameShadow());
-    QRect rect = _frameRect = correctedRect(_frame);
+    VFrame::Type t = type(myFrame->frameShadow());
+    QRect rect = myFrameRect = correctedRect(myFrame);
 
     // mask
     int x,y,r,b;
     rect.getRect(&x, &y, &r, &b); r += x; b += y;
-    QRegion mask(_frame->QWidget::rect());// _frame->mask().isEmpty() ? _frame->rect() : _frame->mask();
+    QRegion mask(myFrame->QWidget::rect());// myFrame->mask().isEmpty() ? myFrame->rect() : myFrame->mask();
     mask -= corner[North].translated(x, y); // tl
     QRect br = corner[South].boundingRect();
     mask -= corner[South].translated(r-br.width(), y); // tr
@@ -247,10 +247,10 @@ VisualFrame::correctPosition()
     mask -= corner[West].translated(x, b-br.height()); // bl
     br = corner[East].boundingRect();
     mask -= corner[East].translated(r-br.width(), b-br.height()); // br
-    _frame->setMask(mask);
+    myFrame->setMask(mask);
 
     // position
-    rect.translate(_frame->mapTo(_window, QPoint(0,0)));
+    rect.translate(myFrame->mapTo(myWindow, QPoint(0,0)));
     rect.getRect(&x, &y, &r, &b);
     int offs = extends[t][West] + extends[t][East];
 
@@ -271,7 +271,7 @@ VisualFrame::correctPosition()
     // East element
     right->resize(sizes[t][East], rect.height() - offs);
     right->move(rect.right() + 1 - sizes[t][East] + extends[t][East], y + sizes[t][North] - extends[t][North]);
-    //    qDebug() << _frame->frameRect() << rect << right->geometry();
+    //    qDebug() << myFrame->frameRect() << rect << right->geometry();
 }
 
 #define PARTS(_FUNC_) top->_FUNC_; left->_FUNC_; right->_FUNC_; bottom->_FUNC_
@@ -280,28 +280,28 @@ void
 VisualFrame::show()
 {
     hidden = false;
-    if (_style != QFrame::StyledPanel)
+    if (myStyle != QFrame::StyledPanel)
         return;
 
-    QWidget *window = _frame;
+    QWidget *window = myFrame;
     while (window->parentWidget())
     {
         window->removeEventFilter(this);
         window->installEventFilter(this);
         window = window->parentWidget();
         if ((window->isWindow() || window->inherits("QMdiSubWindow") ||
-            (window != _frame && window->inherits("QAbstractScrollArea"))))
+            (window != myFrame && window->inherits("QAbstractScrollArea"))))
             break;
     }
 
-    if (window != _window)
+    if (window != myWindow)
     {
-        _window = window;
-        _window->installEventFilter(&stdChildAdd);
-        PARTS(setParent(_window));
-        _window->removeEventFilter(&stdChildAdd);
+        myWindow = window;
+        myWindow->installEventFilter(&stdChildAdd);
+        PARTS(setParent(myWindow));
+        myWindow->removeEventFilter(&stdChildAdd);
     }
-
+    raise();
     correctPosition();
     PARTS(show());
 }
@@ -310,7 +310,7 @@ void
 VisualFrame::hide()
 {
     hidden = true;
-    if (_style != QFrame::StyledPanel)
+    if (myStyle != QFrame::StyledPanel)
         return;
     PARTS(hide());
 }
@@ -318,23 +318,50 @@ VisualFrame::hide()
 void
 VisualFrame::raise()
 {
-    if (_style != QFrame::StyledPanel)
+    if (myStyle != QFrame::StyledPanel)
         return;
 
-    const bool show = !hidden;
-    PARTS(setParent(_frame));
-    PARTS(raise()); // ensure they're right above all other frame childs
-    PARTS(setParent(_window)); // but place them back to window
-    if (show)
-    {   // MUST! be - Qt hides widgets on setParent()
-        PARTS(show());
+    QWidget *sibling = myFrame;
+    while (sibling)
+    {
+        if (sibling->parentWidget() == myWindow)
+            break;
+        sibling = sibling->parentWidget();
+    }
+    const QObjectList &kids = myWindow->children();
+    bool above = false;
+    for (QObjectList::const_iterator i = kids.constBegin(); i != kids.constEnd(); ++i)
+    {
+        if (above)
+        {
+            if (QWidget *w = qobject_cast<QWidget*>(*i))
+            {
+                if (qobject_cast<VisualFramePart*>(w))
+                    continue;
+                sibling = w;
+                break;
+            }
+        }
+        else if (*i == sibling)
+        {
+            above = true;
+            sibling = 0L;
+        }
+    }
+    if (sibling)
+    {
+        PARTS(stackUnder(sibling));
+    }
+    else
+    {
+        PARTS(raise());
     }
 }
 
 void
 VisualFrame::repaint()
 {
-    if (hidden || _style != QFrame::StyledPanel)
+    if (hidden || myStyle != QFrame::StyledPanel)
         return;
     PARTS(repaint());
 }
@@ -342,7 +369,7 @@ VisualFrame::repaint()
 void
 VisualFrame::update()
 {
-    if (hidden || _style != QFrame::StyledPanel)
+    if (hidden || myStyle != QFrame::StyledPanel)
         return;
     PARTS(update());
 }
@@ -373,23 +400,23 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
     }
 
 //    if (ev->type() == QEvent::ParentChange) {
-//       qDebug() << "reparented" << o << _window << _frame->window();
+//       qDebug() << "reparented" << o << myWindow << myFrame->window();
 //       return false;
 //    }
    
-    if (o != _frame)
+    if (o != myFrame)
     {   // now we're only interested in frame events
         return false;
     }
 
     if (ev->type() == QEvent::Paint)
     {
-        if (_frame->frameShape() != _style)
+        if (myFrame->frameShape() != myStyle)
             updateShape();
         return false;
     }
 
-    if (_style != QFrame::StyledPanel)
+    if (myStyle != QFrame::StyledPanel)
         return false;
 
     if (ev->type() == QEvent::Show)
@@ -420,19 +447,19 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
     return false;
 //    if (ev->type() == QEvent::ParentChange) {
 //       qWarning("parent changed?");
-//       _frame->parentWidget() ?
-//          setParent(_frame->parentWidget() ) :
-//          setParent(_frame );
+//       myFrame->parentWidget() ?
+//          setParent(myFrame->parentWidget() ) :
+//          setParent(myFrame );
 //       raise();
 //    }
 //    return false;
 }
 
 VisualFramePart::VisualFramePart(QWidget * parent, QFrame *frame, VisualFrame *vFrame, Side side) :
-QWidget(parent), _frame(frame), _vFrame(vFrame), _side(side)
+QWidget(parent), myFrame(frame), _vFrame(vFrame), _side(side)
 {
-   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
-   connect(_frame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
+   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
 //    setMouseTracking ( true );
 //    setAcceptDrops(true);
 }
@@ -445,12 +472,12 @@ VisualFramePart::paintEvent ( QPaintEvent * event )
     QPainter p(this);
     p.setClipRegion(event->region(), Qt::IntersectClip);
     QStyleOption opt; Type t;
-    if (_frame->frameShadow() == QFrame::Raised)
+    if (myFrame->frameShadow() == QFrame::Raised)
     {
         opt.state |= QStyle::State_Raised;
         t = VFrame::Raised;
     }
-    else if (_frame->frameShadow() == QFrame::Sunken)
+    else if (myFrame->frameShadow() == QFrame::Sunken)
     {
         opt.state |= QStyle::State_Sunken;
         t = VFrame::Sunken;
@@ -458,10 +485,10 @@ VisualFramePart::paintEvent ( QPaintEvent * event )
     else
         t = VFrame::Plain;
 
-    if (_frame->hasFocus())
+    if (myFrame->hasFocus())
         opt.state |= QStyle::State_HasFocus;
 
-    if (_frame->isEnabled())
+    if (myFrame->isEnabled())
         opt.state |= QStyle::State_Enabled;
 
     opt.rect = _vFrame->frameRect();
@@ -496,37 +523,45 @@ VisualFramePart::paintEvent ( QPaintEvent * event )
 void
 VisualFramePart::passDownEvent(QEvent *ev, const QPoint &gMousePos)
 {
-   // the raised frames don't look like you could click in, we'll see if this should be changed...
-   if (_frame->frameShadow() == QFrame::Raised)
-      return;
-   QList<QWidget *> candidates = _frame->findChildren<QWidget *>();
-   QList<QWidget *>::const_iterator i = candidates.constEnd();
-   QWidget *match = 0;
-   while (i != candidates.constBegin()) {
-      --i;
-      if (*i == this)
-         continue;
-      if ((*i)->rect().contains((*i)->mapFromGlobal(gMousePos))) {
-         match = *i;
-         break;
-      }
-   }
-   if (!match) match = _frame;
-   QEvent *nev = 0;
-   if (ev->type() == QEvent::Wheel) {
-      QWheelEvent *wev = static_cast<QWheelEvent *>(ev);
-      QWheelEvent wev2( match->mapFromGlobal(gMousePos), gMousePos,
-                        wev->delta(), wev->buttons(), wev->modifiers(),
-                        wev->orientation() );
-      nev = &wev2;
-   }
-   else {
-      QMouseEvent *mev = static_cast<QMouseEvent *>(ev);
-      QMouseEvent mev2( mev->type(), match->mapFromGlobal(gMousePos), gMousePos,
-                        mev->button(), mev->buttons(), mev->modifiers() );
-      nev = &mev2;
-   }
-   QCoreApplication::sendEvent( match, nev );
+    // the raised frames don't look like you could click in, we'll see if this should be changed...
+    if (myFrame->frameShadow() != QFrame::Sunken)
+        return;
+    const QObjectList &candidates = myFrame->children();
+    QObjectList::const_iterator i = candidates.constEnd();
+    QWidget *match = 0;
+    while (i != candidates.constBegin())
+    {
+        --i;
+        if (*i == this)
+            continue;
+        if (QWidget *w = qobject_cast<QWidget*>(*i))
+        {
+            if (w->rect().contains(w->mapFromGlobal(gMousePos)))
+            {
+                match = w;
+                break;
+            }
+        }
+    }
+    if (!match)
+        match = myFrame;
+    QEvent *nev = 0;
+    if (ev->type() == QEvent::Wheel)
+    {
+        QWheelEvent *wev = static_cast<QWheelEvent *>(ev);
+        QWheelEvent wev2( match->mapFromGlobal(gMousePos), gMousePos,
+                          wev->delta(), wev->buttons(), wev->modifiers(),
+                          wev->orientation() );
+        nev = &wev2;
+    }
+    else
+    {
+        QMouseEvent *mev = static_cast<QMouseEvent *>(ev);
+        QMouseEvent mev2( mev->type(), match->mapFromGlobal(gMousePos), gMousePos,
+                          mev->button(), mev->buttons(), mev->modifiers() );
+        nev = &mev2;
+    }
+    QCoreApplication::sendEvent( match, nev );
 }
 
 #define HANDLE_EVENT(_EV_) \
