@@ -247,6 +247,9 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.bg.opacity = 0xff;
 #endif
 
+    config.bg.docks.invert = readBool(BG_DOCKS_INVERT);
+    config.bg.docks.shape = config.bg.docks.invert ? readBool(BG_DOCKS_SHAPE) : false;
+
     config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
     config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);
     if (config.bg.opacity)

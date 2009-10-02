@@ -945,17 +945,22 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
     }
     case QEvent::Resize:
-        
-        if (config.menu.round && qobject_cast<QMenu*>(object)
-            /*|| qobject_cast<QDockWidget*>(object)*/) // kwin yet cannot. compiz can't even menus...
+    {
+        QWidget *widget = 0, *dock = 0;
+        if ((config.menu.round && (widget = qobject_cast<QMenu*>(object)))
+#if 0
+            || (config.bg.docks.shape && (widget = dock = qobject_cast<QDockWidget*>(object))))
         {
-            QWidget *widget = static_cast<QWidget*>(object);
-            // this would be for docks
-//             if (!widget->isWindow())
-//             {
-//                 widget->clearMask();
-//                 return false;
-//             }
+            // kwin yet cannot. compiz can't even menus...
+            if (dock && dock->isWindow())
+            {
+                dock->clearMask();
+                return false;
+            }
+#else
+            )
+        {
+#endif
 #if 0 // xPerimental code for ribbon like looking menus - not atm.
             QAction *head = menu->actions().at(0);
             QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
@@ -990,7 +995,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
         return false;
-
+    }
 //    case QEvent::MouseButtonRelease:
 //    case QEvent::MouseButtonPress:
 //       qWarning("pressed/released");

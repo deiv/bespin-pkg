@@ -52,7 +52,7 @@ Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *
     }
     if (needRestore) painter->restore();
 }
-
+#include <QtDebug>
 void
 Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -66,6 +66,30 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
     {
         if (!floating)
         {
+            if (config.bg.docks.shape && widget && widget->parentWidget())
+            {
+                QPixmap *buffer = new QPixmap(RECT.size());
+                QRect r = buffer->rect();
+                const int rnd = F(8);
+                QPainter bp(buffer);
+                bp.setPen(Qt::NoPen);
+                QPoint pt = widget->mapFrom(widget->parentWidget(), RECT.topLeft());
+                erase(option, &bp, widget->parentWidget(), &pt);
+                bp.setBrush(FCOLOR(Window));
+                bp.setRenderHint(QPainter::Antialiasing);
+                QPainterPath path;
+                path.moveTo(rnd, 0);
+                path.arcTo(QRect(0,0,rnd,rnd), 90, 90);
+                path.lineTo(0, buffer->height());
+                path.lineTo(buffer->width(), buffer->height());
+                path.lineTo(buffer->width(), rnd);
+                path.arcTo(QRect(buffer->width() - rnd,0,rnd,rnd), 0, 90);
+                path.closeSubpath();
+                bp.drawPath(path);
+                bp.end();
+                painter->drawPixmap(RECT.topLeft(), *buffer);
+                delete buffer;
+            }
             bool ltr = !widget || widget->mapTo(widget->window(), QPoint(0,0)).x() < 3;
             if (glas.size != RECT.size() || ltr != glas.ltr)
             {

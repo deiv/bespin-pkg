@@ -35,6 +35,10 @@ typedef struct Config
         int structure, intensity, minValue, opacity;
         struct
         {
+            bool invert, shape;
+        } docks;
+        struct
+        {
             bool glassy, invert;
             int opacity;
         } modal;

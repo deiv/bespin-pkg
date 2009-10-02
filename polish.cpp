@@ -740,10 +740,20 @@ Style::polish( QWidget * widget )
         widget->removeEventFilter(this);
         widget->installEventFilter(this);
     }
-#if 0 // until kwin provides better shaodws
-    else if (widget->inherits("QDockWidget"))
-        widget->installEventFilter(this); // shape corners... repeated above!
-#endif
+    else if (config.bg.docks.invert && widget->inherits("QDockWidget"))
+    {
+        QPalette pal = widget->palette();
+        QColor c = pal.color(QPalette::Window);
+        pal.setColor(QPalette::Window, pal.color(QPalette::WindowText));
+        pal.setColor(QPalette::WindowText, c);
+        widget->setPalette(pal);
+        widget->setAutoFillBackground(true);
+//         if (config.bg.docks.shape)
+//         {
+//             widget->removeEventFilter(this);
+//             widget->installEventFilter(this); // shape corners... but kwin will refuse shadows then...
+//         }
+    }
     else if (widget->inherits("KFadeWidgetEffect"))
     {   // interfers with our animation, is slower and cannot handle non plain backgrounds
         // (unfortunately i cannot avoid the widget grabbing)
