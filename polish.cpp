@@ -570,7 +570,7 @@ Style::polish( QWidget * widget )
             if (frame->lineWidth() == 1)
                 frame->setLineWidth(F(4)); // but must have enough indention
         }
-        else if (!widget->inherits("KPIM::OverlayWidget"))
+        else if (appType != Opera && !widget->inherits("KPIM::OverlayWidget"))
             VisualFrame::manage(frame);
     }
     //END FRAMES                                                                                   -
