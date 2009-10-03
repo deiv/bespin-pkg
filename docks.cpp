@@ -52,7 +52,7 @@ Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *
     }
     if (needRestore) painter->restore();
 }
-#include <QtDebug>
+
 void
 Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -90,7 +90,7 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
                 painter->drawPixmap(RECT.topLeft(), *buffer);
                 delete buffer;
             }
-            bool ltr = !widget || widget->mapTo(widget->window(), QPoint(0,0)).x() < 3;
+            bool ltr = !widget || (widget->window() && widget->mapTo(widget->window(), QPoint(0,0)).x() < 3);
             if (glas.size != RECT.size() || ltr != glas.ltr)
             {
                 glas.ltr = ltr;
