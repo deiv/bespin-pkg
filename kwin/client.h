@@ -61,12 +61,11 @@ public:
     void borders( int& left, int& right, int& top, int& bottom ) const;
     int buttonBoxPos(bool active);
     void captionChange();
-    inline const Config* config() const { return _factory->config(); }
     void desktopChange() {/*TODO what??*/}
     inline Gradients::Type gradient() {return gType[isActive()];}
     inline void iconChange() {} // no icon!
     void init();
-    
+    bool isSmall() { return iAmSmall; }
     void maximizeChange();
     QSize minimumSize() const;
     KDecorationDefines::Position mousePosition( const QPoint& p ) const;
@@ -81,7 +80,6 @@ public:
     void toggleOnAllDesktops();
     QString trimm(const QString &string);
     void shadeChange();
-    inline Factory *factory() {return _factory;}
 public slots:
     void activate();
     void throwOnDesktop();
@@ -98,9 +96,7 @@ protected:
     /// works like options()->color(.), but allows per window settings to match the window itself
     QColor color(ColorType type, bool active=true) const;
     inline int buttonOpacity() const { return myButtonOpacity; }
-    inline int buttonSize() const { return _factory->buttonSize(); }
     void repaint(QPainter &p, bool paintTitle = true);
-    inline int slickButtons() const { return _factory->slickButtons(); }
     void tileWindow(bool more, bool vertical, bool mirrorGravity);
 private:
     Q_DISABLE_COPY(Client)
@@ -110,19 +106,18 @@ private:
     
     QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
     Button *buttons[4];
-    int borderSize, titleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
+    int borderSize, myTitleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
     int myButtonOpacity;
     int myActiveChangeTimer;
     Picture topTile, btmTile, cnrTile, lCorner, rCorner;
     uint bgMode;
     Gradients::Type gType[2];
-    bool _small;
-    Factory *_factory;
+    bool iAmSmall;
     QHBoxLayout *titleBar;
     QSpacerItem *titleSpacer;
     QRect top, bottom, left, right, label;
     QPainterPath buttonCorner;
-    QString _caption;
+    QString myCaption;
     ResizeCorner *corner;
     Bg *bg;
     bool dirty[2];

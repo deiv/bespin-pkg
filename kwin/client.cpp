@@ -3,7 +3,7 @@
 // -------------------
 // Bespin window decoration for KDE
 // -------------------
-// Copyright (c) 2008/2009 Thomas Lübking <baghira-style@gmx.net>
+// Copyright (c) 2008/2009 Thomas Luebking <thomas.luebking@web.de>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -58,14 +58,14 @@ using namespace Bespin;
 Client::Client(KDecorationBridge *b, Factory *f) :
 KDecoration(b, f), retry(0), myButtonOpacity(0), myActiveChangeTimer(0),
 topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
-bgMode(1), _factory(f), corner(0), bg(0) { }
+bgMode(1), corner(0), bg(0) { }
 
 Client::~Client()
 {
     if (bg)
     {
         if (! --bg->set->clients)
-            _factory->kickBgSet(bg->hash);
+            Factory::kickBgSet(bg->hash);
         delete bg;
     }
 //    delete corner;
@@ -85,7 +85,7 @@ Client::updateStylePixmaps()
             if (bg)
             {
                 if (! --bg->set->clients)
-                    _factory->kickBgSet(bg->hash);
+                    Factory::kickBgSet(bg->hash);
                 delete bg;
                 bg = 0;
             }
@@ -98,7 +98,7 @@ Client::updateStylePixmaps()
         {
             qint64 hash = 0;
             /// NOTICE style encodes the intensity in btmTile!
-            BgSet *set = _factory->bgSet(colors[isActive()][0], bgMode==2, pics->btmTile, &hash);
+            BgSet *set = Factory::bgSet(colors[isActive()][0], bgMode==2, pics->btmTile, &hash);
             if (!bg)
             {
                 ++set->clients;
@@ -109,7 +109,7 @@ Client::updateStylePixmaps()
             else if (bg->hash != hash)
             {
                 if (! --bg->set->clients)
-                    _factory->kickBgSet(bg->hash);
+                    Factory::kickBgSet(bg->hash);
                 ++set->clients;
                 bg->set = set;
                 bg->hash = hash;
@@ -168,7 +168,7 @@ Client::addButtons(const QString& s, int &sz, bool left)
         case 'F': // Keep Above
         case 'B': // Keep Below
         case 'L': // Shade button
-            if (factory()->multiButtons().isEmpty())
+            if (Factory::multiButtons().isEmpty())
                 continue; // no button to insert
             type = Button::Multi; break;
         case 'I': // Minimize
@@ -199,7 +199,7 @@ Client::addButtons(const QString& s, int &sz, bool left)
                 buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
             }
             titleBar->addWidget(buttons[type], 0, Qt::AlignVCenter);
-            sz += (buttonSize()+2);
+            sz += (Factory::buttonSize(iAmSmall) + 2);
         }
     }
 }
@@ -211,18 +211,18 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     // this may be a bug but is annoying at least - TODO: kwin bug report?
     if (maximizeMode() == MaximizeFull)
     {
-        left = right = bottom = options()->moveResizeMaximizedWindows() ? qMin(4, _factory->borderSize()) : 0;
-        top = _factory->titleSize(true);
+        left = right = bottom = options()->moveResizeMaximizedWindows() ? qMin(4, Factory::borderSize()) : 0;
+        top = Factory::buttonSize(iAmSmall)+4;
     }
     else
     {
-        left = right = bottom =  _factory->borderSize();
-        top = _factory->titleSize(_small);
+        left = right = bottom =  Factory::borderSize();
+        top = Factory::titleSize(iAmSmall);
         if (isShade())
             bottom = 8;
     }
     //    left = right = bottom = borderSize;
-    //    top = titleSize;
+    //    top = myTitleSize;
 }
 
 int
@@ -238,8 +238,8 @@ Client::buttonBoxPos(bool active)
 void
 Client::captionChange()
 {
-    _caption = trimm(caption());
-    _caption.replace("[modified]", "*");
+    myCaption = trimm(caption());
+    myCaption.replace("[modified]", "*");
     widget()->update();
 }
 
@@ -273,7 +273,15 @@ Client::eventFilter(QObject *o, QEvent *e)
 
         QPainter p(widget());
         p.setClipRegion(clip);
-        p.setFont(options()->font());
+        QFont fnt = options()->font();
+        if (iAmSmall)
+        {
+            if (fnt.pointSize() > -1)
+                fnt.setPointSize(qRound(fnt.pointSize()*Factory::smallFactor()));
+            else
+                fnt.setPixelSize(qRound(fnt.pixelSize()*Factory::smallFactor()));
+        }
+        p.setFont(fnt);
         // WORKAROUND a bug in QPaintEngine + QPainter::setRedirected
         if (dirty[isActive()])
         {
@@ -334,7 +342,7 @@ Client::eventFilter(QObject *o, QEvent *e)
 void
 Client::fadeButtons()
 {
-    if (config()->hideInactiveButtons)
+    if (Factory::config()->hideInactiveButtons)
     {
         if (!myActiveChangeTimer)
         {
@@ -356,9 +364,9 @@ Client::init()
     createMainWidget();
     dirty[0] = dirty[1] = true;
     NET::WindowType type = windowType( supported_types );
-    _small = type == NET::Utility || type == NET::Menu || type == NET::Toolbar;
+    iAmSmall = type == NET::Utility || type == NET::Menu || type == NET::Toolbar;
 
-    _caption = isPreview() ? (isActive() ? "Active Window" : "Inactive Window") : trimm(caption());
+    myCaption = isPreview() ? (isActive() ? "Active Window" : "Inactive Window") : trimm(caption());
     widget()->setAutoFillBackground(false);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, !isPreview());
 //     widget()->setAttribute(Qt::WA_NoSystemBackground);
@@ -367,7 +375,7 @@ Client::init()
 
     titleBar = new QHBoxLayout();
     titleBar->setSpacing(2); titleBar->setContentsMargins(4,0,4,0);
-    titleSpacer = new QSpacerItem( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    titleSpacer = new QSpacerItem( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
     QVBoxLayout *layout = new QVBoxLayout(widget());
     layout->setSpacing(0); layout->setContentsMargins(0,0,0,0);
     layout->addLayout(titleBar);
@@ -378,7 +386,7 @@ Client::init()
     gType[0] = Gradients::None;
     gType[1] = Gradients::Button;
 
-    if (config()->resizeCorner && isResizable())
+    if (Factory::config()->resizeCorner && isResizable())
         corner = new ResizeCorner(this);
     reset(63);
 }
@@ -442,7 +450,7 @@ Client::mousePosition( const QPoint& p ) const
 QSize
 Client::minimumSize() const
 {
-    return QSize(buttonSpaceLeft + buttonSpaceRight + 2*borderSize, titleSize + borderSize);
+    return QSize(buttonSpaceLeft + buttonSpaceRight + 2*borderSize, myTitleSize + borderSize);
 }
 
 #define DUMP_PICTURE(_PREF_, _PICT_)\
@@ -503,7 +511,7 @@ Client::repaint(QPainter &p, bool paintTitle)
             p.drawPath(Shapes::logo(logo));
         }
         c.setAlpha(255); p.setPen(c); p.setBrush(Qt::NoBrush);
-        p.drawText(r, Qt::AlignHCenter | Qt::TextSingleLine | Qt::AlignTop, _caption);
+        p.drawText(r, Qt::AlignHCenter | Qt::TextSingleLine | Qt::AlignTop, myCaption);
     }
     else if (isShade())
     { // only one "big" gradient, as we can't rely on windowId()!!
@@ -599,7 +607,7 @@ Client::repaint(QPainter &p, bool paintTitle)
                 p.drawTiledPixmap( 0, h-(128+32), width(), 128, ctBuffer );
             }
 //       p.setPen(bg);
-//       p.drawLine(width()/4, titleSize-1, 3*width()/4, titleSize-1);
+//       p.drawLine(width()/4, myTitleSize-1, 3*width()/4, myTitleSize-1);
             break;
         }
         case 0:
@@ -613,16 +621,16 @@ Client::repaint(QPainter &p, bool paintTitle)
         case 1:
         {   // scanlines, fallback
             p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
-            const Gradients::Type gradient = config()->gradient[0][isActive()];
+            const Gradients::Type gradient = Factory::config()->gradient[0][isActive()];
             if (gradient == Gradients::None)
                 p.drawRect(top);
             else
             {
-                p.fillRect(top, Gradients::brush(bg, titleSize, Qt::Vertical, gradient));
+                p.fillRect(top, Gradients::brush(bg, myTitleSize, Qt::Vertical, gradient));
                 p.setPen(Colors::mid(bg, Qt::black,6,1));
-                p.drawLine(borderSize,titleSize-1,width()-borderSize,titleSize-1);
+                p.drawLine(borderSize,myTitleSize-1,width()-borderSize,myTitleSize-1);
 //                 p.setPen(Colors::mid(bg, Qt::white,6,1));
-//                 p.drawLine(0,titleSize-1,width(),titleSize-1);
+//                 p.drawLine(0,myTitleSize-1,width(),myTitleSize-1);
             }
 
             const Gradients::Type titleGradient = gType[isActive()];
@@ -630,10 +638,10 @@ Client::repaint(QPainter &p, bool paintTitle)
             {   // nice deco
                 p.setRenderHint( QPainter::Antialiasing );
                 bg = color(ColorTitleBlend, isActive());
-                const QPixmap &fill = Gradients::pix(bg, titleSize, Qt::Vertical, titleGradient);
+                const QPixmap &fill = Gradients::pix(bg, myTitleSize, Qt::Vertical, titleGradient);
                 const QColor shadow = Colors::mid(bg, Qt::black,6,1);
                 p.setPen(QPen(shadow, 2)); p.setBrush(fill);
-                p.drawRoundRect(label.adjusted(0,4,0,-4),titleSize*99/label.width(),99);
+                p.drawRoundRect(label.adjusted(0,4,0,-4),myTitleSize*99/label.width(),99);
                 p.setRenderHint( QPainter::Antialiasing, false );
             }
             break;
@@ -646,7 +654,7 @@ Client::repaint(QPainter &p, bool paintTitle)
     {   // splitter
         QColor bg2 = color(ColorTitleBlend, isActive());
         p.setPen(Colors::mid(bg, Qt::black, 3, 1));
-        int y = titleSize-2;
+        int y = myTitleSize-2;
         p.drawLine(8, y, width()-8, y);
         ++y;
         p.setPen(Colors::mid(bg, Qt::white, 2, 1));
@@ -657,7 +665,7 @@ Client::repaint(QPainter &p, bool paintTitle)
     if (paintTitle)
     {
     const QColor titleColor = color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive());
-    const int tf = config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
+    const int tf = Factory::config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
     if (isActive())
     {
         // emboss?!
@@ -668,9 +676,9 @@ Client::repaint(QPainter &p, bool paintTitle)
         else // bright bg -> bright bottom borderline
             { p.setPen(light); d = 1; }
         QRect tr;
-        p.drawText ( label.translated(0,d), tf, _caption, &tr );
+        p.drawText ( label.translated(0,d), tf, myCaption, &tr );
 
-        if (!config()->hideInactiveButtons)
+        if (!Factory::config()->hideInactiveButtons)
         {
             if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
                 maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
@@ -685,7 +693,7 @@ Client::repaint(QPainter &p, bool paintTitle)
         }
     }
     p.setPen(titleColor);
-    p.drawText ( label, tf, _caption );
+    p.drawText ( label, tf, myCaption );
     }
 
     // bar =========================
@@ -696,7 +704,7 @@ Client::repaint(QPainter &p, bool paintTitle)
         if (gType[isActive()])
         {   // button corner
             QColor shadow = Colors::mid(bg2, Qt::black,4,1);
-            const QPixmap &fill = Gradients::pix(bg2, titleSize, Qt::Vertical, gType[isActive()]);
+            const QPixmap &fill = Gradients::pix(bg2, myTitleSize, Qt::Vertical, gType[isActive()]);
             p.setPen(shadow);
             p.setBrush(fill);
             p.setRenderHint( QPainter::Antialiasing );
@@ -744,14 +752,14 @@ Client::reset(unsigned long changed)
 {
     if (changed & SettingFont)
     {
-        titleSize = _factory->titleSize(_small);
-        titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+        myTitleSize = Factory::titleSize(iAmSmall);
+        titleSpacer->changeSize( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
 
     if (changed & SettingDecoration)
     {
-        gType[0] = config()->gradient[1][0];
-        gType[1] = config()->gradient[1][1];
+        gType[0] = Factory::config()->gradient[1][0];
+        gType[1] = Factory::config()->gradient[1][1];
         changed |= SettingColors;
     }
 
@@ -760,39 +768,39 @@ Client::reset(unsigned long changed)
         if (maximizeMode() == MaximizeFull)
         {
             if (options()->moveResizeMaximizedWindows())
-                borderSize = qMin(4, _factory->borderSize());
+                borderSize = qMin(4, Factory::borderSize());
             else
             {
                 borderSize = 0;
                 if (corner)
                     corner->hide();
             }
-            titleSize = _factory->titleSize(true);
-            titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+            myTitleSize = Factory::buttonSize(iAmSmall)+4;
+            titleSpacer->changeSize( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
         }
         else
         {
-            borderSize = _factory->borderSize();
-            titleSize = _factory->titleSize(_small);
-            titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+            borderSize = Factory::borderSize();
+            myTitleSize = Factory::titleSize(iAmSmall);
+            titleSpacer->changeSize( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
             if (corner)
                 corner->show();
         }
 
         bottom = QRect(0, height()-borderSize, width(), borderSize);
-        const int sideHeight = height() - (titleSize + borderSize);
-        left = QRect(0, titleSize, borderSize, sideHeight);
-        right = QRect(width()-borderSize, titleSize, borderSize, sideHeight);
+        const int sideHeight = height() - (myTitleSize + borderSize);
+        left = QRect(0, myTitleSize, borderSize, sideHeight);
+        right = QRect(width()-borderSize, myTitleSize, borderSize, sideHeight);
 
-        uint decoDim =   ((borderSize & 0xff) << 24) | ((titleSize &0xff) << 16) |
+        uint decoDim =   ((borderSize & 0xff) << 24) | ((myTitleSize &0xff) << 16) |
                         ((borderSize &0xff) << 8) | (borderSize & 0xff);
         XProperty::set<uint>(windowId(), XProperty::decoDim, &decoDim, XProperty::LONG);
-        titleSpacer->changeSize( 1, titleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+        titleSpacer->changeSize( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
 
     if (changed & SettingButtons)
     {
-        myButtonOpacity = (isActive() || !config()->hideInactiveButtons) ? 100 : 0;
+        myButtonOpacity = (isActive() || !Factory::config()->hideInactiveButtons) ? 100 : 0;
         for (int i = 0; i < 4; ++i)
             { delete buttons[i]; buttons[i] = 0; }
         titleBar->removeItem(titleSpacer);
@@ -828,7 +836,7 @@ Client::reset(unsigned long changed)
             colors[0][ColorButtonBg] = colors[0][ColorFont] =
             Colors::mid(colors[0][ColorTitleBar], colors[1][ColorFont]);
         }
-        else if (!config()->forceUserColors)
+        else if (!Factory::config()->forceUserColors)
         {
 //             KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
             WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
@@ -836,7 +844,7 @@ Client::reset(unsigned long changed)
             {
                 long int *pid = XProperty::get<long int>(windowId(), XProperty::pid, XProperty::LONG);
                 if (pid)
-                    if ((data = factory()->decoInfo(*pid)))
+                    if ((data = Factory::decoInfo(*pid)))
                         XProperty::set<uint>(windowId(), XProperty::winData, (uint*)data, XProperty::WORD, 9);
             }
 
@@ -919,11 +927,11 @@ Client::reset(unsigned long changed)
 void
 Client::updateButtonCorner(bool right)
 {
-    const int ts = titleSize;
+    const int ts = myTitleSize;
     if (right)
     {
         const int w = width();
-        const int dr = buttonSpaceRight + titleSize;
+        const int dr = buttonSpaceRight + myTitleSize;
         const int bs = buttonSpaceRight;
         buttonCorner = QPainterPath(QPoint(w, -1)); //tl corner
         buttonCorner.lineTo(w, ts); // straight to br corner
@@ -932,11 +940,11 @@ Client::updateButtonCorner(bool right)
     }
     else
     {
-        const int dl = buttonSpaceLeft + titleSize;
+        const int dl = buttonSpaceLeft + myTitleSize;
         const int bs = buttonSpaceLeft;
         buttonCorner = QPainterPath(QPoint(0, -1)); //tl corner
         buttonCorner.lineTo(dl, -1); // straight to tl end
-        buttonCorner.cubicTo(bs, 0,   dl - titleSize/2, ts+2,   bs - ts/2, ts); // curve to bl offset
+        buttonCorner.cubicTo(bs, 0,   dl - myTitleSize/2, ts+2,   bs - ts/2, ts); // curve to bl offset
         buttonCorner.lineTo(0, ts); // straight to bl end
     }
 }
@@ -946,23 +954,23 @@ void
 Client::updateTitleLayout( const QSize& )
 {
     int dl = buttonSpaceLeft, dr = buttonSpaceRight;
-    if (config()->titleAlign == Qt::AlignHCenter)
+    if (Factory::config()->titleAlign == Qt::AlignHCenter)
         dl = dr = buttonSpace;
     if (bgMode != 1 && (gType[0] || gType[1]))
     {
         if (buttonSpaceLeft <= buttonSpaceRight)
         {
             updateButtonCorner(true);
-            dr += titleSize;
+            dr += myTitleSize;
         }
         else
-            dl += titleSize;
+            dl += myTitleSize;
 
     }
     else
         { dl += 8; dr += 8; }
 
-    label.setRect(dl, 0, width()-(dl+dr), titleSize);
+    label.setRect(dl, 0, width()-(dl+dr), myTitleSize);
 
     if (!label.isValid())
         label = QRect();
@@ -976,9 +984,9 @@ Client::resize( const QSize& s )
 
     updateTitleLayout( s );
 
-    top = QRect(0, 0, w, titleSize);
+    top = QRect(0, 0, w, myTitleSize);
     bottom = QRect(0, h-borderSize, w, borderSize);
-    const int t2 = 2*titleSize/3;
+    const int t2 = 2*myTitleSize/3;
     const int sideHeight = h - borderSize;
     left = QRect(0, t2, borderSize, sideHeight);
     right = QRect(w-borderSize, t2, borderSize, sideHeight);
@@ -1020,7 +1028,7 @@ Client::showDesktopMenu(const QPoint &p)
    QPoint ip = p;
    QPoint gp = widget()->mapToGlobal(QPoint(width()-60, 0));
    if (ip.x() > gp.x()) ip.setX(gp.x());
-   _factory->showDesktopMenu(ip, this);
+   Factory::showDesktopMenu(ip, this);
 }
 
 void
@@ -1029,7 +1037,7 @@ Client::showWindowList(const QPoint &p)
    QPoint ip = p;
    QPoint gp = widget()->mapToGlobal(QPoint(width()-200, 0));
    if (ip.x() > gp.x()) ip.setX(gp.x());
-   _factory->showWindowList(ip, this);
+   Factory::showWindowList(ip, this);
 }
 
 void
@@ -1038,7 +1046,7 @@ Client::showInfo(const QPoint &p)
    QPoint ip = p;
    QPoint gp = widget()->mapToGlobal(QPoint(width()-320, 0));
    if (ip.x() > gp.x()) ip.setX(gp.x());
-   _factory->showInfo(ip, windowId());
+   Factory::showInfo(ip, windowId());
 }
 
 void
@@ -1112,7 +1120,7 @@ Client::tileWindow(bool more, bool vertical, bool mirrorGravity)
     sz = state*sz/tiles;
 
     NETRootInfo rootinfo(QX11Info::display(), NET::WMMoveResize );
-    rootinfo.moveResizeWindowRequest(windowId(), flags, 0, 0, sz - 2*borderSize, sz - (borderSize + titleSize));
+    rootinfo.moveResizeWindowRequest(windowId(), flags, 0, 0, sz - 2*borderSize, sz - (borderSize + myTitleSize));
 }
 
 
@@ -1199,7 +1207,7 @@ static const QString kwin_sep = QString(" %1 ").arg(QChar(0x2013));
 QString
 Client::trimm(const QString &string)
 {
-    if (!config()->trimmCaption) return string;
+    if (!Factory::config()->trimmCaption) return string;
 
     /* Ok, *some* apps have really long and nasty window captions
     this looks clutterd, so we allow to crop them a bit and remove

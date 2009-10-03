@@ -54,27 +54,29 @@ KDE_EXPORT KDecorationFactory* create_factory()
 
 using namespace Bespin;
 
-bool Factory::initialized_ = false;
-Config Factory::_config = { false, false, false, true, Qt::AlignHCenter, 0, {{Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None}} };
-int Factory::buttonSize_ = -1;
-int Factory::borderSize_ = 4;
-int Factory::titleSize_[2] = {18,16};
-QVector<Button::Type> Factory::multiButton_(0);
-QMenu *Factory::desktopMenu_ = 0;
-QMenu *Factory::_windowList = 0;
-QTextBrowser *Factory::_windowInfo = 0;
+bool Factory::weAreInitialized = false;
+Config Factory::ourConfig = { false, false, false, true, Qt::AlignHCenter, 0, {{Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None}} };
+int Factory::ourButtonSize[2] = {-1, -1};
+int Factory::ourBorderSize = 4;
+int Factory::ourTitleSize[2] = {18,16};
+QVector<Button::Type> Factory::ourMultiButton(0);
+QMenu *Factory::ourDesktopMenu = 0;
+QMenu *Factory::ourWindowList = 0;
+QTextBrowser *Factory::ourWindowInfo = 0;
+QHash<qint64, WindowData*> Factory::ourDecoInfos;
+QHash<qint64, BgSet*> Factory::ourBgSets;
 
 Factory::Factory() : QObject()
 {
     readConfig();
     Gradients::init();
-    initialized_ = true;
+    weAreInitialized = true;
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
     QDBusConnection::sessionBus().registerObject("/BespinDeco", this);
 }
 
-Factory::~Factory() { initialized_ = false; Gradients::wipe(); }
+Factory::~Factory() { weAreInitialized = false; Gradients::wipe(); }
 
 KDecoration* Factory::createDecoration(KDecorationBridge* b)
 {
@@ -87,9 +89,9 @@ KDecoration* Factory::createDecoration(KDecorationBridge* b)
 
 bool Factory::reset(unsigned long changed)
 {
-    initialized_ = false;
+    weAreInitialized = false;
     const bool configChanged = readConfig();
-    initialized_ = true;
+    weAreInitialized = true;
 
     if (configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder)))
     {
@@ -198,84 +200,83 @@ bool Factory::readConfig()
     QSettings settings("Bespin", "Style");
     settings.beginGroup("Deco");
 
-    oldBool = _config.forceUserColors;
-    _config.forceUserColors = settings.value("ForceUserColors", false).toBool();
-    if (oldBool != _config.forceUserColors) ret = true;
+    oldBool = ourConfig.forceUserColors;
+    ourConfig.forceUserColors = settings.value("ForceUserColors", false).toBool();
+    if (oldBool != ourConfig.forceUserColors) ret = true;
 
-    oldBool = _config.trimmCaption;
-    _config.trimmCaption = settings.value("TrimmCaption", true).toBool();
-    if (oldBool != _config.trimmCaption) ret = true;
+    oldBool = ourConfig.trimmCaption;
+    ourConfig.trimmCaption = settings.value("TrimmCaption", true).toBool();
+    if (oldBool != ourConfig.trimmCaption) ret = true;
 
-    oldBool = _config.hideInactiveButtons;
-    _config.hideInactiveButtons = !settings.value("InactiveButtons", false).toBool();
-    if (oldBool != _config.hideInactiveButtons) ret = true;
+    oldBool = ourConfig.hideInactiveButtons;
+    ourConfig.hideInactiveButtons = !settings.value("InactiveButtons", false).toBool();
+    if (oldBool != ourConfig.hideInactiveButtons) ret = true;
 
-    int oldInt = _config.slickButtons;
-    _config.slickButtons = settings.value("SlickButtons", 0).toInt();
-    if (oldInt != _config.slickButtons) ret = true;
+    int oldInt = ourConfig.slickButtons;
+    ourConfig.slickButtons = settings.value("SlickButtons", 0).toInt();
+    if (oldInt != ourConfig.slickButtons) ret = true;
 
-    oldInt = _config.titleAlign;
-    _config.titleAlign = settings.value("TitleAlign", Qt::AlignHCenter).toInt();
-    if (oldInt != _config.titleAlign) ret = true;
+    oldInt = ourConfig.titleAlign;
+    ourConfig.titleAlign = settings.value("TitleAlign", Qt::AlignHCenter).toInt();
+    if (oldInt != ourConfig.titleAlign) ret = true;
 
-    oldBool = _config.resizeCorner;
-    _config.resizeCorner = settings.value("ResizeCorner", false).toBool();
-    if (oldBool != _config.resizeCorner) ret = true;
+    oldBool = ourConfig.resizeCorner;
+    ourConfig.resizeCorner = settings.value("ResizeCorner", false).toBool();
+    if (oldBool != ourConfig.resizeCorner) ret = true;
 
-    oldgradient = _config.gradient[0][0];
-    _config.gradient[0][0] = (Gradients::Type)(settings.value("InactiveGradient", 0).toInt());
-    if (oldgradient != _config.gradient[0][0]) ret = true;
+    oldgradient = ourConfig.gradient[0][0];
+    ourConfig.gradient[0][0] = (Gradients::Type)(settings.value("InactiveGradient", 0).toInt());
+    if (oldgradient != ourConfig.gradient[0][0]) ret = true;
 
-    oldgradient = _config.gradient[0][1];
-    _config.gradient[0][1] = (Gradients::Type)(settings.value("ActiveGradient", 2).toInt());
-    if (oldgradient != _config.gradient[0][1]) ret = true;
+    oldgradient = ourConfig.gradient[0][1];
+    ourConfig.gradient[0][1] = (Gradients::Type)(settings.value("ActiveGradient", 2).toInt());
+    if (oldgradient != ourConfig.gradient[0][1]) ret = true;
 
-    oldgradient = _config.gradient[1][0];
-    _config.gradient[1][0] = Gradients::fromInfo(settings.value("InactiveGradient2", 0).toInt());
-    if (oldgradient != _config.gradient[1][0]) ret = true;
+    oldgradient = ourConfig.gradient[1][0];
+    ourConfig.gradient[1][0] = Gradients::fromInfo(settings.value("InactiveGradient2", 0).toInt());
+    if (oldgradient != ourConfig.gradient[1][0]) ret = true;
     
-    oldgradient = _config.gradient[1][1];
-    _config.gradient[1][1] = Gradients::fromInfo(settings.value("ActiveGradient2", 0).toInt());
-    if (oldgradient != _config.gradient[1][1]) ret = true;
+    oldgradient = ourConfig.gradient[1][1];
+    ourConfig.gradient[1][1] = Gradients::fromInfo(settings.value("ActiveGradient2", 0).toInt());
+    if (oldgradient != ourConfig.gradient[1][1]) ret = true;
 
-    QString oldmultiorder = multiString(multiButton_);
+    QString oldmultiorder = multiString(ourMultiButton);
     QString newmultiorder = settings.value("MultiButtonOrder", "MHFBSLE!").toString();
     if (oldmultiorder != newmultiorder)
     {
         ret = true;
-        multiVector(newmultiorder, multiButton_);
+        multiVector(newmultiorder, ourMultiButton);
     }
 
-    int oldbordersize = borderSize_;
+    int oldbordersize = ourBorderSize;
     switch (options()->preferredBorderSize(this))
     {
-        case BorderTiny: borderSize_ = 0; break;
+        case BorderTiny: ourBorderSize = 0; break;
         default:
-        case BorderNormal: borderSize_ = 4; break;
-        case BorderLarge: borderSize_ = 7; break;
-        case BorderVeryLarge: borderSize_ = 10; break;
-        case BorderHuge: borderSize_ = 16; break;
-        case BorderVeryHuge: borderSize_ = 21; break;
-        case BorderOversized: borderSize_ = 30; break;
+        case BorderNormal: ourBorderSize = 4; break;
+        case BorderLarge: ourBorderSize = 7; break;
+        case BorderVeryLarge: ourBorderSize = 10; break;
+        case BorderHuge: ourBorderSize = 16; break;
+        case BorderVeryHuge: ourBorderSize = 21; break;
+        case BorderOversized: ourBorderSize = 30; break;
     }
-    if (oldbordersize != borderSize_) ret = true;
+    if (oldbordersize != ourBorderSize) ret = true;
 
-    int oldtitlesize = titleSize_[1];
-    QFontMetrics fm(options()->font());
-    titleSize_[1] = fm.height() + 2;
-    if (oldtitlesize != titleSize_[1]) ret = true;
-    oldtitlesize = titleSize_[0];
-    titleSize_[0] = qMax(fm.height() + 4 + settings.value("TitlePadding", 0).toInt(), borderSize_);
-    if (oldtitlesize != titleSize_[0]) ret = true;
+    int fntHgt = QFontMetrics(options()->font()).height();
+    int oldtitlesize = ourTitleSize[0];
+    ourTitleSize[0] = qMax(fntHgt + 4 + settings.value("TitlePadding", 0).toInt(), ourBorderSize);
+    if (oldtitlesize != ourTitleSize[0]) ret = true;
+    ourButtonSize[0] = fntHgt-2 + ourTitleSize[0]%2;
 
-    if (buttonSize_ != titleSize_[1])
-    {
-        buttonSize_ = titleSize_[1]-4; // for the moment
-        buttonSize_ += buttonSize_ % 2;
-        Button::init( buttonSize_, options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
-                                                settings.value("IAmMyLittleSister", false).toBool(),
-                                                settings.value("RoundButtons", true).toBool());
-    }
+    fntHgt *= smallFactor();
+    oldtitlesize = ourTitleSize[1];
+    ourTitleSize[1] = fntHgt + 2;
+    if (oldtitlesize != ourTitleSize[1]) ret = true;
+    ourButtonSize[1] = fntHgt-2 + ourTitleSize[1]%2;
+    
+    Button::init( options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
+                  settings.value("IAmMyLittleSister", false).toBool(),
+                  settings.value("RoundButtons", true).toBool() );
 
     return ret;
 }
@@ -304,37 +305,38 @@ void
 Factory::showDesktopMenu(const QPoint &p, Client *client)
 {
 //    static void KWindowSystem::setCurrentDesktop( int desktop );
-    if (!client) return;
-    if (!desktopMenu_)
-        desktopMenu_ = new QMenu();
+    if (!client)
+        return;
+    if (!ourDesktopMenu)
+        ourDesktopMenu = new QMenu();
     else
-        desktopMenu_->clear();
+        ourDesktopMenu->clear();
 
-    QWidgetAction *headerAct = new QWidgetAction(desktopMenu_);
+    QWidgetAction *headerAct = new QWidgetAction(ourDesktopMenu);
     headerAct->setDefaultWidget(new Header("Throw on:"));
-    desktopMenu_->addAction(headerAct);
+    ourDesktopMenu->addAction(headerAct);
 
     QAction *act = 0;
     for (int i = 1; i <= KWindowSystem::numberOfDesktops(); ++i)
     {
-        act = desktopMenu_->addAction ( "Desktop #" + QString::number(i), client, SLOT(throwOnDesktop()) );
+        act = ourDesktopMenu->addAction ( "Desktop #" + QString::number(i), client, SLOT(throwOnDesktop()) );
         act->setData(i);
         act->setDisabled(i == KWindowSystem::currentDesktop());
     }
-    desktopMenu_->popup(p);
+    ourDesktopMenu->popup(p);
 }
 
 void
 Factory::showWindowList(const QPoint &p, Client *client)
 {
-    if (!_windowList)
-        _windowList = new QMenu();
+    if (!ourWindowList)
+        ourWindowList = new QMenu();
     else
-        _windowList->clear();
+        ourWindowList->clear();
 
-    QWidgetAction *headerAct = new QWidgetAction(_windowList);
+    QWidgetAction *headerAct = new QWidgetAction(ourWindowList);
     headerAct->setDefaultWidget(new Header("Windows"));
-    _windowList->addAction(headerAct);
+    ourWindowList->addAction(headerAct);
 
     const QList<WId>& windows = KWindowSystem::windows();
 
@@ -353,12 +355,12 @@ Factory::showWindowList(const QPoint &p, Client *client)
                 title = "< " + title + " >";
             if (title.length() > 52)
                 title = title.left(22) + "..." + title.right(22);
-            act = _windowList->addAction ( title, client, SLOT(activate()) );
+            act = ourWindowList->addAction ( title, client, SLOT(activate()) );
             act->setData((uint)id);
             act->setDisabled(id == KWindowSystem::activeWindow());
         }
     }
-    _windowList->popup(p);
+    ourWindowList->popup(p);
 }
 
 
@@ -391,29 +393,29 @@ void
 Factory::showInfo(const QPoint &p, WId id) {
 
    // build info widget - in case
-   if (!_windowInfo) {
+   if (!ourWindowInfo) {
       QWidget *window = new QWidget(0, Qt::Popup);
       QVBoxLayout *l = new QVBoxLayout(window);
       l->setContentsMargins ( 6, 2, 6, 10 );
       l->setSpacing(0);
       Header *header = new Header("Window Information", window);
       l->addWidget(header);
-      _windowInfo = new QTextBrowser(window);
+      ourWindowInfo = new QTextBrowser(window);
 
-      _windowInfo->viewport()->setAutoFillBackground(false);
-      _windowInfo->viewport()->setBackgroundRole(QPalette::Window);
-      _windowInfo->viewport()->setForegroundRole(QPalette::WindowText);
-      _windowInfo->setFrameStyle(QFrame::NoFrame);
+      ourWindowInfo->viewport()->setAutoFillBackground(false);
+      ourWindowInfo->viewport()->setBackgroundRole(QPalette::Window);
+      ourWindowInfo->viewport()->setForegroundRole(QPalette::WindowText);
+      ourWindowInfo->setFrameStyle(QFrame::NoFrame);
 
-      _windowInfo->setFontFamily ( "fixed" );
+      ourWindowInfo->setFontFamily ( "fixed" );
       QString css("h1 { font-size:large; margin-top:10px; margin-bottom:4px; }");
-      _windowInfo->document()->setDefaultStyleSheet ( css );
+      ourWindowInfo->document()->setDefaultStyleSheet ( css );
 
-      l->addWidget(_windowInfo);
+      l->addWidget(ourWindowInfo);
       window->resize(255, 453);
    }
    else
-      _windowInfo->clear();
+      ourWindowInfo->clear();
 
    // fill with info
    KWindowInfo info( id,
@@ -477,10 +479,10 @@ ClassName: <b>%7</b><br/>\
                arg(QString(info.windowClassClass())).
                arg(QString(info.windowClassName()));
 
-   _windowInfo->setHtml( text );
+   ourWindowInfo->setHtml( text );
 
    // and show up
-   QWidget *win = _windowInfo->parentWidget();
+   QWidget *win = ourWindowInfo->parentWidget();
 //    QPoint ip = p;
 //    if (ip.x() + 640 > )
    win->move(p);
@@ -528,21 +530,21 @@ Factory::bgSet(const QColor &c, bool vertical, int intensity, qint64 *hashPtr)
     if (hashPtr)
         *hashPtr = hash;
     
-    BgSet *set = _bgSets.value(hash, 0);
+    BgSet *set = ourBgSets.value(hash, 0);
     if (!set)
         set = Gradients::bgSet(c, vertical?Gradients::BevelV:Gradients::BevelH , intensity);
-    _bgSets.insert(hash, set);
+    ourBgSets.insert(hash, set);
     return set;
 }
 
 void
 Factory::kickBgSet(qint64 hash)
 {
-    QHash<qint64, BgSet*>::iterator i = _bgSets.find(hash);
-    if (i != _bgSets.end())
+    QHash<qint64, BgSet*>::iterator i = ourBgSets.find(hash);
+    if (i != ourBgSets.end())
     {
         delete i.value(); i.value() = 0;
-        _bgSets.erase(i);
+        ourBgSets.erase(i);
     }
 }
 
@@ -563,24 +565,24 @@ Factory::learn(qint64 pid, QByteArray data)
     info->inactiveButton = ints[6];
     info->activeButton = ints[7];
     info->style = ints[8];
-    _decoInfos.insert(pid, info);
+    ourDecoInfos.insert(pid, info);
 }
 
 void
 Factory::forget(qint64 pid)
 {
-    QHash<qint64, WindowData*>::iterator i = _decoInfos.find(pid);
-    if (i != _decoInfos.end())
+    QHash<qint64, WindowData*>::iterator i = ourDecoInfos.find(pid);
+    if (i != ourDecoInfos.end())
     {
         delete i.value(); i.value() = 0;
-        _decoInfos.erase(i);
+        ourDecoInfos.erase(i);
     }
 }
 
 WindowData*
 Factory::decoInfo(qint64 pid)
 {
-    return _decoInfos.value(pid, 0);
+    return ourDecoInfos.value(pid, 0);
 }
 
 #include "dbus.moc"

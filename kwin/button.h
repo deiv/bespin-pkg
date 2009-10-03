@@ -47,24 +47,24 @@ public:
         Restore, Unstick, UnAboveBelow, Unshade, NumTypes
     };
     Button(Client *parent, Type type, bool left = false);
-    static void init(int sz, bool leftMenu = false, bool fixedColors = false, bool round = true);
+    static void init(bool leftMenu = false, bool fixedColors = false, bool round = true);
     bool isEnabled() const;
     void setBg(const QPixmap &pix) { bgPix = pix; }
-    inline bool type() {return _type;}
+    inline bool type() {return myType;}
 protected:
-    void enterEvent(QEvent *e);
-    void leaveEvent(QEvent *e);
-    void mousePressEvent ( QMouseEvent * event );
-    void mouseReleaseEvent ( QMouseEvent * event );
-    void paintEvent(QPaintEvent *e);
-    void timerEvent ( QTimerEvent * event );
-    void wheelEvent(QWheelEvent * event);
+    void enterEvent(QEvent*);
+    void leaveEvent(QEvent*);
+    void mousePressEvent(QMouseEvent*);
+    void mouseReleaseEvent(QMouseEvent*);
+    void paintEvent(QPaintEvent*);
+    void timerEvent(QTimerEvent*);
+    void wheelEvent(QWheelEvent*);
 private:
     Q_DISABLE_COPY(Button)
     QColor color() const;
     bool zoomOut, left;
     Client *client;
-    Type _type;
+    Type myType;
     int state, multiIdx, zoomTimer, zoomLevel;
     QPixmap bgPix;
     static QPainterPath shape[NumTypes];

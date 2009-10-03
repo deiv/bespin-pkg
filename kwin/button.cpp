@@ -46,13 +46,14 @@ client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
     setAutoFillBackground(false);
     setAttribute(Qt::WA_Hover, true);
 
-    setFixedSize(parent->buttonSize(), parent->buttonSize());
+    const int sz = Factory::buttonSize(parent->isSmall());
+    setFixedSize(sz, sz);
     setCursor(Qt::ArrowCursor);
     this->left = left;
 
     if (type == Multi)
     {
-        _type = client->factory()->multiButtons().at(0);
+        myType = Factory::multiButtons().at(0);
         connect(client, SIGNAL(keepAboveChanged(bool)), SLOT(clientStateChanged(bool)));
         connect(client, SIGNAL(keepBelowChanged(bool)), SLOT(clientStateChanged(bool)));
         connect(client, SIGNAL(stickyChanged(bool)), SLOT(clientStateChanged(bool)));
@@ -61,7 +62,7 @@ client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
     }
     else
     {
-        _type = type;
+        myType = type;
         if (type == Max)
             connect(client, SIGNAL(maximizeChanged(bool)), SLOT(maximizeChanged(bool)) );
     }
@@ -74,28 +75,28 @@ Button::clientStateChanged(bool state)
 {
     if (state)
     {
-        switch (_type)
+        switch (myType)
         {
         case Above:
         case Below:
-            _type = UnAboveBelow; break;
+            myType = UnAboveBelow; break;
         case Stick:
-            _type = Unstick; break;
+            myType = Unstick; break;
         case Shade:
-            _type = Unshade; break;
+            myType = Unshade; break;
         default:
             return;
         }
     }
     else {
-        switch (_type)
+        switch (myType)
         {
         case UnAboveBelow:
-            _type = client->factory()->multiButtons().at(multiIdx); break;
+            myType = Factory::multiButtons().at(multiIdx); break;
         case Unstick:
-            _type = Stick; break;
+            myType = Stick; break;
         case Unshade:
-            _type = Shade; break;
+            myType = Shade; break;
         default:
             return;
         }
@@ -108,7 +109,7 @@ Button::isEnabled() const
 {
     if (!QWidget::isEnabled())
         return false;
-    switch (_type)
+    switch (myType)
     {
         case Close: return client->isCloseable();
         case Min: return client->isMinimizable();
@@ -119,8 +120,9 @@ Button::isEnabled() const
 }
 
 void
-Button::init(int sz, bool leftMenu, bool fColors, bool round)
+Button::init(bool leftMenu, bool fColors, bool round)
 {
+    const int sz = 99;
     fixedColors = fColors;
     for (int t = 0; t < NumTypes; ++t)
         shape[t] = QPainterPath();
@@ -201,7 +203,7 @@ Button::leaveEvent(QEvent *)
 void
 Button::maximizeChanged(bool maximized)
 {
-    _type = maximized ? Restore : Max;
+    myType = maximized ? Restore : Max;
     repaint();
 }
 
@@ -231,7 +233,7 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
 
     const bool lb = (event->button() == Qt::LeftButton);
     const bool rb = (event->button() == Qt::RightButton);
-    switch (_type)
+    switch (myType)
     {
     case Close:
         if (lb && client->isCloseable ())
@@ -310,9 +312,9 @@ Button::color() const
         bgt = KDecorationDefines::ColorTitleBar;
     }
     QColor c = client->color(fgt, client->isActive());
-    if (fixedColors && _type < Multi)
-        c = client->isActive() ? QColor(fcolors[_type]) :
-            Colors::mid(c, QColor(fcolors[_type]), 6-zoomLevel, zoomLevel);
+    if (fixedColors && myType < Multi)
+        c = client->isActive() ? QColor(fcolors[myType]) :
+            Colors::mid(c, QColor(fcolors[myType]), 6-zoomLevel, zoomLevel);
     const QColor bg = client->color(bgt, client->isActive());
     if (isEnabled())
         c = Colors::mid(bg, c, 6-zoomLevel, 4);
@@ -332,9 +334,10 @@ Button::paintEvent(QPaintEvent *)
     p.setRenderHint(QPainter::Antialiasing);
     p.setPen(Qt::NoPen);
     p.setBrush(color());
-    const int slick = client->slickButtons();
+    const int slick = Factory::slickButtons();
     
     float fx, fy;
+    const float fs = height()/99.0;
     if (state & Sunken)
         fx = fy = .75;
     else if (slick == 2)
@@ -363,9 +366,9 @@ Button::paintEvent(QPaintEvent *)
         fx = fy = (18 + zoomLevel)/24.0;
     const float t = height()/2.0;
     p.translate( QPoint(t,t) );
-    p.scale ( fx, fy );
+    p.scale ( fs*fx, fs*fy );
 //    p.rotate(60*zoomLevel); // too annoying, especially for fast zoom in...
-    p.drawPath(shape[_type]);
+    p.drawPath(shape[myType]);
     p.end();
 }
 
@@ -396,15 +399,15 @@ else if (multiIdx < 0 )\
 void
 Button::wheelEvent(QWheelEvent *e)
 {
-    if ((_type == Max || _type == Restore) && isEnabled())
+    if ((myType == Max || myType == Restore) && isEnabled())
     {
         client->tileWindow(e->delta() < 0, e->modifiers() & Qt::ControlModifier, !left);
         return;
     }
 
-    if (_type < Multi) return;
+    if (myType < Multi) return;
 
-    const QVector<Type> &mb = client->factory()->multiButtons();
+    const QVector<Type> &mb = Factory::multiButtons();
     int d = (e->delta() < 0) ? 1 : -1;
 
     CYCLE_ON;
@@ -414,14 +417,13 @@ Button::wheelEvent(QWheelEvent *e)
         CYCLE_ON;
     }
 
-   _type = mb.at(multiIdx);
-   if ((_type == Above && client->keepAbove()) ||
-      (_type == Below && client->keepBelow()))
-      _type = UnAboveBelow;
-   else if (_type == Stick && client->isOnAllDesktops())
-      _type = Unstick;
-   else if (_type == Shade && client->isSetShade())
-      _type = Unshade;
+   myType = mb.at(multiIdx);
+   if ( (myType == Above && client->keepAbove()) || (myType == Below && client->keepBelow()) )
+      myType = UnAboveBelow;
+   else if (myType == Stick && client->isOnAllDesktops())
+      myType = Unstick;
+   else if (myType == Shade && client->isSetShade())
+      myType = Unshade;
 
    //TODO: roll max/vert/hori?!
    repaint();

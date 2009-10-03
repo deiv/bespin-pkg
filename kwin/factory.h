@@ -57,9 +57,9 @@ public:
     KDecoration *createDecoration(KDecorationBridge *b);
     bool reset(unsigned long changed);
     bool supports( Ability ability ) const;
-    inline static int buttonSize() {return buttonSize_;}
-    inline static int borderSize() {return borderSize_;}
-    inline static int initialized() {return initialized_;}
+    inline static int buttonSize(bool small) {return ourButtonSize[small];}
+    inline static int borderSize() {return ourBorderSize;}
+    inline static int initialized() {return weAreInitialized;}
     QList< BorderSize > borderSizes() const
     {
         return QList< BorderSize >() << BorderTiny << BorderNormal <<
@@ -67,34 +67,35 @@ public:
         BorderOversized;
     }
 //    virtual void checkRequirements( KDecorationProvides* provides );
-    inline static int titleSize(bool minimal = false) {return titleSize_[minimal];}
-    inline static const Config *config() { return &_config; }
-    WindowData *decoInfo(qint64 pid);
-    inline static const QVector<Button::Type> &multiButtons() { return multiButton_; }
-    inline static int slickButtons() { return _config.slickButtons; }
-    void showDesktopMenu(const QPoint &p, Client *client);
-    void showInfo(const QPoint &p, WId id);
-    void showWindowList(const QPoint &p, Client *client);
+    inline static int titleSize(bool minimal = false) {return ourTitleSize[minimal];}
+    inline static const Config *config() { return &ourConfig; }
+    static WindowData *decoInfo(qint64 pid);
+    inline static const QVector<Button::Type> &multiButtons() { return ourMultiButton; }
+    inline static int slickButtons() { return ourConfig.slickButtons; }
+    static inline float smallFactor() { return 0.7; }
+    static void showDesktopMenu(const QPoint &p, Client *client);
+    static void showInfo(const QPoint &p, WId id);
+    static void showWindowList(const QPoint &p, Client *client);
 protected:
     friend class BespinDecoAdaptor;
-    void learn(qint64 pid, QByteArray data);
-    void forget(qint64 pid);
+    static void learn(qint64 pid, QByteArray data);
+    static void forget(qint64 pid);
 protected:
     friend class Client;
-    BgSet *bgSet(const QColor &c, bool vertical, int intensity, qint64 *hash = 0);
-    void kickBgSet(qint64 hash);
+    static BgSet *bgSet(const QColor &c, bool vertical, int intensity, qint64 *hash = 0);
+    static void kickBgSet(qint64 hash);
 private:
     bool readConfig();
 private:
-    QHash<qint64, WindowData*> _decoInfos;
-    QHash<qint64, BgSet*> _bgSets;
-    static bool initialized_;
-    static bool slickButtons_;
-    static int buttonSize_, borderSize_, titleSize_[2];
-    static QVector<Button::Type> multiButton_;
-    static Config _config;
-    static QMenu *desktopMenu_, *_windowList;
-    static QTextBrowser *_windowInfo;
+    static QHash<qint64, WindowData*> ourDecoInfos;
+    static QHash<qint64, BgSet*> ourBgSets;
+    static bool weAreInitialized;
+    static bool weUseSlickButtons;
+    static int ourButtonSize[2], ourBorderSize, ourTitleSize[2];
+    static QVector<Button::Type> ourMultiButton;
+    static Config ourConfig;
+    static QMenu *ourDesktopMenu, *ourWindowList;
+    static QTextBrowser *ourWindowInfo;
 };
 
 } //namespace
