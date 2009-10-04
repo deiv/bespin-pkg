@@ -570,7 +570,7 @@ Style::polish( QWidget * widget )
             if (frame->lineWidth() == 1)
                 frame->setLineWidth(F(4)); // but must have enough indention
         }
-        else if (appType != Opera && !widget->inherits("KPIM::OverlayWidget"))
+        else if (!widget->inherits("KPIM::OverlayWidget"))
             VisualFrame::manage(frame);
     }
     //END FRAMES                                                                                   -
@@ -759,19 +759,6 @@ Style::polish( QWidget * widget )
 //                     this, SLOT(dockFeaturesChanged(QDockWidget::DockWidgetFeatures)));
         }
     }
-    else if (widget->inherits("KFadeWidgetEffect"))
-    {   // interfers with our animation, is slower and cannot handle non plain backgrounds
-        // (unfortunately i cannot avoid the widget grabbing)
-        // maybe ask ereslibre to query a stylehint for this?
-        widget->hide();
-        widget->installEventFilter(&eventKiller);
-    }
-    /// hover some leftover widgets
-    else if (widget->inherits("QAbstractSpinBox") || widget->inherits("QSplitterHandle") ||
-        /*widget->inherits("QDockWidget") ||*/ widget->inherits("QWorkspaceTitleBar") ||
-        widget->inherits("Q3DockWindowResizeHandle"))
-        widget->setAttribute(Qt::WA_Hover);
-
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
     if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
     {
@@ -781,7 +768,40 @@ Style::polish( QWidget * widget )
         if (!((appType == KDevelop) || (appType == QtDesigner) && mbar->inherits("QDesignerMenuBar")))
             MacMenu::manage(mbar);
 #endif
-    }   
+    }
+    else if (widget->inherits("KFadeWidgetEffect"))
+    {   // interfers with our animation, is slower and cannot handle non plain backgrounds
+        // (unfortunately i cannot avoid the widget grabbing)
+        // maybe ask ereslibre to query a stylehint for this?
+        widget->hide();
+        widget->installEventFilter(&eventKiller);
+    }
+    /// hover some leftover widgets
+    else if (widget->inherits("QAbstractSpinBox") || widget->inherits("QSplitterHandle") ||
+        widget->inherits("QWebView") || // to update the scrollbars
+        /*widget->inherits("QDockWidget") ||*/ widget->inherits("QWorkspaceTitleBar") ||
+        widget->inherits("Q3DockWindowResizeHandle"))
+        widget->setAttribute(Qt::WA_Hover);
+    // this is a WORKAROUND for amarok filebrowser, see above on itemviews...
+    else if (widget->inherits("KDirOperator"))
+    {
+        if (widget->parentWidget() && widget->parentWidget()->inherits("FileBrowser"))
+        {
+            QPalette pal = widget->palette();
+            pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
+            pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
+            pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
+            widget->setPalette(pal);
+        }
+    }
+#if 0
+// #ifdef Q_WS_X11
+    else if (config.bg.opacity != 0xff && widget->inherits("QX11EmbedContainer") && widget->window())
+    {
+        qDebug() << "BESPIN, reverting" << widget << widget->window();
+        widget->window()->setAttribute(Qt::WA_TranslucentBackground, false);
+    }
+#endif
 
     bool isTopContainer = qobject_cast<QToolBar *>(widget);
 #ifdef QT3_SUPPORT
@@ -807,21 +827,6 @@ Style::polish( QWidget * widget )
         widget->setAutoFillBackground(false);
     }
 
-    // this is a WORKAROUND for amarok filebrowser, see above on itemviews...
-    if (widget->inherits("KDirOperator") && widget->parentWidget() && widget->parentWidget()->inherits("FileBrowser"))
-    {
-        QPalette pal = widget->palette();
-        pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
-        pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
-        pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
-        widget->setPalette(pal);
-    }
-#if 1
-    /// to update the scrollbars
-    if (widget->inherits("QWebView"))
-        widget->setAttribute(Qt::WA_Hover);
-#endif
-#if 1
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors
     /// are set or KHtml does wrong OR (mainly) by html "designers"
     if (IS_HTML_WIDGET)
@@ -831,7 +836,6 @@ Style::polish( QWidget * widget )
         QEvent ev(QEvent::PaletteChange);
         eventFilter(widget, &ev);
     }
-#endif
 }
 #undef PAL
 

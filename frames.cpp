@@ -29,10 +29,13 @@
 bool
 Style::isSpecialFrame(const QWidget *w)
 {
+    if (appType == Opera)
+        return true;
     if (const QListView *view = qobject_cast<const QListView*>(w))
-        return (view->viewMode() == QListView::IconMode);
-        
-    return  w->inherits("QTextEdit") || w->objectName() == "RenderFormElementWidget";
+    {
+        return view->viewMode() == QListView::IconMode || view->inherits("KCategorizedView");
+    }
+    return w->inherits("QTextEdit") || w->objectName() == "RenderFormElementWidget";
 //     || (w->parentWidget() && w->parentWidget()->inherits("KateView")); // kate repaints the frame anyway
 }
 
