@@ -1022,9 +1022,11 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
     
         if (QListView *list = qobject_cast<QListView*>(object))
-        //         if (list->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) // this should be, but semms to be not
+//         if (list->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) // this should be, but semms to be not
+        if (list->iconSize().height() > -1) // happens on e.g. config views
         if (list->inherits("KCategorizedView"))
-            list->verticalScrollBar()->setSingleStep(list->iconSize().height()/3);
+                list->verticalScrollBar()->setSingleStep(list->iconSize().height()/3);
+
         return false;
     }
 #ifdef MOUSEDEBUG
