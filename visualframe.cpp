@@ -30,7 +30,7 @@
 #define DEBUG_VF 0
 #if DEBUG_VF
 #include <QtDebug>
-#define VDebug(_STREAM_) qDebug() << _STREAM_
+#define VDebug(_STREAM_) qDebug() << "BESPIN:" << _STREAM_
 #else
 #define VDebug(_STREAM_) //
 #define DEBUG //
@@ -97,9 +97,10 @@ VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect 
 class StdChildAdd : public QObject
 {
 public:
-   bool eventFilter( QObject *, QEvent *ev) {
-      return (ev->type() == QEvent::ChildAdded);
-   }
+    bool eventFilter( QObject *, QEvent *ev)
+    {
+        return (ev->type() == QEvent::ChildAdded);
+    }
 };
 
 static StdChildAdd stdChildAdd;
@@ -107,52 +108,58 @@ static StdChildAdd stdChildAdd;
 bool
 VisualFrame::manage(QFrame *frame)
 {
-   if (!frame) return false;
-   VDebug ("======= MANAGE" << frame << "===============");
-   QList<VisualFrame*> vfs = frame->findChildren<VisualFrame*>();
-   foreach (VisualFrame* vf, vfs) {
-      VDebug ("test" << vf);
-      if (vf->parent() == frame) {
-         VDebug (frame << "is allready managed by" << vf);
-         return false;
-      }
-   }
+    if (!frame)
+        return false;
+    VDebug ("======= MANAGE" << frame << "===============");
+    QList<VisualFrame*> vfs = frame->window()->findChildren<VisualFrame*>();
+    foreach (VisualFrame* vf, vfs)
+    {
+        VDebug ("test" << vf);
+        if (vf->myFrame == frame)
+        {
+            VDebug (frame << "is allready managed by" << vf);
+            return false;
+        }
+    }
 //    if (!vfs.isEmpty()) return false; // avoid double adds
 
-   VDebug ("add new visual frame for" << frame);
-   new VisualFrame(frame);
-   return true;
+    VDebug ("add new visual frame for" << frame);
+    new VisualFrame(frame);
+    return true;
 }
 
 void
 VisualFrame::release(QFrame *frame)
 {
-   if (!frame) return;
-   VDebug ("======= RELEASE" << frame << "===============");
-   QList<VisualFrame*> vfs = frame->findChildren<VisualFrame*>();
-   foreach (VisualFrame* vf, vfs) {
-      VDebug ("test" << vf);
-      if (vf->parent() == frame) {
-         VDebug (frame << "matches" << vf << "... releasing");
-         vf->hide(); vf->deleteLater();
-      }
-   }
+    if (!frame) return;
+    VDebug ("======= RELEASE" << frame << "===============");
+    QList<VisualFrame*> vfs = frame->window()->findChildren<VisualFrame*>();
+    foreach (VisualFrame* vf, vfs)
+    {
+        VDebug ("test" << vf);
+        if (vf->myFrame == frame)
+        {
+            VDebug (frame << "matches" << vf << "... releasing");
+            vf->hide(); vf->deleteLater();
+        }
+    }
 }
 
 // TODO: mange ALL frames and catch shape/shadow changes!!!
 VisualFrame::VisualFrame(QFrame *parent) : QObject(parent),
-top(0), bottom(0), left(0), right(0), hidden(true)
+myFrame(0), myWindow(0), hidden(true), top(0), bottom(0), left(0), right(0)
 {
-   if (notInited) {
-      qWarning("You need to initialize the VisualFrames with\n\
-               VisualFrame::setGeometry()\n\
-               for all three QFrame::Shadow types first!\n\
-               No Frame added.");
-      deleteLater(); return;
-   }
-   if (!parent) {
-      deleteLater(); return;
-   }
+    myStyle = (QFrame::Shape)-1;
+    if (notInited)
+    {
+        qWarning("You need to initialize the VisualFrames with\n\
+                VisualFrame::setGeometry()\n\
+                for all three QFrame::Shadow types first!\n\
+                No Frame added.");
+        deleteLater(); return;
+    }
+    if (!parent)
+        { deleteLater(); return; }
    
    // create frame elements
    myFrame = parent;
@@ -174,39 +181,42 @@ top(0), bottom(0), left(0), right(0), hidden(true)
 void
 VisualFrame::updateShape()
 {
-   myStyle = myFrame->frameShape();
-   if (myStyle != QFrame::StyledPanel) {
-      delete top; top = 0L;
-      delete bottom; bottom = 0L;
-      delete left; left = 0L;
-      delete right; right = 0L;
+    myStyle = myFrame->frameShape();
+    
+    if (myStyle != QFrame::StyledPanel)
+    {
+        top->deleteLater(); top = 0L;
+        bottom->deleteLater(); bottom = 0L;
+        left->deleteLater(); left = 0L;
+        right->deleteLater(); right = 0L;
 
-      QWidget *runner = myFrame->parentWidget();
-      while (runner && runner != myWindow) {
-         runner->removeEventFilter(this);
-         runner = runner->parentWidget();
-      }
-      hidden = true;
-      return;
-   }
-
-   // we start out with myWindow == myFrame, the actual parent widget is recalculated on each show()
-   // to capture e.g. dock floats etc.
-   myWindow = myFrame;
-   myWindow->installEventFilter(&stdChildAdd);
-   top = new VisualFramePart(myWindow, myFrame, this, North);
-   bottom = new VisualFramePart(myWindow, myFrame, this, South);
-   left = new VisualFramePart(myWindow, myFrame, this, West);
-   right = new VisualFramePart(myWindow, myFrame, this, East);
-   myWindow->removeEventFilter(&stdChildAdd);
-
-   // manage events
-   top->installEventFilter(this);
-   if (myFrame->isVisible())
-      show();
-   else
-      hide();
-   QTimer::singleShot(0, this, SLOT(correctPosition()));
+        QWidget *runner = myFrame->parentWidget();
+        while (runner && runner != myWindow)
+        {
+            runner->removeEventFilter(this);
+            runner = runner->parentWidget();
+        }
+        hidden = true;
+        return;
+    }
+    
+    // we start out with myWindow == myFrame, the actual parent widget is recalculated on each show()
+    // to capture e.g. dock floats etc.
+    myWindow = myFrame;
+    myWindow->installEventFilter(&stdChildAdd);
+    if (!top) top = new VisualFramePart(myWindow, myFrame, this, North);
+    if (!bottom) bottom = new VisualFramePart(myWindow, myFrame, this, South);
+    if (!left) left = new VisualFramePart(myWindow, myFrame, this, West);
+    if (!right) right = new VisualFramePart(myWindow, myFrame, this, East);
+    myWindow->removeEventFilter(&stdChildAdd);
+    // manage events
+    top->removeEventFilter(this);
+    top->installEventFilter(this);
+    if (myFrame->isVisible())
+        show();
+    else
+        hide();
+    QTimer::singleShot(0, this, SLOT(correctPosition()));
 }
 
 inline static QRect
@@ -301,6 +311,7 @@ VisualFrame::show()
         PARTS(setParent(myWindow));
         myWindow->removeEventFilter(&stdChildAdd);
     }
+
     raise();
     correctPosition();
     PARTS(show());
@@ -315,12 +326,15 @@ VisualFrame::hide()
     PARTS(hide());
 }
 
+static bool blockRaise = false;
+
 void
 VisualFrame::raise()
 {
-    if (myStyle != QFrame::StyledPanel)
+    if (hidden || blockRaise || myStyle != QFrame::StyledPanel)
         return;
 
+    blockRaise = true;
     QWidget *sibling = myFrame;
     while (sibling)
     {
@@ -356,6 +370,7 @@ VisualFrame::raise()
     {
         PARTS(raise());
     }
+    blockRaise = false;
 }
 
 void
@@ -376,14 +391,18 @@ VisualFrame::update()
 
 #undef PARTS
 
+static bool blockZEvent = false;
 bool
 VisualFrame::eventFilter ( QObject * o, QEvent * ev )
 {
-
     if (o == top)
     {   // "top" is the only monitored framepart!
-        if (ev->type() == QEvent::ZOrderChange)
+        if (ev->type() == QEvent::ZOrderChange && !(blockZEvent || hidden))
+        {
+            blockZEvent = true;
             raise();
+            blockZEvent = false;
+        }
         return false;
     }
 
@@ -393,9 +412,11 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
         return false;
     }
 
-    if (ev->type() == QEvent::ZOrderChange)
+    if (ev->type() == QEvent::ZOrderChange && !blockZEvent)
     {   // necessary for all widgets from frame to parent
+        blockZEvent = true;
         raise();
+        blockZEvent = false;
         return false;
     }
 
@@ -421,7 +442,6 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
 
     if (ev->type() == QEvent::Show)
     {
-        correctPosition();
         show();
         return false;
     }
