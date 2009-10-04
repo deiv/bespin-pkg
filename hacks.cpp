@@ -734,9 +734,9 @@ hackAmarokPlayer(QWidget *frame)
                                                box->addSpacing(22);
 #endif
     }
-    QTimer::singleShot(300, bespinHacks, SLOT(swapAmarokPalette()));
-///     frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     frame->installEventFilter(bespinHacks);
+    QTimer::singleShot(0, bespinHacks, SLOT(swapAmarokPalette()));
+///     frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
 }
 
 inline static bool
@@ -1192,7 +1192,7 @@ Hacks::add(QWidget *w)
                 splitter->parentWidget()->parentWidget()->inherits("MainWindow"))
                 amarok->lowerPart = splitter;
         }
-        else if (config.amarokDisplay && qobject_cast<QToolBar*>(w) && w->objectName() == "MainToolbar")
+        else if (config.amarokDisplay && w->objectName() == "MainToolbar")
             hackAmarokPlayer(w);
         else if (QDockWidget *dock = qobject_cast<QDockWidget*>(w))
         {
@@ -1204,6 +1204,7 @@ Hacks::add(QWidget *w)
         }
         else if (QFrame *frame = qobject_cast<QFrame*>(w))
         {
+#if 1
             if (config.amarokListView)
             if (QAbstractItemView *view = qobject_cast<QAbstractItemView*>(w))
             {
@@ -1215,6 +1216,7 @@ Hacks::add(QWidget *w)
                     viewport->setPalette(QPalette());
                 }
             }
+#endif
             if (!(amarok->context || amarok->mainWindow) &&
                 (config.amarokContext || config.amarokDisplay) &&
                 w->inherits("Context::ContextView"))
@@ -1235,6 +1237,7 @@ Hacks::add(QWidget *w)
             }
             if (config.amarokDisplay && frame->objectName() == "MainToolbar")
                 hackAmarokPlayer(frame);
+#if 1
             else if (config.amarokFrames)
             {
                 QWidget *runner = w;
@@ -1247,6 +1250,7 @@ Hacks::add(QWidget *w)
                     }
                 }
             }
+#endif
         }
         else if (config.amarokDisplay && qobject_cast<QAbstractButton*>(w))
         {
