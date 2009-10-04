@@ -185,10 +185,10 @@ VisualFrame::updateShape()
     
     if (myStyle != QFrame::StyledPanel)
     {
-        top->deleteLater(); top = 0L;
-        bottom->deleteLater(); bottom = 0L;
-        left->deleteLater(); left = 0L;
-        right->deleteLater(); right = 0L;
+        if (top) { top->deleteLater(); top = 0L; }
+        if (bottom) { bottom->deleteLater(); bottom = 0L; }
+        if (left) { left->deleteLater(); left = 0L; }
+        if (right) { right->deleteLater(); right = 0L; }
 
         QWidget *runner = myFrame->parentWidget();
         while (runner && runner != myWindow)
@@ -230,9 +230,9 @@ correctedRect(QFrame *frame)
         rect.adjust(-l, -t, r, b);
     }
     // NOTICE: this works around a Qt rtl (bug(?))!
-    else if (   (frame->layoutDirection() == Qt::RightToLeft) &&
-                rect.right() != frame->rect().right() &&
-                frame->inherits("QAbstractScrollArea") )
+    else if ( (frame->layoutDirection() == Qt::RightToLeft) &&
+               rect.right() != frame->rect().right() &&
+               frame->inherits("QAbstractScrollArea") )
         rect.moveLeft(rect.x() + (frame->rect().right() - rect.right()));
     return rect;
 }
