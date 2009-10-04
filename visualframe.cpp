@@ -140,6 +140,7 @@ VisualFrame::release(QFrame *frame)
         if (vf->myFrame == frame)
         {
             VDebug (frame << "matches" << vf << "... releasing");
+            frame->clearMask();
             vf->hide(); vf->deleteLater();
         }
     }
@@ -189,6 +190,7 @@ VisualFrame::updateShape()
         if (bottom) { bottom->deleteLater(); bottom = 0L; }
         if (left) { left->deleteLater(); left = 0L; }
         if (right) { right->deleteLater(); right = 0L; }
+        myFrame->clearMask();
 
         QWidget *runner = myFrame->parentWidget();
         while (runner && runner != myWindow)
