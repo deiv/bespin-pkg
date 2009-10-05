@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="edit-clear-list.svg"
+   sodipodi:docname="media-skip-backward.svg"
    inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/media-skip-backward.png"
    inkscape:export-xdpi="33.75"
    inkscape:export-ydpi="33.75">
@@ -35,15 +35,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.5117188"
-     inkscape:cx="144.42437"
-     inkscape:cy="38.40088"
+     inkscape:zoom="5.9453125"
+     inkscape:cx="64"
+     inkscape:cy="63.9159"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1162"
      inkscape:window-height="1084"
-     inkscape:window-x="228"
+     inkscape:window-x="412"
      inkscape:window-y="20"
      inkscape:window-maximized="0">
     <inkscape:grid
@@ -62,7 +62,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -71,30 +71,22 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-924.36218)">
-    <path
-       sodipodi:type="star"
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       id="path2814"
-       sodipodi:sides="3"
-       sodipodi:cx="52"
-       sodipodi:cy="48"
-       sodipodi:r1="64.498062"
-       sodipodi:r2="32.249031"
-       sodipodi:arg1="1.0516502"
-       sodipodi:arg2="2.0988478"
-       inkscape:flatsided="true"
-       inkscape:rounded="0.16"
-       inkscape:randomized="0"
-       d="M 84.000001,104 C 68.480826,112.8681 -12.57701,65.586864 -12.497423,47.712814 -12.417835,29.838764 69.057834,-16.718763 84.497422,-7.7128135 99.93701,1.2931363 99.519176,95.131899 84.000001,104 z"
-       transform="matrix(0.77213437,0,0,1,45.84338,940.36218)" />
-    <rect
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       id="rect2816"
-       width="28"
-       height="112"
-       x="8"
-       y="932.36218"
-       rx="11.25"
-       ry="11.249999" />
+    <g
+       id="g2908">
+      <path
+         id="rect2836"
+         d="m 116.75,928.36218 c -24.003938,4.71243 -51.908955,16.34994 -74.0625,29.21875 8.190363,4.98477 14.221137,13.15148 16.40625,22.78125 l 53.34375,0 c 1.41199,-14.66628 6.60307,-29.33371 15.5625,-44 0,-4.432 -5.0175,-8 -11.25,-8 z m -57.65625,68 c -2.185113,9.62972 -8.215887,17.79652 -16.40625,22.78122 22.153545,12.8688 50.058562,24.5064 74.0625,29.2188 6.2325,0 11.25,-3.568 11.25,-8 -9.06752,-14.6663 -14.23197,-29.3337 -15.59375,-44.00002 l -53.3125,0 z"
+         style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+      <path
+         transform="translate(0,924.36218)"
+         d="M 48,64 A 24,24 0 1 1 0,64 24,24 0 1 1 48,64 z"
+         sodipodi:ry="24"
+         sodipodi:rx="24"
+         sodipodi:cy="64"
+         sodipodi:cx="24"
+         id="path2881"
+         style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         sodipodi:type="arc" />
+    </g>
   </g>
 </svg>
