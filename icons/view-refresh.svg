@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,9 +13,10 @@
    height="64px"
    id="svg2383"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47pre2 r22153"
    sodipodi:docname="view-refresh.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.1">
   <defs
      id="defs2385">
     <inkscape:perspective
@@ -32,9 +34,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="12.578125"
-     inkscape:cx="19.796273"
-     inkscape:cy="37.219588"
+     inkscape:zoom="2.9765625"
+     inkscape:cx="59.232365"
+     inkscape:cy="21.582744"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
@@ -42,10 +44,15 @@
      inkscape:window-width="1678"
      inkscape:window-height="1009"
      inkscape:window-x="174"
-     inkscape:window-y="61">
+     inkscape:window-y="61"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
-       id="grid3165" />
+       id="grid3165"
+       empspacing="4"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <metadata
      id="metadata2388">
@@ -63,30 +70,17 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <path
-       sodipodi:type="arc"
-       style="opacity:0.65999995;color:#000000;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:12;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       id="path3398"
-       sodipodi:cx="32"
-       sodipodi:cy="32"
-       sodipodi:rx="28"
-       sodipodi:ry="28"
-       d="M 59.992696,31.36051 A 28,28 0 0 1 31.76281,59.998995"
-       sodipodi:start="6.2603444"
-       sodipodi:end="7.8624528"
-       sodipodi:open="true"
-       transform="translate(-1.9926964,-1.9080745)" />
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="M 32 0 C 14.326888 3.5527137e-15 -6.2450045e-17 14.326888 0 32 C 8.4462009e-18 28.686292 2.6862915 26 6 26 C 9.3137085 26 12 28.686292 12 32 C 12 20.954305 20.954305 12 32 12 C 35.313708 12 38 9.3137085 38 6 C 38 2.6862915 35.313708 -1.3071141e-15 32 0 z M 52 32 C 52 43.045695 43.045695 52 32 52 C 28.686292 52 26 54.686292 26 58 C 26 61.313708 28.686292 64 32 64 C 49.673112 64 64 49.673112 64 32 C 64 35.313708 61.313708 38 58 38 C 54.686292 38 52 35.313708 52 32 z "
+       id="path3591" />
     <path
-       sodipodi:open="true"
-       sodipodi:end="4.7337241"
-       sodipodi:start="3.1259538"
-       d="M 4.003424,32.43787 A 28,28 0 0 1 32.597338,4.0063724"
-       sodipodi:ry="28"
-       sodipodi:rx="28"
-       sodipodi:cy="32"
-       sodipodi:cx="32"
-       id="path3400"
-       style="opacity:0.65999995;color:#000000;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:12;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        sodipodi:type="arc"
-       transform="translate(1.996576,2.0670807)" />
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="path3618"
+       sodipodi:cx="32"
+       sodipodi:cy="32"
+       sodipodi:rx="12"
+       sodipodi:ry="12"
+       d="m 44,32 a 12,12 0 1 1 -24,0 12,12 0 1 1 24,0 z" />
   </g>
 </svg>
