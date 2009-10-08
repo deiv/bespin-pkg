@@ -195,10 +195,19 @@ bool Factory::readConfig()
     #endif
     bool ret = false;
     bool oldBool;
+    QString oldString;
     Gradients::Type oldgradient;
     
     QSettings settings("Bespin", "Style");
     settings.beginGroup("Deco");
+
+    oldString = ourConfig.smallTitleClasses.join(",");
+    QString smallTitleClasses = settings.value("SmallTitleClasses", "").toString().replace(QRegExp("\\s*,\\s*"), ",");
+    if (oldString != smallTitleClasses)
+    {
+        ret = true;
+        ourConfig.smallTitleClasses =  smallTitleClasses.split(',');
+    }
 
     oldBool = ourConfig.forceUserColors;
     ourConfig.forceUserColors = settings.value("ForceUserColors", false).toBool();
@@ -276,7 +285,7 @@ bool Factory::readConfig()
     
     Button::init( options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
                   settings.value("IAmMyLittleSister", false).toBool(),
-                  settings.value("RoundButtons", true).toBool() );
+                  settings.value("IconVariant", 1).toInt() );
 
     return ret;
 }

@@ -47,6 +47,7 @@ typedef struct
     bool forceUserColors, trimmCaption, resizeCorner, hideInactiveButtons;
     int slickButtons, titleAlign;
     Gradients::Type gradient[2][2];
+    QStringList smallTitleClasses;
 } Config;
 
 class Factory : public QObject, public KDecorationFactory
@@ -72,7 +73,7 @@ public:
     static WindowData *decoInfo(qint64 pid);
     inline static const QVector<Button::Type> &multiButtons() { return ourMultiButton; }
     inline static int slickButtons() { return ourConfig.slickButtons; }
-    static inline float smallFactor() { return 0.7; }
+    static inline float smallFactor() { return 0.75; }
     static void showDesktopMenu(const QPoint &p, Client *client);
     static void showInfo(const QPoint &p, WId id);
     static void showWindowList(const QPoint &p, Client *client);

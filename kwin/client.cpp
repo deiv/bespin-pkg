@@ -365,6 +365,12 @@ Client::init()
     dirty[0] = dirty[1] = true;
     NET::WindowType type = windowType( supported_types );
     iAmSmall = type == NET::Utility || type == NET::Menu || type == NET::Toolbar;
+    if (!iAmSmall)
+    {
+        KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
+        iAmSmall =  Factory::config()->smallTitleClasses.contains(info.windowClassName(), Qt::CaseInsensitive) ||
+                    Factory::config()->smallTitleClasses.contains(info.windowClassClass(), Qt::CaseInsensitive);
+    }
 
     myCaption = isPreview() ? (isActive() ? "Active Window" : "Inactive Window") : trimm(caption());
     widget()->setAutoFillBackground(false);
@@ -1261,6 +1267,13 @@ Client::trimm(const QString &string)
         int i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
         if (i > -1)
             ret = ret.mid(i, appName.length());
+        else
+        {
+            appName = info.windowClassClass();
+            i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
+            if (i > -1)
+                ret = ret.mid(i, appName.length());
+        }
     }
     
     // in general, remove leading and ending blanks...
