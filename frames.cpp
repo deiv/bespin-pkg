@@ -190,7 +190,7 @@ Style::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, const 
             painter->setPen(textColor);
             role = QPalette::NoRole;
         }
-        setTitleFont(painter);
+        setTitleFont(painter, groupBox->text);
         QStyleOptionGroupBox copy = *groupBox;
         copy.fontMetrics = QFontMetrics(painter->font());
         QRect textRect = subControlRect(CC_GroupBox, &copy, SC_GroupBoxLabel, widget);

@@ -65,7 +65,7 @@ setBold(QPainter *p, const QString &text = QString())
 }
 
 static inline void
-setTitleFont(QPainter *p)
+setTitleFont(QPainter *p, const QString &text = QString())
 {
     if (p->font().pointSize() < 1) // ignore pixelsize fonts for reports of bad visual quality (#2787384)
         return;
@@ -79,7 +79,17 @@ setTitleFont(QPainter *p)
 #else
     title = title.toUpper();
 #endif
-    fnt.setPointSize(9*fnt.pointSize()/10);
+    if (text.isEmpty())
+        fnt.setPointSize(9*fnt.pointSize()/10);
+    else
+    {
+        int wb = QFontMetrics(fnt).size(Qt::TextShowMnemonic, text).width();
+        if (wb)
+        {
+            int w = QFontMetrics(p->font()).size(Qt::TextShowMnemonic, text).width();
+            fnt.setStretch(lround(w*100.0/wb));
+        }
+    }
 
     p->setFont(fnt);
 }
