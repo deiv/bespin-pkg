@@ -47,7 +47,7 @@ public:
         Restore, Unstick, UnAboveBelow, Unshade, NumTypes
     };
     Button(Client *parent, Type type, bool left = false);
-    static void init(bool leftMenu = false, bool fixedColors = false, bool round = true);
+    static void init(bool leftMenu = false, bool fixedColors = false, int variant = 1);
     bool isEnabled() const;
     void setBg(const QPixmap &pix) { bgPix = pix; }
     inline bool type() {return myType;}

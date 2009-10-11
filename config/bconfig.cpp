@@ -257,62 +257,70 @@ BConfig::save()
     return _save(&settings);
 }
 
-QVariant BConfig::variant(const QObject *w) const {
-   if (const QComboBox *box = qobject_cast<const QComboBox*>(w)) {
-      if (box->itemData(box->currentIndex()).isValid())
-         return box->itemData(box->currentIndex());
-      return box->currentIndex();
-   }
-   else if (const QCheckBox *box = qobject_cast<const QCheckBox*>(w))
-      return box->isChecked();
-   else if (const QGroupBox *box = qobject_cast<const QGroupBox*>(w))
-       return box->isCheckable() && box->isChecked();
-   else if (const QButtonGroup *group = qobject_cast<const QButtonGroup*>(w))
-       return group->checkedId();
-   else if (const QAbstractSlider *slider = qobject_cast<const QAbstractSlider*>(w))
-      return slider->value();
-   else if (const QSpinBox *spin = qobject_cast<const QSpinBox*>(w))
-      return spin->value();
-   else if (const QLineEdit *lineEdit = qobject_cast<const QLineEdit*>(w))
-      return lineEdit->text();
-   else if (const QTextEdit *textEdit = qobject_cast<const QTextEdit*>(w))
-      return textEdit->toPlainText();
-   
-   qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
-   return QVariant();
+QVariant
+BConfig::variant(const QObject *w) const
+{
+    if (const QComboBox *box = qobject_cast<const QComboBox*>(w))
+    {
+        if (box->itemData(box->currentIndex()).isValid())
+            return box->itemData(box->currentIndex());
+        return box->currentIndex();
+    }
+    else if (const QCheckBox *box = qobject_cast<const QCheckBox*>(w))
+        return box->isChecked();
+    else if (const QGroupBox *box = qobject_cast<const QGroupBox*>(w))
+        return box->isCheckable() && box->isChecked();
+    else if (const QButtonGroup *group = qobject_cast<const QButtonGroup*>(w))
+        return group->checkedId();
+    else if (const QAbstractSlider *slider = qobject_cast<const QAbstractSlider*>(w))
+        return slider->value();
+    else if (const QSpinBox *spin = qobject_cast<const QSpinBox*>(w))
+        return spin->value();
+    else if (const QLineEdit *lineEdit = qobject_cast<const QLineEdit*>(w))
+        return lineEdit->text();
+    else if (const QTextEdit *textEdit = qobject_cast<const QTextEdit*>(w))
+        return textEdit->toPlainText();
+
+    qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
+    return QVariant();
 }
 
-bool BConfig::setVariant(QObject *w, const QVariant &v) const {
-   if (QComboBox *box = qobject_cast<QComboBox*>(w)) {
-      int idx = box->findData(v);
-      if (idx == -1) {
-         idx = v.toInt();
-         if (idx >= box->count()) idx = box->count()-1;
-      }
-      box->setCurrentIndex(idx);
-   }
-   else if (QButtonGroup *group = qobject_cast<QButtonGroup*>(w))
-   {
-        if (QAbstractButton *btn = group->button(v.toInt()))
-            btn->setChecked(true);
-   }
-   else if (QCheckBox *box = qobject_cast<QCheckBox*>(w))
-      box->setChecked(v.toBool());
-   else if (QGroupBox *box = qobject_cast<QGroupBox*>(w))
-       box->setChecked(v.toBool());
-   else if (QAbstractSlider *slider = qobject_cast<QAbstractSlider*>(w))
-      slider->setValue(v.toInt());
-   else if (QSpinBox *spin = qobject_cast<QSpinBox*>(w))
-      spin->setValue(v.toInt());
-   else if (QLineEdit *lineEdit = qobject_cast<QLineEdit*>(w))
-      lineEdit->setText(v.toString());
-   else if (QTextEdit *textEdit = qobject_cast<QTextEdit*>(w))
-      textEdit->setPlainText(v.toString());
-   else {
-      qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
-      return false;
-   }
-   return true;
+bool
+BConfig::setVariant(QObject *w, const QVariant &v) const
+{
+    if (QComboBox *box = qobject_cast<QComboBox*>(w))
+    {
+        int idx = box->findData(v);
+        if (idx == -1)
+        {
+            idx = v.toInt();
+            if (idx >= box->count())
+                idx = box->count()-1;
+        }
+        box->setCurrentIndex(idx);
+    }
+    else if (QButtonGroup *group = qobject_cast<QButtonGroup*>(w))
+    {
+            if (QAbstractButton *btn = group->button(v.toInt()))
+                btn->setChecked(true);
+    }
+    else if (QCheckBox *box = qobject_cast<QCheckBox*>(w))
+        box->setChecked(v.toBool());
+    else if (QGroupBox *box = qobject_cast<QGroupBox*>(w))
+        box->setChecked(v.toBool());
+    else if (QAbstractSlider *slider = qobject_cast<QAbstractSlider*>(w))
+        slider->setValue(v.toInt());
+    else if (QSpinBox *spin = qobject_cast<QSpinBox*>(w))
+        spin->setValue(v.toInt());
+    else if (QLineEdit *lineEdit = qobject_cast<QLineEdit*>(w))
+        lineEdit->setText(v.toString());
+    else if (QTextEdit *textEdit = qobject_cast<QTextEdit*>(w))
+        textEdit->setPlainText(v.toString());
+    else {
+        qWarning("%s is not supported yet, feel free tro ask", w->metaObject()->className());
+        return false;
+    }
+    return true;
 }
 
 bool

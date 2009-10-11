@@ -46,11 +46,13 @@ public:
 private:
     Q_DISABLE_COPY(Hacks)
 private slots:
+// #if BESPIN_HACK_AMAROK // mc doesn't talk preproc...
     void setAmarokMetaInfo(int);
-    void setKmixMask(int);
     void swapAmarokPalette();
     void toggleAmarokContext();
     void toggleAmarokCompact();
+// #endif
+    void setKmixMask(int);
 };
 } // namespace
 #endif // BESPIN_HACKS_H

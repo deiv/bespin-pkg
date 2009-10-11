@@ -215,7 +215,7 @@ Style::drawBranch(const QStyleOption * option, QPainter * painter, const QWidget
         painter->setPen(Qt::NoPen);
         QRect rect = QRect(bef_h+2, bef_v+2, decoration_size, decoration_size);
         if (firstCol)
-            rect.moveRight(RECT.right()-dpi.f1);
+            rect.moveRight(RECT.right()-F(1));
         if (option->state & State_Open)
         {
             if (option->state & State_Selected)

@@ -455,6 +455,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     treeview in order to be used - can be cute, can be annoying: choose by yourself<br>\
     This way it's activated globally." );
 
+#if BESPIN_HACK_AMAROK
+    setContextHelp(ui.appSpecific->widget(0), "<b>Amarok Hacks</b/><hr>\
+    Notice that this can potentially cause trouble on Amarok<br>\
+    Also this is legacy code and supposed to be redundant due to (future) changes to Amarok.<br>\
+    <b>By activating one of them, you confirm that you know what you're doing!</b>");
     handleSettings(ui.hackAmarokContext, HACK_AMAROK_CONTEXT);
     setContextHelp(ui.hackAmarokContext, "<b>Hide Amarok's Context</b><hr>\
     Did i mention that i don't get a resonable internet connection ;-)\
@@ -486,8 +491,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Amarok uses lists with a window background. Unfortunately the foreground color role is hardcoded\
     (to the wrong value...) Therefore you might (depending on your color scheme) end up with white text\
     on a bright ground :-(<br/>\
-    Check this to make e.g. the collection browser, the playlis etc. look like a normal list with a solid\
-    background." );
+    Check this to make e.g. the collection browser etc. look like a normal list with a solid background." );
+#else
+    delete ui.appSpecific->widget(0);
+#endif
 
     /** setContextHelp(.) attaches a context help string to a widget on your form */
     setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\

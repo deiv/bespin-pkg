@@ -319,7 +319,6 @@ Style::polish( QWidget * widget )
 
 //     if (widget->inherits("QGraphicsView"))
 //         qDebug() << "BESPIN" << widget;
-
 #ifdef MOUSEDEBUG
     widget->removeEventFilter(this);
     widget->installEventFilter(this);
@@ -796,10 +795,15 @@ Style::polish( QWidget * widget )
     }
 #if 0
 // #ifdef Q_WS_X11
-    else if (config.bg.opacity != 0xff && widget->inherits("QX11EmbedContainer") && widget->window())
+    if ( config.bg.opacity != 0xff && widget->window() &&
+         (widget->inherits("QX11EmbedContainer") ||
+         widget->inherits("QX11EmbedWidget") ||
+         widget->inherits("Phonon::VideoWidget")) )
     {
-        qDebug() << "BESPIN, reverting" << widget << widget->window();
-        widget->window()->setAttribute(Qt::WA_TranslucentBackground, false);
+        QWidget *window = widget->window();
+        qDebug() << "BESPIN, reverting" << widget << window;
+        window->setAttribute(Qt::WA_TranslucentBackground, false);
+        window->setAttribute(Qt::WA_NoSystemBackground, false);
     }
 #endif
 

@@ -120,29 +120,31 @@ Button::isEnabled() const
 }
 
 void
-Button::init(bool leftMenu, bool fColors, bool round)
+Button::init(bool leftMenu, bool fColors, int variant)
 {
     const int sz = 99;
     fixedColors = fColors;
     for (int t = 0; t < NumTypes; ++t)
         shape[t] = QPainterPath();
 
+    variant = qMin(qMax(0,variant),1);
+
     QRectF bound(-sz/2.0, -sz/2.0, sz, sz);
-    shape[Close] = Shapes::close(bound, round);
-    shape[Min] = Shapes::min(bound, round);
-    shape[Max] = Shapes::max(bound, round);
-    shape[Restore] = Shapes::restore(bound, round);
-    shape[Stick] = Shapes::stick(bound, round);
-    shape[Unstick] = Shapes::unstick(bound, round);
-    shape[Above] = Shapes::keepAbove(bound, round);
-    shape[Below] = Shapes::keepBelow(bound, round);
-    shape[UnAboveBelow] = Shapes::unAboveBelow(bound, round);
-    shape[Menu] = Shapes::menu(bound, leftMenu, round);
-    shape[Help] = Shapes::help(bound, round);
-    shape[Shade] = Shapes::shade(bound, round);
-    shape[Unshade] = Shapes::unshade(bound, round);
-    shape[Exposee] = Shapes::exposee(bound, round);
-    shape[Info] = Shapes::info(bound, round);
+    shape[Close] = Shapes::close(bound, variant);
+    shape[Min] = Shapes::min(bound, variant);
+    shape[Max] = Shapes::max(bound, variant);
+    shape[Restore] = Shapes::restore(bound, variant);
+    shape[Stick] = Shapes::stick(bound, variant);
+    shape[Unstick] = Shapes::unstick(bound, variant);
+    shape[Above] = Shapes::keepAbove(bound, variant);
+    shape[Below] = Shapes::keepBelow(bound, variant);
+    shape[UnAboveBelow] = Shapes::unAboveBelow(bound, variant);
+    shape[Menu] = Shapes::menu(bound, leftMenu, variant);
+    shape[Help] = Shapes::help(bound, variant);
+    shape[Shade] = Shapes::shade(bound, variant);
+    shape[Unshade] = Shapes::unshade(bound, variant);
+    shape[Exposee] = Shapes::exposee(bound, variant);
+    shape[Info] = Shapes::info(bound, variant);
 #if 0
     tip[Close] = i18n("Close");
     tip[Min] = i18n("Minimize");

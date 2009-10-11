@@ -1006,31 +1006,3 @@ void Gradients::wipe() {
         _borderline[i].clear();
 #endif
 }
-
-Gradients::Type Gradients::fromInfo(int info)
-{
-   switch(info) {
-      case 0: return Gradients::None;
-      case 1: return Gradients::Sunken;
-      default:
-      case 2: return Gradients::Button;
-      case 3: return Gradients::Glass;
-   }
-   return Gradients::Button;
-}
-
-int Gradients::toInfo(Gradients::Type type)
-{
-   switch (type) {
-      case Gradients::None: return 0;
-      default:
-      case Gradients::Simple:
-      case Gradients::Button: return 2;
-      case Gradients::Sunken: return 1;
-      case Gradients::Gloss:
-      case Gradients::Glass:
-      case Gradients::Metal:
-      case Gradients::Cloudy: return 3;
-   }
-   return 2;
-}

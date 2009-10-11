@@ -58,7 +58,7 @@ using namespace Bespin;
 Client::Client(KDecorationBridge *b, Factory *f) :
 KDecoration(b, f), retry(0), myButtonOpacity(0), myActiveChangeTimer(0),
 topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
-bgMode(1), corner(0), bg(0) { }
+bgMode(Factory::defaultBgMode()), corner(0), bg(0) { }
 
 Client::~Client()
 {
@@ -363,16 +363,17 @@ Client::init()
 {
     createMainWidget();
     dirty[0] = dirty[1] = true;
-    NET::WindowType type = windowType( supported_types );
-    iAmSmall = type == NET::Utility || type == NET::Menu || type == NET::Toolbar;
-    if (!iAmSmall)
-    {
-        KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
-        iAmSmall =  Factory::config()->smallTitleClasses.contains(info.windowClassName(), Qt::CaseInsensitive) ||
-                    Factory::config()->smallTitleClasses.contains(info.windowClassClass(), Qt::CaseInsensitive);
-    }
 
-    myCaption = isPreview() ? (isActive() ? "Active Window" : "Inactive Window") : trimm(caption());
+    KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass);
+    NET::WindowType type = info.windowType( supported_types );
+    iAmSmall = (type == NET::Utility || type == NET::Menu || type == NET::Toolbar) ||
+                Factory::config()->smallTitleClasses.contains(info.windowClassName(), Qt::CaseInsensitive) ||
+                Factory::config()->smallTitleClasses.contains(info.windowClassClass(), Qt::CaseInsensitive);
+
+    if (isPreview())
+        myCaption =  isActive() ? "Active Window" : "Inactive Window";
+    else
+        myCaption = trimm(caption());
     widget()->setAutoFillBackground(false);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, !isPreview());
 //     widget()->setAttribute(Qt::WA_NoSystemBackground);
@@ -475,6 +476,7 @@ else\
 #define drawRoundedRect(_R_, _RX_, _RY_) drawRoundRect(_R_, ( 99*_RX_)/qMax(_RX_, _R_.width()), (99*_RY_)/qMax(_RY_, _R_.height()))
 #endif
 
+
 void
 Client::repaint(QPainter &p, bool paintTitle)
 {
@@ -482,9 +484,12 @@ Client::repaint(QPainter &p, bool paintTitle)
         return;
 
     QColor bg = color(ColorTitleBar, isActive());
+
+    // preview widget =============================================================================
     if (isPreview())
     {
         QRect r = widget()->rect();
+        bool hadAntiAliasing = p.testRenderHint(QPainter::Antialiasing);
         p.setRenderHint( QPainter::Antialiasing );
         // the shadow - this is rather expensive, but hey - who cares... ;-P
         p.setPen(Qt::NoPen);
@@ -501,7 +506,7 @@ Client::repaint(QPainter &p, bool paintTitle)
         
         // the window
         p.setBrush(Gradients::pix(bg, r.height(), Qt::Vertical, Gradients::Button));
-        QColor c = color(ColorFont, isActive());
+        QColor c = color(Client::ColorFont, isActive());
         c.setAlpha(80);
         p.setPen(c);
         p.drawRoundedRect(r, 6, 6);
@@ -512,26 +517,37 @@ Client::repaint(QPainter &p, bool paintTitle)
             const int s = qMin(r.width(), r.height())/2;
             QRect logo(0,0,s,s);
             logo.moveCenter(r.center());
-
+            
             c.setAlpha(180); p.setBrush(c); p.setPen(Qt::NoPen);
             p.drawPath(Shapes::logo(logo));
         }
         c.setAlpha(255); p.setPen(c); p.setBrush(Qt::NoBrush);
         p.drawText(r, Qt::AlignHCenter | Qt::TextSingleLine | Qt::AlignTop, myCaption);
+        p.setRenderHint( QPainter::Antialiasing, hadAntiAliasing );
     }
+
+    // only one "big" gradient, as we can't rely on windowId()! ====================================
     else if (isShade())
-    { // only one "big" gradient, as we can't rely on windowId()!!
+    {
         const QPixmap &fill = Gradients::pix(bg, height(), Qt::Vertical, Gradients::Button);
         p.drawTiledPixmap(0,0,width(),height(), fill);
     }
+
+    // window ===================================================================================
     else
-    {   // window ================
+    {
         p.setBrush(bg); p.setPen(Qt::NoPen);
         switch (bgMode)
         {
         case 2: // vertical gradient
-        case 3:
-        {   // horizontal gradient
+        {
+#define ctWidth 32
+#define ctHeight 128
+#define tbWidth 32
+#define tbHeight 256
+#define lrcWidth 128
+#define lrcHeight 128
+
             if (!topTile)
             {   // hmm? paint fallback
                 p.drawRect(left); p.drawRect(right); p.drawRect(top); p.drawRect(bottom);
@@ -539,93 +555,83 @@ Client::repaint(QPainter &p, bool paintTitle)
                 updateStylePixmaps();
                 break;
             }
-            
-#define ctWidth 32
-#define ctHeight 128
-            if (bgMode == 2)
-            {
-                p.drawRect(left); p.drawRect(right);
-                if (bg.alpha() != 0xff)
-                    { p.drawRect(top); p.drawRect(bottom); }
-#define tbWidth 32
-#define tbHeight 256
-#define lrcWidth 128
-#define lrcHeight 128
-                QPixmap tbBuffer(tbWidth, tbHeight);
-                int s1 = tbHeight;
-                int s2 = qMin(s1, (height()+1)/2);
-                s1 -= s2;
-                DUMP_PICTURE(tb, topTile);
-                p.drawTiledPixmap( 0, 0, width(), s2, tbBuffer, 0, s1 );
-                if (Colors::value(bg) < 245 && bg.alpha() == 0xff)
-                {   // no sense otherwise
-                    const int w = width()/4 - 128;
-                    if (w > 0)
-                    {
-                        s2 = 128-s1;
-                        QPixmap ctBuffer(ctWidth, ctHeight);
-                        DUMP_PICTURE(ct, cnrTile);
-                        p.drawTiledPixmap( 0, 0, w, s2, ctBuffer, 0, s1 );
-                        p.drawTiledPixmap( width()-w, 0, w, s2, ctBuffer, 0, s1 );
-                    }
-                    QPixmap lrcBuffer(lrcWidth, lrcHeight);
-                    DUMP_PICTURE(lrc, lCorner);
-                    p.drawPixmap(w, 0, lrcBuffer, 0, s1, 128, s2);
-                    DUMP_PICTURE(lrc, rCorner);
-                    p.drawPixmap(width()-w-128, 0, lrcBuffer, 0, s1, 128, s2);
+
+            p.drawRect(left); p.drawRect(right);
+            if (bg.alpha() != 0xff)
+                { p.drawRect(top); p.drawRect(bottom); }
+
+            QPixmap tbBuffer(tbWidth, tbHeight);
+            int s1 = tbHeight;
+            int s2 = qMin(s1, (height()+1)/2);
+            s1 -= s2;
+            DUMP_PICTURE(tb, topTile);
+            p.drawTiledPixmap( 0, 0, width(), s2, tbBuffer, 0, s1 );
+            if (Colors::value(bg) < 245 && bg.alpha() == 0xff)
+            {   // makes no sense otherwise
+                const int w = width()/4 - 128;
+                if (w > 0)
+                {
+                    s2 = 128-s1;
+                    QPixmap ctBuffer(ctWidth, ctHeight);
+                    DUMP_PICTURE(ct, cnrTile);
+                    p.drawTiledPixmap( 0, 0, w, s2, ctBuffer, 0, s1 );
+                    p.drawTiledPixmap( width()-w, 0, w, s2, ctBuffer, 0, s1 );
                 }
-                if (!borderSize) break;
-                s1 = tbHeight;
-                s2 = qMin(s1, height()/2);
-                DUMP_PICTURE(tb, btmTile);
-                p.drawTiledPixmap( 0, height()-s2, width(), s2, tbBuffer );
+                QPixmap lrcBuffer(lrcWidth, lrcHeight);
+                DUMP_PICTURE(lrc, lCorner);
+                p.drawPixmap(w, 0, lrcBuffer, 0, s1, 128, s2);
+                DUMP_PICTURE(lrc, rCorner);
+                p.drawPixmap(width()-w-128, 0, lrcBuffer, 0, s1, 128, s2);
+            }
+            if (!borderSize) break;
+            s1 = tbHeight;
+            s2 = qMin(s1, height()/2);
+            DUMP_PICTURE(tb, btmTile);
+            p.drawTiledPixmap( 0, height()-s2, width(), s2, tbBuffer );
+            break;
+        }
 #undef tbWidth
 #undef tbHeight
 #undef lrcWidth
 #undef lrcHeight
 
-            }
-            else
-            {
+        case 3: // horizontal gradient
+        {
 #define tbWidth 256
 #define tbHeight 32
 #define lrcWidth 256
 #define lrcHeight 32
-                p.drawRect(top); // can be necessary for flat windows
-                p.drawRect(bottom);
-                if (bg.alpha() != 0xff)
-                    { p.drawRect(left); p.drawRect(right); }
-                int s1 = tbWidth;
-                int s2 = qMin(s1, (width()+1)/2);
-                const int h = qMin(128+32, height()/8);
-                QPixmap tbBuffer(tbWidth, tbHeight);
-                QPixmap lrcBuffer(lrcWidth, lrcHeight);
-                QPixmap ctBuffer(ctWidth, ctHeight);
-                DUMP_PICTURE(tb, topTile); // misleading, this is the LEFT column
-                p.drawTiledPixmap( 0, h, s2, height()-h, tbBuffer, s1-s2, 0 );
-                DUMP_PICTURE(lrc, lCorner); // left bottom shine
-                p.drawPixmap(0, h-32, lrcBuffer, s1-s2, 0,0,0);
-                DUMP_PICTURE(tb, btmTile); // misleading, this is the RIGHT column
-                p.drawTiledPixmap( width() - s2, h, s2, height()-h, tbBuffer );
-                DUMP_PICTURE(lrc, rCorner); // right bottom shine
-                p.drawPixmap(width() - s2, h-32, lrcBuffer);
-                DUMP_PICTURE(ct, cnrTile); // misleading, TOP TILE
-                p.drawTiledPixmap( 0, h-(128+32), width(), 128, ctBuffer );
-            }
-//       p.setPen(bg);
-//       p.drawLine(width()/4, myTitleSize-1, 3*width()/4, myTitleSize-1);
+
+            p.drawRect(top); // can be necessary for flat windows
+            p.drawRect(bottom);
+            if (bg.alpha() != 0xff)
+                { p.drawRect(left); p.drawRect(right); }
+            int s1 = tbWidth;
+            int s2 = qMin(s1, (width()+1)/2);
+            const int h = qMin(128+32, height()/8);
+            QPixmap tbBuffer(tbWidth, tbHeight);
+            QPixmap lrcBuffer(lrcWidth, lrcHeight);
+            QPixmap ctBuffer(ctWidth, ctHeight);
+            DUMP_PICTURE(tb, topTile); // misleading, this is the LEFT column
+            p.drawTiledPixmap( 0, h, s2, height()-h, tbBuffer, s1-s2, 0 );
+            DUMP_PICTURE(lrc, lCorner); // left bottom shine
+            p.drawPixmap(0, h-32, lrcBuffer, s1-s2, 0,0,0);
+            DUMP_PICTURE(tb, btmTile); // misleading, this is the RIGHT column
+            p.drawTiledPixmap( width() - s2, h, s2, height()-h, tbBuffer );
+            DUMP_PICTURE(lrc, rCorner); // right bottom shine
+            p.drawPixmap(width() - s2, h-32, lrcBuffer);
+            DUMP_PICTURE(ct, cnrTile); // misleading, TOP TILE
+            p.drawTiledPixmap( 0, h-(128+32), width(), 128, ctBuffer );
             break;
         }
-        case 0:
-        {   // plain
+        case 0: // plain
             p.setBrush(bg); p.setPen(Qt::NoPen);
             p.drawRect(left); p.drawRect(right);
             p.drawRect(top); p.drawRect(bottom);
             break;
-        }
         default:
-        case 1:
-        {   // scanlines, fallback
+        case 1: // scanlines, fallback
+        {
             p.drawRect(left); p.drawRect(right); p.drawRect(bottom);
             const Gradients::Type gradient = Factory::config()->gradient[0][isActive()];
             if (gradient == Gradients::None)
@@ -655,7 +661,6 @@ Client::repaint(QPainter &p, bool paintTitle)
         }
     }
 
-    
     if (paintTitle && isShade())
     {   // splitter
         QColor bg2 = color(ColorTitleBlend, isActive());
@@ -670,36 +675,36 @@ Client::repaint(QPainter &p, bool paintTitle)
     // title ==============
     if (paintTitle)
     {
-    const QColor titleColor = color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive());
-    const int tf = Factory::config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
-    if (isActive())
-    {
-        // emboss?!
-        int d = 0;
-        QColor dark = Colors::mid(bg, Qt::black, 2, 1), light = Colors::mid(bg, Qt::white);
-        if (Colors::value(bg) < 110) // dark bg -> dark top borderline
-            { p.setPen(dark); d = -1; }
-        else // bright bg -> bright bottom borderline
-            { p.setPen(light); d = 1; }
-        QRect tr;
-        p.drawText ( label.translated(0,d), tf, myCaption, &tr );
-
-        if (!Factory::config()->hideInactiveButtons)
+        const QColor titleColor = color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive());
+        const int tf = Factory::config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
+        if (isActive())
         {
-            if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
-                maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
-                gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1) )
-            {   // inactive window looks like active one...
-                int y = label.center().y();
-                if ( !(tf & Qt::AlignLeft) )
-                    p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
-                if ( !(tf & Qt::Right) )
-                    p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
+            // emboss?!
+            int d = 0;
+            QColor dark = Colors::mid(bg, Qt::black, 2, 1), light = Colors::mid(bg, Qt::white);
+            if (Colors::value(bg) < 110) // dark bg -> dark top borderline
+                { p.setPen(dark); d = -1; }
+            else // bright bg -> bright bottom borderline
+                { p.setPen(light); d = 1; }
+            QRect tr;
+            p.drawText ( label.translated(0,d), tf, myCaption, &tr );
+
+            if (!Factory::config()->hideInactiveButtons)
+            {
+                if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
+                    maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
+                    gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1) )
+                {   // inactive window looks like active one...
+                    int y = label.center().y();
+                    if ( !(tf & Qt::AlignLeft) )
+                        p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
+                    if ( !(tf & Qt::Right) )
+                        p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
+                }
             }
         }
-    }
-    p.setPen(titleColor);
-    p.drawText ( label, tf, myCaption );
+        p.setPen(titleColor);
+        p.drawText ( label, tf, myCaption );
     }
 
     // bar =========================
@@ -798,7 +803,7 @@ Client::reset(unsigned long changed)
         left = QRect(0, myTitleSize, borderSize, sideHeight);
         right = QRect(width()-borderSize, myTitleSize, borderSize, sideHeight);
 
-        uint decoDim =   ((borderSize & 0xff) << 24) | ((myTitleSize &0xff) << 16) |
+        uint decoDim =  ((borderSize & 0xff) << 24) | ((myTitleSize &0xff) << 16) |
                         ((borderSize &0xff) << 8) | (borderSize & 0xff);
         XProperty::set<uint>(windowId(), XProperty::decoDim, &decoDim, XProperty::LONG);
         titleSpacer->changeSize( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -825,7 +830,7 @@ Client::reset(unsigned long changed)
         for (int t = 0; t < 4; ++t)
             colors[a][t] = options()->color((ColorType)t, a);
 
-        bool def = (bgMode == 1);
+        bool def = true;
         if (isPreview())
         {
             def = false;
@@ -844,14 +849,28 @@ Client::reset(unsigned long changed)
         }
         else if (!Factory::config()->forceUserColors)
         {
-//             KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
             WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
             if (!data)
-            {
+            {   // check for data from dbus
                 long int *pid = XProperty::get<long int>(windowId(), XProperty::pid, XProperty::LONG);
                 if (pid)
+                {
                     if ((data = Factory::decoInfo(*pid)))
                         XProperty::set<uint>(windowId(), XProperty::winData, (uint*)data, XProperty::WORD, 9);
+                }
+                if (!data) // check for data from preset
+                {
+                    KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass);
+                    data = Factory::decoInfo(info.windowClassClass(), info.windowType(supported_types));
+                    if (data && (((data->style >> 16) & 0xff) > 1))
+                    {
+                        WindowPics pics;
+                        pics.topTile = pics.cnrTile = pics.lCorner = pics.rCorner = 0;
+                        /// NOTICE encoding the bg gradient intensity in the btmTile Pic!!
+                        pics.btmTile = 150;
+                        XProperty::set<Picture>(windowId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
+                    }
+                }
             }
 
             if (data)
@@ -872,6 +891,14 @@ Client::reset(unsigned long changed)
         }
         if (def)
         {   // the fallback solution
+            if ((bgMode = Factory::defaultBgMode()) > 1)
+            {
+                WindowPics pics;
+                pics.topTile = pics.cnrTile = pics.lCorner = pics.rCorner = 0;
+                /// NOTICE encoding the bg gradient intensity in the btmTile Pic!!
+                pics.btmTile = 150;
+                XProperty::set<Picture>(windowId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
+            }
             for (int i = 0; i <  2; ++i)
             {
                 if (!gType[i])

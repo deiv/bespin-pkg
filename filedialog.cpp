@@ -22,6 +22,8 @@
 #include <QStringList>
 #include <QProcess>
 
+// #include "eventkiller.h"
+
 #ifdef Q_WS_WIN
 #undef Q_GUI_EXPORT
 #define Q_GUI_EXPORT
@@ -32,6 +34,8 @@ class Q_GUI_EXPORT QApplicationPrivate
     public:
         static void enterModal(QWidget*);
         static void leaveModal(QWidget*);
+        static bool isBlockedByModal(QWidget *widget);
+        static bool modalState();
 };
 
 typedef QStringList
@@ -68,6 +72,7 @@ static QString
 dialog(QWidget *parent, Session ses, const QStringList &args, const QString &dir )
 {
 //     qDebug() << parent << args;
+//     qDebug() << QApplicationPrivate::isBlockedByModal(parent) << QApplicationPrivate::modalState();
 #if MODAL_DIALOG
     QWidget modal;
     modal.setAttribute( Qt::WA_NoChildEventsForParent, true );
@@ -79,8 +84,10 @@ dialog(QWidget *parent, Session ses, const QStringList &args, const QString &dir
 #endif
 
     proc.setWorkingDirectory( dir );
+//     proc.installEventFilter(&eventKiller);
     proc.start( ses == KDE ? "kdialog" : "zenity", args );
-    proc.waitForFinished( -1 /*5*60*1000*/ );
+    proc.waitForFinished( -1 );
+//     proc.removeEventFilter(&eventKiller);
 
     QString result;
     if ( proc.error() == QProcess::UnknownError )
@@ -173,7 +180,7 @@ openFilename( QWidget *parent, const QString &caption, const QString &dir, const
     if ( Session ses = session() )
     if ( !(options & QFileDialog::DontUseNativeDialog) )
     {
-    
+//         parent = parent->window();
         QStringList args;
 
         if ( ses == KDE )
@@ -203,6 +210,7 @@ openFilenames(QWidget *parent, const QString &caption, const QString &dir, const
     if ( Session ses = session() )
     if ( !(options & QFileDialog::DontUseNativeDialog) )
     {
+//         parent = parent->window();
         QStringList args;
         args << "--multiple";
 
@@ -234,6 +242,7 @@ saveFilename(QWidget *parent, const QString &caption, const QString &dir, const 
     if ( Session ses = session() )
     if ( !(options & QFileDialog::DontUseNativeDialog) )
     {
+//         parent = parent->window();
         QStringList args;
 
         if ( ses == KDE )
@@ -264,6 +273,7 @@ openDirectory( QWidget *parent, const QString &caption, const QString &dir, QFil
     if ( Session ses = session() )
     if ( !(options & QFileDialog::DontUseNativeDialog) )
     {
+//         parent = parent->window();
         QStringList args;
 
         if ( ses == KDE )

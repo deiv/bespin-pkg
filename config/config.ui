@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>765</width>
-    <height>348</height>
+    <height>345</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -233,7 +233,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>9</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -512,8 +512,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
-               <height>114</height>
+               <width>368</width>
+               <height>87</height>
               </rect>
              </property>
              <attribute name="label">
@@ -721,8 +721,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>439</width>
-               <height>99</height>
+               <width>195</width>
+               <height>63</height>
               </rect>
              </property>
              <attribute name="label">
@@ -817,8 +817,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>439</width>
-               <height>113</height>
+               <width>125</width>
+               <height>90</height>
               </rect>
              </property>
              <attribute name="label">
@@ -909,16 +909,14 @@
                </widget>
               </item>
              </layout>
-             <zorder>modalInvert</zorder>
-             <zorder>modalGlas</zorder>
             </widget>
             <widget class="QWidget" name="argbSupport">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>439</width>
-               <height>112</height>
+               <width>123</width>
+               <height>84</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1025,8 +1023,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
-               <height>180</height>
+               <width>315</width>
+               <height>158</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1207,8 +1205,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
-               <height>165</height>
+               <width>302</width>
+               <height>121</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1637,8 +1635,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
-               <height>103</height>
+               <width>252</width>
+               <height>63</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1719,7 +1717,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
+               <width>203</width>
                <height>187</height>
               </rect>
              </property>
@@ -1878,6 +1876,14 @@
              </layout>
             </widget>
             <widget class="QWidget" name="page_9">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>477</width>
+               <height>128</height>
+              </rect>
+             </property>
              <attribute name="label">
               <string>Selected item</string>
              </attribute>
@@ -2656,17 +2662,17 @@
         <widget class="QWidget" name="AppSpecific">
          <layout class="QGridLayout" name="gridLayout_27">
           <item row="0" column="0">
-           <widget class="QToolBox" name="toolBox_2">
+           <widget class="QToolBox" name="appSpecific">
             <property name="currentIndex">
-             <number>2</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page_3">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
-               <height>146</height>
+               <width>477</width>
+               <height>145</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2721,7 +2727,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
+               <width>477</width>
                <height>82</height>
               </rect>
              </property>
@@ -2729,7 +2735,30 @@
               <string>Arora</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_24">
-              <item row="0" column="0">
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="aroraPath"/>
+              </item>
+              <item row="1" column="2">
+               <widget class="QPushButton" name="aroraPathChooser">
+                <property name="text">
+                 <string>Select...</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <spacer name="verticalSpacer_10">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>1</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="1">
                <widget class="QLabel" name="label_38">
                 <property name="font">
                  <font>
@@ -2738,35 +2767,12 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Icon path</string>
+                 <string>Icon path:</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
                 </property>
                </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="aroraPath"/>
-              </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="aroraPathChooser">
-                <property name="text">
-                 <string>Select...</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <spacer name="verticalSpacer_10">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
              </layout>
             </widget>
@@ -2775,7 +2781,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
+               <width>477</width>
                <height>104</height>
               </rect>
              </property>

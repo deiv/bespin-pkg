@@ -89,6 +89,8 @@ protected:
     virtual bool eventFilter ( QObject * watched, QEvent * event );
     virtual void loadSettings(QSettings *settings = 0, bool updateInitValue = true, bool merge = false);
     virtual bool _save(QSettings *settings = 0, bool makeDirty = true);
+    QVariant variant(const QObject *w) const;
+    bool setVariant(QObject *w, const QVariant &v) const;
 signals:
     void changed(bool);
     void changed();
@@ -105,8 +107,6 @@ private slots:
     void setComboListInfo(int index);
 private:
     Q_DISABLE_COPY(BConfig)
-    QVariant variant(const QObject *w) const;
-    bool setVariant(QObject *w, const QVariant &v) const;
     bool infoItemHovered, infoDirty;
     QTextBrowser *_infoBrowser;
     QMap<QObject*, SettingInfo> _settings;

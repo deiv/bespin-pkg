@@ -25,20 +25,40 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "config.h"
+#include <QSettings>
 #include <QtDebug>
 
 class KConfig;
 
 extern "C"
 {
-    Q_DECL_EXPORT QObject* allocate_config(KConfig* config, QWidget* parent) {
+    Q_DECL_EXPORT QObject* allocate_config(KConfig*, QWidget* parent) {
         return (new Config(parent));
     }
 }
 
+enum ConfigRole { ActiveGradient = Qt::UserRole, ActiveGradient2,
+                  InactiveGradient, InactiveGradient2,
+                  ActiveColor, ActiveColor2, InactiveColor, InactiveColor2,
+                  ActiveText, ActiveButtons, InactiveText, InactiveButtons,
+                  Classes, Types };
+
 Config::Config(QWidget* parent) : BConfig(parent)
 {
     ui.setupUi(this);
+    // designer can't do this atm.
+    ui.actGrad->setItemData( 8, -1);
+    ui.actGrad->setItemData( 9, -3);
+    ui.actGrad->setItemData( 10, -4);
+    ui.inactGrad->setItemData( 8, -1);
+    ui.inactGrad->setItemData( 9, -3);
+    ui.inactGrad->setItemData( 10, -4);
+    connect (ui.actGrad, SIGNAL(currentIndexChanged(int)), this, SLOT(watchBgMode()));
+    connect (ui.inactGrad, SIGNAL(currentIndexChanged(int)), this, SLOT(watchBgMode()));
+
+    connect (ui.actGrad2, SIGNAL(currentIndexChanged(int)), this, SLOT(watchDecoGradient()));
+    connect (ui.inactGrad2, SIGNAL(currentIndexChanged(int)), this, SLOT(watchDecoGradient()));
+    
     ui.onlinehelp->setOpenExternalLinks( true ); /** i've an internet link here */
     ui.onlinehelp->viewport()->setAutoFillBackground(false);
     const QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
@@ -86,11 +106,15 @@ Config::Config(QWidget* parent) : BConfig(parent)
 
     handleSettings(ui.actGrad, "ActiveGradient", 2);
     setContextHelp(ui.actGrad, "<b>Active base gradient</b><hr>\
-    The BASE gradient of ACTIVE windows.");
+    The BASE gradient of ACTIVE windows.<br>\
+    If set to \"Flat\", \"Vertical gradient\" or \"Horizontal gradient\", the inactive variant will\
+    use the same value");
 
     handleSettings(ui.inactGrad, "InactiveGradient", 0);
     setContextHelp(ui.inactGrad, "<b>Inctive base gradient</b><hr>\
-    The BASE gradient of INACTIVE windows.");
+    The BASE gradient of INACTIVE windows.<br>\
+    If set to \"Flat\", \"Vertical gradient\" or \"Horizontal gradient\", the active variant will\
+    use the same value");
 
     handleSettings(ui.actGrad2, "ActiveGradient2", 0);
     setContextHelp(ui.actGrad2, "<b>Second active gradient</b><hr>\
@@ -118,6 +142,8 @@ Config::Config(QWidget* parent) : BConfig(parent)
     <b>!</b>: Window Info<br>\
     <b>E</b>: Window List");
 
+    handleSettings(ui.iconVariant, "IconVariant", 1);
+    
     handleSettings(ui.slickButtons, "SlickButtons", 0);
     setContextHelp(ui.slickButtons, "The appereance of unhovered buttons. Morphs to icon on hover<br>\
     Dots and bricks look slick, but may be considered less usable, as unhovered buttons look all the same");
@@ -136,6 +162,15 @@ Config::Config(QWidget* parent) : BConfig(parent)
     btngrp->addButton(ui.titleRight, Qt::AlignRight);
     handleSettings(btngrp, "TitleAlign", Qt::AlignHCenter);
 
+    handleSettings(ui.smallTitleClasses, "SmallTitleClasses", "");
+    setContextHelp(ui.smallTitleClasses, "<b>Small Title classes</b><hr>\
+    Windows with the NET_WM types \"NET::Utility\", \"NET::Menu\" and \"NET::Toolbar\" get\
+    a smaller titlebar<br>\
+    You can enter a comma separated list of window classes to enforce such small titlebar for all\
+    window types.<br>\
+    The window class is usually near the application name and can determined by adding the Info button\
+    (\"!\") to the multibutton order and pressing it.");
+
     /** if you call setContextHelp(.) with a combobox and pass a stringlist,
     the strings are attached to the combo entries and shown on select/hover */
 
@@ -149,7 +184,242 @@ Config::Config(QWidget* parent) : BConfig(parent)
 
     /** ===========================================
     You're pretty much done here - simple eh? ;) **/
+
+    /* setup the presets UI */
+    QListWidgetItem *item = new QListWidgetItem("Default");
+    item->setData(ActiveGradient, variant(ui.actGrad));
+    item->setData(ActiveGradient2, variant(ui.actGrad2));
+    item->setData(InactiveGradient, variant(ui.inactGrad));
+    item->setData(InactiveGradient2, variant(ui.inactGrad2));
+    ui.presets->addItem(item);
+    connect (ui.newPreset, SIGNAL(clicked()), this, SLOT(createNewPreset()));
+    connect (ui.deletePreset, SIGNAL(clicked()), this, SLOT(deleteCurrentPreset()));
+    connect (ui.presets, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
+              this, SLOT(presetChanged(QListWidgetItem*, QListWidgetItem*)));
+
+    setContextHelp(ui.presets, "<b>Presets</b><hr>\
+    The presets are meant to define the look of <i>some</i> <b>exceptional</b> windows <b>not</b>\
+    controlled by the widget style (whether native or through gtk-qt).<br>\
+    First the class will be matched, then the type. The preset that fits best is chosen. If no match\
+    is found, the default preset will be used.<br>\
+    <i>Preset changes are <b>not</b> applied to running clients!</i><br>\
+    10 presets are no big deal, 1000 will cause a major performance hit.");
+
+    setContextHelp(ui.wmClasses, "<b>Classes</b><hr>\
+    Comma separated list of window classes to define which windows the preset will be applied to.<br>\
+    If this and the type (below) are <i>both</i> empty, the preset will be ignored.<br>\
+    The window class is usually near the application name and can determined by adding the Info button\
+    (\"!\") to the multibutton order and pressing it.");
+
+    setContextHelp(ui.wmTypes, "<b>Types</b><hr>\
+    Comma separated list of window types to define which windows the preset will be applied to.<br>\
+    If this and the class (above) are <i>both</i> empty, the preset will be ignored.<br>\
+    Valid entries (atm, case insensitive): \"normal\", \"dialog\" and \"utility\".");
+
+    loadPresets();
+    /* ------------------------ */
 }
 
 // void Config::load(KConfigGroup) {load();}
-void Config::save(KConfigGroup&) {BConfig::save();}
+void Config::save(KConfigGroup&)
+{
+    ui.presets->setCurrentRow(0);
+    BConfig::save();
+    savePresets();
+}
+
+void Config::catchClones(QListWidgetItem *item)
+{
+    bool isClone = false;
+    for (int i = 0; i < ui.presets->count(); ++i)
+    {
+        QListWidgetItem *other = ui.presets->item(i);
+        if (isClone = (item != other && item->text() == other->text()))
+            break;
+    }
+    if (isClone)
+    {
+        item->setText("Allready taken!");
+        ui.presets->editItem(item);
+    }
+    else
+        disconnect (ui.presets, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(catchClones(QListWidgetItem*)));
+}
+
+void Config::createNewPreset()
+{
+    QListWidgetItem *item;
+    if (ui.presets->currentItem())
+    {
+        item = ui.presets->currentItem()->clone();
+        item->setText("Enter a name");
+    }
+    else
+        item = new QListWidgetItem("Enter a name");
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+    ui.presets->addItem(item);
+
+    connect (ui.presets, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(catchClones(QListWidgetItem*)));
+    ui.presets->editItem(item);
+}
+
+void Config::presetChanged(QListWidgetItem *item, QListWidgetItem *prev)
+{
+    if (prev) // store data
+    {
+        prev->setData(ActiveGradient, variant(ui.actGrad));
+        prev->setData(ActiveGradient2, variant(ui.actGrad2));
+        prev->setData(InactiveGradient, variant(ui.inactGrad));
+        prev->setData(InactiveGradient2, variant(ui.inactGrad2));
+        if (ui.presets->row(prev)) // not for the default preset
+        {
+            prev->setData(ActiveColor, ui.actColor->color().rgba());
+            prev->setData(ActiveColor2, ui.actColor2->color().rgba());
+            prev->setData(ActiveText, ui.actText->color().rgba());
+            prev->setData(ActiveButtons, ui.actButtons->color().rgba());
+            prev->setData(InactiveColor, ui.inactColor->color().rgba());
+            prev->setData(InactiveColor2, ui.inactColor2->color().rgba());
+            prev->setData(InactiveText, ui.inactText->color().rgba());
+            prev->setData(InactiveButtons, ui.inactButtons->color().rgba());
+            prev->setData(Classes, ui.wmClasses->text());
+            prev->setData(Types, ui.wmTypes->text());
+        }
+    }
+    bool enabled = false;
+    if (item)
+    {
+        setVariant(ui.actGrad, item->data(ActiveGradient));
+        setVariant(ui.actGrad2, item->data(ActiveGradient2));
+        setVariant(ui.inactGrad, item->data(InactiveGradient));
+        setVariant(ui.inactGrad2, item->data(InactiveGradient2));
+        if (ui.presets->row(item)) // not for the default preset
+        {
+            enabled = true;
+            ui.actColor->setColor(item->data(ActiveColor).toUInt());
+            ui.actColor2->setColor(item->data(ActiveColor2).toUInt());
+            ui.actText->setColor(item->data(ActiveText).toUInt());
+            ui.actButtons->setColor(item->data(ActiveButtons).toUInt());
+            ui.inactColor->setColor(item->data(InactiveColor).toUInt());
+            ui.inactColor2->setColor(item->data(InactiveColor2).toUInt());
+            ui.inactText->setColor(item->data(InactiveText).toUInt());
+            ui.inactButtons->setColor(item->data(InactiveButtons).toUInt());
+            ui.wmClasses->setText(item->data(Classes).toString());
+            ui.wmTypes->setText(item->data(Types).toString());
+        }
+        else
+        {
+            ui.wmClasses->setText(QString());
+            ui.wmTypes->setText(QString());
+        }
+    }
+    ui.deletePreset->setEnabled(enabled);
+    ui.wmClasses->setEnabled(enabled);
+    ui.wmTypes->setEnabled(enabled);
+    ui.actColor->setEnabled(enabled);
+    ui.actColor2->setEnabled(enabled && ui.actGrad2->currentIndex());
+    ui.actText->setEnabled(enabled);
+    ui.actButtons->setEnabled(enabled);
+    ui.inactColor->setEnabled(enabled);
+    ui.inactColor2->setEnabled(enabled && ui.inactGrad2->currentIndex());
+    ui.inactText->setEnabled(enabled);
+    ui.inactButtons->setEnabled(enabled);
+}
+
+void Config::deleteCurrentPreset()
+{
+    if (ui.presets->currentRow() > 0)
+        delete ui.presets->currentItem();
+}
+
+void Config::loadPresets()
+{
+    QSettings settings("Bespin", "Style");
+    settings.beginGroup("Deco");
+    QStringList presets = settings.childGroups();
+    foreach (QString preset, presets)
+    {
+        settings.beginGroup(preset);
+        QListWidgetItem *item = new QListWidgetItem(preset);
+        item->setData(ActiveGradient, settings.value("ActiveGradient", 0));
+        item->setData(ActiveGradient2, settings.value("ActiveGradient2", 0));
+        item->setData(ActiveColor, settings.value("ActiveColor", 0));
+        item->setData(ActiveColor2, settings.value("ActiveColor2", 0));
+        item->setData(ActiveText, settings.value("ActiveText", 0));
+        item->setData(ActiveButtons, settings.value("ActiveButtons", 0));
+
+        item->setData(InactiveGradient, settings.value("InactiveGradient", 0));
+        item->setData(InactiveGradient2, settings.value("InactiveGradient2", 0));
+        item->setData(InactiveColor, settings.value("InactiveColor", 0));
+        item->setData(InactiveColor2, settings.value("InactiveColor2", 0));
+        item->setData(InactiveText, settings.value("InactiveText", 0));
+        item->setData(InactiveButtons, settings.value("InactiveButtons", 0));
+        item->setData(Classes, settings.value("Classes", QString()));
+        item->setData(Types, settings.value("Types", QString()));
+        ui.presets->addItem(item);
+        settings.endGroup();
+    }
+    settings.endGroup();
+}
+
+void Config::savePresets()
+{
+    QSettings settings("Bespin", "Style");
+    settings.beginGroup("Deco");
+    QStringList presets = settings.childGroups();
+    foreach (QString preset, presets)
+    {
+        settings.beginGroup(preset);
+        settings.remove("");
+        settings.endGroup();
+    }
+    for (int i=1; i < ui.presets->count(); ++i)
+    {
+        QListWidgetItem *item = ui.presets->item(i);
+        settings.beginGroup(item->text());
+        settings.setValue("ActiveGradient", item->data(ActiveGradient).toInt());
+        int gradient = item->data(ActiveGradient2).toInt();
+        settings.setValue("ActiveGradient2", gradient);
+        QRgb color = item->data(ActiveColor).toUInt();
+        settings.setValue("ActiveColor", color);
+        settings.setValue("ActiveColor2", gradient ? item->data(ActiveColor2).toUInt() : color);
+        settings.setValue("ActiveText", item->data(ActiveText).toUInt());
+        settings.setValue("ActiveButtons", item->data(ActiveButtons).toUInt());
+
+        settings.setValue("InactiveGradient", item->data(InactiveGradient).toInt());
+        gradient = item->data(InactiveGradient2).toInt();
+        settings.setValue("InactiveGradient2", gradient);
+        color = item->data(InactiveColor).toUInt();
+        settings.setValue("InactiveColor", color);
+        settings.setValue("InactiveColor2", gradient ? item->data(InactiveColor2).toUInt() : color);
+        settings.setValue("InactiveText", item->data(InactiveText).toUInt());
+        settings.setValue("InactiveButtons", item->data(InactiveButtons).toUInt());
+        settings.setValue("Classes", item->data(Classes).toString());
+        settings.setValue("Types", item->data(Types).toString());
+        settings.endGroup();
+    }
+    settings.endGroup();
+}
+
+void Config::watchBgMode()
+{
+    QWidget *other = 0;
+    if (sender() == ui.actGrad)
+        other = ui.inactGrad;
+    else if (sender() == ui.inactGrad)
+        other = ui.actGrad;
+    if (other)
+        other->setEnabled(variant(sender()).toInt() >= 0);
+}
+
+void Config::watchDecoGradient()
+{
+    if (ui.presets->currentRow() < 1)
+        return;
+    QWidget *other = 0;
+    if (sender() == ui.actGrad2)
+        other = ui.actColor2;
+    else if (sender() == ui.inactGrad2)
+        other = ui.inactColor2;
+    if (other)
+        other->setEnabled(variant(sender()).toInt() != 0);
+}

@@ -31,6 +31,7 @@
 #include <QVector>
 #include <kdecorationfactory.h>
 #include "../gradients.h"
+#include "../xproperty.h"
 #include "button.h"
 
 class QMenu;
@@ -40,7 +41,13 @@ namespace Bespin
 {
 
 class Client;
-typedef struct _WindowData WindowData;
+
+typedef struct _Preset
+{
+    WindowData data;
+    QStringList classes;
+    QList<NET::WindowType>types;
+} Preset;
 
 typedef struct
 {
@@ -71,6 +78,8 @@ public:
     inline static int titleSize(bool minimal = false) {return ourTitleSize[minimal];}
     inline static const Config *config() { return &ourConfig; }
     static WindowData *decoInfo(qint64 pid);
+    static WindowData *decoInfo(QString WMclass, NET::WindowType type);
+    static int defaultBgMode() { return ourBgMode; }
     inline static const QVector<Button::Type> &multiButtons() { return ourMultiButton; }
     inline static int slickButtons() { return ourConfig.slickButtons; }
     static inline float smallFactor() { return 0.75; }
@@ -90,9 +99,10 @@ private:
 private:
     static QHash<qint64, WindowData*> ourDecoInfos;
     static QHash<qint64, BgSet*> ourBgSets;
+    static QList<Preset*> ourPresets;
     static bool weAreInitialized;
     static bool weUseSlickButtons;
-    static int ourButtonSize[2], ourBorderSize, ourTitleSize[2];
+    static int ourButtonSize[2], ourBorderSize, ourTitleSize[2], ourBgMode;
     static QVector<Button::Type> ourMultiButton;
     static Config ourConfig;
     static QMenu *ourDesktopMenu, *ourWindowList;

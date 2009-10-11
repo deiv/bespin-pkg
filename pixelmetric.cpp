@@ -45,8 +45,8 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_DefaultFrameWidth: // 2
         if (appType == GTK)
             return F(2);
-        if (widget && widget->inherits("QComboBoxPrivateContainer"))
-            return 1;
+//         if (widget && widget->inherits("QComboBoxPrivateContainer"))
+//             return 1;
         if (!(widget && qobject_cast<const QFrame*>(widget) &&
             static_cast<const QFrame*>(widget)->frameShape() == QFrame::StyledPanel))
             return F(1);
@@ -64,7 +64,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_ScrollBarExtent: // Width of a vertical scroll bar and the height of a horizontal scroll bar
         return (widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
                 widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) ?
-                dpi.f16 : dpi.ScrollBarExtent;
+                F(16) : dpi.ScrollBarExtent;
     case PM_ScrollBarSliderMin: // The minimum height of a vertical scroll bar's slider and the minimum width of a horizontal scroll bar's slider
         return dpi.ScrollBarSliderMin;
     case PM_SliderThickness: // Total slider thickness
@@ -218,6 +218,8 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
 //       return 10;
 //       if (option) return option->rect.height()-dpi.f4;
 //       return dpi.f16;
+    case PM_TabBarIconSize:
+        return 16;
     case PM_ToolTipLabelFrameWidth: //
         return F(4); // they're so tiny ;)
     default:

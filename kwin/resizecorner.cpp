@@ -57,12 +57,17 @@ ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
     setFixedSize(CORNER_SIZE, CORNER_SIZE);
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_PaintOnScreen);
+//     XSetWindowBackgroundPixmap(QX11Info::display(), winId(), ParentRelative);
+//     setUpdatesEnabled(false);
 //     setAttribute(Qt::WA_OpaquePaintEvent); // lately broken, above works
     QPolygon triangle(3);
     triangle.putPoints(0, 3, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE);
-//     QPolygon hook(4);
-//     hook.putPoints(0, 4, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE, 3*CORNER_SIZE/4, 3*CORNER_SIZE/4);
-    setMask ( triangle );
+    QPolygon hook(4);
+    hook.putPoints(0, 4, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE, 3*CORNER_SIZE/4, 3*CORNER_SIZE/4);
+    QPolygon corner(6);
+    corner.putPoints(0, 6, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE,
+                             0,CORNER_SIZE-2, CORNER_SIZE-2,CORNER_SIZE-2, CORNER_SIZE-2,0);
+    setMask(hook);
 //     QTimer::singleShot(0, this, SLOT(hide()));
 //     QTimer::singleShot(3000, this, SLOT(raise()));
     raise();
@@ -172,11 +177,11 @@ ResizeCorner::mouseReleaseEvent ( QMouseEvent * )
 void
 ResizeCorner::paintEvent ( QPaintEvent * )
 {
-   QPainter p(this);
-   p.setPen(Qt::NoPen);
-   p.setBrush(palette().color(backgroundRole()));
-   p.drawRect(rect());
+    QPainter p(this);
+    p.setPen(Qt::NoPen);
+    p.setBrush(palette().color(backgroundRole()));
+    p.drawRect(rect());
 //    p.setBrush(palette().brush(foregroundRole()));
 //    p.drawRect(rect());
-   p.end();
+    p.end();
 }

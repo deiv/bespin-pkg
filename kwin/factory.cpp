@@ -40,7 +40,6 @@
 #include "client.h"
 #include "factory.h"
 #include "dbus.h"
-#include "../xproperty.h"
 
 #include <QtDebug>
 
@@ -59,12 +58,16 @@ Config Factory::ourConfig = { false, false, false, true, Qt::AlignHCenter, 0, {{
 int Factory::ourButtonSize[2] = {-1, -1};
 int Factory::ourBorderSize = 4;
 int Factory::ourTitleSize[2] = {18,16};
+int Factory::ourBgMode = 1;
 QVector<Button::Type> Factory::ourMultiButton(0);
 QMenu *Factory::ourDesktopMenu = 0;
 QMenu *Factory::ourWindowList = 0;
 QTextBrowser *Factory::ourWindowInfo = 0;
 QHash<qint64, WindowData*> Factory::ourDecoInfos;
 QHash<qint64, BgSet*> Factory::ourBgSets;
+QList<Preset*> Factory::ourPresets;
+
+typedef QHash<QString, QHash<NET::WindowType, WindowData*> > DoubleHash;
 
 Factory::Factory() : QObject()
 {
@@ -149,50 +152,89 @@ multiString(const QVector<Button::Type> &vector)
     return string;
 }
 
+static void
+setupWindowData(Preset *preset, const QSettings &settings)
+{
+    preset->data.inactiveWindow = settings.value("InactiveColor", 0).toUInt();
+    preset->data.activeWindow = settings.value("ActiveColor", 0).toUInt();
+    preset->data.inactiveDeco = settings.value("InactiveColor2", 0).toUInt();
+    preset->data.activeDeco = settings.value("ActiveColor2", 0).toUInt();
+    preset->data.inactiveText = settings.value("InactiveText", 0).toUInt();
+    preset->data.activeText = settings.value("ActiveText", 0).toUInt();
+    preset->data.inactiveButton = settings.value("InactiveButtons", 0).toUInt();
+    preset->data.activeButton = settings.value("ActiveButtons", 0).toUInt();
+    int mode = settings.value("ActiveGradient", 0).toInt();
+    if (mode < 0)
+    {
+        mode = -(mode+1);
+        preset->data.style =  ( ((mode & 0xff) << 16) |
+                                ((settings.value("InactiveGradient2", 0).toInt() & 0xff) << 8) |
+                                (settings.value("ActiveGradient2", 0).toInt() & 0xff) );
+    }
+    else
+        preset->data.style =  ( ((1 & 0xff) << 16) |
+                                ((settings.value("InactiveGradient", 0).toInt() & 0xff) << 8) |
+                                (mode & 0xff) );
+}
+
+
+static NET::WindowType
+string2winType(const QString &string)
+{
+    if (!string.compare("Dialog", Qt::CaseInsensitive))
+        return NET::Dialog;
+    if (!string.compare("Utility", Qt::CaseInsensitive))
+        return NET::Utility;
+    if (!string.compare("Normal", Qt::CaseInsensitive))
+        return NET::Normal;
+    return NET::Unknown;
+}
+
+#if 0 // wine settings
+QSettings winecfg(QDir::homePath() + "/.wine/user.reg", QSettings::IniFormat);
+qDebug() << "BESPIN" << winecfg.childGroups();
+winecfg.beginGroup("Control Panel");//Colors");//Colors");
+winecfg.beginGroup(" ");
+//     winecfg.beginGroup("");
+//     winecfg.beginGroup("");
+qDebug() << "BESPIN" << winecfg.childGroups();
+winecfg.beginGroup("Colors");
+qDebug() << "BESPIN" << winecfg.childKeys();
+//     qDebug() << "BESPIN" << winecfg.value("Control Panel//Colors/\"ButtonFace\"").toString();
+"Control Panel//Colors/"ActiveBorder"",
+"Control Panel//Colors/"ActiveTitle"",
+"Control Panel//Colors/"AppWorkSpace"",
+"Control Panel//Colors/"Background"",
+"Control Panel//Colors/"ButtonAlternateFace"",
+"Control Panel//Colors/"ButtonDkShadow"",
+"Control Panel//Colors/"ButtonHilight"",
+"Control Panel//Colors/"ButtonLight"",
+"Control Panel//Colors/"ButtonShadow"",
+"Control Panel//Colors/"ButtonText"",
+"Control Panel//Colors/"GradientActiveTitle"",
+"Control Panel//Colors/"GradientInactiveTitle"",
+"Control Panel//Colors/"GrayText"",
+"Control Panel//Colors/"Hilight"",
+"Control Panel//Colors/"HilightText"",
+"Control Panel//Colors/"HotTrackingColor"",
+"Control Panel//Colors/"InactiveBorder"",
+"Control Panel//Colors/"InactiveTitle"",
+"Control Panel//Colors/"InactiveTitleText"",
+"Control Panel//Colors/"InfoText"",
+"Control Panel//Colors/"InfoWindow"",
+"Control Panel//Colors/"Menu"",
+"Control Panel//Colors/"MenuBar"",
+"Control Panel//Colors/"MenuHilight"",
+"Control Panel//Colors/"MenuText"",
+"Control Panel//Colors/"Scrollbar"",
+"Control Panel//Colors/"TitleText"",
+"Control Panel//Colors/"Window"",
+"Control Panel//Colors/"WindowFrame"",
+"Control Panel//Colors/"WindowText""
+#endif
+
 bool Factory::readConfig()
 {
-    #if 0
-    QSettings winecfg(QDir::homePath() + "/.wine/user.reg", QSettings::IniFormat);
-    qDebug() << "BESPIN" << winecfg.childGroups();
-    winecfg.beginGroup("Control Panel");//Colors");//Colors");
-    winecfg.beginGroup(" ");
-//     winecfg.beginGroup("");
-//     winecfg.beginGroup("");
-    qDebug() << "BESPIN" << winecfg.childGroups();
-    winecfg.beginGroup("Colors");
-    qDebug() << "BESPIN" << winecfg.childKeys();
-//     qDebug() << "BESPIN" << winecfg.value("Control Panel//Colors/\"ButtonFace\"").toString();
-    "Control Panel//Colors/"ActiveBorder"",
-    "Control Panel//Colors/"ActiveTitle"",
-    "Control Panel//Colors/"AppWorkSpace"",
-    "Control Panel//Colors/"Background"",
-    "Control Panel//Colors/"ButtonAlternateFace"",
-    "Control Panel//Colors/"ButtonDkShadow"",
-    "Control Panel//Colors/"ButtonHilight"",
-    "Control Panel//Colors/"ButtonLight"",
-    "Control Panel//Colors/"ButtonShadow"",
-    "Control Panel//Colors/"ButtonText"",
-    "Control Panel//Colors/"GradientActiveTitle"",
-    "Control Panel//Colors/"GradientInactiveTitle"",
-    "Control Panel//Colors/"GrayText"",
-    "Control Panel//Colors/"Hilight"",
-    "Control Panel//Colors/"HilightText"",
-    "Control Panel//Colors/"HotTrackingColor"",
-    "Control Panel//Colors/"InactiveBorder"",
-    "Control Panel//Colors/"InactiveTitle"",
-    "Control Panel//Colors/"InactiveTitleText"",
-    "Control Panel//Colors/"InfoText"",
-    "Control Panel//Colors/"InfoWindow"",
-    "Control Panel//Colors/"Menu"",
-    "Control Panel//Colors/"MenuBar"",
-    "Control Panel//Colors/"MenuHilight"",
-    "Control Panel//Colors/"MenuText"",
-    "Control Panel//Colors/"Scrollbar"",
-    "Control Panel//Colors/"TitleText"",
-    "Control Panel//Colors/"Window"",
-    "Control Panel//Colors/"WindowFrame"",
-    "Control Panel//Colors/"WindowText""
-    #endif
     bool ret = false;
     bool oldBool;
     QString oldString;
@@ -206,7 +248,7 @@ bool Factory::readConfig()
     if (oldString != smallTitleClasses)
     {
         ret = true;
-        ourConfig.smallTitleClasses =  smallTitleClasses.split(',');
+        ourConfig.smallTitleClasses =  smallTitleClasses.split(',', QString::SkipEmptyParts);
     }
 
     oldBool = ourConfig.forceUserColors;
@@ -235,18 +277,33 @@ bool Factory::readConfig()
 
     oldgradient = ourConfig.gradient[0][0];
     ourConfig.gradient[0][0] = (Gradients::Type)(settings.value("InactiveGradient", 0).toInt());
+    if (ourConfig.gradient[0][0] < 0)
+    {
+        ourBgMode = -(ourConfig.gradient[0][0]+1);
+        ourConfig.gradient[0][0] = Gradients::None;
+    }
+    else
+        ourBgMode = 1;
     if (oldgradient != ourConfig.gradient[0][0]) ret = true;
 
-    oldgradient = ourConfig.gradient[0][1];
-    ourConfig.gradient[0][1] = (Gradients::Type)(settings.value("ActiveGradient", 2).toInt());
-    if (oldgradient != ourConfig.gradient[0][1]) ret = true;
+    if (ourBgMode == 1)
+    {
+        oldgradient = ourConfig.gradient[0][1];
+        ourConfig.gradient[0][1] = (Gradients::Type)(settings.value("ActiveGradient", 2).toInt());
+        if (ourConfig.gradient[0][1] < 0)
+        {
+            ourBgMode = -(ourConfig.gradient[0][1]+1);
+            ourConfig.gradient[0][1] = Gradients::None;
+        }
+        if (oldgradient != ourConfig.gradient[0][1]) ret = true;
+    }
 
     oldgradient = ourConfig.gradient[1][0];
-    ourConfig.gradient[1][0] = Gradients::fromInfo(settings.value("InactiveGradient2", 0).toInt());
+    ourConfig.gradient[1][0] = (Gradients::Type)(settings.value("InactiveGradient2", 0).toInt());
     if (oldgradient != ourConfig.gradient[1][0]) ret = true;
     
     oldgradient = ourConfig.gradient[1][1];
-    ourConfig.gradient[1][1] = Gradients::fromInfo(settings.value("ActiveGradient2", 0).toInt());
+    ourConfig.gradient[1][1] = (Gradients::Type)(settings.value("ActiveGradient2", 0).toInt());
     if (oldgradient != ourConfig.gradient[1][1]) ret = true;
 
     QString oldmultiorder = multiString(ourMultiButton);
@@ -282,7 +339,40 @@ bool Factory::readConfig()
     ourTitleSize[1] = fntHgt + 2;
     if (oldtitlesize != ourTitleSize[1]) ret = true;
     ourButtonSize[1] = fntHgt-2 + ourTitleSize[1]%2;
+
+    // delete old presets
+    qDeleteAll(ourPresets.begin(), ourPresets.end());
+    ourPresets.clear();
     
+    // read presets
+    QStringList presets = settings.childGroups();
+    foreach (QString presetName, presets)
+    {
+        settings.beginGroup(presetName);
+
+        QStringList typeStrings = settings.value("Types", QString()).toString().replace(QRegExp("\\s*,\\s*"), ",").split(',', QString::SkipEmptyParts);
+        QList<NET::WindowType> types;
+        foreach (QString typeString, typeStrings)
+        {
+            NET::WindowType type = string2winType(typeString);
+            if (!types.contains(type))
+                types << type;
+        }
+        if (!typeStrings.isEmpty() && (types.isEmpty() || (types.count() == 1 && types.at(0) == NET::Unknown)))
+            continue; // the list contained only junk and we don't rank this as "matche all!"
+
+        Preset *preset = new Preset;
+        preset->types = types;
+
+        preset->classes = settings.value("Classes", QString()).toString().replace(QRegExp("\\s*,\\s*"), ",").split(',', QString::SkipEmptyParts);
+        preset->classes.removeDuplicates();
+
+        ourPresets << preset;
+        setupWindowData(preset, settings);
+
+        settings.endGroup();
+    }
+
     Button::init( options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
                   settings.value("IAmMyLittleSister", false).toBool(),
                   settings.value("IconVariant", 1).toInt() );
@@ -592,6 +682,36 @@ WindowData*
 Factory::decoInfo(qint64 pid)
 {
     return ourDecoInfos.value(pid, 0);
+}
+
+WindowData*
+Factory::decoInfo(QString wmClass, NET::WindowType type)
+{
+//     qDebug() << "BESPIN, looking for" << wmClass << type;
+    WindowData *data = 0;
+    bool matchesType = false;
+    foreach (Preset *preset, ourPresets)
+    {
+//         qDebug() << "BESPIN, test preset" << preset->classes << preset->types;
+        matchesType = false;
+        if (preset->types.contains(type)) // type match
+        {
+//             qDebug() << "BESPIN, found type";
+            matchesType = true;
+            if (!data) // class not yet matched
+                data = &preset->data;
+        }
+        if (preset->classes.contains(wmClass)) // class matched
+        {
+//             qDebug() << "BESPIN, found class";
+            if (matchesType) // we won't find a better one
+                return &preset->data;
+            else
+                data = &preset->data;
+        }
+    }
+//     qDebug() << "BESPIN, returning" << data;
+    return data; // we may have found a class OR type match
 }
 
 #include "dbus.moc"

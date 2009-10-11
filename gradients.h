@@ -107,9 +107,6 @@ BgSet *bgSet(const QColor &c, BgMode mode, int bgBevelIntesity = 110);
 const QPixmap &borderline(const QColor &c, Position pos);
 void wipe();
 
-Type fromInfo(int info);
-int toInfo(Type type);
-
 }
 }
 

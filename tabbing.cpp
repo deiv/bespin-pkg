@@ -161,7 +161,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
 
 static int animStep = -1;
 static bool customColor = false;
-
+#include <QtDebug>
 void
 Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -432,6 +432,7 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
 
     // color adjustment
     QColor cF = CCOLOR(tab.std, Fg), cB = CCOLOR(tab.std, Bg);
+//     qDebug() << cF << cB;
     if (sunken)
     {
         cF = CCOLOR(tab.active, Fg);

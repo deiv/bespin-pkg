@@ -70,6 +70,8 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 using namespace Bespin;
 
 #define ENSURE_INSTANCE if (!bespinHacks) bespinHacks = new Hacks
+
+#if BESPIN_HACK_AMAROK
 static const int DT = 4000; // display duration
 static const int FT = 500; // fade duration > 50!!!!
 
@@ -344,14 +346,18 @@ class AmarokData {
         QPointer<QMainWindow> mainWindow;
 };
 
+#endif
+
 static Hacks *bespinHacks = 0;
 static Hacks::HackAppType *appType = 0;
 const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
 static QPointer<QWidget> dragWidget = NULL;
 static bool dragHadTrack = false;
-static AmarokData *amarok = NULL;
 
+#if BESPIN_HACK_AMAROK
+static AmarokData *amarok = NULL;
+#endif
 
 static void
 triggerWMMove(const QWidget *w, const QPoint &p)
@@ -566,6 +572,8 @@ hackMoveWindow(QWidget* w, QEvent *e)
     return true;
 }
 
+#if BESPIN_HACK_AMAROK
+
 void
 Hacks::swapAmarokPalette()
 {
@@ -766,7 +774,7 @@ paintAmarok(QWidget *w, QPaintEvent *pe)
             p.drawRect(amarok->displayBg->rect());
             p.end();
         }
-        QPainter p(w); p.setClipRegion(pe->region());
+        QPainter p(w); //p.setClipRegion(pe->region());
         p.drawTiledPixmap(w->rect(), *amarok->displayBg); p.end();
         return true;
     }
@@ -1014,6 +1022,15 @@ Hacks::setAmarokMetaInfo(int)
 #endif
 }
 
+#else //BESPIN_HACK_AMAROK
+
+void Hacks::setAmarokMetaInfo(int) {}
+void Hacks::swapAmarokPalette() {}
+void Hacks::toggleAmarokContext() {}
+void Hacks::toggleAmarokCompact() {}
+
+#endif //BESPIN_HACK_AMAROK
+
 static QVector<QRect>
 kmixRegion(const QProgressBar *pb)
 {
@@ -1057,6 +1074,7 @@ Hacks::setKmixMask(int)
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
+#if BESPIN_HACK_AMAROK
     if (*appType == Amarok && amarok)
     {
         if (e->type() == QEvent::Paint)
@@ -1082,6 +1100,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 #endif
         return false;
     }
+#endif
     if (*appType == KMix)
     {
         if (e->type() == QEvent::Paint)
@@ -1178,7 +1197,7 @@ Hacks::add(QWidget *w)
         else if (QCoreApplication::applicationName() == "kmix")
             *appType = KMix;
     }
-
+#if BESPIN_HACK_AMAROK
     if (*appType == Amarok)
     {
         if (!amarok) amarok = new AmarokData;
@@ -1277,6 +1296,7 @@ Hacks::add(QWidget *w)
         else if (w->inherits("StatusBar"))
             amarok->status = qobject_cast<QStatusBar*>(w);
     }
+#endif
     else if (*appType == KMix)
     {
         if (w->isWindow())
@@ -1343,5 +1363,7 @@ void
 Hacks::releaseApp()
 {
     delete bespinHacks; bespinHacks = 0L;
+#if BESPIN_HACK_AMAROK
     delete amarok; amarok = 0L;
+#endif
 }

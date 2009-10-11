@@ -31,6 +31,7 @@
 #include "ui_configdialog.h"
 
 class KConfigGroup;
+class QListWidgetItem;
 
 class Config : public BConfig
 {
@@ -38,7 +39,17 @@ class Config : public BConfig
 public:
     Config(QWidget* parent);
 public slots:
-   void save(KConfigGroup&);
+    void createNewPreset();
+    void deleteCurrentPreset();
+    void presetChanged(QListWidgetItem*, QListWidgetItem*);
+    void save(KConfigGroup&);
+private:
+    void loadPresets();
+    void savePresets();
+private slots:
+    void catchClones(QListWidgetItem*);
+    void watchBgMode();
+    void watchDecoGradient();
 private:
    Ui::Config ui;
 };

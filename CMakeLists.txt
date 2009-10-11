@@ -6,6 +6,7 @@ add_definitions( ${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} -DQT3_SUPPORT )
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules )
 
 option(ENABLE_ARGB "Enable translucent windows" OFF)
+option(ENABLE_AMAROK_HACK "Legacy Amarok hacks" ON)
 option(ENABLE_KDE "Enable Bespin support for KDE4" ON)
 option(ENABLE_KWIN "Build Bespin KWin decoration" ON)
 option(ENABLE_XBAR "Enable the XBar plasmoid (Mac-Alike-Menubar)" ON)
@@ -17,9 +18,20 @@ endif (ENABLE_KDE)
 if (ENABLE_ARGB)
     message (STATUS "WARNING: *** ARGB windows are experimental, performance might suffer ***")
     add_definitions ( -DBESPIN_ARGB_WINDOWS=1 )
-else (KDE4_FOUND)
+else (ENABLE_ARGB)
     add_definitions ( -DBESPIN_ARGB_WINDOWS=0 )
 endif (ENABLE_ARGB)
+
+if (ENABLE_AMAROK_HACK)
+    message (STATUS "WARNING: *** Amarok Hack enabled, notice that this will potentially cause trouble on Amarok
+                       also this is legacy code and supposed to be redundant due to (future) changes to Amarok
+                       Hacks can be disbaled at runtime and should in case of issues with Amarok
+                       By activating this you confirm that you know what you're doing ***")
+    add_definitions ( -DBESPIN_HACK_AMAROK=1 )
+else (ENABLE_AMAROK_HACK)
+    message (STATUS "INFO: Amarok Hacks disabled, not compiling support for amarok hacks.")
+    add_definitions ( -DBESPIN_HACK_AMAROK=0 )
+endif (ENABLE_AMAROK_HACK)
 
 find_package(X11)
 
