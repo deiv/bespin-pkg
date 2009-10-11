@@ -492,7 +492,7 @@ VisualFramePart::paintEvent ( QPaintEvent * event )
     if (!_vFrame->style())
         return;
     QPainter p(this);
-    p.setClipRegion(event->region(), Qt::IntersectClip);
+    p.setClipRegion(event->region() & rect(), Qt::IntersectClip);
     QStyleOption opt; Type t;
     if (myFrame->frameShadow() == QFrame::Raised)
     {
