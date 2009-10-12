@@ -43,6 +43,17 @@ Style::drawLineEditFrame(const QStyleOption *option, QPainter *painter, const QW
     }
 }
 
+static QPixmap *bgBuffer(const QPalette &pal, const QRect &r)
+{
+    QPixmap *buffer = new QPixmap(r.size());
+    QPainter p(buffer);
+    p.setBrush(pal.brush(QPalette::Base));
+    p.setPen(Qt::NoPen);
+    p.drawRect(buffer->rect());
+    p.end();
+    return buffer;
+}
+
 void
 Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -71,36 +82,30 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
         r.setBottom(r.bottom() - F(2));
         if (hasFocus)
         {
-            QColor c = FCOLOR(Base);
-            if (Colors::value(c) < 100)
-                c = c.light(112);
-            mask.render(r, painter, c);
+            QColor c;
+            if (PAL.brush(QPalette::Base).style() > 1 ) // pixmap, gradient, whatever
+            {
+                QPixmap *buffer = bgBuffer(PAL, r); mask.render(r, painter, *buffer); delete buffer;
+            }
+            else
+            {
+                c = FCOLOR(Base);
+                if (Colors::value(c) < 100)
+                    c = c.light(112);
+                mask.render(r, painter, c);
+            }
             r.setBottom(r.bottom() + F(1));
             c = FCOLOR(Highlight); c.setAlpha(102);
-//          Colors::mid(FCOLOR(Base), FCOLOR(Highlight), 3, 2);
             mask.outline(r, painter, c, F(3));
         }
         else if (r.height() > 2*option->fontMetrics.height()) // no lineEdit... like some input frames in QWebKit
             mask.render(r, painter, FCOLOR(Base));
         else
         {
-//             r.setBottom(r.y() + r.height()/2);
-            mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
-#if 0
-            Tile::setShape(Tile::Full & ~Tile::Bottom);
-            mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
-            r.setTop(r.bottom()); r.setBottom(RECT.bottom()-F(2));
-            Tile::setShape(Tile::Full & ~Tile::Top);
-            QColor bg = FCOLOR(Base);
-            int h,s,v,a;
-            bg.getHsv(&h, &s, &v, &a);
-            if (v < 60) v = 60;
-            v = (v * ( 100 + (250-v)/16 ) )/100;
-            v = CLAMP(v,0,255);
-            bg.setHsv(h,s,v,a);
-            mask.render(r, painter, bg);
-            Tile::reset();
-#endif
+            if (PAL.brush(QPalette::Base).style() > 1 ) // pixmap, gradient, whatever
+                { QPixmap *buffer = bgBuffer(PAL, r); mask.render(r, painter, *buffer); delete buffer; }
+            else
+                mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
         }
     }
     if (appType == GTK)
