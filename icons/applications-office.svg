@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="64"
+   height="64"
+   id="svg2">
+  <defs
+     id="defs4" />
+  <g
+     transform="translate(0,-988.36215)"
+     id="layer1">
+    <path
+       d="M 16,4 C 11.568,4 8,7.568 8,12 l 0,40 c 0,4.432 3.568,8 8,8 l 32,0 c 4.432,0 8,-3.568 8,-8 L 56,12 C 56,7.568 52.432,4 48,4 L 16,4 z m 0,4 32,0 c 2.216,0 4,1.784 4,4 l 0,40 c 0,2.216 -1.784,4 -4,4 l -32,0 c -2.216,0 -4,-1.784 -4,-4 l 0,-40 c 0,-2.216 1.784,-4 4,-4 z"
+       transform="translate(0,988.36215)"
+       id="rect2818"
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <rect
+       width="32"
+       height="4"
+       ry="2"
+       x="16"
+       y="12"
+       transform="translate(0,988.36215)"
+       id="rect3603"
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <rect
+       width="24"
+       height="4"
+       ry="2"
+       x="16"
+       y="20"
+       transform="translate(0,988.36215)"
+       id="rect3605"
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <path
+       d="M 44,40 A 12,12 0 0 1 35.666207,51.426238 L 32,40 z"
+       transform="translate(0,988.36215)"
+       id="path3615"
+       style="opacity:0.86000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <path
+       d="M 32.008136,51.999997 A 12,12 0 0 1 22.375745,47.167546 L 32,40 z"
+       transform="translate(0,988.36215)"
+       id="path3617"
+       style="opacity:0.57999998;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <path
+       d="m 20.694139,44.022126 a 12,12 0 0 1 2.893036,-12.57925 L 32,40 z"
+       transform="translate(0,988.36215)"
+       id="path3623"
+       style="opacity:0.18000004;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <path
+       d="m 24.832058,30.37604 a 12,12 0 0 1 3.172861,-1.691486 L 32,40 z"
+       transform="translate(0,988.36215)"
+       id="path3625"
+       style="opacity:0.95999995;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <path
+       d="M 31.947737,28.000114 A 12,12 0 0 1 43.969079,39.139099 L 32,40 z"
+       transform="translate(0,988.36215)"
+       id="path3627"
+       style="opacity:0.42000002;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+  </g>
+</svg>
