@@ -132,7 +132,6 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     if (pal.brush(widget->backgroundRole()).style() > 1)
         return; // we'd cover a gradient/pixmap/whatever
 
-    // glassy Modal dialog/Popup menu ==========
     QColor c = pal.color(widget->backgroundRole());
     if (c == Qt::transparent) // plasma uses this
         return;
@@ -151,9 +150,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
 #endif
             c.setAlpha(0xff);
     }
+    bool drawRings = false;
     if (config.bg.ringOverlay)
     {
-        if (!rings)
+        drawRings = !(widget->windowFlags() & (Qt::Popup & ~Qt::Window));
+        if (drawRings && !rings)
         {
             createRingPix(config.bg.opacity);
             disconnect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
@@ -162,6 +163,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         ringResetTimer.start(5000);
     }
 
+    // glassy Modal dialog/Popup menu ==========
     // we just kinda abuse this mac only attribute... ;P
     if (widget->testAttribute(Qt::WA_MacBrushedMetal))
     {
@@ -186,7 +188,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
             painter->setBrush(c.light(115-v/20));
         painter->drawPath(glasPath);
 
-        if (config.bg.ringOverlay)
+        if (drawRings)
             painter->drawPixmap(widget->width()-450, 0, *rings);
 
         painter->restore();
@@ -196,7 +198,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     // cause of scrollbars - kinda optimization
     if (config.bg.mode == Plain)
     {
-        if (config.bg.ringOverlay)
+        if (drawRings)
             painter->drawPixmap(widget->width()-450, 0, *rings);
         return;
     }
@@ -302,7 +304,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     default:
         break;
     }
-    if (config.bg.ringOverlay)
+    if (drawRings)
         painter->drawPixmap(widget->width()-450, 0, *rings);
 }
 
