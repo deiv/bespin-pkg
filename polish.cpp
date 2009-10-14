@@ -485,26 +485,36 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                /// NOTE: WORKAROUND for (no more) dolphin but amarok and probably others:
-                // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
-                // force this here, hoping it won't cause to many problems - and make a bug report
                 if (QWidget *vp = itemView->viewport())
                 {
                     if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
                     {
-//                         qDebug() << "BESPIN works around a visual problem in" << itemView << ", please contact thomas.luebking 'at' web.de";
-                        QPalette pal = itemView->palette();
-                        if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)
+                        if (appType == Dolphin && Hacks::config.opaqueDolphinViews)
                         {
-                            pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
-                            pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Inactive, QPalette::Window));
-                            pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Disabled, QPalette::Window));
-                            vp->setAutoFillBackground(false);
+                            itemView->setPalette(QPalette());
+                            itemView->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+                            itemView->setAlternatingRowColors(true);
+                            vp->setPalette(QPalette());
+                            vp->setAutoFillBackground(true);
                         }
-                        pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
-                        pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
-                        pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
-                        itemView->setPalette(pal);
+                        else
+                        {
+                            /// NOTE: WORKAROUND for (no more) dolphin but amarok and probably others:
+                            // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
+                            // force this here, hoping it won't cause to many problems - and make a bug report
+                            QPalette pal = itemView->palette();
+                            if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)
+                            {
+                                pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
+                                pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Inactive, QPalette::Window));
+                                pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Disabled, QPalette::Window));
+                                vp->setAutoFillBackground(false);
+                            }
+                            pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
+                            pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
+                            pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
+                            itemView->setPalette(pal);
+                        }
                     }
                     if (!vp->autoFillBackground())
                     {
@@ -808,6 +818,16 @@ Style::polish( QWidget * widget )
 #endif
 
     bool isTopContainer = qobject_cast<QToolBar *>(widget);
+    if (isTopContainer && appType == Amarok && Hacks::config.amarokDisplay &&
+        (widget->objectName() == "Main Toolbar NG" || widget->objectName() == "MainToolbarNNG"))
+    {
+        QPalette pal = widget->palette();
+        QColor bg = pal.color(QPalette::Window);
+        pal.setColor(QPalette::Window, pal.color(QPalette::WindowText));
+        pal.setColor(QPalette::WindowText, bg);
+        widget->setPalette(pal);
+        widget->setAutoFillBackground(true);
+    }
 #ifdef QT3_SUPPORT
     isTopContainer = isTopContainer || widget->inherits("Q3ToolBar");
 #endif

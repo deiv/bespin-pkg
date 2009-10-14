@@ -98,7 +98,9 @@ static void
 #define registerCE(_FUNC_, _ELEM_) controlRoutine[QStyle::_ELEM_] = &Style::_FUNC_
 #define registerCC(_FUNC_, _ELEM_) complexRoutine[QStyle::_ELEM_] = &Style::_FUNC_
 
+// #if QT_VERSION < 0x040600
 extern void register_dialog_functions();
+// #endif
 
 // static void registerPE(char *S0, ...)
 // {
@@ -115,8 +117,9 @@ extern void register_dialog_functions();
 void
 Style::registerRoutines()
 {
+// #if QT_VERSION < 0x040600
     register_dialog_functions();
-    
+// #endif
     for (int i = 0; i < N_PE; ++i)
         primitiveRoutine[i] = 0;
     for (int i = 0; i < N_CE; ++i)
@@ -224,7 +227,7 @@ Style::registerRoutines()
     registerPE(skip, PE_IndicatorToolBarSeparator);
     registerPE(skip, PE_PanelToolBar);
     registerCE(drawToolButtonLabel, CE_ToolButtonLabel);
-    if (config.bg.mode == Scanlines && config.bg.mode < 5)
+    if (config.bg.mode == Scanlines && config.bg.structure < 5)
         registerCE(drawDockBg, CE_ToolBar);
     else
         registerCE(skip, CE_ToolBar);

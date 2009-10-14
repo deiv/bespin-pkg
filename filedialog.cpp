@@ -16,6 +16,9 @@
     Boston, MA 02110-1301, USA.
 */
 
+// #include <Qt>
+// #if QT_VERSION < 0x040600
+
 #include <QApplication>
 #include <QFileDialog>
 #include <QString>
@@ -309,3 +312,5 @@ register_dialog_functions()
     qt_filedialog_save_filename_hook = &saveFilename;
     qt_filedialog_existing_directory_hook = &openDirectory;
 }
+
+// #endif //QT_VERSION check

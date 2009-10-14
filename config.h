@@ -102,6 +102,7 @@ typedef struct Config
         Gradients::Type gradient;
         Groove::Mode groove;
         bool showButtons, invertBg, fatSlider;
+        QPalette::ColorRole std_role[2], active_role[2];
     } scroll;
 
     float shadowIntensity;

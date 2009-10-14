@@ -142,6 +142,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.treeViews = readBool(HACK_TREEVIEWS);
         Hacks::config.windowMovement = readBool(HACK_WINDOWMOVE);
         Hacks::config.killThrobber = readBool(HACK_THROBBER);
+        Hacks::config.opaqueDolphinViews = readBool(HACK_DOLPHIN_VIEWS);
         // PW Echo Char ===========================
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
         // TODO: redundant, kwin and afaik compiz can handle this
@@ -501,6 +502,8 @@ Style::init(const QSettings* settings)
             appType = KDevelop;
         else if (appName == "kwin")
             appType = KWin;
+        else if (appName == "amarok")
+            appType = Amarok;
         else if (appName.isEmpty() && !QCoreApplication::arguments().isEmpty())
         {
             appName = QCoreApplication::arguments().at(0).section('/', -1);

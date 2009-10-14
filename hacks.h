@@ -41,12 +41,13 @@ public:
     static struct Config
     {
         bool    messages, KHTMLView, treeViews, windowMovement, krunner, killThrobber,
-                amarokContext, amarokFrames, amarokDisplay, amarokListView;
+                amarokContext, amarokFrames, amarokDisplay, amarokListView,
+                opaqueDolphinViews;
     } config;
 private:
     Q_DISABLE_COPY(Hacks)
 private slots:
-// #if BESPIN_HACK_AMAROK // mc doesn't talk preproc...
+// #if BESPIN_HACK_AMAROK // moc doesn't talk preproc...
     void setAmarokMetaInfo(int);
     void swapAmarokPalette();
     void toggleAmarokContext();
