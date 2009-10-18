@@ -68,9 +68,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.3277206"
-     inkscape:cx="60.903126"
-     inkscape:cy="94.260642"
+     inkscape:zoom="3.755361"
+     inkscape:cx="94.374153"
+     inkscape:cy="57.869337"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -94,22 +94,9 @@
      inkscape:label="Capa 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <g
-       id="g6822">
-      <path
-         id="path6716"
-         d="M 5.8428236,76.170348 L 92.863542,119.07787 L 107.96984,103.97159 L 108.85636,102.76592 L 81.65794,69.220038 L 81.65794,64.397374 L 5.8428236,64.397374 L 5.8428236,76.170348 z M 5.8428236,64.361913 L 81.65794,64.361913 L 81.65794,59.539249 L 108.85636,25.99337 L 107.96984,24.7877 L 92.863542,9.68141 L 5.8428236,52.588939 L 5.8428236,64.361913 z"
-         style="opacity:0.8;fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1.13474452px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         transform="matrix(0,-1.1347445,1.1347445,0,-0.8444537,142.03644)"
-         d="M 81.21722,96.578255 A 12.781727,12.781727 0 1 1 55.653767,96.578255 A 12.781727,12.781727 0 1 1 81.21722,96.578255 z"
-         sodipodi:ry="12.781727"
-         sodipodi:rx="12.781727"
-         sodipodi:cy="96.578255"
-         sodipodi:cx="68.435493"
-         id="path6724"
-         style="opacity:0.8;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:4.47200011999999969;stroke-miterlimit:4;stroke-dasharray:none"
-         sodipodi:type="arc" />
-    </g>
+    <path
+       style="opacity:0.66000001;fill:#000000;fill-rule:evenodd;stroke:none;stroke-width:1.13474452px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 127.79269,63.902287 C 127.79269,53.718864 120.02052,45.45385 110.44434,45.453849 C 100.86816,45.453849 93.095993,53.718863 93.095993,63.902287 C 93.095993,74.085709 100.86817,82.350725 110.44434,82.350725 C 120.02052,82.350725 127.79269,74.085706 127.79269,63.902287 z M 112.44739,19.568273 L 111.49678,18.160269 L 95.065082,0.72270447 L 0.54881448,50.291599 L 0.54881448,57.476021 L 0.54881448,63.866185 L 0.54881448,63.938389 L 0.54881448,71.447734 L 0.54881448,77.512974 L 95.065082,127.08188 L 111.49678,109.64431 L 112.44739,108.23631 L 82.911052,69.498192 L 82.911052,63.938389 L 82.911052,63.866185 L 82.911052,58.30638 L 112.44739,19.568273 z"
+       id="path6716" />
   </g>
 </svg>
