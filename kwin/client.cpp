@@ -273,15 +273,6 @@ Client::eventFilter(QObject *o, QEvent *e)
 
         QPainter p(widget());
         p.setClipRegion(clip);
-        QFont fnt = options()->font();
-        if (iAmSmall)
-        {
-            if (fnt.pointSize() > -1)
-                fnt.setPointSize(qRound(fnt.pointSize()*Factory::smallFactor()));
-            else
-                fnt.setPixelSize(qRound(fnt.pixelSize()*Factory::smallFactor()));
-        }
-        p.setFont(fnt);
         // WORKAROUND a bug in QPaintEngine + QPainter::setRedirected
         if (dirty[isActive()])
         {
@@ -300,7 +291,6 @@ Client::eventFilter(QObject *o, QEvent *e)
                 p.begin(&buffer);
                 p.setClipping(false);
                 p.setClipRegion(top);
-                p.setFont(options()->font());
                 repaint(p, false);
                 p.end();
             }
@@ -476,6 +466,13 @@ else\
 #define drawRoundedRect(_R_, _RX_, _RY_) drawRoundRect(_R_, ( 99*_RX_)/qMax(_RX_, _R_.width()), (99*_RY_)/qMax(_RY_, _R_.height()))
 #endif
 
+inline static void shrink(QFont &fnt, qreal factor)
+{
+    if (fnt.pointSize() > -1)
+        fnt.setPointSize(qRound(fnt.pointSize()*factor));
+    else
+        fnt.setPixelSize(qRound(fnt.pixelSize()*factor));
+}
 
 void
 Client::repaint(QPainter &p, bool paintTitle)
@@ -673,10 +670,27 @@ Client::repaint(QPainter &p, bool paintTitle)
     }
 
     // title ==============
-    if (paintTitle)
+    if (paintTitle && label.width() > 0)
     {
         const QColor titleColor = color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive());
         const int tf = Factory::config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
+
+        // FONT ==========================================
+        QFont fnt = options()->font();
+        if (iAmSmall)
+            shrink(fnt, Factory::smallFactor());
+        qreal tw = 1.07*QFontMetrics(fnt).size(tf, myCaption).width();
+        if (tw > label.width())
+        {
+            qreal f = label.width()/tw;
+            if (f > 0.9)
+                fnt.setStretch(qRound(fnt.stretch()*f));
+            else
+                shrink(fnt, qMax(f,0.75));
+        }
+        p.setFont(fnt);
+        // ===============
+
         if (isActive())
         {
             // emboss?!
@@ -686,6 +700,7 @@ Client::repaint(QPainter &p, bool paintTitle)
                 { p.setPen(dark); d = -1; }
             else // bright bg -> bright bottom borderline
                 { p.setPen(light); d = 1; }
+
             QRect tr;
             p.drawText ( label.translated(0,d), tf, myCaption, &tr );
 
@@ -715,9 +730,23 @@ Client::repaint(QPainter &p, bool paintTitle)
         if (gType[isActive()])
         {   // button corner
             QColor shadow = Colors::mid(bg2, Qt::black,4,1);
-            const QPixmap &fill = Gradients::pix(bg2, myTitleSize, Qt::Vertical, gType[isActive()]);
             p.setPen(shadow);
+#if 0
+//             QPaintDevice *dev = p.device();
+//             p.end();
+            QImage img(32,32, QImage::Format_RGB32); // using ARGB32 fixes it
+            QPainter p2(&img);
+            p2.setPen(Qt::NoPen);
+            p2.setBrush(QColor(255,0,0,255));
+            p2.drawRect(img.rect());
+            p2.end();
+            QPixmap pix = QPixmap::fromImage(img);
+//             p.begin(dev);
+            p.setBrush(pix);
+#else
+            const QPixmap &fill = Gradients::pix(bg2, myTitleSize, Qt::Vertical, gType[isActive()]);
             p.setBrush(fill);
+#endif
             p.setRenderHint( QPainter::Antialiasing );
             p.drawPath(buttonCorner);
         }
