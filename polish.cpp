@@ -493,7 +493,9 @@ Style::polish( QWidget * widget )
                         {
                             itemView->setPalette(QPalette());
                             itemView->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-                            itemView->setAlternatingRowColors(true);
+                            itemView->setAlternatingRowColors(false);
+                            itemView->setBackgroundRole(QPalette::AlternateBase);
+                            vp->setBackgroundRole(QPalette::AlternateBase);
                             vp->setPalette(QPalette());
                             vp->setAutoFillBackground(true);
                         }
@@ -818,15 +820,20 @@ Style::polish( QWidget * widget )
 #endif
 
     bool isTopContainer = qobject_cast<QToolBar *>(widget);
-    if (isTopContainer && appType == Amarok && Hacks::config.amarokDisplay &&
-        (widget->objectName() == "Main Toolbar NG" || widget->objectName() == "MainToolbarNNG"))
+    if (isTopContainer && appType == Amarok)
     {
-        QPalette pal = widget->palette();
-        QColor bg = pal.color(QPalette::Window);
-        pal.setColor(QPalette::Window, pal.color(QPalette::WindowText));
-        pal.setColor(QPalette::WindowText, bg);
-        widget->setPalette(pal);
-        widget->setAutoFillBackground(true);
+        bool invert = widget->objectName() == "Main Toolbar" || widget->objectName() == "Slim Toolbar";
+        invert = invert || Hacks::config.amarokDisplay && (widget->objectName() == "Main Toolbar NG" ||
+                                                           widget->objectName() == "MainToolbarNNG");
+        if (invert)
+        {
+            QPalette pal = widget->palette();
+            QColor bg = pal.color(QPalette::Window);
+            pal.setColor(QPalette::Window, pal.color(QPalette::WindowText));
+            pal.setColor(QPalette::WindowText, bg);
+            widget->setPalette(pal);
+            widget->setAutoFillBackground(true);
+        }
     }
 #ifdef QT3_SUPPORT
     isTopContainer = isTopContainer || widget->inherits("Q3ToolBar");
