@@ -1,0 +1,1 @@
+compressed-pack:apps/arc,mimetypes/application-zip:application-x-tarz:application-x-rar
