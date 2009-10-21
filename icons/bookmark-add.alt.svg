@@ -8,15 +8,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64"
-   height="64"
+   width="128"
+   height="128"
    id="svg2"
    version="1.1"
    inkscape:version="0.46"
-   inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/go-up.png"
-   inkscape:export-xdpi="67.5"
-   inkscape:export-ydpi="67.5"
-   sodipodi:docname="go-up.alt.svg"
+   sodipodi:docname="bookmark-add.alt.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
@@ -28,6 +25,13 @@
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective10" />
+    <inkscape:perspective
+       id="perspective3223"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -36,13 +40,13 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="6.609375"
-     inkscape:cx="20.294582"
-     inkscape:cy="30.0239"
+     inkscape:zoom="4"
+     inkscape:cx="52.052644"
+     inkscape:cy="67.84436"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1346"
+     inkscape:window-width="1097"
      inkscape:window-height="841"
      inkscape:window-x="0"
      inkscape:window-y="0"
@@ -50,7 +54,7 @@
     <inkscape:grid
        type="xygrid"
        id="grid2816"
-       empspacing="4"
+       empspacing="8"
        visible="true"
        enabled="true"
        snapvisiblegridlinesonly="true" />
@@ -71,24 +75,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-988.36218)">
-    <g
-       id="g2388"
-       transform="matrix(0,1,-1,0,1052.3145,988.34283)">
-      <path
-         id="rect2867"
-         d="M 59.125118,988.42475 C 37.232477,995.26131 18.851753,1004.641 -0.0283146,1016.9104 L 31.767565,1016.9104 C 33.404149,1008.48 40.940916,1002.0979 50.030187,1002.0979 C 54.044723,1002.0979 57.757188,1003.3306 60.798586,1005.4449 C 61.562562,1001.3643 62.617197,997.27673 64.000001,993.1961 C 64.000001,990.54846 61.83021,988.42475 59.125118,988.42475 z M -0.0283146,1023.7469 C 18.598105,1036.2806 37.232477,1045.396 59.125118,1052.2326 C 61.83021,1052.2326 64.000001,1050.1089 64.000001,1047.4612 C 62.599588,1043.3806 61.52533,1039.2931 60.762206,1035.2124 C 57.725146,1037.3169 54.034435,1038.5595 50.030187,1038.5595 C 40.940916,1038.5595 33.404149,1032.1774 31.767565,1023.7469 L -0.0283146,1023.7469 z"
-         style="opacity:0.66000007;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
-      <path
-         transform="matrix(1.506656,0,0,1.4746559,-22.787492,973.13969)"
-         d="M 56,32 A 8,8 0 1 1 40,32 A 8,8 0 1 1 56,32 z"
-         sodipodi:ry="8"
-         sodipodi:rx="8"
-         sodipodi:cy="32"
-         sodipodi:cx="48"
-         id="path2915"
-         style="opacity:0.66000007;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         sodipodi:type="arc" />
-    </g>
+     transform="translate(0,-924.36218)">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:none;opacity:0.66"
+       d="m 40,924.36218 48,0 0,128 -24,-32 -24,32 z"
+       id="rect2433"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none"
+       d="M 108,924.36218 C 105.784,924.36218 104,926.14618 104,928.36218 L 104,940.36218 L 92,940.36218 C 89.784,940.36218 88,942.14618 88,944.36218 C 88,946.57818 89.784,948.36218 92,948.36218 L 104,948.36218 L 104,960.36218 C 104,962.57818 105.784,964.36218 108,964.36218 C 110.216,964.36218 112,962.57818 112,960.36218 L 112,948.36218 L 124,948.36218 C 126.216,948.36218 128,946.57818 128,944.36218 C 128,942.14618 126.216,940.36218 124,940.36218 L 112,940.36218 L 112,928.36218 C 112,926.14618 110.216,924.36218 108,924.36218 z"
+       id="rect2437" />
   </g>
 </svg>

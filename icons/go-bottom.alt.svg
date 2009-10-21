@@ -16,7 +16,7 @@
    inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/go-up.png"
    inkscape:export-xdpi="67.5"
    inkscape:export-ydpi="67.5"
-   sodipodi:docname="go-up.alt.svg"
+   sodipodi:docname="go-bottom.alt.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
@@ -37,8 +37,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="6.609375"
-     inkscape:cx="20.294582"
-     inkscape:cy="30.0239"
+     inkscape:cx="22.808283"
+     inkscape:cy="27.090814"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -46,7 +46,9 @@
      inkscape:window-height="841"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="0">
+     inkscape:window-maximized="0"
+     showguides="true"
+     inkscape:guide-bbox="true">
     <inkscape:grid
        type="xygrid"
        id="grid2816"
@@ -54,6 +56,10 @@
        visible="true"
        enabled="true"
        snapvisiblegridlinesonly="true" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="35.251697,-0.80239067"
+       id="guide2563" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -73,14 +79,15 @@
      id="layer1"
      transform="translate(0,-988.36218)">
     <g
-       id="g2388"
-       transform="matrix(0,1,-1,0,1052.3145,988.34283)">
+       id="g2638"
+       transform="matrix(-1,0,0,-1,64.093748,2040.8549)">
       <path
          id="rect2867"
-         d="M 59.125118,988.42475 C 37.232477,995.26131 18.851753,1004.641 -0.0283146,1016.9104 L 31.767565,1016.9104 C 33.404149,1008.48 40.940916,1002.0979 50.030187,1002.0979 C 54.044723,1002.0979 57.757188,1003.3306 60.798586,1005.4449 C 61.562562,1001.3643 62.617197,997.27673 64.000001,993.1961 C 64.000001,990.54846 61.83021,988.42475 59.125118,988.42475 z M -0.0283146,1023.7469 C 18.598105,1036.2806 37.232477,1045.396 59.125118,1052.2326 C 61.83021,1052.2326 64.000001,1050.1089 64.000001,1047.4612 C 62.599588,1043.3806 61.52533,1039.2931 60.762206,1035.2124 C 57.725146,1037.3169 54.034435,1038.5595 50.030187,1038.5595 C 40.940916,1038.5595 33.404149,1032.1774 31.767565,1023.7469 L -0.0283146,1023.7469 z"
+         transform="translate(0,988.36218)"
+         d="M 16.59375,19.9375 C 9.9277144,32.217601 4.5441718,45.008 0.09375,59.125 C 0.093750002,61.831101 2.2324,64 4.90625,64 C 12.40889,60.810197 20.525537,59.64725 28.4375,58.71875 L 28.65625,29.15625 C 23.108812,28.065349 18.581391,24.5381 16.59375,19.9375 z M 47.90625,20.25 C 45.82156,24.7892 41.251307,28.21535 35.6875,29.21875 L 35.65625,58.65625 C 43.561282,59.64095 51.676913,60.85085 59.15625,64.09375 C 61.830032,64.112751 63.980396,61.9559 64,59.25 C 59.681331,45.197198 54.418068,32.4958 47.90625,20.25 z"
          style="opacity:0.66000007;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
       <path
-         transform="matrix(1.506656,0,0,1.4746559,-22.787492,973.13969)"
+         transform="matrix(0,1.4976193,-1.479764,0,79.399323,928.49406)"
          d="M 56,32 A 8,8 0 1 1 40,32 A 8,8 0 1 1 56,32 z"
          sodipodi:ry="8"
          sodipodi:rx="8"
