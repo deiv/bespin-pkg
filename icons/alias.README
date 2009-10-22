@@ -12,4 +12,4 @@ NO suffixes like "svg" or "png" must be used
 e.g.:
 compressed-pack:apps/arc,mimetypes/application-zip:application-x-tarz:application-x-rar
 
-Symlinking, timestamping, tinting and autocleanup to be implemented.
+Copying instead of symlinking, tinting and autocleanup to be implemented.

@@ -10,6 +10,7 @@ IFS=':' # set delimiter
 for sz in $sizes; do
     dir=$setname/${sz}x${sz}
     [ -d "$dir" ] || mkdir "$dir"
+    [ -d "$dir/.pool" ] || mkdir "$dir/.pool"
     for typ in $types; do
         [ -d "$dir/$typ" ] || mkdir "$dir/$typ"
     done
@@ -28,8 +29,11 @@ while read line; do
         continue
     fi
     for sz in $sizes; do
-        inkscape -w $sz -e "__temp.png" "$svg" > /dev/null
-        echo -n "."
+        png="$setname/${sz}x${sz}/.pool/$src.png"
+        if [ ! -e $png ] || [ $svg -nt $png ]; then
+            inkscape -w $sz -e "$png" "$svg" > /dev/null
+            echo -n "."
+        fi
         
         IFS=',' # set delimiter
         for dst in $dsts; do
@@ -44,10 +48,9 @@ while read line; do
             IFS=':' # set delimiter
             for f1le in $files; do
                 # split multi destination references
-                cp "__temp.png" "$path/$f1le.png"
+                ln -sf "../.pool/$src.png" "$path/$f1le.png"
             done
         done
-        rm -f "__temp.png"
     done
 done < alias.txt
 
