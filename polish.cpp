@@ -333,8 +333,8 @@ Style::polish( QWidget * widget )
 
     //BEGIN Window handling                                                                        -
     if ( widget->isWindow() &&
-         widget->testAttribute(Qt::WA_WState_Created) &&
-         widget->internalWinId() &&
+//          widget->testAttribute(Qt::WA_WState_Created) &&
+//          widget->internalWinId() &&
          !widget->inherits("QTipLabel") )
     {
         QPalette pal = widget->palette();
