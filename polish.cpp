@@ -332,7 +332,10 @@ Style::polish( QWidget * widget )
     Hacks::add(widget);
 
     //BEGIN Window handling                                                                        -
-    if (widget->isWindow() && !widget->inherits("QTipLabel"))
+    if ( widget->isWindow() &&
+         widget->testAttribute(Qt::WA_WState_Created) &&
+         widget->internalWinId() &&
+         !widget->inherits("QTipLabel") )
     {
         QPalette pal = widget->palette();
 
