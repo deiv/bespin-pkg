@@ -13,3 +13,14 @@ e.g.:
 compressed-pack:apps/arc,mimetypes/application-zip:application-x-tarz:application-x-rar
 
 Copying instead of symlinking, tinting and autocleanup to be implemented.
+
+/* 
+
+Ok, since the work of making the aliases is complex, is easy to be redundant. Also, is tuff to "guess" which icons add to each alias.
+That is why i did a quick ls -R ~/oxygen-icons >> icon-inventory.txt on my system and got a full list of every icon (symlink?) we shall ideally have.
+Please cross from that list (I added * at the end) the icons you aliasize, and that way we can get a complete iconset and use the list as a guide of icons that need an alias.
+Note also that the oxygen set which i got the list from, is very very complete and it may feature icons that are not /essential/ so, is more a guide than a comprehensive list. 
+Kind regards.
+-David
+
+*/ 

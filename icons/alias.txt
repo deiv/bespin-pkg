@@ -1,1 +1,4 @@
 compressed-pack:apps/arc,mimetypes/application-zip:application-x-tarz:application-x-rar
+dialog-close:actions/application-exit
+appointment:actions/appointment-new
+address-book-new:actions/address-book-new
