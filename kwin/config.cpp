@@ -91,6 +91,9 @@ Config::Config(QWidget* parent) : BConfig(parent)
     for 5 seconds by rightclicking it.<br>\
     <b>Notice:<b/> This is a little hackish and might not work on all systems!");
 
+    handleSettings(ui.verticalTitlebar, "VerticalTitlebar", false);
+    setContextHelp(ui.verticalTitlebar, "<b>Vertical Titlebar</b><hr>Could be usefull...");
+
     handleSettings(ui.trimmTitle, "TrimmCaption", true);
     setContextHelp(ui.trimmTitle, "<b>Trimm Title</b><hr>\
     Some windows tend to have ridiculusly looong captions, e.g. Konqueror if a website title\

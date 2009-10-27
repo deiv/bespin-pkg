@@ -34,7 +34,7 @@
 #include <X11/extensions/Xrender.h>
 #include "../fixx11h.h"
 
-class QHBoxLayout;
+class QBoxLayout;
 class QSpacerItem;
 
 namespace Bespin
@@ -113,8 +113,8 @@ private:
     uint bgMode;
     Gradients::Type gType[2];
     bool iAmSmall;
-    QHBoxLayout *titleBar;
-    QSpacerItem *titleSpacer;
+    QBoxLayout *myTitleBar;
+    QSpacerItem *myTitleSpacer;
     QRect top, bottom, left, right, label;
     QPainterPath buttonCorner;
     QString myCaption;

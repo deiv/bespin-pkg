@@ -54,7 +54,12 @@ KDE_EXPORT KDecorationFactory* create_factory()
 using namespace Bespin;
 
 bool Factory::weAreInitialized = false;
-Config Factory::ourConfig = { false, false, false, true, Qt::AlignHCenter, 0, {{Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None}} };
+Config Factory::ourConfig = { false, false, false, true, false,
+                              Qt::AlignHCenter, 0, {
+                                  {Gradients::None, Gradients::Button},
+                                  {Gradients::None, Gradients::None}
+                              }
+                            };
 int Factory::ourButtonSize[2] = {-1, -1};
 int Factory::ourBorderSize = 4;
 int Factory::ourTitleSize[2] = {18,16};
@@ -270,6 +275,10 @@ bool Factory::readConfig()
     oldInt = ourConfig.titleAlign;
     ourConfig.titleAlign = settings.value("TitleAlign", Qt::AlignHCenter).toInt();
     if (oldInt != ourConfig.titleAlign) ret = true;
+
+    oldBool = ourConfig.verticalTitle;
+    ourConfig.verticalTitle = settings.value("VerticalTitlebar", false).toBool();
+    if (oldBool != ourConfig.verticalTitle) ret = true;
 
     oldBool = ourConfig.resizeCorner;
     ourConfig.resizeCorner = settings.value("ResizeCorner", false).toBool();

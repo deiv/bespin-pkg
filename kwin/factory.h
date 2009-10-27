@@ -51,7 +51,7 @@ typedef struct _Preset
 
 typedef struct
 {
-    bool forceUserColors, trimmCaption, resizeCorner, hideInactiveButtons;
+    bool forceUserColors, trimmCaption, resizeCorner, hideInactiveButtons, verticalTitle;
     int slickButtons, titleAlign;
     Gradients::Type gradient[2][2];
     QStringList smallTitleClasses;
@@ -86,6 +86,7 @@ public:
     static void showDesktopMenu(const QPoint &p, Client *client);
     static void showInfo(const QPoint &p, WId id);
     static void showWindowList(const QPoint &p, Client *client);
+    inline static bool verticalTitle() { return ourConfig.verticalTitle; }
 protected:
     friend class BespinDecoAdaptor;
     static void learn(qint64 pid, QByteArray data);
@@ -101,7 +102,6 @@ private:
     static QHash<qint64, BgSet*> ourBgSets;
     static QList<Preset*> ourPresets;
     static bool weAreInitialized;
-    static bool weUseSlickButtons;
     static int ourButtonSize[2], ourBorderSize, ourTitleSize[2], ourBgMode;
     static QVector<Button::Type> ourMultiButton;
     static Config ourConfig;
