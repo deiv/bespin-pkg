@@ -211,7 +211,19 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     // this may be a bug but is annoying at least - TODO: kwin bug report?
     int *title, *border, *counter;
     if (Factory::verticalTitle())
-        { title = &left; border = &top; counter = &right; }
+    {
+        if (isShade())
+        {
+            top = widget()->height() - 2*borderSize;
+            left = Factory::titleSize(iAmSmall) + 8;
+            right = Factory::titleSize(iAmSmall) + 8 - widget()->width();
+            bottom = 0;
+            return;
+        }
+        title = &left;
+        border = &top;
+        counter = &right;
+    }
     else
         { title = &top; border = &left; counter = &bottom; }
 
