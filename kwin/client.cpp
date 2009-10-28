@@ -209,11 +209,11 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
 {
     // KWin seems to call borders() before maximizeChange() in case
     // this may be a bug but is annoying at least - TODO: kwin bug report?
-    int *title, *border;
+    int *title, *border, *counter;
     if (Factory::verticalTitle())
-        { title = &left; border = &top; }
+        { title = &left; border = &top; counter = &right; }
     else
-        { title = &top; border = &left; }
+        { title = &top; border = &left; counter = &bottom; }
 
     if (maximizeMode() == MaximizeFull)
     {
@@ -226,10 +226,8 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
         *title = Factory::titleSize(iAmSmall);
 
         if (isShade())
-            bottom = 8;
+            *counter = 8;
     }
-    //    left = right = bottom = borderSize;
-    //    top = myTitleSize;
 }
 
 int
@@ -872,8 +870,18 @@ Client::reset(unsigned long changed)
 
         bottom = QRect(0, height()-borderSize, width(), borderSize);
         const int sideHeight = height() - (myTitleSize + borderSize);
-        left = QRect(0, myTitleSize, borderSize, sideHeight);
-        right = QRect(width()-borderSize, myTitleSize, borderSize, sideHeight);
+        if (Factory::verticalTitle())
+        {
+            top = QRect(0, 0, width(), borderSize);
+            left = QRect(0, borderSize, myTitleSize, sideHeight);
+            right = QRect(0, borderSize, borderSize, sideHeight);
+        }
+        else
+        {
+            top = QRect(0, 0, width(), myTitleSize);
+            left = QRect(0, myTitleSize, borderSize, sideHeight);
+            right = QRect(width()-borderSize, myTitleSize, borderSize, sideHeight);
+        }
 
         uint decoDim = ((borderSize &0xff) << 8) | (borderSize & 0xff);
         if (Factory::verticalTitle())
@@ -1171,7 +1179,7 @@ Client::setFullscreen(bool on)
 void
 Client::shadeChange()
 {
-   emit shadeChanged(isSetShade());
+    emit shadeChanged(isSetShade());
 }
 
 void
@@ -1186,34 +1194,37 @@ Client::showDesktopMenu(const QPoint &p)
 void
 Client::showWindowList(const QPoint &p)
 {
-   QPoint ip = p;
-   QPoint gp = widget()->mapToGlobal(QPoint(width()-200, 0));
-   if (ip.x() > gp.x()) ip.setX(gp.x());
-   Factory::showWindowList(ip, this);
+    QPoint ip = p;
+    QPoint gp = widget()->mapToGlobal(QPoint(width()-200, 0));
+    if (ip.x() > gp.x())
+        ip.setX(gp.x());
+    Factory::showWindowList(ip, this);
 }
 
 void
 Client::showInfo(const QPoint &p)
 {
-   QPoint ip = p;
-   QPoint gp = widget()->mapToGlobal(QPoint(width()-320, 0));
-   if (ip.x() > gp.x()) ip.setX(gp.x());
-   Factory::showInfo(ip, windowId());
+    QPoint ip = p;
+    QPoint gp = widget()->mapToGlobal(QPoint(width()-320, 0));
+    if (ip.x() > gp.x())
+        ip.setX(gp.x());
+    Factory::showInfo(ip, windowId());
 }
 
 void
 Client::showWindowMenu(const QRect &r)
 {
-   showWindowMenu(r.bottomLeft());
+    showWindowMenu(r.bottomLeft());
 }
 
 void
 Client::showWindowMenu(const QPoint &p)
 {
-   QPoint ip = p;
-   QPoint gp = widget()->mapToGlobal(QPoint(width()-200, 0));
-   if (ip.x() > gp.x()) ip.setX(gp.x());
-   KDecoration::showWindowMenu(ip);
+    QPoint ip = p;
+    QPoint gp = widget()->mapToGlobal(QPoint(width()-200, 0));
+    if (ip.x() > gp.x())
+        ip.setX(gp.x());
+    KDecoration::showWindowMenu(ip);
 }
 
 void
@@ -1312,54 +1323,62 @@ Client::timerEvent(QTimerEvent *te)
 void
 Client::activate()
 {
-    if (QAction *act = qobject_cast<QAction*>(sender()))
+    QAction *act = qobject_cast<QAction*>(sender());
+    if (!act)
+        return;
+
+    bool ok;
+    int id = act->data().toUInt(&ok);
+    if (ok)
     {
-        bool ok; int id = act->data().toUInt(&ok);
-        if (ok) {
-            KWindowSystem::activateWindow( id );
-            return;
-        }
+        KWindowSystem::activateWindow( id );
+        return;
     }
     KWindowSystem::activateWindow( windowId() );
 }
 
 void
-Client::throwOnDesktop() {
-   if (QAction *act = qobject_cast<QAction*>(sender())) {
-      bool ok;
-      int desktop = act->data().toInt(&ok);
-      if (ok) setDesktop(desktop);
-   }
+Client::throwOnDesktop()
+{
+    QAction *act = qobject_cast<QAction*>(sender());
+    if (!act)
+        return;
+
+    bool ok;
+    int desktop = act->data().toInt(&ok);
+    if (ok)
+        setDesktop(desktop);
 }
 
 
 void
 Client::toggleOnAllDesktops()
 {
-   KDecoration::toggleOnAllDesktops();
-   emit stickyChanged(isOnAllDesktops());
+    KDecoration::toggleOnAllDesktops();
+    emit stickyChanged(isOnAllDesktops());
 }
 
 static bool
 isBrowser(const QString &s)
 {
-   return !s.compare("konqueror", Qt::CaseInsensitive) ||
-          !s.compare("opera", Qt::CaseInsensitive) ||
-          !s.compare("arora", Qt::CaseInsensitive) ||
-          !s.compare("firefox", Qt::CaseInsensitive) ||
-          !s.compare("rekonq", Qt::CaseInsensitive) ||
-          !s.compare("leechcraft", Qt::CaseInsensitive) ||
-          !s.compare("mozilla", Qt::CaseInsensitive) ||
-          !s.compare("chrome", Qt::CaseInsensitive) ||
-          !s.compare("safari", Qt::CaseInsensitive); // just in case ;)
+    return  !s.compare("konqueror", Qt::CaseInsensitive) ||
+            !s.compare("opera", Qt::CaseInsensitive) ||
+            !s.compare("arora", Qt::CaseInsensitive) ||
+            !s.compare("firefox", Qt::CaseInsensitive) ||
+            !s.compare("rekonq", Qt::CaseInsensitive) ||
+            !s.compare("leechcraft", Qt::CaseInsensitive) ||
+            !s.compare("mozilla", Qt::CaseInsensitive) ||
+            !s.compare("chrome", Qt::CaseInsensitive) ||
+            !s.compare("safari", Qt::CaseInsensitive); // just in case ;)
 }
-
-static const QString kwin_sep = QString(" %1 ").arg(QChar(0x2013));
 
 QString
 Client::trimm(const QString &string)
 {
-    if (!Factory::config()->trimmCaption) return string;
+    if (!Factory::config()->trimmCaption)
+        return string;
+
+    const QString kwin_sep = QString(" %1 ").arg(QChar(0x2013));
 
     /* Ok, *some* apps have really long and nasty window captions
     this looks clutterd, so we allow to crop them a bit and remove
@@ -1408,8 +1427,8 @@ Client::trimm(const QString &string)
 
     /* last: if the remaining string still contains the app name, please shape
     away additional info like compile time, version numbers etc. ------------ */
-    else {
-        // TODO maybe check with regexp and word bounds?
+    else
+    {   // TODO maybe check with regexp and word bounds?
         int i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
         if (i > -1)
             ret = ret.mid(i, appName.length());
