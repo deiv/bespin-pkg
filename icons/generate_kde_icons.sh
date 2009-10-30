@@ -8,8 +8,11 @@ for sz in $sizes; do
     [ -d "$dir" ] || mkdir "$dir"
     for svg in *.svg *.svgz; do
 #         links="$(grep ${svg%.svg} $1)"
+        if [ ! -e "$svg" ]; then
+            continue
+        fi
         png="$dir/${svg%.svg*}.png"
-        if [ ! -e $png ] || [ $svg -nt $png ]; then
+        if [ ! -e "$png" ] || [ "$svg" -nt "$png" ]; then
             inkscape -w $sz -e "$png" "$svg"
         fi
     done

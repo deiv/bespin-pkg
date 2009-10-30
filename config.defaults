@@ -105,6 +105,8 @@
 #define SCROLL_SLIM_SLIDER "Scroll.SlimSlider", false
 #define SCROLL_GROOVE "Scroll.Groove", 0
 #define SCROLL_INVERT_BG "Scroll.InvertBg", false
+#define SCROLL_ROLE "Scroll.Role", config.btn.std_role[Bg]
+#define SCROLL_ACTIVEROLE "Scroll.ActiveRole", config.btn.active_role[Bg]
 
 #define TAB_ACTIVEROLE "Tab.ActiveRole", QPalette::Window
 #define TAB_DURATION "Tab.Duration", 350

@@ -57,12 +57,12 @@ void
 Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(dock, DockWidget);
-    
-    QColor bg = FCOLOR(Window);
+
+    QColor bg = widget ? COLOR(widget->backgroundRole()) : FCOLOR(Window);
     bg.setAlpha(config.bg.opacity);
     const bool floating = widget && widget->isWindow();
-#if 1
-    if ((dock->floatable || dock->movable))
+
+    if (dock->floatable || dock->movable)
     {
         if (!floating)
         {
@@ -119,7 +119,7 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
         floating ? painter->drawRect(RECT.adjusted(0,0,0,-RECT.height()/2)) : painter->drawPath(glas.path);
         painter->restore();
     }
-#endif
+
     if (dock->title.isEmpty())
         return;
 
@@ -133,12 +133,12 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
 
     // text
     const int itemtextopts = Qt::AlignCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
-
+    QPalette::ColorRole fg = widget ? widget->foregroundRole() : QPalette::WindowText;
     QPen pen = painter->pen();
     if (floating && widget->isActiveWindow())
-        painter->setPen(FCOLOR(WindowText));
+        painter->setPen(COLOR(fg));
     else
-        painter->setPen(Colors::mid(bg, FCOLOR(WindowText), 2, 1+isEnabled));
+        painter->setPen(Colors::mid(bg, COLOR(fg), 2, 1+isEnabled));
     drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dock->title);
     painter->setPen(pen);
 }

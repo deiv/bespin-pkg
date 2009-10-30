@@ -142,7 +142,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.treeViews = readBool(HACK_TREEVIEWS);
         Hacks::config.windowMovement = readBool(HACK_WINDOWMOVE);
         Hacks::config.killThrobber = readBool(HACK_THROBBER);
-        Hacks::config.opaqueDolphinViews = readBool(HACK_DOLPHIN_VIEWS);
+        Hacks::config.opaqueDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_VIEWS);
         // PW Echo Char ===========================
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
         // TODO: redundant, kwin and afaik compiz can handle this
@@ -348,6 +348,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         config.menu.barGradient = readGrad(MENU_BAR_GRADIENT);
         config.menu.barSunken = readBool(MENU_BARSUNKEN);
     }
+
     readRole(menu.bar, MENU_BARROLE);
     config.menu.boldText = readBool(MENU_BOLDTEXT);
     config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);
@@ -369,6 +370,13 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.scroll.fatSlider = !readBool(SCROLL_SLIM_SLIDER);
     config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
     config.scroll.invertBg = readBool(SCROLL_INVERT_BG);
+    // this MUST happen after reading the button role, which it will default to!
+//     readRole(scroll.std, SCROLL_ROLE);
+//     readRole(scroll.active, SCROLL_ACTIVEROLE);
+    config.scroll.std_role[Bg] = config.btn.std_role[Bg];
+    config.scroll.std_role[Fg] = config.btn.std_role[Fg];
+    config.scroll.active_role[Bg] = config.btn.active_role[Bg];
+    config.scroll.active_role[Fg] = config.btn.active_role[Fg];
 
     // Tabs ===========================
     readRole(tab.active, TAB_ACTIVEROLE);
@@ -496,6 +504,8 @@ Style::init(const QSettings* settings)
             appType = KRunner;
         else if (appName == "kget")
             appType = KGet;
+        else if (appName == "ktorrent")
+            appType = KTorrent;
         else if (appName == "Designer")
             appType = QtDesigner;
         else if (appName == "kdevelop")

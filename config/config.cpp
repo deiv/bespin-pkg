@@ -217,6 +217,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateColorModes(ui.crMenuActive);
     generateColorModes(ui.btnRole);
     generateColorModes(ui.btnActiveRole);
+    generateColorModes(ui.scrollRole);
+    generateColorModes(ui.scrollActiveRole);
     generateColorModes(ui.headerRole);
     generateColorModes(ui.headerSortingRole);
     QList<int> roles; roles << 3 << 4 << 6;
@@ -325,8 +327,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.cushion, "Btn.Cushion", true);
     handleSettings(ui.fullButtonHover, "Btn.FullHover", true);
     handleSettings(ui.gradButton, "Btn.Gradient", GradButton);
-    handleSettings(ui.btnRole, "Btn.Role", QPalette::Window);
-    handleSettings(ui.btnActiveRole, "Btn.ActiveRole", QPalette::Button);
+    handleSettings(ui.btnRole, BTN_ROLE);
+    handleSettings(ui.btnActiveRole, BTN_ACTIVEROLE);
     handleSettings(ui.ambientLight, "Btn.AmbientLight", true);
     handleSettings(ui.backlightHover, "Btn.BacklightHover", false);
     handleSettings(ui.btnRound, "Btn.Round", false);
@@ -380,6 +382,9 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.slimSlider, SCROLL_SLIM_SLIDER);
     setContextHelp(ui.slimSlider, "<b>Slim slider</b><hr>\
     This will reduce the thickness of scrollbars by 2 pixel and in addition apply a more rectangular shape.");
+    // THIS MUST! happen after the buttons are loaded!
+    handleSettings(ui.btnRole, "Scroll.Role", QPalette::Window);
+    handleSettings(ui.btnActiveRole, "Scroll.ActiveRole", QPalette::Button);
 
     handleSettings(ui.shadowIntensity, "ShadowIntensity", 100);
    

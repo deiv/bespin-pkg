@@ -114,6 +114,8 @@ void
 Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *) const
 {   // TODO: widget doesn't set a state - make bug report!
     OPT_ENABLED;
+    if (appType == KTorrent)
+        isEnabled = true; // ....
 
     const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(option);
     QPalette::ColorRole fg = QPalette::Text, bg = QPalette::Base;
@@ -164,7 +166,10 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
     ASSURE_OPTION(pb, ProgressBar);
     OPT_HOVER
 
-    if ((widget && qobject_cast<const QAbstractItemView*>(widget)) || (appType == KGet && !widget))
+    bool listView = !widget && (appType == KGet || appType == KTorrent);
+    if (!listView && widget && qobject_cast<const QAbstractItemView*>(widget))
+        listView = true;
+    if (listView)
     {   // kinda inline progress in itemview (but unfortunately kget doesn't send a widget)
         drawListViewProgress(pb, painter, widget);
         return;
@@ -201,7 +206,7 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
 {
     if (appType == GTK && !content)
         return; // looks really crap
-        
+
     ASSURE_OPTION(pb, ProgressBar);
     const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(pb);
 

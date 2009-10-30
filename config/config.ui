@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>765</width>
-    <height>345</height>
+    <height>378</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -233,7 +233,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>9</number>
+         <number>6</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -512,8 +512,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>368</width>
-               <height>87</height>
+               <width>369</width>
+               <height>89</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1016,15 +1016,15 @@
           <item row="1" column="0">
            <widget class="QToolBox" name="toolBox_3">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_5">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>315</width>
-               <height>158</height>
+               <width>478</width>
+               <height>200</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1205,8 +1205,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>302</width>
-               <height>121</height>
+               <width>478</width>
+               <height>160</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1635,8 +1635,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>252</width>
-               <height>63</height>
+               <width>254</width>
+               <height>65</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1717,8 +1717,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>203</width>
-               <height>187</height>
+               <width>204</width>
+               <height>189</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1880,8 +1880,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>477</width>
-               <height>128</height>
+               <width>245</width>
+               <height>90</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2201,7 +2201,7 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="2">
+             <item row="0" column="2" colspan="3">
               <spacer name="horizontalSpacer_8">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -2215,6 +2215,65 @@
               </spacer>
              </item>
              <item row="1" column="0">
+              <widget class="QLabel" name="label_56">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Colors</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="scrollRole">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_57">
+               <property name="text">
+                <string>-&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QComboBox" name="scrollActiveRole">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="4" rowspan="2">
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>3</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="2" column="0" rowspan="2">
               <widget class="QLabel" name="label_42">
                <property name="font">
                 <font>
@@ -2230,7 +2289,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1" colspan="2">
+             <item row="2" column="1" rowspan="2" colspan="3">
               <widget class="QSlider" name="sliderGroove">
                <property name="maximum">
                 <number>3</number>
@@ -2246,7 +2305,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="3">
+             <item row="3" column="4">
               <widget class="QLabel" name="grooveLabel">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -2259,21 +2318,21 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0" colspan="2">
+             <item row="4" column="0" colspan="2">
               <widget class="QCheckBox" name="invertGroove">
                <property name="text">
                 <string>Invert groove</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="2">
+             <item row="5" column="0" colspan="2">
               <widget class="QCheckBox" name="slimSlider">
                <property name="text">
                 <string>Slim sliders</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="0" colspan="2">
+             <item row="6" column="0" colspan="2">
               <widget class="QCheckBox" name="showScrollButtons">
                <property name="text">
                 <string>Show scrollbar buttons</string>
@@ -2671,8 +2730,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>477</width>
-               <height>145</height>
+               <width>369</width>
+               <height>114</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2727,8 +2786,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>477</width>
-               <height>82</height>
+               <width>478</width>
+               <height>91</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2781,8 +2840,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>477</width>
-               <height>104</height>
+               <width>232</width>
+               <height>64</height>
               </rect>
              </property>
              <attribute name="label">

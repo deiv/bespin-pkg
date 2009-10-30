@@ -416,15 +416,15 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         c = SCROLL_COLOR(6);
     else if (complexStep)
     {
-        c = Colors::mid(CCOLOR(btn.std, Bg), SCROLL_COLOR(widgetStep));
+        c = Colors::mid(CCOLOR(scroll.std, Bg), SCROLL_COLOR(widgetStep));
         c = Colors::mid(c, SCROLL_COLOR(complexStep),6-complexStep,complexStep);
     }
     else if (hover)
         { complexStep = 6; c = SCROLL_COLOR(6); }
     else if (widgetStep)
-        c = Colors::mid(CCOLOR(btn.std, Bg), SCROLL_COLOR(widgetStep));
+        c = Colors::mid(CCOLOR(scroll.std, Bg), SCROLL_COLOR(widgetStep));
     else
-        c = CCOLOR(btn.std, 0);
+        c = CCOLOR(scroll.std, Bg);
     c.setAlpha(255); // bg could be transparent, i don't want scrollers translucent, though.
 #undef SCROLL_COLOR
    
@@ -454,7 +454,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     {
         if (!sunken && config.btn.backLightHover && complexStep)
         {
-            QColor blh = Colors::mid(c, CCOLOR(btn.active, Bg), 6-complexStep, complexStep);
+            QColor blh = Colors::mid(c, CCOLOR(scroll.active, Bg), 6-complexStep, complexStep);
             lights.rect[round_].render(r, painter, blh); // backlight
         }
         shadows.raised[round_][true][false].render(r, painter);
@@ -476,8 +476,8 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         pf = Tile::Top | Tile::Bottom;
     }
 
-    QColor bc = config.btn.fullHover ? c : CCOLOR(btn.std, Bg);
-    bc.setAlpha(255); // CCOLOR(btn.std, Bg) pot. reintroduces translucency...
+    QColor bc = config.btn.fullHover ? c : CCOLOR(scroll.std, Bg);
+    bc.setAlpha(255); // CCOLOR(scroll.std, Bg) pot. reintroduces translucency...
     masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size);
 
     // reflexive outline

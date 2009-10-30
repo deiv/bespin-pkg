@@ -32,7 +32,7 @@ Style::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainte
 //     if (hasFocus && !sunken)
 //         fillWithMask(painter, xy, FCOLOR(Highlight), lights.slider);
     /*else */if (step && config.btn.backLightHover)
-        fillWithMask(painter, xy, Colors::mid(FCOLOR(Window), CCOLOR(btn.active, Bg), 6-step, step), lights.slider);
+        fillWithMask(painter, xy, Colors::mid(FCOLOR(Window), CCOLOR(scroll.active, Bg), 6-step, step), lights.slider);
     if (sunken)
         xy += QPoint(F(1), 0);
     painter->drawPixmap(xy, shadows.slider[isEnabled][sunken]);
@@ -40,15 +40,15 @@ Style::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainte
     // gradient
     xy += QPoint(sunken ? F(1) : F(2), F(1));
 
-    QColor bc = CCOLOR(btn.std, Bg);
+    QColor bc = CCOLOR(scroll.std, Bg);
     if (fullHover)
-        bc = Colors::mid(bc, CCOLOR(btn.active, Bg), 6-step, step);
+        bc = Colors::mid(bc, CCOLOR(scroll.active, Bg), 6-step, step);
 
     const QPixmap &fill = Gradients::pix(bc, masks.slider.height(), Qt::Vertical, isEnabled ? GRAD(scroll) : Gradients::None);
     fillWithMask(painter, xy, fill, masks.slider);
     if (isEnabled)
     {
-        const QColor fc = Colors::mid(hasFocus ? FCOLOR(Highlight) : bc, CCOLOR(btn.std, Fg), 6-step, step+3);
+        const QColor fc = Colors::mid(hasFocus ? FCOLOR(Highlight) : bc, CCOLOR(scroll.std, Fg), 6-step, step+3);
         xy += QPoint(F(5), F(5));
         fillWithMask(painter, xy, fc, masks.notch);
     }
