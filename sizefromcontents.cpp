@@ -182,7 +182,7 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
             
         w = qMax(contentsSize.width()+F(4), h*4/3-F(4)); // 4/3 - 16/9
     //      w = contentsSize.width()+F(8);
-        if (toolbutton && (toolbutton->subControls & SC_ToolButtonMenu))
+        if (toolbutton && drawMenuIndicator(toolbutton))
             w += pixelMetric(PM_MenuButtonIndicator, option, widget)/* + F(4)*/;
         return QSize(w, h);
     }

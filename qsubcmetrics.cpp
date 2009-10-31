@@ -324,10 +324,8 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
     case CC_ToolButton: // A tool button, like QToolButton
         if HAVE_OPTION(tb, ToolButton)
         {
-//             int fw = pixelMetric(PM_DefaultFrameWidth, tb, widget);
-//             ret = tb->rect.adjusted(fw,fw,-fw,0);
             ret = tb->rect;
-            if ((tb->features & (QStyleOptionToolButton::Menu | QStyleOptionToolButton::PopupDelay)) == QStyleOptionToolButton::Menu)
+            if (drawMenuIndicator(tb))
             {   // has an arrow
                 int x = ret.right() - pixelMetric(PM_MenuButtonIndicator, tb, widget);
                 if (subControl == SC_ToolButton)
