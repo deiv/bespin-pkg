@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,10 +13,9 @@
    height="128"
    id="svg4289"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47pre2 r22153"
    version="1.0"
-   sodipodi:docbase="/home/qwerty/.icons/MonoBlack/scalable/actions"
-   sodipodi:docname="add-folder-to-file.svg"
+   sodipodi:docname="add-file-to-archive.svg"
    inkscape:export-filename="/home/andreas/project/gnome-icon-theme/scalable/actions/list-add.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
@@ -62,9 +62,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.0000001"
-     inkscape:cx="-58.939585"
-     inkscape:cy="129.13057"
+     inkscape:zoom="4.78125"
+     inkscape:cx="64"
+     inkscape:cy="64"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
@@ -75,11 +75,20 @@
      inkscape:guide-bbox="true"
      inkscape:window-width="1440"
      inkscape:window-height="846"
-     inkscape:window-x="-4"
-     inkscape:window-y="-1"
+     inkscape:window-x="278"
+     inkscape:window-y="132"
      objecttolerance="10000"
      gridtolerance="10000"
-     guidetolerance="10000" />
+     guidetolerance="10000"
+     inkscape:window-maximized="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2818"
+       empspacing="8"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
   <metadata
      id="metadata4294">
     <rdf:RDF>
@@ -96,9 +105,8 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <path
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.00000047999999997;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M -1.5248219e-15,55.799724 L -1.5248219e-15,76.985788 L 53.851564,76.985788 L 53.851564,127.93611 L 74.437537,128.125 L 74.318484,76.985788 L 128,76.7969 L 128,55.799724 L 74.235497,55.799724 L 74.248983,0.30814975 L 53.669746,0.12499999 L 53.663007,55.811204 L -1.5248219e-15,55.799724 z"
-       id="path4314"
-       sodipodi:nodetypes="ccccccccccccc" />
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="M 64 0 C 55.136 0 48 7.136 48 16 L 48 48 L 16 48 C 7.136 48 2.6111925e-18 55.136 0 64 C 0 72.864 7.136 80 16 80 L 48 80 L 48 112 C 48 120.864 55.136 128 64 128 C 72.864 128 80 120.864 80 112 L 80 80 L 112 80 C 120.864 80 128 72.864 128 64 C 128 55.136 120.864 48 112 48 L 80 48 L 80 16 C 80 7.136 72.864 2.6111925e-18 64 0 z "
+       id="rect2820" />
   </g>
 </svg>
