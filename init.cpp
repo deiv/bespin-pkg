@@ -277,7 +277,6 @@ Style::readSettings(const QSettings* settings, QString appName)
 
     // Buttons ===========================
     config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
-    config.btn.disabledToolStyle = readInt(BTN_DISABLED_TOOLS);
     config.btn.round = readBool(BTN_ROUND);
     GRAD(btn) = readGrad(BTN_GRADIENT);
     if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
@@ -295,14 +294,27 @@ Style::readSettings(const QSettings* settings, QString appName)
     readRole(btn.active, BTN_ACTIVEROLE);
     config.btn.ambientLight = readBool(BTN_AMBIENTLIGHT);
     config.btn.bevelEnds = readBool(BTN_BEVEL_ENDS);
+
+    // .Tool
+    config.btn.tool.connected = readBool(BTN_CONNECTED_TOOLS);
+    config.btn.tool.disabledStyle = readInt(BTN_DISABLED_TOOLS);
+    if (config.btn.tool.connected)
+    {
+        config.btn.tool.sunken = readBool(BTN_SUNKEN_TOOLS);
+        readRole(btn.tool.std, BTN_TOOL_ROLE);
+        readRole(btn.tool.active, BTN_TOOL_ACTIVEROLE);
+        GRAD(btn.tool) = readGrad(BTN_TOOL_GRADIENT);
+    }
+    else
+    {
+        config.btn.tool.sunken = false;
+        config.btn.tool.std_role[Bg] = config.btn.tool.active_role[Bg] = QPalette::Window;
+        config.btn.tool.std_role[Fg] = config.btn.tool.active_role[Fg] = QPalette::WindowText;
+    }
    
     // Choosers ===========================
     GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
 
-    config.btn.toolConnected = readBool(BTN_CONNECTED_TOOLS);
-    config.btn.toolSunken = false;
-    if (config.btn.toolConnected)
-        config.btn.toolSunken = readBool(BTN_SUNKEN_TOOLS);
 
     // kwin - yes i let the style control the deco, iff the deco permits, though :)
     config.kwin.gradient[0] = readGrad(KWIN_INACTIVE_GRADIENT);

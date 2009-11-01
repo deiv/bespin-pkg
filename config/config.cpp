@@ -217,6 +217,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateColorModes(ui.crMenuActive);
     generateColorModes(ui.btnRole);
     generateColorModes(ui.btnActiveRole);
+    generateColorModes(ui.toolbuttonRole);
+    generateColorModes(ui.toolbuttonActiveRole);
     generateColorModes(ui.scrollRole);
     generateColorModes(ui.scrollActiveRole);
     generateColorModes(ui.headerRole);
@@ -231,6 +233,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateColorModes(ui.kwinActiveText);
    
     generateGradientTypes(ui.gradButton);
+    generateGradientTypes(ui.toolbuttonGradient);
     generateGradientTypes(ui.gradChoose);
     generateGradientTypes(ui.gradMenuBar);
     generateGradientTypes(ui.gradMenuItem);
@@ -336,7 +339,9 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 
     handleSettings(ui.connectedToolbuttons, BTN_CONNECTED_TOOLS);
     handleSettings(ui.toolbuttonLayer, BTN_SUNKEN_TOOLS);
-//     handleSettings(ui.toolbuttonGradient, BTN_CONNECTED_TOOLS);
+    handleSettings(ui.toolbuttonRole, BTN_TOOL_ROLE);
+    handleSettings(ui.toolbuttonActiveRole, BTN_TOOL_ACTIVEROLE);
+    handleSettings(ui.toolbuttonGradient, BTN_TOOL_GRADIENT);
     handleSettings(ui.disabledToolbuttonStyle, BTN_DISABLED_TOOLS);
     setContextHelp(ui.disabledToolbuttonStyle, "<b>Disabled Toolbuttons</b><hr>\
     Qt has a \"standard\" way to gray out disabled toolbuttons, which can be altered by the style.\

@@ -112,7 +112,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_ToolBarItemMargin: // Spacing between the toolbar frame and the items
         return F(2);//f4
     case PM_ToolBarItemSpacing: // Spacing between toolbar items
-        return config.btn.toolConnected ? 0 : F(4);
+        return config.btn.tool.connected ? 0 : F(4);
     case PM_ToolBarSeparatorExtent: // Width of a toolbar separator in a horizontal toolbar and the height of a separator in a vertical toolbar
         return F(6);
     case PM_ToolBarExtensionExtent: // Width of a toolbar extension button in a horizontal toolbar and the height of the button in a vertical toolbar
@@ -204,7 +204,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_DefaultLayoutSpacing: //
         return F(4);
     case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize
-        return config.btn.toolConnected ? 16 : 22;
+        return config.btn.tool.connected ? 16 : 22;
     case PM_SmallIconSize: // Default small icon size
         return 16;
     case PM_LargeIconSize: // Default large icon size

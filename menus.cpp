@@ -153,8 +153,7 @@ static const int windowsItemVMargin = 1; // menu item ver text margin
 static const int windowsRightBorder = 12; // right border on windows
 
 void
-Style::drawMenuItem(const QStyleOption * option, QPainter * painter,
-                          const QWidget * widget) const
+Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(menuItem, MenuItem);
     ROLES(menu.std);

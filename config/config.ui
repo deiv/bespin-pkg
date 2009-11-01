@@ -233,7 +233,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>6</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -1016,15 +1016,15 @@
           <item row="1" column="0">
            <widget class="QToolBox" name="toolBox_3">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page_5">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>478</width>
-               <height>200</height>
+               <width>316</width>
+               <height>160</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1206,7 +1206,7 @@
                <x>0</x>
                <y>0</y>
                <width>478</width>
-               <height>160</height>
+               <height>131</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1269,30 +1269,120 @@
                 <property name="checked">
                  <bool>true</bool>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_4">
-                 <item row="0" column="0">
-                  <widget class="QComboBox" name="toolbuttonLayer">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
+                <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_6">
                    <item>
-                    <property name="text">
-                     <string>Raised</string>
-                    </property>
+                    <spacer name="horizontalSpacer_11">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                    <item>
-                    <property name="text">
-                     <string>Sunken</string>
-                    </property>
+                    <widget class="QComboBox" name="toolbuttonLayer">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <item>
+                      <property name="text">
+                       <string>Raised</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Sunken</string>
+                      </property>
+                     </item>
+                    </widget>
                    </item>
-                  </widget>
+                   <item>
+                    <widget class="QComboBox" name="toolbuttonGradient">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_4">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
                  </item>
-                 <item row="1" column="0">
-                  <widget class="QComboBox" name="toolbuttonGradient">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <item>
+                    <spacer name="horizontalSpacer_12">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="toolbuttonRole">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_58">
+                     <property name="text">
+                      <string>-&gt;</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="toolbuttonActiveRole">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_5">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
                  </item>
                 </layout>
                </widget>
@@ -1350,6 +1440,9 @@
            <spacer name="verticalSpacer_7">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Expanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -2786,8 +2879,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>478</width>
-               <height>91</height>
+               <width>130</width>
+               <height>79</height>
               </rect>
              </property>
              <attribute name="label">

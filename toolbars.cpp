@@ -99,7 +99,7 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
     hover = isEnabled && (bflags & (State_Sunken | State_On | State_Raised | State_HasFocus));
 
     step = Animator::Hover::step(widget);
-    connected = (config.btn.toolConnected && widget && widget->parentWidget() && qobject_cast<QToolBar*>(widget->parentWidget()));
+    connected = (config.btn.tool.connected && widget && widget->parentWidget() && qobject_cast<QToolBar*>(widget->parentWidget()));
 
     // frame around whole button
     if (connected || option->state & State_On)
@@ -114,18 +114,10 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
     if (!(bflags & State_Sunken) && hasMenuIndicator(toolbutton))
     {
         QRect menuarea = subControlRect(CC_ToolButton, toolbutton, SC_ToolButtonMenu, widget);
-//         if (toolbutton->activeSubControls & SC_ToolButtonMenu) // pressed
-//             painter->drawTiledPixmap(menuarea, Gradients::pix(FCOLOR(Window), menuarea.height(), Qt::Vertical, Gradients::Sunken));
         QPen oldPen = painter->pen();
         painter->setPen(Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 8-step, step+3));
-//          tool.rect = menuarea; tool.state = mflags;
         drawSolidArrow(Navi::S, menuarea, painter);
         painter->setPen(oldPen);
-//         if (hover)
-//         {
-//             menuarea.setLeft(button.right()-shadows.line[1][Sunken].thickness()/2);
-//             shadows.line[1][Sunken].render(menuarea, painter);
-//         }
     }
 
    // label in the toolbutton area
@@ -146,9 +138,11 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
     {
         QToolBar *tb = static_cast<QToolBar*>(widget->parentWidget()); // guaranteed by "connected", see above
         OPT_SUNKEN
-        const bool round = config.btn.toolSunken;
+        const bool round = config.btn.tool.sunken;
         
-        QColor c = (option->state & State_On) ? FCOLOR(Highlight) : Colors::bg(PAL, widget);
+        QColor c = (option->state & State_On) ? COLOR(config.btn.tool.active_role[Bg]) :
+                                                (config.btn.tool.std_role[Bg] == QPalette::Window ?
+                                                    Colors::bg(PAL, widget) : COLOR(config.btn.tool.std_role[Bg]));
         if (Colors::value(c) < 50)
             { int h,s,v,a; c.getHsv(&h, &s, &v, &a); c.setHsv(h, s, 50, a); }
         if (step)
@@ -178,10 +172,10 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         }
 
         // paint
-        Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(btn);
+        Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(btn.tool);
         o = (o == Qt::Horizontal) ? Qt::Vertical : Qt::Horizontal;
         Tile::setShape(pf);
-        if (config.btn.toolSunken)
+        if (config.btn.tool.sunken)
         {
             if (pf & Tile::Bottom)
                 rect.setBottom(rect.bottom()-F(2));
@@ -262,7 +256,12 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     QPalette::ColorRole role = QPalette::WindowText;
     QPalette::ColorRole bgRole = QPalette::Window;
-    if (widget)
+    if (connected)
+    {
+        role = config.btn.tool.std_role[Fg];
+        bgRole = config.btn.tool.std_role[Bg];
+    }
+    if (widget && bgRole == QPalette::Window)
     {
         bgRole = widget->backgroundRole();
         role = widget->foregroundRole();
@@ -273,7 +272,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     QColor text = PAL.color(role);
     if (connected && (option->state & State_On))
-        text = FCOLOR(HighlightedText);
+        text = CCOLOR(btn.tool.active, Fg);
 
     if (justText)
     {   // the most simple way
@@ -292,7 +291,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     if (!toolbutton->icon.isNull())
     {
-        const int style = config.btn.disabledToolStyle;
+        const int style = config.btn.tool.disabledStyle;
 //         const QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
         pm = toolbutton->icon.pixmap(RECT.size().boundedTo(pmSize), isEnabled || style ? QIcon::Normal : QIcon::Disabled, QIcon::Off);
 #if 0   // this is -in a way- the way it should be done..., but KIconLoader gives a shit on this or anything else

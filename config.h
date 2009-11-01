@@ -47,13 +47,17 @@ typedef struct Config
    
     struct btn
     {
-        int disabledToolStyle;
-        bool toolConnected, toolSunken;
         int layer;
         Check::Type checkType;
         bool cushion, fullHover, backLightHover, ambientLight, bevelEnds, round;
-        Gradients::Type gradient, focusGradient;
+        Gradients::Type gradient;
         QPalette::ColorRole std_role[2], active_role[2];
+        struct tool {
+            int disabledStyle;
+            bool connected, sunken;
+            Gradients::Type gradient;
+            QPalette::ColorRole std_role[2], active_role[2];
+        } tool;
     } btn;
    
     struct chooser
