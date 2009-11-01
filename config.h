@@ -94,7 +94,7 @@ typedef struct Config
     struct progress
     {
         Gradients::Type gradient;
-        QPalette::ColorRole std_role[2];
+        QPalette::ColorRole __role[2];
     } progress;
 
     bool newWinBtns;
@@ -106,7 +106,7 @@ typedef struct Config
         Gradients::Type gradient;
         Groove::Mode groove;
         bool showButtons, invertBg, fatSlider;
-        QPalette::ColorRole std_role[2], active_role[2];
+        QPalette::ColorRole __role[2];
     } scroll;
 
     float shadowIntensity;

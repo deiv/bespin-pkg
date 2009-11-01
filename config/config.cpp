@@ -388,8 +388,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     setContextHelp(ui.slimSlider, "<b>Slim slider</b><hr>\
     This will reduce the thickness of scrollbars by 2 pixel and in addition apply a more rectangular shape.");
     // THIS MUST! happen after the buttons are loaded!
-    handleSettings(ui.btnRole, "Scroll.Role", QPalette::Window);
-    handleSettings(ui.btnActiveRole, "Scroll.ActiveRole", QPalette::Button);
+    handleSettings(ui.scrollRole, "Scroll.Role", QPalette::Window);
+    handleSettings(ui.scrollActiveRole, "Scroll.ActiveRole", QPalette::Button);
 
     handleSettings(ui.shadowIntensity, "ShadowIntensity", 100);
    

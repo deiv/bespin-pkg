@@ -53,7 +53,7 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
     }
 
     r.setBottom(r.bottom()-f2);
-    masks.rect[false].render(r, painter, Gradients::Sunken, Qt::Vertical, Colors::mid(COLOR(fg), Qt::black,6, 1)); // CCOLOR(progress.std, Bg)
+    masks.rect[false].render(r, painter, Gradients::Sunken, Qt::Vertical, Colors::mid(COLOR(fg), Qt::black,6, 1)); // CCOLOR(progress, Bg)
     shadows.sunken[false][isEnabled].render(RECT, painter);
 
     int w = r.width()*cb->progress/(cb->maximum - cb->minimum)  - f2;
@@ -276,14 +276,14 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
     // draw a chunk
     int nn = (val < 0) ? 0 : int(n*val);
     if (content)
-        p.setBrush(Gradients::brush(CCOLOR(progress.std, Fg), ss, Qt::Vertical, GRAD(progress) ));
+        p.setBrush(Gradients::brush(CCOLOR(progress._, Fg), ss, Qt::Vertical, GRAD(progress) ));
     else
     {   // this is the "not-yet-done" part - in case we're currently painting it...
         if (busy)
             nn = n;
         else
             { x += nn*s; nn = n - nn; }
-        const QColor c = CCOLOR(progress.std, Bg);
+        const QColor c = CCOLOR(progress._, Bg);
         p.setBrush(Gradients::brush(c, ss, Qt::Vertical, GRAD(progress) ));
     }
     p.setBrushOrigin(0,1);
@@ -317,7 +317,7 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
             int q = int((10*n)*val) - 10*nn;
             if (q)
             {
-                const QColor c = Colors::mid(CCOLOR(progress.std, Bg), CCOLOR(progress.std, Fg), 10-q, q);
+                const QColor c = Colors::mid(CCOLOR(progress._, Bg), CCOLOR(progress._, Fg), 10-q, q);
 
                 if (vertical) // swap again, we abuse 'q' from above
                     { q = x; x = y; y = q; }

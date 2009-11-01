@@ -373,8 +373,8 @@ Style::readSettings(const QSettings* settings, QString appName)
 
     // Progress ===========================
     GRAD(progress) = readGrad(PROGRESS_GRADIENT);
-    config.progress.std_role[Bg] =  (QPalette::ColorRole) readInt(PROGRESS_ROLE_BG);
-    config.progress.std_role[Fg] = (QPalette::ColorRole) readInt(PROGRESS_ROLE_FG);
+    config.progress.__role[Bg] =  (QPalette::ColorRole) readInt(PROGRESS_ROLE_BG);
+    config.progress.__role[Fg] = (QPalette::ColorRole) readInt(PROGRESS_ROLE_FG);
 
     // ScrollStuff ===========================
     GRAD(scroll) = readGrad(SCROLL_GRADIENT);
@@ -383,12 +383,12 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
     config.scroll.invertBg = readBool(SCROLL_INVERT_BG);
     // this MUST happen after reading the button role, which it will default to!
-//     readRole(scroll.std, SCROLL_ROLE);
-//     readRole(scroll.active, SCROLL_ACTIVEROLE);
-    config.scroll.std_role[Bg] = config.btn.std_role[Bg];
-    config.scroll.std_role[Fg] = config.btn.std_role[Fg];
-    config.scroll.active_role[Bg] = config.btn.active_role[Bg];
-    config.scroll.active_role[Fg] = config.btn.active_role[Fg];
+    config.scroll.__role[Bg] = (QPalette::ColorRole) readInt(SCROLL_ROLE);
+    config.scroll.__role[Fg] = (QPalette::ColorRole) readInt(SCROLL_ACTIVEROLE);
+//     config.scroll.std_role[Bg] = config.btn.std_role[Bg];
+//     config.scroll.std_role[Fg] = config.btn.std_role[Fg];
+//     config.scroll.active_role[Bg] = config.btn.active_role[Bg];
+//     config.scroll.active_role[Fg] = config.btn.active_role[Fg];
 
     // Tabs ===========================
     readRole(tab.active, TAB_ACTIVEROLE);
