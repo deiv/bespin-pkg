@@ -277,11 +277,11 @@ protected slots:
    
 private:
     Q_DISABLE_COPY(Style)
-    static bool drawMenuIndicator(const QStyleOptionToolButton *tb);
     void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
     int elementId(const QString &string) const;
     void erase(const QStyleOption*, QPainter*, const QWidget*, const QPoint *off = 0) const;
     void generatePixmaps();
+    static bool hasMenuIndicator(const QStyleOptionToolButton *tb);
     void initMetrics();
     static bool isSpecialFrame(const QWidget *w);
     QColor mapFadeColor(const QColor &color, int index) const;

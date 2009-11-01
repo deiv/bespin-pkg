@@ -325,7 +325,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         if HAVE_OPTION(tb, ToolButton)
         {
             ret = tb->rect;
-            if (drawMenuIndicator(tb))
+            if (hasMenuIndicator(tb))
             {   // has an arrow
                 int x = ret.right() - pixelMetric(PM_MenuButtonIndicator, tb, widget);
                 if (subControl == SC_ToolButton)

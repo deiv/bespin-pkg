@@ -26,7 +26,7 @@ static int step = 0;
 static bool connected = false;
 
 bool
-Style::drawMenuIndicator(const QStyleOptionToolButton *tb)
+Style::hasMenuIndicator(const QStyleOptionToolButton *tb)
 {
     // subcontrol requested?
     bool ret = (tb->subControls & SC_ToolButtonMenu) || (tb->features & QStyleOptionToolButton::Menu);
@@ -111,7 +111,7 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
         drawToolButtonShape(&tool, painter, widget);
     }
 
-    if (!(bflags & State_Sunken) && drawMenuIndicator(toolbutton))
+    if (!(bflags & State_Sunken) && hasMenuIndicator(toolbutton))
     {
         QRect menuarea = subControlRect(CC_ToolButton, toolbutton, SC_ToolButtonMenu, widget);
 //         if (toolbutton->activeSubControls & SC_ToolButtonMenu) // pressed

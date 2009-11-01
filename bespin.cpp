@@ -33,6 +33,7 @@
 #include <QStyleOptionTabWidgetFrame>
 #include <QStylePlugin>
 #include <QScrollBar>
+#include <QToolBar>
 #include <QToolButton>
 #include <QTreeView>
 #include <QtDBus/QDBusInterface>
@@ -227,10 +228,7 @@ Style::registerRoutines()
     registerPE(skip, PE_IndicatorToolBarSeparator);
     registerPE(skip, PE_PanelToolBar);
     registerCE(drawToolButtonLabel, CE_ToolButtonLabel);
-    if (config.bg.mode == Scanlines && config.bg.structure < 5)
-        registerCE(drawDockBg, CE_ToolBar);
-    else
-        registerCE(skip, CE_ToolBar);
+    registerCE(drawDockBg, CE_ToolBar);
     registerPE(skip, PE_FrameButtonTool);
 #ifdef QT3_SUPPORT
     registerPE(skip, PE_Q3Separator);
@@ -252,10 +250,10 @@ Style::registerRoutines()
 #endif
     // window.cpp
     registerPE(drawWindowFrame, PE_FrameWindow);
-//     if (config.menu.shadow)
+    if (config.menu.shadow)
         registerPE(drawWindowFrame, PE_FrameMenu);
-//     else
-//         registerPE(skip, PE_FrameMenu);
+    else
+        registerPE(skip, PE_FrameMenu);
     registerPE(drawWindowBg, PE_Widget);
     registerPE(drawToolTip, PE_PanelTipLabel);
     registerCC(drawTitleBar, CC_TitleBar);
@@ -949,7 +947,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
     }
     case QEvent::Resize:
     {
-        QWidget *widget = 0, *dock = 0;
+        QWidget *widget = 0/*, *dock = 0*/;
         if ((config.menu.round && (widget = qobject_cast<QMenu*>(object)))
 #if 0
             || (config.bg.docks.shape && (widget = dock = qobject_cast<QDockWidget*>(object))))
@@ -1023,13 +1021,24 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 Animator::Hover::Play(slider);
             return false;
         }
-    
-        if (QListView *list = qobject_cast<QListView*>(object))
-//         if (list->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) // this should be, but semms to be not
-        if (list->iconSize().height() > -1) // happens on e.g. config views
-        if (list->inherits("KCategorizedView"))
-                list->verticalScrollBar()->setSingleStep(list->iconSize().height()/3);
 
+        if (object->objectName() == "qt_scrollarea_viewport")
+        {
+            if (QListView *list = qobject_cast<QListView*>(object->parent()))
+            if (list->verticalScrollBar() && list->inherits("KateFileList"))
+            { // suck it, jerks!
+                QCoreApplication::sendEvent(list->verticalScrollBar(), ev); // tell the scrollbar to do this ;-P
+                return true; // eat it
+            }
+            return false;
+        }
+        if (QListView *list = qobject_cast<QListView*>(object))
+        {
+//             if (list->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) // this should be, but semms to be not
+            if (list->iconSize().height() > -1) // happens on e.g. config views
+            if (list->inherits("KCategorizedView"))
+                list->verticalScrollBar()->setSingleStep(list->iconSize().height()/3);
+        }
         return false;
     }
 #ifdef MOUSEDEBUG

@@ -18,6 +18,7 @@
 
 #include <QDockWidget>
 #include <QStyleOptionDockWidget>
+#include <QToolBar>
 #include "draw.h"
 
 static struct {
@@ -30,27 +31,29 @@ void
 Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     bool needRestore = false;
-    if (config.bg.mode == Scanlines)
+    if (config.bg.mode == Scanlines  && config.bg.structure < 5)
     {
         painter->save(); needRestore = true;
-        
         painter->setPen(Qt::NoPen);
         painter->setBrush(Gradients::structure(FCOLOR(Window), true));
         painter->translate(RECT.topLeft());
         painter->drawRect(RECT);
     }
-    
-    if (widget && widget->isWindow())
+
+    else if (widget && widget->isWindow())
     {
-        if (!needRestore) painter->save();
-
-        painter->setPen(Colors::mid(FCOLOR(Window), Qt::black, 3,1));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(RECT.adjusted(0,0,-1,-1));
-
-        painter->restore(); needRestore = false;
+        if (qobject_cast<const QToolBar*>(widget))
+        {
+            if (config.bg.mode != Scanlines)
+                painter->fillRect(RECT, Gradients::pix(FCOLOR(Window), RECT.height(), Qt::Vertical));
+            else
+                painter->fillRect(RECT, Gradients::structure(FCOLOR(Window), false));
+        }
+        drawWindowFrame(option, painter, widget);
     }
-    if (needRestore) painter->restore();
+
+    if (needRestore)
+        painter->restore();
 }
 
 void

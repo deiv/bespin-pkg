@@ -536,10 +536,14 @@ Style::polish( QWidget * widget )
                 }
 
                 if (itemView->inherits("KCategorizedView"))
-                {
+                {   // fix scrolldistance...
                     itemView->removeEventFilter(this);
-                    itemView->installEventFilter(this); // scrolldistance...
-//                     itemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+                    itemView->installEventFilter(this);
+                }
+                else if (itemView->inherits("KateFileList") && itemView->viewport())
+                {   // fix fucking "switch dock on wheel CRAP"
+                    itemView->viewport()->removeEventFilter(this);
+                    itemView->viewport()->installEventFilter(this);
                 }
 
 #if QT_VERSION >= 0x040500
