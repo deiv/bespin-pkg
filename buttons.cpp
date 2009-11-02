@@ -87,7 +87,7 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
 }
 
 void
-Style::drawPushButtonBevel(const QStyleOption * option, QPainter * painter, const QWidget * widget) const
+Style::drawPushButtonBevel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
 
 //     if (widget && widget->parentWidget() && widget->parentWidget()->inherits("KPIM::StatusbarProgressWidget"))
@@ -95,7 +95,7 @@ Style::drawPushButtonBevel(const QStyleOption * option, QPainter * painter, cons
 
     ASSURE_OPTION(btn, Button);
 
-    if (btn->features & QStyleOptionBubtton::Flat)
+    if (btn->features & QStyleOptionButton::Flat)
         return;
 
     OPT_SUNKEN OPT_HOVER
