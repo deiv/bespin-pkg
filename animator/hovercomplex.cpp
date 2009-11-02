@@ -32,46 +32,52 @@ SET_DURATION(HoverComplex)
 const ComplexInfo *
 HoverComplex::info(const QWidget *widget, QStyle::SubControls active)
 {
-   if (!widget) return 0;
-   if (!instance) instance = new HoverComplex;
+   if (!widget)
+       return 0;
+   if (!instance)
+       instance = new HoverComplex;
    return instance->_info(widget, active);
 }
 
 const ComplexInfo *
 HoverComplex::_info(const QWidget *widget, QStyle::SubControls active) const
 {
-   QWidget *w = const_cast<QWidget*>(widget);
-   HoverComplex *that = const_cast<HoverComplex*>(this);
-   Items::iterator it = that->items.find(w);
-   if (it == items.end()) {
-      // we have no entry yet
-      if (active == QStyle::SC_None)
-         return 0; // no need here
-      // ...but we'll need one
-      it = that->items.insert(w, ComplexInfo());
-      connect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release(QObject*)));
-      that->timer.start(timeStep, that);
-   }
-   // we now have an entry - check for validity and update in case
-   ComplexInfo *info = &it.value();
-   if (info->active != active) { // sth. changed
-      QStyle::SubControls diff = info->active ^ active;
-      QStyle::SubControls newActive = diff & active;
-      QStyle::SubControls newDead = diff & info->active;
-      info->fades[In] &= ~newDead; info->fades[In] |= newActive;
-      info->fades[Out] &= ~newActive; info->fades[Out] |= newDead;
-      info->active = active;
-      for (QStyle::SubControl control = (QStyle::SubControl)0x01;
-      control <= (QStyle::SubControl)0x80;
-      control = (QStyle::SubControl)(control<<1)) {
-         if (newActive & control)
-            info->steps[control] = 1;
-         else if (newDead & control) {
-            info->steps[control] = maxSteps;
-         }
-      }
-   }
-   return info;
+    QWidget *w = const_cast<QWidget*>(widget);
+    HoverComplex *that = const_cast<HoverComplex*>(this);
+    Items::iterator it = that->items.find(w);
+    if (it == items.end())
+    {
+        // we have no entry yet
+        if (active == QStyle::SC_None)
+            return 0; // no need here
+        // ...but we'll need one
+        it = that->items.insert(w, ComplexInfo());
+        connect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release(QObject*)));
+        that->timer.start(timeStep, that);
+    }
+    // we now have an entry - check for validity and update in case
+    ComplexInfo *info = &it.value();
+    if (info->active != active)
+    {   // sth. changed
+        QStyle::SubControls diff = info->active ^ active;
+        QStyle::SubControls newActive = diff & active;
+        QStyle::SubControls newDead = diff & info->active;
+        info->fades[In] &= ~newDead; info->fades[In] |= newActive;
+        info->fades[Out] &= ~newActive; info->fades[Out] |= newDead;
+        info->active = active;
+        for (QStyle::SubControl control = (QStyle::SubControl)0x01;
+                                control <= (QStyle::SubControl)0x80;
+                                control = (QStyle::SubControl)(control<<1))
+        {
+            if (newActive & control)
+                info->steps[control] = 1;
+//             else if (newDead & control)
+//             {
+//                 info->steps[control] = maxSteps;
+//             }
+        }
+    }
+    return info;
 }
 
 
@@ -84,7 +90,8 @@ HoverComplex::timerEvent(QTimerEvent * event)
     bool update;
     Items::iterator it = items.begin();
     ComplexInfo *info;
-    while (it != items.end()) {
+    while (it != items.end())
+    {
         if (!it.key())
         {
             it = items.erase(it);
@@ -94,25 +101,28 @@ HoverComplex::timerEvent(QTimerEvent * event)
         update = false;
         for (QStyle::SubControl control = (QStyle::SubControl)0x01;
             control <= (QStyle::SubControl)0x80;
-            control = (QStyle::SubControl)(control<<1)) {
-                if (info->fades[In] & control) {
+            control = (QStyle::SubControl)(control<<1))
+            {
+                if (info->fades[In] & control)
+                {
                     update = true;
                     info->steps[control] += 2;
                     if (info->steps.value(control) > 4)
-                    info->fades[In] &= ~control;
+                        info->fades[In] &= ~control;
                 }
-                else if (info->fades[Out] & control) {
+                else if (info->fades[Out] & control)
+                {
                     update = true;
                     --info->steps[control];
                     if (info->steps.value(control) < 1)
-                    info->fades[Out] &= ~control;
+                        info->fades[Out] &= ~control;
                 }
             }
         if (update)
             it.key()->update();
         if (info->active == QStyle::SC_None && // needed to detect changes!
-            info->fades[Out] == QStyle::SC_None &&
-            info->fades[In] == QStyle::SC_None)
+                                                info->fades[Out] == QStyle::SC_None &&
+                                                info->fades[In] == QStyle::SC_None)
             it = items.erase(it);
         else
             ++it;
