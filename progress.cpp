@@ -201,6 +201,8 @@ drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
     p->drawEllipse(x,y+1,s+2,s);
 }
 
+static QPixmap renderPix;
+
 void
 Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QWidget *widget, bool content) const
 {
@@ -268,8 +270,10 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
 #endif
 
     // cause most chunks will look the same we render ONE into a buffer and then just dump that multiple times...
-    QPixmap renderPix(ss+2,ss+2);
+    if (renderPix.width() != ss+2)
+        renderPix = QPixmap(ss+2, ss+2);
     renderPix.fill(Qt::transparent);
+
     QPainter p(&renderPix);
     p.setRenderHint(QPainter::Antialiasing);
 
