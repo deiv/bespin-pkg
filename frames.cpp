@@ -129,8 +129,8 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
     }
     if (hasFocus)
     {
-        rect.adjust(-F(2), -F(2), F(2), F(2));
-//         QColor h = FCOLOR(Highlight); h.setAlpha(128);
+//         rect.adjust(-F(2), -F(2), F(2), F(2));
+        QColor h = FCOLOR(Highlight); h.setAlpha(128);
         if (!fastFrame)
         if (const VisualFramePart* vfp = qobject_cast<const VisualFramePart*>(widget))
         {   // Looks somehow dull if a views header get's surrounded by the focus, ...but it
@@ -155,8 +155,8 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
                 rect.setTop(rect.top() + F(2) + hHeader->height());
             }
         }
-        lights.rect[false].render(rect, painter, FCOLOR(Highlight));
-//         mask->outline(rect, painter, h, F(3));
+//         lights.rect[false].render(rect, painter, FCOLOR(Highlight));
+        mask->outline(rect, painter, h, F(3));
         Tile::reset();
     }
 }
