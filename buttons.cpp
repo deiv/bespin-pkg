@@ -560,10 +560,10 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
     if (animStep > 0)
     {   // the drop ============================
         QColor c = Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg), 12-animStep, animStep);
-        const int off = dpi.ExclusiveIndicator/4;
+        const int off = (dpi.ExclusiveIndicator - (masks.radioIndicator.height() + 1))/2;
         QPoint xy = r.topLeft() + QPoint(off, off);
-//         const Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
-        fillWithMask(painter, xy, c, masks.radioIndicator);
+        const Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
+        fillWithMask(painter, xy, Gradients::pix(c, masks.radioIndicator.height(), Qt::Vertical, gt), masks.radioIndicator);
     }
 
 //     if (hasFocus)

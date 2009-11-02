@@ -332,7 +332,8 @@ Style::generatePixmaps()
 #if 0
     masks.radioIndicator = roundMask(Style::dpi.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
 #else
-    int s = (Style::dpi.ExclusiveIndicator)/4; s *= 2; // cause of int div...
+    int s = (Style::dpi.ExclusiveIndicator)/5;
+    s *= 2; // cause of int div...
     s += F(2); // cause sunken frame "outer" part covers F(2) pixels
     masks.radioIndicator = roundMask(Style::dpi.ExclusiveIndicator - s);
 #endif
