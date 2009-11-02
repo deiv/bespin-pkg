@@ -78,9 +78,11 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
 
     const QColor *brush = 0;
     QRect rect = RECT;
+    bool fastFrame = false;
     if (qobject_cast<const QFrame*>(widget))
     {   // frame, can be killed unless...
-        if (isSpecialFrame(widget))
+        fastFrame = isSpecialFrame(widget);
+        if (fastFrame)
         {   // ...TextEdit, ...
             brush = &PAL.color(QPalette::Base);
             if (sunken)
@@ -115,7 +117,7 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
     if (brush)
         mask->render(rect, painter, *brush);
     if (shadow)
-        shadow->render(RECT, painter);
+            shadow->render(RECT, painter);
     else
     {   // plain frame
         //horizontal
@@ -127,7 +129,9 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
     }
     if (hasFocus)
     {
-        QColor h = FCOLOR(Highlight); h.setAlpha(128);
+        rect.adjust(-F(2), -F(2), F(2), F(2));
+//         QColor h = FCOLOR(Highlight); h.setAlpha(128);
+        if (!fastFrame)
         if (const VisualFramePart* vfp = qobject_cast<const VisualFramePart*>(widget))
         {   // Looks somehow dull if a views header get's surrounded by the focus, ...but it
             // still should inside the frame: don't dare!
@@ -143,15 +147,16 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
             if (vHeader && vHeader->isVisible())
             {
                 Tile::setShape(Tile::shape() & ~Tile::Left);
-                rect.setLeft(rect.left() + vHeader->width());
+                rect.setLeft(rect.left() + F(2) + vHeader->width());
             }
             if (hHeader && hHeader->isVisible())
             {
                 Tile::setShape(Tile::shape() & ~Tile::Top);
-                rect.setTop(rect.top() + hHeader->height());
+                rect.setTop(rect.top() + F(2) + hHeader->height());
             }
         }
-        mask->outline(rect, painter, h, F(3));
+        lights.rect[false].render(rect, painter, FCOLOR(Highlight));
+//         mask->outline(rect, painter, h, F(3));
         Tile::reset();
     }
 }
