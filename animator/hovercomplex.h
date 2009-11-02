@@ -34,7 +34,7 @@ class ComplexInfo
         inline int step(QStyle::SubControl sc) const {return steps.value(sc);}
     private:
         friend class HoverComplex;
-        QHash<QStyle::SubControl, int> steps;
+        QMap<QStyle::SubControl, int> steps;
 };
 
 class HoverComplex : public HoverIndex

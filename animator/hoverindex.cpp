@@ -25,14 +25,16 @@ Boston, MA 02110-1301, USA.
 using namespace Animator;
 
 int
-IndexInfo::step(long int index) const {
-   Fades::const_iterator i;
-   for (int dir = 0; dir < 2; ++dir) {
-      for (i = fades[dir].begin(); i != fades[dir].end(); ++i)
-         if (i.key() == index)
-            return i.value();
-   }
-   return 0;
+IndexInfo::step(long int index) const
+{
+    Fades::const_iterator i;
+    for (int dir = 0; dir < 2; ++dir)
+    {
+        for (i = fades[dir].begin(); i != fades[dir].end(); ++i)
+            if (i.key() == index)
+                return i.value();
+    }
+    return 0;
 }
 
 INSTANCE(HoverIndex)
@@ -56,42 +58,57 @@ const IndexInfo *
 HoverIndex::info(const QWidget *widget, long int idx)
 {
    if (!widget) return 0;
-   if (!instance) instance = new HoverIndex;
+   if (!instance)
+       instance = new HoverIndex;
    return instance->_info(widget, idx);
 }
 
 const IndexInfo *
 HoverIndex::_info(const QWidget *widget, long int idx) const
 {
-   HoverIndex *that = const_cast<HoverIndex*>(this);
-   QWidget *w = const_cast<QWidget*>(widget);
-   Items::iterator it = that->items.find(w);
-   if (it == items.end()) { // we have no entry yet
-      if (idx == 0L) return 0L;
-      // ... but we'll need one
-      it = that->items.insert(w, IndexInfo(0L));
-      connect(widget, SIGNAL(destroyed(QObject*)), this, SLOT(release(QObject*)));
-      if (!timer.isActive()) that->timer.start(timeStep, that);
-   }
-   // we now have an entry - check for validity and update in case
-   IndexInfo &info = it.value();
-   if (info.index != idx) { // sth. changed
-      info.fades[In][idx] = 1;
-      if (info.index)
-         info.fades[Out][info.index] = maxSteps;
-      info.index = idx;
-   }
-   return &info;
+    HoverIndex *that = const_cast<HoverIndex*>(this);
+    QWidget *w = const_cast<QWidget*>(widget);
+    Items::iterator it = that->items.find(w);
+    if (it == items.end())
+    {   // we have no entry yet
+        if (idx == 0L)
+            return 0L;
+        // ... but we'll need one
+        it = that->items.insert(w, IndexInfo(0L));
+        connect(widget, SIGNAL(destroyed(QObject*)), this, SLOT(release(QObject*)));
+//         if (!timer.isActive())
+            that->timer.start(timeStep, that);
+    }
+    // we now have an entry - check for validity and update in case
+    IndexInfo &info = it.value();
+    if (info.index != idx)
+    {   // sth. changed
+        info.fades[In][idx] = 1;
+        if (info.index)
+        {
+            int v = maxSteps;
+            IndexInfo::Fades::iterator old = info.fades[In].find(info.index);
+            if (old != info.fades[In].end())
+            {
+                v = old.value();
+                info.fades[In].erase(old);
+            }
+            info.fades[Out][info.index] = v;
+        }
+        info.index = idx;
+    }
+    return &info;
 }
 
 void
 HoverIndex::release(QObject *o)
 {
-   QWidget *w = qobject_cast<QWidget*>(o);
-   if (!w) return;
-   
-   items.remove(w);
-   if (items.isEmpty()) timer.stop();
+    QWidget *w = qobject_cast<QWidget*>(o);
+    if (!w) return;
+
+    items.remove(w);
+    if (items.isEmpty())
+        timer.stop();
 }
 
 
@@ -105,7 +122,8 @@ HoverIndex::timerEvent(QTimerEvent * event)
     IndexInfo::Fades::iterator step;
     it = items.begin();
     QWidget *w;
-    while (it != items.end()) {
+    while (it != items.end())
+    {
         if (!it.key())
         {
             it = items.erase(it);
@@ -137,7 +155,7 @@ HoverIndex::timerEvent(QTimerEvent * event)
         step = info.fades[Out].begin();
         while (step != info.fades[Out].end())
         {
-            --step.value();
+            step.value() -= 2;
             if (step.value() < 1)
                 step = info.fades[Out].erase(step);
             else

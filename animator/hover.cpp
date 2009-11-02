@@ -152,7 +152,7 @@ Hover::timerEvent(QTimerEvent * event)
         if (it.value().backwards)
         { // fade out
             --(*step);
-            widget->repaint();
+            widget->update();
             if (*step < 1)
             {
 #if WOBBLE_HOVER
@@ -168,7 +168,7 @@ Hover::timerEvent(QTimerEvent * event)
         else
         { // fade out
             *step += HOVER_IN_STEP;
-            widget->repaint();
+            widget->update();
             if ((uint)(*step) > maxSteps-2)
             {
 #if WOBBLE_HOVER
@@ -283,7 +283,7 @@ Hover::eventFilter( QObject* object, QEvent *e )
             if (!widget->isEnabled())
                 return false;
             if (widget->testAttribute(Qt::WA_UnderMouse))
-                widget->repaint();
+                widget->update();
             else
                 animator->fade(widget);
             return false;
@@ -296,7 +296,7 @@ Hover::eventFilter( QObject* object, QEvent *e )
             if (!widget->isEnabled())
                 return false;
             if (widget->testAttribute(Qt::WA_UnderMouse))
-                widget->repaint();
+                widget->update();
             else
                 animator->fade((QWidget*)(object), OUT);
             return false;

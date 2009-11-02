@@ -20,7 +20,6 @@ Boston, MA 02110-1301, USA.
 #define HOVER_INDEX_ANIMATOR_H
 
 #include <QBasicTimer>
-#include <QHash>
 #include <QMap>
 #include <QPointer>
 
@@ -35,7 +34,7 @@ public:
    virtual int step(long int idx = 0) const;
 protected:
    friend class HoverIndex;
-   typedef QHash<long int, int> Fades;
+   typedef QMap<long int, int> Fades;
    Fades fades[2];
    long int index;
 };
