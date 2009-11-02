@@ -95,7 +95,7 @@ Style::drawPushButtonBevel(const QStyleOption * option, QPainter * painter, cons
 
     ASSURE_OPTION(btn, Button);
 
-    if (btn->features & QStyleOptionButton::Flat)
+    if (btn->features & QStyleOptionBubtton::Flat)
         return;
 
     OPT_SUNKEN OPT_HOVER
@@ -169,8 +169,8 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
 
         // "Flash effect - is debatable"
-    if (sunken)
-        anim.step = hover = sunken = 0;
+//     if (sunken)
+//         anim.step = hover = sunken = 0;
         
 //    const bool toggled = !hover && (option->state & State_On);
     const bool round = !isCheckbox && (config.btn.round || (btn && btn->isCheckable()));
