@@ -37,46 +37,51 @@ static uint maxSteps = 6;
 void
 Hover::setDuration(uint ms)
 {
-   maxSteps = ms/_timeStep;
+    maxSteps = ms/_timeStep;
 }
 
-Hover::Hover() : Basic() {
-   timeStep = _timeStep;
+Hover::Hover() : Basic()
+{
+    timeStep = _timeStep;
 }
 
 bool
 Hover::manage(QWidget *w, bool isScrollArea)
 {
-   if (!w) return false;
-   if (!instance) instance = new Hover;
-      if (isScrollArea)
-         return instance->manageScrollArea(w);
-      else
-         return instance->_manage(w);
+    if (!w)
+        return false;
+    if (!instance)
+        instance = new Hover;
+    if (isScrollArea)
+        return instance->manageScrollArea(w);
+    else
+        return instance->_manage(w);
 }
 
 bool
 Hover::managesArea(QWidget *area)
 {
-   if (!instance) return false;
-   return instance->_scrollAreas.contains(area);
+    if (!instance)
+        return false;
+    return instance->_scrollAreas.contains(area);
 }
 
 bool
 Hover::manageScrollArea(QWidget *area)
 {
-   if (!area) return false;
-   area->removeEventFilter(this); // just to be sure...
-   area->installEventFilter(this);
+    if (!area)
+        return false;
+    area->removeEventFilter(this); // just to be sure...
+    area->installEventFilter(this);
 
-   if (qobject_cast<QAbstractScrollArea*>(area))
-      return true; // nope, catched by qobject_cast
+    if (qobject_cast<QAbstractScrollArea*>(area))
+        return true; // nope, catched by qobject_cast
 
-   if (_scrollAreas.contains(area))
-      return false; // we already have this as scrollarea
+    if (_scrollAreas.contains(area))
+        return false; // we already have this as scrollarea
 
-   _scrollAreas.append(area); // manage by itemlist
-   return true;
+    _scrollAreas.append(area); // manage by itemlist
+    return true;
 }
 
 void
@@ -89,36 +94,17 @@ Hover::Play(QWidget *widget, bool bwd)
 void
 Hover::play(QWidget *widget, bool bwd)
 {
-   if (!widget) return;
+    if (!widget)
+        return;
 
-   const bool needTimer = noAnimations();
-   Items::iterator it = items.find(widget);
-   if (it == items.end())
-      it = items.insert(widget, Info(bwd ? maxSteps : 1, bwd));
-   else
-      it.value().backwards = bwd;
-   if (needTimer) timer.start(timeStep, this);
-}
-
-void
-Hover::_setFPS(uint fps)
-{
-   maxSteps = (1000 * maxSteps) / (timeStep * fps);
-   timeStep = 1000/fps;
-   if (timer.isActive()) timer.start(timeStep, this);
-}
-
-int
-Hover::_step(const QWidget *widget, long int) const
-{
-   if (!widget || !widget->isEnabled()) return 0;
-   
-   Items::const_iterator it = items.find(const_cast<QWidget*>(widget));
-   if (it != items.end())
-      return it.value().step() + !it.value().backwards; // (map 1,3,5 -> 2,4,6)
-   if (widget->testAttribute(Qt::WA_UnderMouse))
-      return maxSteps;
-   return 0;
+    const bool needTimer = noAnimations(); // true by next lines
+    Items::iterator it = items.find(widget);
+    if (it == items.end())
+        it = items.insert(widget, Info(bwd ? maxSteps : 1, bwd));
+    else
+        it.value().backwards = bwd;
+    if (needTimer)
+        timer.start(timeStep, this);
 }
 
 // works, cpu load is ok, but REALLY annoying!
@@ -131,6 +117,29 @@ Hover::_step(const QWidget *widget, long int) const
 #endif
 
 void
+Hover::_setFPS(uint fps)
+{
+    maxSteps = (1000 * maxSteps) / (timeStep * fps);
+    timeStep = 1000/fps;
+    if (timer.isActive())
+        timer.start(timeStep, this);
+}
+
+int
+Hover::_step(const QWidget *widget, long int) const
+{
+    if (!widget || !widget->isEnabled())
+        return 0;
+
+    Items::const_iterator it = items.find(const_cast<QWidget*>(widget));
+    if (it != items.end())
+        return it.value().step() + !it.value().backwards; // (map 1,3,5 -> 2,4,6)
+    if (widget->testAttribute(Qt::WA_UnderMouse))
+        return maxSteps;
+    return 0;
+}
+
+void
 Hover::timerEvent(QTimerEvent * event)
 {
     if (event->timerId() != timer.timerId() || noAnimations())
@@ -139,41 +148,40 @@ Hover::timerEvent(QTimerEvent * event)
     Items::iterator it = items.begin();
     int *step = 0;
     QWidget *widget = 0;
-    bool mkProper = false;
     while (it != items.end())
     {
         widget = it.key();
         if (!widget)
         {
-            mkProper = true;
-            ++it; continue;
+            it = items.erase(it);
+            continue;
         }
         step = &it.value()._step;
         if (it.value().backwards)
-        { // fade out
+        {   // fade OUT
             --(*step);
             widget->update();
             if (*step < 1)
             {
 #if WOBBLE_HOVER
-            if (widget->testAttribute(Qt::WA_UnderMouse))
-               it.value().fadeIn = true;
-            else
+                if (widget->testAttribute(Qt::WA_UnderMouse))
+                    it.value().backwards = false;
+                else
 #endif
-                it = items.erase(it);
+                    it = items.erase(it);
             }
             else
                 ++it;
         }
         else
-        { // fade out
+        {   // fade IN
             *step += HOVER_IN_STEP;
             widget->update();
             if ((uint)(*step) > maxSteps-2)
             {
 #if WOBBLE_HOVER
                 if (widget->testAttribute(Qt::WA_UnderMouse))
-                    it.value().fadeIn = false;
+                    it.value().backwards = true;
                 else
 #endif
                     it = items.erase(it);
@@ -182,19 +190,18 @@ Hover::timerEvent(QTimerEvent * event)
                 ++it;
         }
     }
-    if (mkProper)
-        _release(NULL);
-    else if (noAnimations())
+    if (noAnimations())
         timer.stop();
 }
 
 #define HANDLE_SCROLL_AREA_EVENT(_DIR_) \
 if (area->horizontalScrollBar()->isVisible())\
-play(area->horizontalScrollBar(), _DIR_);\
+    play(area->horizontalScrollBar(), _DIR_);\
 if (area->verticalScrollBar()->isVisible())\
-play(area->verticalScrollBar(), _DIR_)
+    play(area->verticalScrollBar(), _DIR_)
 
-#define isAttachedScrollbar (kid && kid->parent() == object)\
+#define isAttachedScrollbar\
+/*if*/ (kid && kid->parent() == object)\
 if ((sb = qobject_cast<QScrollBar*>(kid)))
 
 

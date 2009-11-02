@@ -45,17 +45,18 @@ Basic::Basic() : QObject(), timeStep(_timeStep), count(0) {}
 bool
 Basic::_manage(QWidget *w)
 {
-   // just to be sure...
-   disconnect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
-   w->removeEventFilter(this);
+    // just to be sure...
+    disconnect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
+    w->removeEventFilter(this);
 
-   connect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
-   if (w->isVisible()) {
-      QEvent ev(QEvent::Show);
-      eventFilter(w, &ev);
-   }
-   w->installEventFilter(this);
-   return true;
+    connect(w, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
+    if (w->isVisible())
+    {
+        QEvent ev(QEvent::Show);
+        eventFilter(w, &ev);
+    }
+    w->installEventFilter(this);
+    return true;
 }
 
 void
@@ -64,7 +65,8 @@ Basic::_release(QWidget *w)
     if (w)
         w->removeEventFilter(instance);
     items.remove(w);
-    if (noAnimations()) {
+    if (noAnimations())
+    {
         timer.stop();
 //       delete instance; instance = 0; // nope, TODO check whether the eventFilter is used at all!
     }
@@ -73,25 +75,26 @@ Basic::_release(QWidget *w)
 void
 Basic::play(QWidget *widget, bool bwd)
 {
-   if (!widget) return;
-//    if (items.contains(w)) return;
-   const bool needTimer = noAnimations();
-   items[widget].init(0, bwd);
-   if (needTimer) timer.start(timeStep, this);
+    if (!widget)
+        return;
+    const bool needTimer = noAnimations();
+    items[widget].init(0, bwd);
+    if (needTimer)
+        timer.start(timeStep, this);
 }
 
 void
 Basic::_setFPS(uint fps)
 {
-   timeStep = 1000/fps;
-   if (timer.isActive())
-      timer.start(timeStep, this);
+    timeStep = 1000/fps;
+    if (timer.isActive())
+        timer.start(timeStep, this);
 }
 
 int
 Basic::_step(const QWidget *widget, long int index) const
 {
-   return info(widget, index).step(index);
+    return info(widget, index).step(index);
 }
 
 const Info &
@@ -107,66 +110,69 @@ Basic::info(const QWidget *widget, long int) const
 bool
 Basic::noAnimations() const
 {
-   return items.isEmpty();
+    return items.isEmpty();
 }
 
 void
 Basic::release_s(QObject *obj)
 {
-   _release(qobject_cast<QWidget*>(obj));
+    _release(qobject_cast<QWidget*>(obj));
 }
 
 void
 Basic::timerEvent(QTimerEvent * event)
 {
-   if (event->timerId() != timer.timerId() || noAnimations())
-      return;
-   //Update the registered progressbars.
-   Items::iterator iter;
-   QWidget *w;
-   bool mkProper = false;
-   for (iter = items.begin(); iter != items.end(); iter++) {
-        w = iter.key();
+    if (event->timerId() != timer.timerId() || noAnimations())
+        return;
+    //Update the registered progressbars.
+    QWidget *w;
+    Items::iterator it = items.begin();
+    while (it != items.end())
+    {
+        w = it.key();
         if (!w)
         {
-            mkProper = true;
+            it = items.erase(it);
             continue;
         }
         if (w->paintingActive() || !w->isVisible())
             continue;
-        ++iter.value();
+        ++it.value();
         w->repaint();
-   }
-   if (mkProper)
-        _release(NULL);
+        ++it;
+    }
 }
 
 bool
-Basic::eventFilter( QObject* object, QEvent *e ) {
-   
+Basic::eventFilter( QObject* object, QEvent *e )
+{
    QWidget* widget = qobject_cast<QWidget*>(object);
    if (!(widget && widget->isVisible()))
       return false;
    
-   switch (e->type()) {
-   case QEvent::MouseMove:
-   case QEvent::Timer:
-   case QEvent::Move:
-   case QEvent::Paint:
-      return false; // just for performance - they can occur really often
-      
-   case QEvent::Show:
-      if (widget->isEnabled()) play(widget);
-      return false;
-   case QEvent::Hide:
-      _release(widget);
-      return false;
-   case QEvent::EnabledChange:
-      if (widget->isEnabled()) play(widget);
-      else _release(widget);
-      return false;
-   default:
-      return false;
+   switch (e->type())
+   {
+    case QEvent::MouseMove:
+    case QEvent::Timer:
+    case QEvent::Move:
+    case QEvent::Paint:
+        return false; // just for performance - they can occur really often
+
+    case QEvent::Show:
+        if (widget->isEnabled())
+            play(widget);
+        return false;
+    case QEvent::Hide:
+        _release(widget);
+        return false;
+    case QEvent::EnabledChange:
+        if (widget->isEnabled())
+            play(widget);
+        else
+            _release(widget);
+        return false;
+    default:
+        return false;
    }
 }
 
