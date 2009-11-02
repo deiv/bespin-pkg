@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,8 +12,10 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="im-away.svg">
+   inkscape:version="0.46"
+   sodipodi:docname="im-busy.svg"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
     <inkscape:path-effect
@@ -54,15 +55,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.484375"
-     inkscape:cx="64"
-     inkscape:cy="65.023001"
+     inkscape:cx="33.985834"
+     inkscape:cy="71.80265"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1418"
-     inkscape:window-height="936"
-     inkscape:window-x="269"
-     inkscape:window-y="78"
+     inkscape:window-height="841"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -80,7 +81,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -91,21 +92,8 @@
      transform="translate(0,-924.36218)">
     <path
        style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="M 64 0 C 28.653776 7.1054274e-15 -1.1242185e-16 28.653776 0 64 C 0 99.346224 28.653776 128 64 128 C 99.346224 128 128 99.346224 128 64 C 128 28.653776 99.346224 -1.4323277e-14 64 0 z M 16 56 L 112 56 L 112 72 L 16 72 L 16 56 z "
+       d="M 64 0 C 28.653776 7.1054274e-15 -1.110223e-16 28.653776 0 64 C 0 99.346224 28.653776 128 64 128 C 99.346224 128 128 99.346224 128 64 C 128 28.653776 99.346224 -1.4321877e-14 64 0 z M 21.1875 56.40625 L 63.6875 56.40625 L 64.28125 56.40625 L 106.78125 56.40625 C 111.99548 56.40625 116.1875 59.764659 116.1875 63.96875 C 116.1875 68.17284 111.99548 71.562503 106.78125 71.5625 L 64.28125 71.5625 L 63.6875 71.5625 L 21.1875 71.5625 C 15.973266 71.56251 11.75 68.172849 11.75 63.96875 C 11.75 59.76466 15.973266 56.406249 21.1875 56.40625 z "
        transform="translate(0,924.36218)"
        id="path3798" />
-    <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m -12,904.36218 c 0,0 -38.4,52.80004 -38.4,52.80004 0,0 -14.4,-19.20004 -14.4,-19.20004 0,0 -19.2,0 -19.2,0 9.6,14.40002 28.8,38.40004 33.6,43.20004 4.820789,-4.7977 57.6,-76.80004 57.6,-76.80004 0,0 -19.2,0 -19.2,0 z"
-       id="path3802"
-       sodipodi:nodetypes="cccccsc" />
-    <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 17.125,825.48718 -11.3125,11.3125 26.875,26.875 -26.875,26.87502 11.3125,11.3125 26.875,-26.875 26.875,26.875 11.3125,-11.3125 -26.875,-26.87502 26.875,-26.875 -11.3125,-11.3125 -26.875,26.875 -26.875,-26.875 z"
-       id="rect3836" />
-    <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 99.71875,860.17468 0,56 4,0 0,0.1875 40.28125,0 0,-16.1875 -36.28125,0 0,-40 -8,0 z"
-       id="rect3863" />
   </g>
 </svg>
