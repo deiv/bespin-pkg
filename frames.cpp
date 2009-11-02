@@ -147,12 +147,12 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
             if (vHeader && vHeader->isVisible())
             {
                 Tile::setShape(Tile::shape() & ~Tile::Left);
-                rect.setLeft(rect.left() + F(2) + vHeader->width());
+                rect.setLeft(rect.left() + /*F(2) +*/ vHeader->width());
             }
             if (hHeader && hHeader->isVisible())
             {
                 Tile::setShape(Tile::shape() & ~Tile::Top);
-                rect.setTop(rect.top() + F(2) + hHeader->height());
+                rect.setTop(rect.top() + /*F(2) +*/ hHeader->height());
             }
         }
 //         lights.rect[false].render(rect, painter, FCOLOR(Highlight));
