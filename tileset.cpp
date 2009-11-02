@@ -275,6 +275,19 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
         yOff += tlh;
         h -= tlh;
 
+        checkRect.setRect(xOff, r.y(), w, tlh);
+        if (w > 0 && !pixmap[TopMid].isNull() && UNCLIPPED)
+        {   // upper line
+            if (NEED_RECT_FILL(TopMid))
+                p->drawTiledPixmap(checkRect, *_texPix, QPoint(xOff, r.y()) - off);
+            else
+            {
+                tile = &pixmap[TopMid];
+                MAKE_FILL(QPoint(xOff, r.y()));
+                p->drawTiledPixmap(checkRect, *tile);
+            }
+        }
+        
         checkRect.setRect(r.x(),r.y(), tlw, tlh);
         if ((pf & Left) && UNCLIPPED)
         {
@@ -289,20 +302,6 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
             tile = &pixmap[TopRight];
             MAKE_FILL(r.topRight()-tile->rect().topRight());
             p->drawPixmap(rOff, r.y(), *tile, width(TopRight)-trw, 0, trw, trh);
-//             p->fillRect(checkRect, Qt::red);
-        }
-
-        checkRect.setRect(xOff, r.y(), w, tlh);
-        if (w > 0 && !pixmap[TopMid].isNull() && UNCLIPPED)
-        {   // upper line
-            if (NEED_RECT_FILL(TopMid))
-                p->drawTiledPixmap(checkRect, *_texPix, QPoint(xOff, r.y()) - off);
-            else
-            {
-                tile = &pixmap[TopMid];
-                MAKE_FILL(QPoint(xOff, r.y()));
-                p->drawTiledPixmap(checkRect, *tile);
-            }
         }
     }
     
