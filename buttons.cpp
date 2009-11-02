@@ -169,11 +169,12 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
 
         // "Flash effect - is debatable"
-//     if (sunken) animStep = hover = sunken = 0;
+    if (sunken)
+        anim.step = hover = sunken = 0;
         
 //    const bool toggled = !hover && (option->state & State_On);
     const bool round = !isCheckbox && (config.btn.round || (btn && btn->isCheckable()));
-    const bool fullHover = config.btn.fullHover ||
+    const bool fullHover =  config.btn.fullHover ||
                             (isCheckbox && (config.btn.layer || config.btn.checkType == Check::O));
 
     int iOff[4] = {0,0,0,0};
@@ -392,8 +393,7 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
 }
 
 void
-Style::drawCheckBox(const QStyleOption * option, QPainter * painter,
-                          const QWidget * widget) const
+Style::drawCheckBox(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     B_STATES
     if ( widget && widget->inherits("QWebView") )
@@ -539,13 +539,14 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
                    masks.radioIndicator);
    }
 #else
-//     painter->fillRect(RECT, Qt::red);
+
     QRect r = RECT.adjusted(f1,f1,-f1,-f1);
     QColor bg = isEnabled ? CCOLOR(btn.std, Bg) : FCOLOR(Window);
     if (hasFocus)
     {
         const int contrast = Colors::contrast(bg, FCOLOR(Highlight));
-        if (contrast > 10) {
+        if (contrast > 10)
+        {
             masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
             bg = Colors::mid(bg, FCOLOR(Highlight), contrast/5, 1);
         }
@@ -565,62 +566,52 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
         const Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
         fillWithMask(painter, xy, Gradients::pix(c, masks.radioIndicator.height(), Qt::Vertical, gt), masks.radioIndicator);
     }
-
-//     if (hasFocus)
-//     {
-//         r = RECT; r.setTop(r.top()+F(2));
-//         masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
-//     }
 #endif
 }
 
 //    case PE_FrameButtonBevel: // Panel frame for a button bevel
 
 void
-Style::drawRadioItem(const QStyleOption * option, QPainter * painter,
-                           const QWidget * widget) const
+Style::drawRadioItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-   ASSURE_OPTION(btn, Button);
-   QStyleOptionButton subopt = *btn;
-   subopt.rect = subElementRect(SE_RadioButtonIndicator, btn, widget);
-   drawRadio(&subopt, painter, widget);
-   subopt.rect = subElementRect(SE_RadioButtonContents, btn, widget);
-   drawCheckLabel(&subopt, painter, widget);
+    ASSURE_OPTION(btn, Button);
+    QStyleOptionButton subopt = *btn;
+    subopt.rect = subElementRect(SE_RadioButtonIndicator, btn, widget);
+    drawRadio(&subopt, painter, widget);
+    subopt.rect = subElementRect(SE_RadioButtonContents, btn, widget);
+    drawCheckLabel(&subopt, painter, widget);
 }
 
 void
-Style::drawCheckBoxItem(const QStyleOption * option, QPainter * painter,
-                              const QWidget * widget) const
+Style::drawCheckBoxItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-   ASSURE_OPTION(btn, Button);
-   QStyleOptionButton subopt = *btn;
-   subopt.rect = subElementRect(SE_CheckBoxIndicator, btn, widget);
-   drawCheckBox(&subopt, painter, widget);
-   subopt.rect = subElementRect(SE_CheckBoxContents, btn, widget);
-   drawCheckLabel(&subopt, painter, widget);
+    ASSURE_OPTION(btn, Button);
+    QStyleOptionButton subopt = *btn;
+    subopt.rect = subElementRect(SE_CheckBoxIndicator, btn, widget);
+    drawCheckBox(&subopt, painter, widget);
+    subopt.rect = subElementRect(SE_CheckBoxContents, btn, widget);
+    drawCheckLabel(&subopt, painter, widget);
 }
 
 void
-Style::drawCheckLabel(const QStyleOption * option, QPainter * painter,
-                            const QWidget * /*widget*/) const
+Style::drawCheckLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
-   ASSURE_OPTION(btn, Button);
-   OPT_ENABLED;
-   
-   uint alignment =
-      visualAlignment(btn->direction, Qt::AlignLeft | Qt::AlignVCenter);
+    ASSURE_OPTION(btn, Button);
+    OPT_ENABLED;
 
-   QRect textRect = RECT;
-   if (!btn->icon.isNull()) {
-      const QPixmap pix =
-         btn->icon.pixmap(btn->iconSize,
-                          isEnabled ? QIcon::Normal : QIcon::Disabled);
-      drawItemPixmap(painter, btn->rect, alignment, pix);
-      if (btn->direction == Qt::RightToLeft)
-         textRect.setRight(textRect.right() - btn->iconSize.width() - F(4));
-      else
-         textRect.setLeft(textRect.left() + btn->iconSize.width() + F(4));
-   }
-   if (!btn->text.isEmpty())
-      drawItemText(painter, textRect, alignment | BESPIN_MNEMONIC, PAL, isEnabled, btn->text, QPalette::WindowText);
+    uint alignment = visualAlignment(btn->direction, Qt::AlignLeft | Qt::AlignVCenter);
+    QRect textRect = RECT;
+    
+    if (!btn->icon.isNull())
+    {
+        const QPixmap pix =
+            btn->icon.pixmap(btn->iconSize, isEnabled ? QIcon::Normal : QIcon::Disabled);
+        drawItemPixmap(painter, btn->rect, alignment, pix);
+        if (btn->direction == Qt::RightToLeft)
+            textRect.setRight(textRect.right() - btn->iconSize.width() - F(4));
+        else
+            textRect.setLeft(textRect.left() + btn->iconSize.width() + F(4));
+    }
+    if (!btn->text.isEmpty())
+        drawItemText(painter, textRect, alignment | BESPIN_MNEMONIC, PAL, isEnabled, btn->text, QPalette::WindowText);
 }
