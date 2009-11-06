@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -8,16 +9,17 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64px"
-   height="64px"
+   width="128"
+   height="128"
    id="svg2383"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docname="edit-redo.svg"
+   inkscape:version="0.47pre2 r22153"
+   sodipodi:docname="edit-undo.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/view-refresh.png"
    inkscape:export-xdpi="67.5"
-   inkscape:export-ydpi="67.5">
+   inkscape:export-ydpi="67.5"
+   version="1.1">
   <defs
      id="defs2385">
     <inkscape:perspective
@@ -35,20 +37,25 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="13.53125"
-     inkscape:cx="32"
-     inkscape:cy="32"
+     inkscape:zoom="6.5234375"
+     inkscape:cx="63.846707"
+     inkscape:cy="64"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="1724"
-     inkscape:window-height="1068"
-     inkscape:window-x="142"
-     inkscape:window-y="18">
+     inkscape:window-width="1662"
+     inkscape:window-height="1075"
+     inkscape:window-x="177"
+     inkscape:window-y="17"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
-       id="grid3165" />
+       id="grid3165"
+       empspacing="8"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <metadata
      id="metadata2388">
@@ -58,35 +65,22 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
      id="layer1"
      inkscape:label="Layer 1"
-     inkscape:groupmode="layer">
-    <g
-       id="g3177"
-       transform="matrix(-1,0,0,1,64.958637,1.040245)"
-       style="opacity:0.66000001">
-      <path
-         sodipodi:nodetypes="cs"
-         inkscape:connector-type="polyline"
-         id="path3155"
-         d="M 48.184758,55.87067 C 51.316869,35.645664 54.764726,15.489058 24.092379,15.74134"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8.39999962;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="M 23.464203,15.743649 L 34.254042,4.8799081"
-         id="path3167"
-         inkscape:connector-type="polyline"
-         sodipodi:nodetypes="cc" />
-      <path
-         sodipodi:nodetypes="cc"
-         inkscape:connector-type="polyline"
-         id="path3169"
-         d="M 23.501154,15.959755 L 34.290993,26.823497"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    </g>
+     inkscape:groupmode="layer"
+     transform="translate(0,64)">
+    <path
+       style="fill:#8f8f8f;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="m 97.09375,-54.78125 c 0.323599,0.195954 0.648935,0.392257 0.96875,0.59375 -0.319726,-0.201336 -0.645246,-0.397946 -0.96875,-0.59375 z M 126,-16 c 1.31533,5.112292 2,10.477153 2,16 0,35.346224 -28.653776,64 -64,64 -5.522847,0 -10.887708,-0.68467 -16,-2 L 48,8 c 0,-13.296 10.704,-24 24,-24 l 54,0 z M 9.21875,33.09375 C 9.41455,33.417254 9.61116,33.742774 9.8125,34.0625 9.61101,33.742685 9.4147,33.417349 9.21875,33.09375 z"
+       id="path2858" />
+    <path
+       style="fill:#424242;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="m 64,-64 c 20.232491,0 38.24071,9.404438 49.96875,24.0625 C 113.31575,-39.968892 112.66105,-40 112,-40 l -48,0 C 41.84,-40 24,-22.16 24,0 l 0,4 0,44 c 0,0.66105 0.03111,1.31575 0.0625,1.96875 C 24.03961,49.95043 24.02287,49.9246 24,49.90625 L 24,68 c 0,2.216 -1.784,4 -4,4 L 4,72 C 1.784,72 0,70.216 0,68 L 0,4 C 0,3.765055 0.05525,3.536121 0.09375,3.3125 0.0379,2.217317 0,1.109223 0,0 0,-35.346224 28.653776,-64 64,-64 z"
+       id="path2842" />
   </g>
 </svg>

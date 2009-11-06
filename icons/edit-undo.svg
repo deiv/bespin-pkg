@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -8,16 +9,17 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64px"
-   height="64px"
+   width="128"
+   height="128"
    id="svg2383"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47pre2 r22153"
    sodipodi:docname="edit-undo.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/view-refresh.png"
    inkscape:export-xdpi="67.5"
-   inkscape:export-ydpi="67.5">
+   inkscape:export-ydpi="67.5"
+   version="1.1">
   <defs
      id="defs2385">
     <inkscape:perspective
@@ -35,20 +37,25 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="13.53125"
-     inkscape:cx="32"
-     inkscape:cy="32"
+     inkscape:zoom="6.5234375"
+     inkscape:cx="63.846707"
+     inkscape:cy="51.736527"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="1724"
-     inkscape:window-height="1068"
-     inkscape:window-x="142"
-     inkscape:window-y="18">
+     inkscape:window-width="1662"
+     inkscape:window-height="1075"
+     inkscape:window-x="177"
+     inkscape:window-y="17"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
-       id="grid3165" />
+       id="grid3165"
+       empspacing="8"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <metadata
      id="metadata2388">
@@ -64,29 +71,17 @@
   <g
      id="layer1"
      inkscape:label="Layer 1"
-     inkscape:groupmode="layer">
-    <g
-       id="g3177"
-       transform="translate(-0.812933,1.176503)"
-       style="opacity:0.66000004">
-      <path
-         sodipodi:nodetypes="cs"
-         inkscape:connector-type="polyline"
-         id="path3155"
-         d="M 48.184758,55.87067 C 51.316869,35.645664 54.764726,15.489058 24.092379,15.74134"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8.39999961999999911;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="M 23.464203,15.743649 L 34.254042,4.8799081"
-         id="path3167"
-         inkscape:connector-type="polyline"
-         sodipodi:nodetypes="cc" />
-      <path
-         sodipodi:nodetypes="cc"
-         inkscape:connector-type="polyline"
-         id="path3169"
-         d="M 23.501154,15.959755 L 34.290993,26.823497"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    </g>
+     inkscape:groupmode="layer"
+     transform="translate(0,64)">
+    <path
+       style="fill:#8f8f8f;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="M 30.90625 9.21875 C 30.582651 9.4147041 30.257315 9.6110068 29.9375 9.8125 C 30.257226 9.6111638 30.582746 9.414554 30.90625 9.21875 z M 2 48 C 0.68466566 53.112292 -1.7565914e-17 58.477153 0 64 C 0 99.346224 28.653776 128 64 128 C 69.522847 128 74.887708 127.31533 80 126 L 80 72 C 80 58.704 69.296 48 56 48 L 2 48 z M 118.78125 97.09375 C 118.58545 97.417254 118.38884 97.742774 118.1875 98.0625 C 118.38899 97.742685 118.5853 97.417349 118.78125 97.09375 z "
+       transform="translate(0,-64)"
+       id="path2858" />
+    <path
+       style="fill:#424242;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="M 64 0 C 43.767509 4.0672095e-15 25.759289 9.4044379 14.03125 24.0625 C 14.684254 24.031108 15.338948 24 16 24 L 64 24 C 86.16 24 104 41.84 104 64 L 104 68 L 104 112 C 104 112.66105 103.96889 113.31575 103.9375 113.96875 C 103.96039 113.95043 103.97713 113.9246 104 113.90625 L 104 132 C 104 134.216 105.784 136 108 136 L 124 136 C 126.216 136 128 134.216 128 132 L 128 68 C 128 67.765055 127.94475 67.536121 127.90625 67.3125 C 127.9621 66.217317 128 65.109223 128 64 C 128 28.653776 99.346224 -1.4321877e-14 64 0 z "
+       transform="translate(0,-64)"
+       id="path2842" />
   </g>
 </svg>
