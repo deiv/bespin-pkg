@@ -715,11 +715,21 @@ Client::repaint(QPainter &p, bool paintTitle)
     {   // splitter
         QColor bg2 = color(ColorTitleBlend, isActive());
         p.setPen(Colors::mid(bg, Qt::black, 3, 1));
-        int y = myTitleSize-2;
-        p.drawLine(8, y, width()-8, y);
-        ++y;
-        p.setPen(Colors::mid(bg, Qt::white, 2, 1));
-        p.drawLine(8, y, width()-8, y);
+        int xy = myTitleSize-2;
+        if (Factory::verticalTitle())
+        {
+            p.drawLine(xy, 8, xy, height()-8);
+            ++xy;
+            p.setPen(Colors::mid(bg, Qt::white, 2, 1));
+            p.drawLine(xy, 8, xy, height()-8);
+        }
+        else
+        {
+            p.drawLine(8, xy, width()-8, xy);
+            ++xy;
+            p.setPen(Colors::mid(bg, Qt::white, 2, 1));
+            p.drawLine(8, xy, width()-8, xy);
+        }
     }
 
     paintTitle = paintTitle && !Factory::verticalTitle();
