@@ -246,7 +246,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
                 // because it's defined that it has to be this. Qt provides all these color roles just
                 // to waste space and time... ...
                 const QColor &fgColor = tbar->tabTextColor(index - 1);
-                const QColor &stdFgColor = CCOLOR(tab.std, Fg); // tbar->palette().color(tbar->foregroundRole());
+                const QColor &stdFgColor = tbar->palette().color(config.tab.std_role[Fg]);
                 if (fgColor.isValid() && fgColor != stdFgColor)
                 {
                     if (fgColor == tbar->palette().color(QPalette::WindowText))
@@ -254,7 +254,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
                     else // nope, this is really a custom color that will likley contrast just enough with QPalette::Window...
                     {
                         customColor = true;
-                        if (appType == Konversation)
+                        if (Colors::haveContrast(tbar->palette().color(config.tab.std_role[Bg]), fgColor))
                             painter->setPen(fgColor);
                     }
                 }
@@ -448,7 +448,7 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
     }
     else if (customColor)
     {
-        if (appType == Konversation)
+        if (Colors::haveContrast(CCOLOR(tab.std, Bg), painter->pen().color()))
             cF = painter->pen().color();
         QFont fnt = painter->font();
         fnt.setUnderline(true);
