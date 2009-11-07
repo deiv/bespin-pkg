@@ -61,37 +61,38 @@ void
 VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer)
 {
 
-   // first call, generate corner regions
-   if (corner[North].isEmpty()) {
-      int f5 = 4; // TODO: make this value dynamic!
-      QBitmap bm(2*f5, 2*f5);
-      bm.fill(Qt::black);
-      QPainter p(&bm);
-      p.setPen(Qt::NoPen);
-      p.setBrush(Qt::white);
-      p.drawEllipse(0,0,2*f5,2*f5);
-      p.end();
-      QRegion circle(bm);
-      corner[North] = circle & QRegion(0,0,f5,f5); // tl
-      corner[South] = circle & QRegion(f5,0,f5,f5); // tr
-      corner[South].translate(-corner[South].boundingRect().left(), 0);
-      corner[West] = circle & QRegion(0,f5,f5,f5); // bl
-      corner[West].translate(0, -corner[West].boundingRect().top());
-      corner[East] = circle & QRegion(f5,f5,f5,f5); // br
-      corner[East].translate(-corner[East].boundingRect().topLeft());
-   }
+    // first call, generate corner regions
+    if (corner[North].isEmpty())
+    {
+        int f5 = 4; // TODO: make this value dynamic!
+        QBitmap bm(2*f5, 2*f5);
+        bm.fill(Qt::black);
+        QPainter p(&bm);
+        p.setPen(Qt::NoPen);
+        p.setBrush(Qt::white);
+        p.drawEllipse(0,0,2*f5,2*f5);
+        p.end();
+        QRegion circle(bm);
+        corner[North] = circle & QRegion(0,0,f5,f5); // tl
+        corner[South] = circle & QRegion(f5,0,f5,f5); // tr
+        corner[South].translate(-corner[South].boundingRect().left(), 0);
+        corner[West] = circle & QRegion(0,f5,f5,f5); // bl
+        corner[West].translate(0, -corner[West].boundingRect().top());
+        corner[East] = circle & QRegion(f5,f5,f5,f5); // br
+        corner[East].translate(-corner[East].boundingRect().topLeft());
+    }
 
-   const Type t = type(shadow);
-   notInited &= ~(1 << t);
-   
-   sizes[t][North] = inner.y() - outer.y();
-   sizes[t][South] = outer.bottom() - inner.bottom();
-   sizes[t][East] = outer.right() - inner.right();
-   sizes[t][West] = inner.x() - outer.x();
-   extends[t][North] = -outer.y();
-   extends[t][South] = outer.bottom() - 99;
-   extends[t][East] = outer.right() - 99;
-   extends[t][West] = -outer.x();
+    const Type t = type(shadow);
+    notInited &= ~(1 << t);
+
+    sizes[t][North] = inner.y() - outer.y();
+    sizes[t][South] = outer.bottom() - inner.bottom();
+    sizes[t][East] = outer.right() - inner.right();
+    sizes[t][West] = inner.x() - outer.x();
+    extends[t][North] = -outer.y();
+    extends[t][South] = outer.bottom() - 99;
+    extends[t][East] = outer.right() - 99;
+    extends[t][West] = -outer.x();
 }
 
 class StdChildAdd : public QObject
@@ -186,10 +187,10 @@ VisualFrame::updateShape()
     
     if (myStyle != QFrame::StyledPanel)
     {
-        if (top) { top->deleteLater(); top = 0L; }
-        if (bottom) { bottom->deleteLater(); bottom = 0L; }
-        if (left) { left->deleteLater(); left = 0L; }
-        if (right) { right->deleteLater(); right = 0L; }
+        if (top) { top->hide(); top->deleteLater(); top = 0L; }
+        if (bottom) { bottom->hide(); bottom->deleteLater(); bottom = 0L; }
+        if (left) { left->hide(); left->deleteLater(); left = 0L; }
+        if (right) { right->hide(); right->deleteLater(); right = 0L; }
         myFrame->clearMask();
 
         QWidget *runner = myFrame->parentWidget();
