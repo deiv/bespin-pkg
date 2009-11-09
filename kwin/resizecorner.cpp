@@ -78,27 +78,31 @@ ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
 void
 ResizeCorner::raise()
 {
-    WId root, daddy = 0;
-    WId *kids = 0L;
-    uint numKids = 0;
-    XQueryTree(QX11Info::display(), client->windowId(), &root, &daddy, &kids, &numKids);
-    /*
-    while (numKids)
+    if ( client->isPreview() )
+        setParent( client->widget() );
+    else if ( WId window = client->windowId() )
     {
-        root = kids[--numKids];
-        if (root != winId())
-            break;
+        WId root, daddy = 0;
+        WId *kids = 0L;
+        uint numKids = 0;
+        XQueryTree(QX11Info::display(), window, &root, &daddy, &kids, &numKids);
+        if (daddy != root)
+            window = daddy;
+        if (window)
+        {
+            XReparentWindow( QX11Info::display(), winId(), window, 0, 0 );
+            move( client->width() - (CORNER_SIZE + CORNER_OFFSET),
+                  client->height() - (CORNER_SIZE + CORNER_OFFSET) );
+            client->widget()->removeEventFilter(this);
+            client->widget()->installEventFilter(this);
+        }
     }
-    */
-    if (daddy)
-        XReparentWindow( QX11Info::display(), winId(), daddy, 0, 0 );
-//     else
-//     {
-//         XReparentWindow( QX11Info::display(), winId(), client->windowId(), 0, 0 );
-//     }
-    move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
-    client->widget()->removeEventFilter(this);
-    client->widget()->installEventFilter(this);
+    else
+    {
+        hide();
+        return;
+    }
+    show();
 }
 
 void
@@ -113,9 +117,9 @@ ResizeCorner::setColor(const QColor &c)
 void
 ResizeCorner::move ( int x, int y )
 {
-   int l,r,t,b;
-   client->borders( l, r, t, b );
-   QWidget::move(x-(l+r), y-(t+b));
+    int l,r,t,b;
+    client->borders( l, r, t, b );
+    QWidget::move(x-(l+r), y-(t+b));
 }
 
 bool
@@ -130,7 +134,8 @@ ResizeCorner::eventFilter(QObject *obj, QEvent *e)
     }
 
     if ( obj == parent() && e->type() == QEvent::Resize)
-        move(client->width() - (CORNER_SIZE+CORNER_OFFSET), client->height() - (CORNER_SIZE+CORNER_OFFSET));
+        move(client->width() - (CORNER_SIZE + CORNER_OFFSET),
+             client->height() - (CORNER_SIZE + CORNER_OFFSET));
 
     return false;
 }
