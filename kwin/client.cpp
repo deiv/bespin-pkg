@@ -34,6 +34,7 @@
 #include <QX11Info>
 #include <QtDebug>
 
+#include <klocale.h>
 #include <kwindowinfo.h>
 #include <kwindowsystem.h>
 #include <netwm.h>
@@ -256,7 +257,7 @@ void
 Client::captionChange()
 {
     myCaption = trimm(caption());
-    myCaption.replace("[modified]", "*");
+    myCaption.replace(i18n("[modified]"), "*");
     if (Factory::verticalTitle() && buttons[Button::Multi])
         buttons[Button::Multi]->setToolTip(myCaption);
     else
