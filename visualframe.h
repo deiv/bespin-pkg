@@ -82,7 +82,7 @@ private:
     VisualFrame( QFrame *parent );
 //    ~VisualFrame();
     void updateShape();
-    QFrame *myFrame; // parent, to avoid nasty casting
+    QFrame *myFrame; // parent
     QWidget *myWindow;
     QFrame::Shape myStyle;
     VisualFramePart *top, *bottom, *left, *right;
@@ -91,6 +91,8 @@ private:
     static QStyle *ourStyle;
 private slots:
     void correctPosition();
+    void deleteMuchLater();
+    void hideMe();
 };
 
 #endif //VISUALFRAME_H

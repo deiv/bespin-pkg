@@ -100,7 +100,7 @@ class StdChildAdd : public QObject
 public:
     bool eventFilter( QObject *, QEvent *ev)
     {
-        return (ev->type() == QEvent::ChildAdded);
+        return (ev->type() == QEvent::ChildAdded || ev->type() == QEvent::ChildInserted);
     }
 };
 
@@ -148,8 +148,8 @@ VisualFrame::release(QFrame *frame)
 }
 
 // TODO: mange ALL frames and catch shape/shadow changes!!!
-VisualFrame::VisualFrame(QFrame *parent) : QObject(parent),
-myFrame(0), myWindow(0), hidden(true), top(0), bottom(0), left(0), right(0)
+VisualFrame::VisualFrame(QFrame *parent) : QObject(0),
+myFrame(0), myWindow(0), top(0), bottom(0), left(0), right(0), hidden(true)
 {
     myStyle = (QFrame::Shape)-1;
     if (notInited)
@@ -166,19 +166,17 @@ myFrame(0), myWindow(0), hidden(true), top(0), bottom(0), left(0), right(0)
    // create frame elements
    myFrame = parent;
    myFrame->installEventFilter(this);
-   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
-   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(hideMe()));
+   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteMuchLater()));
    updateShape();
 }
 
-// VisualFrame::~VisualFrame()
-// {
-//    delete top; top = 0L;
-//    delete bottom; bottom = 0L;
-//    delete left; left = 0L;
-//    delete right; right = 0L;
-//    QObject::~QObject();
-// }
+void
+VisualFrame::deleteMuchLater() // more or less ensure we get deleted after the parts
+{
+    QTimer::singleShot(500, this, SLOT(deleteLater()));
+}
+
 
 void
 VisualFrame::updateShape()
@@ -321,9 +319,15 @@ VisualFrame::show()
 }
 
 void
-VisualFrame::hide()
+VisualFrame::hideMe()
 {
     hidden = true;
+}
+
+void
+VisualFrame::hide()
+{
+    hideMe();
     if (myStyle != QFrame::StyledPanel)
         return;
     PARTS(hide());
@@ -481,7 +485,7 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
 VisualFramePart::VisualFramePart(QWidget * parent, QFrame *frame, VisualFrame *vFrame, Side side) :
 QWidget(parent), myFrame(frame), _vFrame(vFrame), _side(side)
 {
-   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(hide()));
+   connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(hide())); // done by vframe
    connect(myFrame, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
 //    setMouseTracking ( true );
 //    setAcceptDrops(true);
