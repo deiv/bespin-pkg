@@ -100,50 +100,56 @@ newPix(int size, Qt::Orientation o, QPoint *start, QPoint *stop, int other = 32)
 
 
 static inline QLinearGradient
-simpleGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
-   QLinearGradient lg(start, stop);
-   lg.setColorAt(0, c.light(112));
-   lg.setColorAt(1, c.dark(110));
-   return lg;
+simpleGradient(const QColor &c, const QPoint &start, const QPoint &stop)
+{
+    QLinearGradient lg(start, stop);
+    lg.setColorAt(0, Gradients::endColor(c, Gradients::Top, Gradients::Simple));
+    lg.setColorAt(1, Gradients::endColor(c, Gradients::Bottom, Gradients::Simple));
+    return lg;
 }
 
 static inline QLinearGradient
-metalGradient(const QColor &c, const QPoint &start, const QPoint &stop) {
-   QLinearGradient lg(start, stop);
-   QColor iC = c.light(108); lg.setColorAt(0, iC);
-   iC = c.light(105); lg.setColorAt(0.45, iC);
-   iC = c.dark(105); lg.setColorAt(0.451, iC);
-   iC = c.dark(112); lg.setColorAt(1, iC);
-   return lg;
+metalGradient(const QColor &c, const QPoint &start, const QPoint &stop)
+{
+    QLinearGradient lg(start, stop);
+    lg.setColorAt(0, Gradients::endColor(c, Gradients::Top, Gradients::Metal));
+    lg.setColorAt(0.45, c.lighter(105));
+    lg.setColorAt(0.451, c.darker(105));
+    lg.setColorAt(1, Gradients::endColor(c, Gradients::Bottom, Gradients::Metal));
+    return lg;
 }
 
 static inline QLinearGradient
 sunkenGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 {
     QLinearGradient lg(start, stop);
-    lg.setColorAt(0, c.dark(115));
-    lg.setColorAt(1, c.light(117));
+    lg.setColorAt(0, Gradients::endColor(c, Gradients::Top, Gradients::Sunken));
+    lg.setColorAt(1, Gradients::endColor(c, Gradients::Bottom, Gradients::Sunken));
     return lg;
 }
 
 static inline QLinearGradient
 buttonGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 {
-    int h,s,v,a, inc, dec;
+    int h,s,v,a, inc = 15, dec = 6;
     c.getHsv(&h,&s,&v,&a);
 
     // calc difference
-    inc = 15; dec = 6;
     if (v+inc > 255)
-        { inc = 255-v; dec += (15-inc); }
+    {
+        inc = 255-v;
+        dec += (15-inc);
+    }
+
     QLinearGradient lg(start, stop);
-    QColor ic; ic.setHsv(h,s,v+inc, a);
+    QColor ic;
+    ic.setHsv(h,s,v+inc, a);
     lg.setColorAt(0, ic);
     ic.setHsv(h,s,v-dec, a);
     lg.setColorAt(0.75, ic);
     return lg;
 }
-#include <QtDebug>
+
 inline static void
 gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
 {
@@ -165,23 +171,31 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
 
     // the brightest color (top)
     int cv = v + 27 + add, ch = h, cs = s;
-    if (cv > 255)
+    if (bb)
     {
-        int delta = cv - 255;
-        cv = 255;
-        cs = s - (glass?6:2)*delta;
-        if (cs < 0) cs = 0;
-        ch = h - 3*delta/2;
-        while (ch < 0) ch += 360;
+        if (cv > 255)
+        {
+            int delta = cv - 255;
+            cv = 255;
+            cs = s - (glass?6:2)*delta;
+            if (cs < 0)
+                cs = 0;
+            ch = h - 3*delta/2;
+            while (ch < 0)
+                ch += 360;
+        }
+        bb->setHsv(ch,cs,cv,a);
     }
-    bb->setHsv(ch,cs,cv,a);
-
-    // the darkest color (lower center)
-    cv = v - 14 - add;
-    if (cv < 0) cv = 0;
-    cs = s*(glass ? 13 : 10)/7;
-    if (cs > 255) cs = 255;
-    dd->setHsv(h,cs,cv,a);
+    if (dd)
+    {
+        // the darkest color (lower center)
+        cv = v - 14 - add;
+        if (cv < 0)
+            cv = 0;
+        cs = s*(glass ? 13 : 10)/7;
+        if (cs > 255) cs = 255;
+        dd->setHsv(h,cs,cv,a);
+    }
 #endif
 }
 
@@ -201,7 +215,7 @@ gl_ssGradient(const QColor &c, const QPoint &start, const QPoint &stop, bool gla
 //         lg.setColorAt(1, Qt::white);
     return lg;
 }
-
+#if 0
 static inline QPixmap *
 rGlossGradient(const QColor &c, int size)
 {
@@ -214,7 +228,7 @@ rGlossGradient(const QColor &c, int size)
     QPainter p(pix); p.fillRect(pix->rect(), rg); p.end();
     return pix;
 }
-
+#endif
 static inline QPixmap *
 progressGradient(const QColor &c, int size, Qt::Orientation o)
 {
@@ -298,7 +312,7 @@ typedef QCache<uint, BgSet> BgSetCache;
 static BgSetCache _bgSet;
 #endif
 
-static PixmapCache gradients[2][Gradients::TypeAmount];
+static PixmapCache gradients[2][Gradients::TypeAmount-1];
 static PixmapCache _borderline[4];
 
 static inline uint costs(QPixmap *pix)
@@ -335,6 +349,45 @@ Gradients::borderline(const QColor &c, Position pos)
     return nullPix;
 }
 
+QColor
+Gradients::endColor(const QColor &c, Position p, Type type)
+{
+    bool begin = (p == Top || p == Left);
+    switch ( type )
+    {
+        case None:
+//         case RadialGloss:
+        default:
+            return c;
+        case Simple:
+            return begin ? c.lighter(112) : c.darker(110);
+        case Button:
+        {
+            int h,s,v,a, inc = 15, dec = 6;
+            c.getHsv(&h,&s,&v,&a);
+            // calc difference
+            if (v+inc > 255)
+            {
+                inc = 255-v;
+                dec += (15-inc);
+            }
+            return begin ? QColor::fromHsv(h,s,v+inc, a) : QColor::fromHsv(h,s,v-dec, a);
+        }
+        case Sunken:
+            return begin ? c.darker(115) : c.lighter(117);
+        case Gloss:
+        case Glass:
+        case Cloudy:
+        {
+            QColor bb;
+            gl_ssColors(c, &bb, 0, type == Glass);
+            return bb;
+        }
+        case Metal:
+            return begin ? c.lighter(108) : c.darker(112);
+    }
+}
+
 const QPixmap&
 Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type)
 {
@@ -349,6 +402,8 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         qWarning("gradient with more than 6800 steps requested, returning NULL pixmap");
         return nullPix;
     }
+    if (type < 1 || type >= TypeAmount)
+        type = Simple;
    
     // very dark colors won't make nice buttons =)
     QColor iC = c;
@@ -380,7 +435,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
     QPoint start, stop;
     if (type == Gradients::Cloudy)
         pix = progressGradient(iC, size, o);
-#ifndef BESPIN_DECO
+#if 0 //#ifndef BESPIN_DECO
     else if (type == Gradients::RadialGloss)
         pix = rGlossGradient(iC, size);
 #endif
@@ -986,14 +1041,14 @@ void Gradients::init() {
     for (int i = 0; i < 4; ++i)
         _borderline[i].setMaxCost( ((32*32)<<3)<<4 ); // enough for 16 different colors
     for (int i = 0; i < 2; ++i) {
-        for (int j = 0; j < Gradients::TypeAmount; ++j)
+        for (int j = 0; j < Gradients::TypeAmount-1; ++j)
             gradients[i][j].setMaxCost( 1024<<10 );
    }
 }
 
 void Gradients::wipe() {
     for (int i = 0; i < 2; ++i)
-        for (int j = 0; j < Gradients::TypeAmount; ++j)
+        for (int j = 0; j < Gradients::TypeAmount-1; ++j)
             gradients[i][j].clear();
 #ifndef BESPIN_DECO
     _bgSet.clear();

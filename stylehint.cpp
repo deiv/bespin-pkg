@@ -81,7 +81,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         if (!menubar->actions().isEmpty())
         {   // we trick menubars if we use macmenus - hehehe...
             // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
-            return -menubar->actionGeometry(menubar->actions().first()).height() + 1;
+            return -menubar->actionGeometry(menubar->actions().first()).height() + !config.UNO.title;
         }
         return 0; // no space between menus and docks (we need padding rather than margin)
 ///    case SH_FontDialog_SelectAssociatedText: // Select the text in the line edit, or when selecting an item from the listbox, or when the line edit receives focus, as done on Windows.

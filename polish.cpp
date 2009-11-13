@@ -275,9 +275,9 @@ polishGTK(QWidget * widget, const Config &config)
     if (widget->objectName() == "QMenuBar" )
     {
         QPalette pal = widget->palette();
-        c1 = Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6);
+        c1 = Colors::mid(FCOLOR(Window), CCOLOR(UNO._, Bg),1,6);
         c2 = CCOLOR(menu.active, Bg);
-        c3 = CCOLOR(menu.bar, Fg);
+        c3 = CCOLOR(UNO._, Fg);
         c4 = CCOLOR(menu.active, Fg);
         
         pal.setColor(QPalette::Inactive, QPalette::Window, c1);
@@ -780,8 +780,15 @@ Style::polish( QWidget * widget )
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
     if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
     {
-        widget->setBackgroundRole(config.menu.bar_role[Bg]);
-        widget->setForegroundRole(config.menu.bar_role[Fg]);
+        mbar->setBackgroundRole(config.UNO.__role[Bg]);
+        mbar->setForegroundRole(config.UNO.__role[Fg]);
+        if (config.UNO.used)
+        {
+            widget->setAutoFillBackground(true);
+            // catch resizes for gradient recalculation
+            mbar->removeEventFilter(this);
+            mbar->installEventFilter(this);
+        }
 #ifdef Q_WS_X11
         if (!((appType == KDevelop) || (appType == QtDesigner) && mbar->inherits("QDesignerMenuBar")))
             MacMenu::manage(mbar);
@@ -827,6 +834,13 @@ Style::polish( QWidget * widget )
 #endif
 
     bool isTopContainer = qobject_cast<QToolBar *>(widget);
+    if ( isTopContainer && config.UNO.toolbar )
+    {   // catches show events and manipulates fg/bg role
+        widget->removeEventFilter(this);
+        widget->installEventFilter(this);
+        QEvent ev(QEvent::Show);
+        eventFilter(widget, &ev);
+    }
     if (isTopContainer && appType == Amarok && Hacks::config.amarokDisplay &&
         (widget->objectName() == "Main Toolbar NG" || widget->objectName() == "MainToolbarNNG") )
     {
@@ -841,7 +855,7 @@ Style::polish( QWidget * widget )
 #ifdef QT3_SUPPORT
     isTopContainer = isTopContainer || widget->inherits("Q3ToolBar");
 #endif
-    if (isTopContainer || qobject_cast<QToolBar *>(widget->parent()))
+    if (isTopContainer || qobject_cast<QToolBar*>(widget->parent()))
     {
         widget->setBackgroundRole(QPalette::Window);
         widget->setForegroundRole(QPalette::WindowText);

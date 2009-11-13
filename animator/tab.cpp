@@ -232,7 +232,7 @@ public:
     Curtain(TabInfo *info, QWidget *parent) : QWidget(parent), _info(info)
     {
         setAutoFillBackground(false);
-        setAttribute(Qt::WA_NoSystemBackground);
+//         setAttribute(Qt::WA_NoSystemBackground);
         setAttribute(Qt::WA_OpaquePaintEvent);
         raise();
     }

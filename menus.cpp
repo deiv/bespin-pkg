@@ -17,6 +17,7 @@
  */
 
 #include <QAction>
+#include <QMainWindow>
 #include <QMenuBar>
 #include "draw.h"
 #include "animator/hoverindex.h"
@@ -24,29 +25,45 @@
 static const bool round_ = true;
 
 void
-Style::drawMenuBarBg(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawMenuBarBg(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-    if (appType == Plasma || appType == BEshell)
+    const bool needScanlines = config.bg.mode == Scanlines && config.bg.structure < 5;
+    if (!(config.UNO.used || needScanlines))
         return;
 
     QRect rect = RECT;
-    QColor c = FCOLOR(Window);
-    if (config.menu.bar_role[Bg] != QPalette::Window)
+    QColor c = CCOLOR(UNO._, Bg);
+    // TODO: handle end colors of gradients
+
+    const bool sunken = config.UNO.sunken && !config.UNO.toolbar;
+    // TODO: handle non present toolbar!
+    
+    if (sunken)
+        rect.setBottom(rect.bottom()-F(2));
+
+    if (config.UNO.used)
     {
-        if (config.menu.barSunken) rect.setBottom(rect.bottom()-F(2));
-        c = Colors::mid(FCOLOR(Window), CCOLOR(menu.bar, Bg),1,6);
+        if (widget)
+        if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(widget->parentWidget()) )
+        if (config.UNO.gradient)
+        {
+            QVariant h = mwin->property("UnoHeight");
+            if (h.isValid())
+            {
+                const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), h.toInt(), Qt::Vertical, config.UNO.gradient);
+                painter->drawTiledPixmap(RECT, fill, QPoint(0,widget->geometry().y())); //the offset should be 0,0 though...
+            }
+        }
     }
-
-    if (config.menu.barGradient != Gradients::None)
-        painter->fillRect(rect, Gradients::brush(c, rect.height(), Qt::Vertical, config.menu.barGradient));
-    else if (config.bg.mode == Scanlines && config.bg.structure < 5)
+    else // "else if (needScanlines)"
         painter->fillRect(rect, Gradients::structure(c, true));
-    else if (config.menu.bar_role[Bg] != QPalette::Window)
-        painter->fillRect(rect, c);
 
-    if (config.menu.barSunken)
+    if (sunken)
     {
-        Tile::setShape(Tile::Top | Tile::Bottom);
+        Tile::PosFlags pf = Tile::Bottom;
+        if (!config.UNO.title)
+            pf |= Tile::Top;
+        Tile::setShape(pf);
         shadows.sunken[false][false].render(RECT, painter);
         Tile::reset();
     }
@@ -73,6 +90,11 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
     QPalette::ColorRole bg = config.menu.active_role[Bg];
     QPalette::ColorRole fg = config.menu.active_role[Fg];
+    if (bg == config.UNO.__role[Bg])
+    {   // swap!
+        bg = fg;
+        fg = config.UNO.__role[Bg];
+    }
 
     hover = option->state & State_Selected;
     Animator::IndexInfo *info = 0;
@@ -137,7 +159,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         else if (step == 6 && config.menu.itemSunken)
             shadows.sunken[round_][false].render(r, painter);
     }
-    QPalette::ColorRole fg2 = (appType == Plasma) ? QPalette::WindowText : config.menu.bar_role[Fg];
+    QPalette::ColorRole fg2 = config.UNO.__role[Fg];
     QPixmap pix = mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ? QIcon::Normal : QIcon::Disabled);
     const uint alignment = Qt::AlignCenter | BESPIN_MNEMONIC | Qt::TextDontClip | Qt::TextSingleLine;
     if (!pix.isNull())
@@ -195,8 +217,7 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
     // selected bg
     if (selected)
     {
-        if (config.menu.itemGradient != Gradients::None ||
-            config.menu.bar_role[Bg] == ROLE[Bg] ||
+        if (config.menu.itemGradient != Gradients::None || config.UNO.__role[Bg] == ROLE[Bg] ||
             Colors::contrast(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg)) > 8) // enough to indicate hover
         {
             bg = Colors::mid(COLOR(ROLE[Bg]), CCOLOR(menu.active, Bg), 1, 6);

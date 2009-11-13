@@ -101,7 +101,7 @@ descent:
 config._VAR_##_role[0] = (QPalette::ColorRole) iSettings->value(_DEF_).toInt();\
 Colors::counterRole(config._VAR_##_role[0], config._VAR_##_role[1])
 //, QPalette::_DEF_, Colors::counterRole(QPalette::_DEF_))
-#define readGrad(_DEF_) (Gradients::Type) iSettings->value(_DEF_).toInt();
+#define readGrad(_DEF_) (Gradients::Type) clamp(iSettings->value(_DEF_).toInt(), 0, Gradients::TypeAmount-1);
 
 void
 Style::removeAppEventFilter()
@@ -340,28 +340,38 @@ Style::readSettings(const QSettings* settings, QString appName)
         config.menu.active_role[Bg] = QPalette::Highlight;
         config.menu.active_role[Fg] = QPalette::HighlightedText;
         // both do not work :-( - also the user has to choose a bg that usually fits window fg
-        config.menu.barGradient = Gradients::None;
-        config.menu.barSunken = false;
+        config.UNO.used = false;
+        config.UNO.sunken = false;
     }
     else
     {
+        config.UNO.used = readBool(UNO_UNO);
         config.menu.glassy = readBool(MENU_GLASSY);
         readRole(menu.active, MENU_ACTIVEROLE);
         readRole(menu.std, MENU_ROLE);
     }
-    if (appType == Plasma)
-    {   // that's probably XBar, ...
-        // ... and we don't want a bg there
-        config.menu.barGradient = Gradients::None;
-        config.menu.barSunken = false;
+
+    if (appType == Plasma || appType == BEshell)
+        config.UNO.used = false; // that's probably XBar, ...
+    
+    if (config.UNO.used)
+    {
+        config.UNO.sunken = readBool(UNO_SUNKEN);
+        config.UNO.toolbar = readBool(UNO_TOOLBAR);
+        config.UNO.title = readBool(UNO_TITLE);
+        config.UNO.gradient = readGrad(UNO_GRADIENT);
+        readRole(UNO._, UNO_ROLE);
     }
     else
     {
-        config.menu.barGradient = readGrad(MENU_BAR_GRADIENT);
-        config.menu.barSunken = readBool(MENU_BARSUNKEN);
+        config.UNO.sunken = false;
+        config.UNO.toolbar = false;
+        config.UNO.title = false;
+        config.UNO.gradient = Gradients::None;
+        config.UNO.__role[Bg] = QPalette::Window;
+        config.UNO.__role[Fg] = QPalette::WindowText;
     }
 
-    readRole(menu.bar, MENU_BARROLE);
     config.menu.boldText = readBool(MENU_BOLDTEXT);
     config.menu.itemSunken = readBool(MENU_ITEM_SUNKEN);
     config.menu.activeItemSunken = config.menu.itemSunken || readBool(MENU_ACTIVEITEMSUNKEN);

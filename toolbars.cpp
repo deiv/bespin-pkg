@@ -16,11 +16,14 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QMainWindow>
 #include <QToolBar>
 #include <QToolButton>
 #include "oxrender.h"
 #include "draw.h"
 #include "animator/hover.h"
+
+#include <QtDebug>
 
 static int step = 0;
 static bool connected = false;
@@ -36,6 +39,48 @@ Style::hasMenuIndicator(const QStyleOptionToolButton *tb)
         ret = (tb->features & (QStyleOptionToolButton::HasMenu | QStyleOptionToolButton::PopupDelay))
                            == (QStyleOptionToolButton::HasMenu | QStyleOptionToolButton::PopupDelay);
     return ret;
+}
+
+void
+Style::drawToolBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
+    // UNO bar
+    if (config.UNO.toolbar && widget && widget->autoFillBackground())
+    if ( const QToolBar *bar = qobject_cast<const QToolBar*>(widget) )
+    if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget()) )
+    if ( mwin->toolBarArea(const_cast<QToolBar*>(bar)) == Qt::TopToolBarArea )
+    {
+        if (config.UNO.gradient)
+        {
+            QVariant h = mwin->property("UnoHeight");
+            if (h.isValid())
+            {
+                const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), h.toInt(), Qt::Vertical, config.UNO.gradient);
+                painter->drawTiledPixmap(RECT, fill, QPoint(0,bar->geometry().y()));
+            }
+        }
+        return;
+    }
+    
+    // lighter scanline variant
+    if (config.bg.mode == Scanlines  && config.bg.structure < 5)
+    {
+        painter->save();
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(Gradients::structure(FCOLOR(Window), true));
+        painter->translate(RECT.topLeft());
+        painter->drawRect(RECT);
+        painter->restore();
+    }
+    // window
+    else if (widget && widget->isWindow())
+    {
+        if (config.bg.mode != Scanlines)
+            painter->fillRect(RECT, Gradients::pix(FCOLOR(Window), RECT.height(), Qt::Vertical));
+        else
+            painter->fillRect(RECT, Gradients::structure(FCOLOR(Window), false));
+        drawWindowFrame(option, painter, widget);
+    }
 }
 
 void
@@ -375,7 +420,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
 }
 
 void
-Style::drawToolBarHandle(const QStyleOption *option, QPainter *painter, const QWidget*) const
+Style::drawToolBarHandle(const QStyleOption *option, QPainter *painter, const QWidget*widget) const
 {
 
     OPT_HOVER
@@ -399,9 +444,11 @@ Style::drawToolBarHandle(const QStyleOption *option, QPainter *painter, const QW
         rect.setTop(rect.top()+(rect.height()-rect.width())/2);
         rect.setHeight(rect.width());
     }
-    QColor c = FCOLOR(Window);
+    QColor c = (config.UNO.toolbar && widget && widget->autoFillBackground()) ? CCOLOR(UNO._, Bg) : FCOLOR(Window);
     if (hover)
         c = Colors::mid(c, FCOLOR(Highlight), 3, 1);
+    else
+        c = Colors::mid(c, Qt::black, 15, 1);
 
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setBrush(Gradients::pix(c, rect.height(), Qt::Vertical, Gradients::Sunken));

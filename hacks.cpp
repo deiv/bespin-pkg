@@ -1161,10 +1161,9 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         dragWidget->setMouseTracking(true);
         return false;
     }
-    else if (e->type() == QEvent::MouseButtonRelease)
+    else if (e->type() == QEvent::MouseButtonRelease && dragWidget)
     {
-        if (dragWidget)
-            dragWidget->setMouseTracking(dragHadTrack);
+        dragWidget->setMouseTracking(dragHadTrack);
         dragWidget = NULL;
         return false;
     }

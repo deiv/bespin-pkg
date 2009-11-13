@@ -209,6 +209,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
    
     /** fill some comboboxes, not of interest */
     generateColorModes(ui.tooltipRole);
+    generateColorModes(ui.uno_role);
     generateColorModes(ui.crProgressBg);
     generateColorModes(ui.crProgressFg);
     generateColorModes(ui.crTabBar);
@@ -231,7 +232,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateColorModes(ui.kwinActiveRole);
     generateColorModes(ui.kwinInactiveText);
     generateColorModes(ui.kwinActiveText);
-   
+
+    generateGradientTypes(ui.uno_gradient);
     generateGradientTypes(ui.gradButton);
     generateGradientTypes(ui.toolbuttonGradient);
     generateGradientTypes(ui.gradChoose);
@@ -324,6 +326,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.modalInvert, BG_MODAL_INVERT);
     handleSettings(ui.tooltipRole, BG_TOOLTIP_ROLE);
     handleSettings(ui.sunkenGroups, SUNKEN_GROUPS);
+
+    handleSettings(ui.uno, UNO_UNO);
+    handleSettings(ui.uno_toolbars, UNO_TOOLBAR);
+    handleSettings(ui.uno_title, UNO_TITLE);
+    handleSettings(ui.uno_gradient, UNO_GRADIENT);
+    handleSettings(ui.uno_role, UNO_ROLE);
+//     handleSettings(ui.uno_sunken, UNO_SUNKEN);
 
     handleSettings(ui.sunkenButtons, "Btn.Layer", 0);
     handleSettings(ui.checkMark, "Btn.CheckType", 0);

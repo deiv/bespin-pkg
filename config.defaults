@@ -119,6 +119,13 @@
 #define TAB_ACTIVETABSUNKEN "Tab.ActiveTabSunken", true
 #define TAB_ACTIVEGRADIENT "Tab.ActiveGradient", Gradients::Sunken
 
+#define UNO_UNO "Uno", false
+#define UNO_SUNKEN "Uno.Sunken", false
+#define UNO_TOOLBAR "Uno.Toolbar", true
+#define UNO_TITLE "Uno.Title", true
+#define UNO_GRADIENT "Uno.Gradient", Gradients::Button
+#define UNO_ROLE "Uno.Role", QPalette::WindowText
+
 #define VIEW_HEADERROLE "View.HeaderRole", QPalette::Text
 #define VIEW_SORTINGHEADERROLE "View.SortingHeaderRole", QPalette::Text
 #define VIEW_HEADERGRADIENT "View.HeaderGradient", Gradients::Button

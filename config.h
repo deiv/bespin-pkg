@@ -83,8 +83,8 @@ typedef struct Config
 
     struct menu
     {
-        QPalette::ColorRole std_role[2], active_role[2], bar_role[2];
-        Gradients::Type itemGradient, barGradient;
+        QPalette::ColorRole std_role[2], active_role[2];
+        Gradients::Type itemGradient;
         bool showIcons, shadow, barSunken, boldText, itemSunken, activeItemSunken, glassy, round, roundSelect;
         int opacity;
     } menu;
@@ -124,6 +124,13 @@ typedef struct Config
         QPalette::ColorRole active_role[2];
         Gradients::Type gradient;
     } toolbox;
+
+    struct UNO
+    {
+        bool used, sunken, title, toolbar;
+        QPalette::ColorRole __role[2];
+        Gradients::Type gradient;
+    } UNO;
 
     struct view
     {

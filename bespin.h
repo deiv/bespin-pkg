@@ -248,6 +248,7 @@ protected:
     void drawTabCloser(const QStyleOption*, QPainter*, const QWidget*) const;
 #endif
     // toolbars.cpp
+    void drawToolBar(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawToolButton(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
     void drawToolButtonShape(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawToolButtonLabel(const QStyleOption*, QPainter*, const QWidget*) const;

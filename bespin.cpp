@@ -25,6 +25,7 @@
 #include <QEvent>
 #include <QFrame>
 #include <QListView>
+#include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMouseEvent>
@@ -226,9 +227,9 @@ Style::registerRoutines()
     registerCC(drawToolButton, CC_ToolButton);
     registerPE(drawToolButtonShape, PE_PanelButtonTool);
     registerPE(skip, PE_IndicatorToolBarSeparator);
-    registerPE(skip, PE_PanelToolBar);
+    registerPE(drawToolBar, PE_PanelToolBar);
     registerCE(drawToolButtonLabel, CE_ToolButtonLabel);
-    registerCE(drawDockBg, CE_ToolBar);
+    registerCE(drawToolBar, CE_ToolBar);
     registerPE(skip, PE_FrameButtonTool);
 #ifdef QT3_SUPPORT
     registerPE(skip, PE_Q3Separator);
@@ -556,12 +557,28 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 
     // the title region in the center
     WindowData data;
+    QPalette::ColorRole active[2] = { QPalette::Window, QPalette::WindowText};
     const bool glassy = (widget && widget->testAttribute(Qt::WA_MacBrushedMetal));
-    QColor bg = pal.color(QPalette::Inactive, QPalette::Window);
-    if (glassy)
+    bool uno = false;
+    if (config.UNO.title && widget)
+    {
+        QVariant h = widget->property("UnoHeight");
+        uno = h.isValid() && h.toInt() > 0;
+        if (uno)
+        {
+            active[Bg] = config.UNO.__role[Bg];
+            active[Fg] = config.UNO.__role[Fg];
+        }
+    }
+
+    QColor bg = pal.color(QPalette::Inactive, active[Bg]);
+    if (glassy || uno)
     {
         data.style = (((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff));
-        bg = bg.light(115-Colors::value(bg)/20);
+        if (uno)
+            bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient);
+        else
+            bg = bg.light(115-Colors::value(bg)/20);
     }
     else
         data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
@@ -569,35 +586,43 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     bg.setAlpha(config.bg.opacity);
 #endif
     data.inactiveWindow = bg.rgba();
-    
-    bg = pal.color(QPalette::Active, QPalette::Window);
-    if (glassy)
+
+    bg = pal.color(QPalette::Active, active[Bg]);
+    if (uno)
+        bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient);
+    else if (glassy)
         bg = bg.light(115-Colors::value(bg)/20);
+    
 #if BESPIN_ARGB_WINDOWS
     bg.setAlpha(config.bg.opacity);
 #endif
     data.activeWindow = bg.rgba();
 
-    if (glassy)
+    QPalette::ColorRole inactive[2], text[2];
+    if (uno || glassy)
     {
-        data.inactiveDeco = pal.color(QPalette::Inactive, QPalette::Window).rgba();
-        data.activeDeco = pal.color(QPalette::Active, QPalette::Window).rgba();
-        data.inactiveText = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window),
-                                        pal.color(QPalette::Inactive, QPalette::WindowText)).rgba();
-        data.activeText = pal.color(QPalette::Active, QPalette::WindowText).rgba();
-        data.inactiveButton = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window),
-                                          pal.color(QPalette::Inactive, QPalette::WindowText),2,1).rgba();
-        data.activeButton = pal.color(QPalette::Active, QPalette::WindowText).rgba();
+        inactive[Bg] = active[Bg];
+        text[0] = text[1] = inactive[Fg] = active[Fg];
     }
     else
     {
-        data.inactiveDeco = CCOLOR(kwin.inactive, Bg).rgba();
-        data.activeDeco = CCOLOR(kwin.active, Bg).rgba();
-        data.inactiveText = Colors::mid(pal.color(QPalette::Inactive, QPalette::Window), CCOLOR(kwin.text, Bg)).rgba();
-        data.activeText = CCOLOR(kwin.text, Fg).rgba();
-        data.inactiveButton = Colors::mid(CCOLOR(kwin.inactive, Bg), CCOLOR(kwin.inactive, Fg), 1, 2).rgba();
-        data.activeButton = CCOLOR(kwin.active, Fg).rgba();
+        inactive[Bg]    = config.kwin.inactive_role[Bg];
+        inactive[Fg]    = config.kwin.inactive_role[Fg];
+        active[Bg]      = config.kwin.active_role[Bg];
+        active[Fg]      = config.kwin.active_role[Fg];
+        text[0]         = config.kwin.text_role[0];
+        text[1]         = config.kwin.text_role[1];
     }
+
+
+    data.inactiveDeco   = pal.color(QPalette::Inactive, inactive[Bg]).rgba();
+    data.activeDeco     = pal.color(QPalette::Active, active[Bg]).rgba();
+    data.inactiveText   = Colors::mid( pal.color(QPalette::Inactive, QPalette::Window),
+                                       pal.color(QPalette::Inactive, text[0])).rgba();
+    data.activeText     = pal.color(QPalette::Active, text[1]).rgba();
+    data.inactiveButton = Colors::mid( pal.color(QPalette::Inactive, inactive[Bg]),
+                                       pal.color(QPalette::Inactive, inactive[Fg]),2,1).rgba();
+    data.activeButton   = pal.color(QPalette::Active, active[Fg]).rgba();
     
     if (widget)
         XProperty::set<uint>(widget->winId(), XProperty::winData, (uint*)&data, XProperty::WORD, 9);
@@ -792,6 +817,43 @@ static const
 Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::SubWindow |
 Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
+static bool
+updateUnoHeight(QMainWindow *mwin, bool includeToolbars)
+{
+    const QVariant var = mwin->property("UnoHeight");
+    int oldH = 0, newH = 0;
+    if (var.isValid())
+        oldH = var.toInt();
+    
+    QList<QWidget*> dirty;
+    if (includeToolbars)
+    {
+        QList<QToolBar*> bars = mwin->findChildren<QToolBar*>();
+        foreach (QToolBar *tbar, bars)
+        {
+            if ( mwin->toolBarArea(tbar) == Qt::TopToolBarArea )
+            {
+                dirty << tbar;
+                const int y = tbar->geometry().bottom();
+                if (y > newH)
+                    newH = y;
+            }
+        }
+    }
+    if (mwin->menuBar())
+    {
+        newH += mwin->menuBar()->height();
+        dirty << mwin->menuBar();
+    }
+    if ( oldH != newH )
+    {
+        mwin->setProperty("UnoHeight", newH);
+        foreach (QWidget *w, dirty)
+            w->update();
+    }
+    return !(oldH && newH);
+}
+
 
 bool
 Style::eventFilter( QObject *object, QEvent *ev )
@@ -944,9 +1006,24 @@ Style::eventFilter( QObject *object, QEvent *ev )
             w->setFont(fnt);
             return false;
         }
+        return false;
     }
     case QEvent::Resize:
     {
+        QResizeEvent *re = static_cast<QResizeEvent*>(ev);
+        if (config.UNO.used)
+        if (re->size().height() != re->oldSize().height())
+        if (QMainWindow *mwin = qobject_cast<QMainWindow*>(object->parent()))
+        if ((config.UNO.toolbar && qobject_cast<QToolBar*>(object) &&
+             mwin->toolBarArea(static_cast<QToolBar*>(object)) == Qt::TopToolBarArea) ||
+             qobject_cast<QMenuBar*>(object))
+        {
+            if (updateUnoHeight(mwin,config.UNO.toolbar))
+                setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
+            return false;
+        }
+
+        
         QWidget *widget = 0/*, *dock = 0*/;
         if ((config.menu.round && (widget = qobject_cast<QMenu*>(object)))
 #if 0
@@ -1101,6 +1178,38 @@ Style::eventFilter( QObject *object, QEvent *ev )
             menu->move(menu->pos()-QPoint(0,dpi.f2));
 #endif
             return false;
+        }
+        if ( config.UNO.toolbar )
+        if ( QToolBar *bar = qobject_cast<QToolBar*>(object) )
+        if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget()) )
+        {
+            if (updateUnoHeight(mwin,config.UNO.toolbar))
+                setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
+            QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
+            bool autoFill = false;
+            if ( mwin->toolBarArea(bar) == Qt::TopToolBarArea )
+            {
+                autoFill = true;
+                bg = config.UNO.__role[Bg];
+                fg = config.UNO.__role[Fg];
+            }
+            if (!(autoFill == bar->autoFillBackground() &&
+                  bg == bar->backgroundRole() &&
+                  fg == bar->foregroundRole()))
+            {
+                bar->setAutoFillBackground(autoFill);
+                bar->setBackgroundRole(bg);
+                bar->setForegroundRole(fg);
+                QList<QWidget*> kids = bar->findChildren<QWidget*>();
+                foreach (QWidget *kid, kids)
+                {
+                    if (kid->isWindow())
+                        continue;
+                    kid->setBackgroundRole(bg);
+                    kid->setForegroundRole(fg);
+                }
+                bar->update();
+            }
         }
         return false;
     }

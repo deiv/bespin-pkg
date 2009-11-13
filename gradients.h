@@ -47,7 +47,7 @@ public:
 namespace Gradients {
 
 enum Type {
-   None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, RadialGloss,
+   None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, //RadialGloss,
    TypeAmount
 };
 
@@ -80,7 +80,10 @@ inline bool isTranslucent(Type type = Simple) {
    return type > Sunken && type != Metal;
 }
 
+QColor endColor(const QColor &c, Position p, Type type = Simple);
+
 #ifndef BESPIN_DECO
+
 /** a diagonal NW -> SE light */
 const QPixmap &shadow(int height, bool bottom = false);
 
