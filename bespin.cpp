@@ -1018,7 +1018,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
              mwin->toolBarArea(static_cast<QToolBar*>(object)) == Qt::TopToolBarArea) ||
              qobject_cast<QMenuBar*>(object))
         {
-            if (updateUnoHeight(mwin,config.UNO.toolbar))
+            if (updateUnoHeight(mwin,config.UNO.toolbar) && config.UNO.title)
                 setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
             return false;
         }
@@ -1183,7 +1183,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if ( QToolBar *bar = qobject_cast<QToolBar*>(object) )
         if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget()) )
         {
-            if (updateUnoHeight(mwin,config.UNO.toolbar))
+            if (updateUnoHeight(mwin,config.UNO.toolbar) && config.UNO.title)
                 setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
             QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
             bool autoFill = false;
