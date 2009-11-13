@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -794,7 +794,7 @@
          <item row="5" column="0">
           <widget class="QLabel" name="label_12">
            <property name="text">
-            <string>Force small tilebar for</string>
+            <string>Force small titlebar for</string>
            </property>
           </widget>
          </item>
@@ -806,7 +806,7 @@
        <item row="1" column="0" colspan="2">
         <widget class="QCheckBox" name="verticalTitlebar">
          <property name="text">
-          <string>Netbook comatible titlebar orientation ;-)</string>
+          <string>Netbook compatible titlebar orientation ;-)</string>
          </property>
         </widget>
        </item>
