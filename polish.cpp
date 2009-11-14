@@ -835,11 +835,10 @@ Style::polish( QWidget * widget )
 
     bool isTopContainer = qobject_cast<QToolBar *>(widget);
     if ( isTopContainer && config.UNO.toolbar )
-    {   // catches show events and manipulates fg/bg role
+    {   // catches show/resize events and manipulates fg/bg role
+        updateUno(static_cast<QToolBar *>(widget));
         widget->removeEventFilter(this);
         widget->installEventFilter(this);
-        QEvent ev(QEvent::Show);
-        eventFilter(widget, &ev);
     }
     if (isTopContainer && appType == Amarok && Hacks::config.amarokDisplay &&
         (widget->objectName() == "Main Toolbar NG" || widget->objectName() == "MainToolbarNNG") )

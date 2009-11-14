@@ -21,6 +21,7 @@
 
 class QSettings;
 class QStyleOptionToolButton;
+class QToolBar;
 
 #include <QCommonStyle>
 #include <QStyleOption>
@@ -289,6 +290,7 @@ private:
     void readSettings(const QSettings *settings = 0L, QString appName = QString());
     void registerRoutines();
     void setupDecoFor(QWidget *w, const QPalette &pal, int mode, const Gradients::Type (&gt)[2]);
+    void updateUno(QToolBar *);
 private:
     typedef QHash<uint, Tile::Set> TileCache;
     typedef struct
@@ -333,6 +335,7 @@ private slots:
     void clearScrollbarCache();
     void removeAppEventFilter();
     void resetRingPix();
+    void updateUno();
 };
 
 } // namespace Bespin

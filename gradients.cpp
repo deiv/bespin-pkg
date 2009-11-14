@@ -402,7 +402,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         qWarning("gradient with more than 6800 steps requested, returning NULL pixmap");
         return nullPix;
     }
-    
+
     if (type < 1 || type >= TypeAmount)
         type = Simple;
    
@@ -539,7 +539,7 @@ const QPixmap
         }
         break;
     case 2:  // fat scans
-        i = (_bgIntensity - 100);
+        i = _bgIntensity - 100;
         p.setPen(Qt::NoPen);
         p.setBrush( c.light(100+3*i/10) );
         p.setPen(QPen(light ? c.light(100+i/10) : c, 2));

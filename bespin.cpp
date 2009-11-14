@@ -819,6 +819,8 @@ static const
 Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::SubWindow |
 Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
+static QList<QToolBar*> unoUpdates;
+
 static bool
 updateUnoHeight(QMainWindow *mwin, bool includeToolbars)
 {
@@ -854,6 +856,49 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars)
             w->update();
     }
     return !(oldH && newH);
+}
+
+void
+Style::updateUno()
+{
+    foreach (QToolBar *bar, unoUpdates)
+        updateUno(bar);
+    unoUpdates.clear();
+}
+
+void
+Style::updateUno(QToolBar *bar)
+{
+    if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget()) )
+    {
+        if (updateUnoHeight(mwin,config.UNO.toolbar) && config.UNO.title)
+            setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
+        
+        QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
+        bool autoFill = false;
+        if ( mwin->toolBarArea(bar) == Qt::TopToolBarArea )
+        {
+            autoFill = true;
+            bg = config.UNO.__role[Bg];
+            fg = config.UNO.__role[Fg];
+        }
+        if (!(autoFill == bar->autoFillBackground() &&
+            bg == bar->backgroundRole() && fg == bar->foregroundRole()))
+        {
+            bar->setAutoFillBackground(autoFill);
+            bar->setBackgroundRole(bg);
+            bar->setForegroundRole(fg);
+            QList<QWidget*> kids = bar->findChildren<QWidget*>();
+            foreach (QWidget *kid, kids)
+            {
+                if (kid->isWindow())
+                    continue;
+                kid->setBackgroundRole(bg);
+                kid->setForegroundRole(fg);
+            }
+            bar->update();
+        }
+    }
 }
 
 
@@ -1013,6 +1058,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::Resize:
     {
         QResizeEvent *re = static_cast<QResizeEvent*>(ev);
+
         if (config.UNO.used)
         if (re->size().height() != re->oldSize().height())
         if (QMainWindow *mwin = qobject_cast<QMainWindow*>(object->parent()))
@@ -1024,7 +1070,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
             return false;
         }
-
         
         QWidget *widget = 0/*, *dock = 0*/;
         if ((config.menu.round && (widget = qobject_cast<QMenu*>(object)))
@@ -1181,39 +1226,15 @@ Style::eventFilter( QObject *object, QEvent *ev )
 #endif
             return false;
         }
+
         if ( config.UNO.toolbar )
         if ( QToolBar *bar = qobject_cast<QToolBar*>(object) )
-        if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget()) )
         {
-            if (updateUnoHeight(mwin,config.UNO.toolbar) && config.UNO.title)
-                setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
-            QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
-            bool autoFill = false;
-            if ( mwin->toolBarArea(bar) == Qt::TopToolBarArea )
-            {
-                autoFill = true;
-                bg = config.UNO.__role[Bg];
-                fg = config.UNO.__role[Fg];
-            }
-            if (!(autoFill == bar->autoFillBackground() &&
-                  bg == bar->backgroundRole() &&
-                  fg == bar->foregroundRole()))
-            {
-                bar->setAutoFillBackground(autoFill);
-                bar->setBackgroundRole(bg);
-                bar->setForegroundRole(fg);
-                QList<QWidget*> kids = bar->findChildren<QWidget*>();
-                foreach (QWidget *kid, kids)
-                {
-                    if (kid->isWindow())
-                        continue;
-                    kid->setBackgroundRole(bg);
-                    kid->setForegroundRole(fg);
-                }
-                bar->update();
-            }
+            if (unoUpdates.isEmpty())
+                QTimer::singleShot(0, this, SLOT(updateUno()));
+            unoUpdates << bar;
+            return false;
         }
-        return false;
     }
     case QEvent::Hide:
         if (config.bg.modal.invert)
