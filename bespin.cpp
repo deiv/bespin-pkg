@@ -583,7 +583,8 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     else
         data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
 #if BESPIN_ARGB_WINDOWS
-    bg.setAlpha(config.bg.opacity);
+    if (!uno)
+        bg.setAlpha(config.bg.opacity);
 #endif
     data.inactiveWindow = bg.rgba();
 
@@ -594,7 +595,8 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
         bg = bg.light(115-Colors::value(bg)/20);
     
 #if BESPIN_ARGB_WINDOWS
-    bg.setAlpha(config.bg.opacity);
+    if (!uno)
+        bg.setAlpha(config.bg.opacity);
 #endif
     data.activeWindow = bg.rgba();
 
