@@ -100,6 +100,12 @@ MacMenu::release(QMenuBar *menu)
     instance->_release(menu);
 }
 
+bool
+MacMenu::isActive()
+{
+    return instance && instance->usingMacMenu;
+}
+
 void
 MacMenu::_release(QObject *o)
 {

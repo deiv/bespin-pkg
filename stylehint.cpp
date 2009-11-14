@@ -25,6 +25,7 @@
 // #include <QTabWidget>
 #include "colors.h"
 #include "bespin.h"
+#include "macmenu.h"
 #include "makros.h"
 
 using namespace Bespin;
@@ -76,6 +77,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_PrintDialog_RightAlignButtons:
         return true; // ok/cancel just belong there
     case SH_MainWindow_SpaceBelowMenuBar:
+        if (MacMenu::isActive())
         if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
         if (menubar->height() == 0)
         if (!menubar->actions().isEmpty())
