@@ -402,6 +402,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         qWarning("gradient with more than 6800 steps requested, returning NULL pixmap");
         return nullPix;
     }
+    
     if (type < 1 || type >= TypeAmount)
         type = Simple;
    
@@ -427,7 +428,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
     int sloppyAdd = 1;
     uint magicNumber = hash(size, iC, &sloppyAdd);
 
-    PixmapCache *cache = &gradients[o == Qt::Horizontal][type];
+    PixmapCache *cache = &gradients[o == Qt::Horizontal][type-1];
     QPixmap *pix = cache->object(magicNumber);
     if (pix)
         return *pix;
