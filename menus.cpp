@@ -33,36 +33,41 @@ Style::drawMenuBarBg(const QStyleOption *option, QPainter *painter, const QWidge
 
     QRect rect = RECT;
     QColor c = CCOLOR(UNO._, Bg);
-    // TODO: handle end colors of gradients
 
-    const bool sunken = config.UNO.sunken && !config.UNO.toolbar;
-    // TODO: handle non present toolbar!
+    Tile::PosFlags pf = 0;
+    if (config.UNO.sunken && !config.UNO.title)
+        pf |= Tile::Top;
     
-    if (sunken)
-        rect.setBottom(rect.bottom()-F(2));
+//     if (sunken)
+//         rect.setBottom(rect.bottom()-F(2));
 
     if (config.UNO.used)
     {
         if (widget)
         if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(widget->parentWidget()) )
-        if (config.UNO.gradient)
         {
-            QVariant h = mwin->property("UnoHeight");
-            if (h.isValid())
+            QVariant var = mwin->property("UnoHeight");
+            const int h = var.isValid() ? var.toInt() : 0;
+            if (config.UNO.gradient)
             {
-                const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), h.toInt(), Qt::Vertical, config.UNO.gradient);
-                painter->drawTiledPixmap(RECT, fill, QPoint(0,widget->geometry().y())); //the offset should be 0,0 though...
+                if (h)
+                {
+                    const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), h, Qt::Vertical, config.UNO.gradient);
+                    painter->drawTiledPixmap(RECT, fill, QPoint(0,widget->geometry().y())); //the offset should be 0,0 though...
+                }
             }
+            else if (config.bg.mode == Scanlines)
+                painter->fillRect(rect, Gradients::structure(c, needScanlines));
+            
+            if (config.UNO.sunken && h == widget->geometry().bottom()+1) // i.e. no toolbar
+                pf |= Tile::Bottom;
         }
     }
     else // "else if (needScanlines)"
         painter->fillRect(rect, Gradients::structure(c, true));
 
-    if (sunken)
+    if (pf)
     {
-        Tile::PosFlags pf = Tile::Bottom;
-        if (!config.UNO.title)
-            pf |= Tile::Top;
         Tile::setShape(pf);
         shadows.sunken[false][false].render(RECT, painter);
         Tile::reset();

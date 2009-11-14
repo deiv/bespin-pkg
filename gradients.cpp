@@ -349,9 +349,31 @@ Gradients::borderline(const QColor &c, Position pos)
     return nullPix;
 }
 
-QColor
-Gradients::endColor(const QColor &c, Position p, Type type)
+static QColor
+checkValue(QColor c, int type)
 {
+    int v = Colors::value(c);
+    const int minV = type ? ((type < Gradients::Gloss) ? 60 : 40) : 0;
+    if (v < minV)
+    {
+        int h,s,a;
+        c.getHsv(&h,&s,&v,&a);
+        c.setHsv(h,s,minV,a);
+    }
+    else if (v > 240 && type > Gradients::Sunken) // glosses etc hate high value colors
+    {
+        int h,s,a;
+        c.getHsv(&h,&s,&v,&a);
+        s = 400*s/(400+v-240);
+        c.setHsv(h,CLAMP(s,0,255),240,a);
+    }
+    return c;
+}
+
+QColor
+Gradients::endColor(const QColor &oc, Position p, Type type, bool cv)
+{
+    QColor c = cv ? checkValue(oc, type) : oc;
     bool begin = (p == Top || p == Left);
     switch ( type )
     {
@@ -407,22 +429,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         type = Simple;
    
     // very dark colors won't make nice buttons =)
-    QColor iC = c;
-    int v = Colors::value(c);
-    const int minV = type ? ((type < Gloss) ? 60 : 40) : 0;
-    if (v < minV)
-    {
-        int h,s,a;
-        c.getHsv(&h,&s,&v,&a);
-        iC.setHsv(h,s,minV,a);
-    }
-    else if (v > 240 && type > Sunken) // glosses etc hate high value colors
-    {
-        int h,s,a;
-        c.getHsv(&h,&s,&v,&a);
-        s = 400*s/(400+v-240);
-        iC.setHsv(h,CLAMP(s,0,255),240,a);
-    }
+    QColor iC = checkValue(c, type);
 
     // hash
     int sloppyAdd = 1;

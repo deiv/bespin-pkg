@@ -50,14 +50,28 @@ Style::drawToolBar(const QStyleOption *option, QPainter *painter, const QWidget 
     if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget()) )
     if ( mwin->toolBarArea(const_cast<QToolBar*>(bar)) == Qt::TopToolBarArea )
     {
+        QVariant var = mwin->property("UnoHeight");
+        const int h = var.isValid() ? var.toInt() : 0;
         if (config.UNO.gradient)
         {
-            QVariant h = mwin->property("UnoHeight");
-            if (h.isValid())
+            if (h)
             {
-                const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), h.toInt(), Qt::Vertical, config.UNO.gradient);
+                const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), h, Qt::Vertical, config.UNO.gradient);
                 painter->drawTiledPixmap(RECT, fill, QPoint(0,bar->geometry().y()));
             }
+        }
+        if (h == bar->geometry().bottom())
+        {
+            SAVE_PEN;
+            painter->setPen(Colors::mid(CCOLOR(UNO._, Bg), config.UNO.sunken ? Qt::white : Qt::black, 6, 1));
+            painter->drawLine(RECT.bottomLeft(), RECT.bottomRight());
+            RESTORE_PEN;
+        }
+        if (config.UNO.sunken && !(config.UNO.title || bar->geometry().y()-1))
+        {
+            Tile::setShape(Tile::Top);
+            shadows.sunken[false][false].render(RECT, painter);
+            Tile::reset();
         }
         return;
     }

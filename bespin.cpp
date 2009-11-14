@@ -576,7 +576,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     {
         data.style = (((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff));
         if (uno)
-            bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient);
+            bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient, true);
         else
             bg = bg.light(115-Colors::value(bg)/20);
     }
@@ -590,7 +590,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 
     bg = pal.color(QPalette::Active, active[Bg]);
     if (uno)
-        bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient);
+        bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient, true);
     else if (glassy)
         bg = bg.light(115-Colors::value(bg)/20);
     

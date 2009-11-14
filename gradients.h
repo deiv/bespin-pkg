@@ -80,7 +80,7 @@ inline bool isTranslucent(Type type = Simple) {
    return type > Sunken && type != Metal;
 }
 
-QColor endColor(const QColor &c, Position p, Type type = Simple);
+QColor endColor(const QColor &c, Position p, Type type = Simple, bool checkValue = false);
 
 #ifndef BESPIN_DECO
 

@@ -330,7 +330,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.uno_title, UNO_TITLE);
     handleSettings(ui.uno_gradient, UNO_GRADIENT);
     handleSettings(ui.uno_role, UNO_ROLE);
-//     handleSettings(ui.uno_sunken, UNO_SUNKEN);
+    handleSettings(ui.uno_sunken, UNO_SUNKEN);
 
     handleSettings(ui.sunkenButtons, "Btn.Layer", 0);
     handleSettings(ui.checkMark, "Btn.CheckType", 0);
