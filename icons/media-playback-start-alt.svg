@@ -14,7 +14,9 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="media-skip-backward-alt.svg">
+   sodipodi:docname="media-playback-stop-al:application-x-rar
+
+Copying instead of sy.2009_11_14_14_25_06.0.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -32,16 +34,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.671875"
-     inkscape:cx="28.776252"
+     inkscape:zoom="11.5625"
+     inkscape:cx="18.897297"
      inkscape:cy="32"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1174"
      inkscape:window-height="963"
-     inkscape:window-x="431"
-     inkscape:window-y="40"
+     inkscape:window-x="383"
+     inkscape:window-y="46"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -70,8 +72,12 @@
      transform="translate(0,-988.36218)">
     <path
        style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="M 12.03125 2 C 5.1620434 2.1959275 4.0670482 10.66694 4 30 L 17.53125 30 C 17.603064 20.826726 18.231893 16.721766 21.625 16.625 C 24.11615 16.5539 28.09137 18.6041 34.40625 22.25 C 40.248281 25.622873 43.894562 27.933265 45.34375 30 L 59.375 30 C 57.668203 25.467403 50.220179 20.570175 37 12.9375 C 24.66625 5.8166055 16.896776 1.8612226 12.03125 2 z M 4 34 C 4.114536 67.026855 7.2533169 68.236754 37 51.0625 C 50.22018 43.429827 57.668203 38.532596 59.375 34 L 45.34375 34 C 43.894562 36.066735 40.248282 38.377127 34.40625 41.75 C 19.486532 50.363885 17.624227 49.916825 17.5 34 L 4 34 z "
+       d="M 16 8 C 11.568 8 8 11.568 8 16 L 8 30 L 16 30 L 16 20 C 16 17.688173 17.875673 15.8125 20.1875 15.8125 L 48 30 L 56 30 L 56 26 L 20 8 L 16 8 z "
        transform="translate(0,988.36218)"
-       id="path2820" />
+       id="rect3046" />
+    <path
+       id="path2817"
+       d="m 16,1044.3622 c -4.432,0 -8,-3.568 -8,-8 l 0,-14 8,0 0,10 c 0,2.3118 1.875673,4.1875 4.1875,4.1875 L 48,1022.3622 l 8,0 0,4 -36,18 -4,0 z"
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
   </g>
 </svg>
