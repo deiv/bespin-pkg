@@ -227,7 +227,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     QList<int> roles; roles << 3 << 4 << 6;
     generateColorModes(ui.viewShadingRole, &roles);
     
-    generateColorModes(ui.crMenu);
     generateColorModes(ui.kwinInactiveRole);
     generateColorModes(ui.kwinActiveRole);
     generateColorModes(ui.kwinInactiveText);
@@ -237,7 +236,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateGradientTypes(ui.gradButton);
     generateGradientTypes(ui.toolbuttonGradient);
     generateGradientTypes(ui.gradChoose);
-    generateGradientTypes(ui.gradMenuBar);
     generateGradientTypes(ui.gradMenuItem);
     generateGradientTypes(ui.gradProgress);
     generateGradientTypes(ui.gradTab);
@@ -379,9 +377,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.menuShadow, MENU_SHADOW); // false, i have a compmgr running :P
     handleSettings(ui.menuOpacity, MENU_OPACITY);
     handleSettings(ui.crPopup, MENU_ROLE);
-    handleSettings(ui.gradMenuBar, MENU_BAR_GRADIENT);
-    handleSettings(ui.crMenu, MENU_BARROLE);
-    handleSettings(ui.barSunken, MENU_BARSUNKEN);
     handleSettings(ui.menuBoldText, MENU_BOLDTEXT);
     handleSettings(ui.menuActiveItemSunken, MENU_ACTIVEITEMSUNKEN);
 

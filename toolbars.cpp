@@ -184,17 +184,30 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         QToolBar *tb = static_cast<QToolBar*>(widget->parentWidget()); // guaranteed by "connected", see above
         OPT_SUNKEN
         const bool round = config.btn.tool.sunken;
+
+        QPalette pal = PAL;
+#undef PAL
+#define PAL pal
+        if (widget && widget->parentWidget())
+            pal.setCurrentColorGroup(widget->parentWidget()->palette().currentColorGroup());
+        else
+            pal.setCurrentColorGroup(QPalette::Active);
         
-        QColor c = (option->state & State_On) ? COLOR(config.btn.tool.active_role[Bg]) :
-                                                (config.btn.tool.std_role[Bg] == QPalette::Window ?
-                                                    Colors::bg(PAL, widget) : COLOR(config.btn.tool.std_role[Bg]));
+        QColor c  = config.btn.tool.std_role[Bg] == QPalette::Window ? Colors::bg(pal, widget) : CCOLOR(btn.tool.std, Bg);
+        QColor c2 = /*config.btn.tool.active_role[Bg] == QPalette::Window ? Colors::bg(pal, widget) : */CCOLOR(btn.tool.active, Bg);
+#undef PAL
+#define PAL option->palette
+        if (option->state & State_On)
+        {
+            QColor h = c;
+            c = c2;
+            c2 = h;
+        }
+
         if (Colors::value(c) < 50)
             { int h,s,v,a; c.getHsv(&h, &s, &v, &a); c.setHsv(h, s, 50, a); }
         if (step)
-        {
-            QColor dest = (option->state & State_On) ? Colors::bg(PAL, widget) : FCOLOR(Highlight);
-            c = Colors::mid(c, dest, 18-step, step);
-        }
+            c = Colors::mid(c, c2, 18-step, step);
 
         // shape
         const int d = 1;
