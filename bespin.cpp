@@ -619,7 +619,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 
     data.inactiveDeco   = pal.color(QPalette::Inactive, inactive[Bg]).rgba();
     data.activeDeco     = pal.color(QPalette::Active, active[Bg]).rgba();
-    data.inactiveText   = Colors::mid( pal.color(QPalette::Inactive, QPalette::Window),
+    data.inactiveText   = Colors::mid( pal.color(QPalette::Inactive, inactive[Bg]),
                                        pal.color(QPalette::Inactive, text[0])).rgba();
     data.activeText     = pal.color(QPalette::Active, text[1]).rgba();
     data.inactiveButton = Colors::mid( pal.color(QPalette::Inactive, inactive[Bg]),
