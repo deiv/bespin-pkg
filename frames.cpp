@@ -94,7 +94,7 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
         }
         else
         {   // usually painted on visual frame, but...
-            if (widget->inherits("QComboBoxPrivateContainer"))
+            if (config.menu.shadow && widget->inherits("QComboBoxPrivateContainer"))
             {   // a decent combobox dropdown frame...
                 SAVE_PEN;
                 painter->setPen(Colors::mid(FCOLOR(Base),FCOLOR(Text),4,1));

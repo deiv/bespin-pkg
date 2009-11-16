@@ -45,11 +45,11 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_DefaultFrameWidth: // 2
         if (appType == GTK)
             return F(2);
-//         if (widget && widget->inherits("QComboBoxPrivateContainer"))
-//             return 1;
         if (!(widget && qobject_cast<const QFrame*>(widget) &&
             static_cast<const QFrame*>(widget)->frameShape() == QFrame::StyledPanel))
             return F(1);
+        if (config.menu.shadow && widget && widget->inherits("QComboBoxPrivateContainer"))
+            return 1;
         if (isSpecialFrame(widget))
             return F(4);
         return 0;
