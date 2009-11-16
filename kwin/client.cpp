@@ -46,11 +46,11 @@
 #include <X11/Xatom.h>
 #include "../fixx11h.h"
 
+#include "../blib/colors.h"
+#include "../blib/gradients.h"
+#include "../blib/xproperty.h"
+#include "../blib/shapes.h"
 #include "button.h"
-#include "../colors.h"
-#include "../gradients.h"
-#include "../xproperty.h"
-#include "../paths.h"
 #include "resizecorner.h"
 #include "client.h"
 

@@ -20,7 +20,7 @@
 #define BESPIN_CONFIG
 
 #include "types.h"
-#include "gradients.h"
+#include "blib/gradients.h"
 
 namespace Bespin
 {

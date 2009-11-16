@@ -23,7 +23,7 @@
 // #include <QStyleOptionTab>
 // #include <QTabBar>
 // #include <QTabWidget>
-#include "colors.h"
+#include "blib/colors.h"
 #include "bespin.h"
 #include "macmenu.h"
 #include "makros.h"

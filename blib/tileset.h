@@ -58,7 +58,7 @@ namespace Tile
 
 inline static bool matches(PosFlags This, PosFlags That){return (This & That) == This;}
 
-class Set
+class BLIB_EXPORT Set
 {
 public:
     Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round = 99);
@@ -129,11 +129,11 @@ private:
    QRect rndRect;
 };
 
-PosFlags shape();
-void setShape(PosFlags pf);
-void reset();
+BLIB_EXPORT PosFlags shape();
+BLIB_EXPORT void setShape(PosFlags pf);
+BLIB_EXPORT void reset();
 
-class Line
+class BLIB_EXPORT Line
 {
 public:
    Line(const QPixmap &pix, Qt::Orientation o, int d1, int d2);

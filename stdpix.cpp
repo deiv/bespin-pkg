@@ -23,10 +23,11 @@
 #include <QPainter>
 #include <QPen>
 
+#include "blib/colors.h"
+#include "blib/gradients.h"
+#include "blib/shapes.h"
+
 #include "bespin.h"
-#include "colors.h"
-#include "gradients.h"
-#include "paths.h"
 
 #include <QtDebug>
 

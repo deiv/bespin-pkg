@@ -29,8 +29,8 @@
 #include <netwm.h>
 #include <cmath>
 
-#include "../colors.h"
-#include "../paths.h"
+#include "../blib/colors.h"
+#include "../blib/shapes.h"
 #include "client.h"
 #include "factory.h"
 #include "button.h"

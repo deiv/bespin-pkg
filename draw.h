@@ -22,7 +22,7 @@
 #include <cmath>
 #include <QPainter>
 
-#include "colors.h"
+#include "blib/colors.h"
 #include "bespin.h"
 #include "makros.h"
 

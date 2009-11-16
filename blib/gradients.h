@@ -29,19 +29,16 @@
 
 namespace Bespin {
 
-class BgSet {
+class BLIB_EXPORT  BgSet {
 public:
     BgSet()
     {
-#ifdef BESPIN_DECO
         clients = 0;
-#endif
     }
     QPixmap topTile, btmTile;
     QPixmap cornerTile, lCorner, rCorner;
-#ifdef BESPIN_DECO
-    uint clients;
-#endif
+    /** the amount of clients attached to this set - use this if you don't want the auto cache */
+    uint clients; // used by the deco
 };
 
 namespace Gradients {
@@ -51,64 +48,59 @@ enum Type {
    TypeAmount
 };
 
-enum BgMode {
-   BevelV = 2, BevelH
-};
+enum BgMode { BevelV = 2, BevelH };
 
 enum Position { Top = 0, Bottom, Left, Right };
 
 
 /** use only if sure you're not requesting Type::None */
-const QPixmap& pix(const QColor &c,
-                   int size,
-                   Qt::Orientation o,
-                   Type type = Simple);
+BLIB_EXPORT const QPixmap& pix(const QColor &c, int size, Qt::Orientation o, Type type = Simple);
 
 /** wrapper to support Type::None */
-inline QBrush
-brush(const QColor &c, int size, Qt::Orientation o, Type type  = Simple) {
-   if (type == None)
-      return QBrush(c);
-   return QBrush(pix(c, size, o, type));
+BLIB_EXPORT inline QBrush brush(const QColor &c, int size, Qt::Orientation o, Type type  = Simple)
+{
+    if (type == None)
+        return QBrush(c);
+    return QBrush(pix(c, size, o, type));
 }
 
-inline bool isReflective(Type type = Simple) {
-   return type == Button || type == Metal;
+BLIB_EXPORT inline bool isReflective(Type type = Simple)
+{
+    return type == Button || type == Metal;
 }
 
-inline bool isTranslucent(Type type = Simple) {
-   return type > Sunken && type != Metal;
+BLIB_EXPORT inline bool isTranslucent(Type type = Simple)
+{
+    return type > Sunken && type != Metal;
 }
 
-QColor endColor(const QColor &c, Position p, Type type = Simple, bool checkValue = false);
-
-#ifndef BESPIN_DECO
+BLIB_EXPORT QColor endColor(const QColor &c, Position p, Type type = Simple, bool checkValue = false);
 
 /** a diagonal NW -> SE light */
-const QPixmap &shadow(int height, bool bottom = false);
+BLIB_EXPORT const QPixmap &shadow(int height, bool bottom = false);
 
 /** a diagonal 16:9 SE -> NW light */
-const QPixmap &ambient(int height);
+BLIB_EXPORT const QPixmap &ambient(int height);
 
 /** a horizontal black bevel from low alpha to transparent */
-const QPixmap &bevel(bool ltr = true);
+BLIB_EXPORT const QPixmap &bevel(bool ltr = true);
 
 /** a vertical N -> S light */
-const QPixmap &light(int height);
+BLIB_EXPORT const QPixmap &light(int height);
 
-const QPixmap &structure(const QColor &c, bool light = false);
+BLIB_EXPORT const QPixmap &structure(const QColor &c, bool light = false);
 
-const BgSet &bgSet(const QColor &c);
+/** pulls a background pixmap set out of a (limited) cache - creates it if necessary */
+BLIB_EXPORT const BgSet &bgSet(const QColor &c);
+
+/** create a bgset on the heap, utilized by the caching variant - The pointer is YOUR response!! */
+BLIB_EXPORT BgSet *bgSet(const QColor &c, BgMode mode, int bgBevelIntesity = 110);
 // const QPixmap &bgCorner(const QColor &c, bool other = false);
 
-void init(BgMode mode, int structure = 0, int bgBevelIntesity = 110, int btnBevelSize = 16, bool force = false);
-#else
-void init();
-BgSet *bgSet(const QColor &c, BgMode mode, int bgBevelIntesity = 110);
-#endif
+BLIB_EXPORT void init(BgMode mode = BevelV, int structure = 0, int bgBevelIntesity = 110, int btnBevelSize = 16, bool force = false);
 
-const QPixmap &borderline(const QColor &c, Position pos);
-void wipe();
+BLIB_EXPORT const QPixmap &borderline(const QColor &c, Position pos);
+BLIB_EXPORT void wipe();
 
 }
 }

@@ -58,7 +58,7 @@ Config Factory::ourConfig = { false, false, false, true, false,
                               Qt::AlignHCenter, 0, {
                                   {Gradients::None, Gradients::Button},
                                   {Gradients::None, Gradients::None}
-                              }
+                              }, QStringList()
                             };
 int Factory::ourButtonSize[2] = {-1, -1};
 int Factory::ourBorderSize = 4;

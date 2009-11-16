@@ -37,19 +37,19 @@
 
 #include <QtDebug>
 
-#include "colors.h"
-
 #include <unistd.h>
 #include <cmath>
 
+#include "blib/colors.h"
+
 #ifdef Q_WS_X11
 #include "macmenu.h"
-#include "xproperty.h"
+#include "blib/xproperty.h"
 #endif
 
 #include "visualframe.h"
-#include "bespin.h"
 #include "hacks.h"
+#include "bespin.h"
 
 #include "animator/hover.h"
 #include "animator/aprogress.h"

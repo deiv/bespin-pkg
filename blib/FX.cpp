@@ -31,7 +31,7 @@
 // #include <QWidget>
 // #include <QtCore/QVarLengthArray>
 #include <cmath>
-#include "oxrender.h"
+#include "FX.h"
 
 using namespace FX;
 

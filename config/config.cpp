@@ -28,7 +28,7 @@ Boston, MA 02110-1301, USA.
 #include <QProcess>
 #include <QValidator>
 
-#include "../gradients.h"
+#include "../blib/gradients.h"
 #include "kdeini.h"
 #include "../config.defaults"
 #include "config.h"
@@ -1026,6 +1026,7 @@ Config::savePalette(const QPalette &pal)
     //
     // yeah - 5000 new extra colors for a style that relies on very restricted
     // color assumptions (kstyle, plastik and thus oxygen...) - sure...
+    //
     // [ UPDATE:this is meanwhile fixed... ]
     // and please don't sync the Qt palette, ppl. will certainly be happy to
     // make color setting in KDE first and then in qtconfig for QApplication...
@@ -1042,21 +1043,20 @@ Config::savePalette(const QPalette &pal)
     // third, there're alternate backgroundcolors for all sections - sure:
     //                 ------------------------        ---------
     // my alternate button color: 1st button blue, second red, third blue...
-    // -- we'll' do what we do for normal alternate row colors and slightly shift
+    // -- we'll do what we do for normal alternate row colors and slightly shift
     // to the foreground....
     //
     // there's a ForegroundActive color that is by default... PINK???
     //          -----------------
-    // what a decent taste for asthetics... &-}
+    // what a decent taste for aesthetics... &-}
     // -- we just leave it as it is, cause i've no idea what it shall be good for
     // (active palette text - that's gonna be fun ;-)
     //
     // last there're ForegroundNegative, ForegroundNeutral and ForegroundPositive
     //               ------------------  ----------------      -----------------
     // what basically means: shifted to red, yellow and green...
-    // who exactly is resposible for this fucking ridiculous nonsense?
     //
-    // oh, and of course there NEEDS to be support for speciacl chars in the
+    // oh, and of course there NEEDS to be support for special chars in the
     // KDE ini files - plenty. who could ever life without keys w/o ':' or '$'
     // so we cannot simply use QSettings on a KDE ini file, thus we'll use our
     // own very... slim... ini parser, ok, we just read the file group it by
@@ -1280,15 +1280,17 @@ static void ensureIcons()
     if (haveIcons)
         return;
     QPixmap pix(16,16);
-    pix.fill(Qt::white);
-    QPainter p(&pix);
-    p.fillRect(1,1,14,14, Qt::black);
-    p.end();
+    pix.fill(Qt::transparent);
+    QPainter p;
     QPalette *pal = /*loadedPal ? loadedPal :*/ &qApp->palette();
     for (int i = 0; i < 8; ++i)
     {
+        pix.fill(Qt::transparent);
         p.begin(&pix);
-        p.fillRect(2,2,12,12, pal->color(roles[i]));
+        p.setPen(Qt::black);
+        p.setBrush(pal->color(roles[i]));
+        p.setRenderHint(QPainter::Antialiasing);
+        p.drawEllipse(pix.rect().adjusted(1,1,-1,-1));
         p.end();
         icons[i] = QIcon(pix);
     }

@@ -18,7 +18,7 @@ Boston, MA 02110-1301, USA.
 
 #include <QPainterPath>
 #include <QRectF>
-#include "paths.h"
+#include "shapes.h"
 
 using namespace Bespin;
 

@@ -3,7 +3,7 @@
 // -------------------
 // Bespin style & window decoration for KDE
 // -------------------
-// Copyright (c) 2008 Thomas Lübking <baghira-style@gmx.net>
+// Copyright (c) 2008 Thomas Luebking <baghira-style@gmx.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -32,10 +32,10 @@ using namespace Bespin;
 #include <X11/Xatom.h>
 #include <QX11Info>
 
-Atom XProperty::winData = XInternAtom(QX11Info::display(), "BESPIN_WIN_DATA", False);
-Atom XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", False);
-Atom XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
-Atom XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
+BLIB_EXPORT Atom XProperty::winData = XInternAtom(QX11Info::display(), "BESPIN_WIN_DATA", False);
+BLIB_EXPORT Atom XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", False);
+BLIB_EXPORT Atom XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
+BLIB_EXPORT Atom XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
 
 void
 XProperty::handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n)

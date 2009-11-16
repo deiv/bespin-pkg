@@ -24,20 +24,19 @@ class QWidget;
 #include <QPalette>
 
 namespace Bespin {
-
 namespace Colors {
 
-const QColor &bg(const QPalette &pal, const QWidget *w);
-int contrast(const QColor &a, const QColor &b);
-QPalette::ColorRole counterRole(QPalette::ColorRole role);
-bool counterRole(QPalette::ColorRole &from, QPalette::ColorRole &to,
-                 QPalette::ColorRole defFrom = QPalette::WindowText,
-                 QPalette::ColorRole defTo = QPalette::Window);
-QColor emphasize(const QColor &c, int value = 10);
-bool haveContrast(const QColor &a, const QColor &b);
-QColor light(const QColor &c, int value);
-QColor mid(const QColor &oc1, const QColor &c2, int w1 = 1, int w2 = 1);
-int value(const QColor &c);
+    BLIB_EXPORT const QColor &bg(const QPalette &pal, const QWidget *w);
+    BLIB_EXPORT int contrast(const QColor &a, const QColor &b);
+    BLIB_EXPORT QPalette::ColorRole counterRole(QPalette::ColorRole role);
+    BLIB_EXPORT bool counterRole( QPalette::ColorRole &from, QPalette::ColorRole &to,
+                                  QPalette::ColorRole defFrom = QPalette::WindowText,
+                                  QPalette::ColorRole defTo = QPalette::Window);
+    BLIB_EXPORT QColor emphasize(const QColor &c, int value = 10);
+    BLIB_EXPORT bool haveContrast(const QColor &a, const QColor &b);
+    BLIB_EXPORT QColor light(const QColor &c, int value);
+    BLIB_EXPORT QColor mid(const QColor &oc1, const QColor &c2, int w1 = 1, int w2 = 1);
+    BLIB_EXPORT int value(const QColor &c);
 
 }
 }

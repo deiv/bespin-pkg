@@ -30,8 +30,8 @@
 #include <QHash>
 #include <QVector>
 #include <kdecorationfactory.h>
-#include "../gradients.h"
-#include "../xproperty.h"
+#include "../blib/gradients.h"
+#include "../blib/xproperty.h"
 #include "button.h"
 
 class QMenu;

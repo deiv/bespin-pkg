@@ -72,7 +72,7 @@ Style::drawCheckMark(const QStyleOption *option, QPainter *painter, Check::Type 
         else
         {   // tristate
             const int d = 2*RECT.height()/5;
-            QRect r = RECT.adjusted(dpi.f2,d,-dpi.f2,-d);
+            QRect r = RECT.adjusted(F(2),d,-F(2),-d);
             painter->drawRect(r);
         }
         break;

@@ -50,7 +50,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         int w = spinbox->rect.width(), h = spinbox->rect.height();
         h /= 2;
         // 1.6 -approximate golden mean
-        w = qMax(dpi.f18, qMin(h, w / 4));
+        w = qMax(F(18), qMin(h, w / 4));
 //          bs = bs.expandedTo(QApplication::globalStrut());
         int x = spinbox->rect.width() - w;
         switch (subControl)
@@ -64,8 +64,8 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         case SC_SpinBoxEditField:
             w = h = 0; // becomes framesizes
             if (spinbox->frame)
-                { w = dpi.f4; h = dpi.f1; }
-            ret = QRect(w, h, x-dpi.f1, spinbox->rect.height() - 2*h);
+                { w = F(4); h = F(1); }
+            ret = QRect(w, h, x-F(1), spinbox->rect.height() - 2*h);
             break;
         case SC_SpinBoxFrame:
             ret = spinbox->rect;
@@ -127,7 +127,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         {
             int top = 0;
             if (groupBox->subControls & SC_GroupBoxCheckBox)
-                top = dpi.ExclusiveIndicator;
+                top = Dpi::target.ExclusiveIndicator;
             if (!groupBox->text.isEmpty())
                 top = qMax(top, groupBox->fontMetrics.height());
             top += (groupBox->features & QStyleOptionFrameV2::Flat) ? F(3) : F(6);
@@ -138,8 +138,8 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
         {
             if (!(config.sunkenGroups || groupBox->features & QStyleOptionFrameV2::Flat))
                 ret = groupBox->rect.adjusted(F(7), F(7), 0, 0);
-            ret.setWidth(dpi.ExclusiveIndicator);
-            ret.setHeight(dpi.ExclusiveIndicator);
+            ret.setWidth(Dpi::target.ExclusiveIndicator);
+            ret.setHeight(Dpi::target.ExclusiveIndicator);
             break;
         }
         case SC_GroupBoxLabel:
@@ -155,7 +155,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             {
                 int left = marg;
                 if (groupBox->subControls & SC_GroupBoxCheckBox)
-                    left += dpi.ExclusiveIndicator + flat*F(3);
+                    left += Dpi::target.ExclusiveIndicator + flat*F(3);
                 ret = groupBox->rect.adjusted(left, 0, -marg, 0);
                 align = Qt::AlignLeft | Qt::AlignVCenter;
             }
@@ -339,7 +339,7 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
    case CC_TitleBar: // A Title bar, like what is used in Q3Workspace
       if (const QStyleOptionTitleBar *tb = qstyleoption_cast<const QStyleOptionTitleBar *>(option))
       {
-         const int controlMargin = dpi.f3;
+         const int controlMargin = F(3);
          const int controlHeight = tb->rect.height() - controlMargin*2;
          const int delta = controlHeight + 2*controlMargin;
          int offset = 0;
@@ -447,7 +447,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
     case SE_ViewItemCheckIndicator: // Area for a view item's check mark
     case SE_CheckBoxIndicator: // Area for the state indicator (e.g., check mark)
     {
-        const int h = dpi.Indicator;
+        const int h = Dpi::target.Indicator;
         const int shrink = config.btn.layer && (element != SE_CheckBoxContents) ? F(2) : 0;
         QRect r = RECT;
         r.setRect(r.x()+shrink, r.y() + ((r.height() - h) / 2), h-shrink, h);
@@ -461,7 +461,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
     case SE_RadioButtonIndicator: // Area for the state indicator
     case SE_RadioButtonContents: // Area for the label
     {
-        const int h = dpi.ExclusiveIndicator;
+        const int h = Dpi::target.ExclusiveIndicator;
         QRect r = RECT;
         r.setRect(r.x()+F(1), r.y() + ((r.height() - h) / 2), h, h);
 
@@ -501,7 +501,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
             option->rect.intersected(widget->rect()).getRect(&x,&y,&w,&h);
         else
             option->rect.getRect(&x,&y,&w,&h);
-        int margin = dpi.f2;// ;) pixelMetric(QStyle::PM_HeaderMargin, opt, widget);
+        int margin = F(2);// ;) pixelMetric(QStyle::PM_HeaderMargin, opt, widget);
         QRect r;
         if (option->state & State_Horizontal)
         {
@@ -638,7 +638,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
 //     case QStyle::SE_TabBarTabText:
 #endif
     case SE_TabWidgetTabPane: //
-        return RECT;//.adjusted(-dpi.f8, 0, dpi.f8, 0);
+        return RECT;//.adjusted(-F(8), 0, F(8), 0);
 //     case SE_ItemViewItemFocusRect:
 //     case SE_ItemViewItemText:
 //     case SE_TreeViewDisclosureItem: //Area for the actual disclosure item in a tree branch.

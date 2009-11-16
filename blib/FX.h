@@ -41,29 +41,29 @@ typedef Pixmap OXPixmap;
 namespace FX
 {
 #ifndef QT_NO_XRENDER
-    void freePicture(OXPicture pict);
-    void composite( OXPicture src, OXPicture mask, OXPicture dst,
-                    int sx, int sy, int mx, int my, int dx, int dy,
-                    uint w, uint h, int op = PictOpSrc);
-    void composite( OXPicture src, OXPicture mask, const QPixmap &dst,
-                    int sx, int sy, int mx, int my, int dx, int dy,
-                    uint w, uint h, int op = PictOpSrc);
-    void composite( const QPixmap &src, OXPicture mask, const QPixmap &dst,
-                    int sx, int sy, int mx, int my, int dx, int dy,
-                    uint w, uint h, int op = PictOpSrc);
+    BLIB_EXPORT void freePicture(OXPicture pict);
+    BLIB_EXPORT void composite( OXPicture src, OXPicture mask, OXPicture dst,
+                                int sx, int sy, int mx, int my, int dx, int dy,
+                                uint w, uint h, int op = PictOpSrc);
+    BLIB_EXPORT void composite( OXPicture src, OXPicture mask, const QPixmap &dst,
+                                int sx, int sy, int mx, int my, int dx, int dy,
+                                uint w, uint h, int op = PictOpSrc);
+    BLIB_EXPORT void composite( const QPixmap &src, OXPicture mask, const QPixmap &dst,
+                                int sx, int sy, int mx, int my, int dx, int dy,
+                                uint w, uint h, int op = PictOpSrc);
 
-    void setColor(XRenderColor &xc, double r, double g, double b, double a = 1);
-    void setColor(XRenderColor &xc, QColor qc);
+    BLIB_EXPORT void setColor(XRenderColor &xc, double r, double g, double b, double a = 1);
+    BLIB_EXPORT void setColor(XRenderColor &xc, QColor qc);
 #endif
 
-    void init();
-    bool usesXRender();
-    bool blend(const QPixmap &upper, QPixmap &lower, double opacity = 0.5, int x = 0, int y = 0);
-    void desaturate(QImage &img, const QColor &c);
-    QPixmap fade(const QPixmap &pix, double percent);
-    QPixmap tint(const QPixmap &mask, const QColor &color);
-    QPixmap applyAlpha( const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect &rect = QRect(), const QRect &alphaRect = QRect());
-    void expblur(QImage &img, int radius);
+    BLIB_EXPORT void init();
+    BLIB_EXPORT bool usesXRender();
+    BLIB_EXPORT bool blend(const QPixmap &upper, QPixmap &lower, double opacity = 0.5, int x = 0, int y = 0);
+    BLIB_EXPORT void desaturate(QImage &img, const QColor &c);
+    BLIB_EXPORT QPixmap fade(const QPixmap &pix, double percent);
+    BLIB_EXPORT QPixmap tint(const QPixmap &mask, const QColor &color);
+    BLIB_EXPORT QPixmap applyAlpha( const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect &rect = QRect(), const QRect &alphaRect = QRect());
+    BLIB_EXPORT void expblur(QImage &img, int radius);
 //    QPixmap applyAlpha(const QPixmap &toThisPix,
 //                       const OXPicture &fromThisPict,
 //                       const QRect &rect = QRect(),

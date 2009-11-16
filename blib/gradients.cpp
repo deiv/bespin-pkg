@@ -24,8 +24,8 @@
 
 #include "colors.h"
 #include "gradients.h"
-#include "makros.h"
-#include "oxrender.h"
+#include "../makros.h"
+#include "FX.h"
 
 using namespace Bespin;
 
@@ -293,8 +293,6 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
 #undef GLOSS
 }
 
-#ifndef BESPIN_DECO
-
 static inline uint costs(BgSet *set)
 {
     return (set->topTile.width()*set->topTile.height() +
@@ -310,8 +308,6 @@ static Gradients::BgMode _mode = Gradients::BevelV;
 static PixmapCache _btnAmbient, _tabShadow, _groupLight, _structure[2];
 typedef QCache<uint, BgSet> BgSetCache;
 static BgSetCache _bgSet;
-#endif
-
 static PixmapCache gradients[2][Gradients::TypeAmount-1];
 static PixmapCache _borderline[4];
 
@@ -481,7 +477,6 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
     return nullPix;
 }
 
-#ifndef BESPIN_DECO
 static QPixmap _dither;
 
 static inline void
@@ -779,8 +774,6 @@ Gradients::shadow(int height, bool bottom)
     return nullPix;
 }
 
-#endif
-
 static inline QPixmap *
 cornerMask(bool right = false)
 {
@@ -802,23 +795,24 @@ cornerMask(bool right = false)
     return alpha;
 }
 
-#ifndef BESPIN_DECO
 const BgSet&
 Gradients::bgSet(const QColor &c)
 {
     BgSet *set = _bgSet.object(c.rgb());
     if (set)
         return *set;
-    set = new BgSet;
-#else
+    set = bgSet(c, _mode, _bgIntensity);
+    _bgSet.insert(c.rgba(), set, costs(set));
+    return *set;
+}
+
 BgSet*
-Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
+Gradients::bgSet(const QColor &c, BgMode mode, int bgIntensity)
 {
     BgSet *set = new BgSet;
-#endif
     QLinearGradient lg;
     QPainter p;
-    switch (_mode)
+    switch (mode)
     {
     case BevelV:
     {
@@ -829,8 +823,8 @@ Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
         {
             set->topTile.fill(Qt::transparent);
             set->lCorner.fill(Qt::transparent);
-            int a = qAbs(_bgIntensity - 100)*3; a = CLAMP(a,0,255);
-            int v = (_bgIntensity > 100)*255;
+            int a = qAbs(bgIntensity - 100)*3; a = CLAMP(a,0,255);
+            int v = (bgIntensity > 100)*255;
             c1 = QColor(v,v,v, a);
             c2 = QColor(v,v,v, a/2);
             v = (!v)*255;
@@ -838,9 +832,9 @@ Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
         }
         else
         {
-            c1 = c.light(_bgIntensity);
+            c1 = c.light(bgIntensity);
             c2 = Colors::mid(c1, c);
-            c3 = c.dark(_bgIntensity);
+            c3 = c.dark(bgIntensity);
         }
         // this can save some time on alpha enabled pixmaps
         set->cornerTile = set->topTile.copy(set->cornerTile.rect());
@@ -849,21 +843,19 @@ Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
 
         lg = QLinearGradient(QPoint(0,0), QPoint(0,256));
         QGradientStops stops;
+
         // Top Tile
         p.begin(&set->topTile);
         stops << QGradientStop(0, c1) << QGradientStop(1, c);
         lg.setStops(stops); p.fillRect(set->topTile.rect(), lg); stops.clear();
-#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->topTile.rect(), _dither);
-#endif
         p.end();
+
         // Bottom Tile
         p.begin(&set->btmTile);
         stops << QGradientStop(0, c) << QGradientStop(1, c3);
         lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg); stops.clear();
-#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->btmTile.rect(), _dither);
-#endif
         p.end();
 
         if (Colors::value(c) > 244)
@@ -883,10 +875,9 @@ Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
         lg.setStops(stops);
         p.fillRect(set->cornerTile.rect(), lg);
         stops.clear();
-#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->cornerTile.rect(), _dither);
-#endif
         p.end();
+        
         // Left Corner, right corner
         QPixmap *mask, *pix;
         for (int cnr = 0; cnr < 2; ++cnr)
@@ -906,9 +897,7 @@ Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
 
             p.begin(pix);
             p.drawPixmap(0,0, fill);
-#ifndef BESPIN_DECO
             p.drawTiledPixmap(pix->rect(), _dither);
-#endif
             p.end();
             delete mask;
         }
@@ -949,18 +938,16 @@ Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
         p.begin(&set->topTile);
         stops << QGradientStop(0, c1) << QGradientStop(1, c);
         lg.setStops(stops); p.fillRect(set->topTile.rect(), lg); stops.clear();
-#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->topTile.rect(), _dither);
-#endif
         p.end();
+
         // right
         p.begin(&set->btmTile);
         stops << QGradientStop(0, c) << QGradientStop(1, c1);
         lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg); stops.clear();
-#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->btmTile.rect(), _dither);
-#endif
         p.end();
+
         // left corner right corner
         QPixmap *pix, *blend;
         QPixmap *mask = new QPixmap(256,32);
@@ -986,9 +973,7 @@ Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
 
             p.begin(pix);
             p.drawPixmap(0,0, fill);
-#ifndef BESPIN_DECO
             p.drawTiledPixmap(pix->rect(), _dither);
-#endif
             p.end();
         }
         delete mask;
@@ -996,24 +981,17 @@ Gradients::bgSet(const QColor &c, BgMode _mode, int _bgIntensity)
         lg.setColorAt(0, c3); lg.setColorAt(1, c);
         p.begin(&set->cornerTile);
         p.fillRect(set->cornerTile.rect(), lg);
-#ifndef BESPIN_DECO
         p.drawTiledPixmap(set->cornerTile.rect(), _dither);
-#endif
         p.end();
         break;
     }
     default:
         break;
     }
-#ifndef BESPIN_DECO
-    _bgSet.insert(c.rgba(), set, costs(set));
-    return *set;
-#else
     return set;
-#endif
 }
 
-#ifndef BESPIN_DECO
+
 static bool _initialized = false;
 
 void
@@ -1042,10 +1020,7 @@ Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bo
         p.begin(&_bevel[i]); p.fillRect(_bevel[i].rect(), lg); p.end();
     }
     createDither();
-#else
 
-void Gradients::init() {
-#endif
     for (int i = 0; i < 4; ++i)
         _borderline[i].setMaxCost( ((32*32)<<3)<<4 ); // enough for 16 different colors
     for (int i = 0; i < 2; ++i) {
@@ -1058,14 +1033,13 @@ void Gradients::wipe() {
     for (int i = 0; i < 2; ++i)
         for (int j = 0; j < Gradients::TypeAmount-1; ++j)
             gradients[i][j].clear();
-#ifndef BESPIN_DECO
+
     _bgSet.clear();
     _btnAmbient.clear();
     _tabShadow.clear();
     _groupLight.clear();
     _structure[0].clear(); _structure[1].clear();
-#else
+
     for (int i = 0; i < 4; ++i)
         _borderline[i].clear();
-#endif
 }

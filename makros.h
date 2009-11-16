@@ -47,7 +47,7 @@ if (!_VAR_) return
 
 #define ASSURE(_VAR_) if (!_VAR_) return
 
-#define F(_I_) Style::dpi.f##_I_
+#define F(_I_) Dpi::target.f##_I_
 
 #define IS_HTML_WIDGET (widget->objectName() == "RenderFormElementWidget")
 

@@ -26,7 +26,7 @@ Boston, MA 02110-1301, USA.
 
 #include <cmath>
 
-#include "../oxrender.h"
+#include "../blib/FX.h"
 
 #define ANIMATOR_IMPL 1
 #include "tab.h"
@@ -45,12 +45,15 @@ SET_FPS(Tab)
 static inline QAbstractScrollArea*
 scrollAncestor(QWidget *w, QWidget *root)
 {
-   QWidget *parent = w;
-   while (parent != root && (parent = parent->parentWidget())) {
-      if (qobject_cast<QAbstractScrollArea*>(parent)) break;
-   }
-   if (parent != root) return static_cast<QAbstractScrollArea*>(parent);
-   return 0L;
+    QWidget *parent = w;
+    while (parent != root && (parent = parent->parentWidget()))
+    {
+        if (qobject_cast<QAbstractScrollArea*>(parent))
+            break;
+    }
+    if (parent != root)
+        return static_cast<QAbstractScrollArea*>(parent);
+    return 0L;
 }
 
 // to get an idea about what the bg of out tabs looks like - seems as if we

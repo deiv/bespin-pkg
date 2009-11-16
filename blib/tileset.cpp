@@ -24,7 +24,7 @@
 
 #include <QPainter>
 #include <cmath>
-#include "oxrender.h"
+#include "FX.h"
 #include "tileset.h"
 
 #include <QtDebug>

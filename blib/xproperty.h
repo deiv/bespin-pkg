@@ -49,7 +49,7 @@ typedef struct _WindowPics
     Picture topTile, btmTile, cnrTile, lCorner, rCorner;
 } WindowPics;
 
-class XProperty
+class BLIB_EXPORT XProperty
 {
 public:
     enum Type { BYTE = 8, WORD = 16, LONG = 32 };

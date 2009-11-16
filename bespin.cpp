@@ -44,13 +44,13 @@
 // #include "debug.h"
 
 #ifdef Q_WS_X11
-#include "xproperty.h"
+#include "blib/xproperty.h"
 #endif
-#include "oxrender.h"
-#include "colors.h"
-#include "bespin.h"
-
+#include "blib/FX.h"
+#include "blib/colors.h"
 #include "animator/hover.h"
+
+#include "bespin.h"
 
 /**=========================================================*/
 
@@ -79,7 +79,6 @@ using namespace Bespin;
 
 AppType Style::appType;
 Config Style::config;
-Dpi Style::dpi;
 Style::Lights Style::lights;
 Style::Masks Style::masks;
 QPalette *Style::originalPalette = 0;
@@ -1222,7 +1221,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 menu->setActiveAction(menu->actions().at(0));
             }
 #else
-            menu->move(menu->pos()-QPoint(0,dpi.f2));
+            menu->move(menu->pos()-QPoint(0,F(2)));
 #endif
             return false;
         }

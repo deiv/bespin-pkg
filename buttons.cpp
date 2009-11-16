@@ -561,7 +561,7 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
     if (animStep > 0)
     {   // the drop ============================
         QColor c = Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg), 12-animStep, animStep);
-        const int off = (dpi.ExclusiveIndicator - (masks.radioIndicator.height() + 1))/2;
+        const int off = (Dpi::target.ExclusiveIndicator - (masks.radioIndicator.height() + 1))/2;
         QPoint xy = r.topLeft() + QPoint(off, off);
         const Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
         fillWithMask(painter, xy, Gradients::pix(c, masks.radioIndicator.height(), Qt::Vertical, gt), masks.radioIndicator);
@@ -604,8 +604,7 @@ Style::drawCheckLabel(const QStyleOption *option, QPainter *painter, const QWidg
     
     if (!btn->icon.isNull())
     {
-        const QPixmap pix =
-            btn->icon.pixmap(btn->iconSize, isEnabled ? QIcon::Normal : QIcon::Disabled);
+        const QPixmap pix = btn->icon.pixmap(btn->iconSize, isEnabled ? QIcon::Normal : QIcon::Disabled);
         drawItemPixmap(painter, btn->rect, alignment, pix);
         if (btn->direction == Qt::RightToLeft)
             textRect.setRight(textRect.right() - btn->iconSize.width() - F(4));

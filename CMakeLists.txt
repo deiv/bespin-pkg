@@ -6,7 +6,7 @@ add_definitions( ${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} -DQT3_SUPPORT )
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules )
 
 option(ENABLE_ARGB "Enable translucent windows" OFF)
-option(ENABLE_AMAROK_HACK "Legacy Amarok hacks" ON)
+option(ENABLE_AMAROK_HACK "Legacy Amarok hacks" OFF)
 option(ENABLE_KDE "Enable Bespin support for KDE4" ON)
 option(ENABLE_KWIN "Build Bespin KWin decoration" ON)
 option(ENABLE_XBAR "Enable the XBar plasmoid (Mac-Alike-Menubar)" ON)
@@ -50,24 +50,22 @@ else (KDE4_FOUND)
    set (CMAKE_INCLUDE_CURRENT_DIR ON)
 endif (KDE4_FOUND)
 
+add_subdirectory (blib)
+
+add_definitions ( -DBLIB_EXPORT=Q_DECL_IMPORT )
+
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
 
 set (bespin_SOURCES animator/basic.cpp animator/aprogress.cpp animator/hover.cpp
 animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp
-colors.cpp bespin.cpp tileset.cpp oxrender.cpp stylehint.cpp
-sizefromcontents.cpp qsubcmetrics.cpp
-pixelmetric.cpp stdpix.cpp
-visualframe.cpp gradients.cpp init.cpp genpixmaps.cpp polish.cpp
-buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp
-scrollareas.cpp shapes.cpp slider.cpp tabbing.cpp toolbars.cpp
-views.cpp window.cpp hacks.cpp macmenu.cpp paths.cpp filedialog.cpp)
+bespin.cpp buttons.cpp docks.cpp filedialog.cpp frames.cpp genpixmaps.cpp hacks.cpp init.cpp
+input.cpp macmenu.cpp menus.cpp pixelmetric.cpp polish.cpp progress.cpp qsubcmetrics.cpp
+scrollareas.cpp shapes.cpp sizefromcontents.cpp slider.cpp stdpix.cpp stylehint.cpp
+tabbing.cpp toolbars.cpp views.cpp visualframe.cpp window.cpp )
 
-if ( X11_FOUND )
-   set (bespin_SOURCES ${bespin_SOURCES} xproperty.cpp)
-endif ( X11_FOUND )
-if (X11_Xrender_FOUND)
-   message (STATUS "INFO: XRender was found - kwin deco & FX via GPU available!")
-endif (X11_Xrender_FOUND)
+# if ( X11_FOUND )
+#     set (bespin_SOURCES ${bespin_SOURCES} lib/xproperty.cpp)
+# endif ( X11_FOUND )
 
 set (bespin_MOC_HDRS animator/basic.h animator/aprogress.h animator/hover.h
 animator/hoverindex.h animator/tab.h
@@ -77,8 +75,7 @@ qt4_wrap_cpp(bespin_MOC_SRCS ${bespin_MOC_HDRS})
 add_library (bespin SHARED ${bespin_SOURCES} ${bespin_MOC_SRCS})
 
 
-target_link_libraries(bespin  ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY}
-                              ${QT_QTDBUS_LIBRARY} ${QT_QT3SUPPORT_LIBRARY})
+target_link_libraries(bespin QtBespin ${QT_QTDBUS_LIBRARY} ${QT_QT3SUPPORT_LIBRARY})
 if ( X11_FOUND )
    target_link_libraries(bespin ${X11_LIBRARIES})
 endif( X11_FOUND )

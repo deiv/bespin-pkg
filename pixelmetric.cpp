@@ -64,14 +64,14 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_ScrollBarExtent: // Width of a vertical scroll bar and the height of a horizontal scroll bar
         return (widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
                 widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) ?
-                F(16) : dpi.ScrollBarExtent;
+                F(16) : Dpi::target.ScrollBarExtent;
     case PM_ScrollBarSliderMin: // The minimum height of a vertical scroll bar's slider and the minimum width of a horizontal scroll bar's slider
-        return dpi.ScrollBarSliderMin;
+        return Dpi::target.ScrollBarSliderMin;
     case PM_SliderThickness: // Total slider thickness
     case PM_SliderControlThickness: // Thickness of the slider handle
-        return dpi.SliderThickness;
+        return Dpi::target.SliderThickness;
     case PM_SliderLength: // Length of the slider
-        return dpi.SliderControl;
+        return Dpi::target.SliderControl;
 //    case PM_SliderTickmarkOffset: // The offset between the tickmarks and the slider
     case PM_SliderSpaceAvailable:
     {   // The available space for the slider to move
@@ -79,9 +79,9 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
         if (const QSlider *slider = qobject_cast<const QSlider*>(widget))
         {
             if (slider->orientation() == Qt::Horizontal)
-                return (widget->width() - dpi.SliderControl);
+                return (widget->width() - Dpi::target.SliderControl);
             else
-                return (widget->height() - dpi.SliderControl);
+                return (widget->height() - Dpi::target.SliderControl);
         }
         return 0;
     }
@@ -172,10 +172,10 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_TitleBarHeight: // Height of the title bar
     case PM_IndicatorWidth: // Width of a check box indicator
     case PM_IndicatorHeight: // Height of a checkbox indicator
-        return dpi.Indicator;
+        return Dpi::target.Indicator;
     case PM_ExclusiveIndicatorWidth: // Width of a radio button indicator
     case PM_ExclusiveIndicatorHeight: // Height of a radio button indicator
-        return dpi.ExclusiveIndicator;
+        return Dpi::target.ExclusiveIndicator;
     case PM_MenuPanelWidth: // Border width (applied on all sides) for a QMenu
         return 1; // cosmetic, qt hates 0 sized popupframes
     case PM_MenuHMargin: // Additional border (used on left and right) for a QMenu
@@ -186,8 +186,8 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
 //    case PM_MenuDesktopFrameWidth: //
 //    case PM_CheckListButtonSize: // Area (width/height) of the checkbox/radio button in a Q3CheckListItem
 //    case PM_CheckListControllerSize: // Area (width/height) of the controller in a Q3CheckListItem
-//       if (option) return option->rect.height()-dpi.f4;
-//       return dpi.f16;
+//       if (option) return option->rect.height()-F(4);
+//       return F(16);
 //    case PM_DialogButtonsSeparator: // Distance between buttons in a dialog buttons widget
 //    case PM_DialogButtonsButtonWidth: // Minimum width of a button in a dialog buttons widget
 //    case PM_DialogButtonsButtonHeight: // Minimum height of a button in a dialog buttons widget
@@ -216,8 +216,8 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
 //    case PM_IconViewIconSize: //
 //    case PM_ListViewIconSize: //
 //       return 10;
-//       if (option) return option->rect.height()-dpi.f4;
-//       return dpi.f16;
+//       if (option) return option->rect.height()-F(4);
+//       return F(16);
     case PM_TabBarIconSize:
         return 16;
     case PM_ToolTipLabelFrameWidth: //

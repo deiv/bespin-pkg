@@ -39,7 +39,7 @@ Style::drawLineEditFrame(const QStyleOption *option, QPainter *painter, const QW
     if (hasFocus)
     {
         QColor h = FCOLOR(Highlight); h.setAlpha(128);
-        masks.rect[false].outline(r, painter, h, dpi.f3);
+        masks.rect[false].outline(r, painter, h, F(3));
     }
 }
 

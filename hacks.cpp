@@ -63,8 +63,8 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 #endif
 
 #include <QtDebug>
-#include "colors.h"
-#include "gradients.h"
+#include "blib/colors.h"
+#include "blib/gradients.h"
 #include "hacks.h"
 
 using namespace Bespin;

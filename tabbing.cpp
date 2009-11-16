@@ -525,7 +525,7 @@ Style::drawToolboxTab(const QStyleOption *option, QPainter *painter, const QWidg
 
     drawToolboxTabShape(tbt, painter, widget);
     QStyleOptionToolBox copy = *tbt;
-    copy.rect.setBottom(copy.rect.bottom()-dpi.f2);
+    copy.rect.setBottom(copy.rect.bottom()-F(2));
     drawToolboxTabLabel(&copy, painter, widget);
 }
 

@@ -201,7 +201,7 @@ Style::drawDial(const QStyleOptionComplex *option, QPainter *painter, const QWid
         rect.setHeight(rect.width());
     }
        
-    int d = qMin(2*rect.width()/5, dpi.SliderThickness);
+    int d = qMin(2*rect.width()/5, Dpi::target.SliderThickness);
     int r;
     // angle calculation from qcommonstyle.cpp (c) Trolltech 1992-2007, ASA.
     qreal a;
@@ -218,13 +218,13 @@ Style::drawDial(const QStyleOptionComplex *option, QPainter *painter, const QWid
 
     // fallback for small dials ============================
     bool small = false;
-    if (small = (rect.width() < 8*dpi.SliderThickness/3))
+    if (small = (rect.width() < 8*Dpi::target.SliderThickness/3))
     {
         painter->setRenderHint( QPainter::Antialiasing );
         painter->setPen(Qt::NoPen);
         painter->setBrush(QColor(0,0,0,50));
         painter->drawEllipse(rect);
-        rect.adjust(dpi.f2,dpi.f1,-dpi.f2,-dpi.f2);
+        rect.adjust(F(2), F(1), -F(2), -F(2));
         painter->setBrushOrigin(rect.topLeft());
         const QPixmap &fill = Gradients::pix(FCOLOR(Window), rect.height(), Qt::Vertical, GRAD(scroll));
         painter->setBrush(fill);
@@ -232,7 +232,7 @@ Style::drawDial(const QStyleOptionComplex *option, QPainter *painter, const QWid
         QColor c = hasFocus ? FCOLOR(Highlight) : FCOLOR(WindowText);
         if (!hover)
             c = Colors::mid(FCOLOR(Window), c, 1, 1+isEnabled);
-        d = qMax(dpi.f3, d/4);
+        d = qMax(F(3), d/4);
         r = (rect.width()-d)/2;
         cp += QPoint((int)(r * cos(a)), -(int)(r * sin(a)));
         painter->setPen(QPen(c, d, Qt::SolidLine, Qt::RoundCap));

@@ -24,14 +24,14 @@
 #include "draw.h"
 
 #ifdef Q_WS_X11
-#include "oxrender.h"
-#include "xproperty.h"
+#include "blib/FX.h"
+#include "blib/xproperty.h"
 #else
 #define QT_NO_XRENDER #
 #endif
 
 void
-Style::drawWindowFrame(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
+Style::drawWindowFrame(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
     // windows, docks etc. - just a frame
     const QColor border = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 5,2);
@@ -310,7 +310,7 @@ Style::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidge
    painter->setBrush(FCOLOR(ToolTipBase));
 //    painter->setPen(Qt::NoPen);
 //    painter->drawRect(RECT);
-   const int f1 = dpi.f1;
+   const int f1 = F(1);
 //    QPen pen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),6,1), f1);
    QPen pen(FCOLOR(ToolTipText), f1);
    painter->setPen(pen);
@@ -351,7 +351,7 @@ Style::drawTitleBar(const QStyleOptionComplex * option,
    if (option->subControls & SC_TitleBarLabel) {
       ir = subControlRect(CC_TitleBar, tb, SC_TitleBarLabel, widget);
       painter->setPen(PAL.color(QPalette::WindowText));
-      ir.adjust(dpi.f2, 0, -dpi.f2, 0);
+      ir.adjust(F(2), 0, -F(2), 0);
       painter->drawText(ir, Qt::AlignCenter | Qt::TextSingleLine, tb->text);
    }
    

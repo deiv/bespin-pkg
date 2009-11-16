@@ -27,7 +27,8 @@
 #include <cmath>
 
 #include "animator/tab.h"
-#include "colors.h"
+#include "blib/colors.h"
+#include "blib/elements.h"
 #include "bespin.h"
 #include "hacks.h"
 #include "visualframe.h"
@@ -473,26 +474,26 @@ Style::readSettings(const QSettings* settings, QString appName)
 
 void Style::initMetrics()
 {
-   dpi.f1 = SCALE(1); dpi.f2 = SCALE(2);
-   dpi.f3 = SCALE(3); dpi.f4 = SCALE(4);
-   dpi.f5 = SCALE(5); dpi.f6 = SCALE(6);
-   dpi.f7 = SCALE(7); dpi.f8 = SCALE(8);
-   dpi.f9 = SCALE(9); dpi.f10 =SCALE(10);
+   Dpi::target.f1 = SCALE(1); Dpi::target.f2 = SCALE(2);
+   Dpi::target.f3 = SCALE(3); Dpi::target.f4 = SCALE(4);
+   Dpi::target.f5 = SCALE(5); Dpi::target.f6 = SCALE(6);
+   Dpi::target.f7 = SCALE(7); Dpi::target.f8 = SCALE(8);
+   Dpi::target.f9 = SCALE(9); Dpi::target.f10 =SCALE(10);
    
-   dpi.f12 = SCALE(12); dpi.f13 = SCALE(13);
-   dpi.f16 = SCALE(16); dpi.f18 = SCALE(18);
-   dpi.f20 = SCALE(20); dpi.f32 = SCALE(32);
-   dpi.f80 = SCALE(80);
+   Dpi::target.f12 = SCALE(12); Dpi::target.f13 = SCALE(13);
+   Dpi::target.f16 = SCALE(16); Dpi::target.f18 = SCALE(18);
+   Dpi::target.f20 = SCALE(20); Dpi::target.f32 = SCALE(32);
+   Dpi::target.f80 = SCALE(80);
    
-   dpi.ScrollBarExtent = SCALE((config.scroll.groove > Groove::Groove ? 15 : 17) - config.btn.fullHover - 2*!config.scroll.fatSlider);
-   dpi.ScrollBarSliderMin = SCALE(40);
-   dpi.SliderThickness = SCALE(20);
-   dpi.SliderControl = SCALE(20);
-   dpi.Indicator = SCALE(20 - 2*config.btn.layer);
+   Dpi::target.ScrollBarExtent = SCALE((config.scroll.groove > Groove::Groove ? 15 : 17) - config.btn.fullHover - 2*!config.scroll.fatSlider);
+   Dpi::target.ScrollBarSliderMin = SCALE(40);
+   Dpi::target.SliderThickness = SCALE(20);
+   Dpi::target.SliderControl = SCALE(20);
+   Dpi::target.Indicator = SCALE(20 - 2*config.btn.layer);
 #if 0
-   dpi.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
+   Dpi::target.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
 #else
-	dpi.ExclusiveIndicator = SCALE(17);
+	Dpi::target.ExclusiveIndicator = SCALE(17);
 #endif
 }
 
@@ -546,6 +547,7 @@ Style::init(const QSettings* settings)
     // ==========================
     readSettings(settings, appName);
     initMetrics();
+    Elements::setScale(config.scale);
     generatePixmaps();
     Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
                     config.bg.structure, config.bg.intensity, F(8));

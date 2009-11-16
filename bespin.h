@@ -26,8 +26,9 @@ class QToolBar;
 #include <QCommonStyle>
 #include <QStyleOption>
 
-#include "tileset.h"
-#include "gradients.h"
+#include "blib/gradients.h"
+#include "blib/tileset.h"
+#include "blib/dpi.h"
 #include "types.h"
 #include "config.h"
 #include "debug.h"
@@ -43,19 +44,6 @@ namespace Bespin
 #ifdef Q_WS_X11
 typedef struct _WindowData WindowData;
 #endif
-
-typedef struct
-{
-    int f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
-    int f12, f13, f16, f32, f18, f20, f80;
-    int ScrollBarExtent;
-    int ScrollBarSliderMin;
-    int SliderThickness;
-    int SliderControl;
-    int Indicator;
-    int ExclusiveIndicator;
-} Dpi;
-
 
 class
 #ifndef Q_WS_WIN
@@ -330,7 +318,6 @@ private:
     static Lights lights;
 public:
     static Config config;
-    static Dpi dpi;
 private slots:
     void clearScrollbarCache();
     void removeAppEventFilter();
