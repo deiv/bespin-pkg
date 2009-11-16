@@ -84,7 +84,11 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
         fastFrame = isSpecialFrame(widget);
         if (fastFrame)
         {   // ...TextEdit, ...
-            brush = &PAL.color(QPalette::Base);
+            if (const QAbstractItemView *view = qobject_cast<const QAbstractItemView*>(widget))
+            if (view->viewport())
+                brush = &view->viewport()->palette().color(view->viewport()->backgroundRole());
+            if (!brush)
+                brush = &PAL.color(QPalette::Base);
             if (sunken)
                 rect.setBottom(rect.bottom() + F(2));
         }
@@ -115,7 +119,16 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
         shadow = &shadows.group;
 
     if (brush)
+    {
+        QRegion rgn = painter->clipRegion();
+        bool hadClip = painter->hasClipping();
+        painter->setClipRegion(QRegion(RECT) - RECT.adjusted(F(4),F(4),-F(4),-F(4)));
         mask->render(rect, painter, *brush);
+        if (hadClip)
+            painter->setClipRegion(rgn);
+        else
+            painter->setClipping(false);
+    }
     if (shadow)
             shadow->render(RECT, painter);
     else
