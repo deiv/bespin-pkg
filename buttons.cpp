@@ -80,7 +80,7 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
     if (appType == GTK)
         return; // GTK paints the label itself
-    _btn->rect.adjust(F(6), F(3), -F(6), -F(4));
+    _btn->rect.adjust(F(6), (config.btn.layer == 1) ? F(2) : F(3), -F(6), -F(4));
     drawPushButtonLabel(btn, painter, widget);
     _btn->rect = oldRect;
     anim.widget = 0; anim.step = 0;
