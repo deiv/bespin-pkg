@@ -1287,10 +1287,12 @@ static void ensureIcons()
     {
         pix.fill(Qt::transparent);
         p.begin(&pix);
-        p.setPen(Qt::black);
-        p.setBrush(pal->color(roles[i]));
         p.setRenderHint(QPainter::Antialiasing);
-        p.drawEllipse(pix.rect().adjusted(1,1,-1,-1));
+        p.setPen(Qt::white);
+        p.drawEllipse(pix.rect().adjusted(2,2,-2,-2));
+        p.setBrush(pal->color(roles[i]));
+        p.setPen(Qt::black);
+        p.drawEllipse(pix.rect().adjusted(3,3,-3,-3));
         p.end();
         icons[i] = QIcon(pix);
     }
