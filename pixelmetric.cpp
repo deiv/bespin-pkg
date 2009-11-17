@@ -110,7 +110,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_ToolBarHandleExtent: // Width of a toolbar handle in a horizontal toolbar and the height of the handle in a vertical toolbar
         return F(6);
     case PM_ToolBarItemMargin: // Spacing between the toolbar frame and the items
-        return config.UNO.toolbar ? F(4) : F(2);//f4
+        return config.UNO.toolbar ? F(4) : F(2);
     case PM_ToolBarItemSpacing: // Spacing between toolbar items
         return config.btn.tool.connected ? 0 : F(4);
     case PM_ToolBarSeparatorExtent: // Width of a toolbar separator in a horizontal toolbar and the height of a separator in a vertical toolbar

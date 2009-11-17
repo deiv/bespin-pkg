@@ -156,7 +156,14 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
     hover = isEnabled && (bflags & (State_Sunken | State_On | State_Raised | State_HasFocus));
 
     step = Animator::Hover::step(widget);
-    connected = (config.btn.tool.connected && widget && widget->parentWidget() && qobject_cast<QToolBar*>(widget->parentWidget()));
+    QToolBar *bar = 0;
+    QMainWindow *mwin = 0;
+    connected = config.btn.tool.connected && // we want them at all
+                widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+                (bar = qobject_cast<QToolBar*>(widget->parentWidget())) && // daddy is a toolbar
+                (mwin = qobject_cast<QMainWindow*>(widget->parentWidget()->parentWidget())) && // in a mainwindow
+//                 mwin->toolBarArea(bar) != Qt::NoToolBarArea && // kills floaters...
+                true;
 
     // frame around whole button
     if (connected || option->state & State_On)
