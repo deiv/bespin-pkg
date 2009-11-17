@@ -47,7 +47,7 @@ typedef struct Config
    
     struct btn
     {
-        int layer;
+        int layer, minHeight;
         Check::Type checkType;
         bool cushion, fullHover, backLightHover, ambientLight, bevelEnds, round;
         Gradients::Type gradient;

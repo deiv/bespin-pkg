@@ -446,30 +446,19 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
     case SE_CheckBoxContents: // Area for the state label
     case SE_ViewItemCheckIndicator: // Area for a view item's check mark
     case SE_CheckBoxIndicator: // Area for the state indicator (e.g., check mark)
-    {
-        const int h = Dpi::target.Indicator;
-        const int shrink = config.btn.layer && (element != SE_CheckBoxContents) ? F(2) : 0;
-        QRect r = RECT;
-        r.setRect(r.x()+shrink, r.y() + ((r.height() - h) / 2), h-shrink, h);
-        if (element != SE_CheckBoxContents)
-            return visualRect(option->direction, RECT, r);
-
-        const int spacing = F(5);
-        r.setRect(r.right() + spacing, RECT.y(), RECT.width() - r.width() - spacing, RECT.height());
-        return visualRect(option->direction, RECT, r);
-    }
     case SE_RadioButtonIndicator: // Area for the state indicator
     case SE_RadioButtonContents: // Area for the label
     {
-        const int h = Dpi::target.ExclusiveIndicator;
+        const int ms = (element == SE_RadioButtonContents || element == SE_RadioButtonIndicator) ?
+                        Dpi::target.ExclusiveIndicator : Dpi::target.Indicator;
+        const int s = qMax(Dpi::target.Indicator, Dpi::target.ExclusiveIndicator);
         QRect r = RECT;
-        r.setRect(r.x()+F(1), r.y() + ((r.height() - h) / 2), h, h);
-
-        if (element == SE_RadioButtonIndicator)
+        r.setRect(r.x()+(s-ms)/2, r.y() + (r.height()-s)/2, ms, ms);
+        if ( !(element == SE_CheckBoxContents || element == SE_RadioButtonContents) )
             return visualRect(option->direction, RECT, r);
 
-        int spacing = F(5);
-        r.setRect(r.right() + spacing, RECT.y(), RECT.width() - r.width() - spacing, RECT.height());
+        const int spacing = F(5);
+        r.setRect(s + spacing, RECT.y(), RECT.width() - s - spacing, RECT.height());
         return visualRect(option->direction, RECT, r);
     }
     case SE_CheckBoxFocusRect: // Area for the focus indicator

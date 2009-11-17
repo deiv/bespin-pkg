@@ -59,6 +59,7 @@
 #define BTN_BEVEL_ENDS "Btn.BevelEnds", false
 #define BTN_ROUND "Btn.Round", false
 #define BTN_SUNKEN_TOOLS "Btn.ToolSunken", false
+#define BTN_MIN_HEIGHT "Btn.MinHeight", 0
    
 #define CHOOSER_GRADIENT "Chooser.Gradient", Gradients::Sunken
 

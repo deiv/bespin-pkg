@@ -28,7 +28,6 @@ Boston, MA 02110-1301, USA.
 #include <QProcess>
 #include <QValidator>
 
-#include "../blib/gradients.h"
 #include "kdeini.h"
 #include "../config.defaults"
 #include "config.h"
@@ -39,23 +38,25 @@ typedef QMap<QString,QString> StringMap;
 for other plugins or won't need it at all, if you're not interested in a plugin */
 extern "C"
 {
-   Q_DECL_EXPORT QWidget* allocate_kstyle_config(QWidget* parent)
-   {
-      /**Create our config dialog and reply it as plugin
-      This is slightly different from the setup in a standalone dialog at the
-      bottom of this file*/
-      return new Config(parent);
-   }
+    Q_DECL_EXPORT QWidget* allocate_kstyle_config(QWidget* parent)
+    {
+        /**Create our config dialog and reply it as plugin
+        This is slightly different from the setup in a standalone dialog at the
+        bottom of this file*/
+        return new Config(parent);
+    }
 }
 
 /** Gradient enumeration for the comboboxes, so that i don't have to handle the
 integers - not of interest for you*/
-enum GradientType {
-   GradNone = 0, GradSimple, GradButton, GradSunken, GradGloss,
-      GradGlass, GradMetal, GradCloud
-};
+namespace Gradients {
+    enum Type {
+        None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, //RadialGloss,
+        TypeAmount
+    };
+    enum BgMode { BevelV = 2, BevelH };
+}
 
-using namespace Bespin;
 
 static const char* defInfo1 =
 "<b>Bespin Style</b><hr>\
@@ -93,31 +94,33 @@ Activating these hacks...\
 
 /** Intenal class for the PW Char entry - not of interest */
 
-static ushort unicode(const QString &string) {
-   if (string.length() == 1)
-      return string.at(0).unicode();
-   uint n = string.toUShort();
-   if (!n)
-      n = string.toUShort(0,16);
-   if (!n)
-      n = string.toUShort(0,8);
-   return n;
+static ushort unicode(const QString &string)
+{
+    if (string.length() == 1)
+        return string.at(0).unicode();
+    uint n = string.toUShort();
+    if (!n)
+        n = string.toUShort(0,16);
+    if (!n)
+        n = string.toUShort(0,8);
+    return n;
 }
 
 class UniCharValidator : public QValidator {
 public:
-   UniCharValidator( QObject * parent ) : QValidator(parent){}
-   virtual State validate ( QString & input, int & ) const {
-      if (input.length() == 0)
-         return Intermediate;
-      if (input.length() == 1)
-         return Acceptable;
-      if (input.length() == 2 && input.at(0) == '0' && input.at(1).toLower() == 'x')
-         return Intermediate;
-      if (unicode(input))
-         return Acceptable;
-      return Invalid;
-   }
+    UniCharValidator( QObject * parent ) : QValidator(parent){}
+    virtual State validate ( QString & input, int & ) const
+    {
+        if (input.length() == 0)
+            return Intermediate;
+        if (input.length() == 1)
+            return Acceptable;
+        if (input.length() == 2 && input.at(0) == '0' && input.at(1).toLower() == 'x')
+            return Intermediate;
+        if (unicode(input))
+            return Acceptable;
+        return Invalid;
+    }
 };
 
 /** The Constructor - your first job! */
@@ -332,16 +335,16 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.uno_role, UNO_ROLE);
     handleSettings(ui.uno_sunken, UNO_SUNKEN);
 
-    handleSettings(ui.sunkenButtons, "Btn.Layer", 0);
-    handleSettings(ui.checkMark, "Btn.CheckType", 0);
-    handleSettings(ui.cushion, "Btn.Cushion", true);
-    handleSettings(ui.fullButtonHover, "Btn.FullHover", true);
-    handleSettings(ui.gradButton, "Btn.Gradient", GradButton);
+    handleSettings(ui.sunkenButtons, BTN_LAYER);
+    handleSettings(ui.checkMark, BTN_CHECKTYPE);
+    handleSettings(ui.cushion, BTN_CUSHION);
+    handleSettings(ui.fullButtonHover, BTN_FULLHOVER);
+    handleSettings(ui.gradButton, BTN_GRADIENT);
     handleSettings(ui.btnRole, BTN_ROLE);
     handleSettings(ui.btnActiveRole, BTN_ACTIVEROLE);
-    handleSettings(ui.ambientLight, "Btn.AmbientLight", true);
-    handleSettings(ui.backlightHover, "Btn.BacklightHover", false);
-    handleSettings(ui.btnRound, "Btn.Round", false);
+    handleSettings(ui.ambientLight, BTN_AMBIENTLIGHT);
+    handleSettings(ui.backlightHover, BTN_BACKLIGHTHOVER);
+    handleSettings(ui.btnRound, BTN_ROUND);
     handleSettings(ui.btnBevelEnds, BTN_BEVEL_ENDS);
 
     handleSettings(ui.connectedToolbuttons, BTN_CONNECTED_TOOLS);
@@ -360,13 +363,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     untouched (what will result in different disabled looks for Qt and KDE applications), force the\
     Qt desaturation or the former Bespin (forced - sorry everyone) blurring.");
    
-    handleSettings(ui.gradChoose, "Chooser.Gradient", GradSunken);
+    handleSettings(ui.gradChoose, CHOOSER_GRADIENT);
 
-    handleSettings(ui.pwEchoChar, "Input.PwEchoChar", 0x26AB);
+    handleSettings(ui.pwEchoChar, INPUT_PWECHOCHAR);
 
     handleSettings(ui.showMnemonics, SHOW_MNEMONIC);
-    handleSettings(ui.leftHanded, "LeftHanded", false);
-    handleSettings(ui.macStyle, "MacStyle", true);
+    handleSettings(ui.leftHanded, LEFTHANDED);
+    handleSettings(ui.macStyle, MACSTYLE);
 
     handleSettings(ui.crMenuActive, MENU_ACTIVEROLE);
     handleSettings(ui.menuRound, MENU_ROUND);
@@ -380,29 +383,29 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.menuBoldText, MENU_BOLDTEXT);
     handleSettings(ui.menuActiveItemSunken, MENU_ACTIVEITEMSUNKEN);
 
-    handleSettings(ui.gradProgress, "Progress.Gradient", GradGloss);
+    handleSettings(ui.gradProgress, PROGRESS_GRADIENT);
     handleSettings(ui.crProgressBg, PROGRESS_ROLE_BG);
     handleSettings(ui.crProgressFg, PROGRESS_ROLE_FG);
 
-    handleSettings(ui.showScrollButtons, "Scroll.ShowButtons", false);
-    handleSettings(ui.sliderGroove, "Scroll.Groove", false);
-    handleSettings(ui.gradScroll, "Scroll.Gradient", GradButton);
+    handleSettings(ui.showScrollButtons, SCROLL_SHOWBUTTONS);
+    handleSettings(ui.sliderGroove, SCROLL_GROOVE);
+    handleSettings(ui.gradScroll, SCROLL_GRADIENT);
     handleSettings(ui.invertGroove, SCROLL_INVERT_BG);
     handleSettings(ui.slimSlider, SCROLL_SLIM_SLIDER);
     setContextHelp(ui.slimSlider, "<b>Slim slider</b><hr>\
     This will reduce the thickness of scrollbars by 2 pixel and in addition apply a more rectangular shape.");
     // THIS MUST! happen after the buttons are loaded!
-    handleSettings(ui.scrollRole, "Scroll.Role", QPalette::Window);
-    handleSettings(ui.scrollActiveRole, "Scroll.ActiveRole", QPalette::Button);
+    handleSettings(ui.scrollRole, "Scroll.Role", QPalette::Button);
+    handleSettings(ui.scrollActiveRole, "Scroll.ActiveRole", QPalette::Highlight);
 
-    handleSettings(ui.shadowIntensity, "ShadowIntensity", 100);
+    handleSettings(ui.shadowIntensity, SHADOW_INTENSITY);
    
-    handleSettings(ui.crTabBarActive, "Tab.ActiveRole", QPalette::Highlight);
+    handleSettings(ui.crTabBarActive, TAB_ACTIVEROLE);
     handleSettings(ui.tabAnimDuration, TAB_DURATION);
-    handleSettings(ui.gradTab, "Tab.Gradient", GradButton);
-    handleSettings(ui.crTabBar, "Tab.Role", QPalette::Window);
+    handleSettings(ui.gradTab, TAB_GRADIENT);
+    handleSettings(ui.crTabBar, TAB_ROLE);
     handleSettings(ui.tabTransition, TAB_TRANSITION);
-    handleSettings(ui.activeTabSunken, "Tab.ActiveTabSunken", false);
+    handleSettings(ui.activeTabSunken, TAB_ACTIVETABSUNKEN);
 
     handleSettings(ui.headerRole, VIEW_HEADERROLE);
     handleSettings(ui.headerSortingRole, VIEW_SORTINGHEADERROLE);
@@ -1131,11 +1134,13 @@ Config::store2a()
     if (sender() != ui.storeLine)
         return;
     const QString &string = ui.storeLine->text();
-    if (string.isEmpty()) {
+    if (string.isEmpty())
+    {
         ui.storeLine->setText("Valid names have some chars...");
         return;
     }
-    if (!ui.store->findItems ( string, Qt::MatchExactly ).isEmpty()) {
+    if (!ui.store->findItems ( string, Qt::MatchExactly ).isEmpty())
+    {
         ui.storeLine->setText("Item allready exists, please click it to replace it!");
         return;
     }

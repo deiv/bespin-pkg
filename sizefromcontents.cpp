@@ -27,12 +27,24 @@ using namespace Bespin;
 static const int windowsArrowHMargin = 6; // arrow horizontal margin
 
 QSize
-Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
-                                const QSize & contentsSize, const QWidget * widget ) const
+Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
     switch ( ct )
     {
-//    case CT_CheckBox: // A check box, like QCheckBox
+    case CT_CheckBox: // A check box, like QCheckBox
+    case CT_RadioButton: // A radio button, like QRadioButton
+        if HAVE_OPTION(btn, Button)
+        {
+            int w, h;
+            w = h = qMax( Dpi::target.Indicator, Dpi::target.ExclusiveIndicator );
+            h = qMax(h, contentsSize.height() + 4);
+
+            int margin = 0;
+            // we add 4 pixels for label margins
+            if (btn->icon.isNull() || !btn->text.isEmpty())
+                margin = F(7);
+            return QSize(contentsSize.width() + w + margin, h);
+        }
     case CT_ComboBox: // A combo box, like QComboBox
         if HAVE_OPTION(cb, ComboBox)
         {
@@ -45,7 +57,7 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
             }
 //             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
 //                 hgt += F(2);
-            return QSize(contentsSize.width() + d +( int)(hgt/1.1), hgt);
+            return QSize(contentsSize.width() + d +( int)(hgt/1.1), qMax(config.btn.minHeight, hgt));
         }
 //    case CT_DialogButtons: //
 //       return QSize((contentsSize.width()+16 < 80) ? 80 : contentsSize.width()+16, contentsSize.height()+10);
@@ -135,10 +147,9 @@ Style::sizeFromContents ( ContentsType ct, const QStyleOption * option,
                 if (w < F(80))
                     w = F(80);
 
-                return QSize(w, h);
+                return QSize(w, qMax(config.btn.minHeight, h));
             }
         }
-//    case CT_RadioButton: // A radio button, like QRadioButton
 //    case CT_SizeGrip: // A size grip, like QSizeGrip
 
     case CT_Menu: // A menu, like QMenu

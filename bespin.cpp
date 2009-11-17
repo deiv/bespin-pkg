@@ -21,7 +21,7 @@
 #include <QAbstractScrollArea>
 #include <QApplication>
 #include <QComboBox>
-#include <QDockWidget>
+// #include <QDockWidget>
 #include <QEvent>
 #include <QFrame>
 #include <QListView>
@@ -1036,21 +1036,24 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::Enter:
     case QEvent::Leave:
     {
-        bool b = false;
-        if ((b = object->inherits("KUrlButton")) || object->inherits("BreadcrumbItemButton"))
+        if (qobject_cast<QPushButton*>(object))
         {
-            QWidget *w = static_cast<QWidget*>(object);
-            w->setCursor(Qt::PointingHandCursor);
-            QFont fnt = w->font();
-            if (isLastNavigatorButton(w, b?"KUrlButton":"BreadcrumbItemButton"))
+            bool b = false;
+            if ((b = object->inherits("KUrlButton")) || object->inherits("BreadcrumbItemButton"))
             {
-                w->setCursor(Qt::ArrowCursor);
-                fnt.setUnderline(false);
+                QWidget *w = static_cast<QWidget*>(object);
+                w->setCursor(Qt::PointingHandCursor);
+                QFont fnt = w->font();
+                if (isLastNavigatorButton(w, b?"KUrlButton":"BreadcrumbItemButton"))
+                {
+                    w->setCursor(Qt::ArrowCursor);
+                    fnt.setUnderline(false);
+                }
+                else
+                    fnt.setUnderline(ev->type() == QEvent::Enter);
+                w->setFont(fnt);
+                return false;
             }
-            else
-                fnt.setUnderline(ev->type() == QEvent::Enter);
-            w->setFont(fnt);
-            return false;
         }
         return false;
     }
