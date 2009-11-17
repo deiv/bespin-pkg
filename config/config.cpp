@@ -346,6 +346,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.backlightHover, BTN_BACKLIGHTHOVER);
     handleSettings(ui.btnRound, BTN_ROUND);
     handleSettings(ui.btnBevelEnds, BTN_BEVEL_ENDS);
+    handleSettings(ui.btnMinHeight, BTN_MIN_HEIGHT);
 
     handleSettings(ui.connectedToolbuttons, BTN_CONNECTED_TOOLS);
     handleSettings(ui.toolbuttonLayer, BTN_SUNKEN_TOOLS);
