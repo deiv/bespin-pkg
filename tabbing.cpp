@@ -344,8 +344,12 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
     if (sunken)
     {
         if (const QTabBar *bar = qobject_cast<const QTabBar*>(widget))
-        if (!bar->drawBase())
+        {
             noBase = true;
+            if (bar->drawBase() || qobject_cast<const QTabWidget*>(bar->parentWidget()))
+                noBase = false;
+        }
+
         c = CCOLOR(tab.active, Bg);
         if (sameRoles)
             rect = RECT.adjusted(0,0,0,-F(2));
