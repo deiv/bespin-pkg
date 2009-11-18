@@ -316,6 +316,7 @@ private:
     static Masks masks;
     static Shadows shadows;
     static Lights lights;
+    static Qt::Orientation ori[2];
 public:
     static Config config;
 private slots:

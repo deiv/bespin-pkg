@@ -129,6 +129,10 @@ Style::readSettings(const QSettings* settings, QString appName)
             config.appDataPath = iSettings->value("App.Arora.Path", "").toString();
         // flanders
         config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
+        if (config.showOff = readBool(SHOW_OFF))
+            { ori[0] = Qt::Vertical; ori[1] = Qt::Horizontal; }
+        else
+            { ori[0] = Qt::Horizontal; ori[1] = Qt::Vertical; }
         // item single vs. double click, wizard appereance
         config.macStyle = readBool(MACSTYLE);
         config.fadeInactive = readBool(FADE_INACTIVE);

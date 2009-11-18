@@ -143,7 +143,7 @@ Style::drawPushButtonBevel(const QStyleOption *option, QPainter *painter, const 
                         Colors::mid(CCOLOR(btn.std, Fg), CCOLOR(btn.active, Fg), 6-animStep, animStep);
         if (option->state & State_On)
         {
-            const QPixmap &fill = Gradients::pix(c, r.height(), Qt::Vertical, GRAD(btn));
+            const QPixmap &fill = Gradients::pix(c, config.showOff ? r.width() : r.height(), ori[1], GRAD(btn));
             painter->setBrush(fill);
             painter->setBrushOrigin(r.topLeft());
         }
@@ -220,7 +220,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
                 r.setBottom(r.bottom()-f2);
             else
                 r.adjust(0, f1,0,-f2);
-            masks.rect[round].render(r, painter, gt, Qt::Vertical, c);
+            masks.rect[round].render(r, painter, gt, ori[1], c);
             if (drawInner)
             {
                 iOff[0] = iOff[2] = F(3);
@@ -284,7 +284,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         }
 
         // plate
-        masks.rect[round].render(r, painter, GRAD(btn), Qt::Vertical, c);
+        masks.rect[round].render(r, painter, GRAD(btn), ori[1], c);
 
         // outline
         if (Gradients::isReflective(GRAD(btn)))
@@ -296,8 +296,8 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
     {
         if (drawInner)
             masks.rect[round].render(r.adjusted(iOff[0], iOff[1], -iOff[2], -iOff[3]), painter,
-                                     gt, Qt::Vertical, config.btn.backLightHover ? c : iC,
-                                     r.height(), QPoint(0, iOff[1]));
+                                     gt, ori[1], config.btn.backLightHover ? c : iC,
+                                     config.showOff ? r.width() : r.height(), QPoint(iOff[0], iOff[1]));
 
         if (config.btn.ambientLight && !(sunken || isCheckbox)) // do we want ambient lights?
             painter->drawPixmap(QPoint(r.right()+1-16*r.height()/9, r.top()), Gradients::ambient(r.height()));
@@ -551,7 +551,7 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
             bg = Colors::mid(bg, FCOLOR(Highlight), contrast/5, 1);
         }
     }
-    masks.rect[true].render(r, painter, GRAD(chooser), Qt::Vertical, bg);
+    masks.rect[true].render(r, painter, GRAD(chooser), ori[1], bg);
 
     r.setBottom(RECT.bottom());
     shadows.sunken[true][isEnabled].render(r, painter);
@@ -564,7 +564,7 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
         const int off = (Dpi::target.ExclusiveIndicator - (masks.radioIndicator.height() + 1))/2;
         QPoint xy = r.topLeft() + QPoint(off, off);
         const Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
-        fillWithMask(painter, xy, Gradients::pix(c, masks.radioIndicator.height(), Qt::Vertical, gt), masks.radioIndicator);
+        fillWithMask(painter, xy, Gradients::pix(c, masks.radioIndicator.height(), ori[1], gt), masks.radioIndicator);
     }
 #endif
 }
@@ -599,7 +599,7 @@ Style::drawCheckLabel(const QStyleOption *option, QPainter *painter, const QWidg
     ASSURE_OPTION(btn, Button);
     OPT_ENABLED;
 
-    uint alignment = visualAlignment(btn->direction, Qt::AlignLeft | Qt::AlignVCenter);
+    uint alignment = visualAlignment(btn->direction, Qt::AlignLeft)  | Qt::AlignVCenter;
     QRect textRect = RECT;
     
     if (!btn->icon.isNull())

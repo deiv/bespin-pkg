@@ -265,7 +265,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
                     }
                 }
 
-                mask.render(r, painter, GRAD(chooser), Qt::Vertical, c);
+                mask.render(r, painter, GRAD(chooser), ori[1], c);
 
                 if (animStep)
                 {
@@ -273,7 +273,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
                     {   // maybe hover indicator?
                         r.adjust(f3, f3, -f3, -f3);
                         c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-                        mask.render(r, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0,f3));
+                        mask.render(r, painter, GRAD(chooser), ori[1], c, RECT.height()-f2, QPoint(0,f3));
                         r = RECT.adjusted(f1, f1, -f1, -f2); // RESET 'r' !!!
                     }
                     else if (config.btn.backLightHover)
@@ -338,7 +338,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
 //          ar.adjust(f2, f3, -f2, -f3);
-            mask.render(ar, painter, GRAD(chooser), Qt::Vertical, c, RECT.height()-f2, QPoint(0, ar.y() - RECT.y()) );
+            mask.render(ar, painter, GRAD(chooser), ori[1], c, RECT.height()-f2, QPoint(0, ar.y() - RECT.y()) );
             painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
         }
         if (upDown)

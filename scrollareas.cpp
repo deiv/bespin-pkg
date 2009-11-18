@@ -473,11 +473,9 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     // the always shown base
     Qt::Orientation o = Qt::Horizontal;
     int size = r.width();
-    Tile::PosFlags pf = Tile::Left | Tile::Right;
-    if (horizontal)
+    if (horizontal || config.showOff)
     {
         o = Qt::Vertical; size = r.height();
-        pf = Tile::Top | Tile::Bottom;
     }
 
     QColor bc = config.btn.fullHover ? c : CCOLOR(scroll._, Bg);

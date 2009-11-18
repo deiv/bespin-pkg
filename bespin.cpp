@@ -83,6 +83,7 @@ Style::Lights Style::lights;
 Style::Masks Style::masks;
 QPalette *Style::originalPalette = 0;
 Style::Shadows Style::shadows;
+Qt::Orientation Style::ori[2] = { Qt::Horizontal, Qt::Vertical };
 
 
 #define N_PE 54
