@@ -199,7 +199,7 @@ Client::addButtons(const QString& s, int &sz, bool left)
 //                 buttons[type]->setAttribute(Qt::WA_PaintOnScreen);
                 buttons[type]->setAttribute(Qt::WA_NoSystemBackground);
             }
-            myTitleBar->addWidget(buttons[type], 0, Factory::verticalTitle() ? Qt::AlignHCenter : Qt::AlignVCenter);
+            myTitleBar->addWidget(buttons[type], 0, Qt::AlignCenter);
             sz += (Factory::buttonSize(iAmSmall) + 2);
         }
     }
@@ -922,6 +922,7 @@ Client::reset(unsigned long changed)
             myTitleSpacer->changeSize( myTitleSize, 1, QSizePolicy::Fixed, QSizePolicy::Expanding);
         else
             myTitleSpacer->changeSize( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+        myTitleBar->invalidate();
     }
 
     if (changed & SettingButtons)
