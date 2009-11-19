@@ -83,8 +83,8 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
    case CT_MenuItem: // A menu item, like QMenuItem
         if HAVE_OPTION(menuItem, MenuItem)
         {
-            if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
-                return QSize(10, menuItem->text.isEmpty() ? F(6) : menuItem->fontMetrics.lineSpacing());
+            if (menuItem->menuItemType == QStyleOptionMenuItem::Separator && menuItem->text.isEmpty())
+                return QSize(10, F(6));
              
             bool checkable = menuItem->menuHasCheckableItems;
             int maxpmw = config.menu.showIcons*menuItem->maxIconWidth;
@@ -113,6 +113,8 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
                 QFontMetrics fmBold(fontBold);
                 w += fmBold.width(menuItem->text) - fm.width(menuItem->text);
             }
+            if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
+                w += 32; // add some space for the separator lines
             return QSize(w, h);
         }
         break;
