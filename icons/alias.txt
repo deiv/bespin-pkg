@@ -2,3 +2,7 @@ compressed-pack:apps/arc,mimetypes/application-zip:application-x-tarz:applicatio
 dialog-close:actions/application-exit
 appointment:actions/appointment-new
 address-book-new:actions/address-book-new
+file-sound-wave:mimetypes/audio-ac3:audio-x-adpcm:audio-x-flac+ogg:audio-x-generic:audio-x-speex+ogg:audio-vnd.rn-realvideo:audio-x-aiff:audio-x-flac:audio-x-monkey:audio-x-wav
+juk:mimetypes/audio-midi:audio-prs.sid
+node:mimetypes/inode-directory
+txt:mimetypes/text-rdf:text-rtf:application-vnd.oasis.opendocument.text
