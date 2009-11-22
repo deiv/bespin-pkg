@@ -111,6 +111,7 @@ typedef struct Config
 
     float shadowIntensity;
     bool showOff;
+    bool fileDialogDE;
     bool sunkenGroups;
 
     struct tab

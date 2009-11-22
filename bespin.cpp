@@ -120,7 +120,8 @@ void
 Style::registerRoutines()
 {
 // #if QT_VERSION < 0x040600
-    register_dialog_functions();
+    if (config.fileDialogDE)
+        register_dialog_functions();
 // #endif
     for (int i = 0; i < N_PE; ++i)
         primitiveRoutine[i] = 0;
