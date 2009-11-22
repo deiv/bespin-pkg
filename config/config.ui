@@ -233,7 +233,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>9</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -513,7 +513,7 @@
                <x>0</x>
                <y>0</y>
                <width>367</width>
-               <height>91</height>
+               <height>89</height>
               </rect>
              </property>
              <attribute name="label">
@@ -818,7 +818,7 @@
                <x>0</x>
                <y>0</y>
                <width>458</width>
-               <height>184</height>
+               <height>180</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1138,7 +1138,7 @@
                <x>0</x>
                <y>0</y>
                <width>472</width>
-               <height>202</height>
+               <height>225</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1337,7 +1337,7 @@
                <x>0</x>
                <y>0</y>
                <width>302</width>
-               <height>137</height>
+               <height>131</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1860,7 +1860,7 @@
                <x>0</x>
                <y>0</y>
                <width>203</width>
-               <height>191</height>
+               <height>189</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2023,7 +2023,7 @@
                <x>0</x>
                <y>0</y>
                <width>243</width>
-               <height>92</height>
+               <height>90</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2878,15 +2878,15 @@
           <item row="0" column="0">
            <widget class="QToolBox" name="appSpecific">
             <property name="currentIndex">
-             <number>1</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="page_3">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>366</width>
-               <height>114</height>
+               <width>472</width>
+               <height>154</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2941,8 +2941,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>130</width>
-               <height>80</height>
+               <width>472</width>
+               <height>82</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2990,13 +2990,40 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="page_7">
+             <attribute name="label">
+              <string>Dolphin</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <item>
+               <widget class="QCheckBox" name="dolphinViews">
+                <property name="text">
+                 <string>Normal listviews in sidebars</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_20">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
             <widget class="QWidget" name="Seite_3">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>229</width>
-               <height>64</height>
+               <width>472</width>
+               <height>109</height>
               </rect>
              </property>
              <attribute name="label">

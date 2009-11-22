@@ -431,6 +431,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     - <b>next.png</b><br>\
     into the selected path");
 
+    handleSettings(ui.dolphinViews, HACK_DOLPHIN_VIEWS);
+    setContextHelp(ui.dolphinViews, "<b>Dolphin sidebar</b><hr>\
+    Dolphin sets some views in the sidebars to look like the window - check this to force a\
+    \"traditional\" appearance.<br>(Sunken frame, Base colored background)");
+
     handleSettings(ui.hackMessages, HACK_MESSAGES);
     setContextHelp(ui.hackMessages, "<b>Messageboxes</b><hr>\
     Overwrites the painting routines of QMessageBoxes for a custom appereance.<br>\
