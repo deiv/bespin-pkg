@@ -46,12 +46,9 @@ edit-redo:actions/edit-redo
 eject:actions/media-eject
 extract:actions/archive-extract
 eye:actions/view-preview
-file-sound-wave:apps/preferences-desktop-sound:audio-aac:audio-ac3:audio-basic:audio-midi:audio-mp4:audio-mpeg:audio-prs.sid:audio-vnd.rn-realaudio:audio-vnd.rn-realvideo:audio-x-adpcm:audio-x-aiff:audio-x-flac+ogg:audio-x-flac:audio-x-generic:audio-x-matroska:audio-x-mod:audio-x-monkey:audio-x-mp2:audio-x-mpegurl:audio-x-ms-asx:audio-x-ms-wma:audio-x-musepack:audio-x-pn-realaudio-plugin:audio-x-scpls:audio-x-speex+ogg:audio-x-vorbis+ogg:audio-x-wav
+file-sound-wave:apps/preferences-desktop-sound:audio-aac:audio-ac3:audio-basic:audio-mp4:audio-mpeg:audio-vnd.rn-realaudio:audio-vnd.rn-realvideo:audio-x-adpcm:audio-x-aiff:audio-x-flac+ogg:audio-x-flac:audio-x-generic:audio-x-matroska:audio-x-mod:audio-x-monkey:audio-x-mp2:audio-x-mpegurl:audio-x-ms-asx:audio-x-ms-wma:audio-x-musepack:audio-x-pn-realaudio-plugin:audio-x-scpls:audio-x-speex+ogg:audio-x-vorbis+ogg:audio-x-wav
 file-video:mimetypes/video-x-generic:video-x-mng
 filter:actions/view-filter
-
-
-
-juk:mimetypes/audio-midi:audio-prs.sid
+juk:mimetypes/audio-midi:audio-prs.sid,apps/juk
 node:mimetypes/inode-directory
 txt:mimetypes/text-rdf:text-rtf:application-vnd.oasis.opendocument.text
