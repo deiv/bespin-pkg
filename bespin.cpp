@@ -820,7 +820,7 @@ static const
 Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::SubWindow |
 Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
-static QList<QToolBar*> unoUpdates;
+static QList<QPointer<QToolBar> > unoUpdates;
 
 static bool
 updateUnoHeight(QMainWindow *mwin, bool includeToolbars)
@@ -863,7 +863,10 @@ void
 Style::updateUno()
 {
     foreach (QToolBar *bar, unoUpdates)
-        updateUno(bar);
+    {
+        if (bar)
+            updateUno(bar);
+    }
     unoUpdates.clear();
 }
 
