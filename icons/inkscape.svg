@@ -84,7 +84,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4.5188543"
-     inkscape:cx="58.125739"
+     inkscape:cx="17.296806"
      inkscape:cy="48.58169"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -123,7 +123,8 @@
      transform="translate(0,-988.36218)">
     <g
        transform="matrix(0.1584222,0,0,0.1635514,-25.013604,985.27201)"
-       id="g839">
+       id="g839"
+       style="opacity:0.66">
       <path
          id="droplet01"
          d="M 476.95792,339.17168 C 495.78197,342.93607 499.54842,356.11361 495.78197,359.87802 C 492.01856,363.6434 482.6065,367.40781 475.07663,361.76014 C 467.54478,356.11361 467.54478,342.93607 476.95792,339.17168 z"
