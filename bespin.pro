@@ -21,23 +21,25 @@ unix {
 
 HEADERS = animator/basic.h animator/aprogress.h animator/hover.h \
           animator/hoverindex.h animator/hovercomplex.h animator/tab.h \
-          colors.h bespin.h tileset.h debug.h \
-          visualframe.h gradients.h draw.h config.h types.h\
-          hacks.h oxrender.h paths.h
+          blib/colors.h blib/gradients.h blib/tileset.h blib/FX.h blib/shapes.h blib/elements.h \
+          blib/dpi.h\
+          bespin.h visualframe.h draw.h config.h types.h debug.h hacks.h
 
 SOURCES = animator/basic.cpp animator/aprogress.cpp animator/hover.cpp \
           animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp \
-          colors.cpp bespin.cpp tileset.cpp stylehint.cpp \
-          sizefromcontents.cpp qsubcmetrics.cpp \
-          pixelmetric.cpp stdpix.cpp \
-          visualframe.cpp gradients.cpp init.cpp genpixmaps.cpp polish.cpp \
+          blib/colors.cpp blib/elements.cpp blib/dpi.cpp blib/tileset.cpp blib/gradients.cpp\
+          blib/FX.cpp blib/shapes.cpp \
+          bespin.cpp stylehint.cpp sizefromcontents.cpp qsubcmetrics.cpp \
+          pixelmetric.cpp stdpix.cpp  visualframe.cpp init.cpp genpixmaps.cpp polish.cpp \
           buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp \
           scrollareas.cpp shapes.cpp slider.cpp tabbing.cpp toolbars.cpp \
-          views.cpp window.cpp hacks.cpp oxrender.cpp paths.cpp filedialog.cpp
+          views.cpp window.cpp hacks.cpp filedialog.cpp
+          
 
 TEMPLATE = lib
 PLUGIN = true
 CONFIG += qt plugin
+DEFINES += BLIB_EXPORT=""
 
 QT += qt3support
 
