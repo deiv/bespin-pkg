@@ -30,6 +30,7 @@ public:
    QStringList groups() const;
    bool setGroup(const QString &group);
    void setValue(const QString &key, const QVariant &value);
+   QColor value(const QString &key, QColor def);
    QString value(const QString &key);
 private:
    KdeIni(const QString &name);

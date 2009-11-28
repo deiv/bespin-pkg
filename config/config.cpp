@@ -1116,7 +1116,7 @@ Config::savePalette(const QPalette &pal)
         kdeglobals->setValue("ForegroundVisited", pal.color(QPalette::Active, QPalette::LinkVisited));
     }
     kdeglobals->close();
-    delete kdeglobals; kdeglobals = 0;
+    delete kdeglobals;
 
 }
 

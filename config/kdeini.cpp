@@ -114,6 +114,32 @@ KdeIni::setValue(const QString &key, const QVariant &value)
    (*localGroup)[key] = val;
 }
 
+QColor color( const QString &s, QColor c )
+{
+    QStringList rgb = s.split(',');
+    if (rgb.count() > 0)
+        c.setRed( rgb.at(0).toUInt() );
+    if (rgb.count() > 1)
+        c.setGreen( rgb.at(1).toUInt() );
+    if (rgb.count() > 2)
+        c.setBlue( rgb.at(2).toUInt() );
+    if (rgb.count() > 3)
+        c.setAlpha( rgb.at(3).toUInt() );
+    return c;
+}
+
+QColor
+KdeIni::value(const QString &key, QColor def)
+{
+    Entries::const_iterator it = localGroup->constFind(key);
+    if (it != localGroup->constEnd())
+        return color(*it, def);
+    it = globalGroup->constFind(key);
+    if (it != globalGroup->constEnd())
+        return color(*it, def);
+    return def;
+}
+
 QString
 KdeIni::value(const QString &key)
 {
