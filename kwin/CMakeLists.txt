@@ -12,7 +12,7 @@ install (FILES bespin.desktop DESTINATION ${DATA_INSTALL_DIR}/kwin)
 
 
 project (kwin-bespin-config)
-set (kwin_bespin_config_SOURCES ../config/bconfig.cpp config.cpp)
+set (kwin_bespin_config_SOURCES ../config/bconfig.cpp ../config/kdeini.cpp config.cpp)
 qt4_wrap_ui (kwin_bespin_config_FRM_HDRS configdialog.ui)
 kde4_add_plugin (kwin_bespin_config ${kwin_bespin_config_SOURCES} ${kwin_bespin_config_FRM_HDRS})
 target_link_libraries (kwin_bespin_config ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${KDE4_KDEUI_LIBS})

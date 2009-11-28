@@ -226,7 +226,7 @@ Config::Config(QWidget* parent) : BConfig(parent)
 // void Config::load(KConfigGroup) {load();}
 void Config::save(KConfigGroup&)
 {
-    ui.presets->setCurrentRow(0);
+    ui.presets->setCurrentRow(-1);
     BConfig::save();
     savePresets();
 }
@@ -274,16 +274,16 @@ void Config::presetChanged(QListWidgetItem *item, QListWidgetItem *prev)
         prev->setData(ActiveGradient2, variant(ui.actGrad2));
         prev->setData(InactiveGradient, variant(ui.inactGrad));
         prev->setData(InactiveGradient2, variant(ui.inactGrad2));
+        prev->setData(ActiveColor, ui.actColor->color().rgba());
+        prev->setData(ActiveColor2, ui.actColor2->color().rgba());
+        prev->setData(ActiveText, ui.actText->color().rgba());
+        prev->setData(ActiveButtons, ui.actButtons->color().rgba());
+        prev->setData(InactiveColor, ui.inactColor->color().rgba());
+        prev->setData(InactiveColor2, ui.inactColor2->color().rgba());
+        prev->setData(InactiveText, ui.inactText->color().rgba());
+        prev->setData(InactiveButtons, ui.inactButtons->color().rgba());
         if (ui.presets->row(prev)) // not for the default preset
         {
-            prev->setData(ActiveColor, ui.actColor->color().rgba());
-            prev->setData(ActiveColor2, ui.actColor2->color().rgba());
-            prev->setData(ActiveText, ui.actText->color().rgba());
-            prev->setData(ActiveButtons, ui.actButtons->color().rgba());
-            prev->setData(InactiveColor, ui.inactColor->color().rgba());
-            prev->setData(InactiveColor2, ui.inactColor2->color().rgba());
-            prev->setData(InactiveText, ui.inactText->color().rgba());
-            prev->setData(InactiveButtons, ui.inactButtons->color().rgba());
             prev->setData(Classes, ui.wmClasses->text());
             prev->setData(Types, ui.wmTypes->text());
         }
@@ -295,17 +295,17 @@ void Config::presetChanged(QListWidgetItem *item, QListWidgetItem *prev)
         setVariant(ui.actGrad2, item->data(ActiveGradient2));
         setVariant(ui.inactGrad, item->data(InactiveGradient));
         setVariant(ui.inactGrad2, item->data(InactiveGradient2));
+        ui.actColor->setColor(item->data(ActiveColor).toUInt());
+        ui.actColor2->setColor(item->data(ActiveColor2).toUInt());
+        ui.actText->setColor(item->data(ActiveText).toUInt());
+        ui.actButtons->setColor(item->data(ActiveButtons).toUInt());
+        ui.inactColor->setColor(item->data(InactiveColor).toUInt());
+        ui.inactColor2->setColor(item->data(InactiveColor2).toUInt());
+        ui.inactText->setColor(item->data(InactiveText).toUInt());
+        ui.inactButtons->setColor(item->data(InactiveButtons).toUInt());
         if (ui.presets->row(item)) // not for the default preset
         {
             enabled = true;
-            ui.actColor->setColor(item->data(ActiveColor).toUInt());
-            ui.actColor2->setColor(item->data(ActiveColor2).toUInt());
-            ui.actText->setColor(item->data(ActiveText).toUInt());
-            ui.actButtons->setColor(item->data(ActiveButtons).toUInt());
-            ui.inactColor->setColor(item->data(InactiveColor).toUInt());
-            ui.inactColor2->setColor(item->data(InactiveColor2).toUInt());
-            ui.inactText->setColor(item->data(InactiveText).toUInt());
-            ui.inactButtons->setColor(item->data(InactiveButtons).toUInt());
             ui.wmClasses->setText(item->data(Classes).toString());
             ui.wmTypes->setText(item->data(Types).toString());
         }
@@ -318,14 +318,8 @@ void Config::presetChanged(QListWidgetItem *item, QListWidgetItem *prev)
     ui.deletePreset->setEnabled(enabled);
     ui.wmClasses->setEnabled(enabled);
     ui.wmTypes->setEnabled(enabled);
-    ui.actColor->setEnabled(enabled);
-    ui.actColor2->setEnabled(enabled && ui.actGrad2->currentIndex());
-    ui.actText->setEnabled(enabled);
-    ui.actButtons->setEnabled(enabled);
-    ui.inactColor->setEnabled(enabled);
-    ui.inactColor2->setEnabled(enabled && ui.inactGrad2->currentIndex());
-    ui.inactText->setEnabled(enabled);
-    ui.inactButtons->setEnabled(enabled);
+    ui.actColor2->setEnabled(ui.actGrad2->currentIndex());
+    ui.inactColor2->setEnabled(ui.inactGrad2->currentIndex());
 }
 
 void Config::deleteCurrentPreset()
@@ -362,6 +356,32 @@ void Config::loadPresets()
         settings.endGroup();
     }
     settings.endGroup();
+
+    // read default KDE wm colors (gradients are read elsewhere.. grown feature :-(
+    KdeIni *kdeglobals = KdeIni::open("kdeglobals");
+    if (!kdeglobals)
+    {
+        qWarning("Warning: kde4-config not found or \"--path config\" flag does not work\nWarning: No KDE support!");
+        return;
+    }
+    kdeglobals->setGroup("WM");
+    
+    QListWidgetItem *item = ui.presets->item(0);
+
+    item->setData(ActiveColor, kdeglobals->value("activeBackground", Qt::black).rgba());
+    item->setData(ActiveColor2, kdeglobals->value("activeBlend", Qt::black).rgba());
+    item->setData(ActiveText, kdeglobals->value("activeForeground", Qt::black).rgba());
+    item->setData(ActiveButtons, kdeglobals->value("activeTitleBtnBg", Qt::black).rgba());
+    
+    item->setData(InactiveColor, kdeglobals->value("inactiveBackground", Qt::black).rgba());
+    item->setData(InactiveColor2, kdeglobals->value("inactiveBlend", Qt::black).rgba());
+    item->setData(InactiveText, kdeglobals->value("inactiveForeground", Qt::black).rgba());
+    item->setData(InactiveButtons, kdeglobals->value("inactiveTitleBtnBg", Qt::black).rgba());
+
+    kdeglobals->close();
+    delete kdeglobals;
+
+    ui.presets->setCurrentRow(0);
 }
 
 void Config::savePresets()
@@ -401,6 +421,42 @@ void Config::savePresets()
         settings.endGroup();
     }
     settings.endGroup();
+
+    // store default KDE wm colors
+    KdeIni *kdeglobals = KdeIni::open("kdeglobals");
+    if (!kdeglobals)
+    {
+        qWarning("Warning: kde4-config not found or \"--path config\" flag does not work\nWarning: No KDE support!");
+        return;
+    }
+    kdeglobals->setGroup("WM");
+    
+    QListWidgetItem *item = ui.presets->item(0);
+    
+    int gradient = item->data(ActiveGradient2).toInt();
+    QRgb color = item->data(ActiveColor).toUInt();
+    kdeglobals->setValue("activeBackground", QColor(color));
+    if (gradient)
+        color = item->data(ActiveColor2).toUInt();
+    kdeglobals->setValue("activeBlend", QColor(color));
+    color = item->data(ActiveText).toUInt();
+    kdeglobals->setValue("activeForeground", QColor(color));
+    color = item->data(ActiveButtons).toUInt();
+    kdeglobals->setValue("activeTitleBtnBg", QColor(color));
+
+    gradient = item->data(InactiveGradient2).toInt();
+    color = item->data(InactiveColor).toUInt();
+    kdeglobals->setValue("inactiveBackground", QColor(color));
+    if (gradient)
+        color = item->data(InactiveColor2).toUInt();
+    kdeglobals->setValue("inactiveBlend", QColor(color));
+    color = item->data(InactiveText).toUInt();
+    kdeglobals->setValue("inactiveForeground", QColor(color));
+    color = item->data(InactiveButtons).toUInt();
+    kdeglobals->setValue("inactiveTitleBtnBg", QColor(color));
+
+    kdeglobals->close();
+    delete kdeglobals;
 }
 
 void Config::watchBgMode()
@@ -416,7 +472,7 @@ void Config::watchBgMode()
 
 void Config::watchDecoGradient()
 {
-    if (ui.presets->currentRow() < 1)
+    if (ui.presets->currentRow() < 0)
         return;
     QWidget *other = 0;
     if (sender() == ui.actGrad2)

@@ -129,7 +129,7 @@
            <item row="0" column="2">
             <widget class="KColorButton" name="actColor">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -187,7 +187,7 @@
            <item row="1" column="2">
             <widget class="KColorButton" name="actColor2">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -204,7 +204,7 @@
            <item row="2" column="2">
             <widget class="KColorButton" name="actText">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -221,7 +221,7 @@
            <item row="3" column="2">
             <widget class="KColorButton" name="actButtons">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -301,7 +301,7 @@
            <item row="0" column="2">
             <widget class="KColorButton" name="inactColor">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -359,7 +359,7 @@
            <item row="1" column="2">
             <widget class="KColorButton" name="inactColor2">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -376,7 +376,7 @@
            <item row="2" column="2">
             <widget class="KColorButton" name="inactText">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -393,7 +393,7 @@
            <item row="3" column="2">
             <widget class="KColorButton" name="inactButtons">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>
