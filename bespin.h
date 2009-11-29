@@ -280,7 +280,6 @@ private:
     void setupDecoFor(QWidget *w, const QPalette &pal, int mode, const Gradients::Type (&gt)[2]);
     void updateUno(QToolBar *);
 private:
-    typedef QHash<uint, Tile::Set> TileCache;
     typedef struct
     {
         Tile::Set rect[2]; // round

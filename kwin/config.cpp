@@ -28,6 +28,8 @@
 #include <QSettings>
 #include <QtDebug>
 
+#include "../config/kdeini.h"
+
 class KConfig;
 
 extern "C"
