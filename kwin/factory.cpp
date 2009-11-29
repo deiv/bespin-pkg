@@ -71,6 +71,7 @@ QTextBrowser *Factory::ourWindowInfo = 0;
 QHash<qint64, WindowData*> Factory::ourDecoInfos;
 QHash<qint64, BgSet*> Factory::ourBgSets;
 QList<Preset*> Factory::ourPresets;
+QPixmap Factory::mask;
 
 typedef QHash<QString, QHash<NET::WindowType, WindowData*> > DoubleHash;
 
@@ -78,6 +79,15 @@ Factory::Factory() : QObject()
 {
     readConfig();
     Gradients::init();
+
+    mask = QPixmap(11,11);
+    mask.fill(Qt::transparent);
+    QPainter p(&mask);
+    p.setPen(Qt::NoPen); p.setBrush(Qt::black);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.drawEllipse(mask.rect());
+    p.end();
+
     weAreInitialized = true;
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");

@@ -28,6 +28,7 @@
 #define BESPIN_H
 
 #include <QHash>
+#include <QPixmap>
 #include <QVector>
 #include <kdecorationfactory.h>
 #include "../blib/gradients.h"
@@ -94,6 +95,7 @@ protected:
 protected:
     friend class Client;
     static BgSet *bgSet(const QColor &c, bool vertical, int intensity, qint64 *hash = 0);
+    static QPixmap mask;
     static void kickBgSet(qint64 hash);
 private:
     bool readConfig();

@@ -301,6 +301,25 @@ Client::eventFilter(QObject *o, QEvent *e)
             repaint(p, bgMode < 2 && gType[isActive()]);
         }
         repaint(p);
+        if ( KWindowSystem::compositingActive() )
+        {
+            const bool full = isShade() || borderSize > 3;
+            const int sw = Factory::mask.width() / 2 + 1;
+            const int sh = Factory::mask.height() / 2 + 1;
+            const int sx = Factory::mask.width() - sw;
+            const int sy = Factory::mask.height() - sh;
+            const int x2 = widget()->rect().width() - sw;
+            const int y2 = widget()->rect().height() - sh;
+            p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+
+            p.drawPixmap( 0,0, Factory::mask, 0,0, sw,sh ); // topLeft
+            if ( full || !Factory::verticalTitle() )
+                p.drawPixmap( x2,0, Factory::mask, sx,0, sw,sh ); // topRight
+            if ( full || Factory::verticalTitle() )
+                p.drawPixmap( 0,y2, Factory::mask, 0,sy, sw,sh ); // btmLeft
+            if ( full )
+                p.drawPixmap( x2,y2, Factory::mask, sx,sy, sw,sh ); // btmRight
+        }
         p.end();
 
         if (useInternalDoubleBuffering)
@@ -1165,27 +1184,31 @@ Client::resize( const QSize& s )
     left = QRect(0, t2, Factory::verticalTitle() ? myTitleSize : borderSize, sideHeight);
     right = QRect(w-borderSize, t2, borderSize, sideHeight);
 
-    if (maximizeMode() == MaximizeFull)
-        { clearMask(); widget()->update(); return; }
-
-    int d = (isShade() || borderSize > 3) ? 8 : 4;
-    QRegion mask;
-    if (Factory::verticalTitle())
+    if ( !KWindowSystem::compositingActive() )
     {
-        mask = QRegion(0, 4, w, h-8);
-        mask += QRegion(4, 0, w-d, h);
-        mask += QRegion(1, 2, w-d/4, h-4);
-        mask += QRegion(2, 1, w-d/2, h-2);
+        if (maximizeMode() == MaximizeFull)
+            { clearMask(); widget()->update(); return; }
+
+        int d = (isShade() || borderSize > 3) ? 8 : 4;
+        QRegion mask;
+        if (Factory::verticalTitle())
+        {
+            mask = QRegion(0, 4, w, h-8);
+            mask += QRegion(4, 0, w-d, h);
+            mask += QRegion(1, 2, w-d/4, h-4);
+            mask += QRegion(2, 1, w-d/2, h-2);
+        }
+        else
+        {
+            mask = QRegion(4, 0, w-8, h);
+            mask += QRegion(0, 4, w, h-d);
+            mask += QRegion(2, 1, w-4, h-d/4);
+            mask += QRegion(1, 2, w-2, h-d/2);
+        }
+        setMask(mask);
     }
     else
-    {
-        mask = QRegion(4, 0, w-8, h);
-        mask += QRegion(0, 4, w, h-d);
-        mask += QRegion(2, 1, w-4, h-d/4);
-        mask += QRegion(1, 2, w-2, h-d/2);
-    }
-    setMask(mask);
-    
+        clearMask();
     widget()->update(); // force! there're painting errors otherwise
 }
 
