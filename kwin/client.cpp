@@ -301,7 +301,7 @@ Client::eventFilter(QObject *o, QEvent *e)
             repaint(p, bgMode < 2 && gType[isActive()]);
         }
         repaint(p);
-        if ( KWindowSystem::compositingActive() )
+        if ( maximizeMode() != MaximizeFull && KWindowSystem::compositingActive() )
         {
             const bool full = isShade() || borderSize > 3;
             const int sw = Factory::mask.width() / 2 + 1;
