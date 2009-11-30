@@ -419,10 +419,11 @@ Client::init()
         myCaption =  isActive() ? "Active Window" : "Inactive Window";
     else if (!Factory::verticalTitle())
         myCaption = trimm(caption());
-    widget()->setAutoFillBackground(false);
+    widget()->setAutoFillBackground(!isPreview());
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, !isPreview());
-//     widget()->setAttribute(Qt::WA_NoSystemBackground);
+//     widget()->setAttribute(Qt::WA_NoSystemBackground, !isPreview());
     widget()->setAttribute(Qt::WA_PaintOnScreen, !isPreview());
+    widget()->setAttribute(Qt::WA_StyledBackground, false);
     widget()->installEventFilter(this);
 
     QBoxLayout *layout;
@@ -1097,6 +1098,11 @@ Client::reset(unsigned long changed)
                 }
             }
         }
+        QPalette pal = widget()->palette();
+        pal.setColor(QPalette::Active, widget()->backgroundRole(), color(ColorTitleBar, true));
+        pal.setColor(QPalette::Inactive, widget()->backgroundRole(), color(ColorTitleBar, false));
+        pal.setColor(QPalette::Disabled, widget()->backgroundRole(), color(ColorTitleBar, false));
+        widget()->setPalette(pal);
     }
 
     // WORKAROUND a bug apparently in QPaintEngine which seems to
