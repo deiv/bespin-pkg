@@ -80,7 +80,7 @@ Factory::Factory() : QObject()
     readConfig();
     Gradients::init();
 
-    mask = QPixmap(11,11);
+    mask = QPixmap(13,13);
     mask.fill(Qt::transparent);
     QPainter p(&mask);
     p.setPen(Qt::NoPen); p.setBrush(Qt::black);

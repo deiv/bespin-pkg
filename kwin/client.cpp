@@ -281,7 +281,7 @@ Client::eventFilter(QObject *o, QEvent *e)
     {
     case QEvent::Paint:
     {
-        const bool useInternalDoubleBuffering = !isPreview();
+        const bool realWindow = !isPreview();
         QRegion clip = static_cast<QPaintEvent*>(e)->region();
 
 #if 0
@@ -301,7 +301,7 @@ Client::eventFilter(QObject *o, QEvent *e)
             repaint(p, bgMode < 2 && gType[isActive()]);
         }
         repaint(p);
-        if ( maximizeMode() != MaximizeFull && KWindowSystem::compositingActive() )
+        if ( realWindow && maximizeMode() != MaximizeFull && KWindowSystem::compositingActive() )
         {
             const bool full = isShade() || borderSize > 3;
             const int sw = Factory::mask.width() / 2 + 1;
@@ -322,22 +322,37 @@ Client::eventFilter(QObject *o, QEvent *e)
         }
         p.end();
 
-        if (useInternalDoubleBuffering)
+        if (realWindow)
         {
-            QPixmap buffer;
+            QPixmap *buffer = 0;
+            QPixmap dBuffer;
+            QPoint off(0,0);
+            
             if (color(ColorTitleBar, isActive()).alpha() == 0xff)
-            {   // buffer titlebar
-                buffer = QPixmap(myTitleBar->geometry().size());
-                p.begin(&buffer);
-//                 p.setClipping(false);
-                p.setClipRegion(myTitleBar->geometry());
-                repaint(p, false);
-                p.end();
+            {
+                // try to copy from redirection
+                if ( QPaintDevice *device = QPainter::redirected(widget(), &off) )
+                {
+                    if (device->devType() == QInternal::Pixmap)
+                        buffer = static_cast<QPixmap*>(device);
+                }
+                if (!buffer)
+                {
+                    // nope, repaint tp buffer
+                    dBuffer = QPixmap(myTitleBar->geometry().size());
+                    buffer = &dBuffer;
+                    p.begin(buffer);
+//                     p.setClipping(false);
+                    p.setClipRegion(myTitleBar->geometry());
+                    repaint(p, false);
+                    p.end();
+                }
             }
+
             for (int i = 0; i < 4; ++i)
                 if (buttons[i])
                 {   // dump button BGs unless ARGB
-                    buttons[i]->setBg(buffer.isNull()?buffer:buffer.copy(buttons[i]->geometry()));
+                    buttons[i]->setBg(buffer ? buffer->copy(buttons[i]->geometry().translated(-off)) : dBuffer);
                     // enforce repaint, button thinks it's independend
                     buttons[i]->repaint();
                 }
@@ -1184,8 +1199,8 @@ Client::resize( const QSize& s )
     left = QRect(0, t2, Factory::verticalTitle() ? myTitleSize : borderSize, sideHeight);
     right = QRect(w-borderSize, t2, borderSize, sideHeight);
 
-    if ( !KWindowSystem::compositingActive() )
-    {
+//     if ( !KWindowSystem::compositingActive() )
+//     {
         if (maximizeMode() == MaximizeFull)
             { clearMask(); widget()->update(); return; }
 
@@ -1206,9 +1221,9 @@ Client::resize( const QSize& s )
             mask += QRegion(1, 2, w-2, h-d/2);
         }
         setMask(mask);
-    }
-    else
-        clearMask();
+//     }
+//     else
+//         clearMask();
     widget()->update(); // force! there're painting errors otherwise
 }
 
