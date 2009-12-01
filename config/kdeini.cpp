@@ -134,6 +134,8 @@ KdeIni::value(const QString &key, QColor def)
     Entries::const_iterator it = localGroup->constFind(key);
     if (it != localGroup->constEnd())
         return color(*it, def);
+    if (globalGroup == global.constEnd())
+        return def;
     it = globalGroup->constFind(key);
     if (it != globalGroup->constEnd())
         return color(*it, def);
@@ -146,6 +148,8 @@ KdeIni::value(const QString &key)
    Entries::const_iterator it = localGroup->constFind(key);
    if (it != localGroup->constEnd())
       return *it;
+   if (globalGroup == global.constEnd())
+       return QString();
    it = globalGroup->constFind(key);
    if (it != globalGroup->constEnd())
       return *it;
