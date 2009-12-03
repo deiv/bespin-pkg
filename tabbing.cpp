@@ -477,7 +477,7 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
 
 //     sunken = sunken && config.tab.activeTabSunken;
 //     if (!sunken || Colors::value(CCOLOR(tab.active, Bg)) < 164)
-        tr.translate(0,-F(1));
+        tr.translate(0,-F(2));
     if (isEnabled && Colors::value(cB) < 148) // this is not the same...
     {   // dark background, let's paint an emboss
         painter->setPen(cB.dark(120));

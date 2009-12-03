@@ -507,7 +507,6 @@ void Style::initMetrics()
 void
 Style::init(const QSettings* settings)
 {
-    config.fileDialogDE = true;
     QTime time; time.start();
     // various workarounds... ==========================
     appType = Unknown;
@@ -547,12 +546,7 @@ Style::init(const QSettings* settings)
         {
             appName = QCoreApplication::arguments().at(0).section('/', -1);
             if (appName == "arora")
-            {
                 appType = Arora;
-                config.fileDialogDE = false;
-            }
-            else if (appName == "vlc" || appName == "VirtualBox")
-                config.fileDialogDE = false;
         }
     }
     // ==========================

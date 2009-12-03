@@ -100,10 +100,6 @@ static void
 #define registerCE(_FUNC_, _ELEM_) controlRoutine[QStyle::_ELEM_] = &Style::_FUNC_
 #define registerCC(_FUNC_, _ELEM_) complexRoutine[QStyle::_ELEM_] = &Style::_FUNC_
 
-// #if QT_VERSION < 0x040600
-extern void register_dialog_functions();
-// #endif
-
 // static void registerPE(char *S0, ...)
 // {
 //    register char *s;
@@ -119,10 +115,6 @@ extern void register_dialog_functions();
 void
 Style::registerRoutines()
 {
-// #if QT_VERSION < 0x040600
-    if (config.fileDialogDE)
-        register_dialog_functions();
-// #endif
     for (int i = 0; i < N_PE; ++i)
         primitiveRoutine[i] = 0;
     for (int i = 0; i < N_CE; ++i)
