@@ -897,7 +897,6 @@ Style::updateUno(QToolBar *bar)
     }
 }
 
-
 bool
 Style::eventFilter( QObject *object, QEvent *ev )
 {
@@ -1011,8 +1010,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
             bool b = false;
             if ((b = object->inherits("KUrlButton")) || object->inherits("BreadcrumbItemButton"))
             {
+                qDebug() << "urlbutton" << w;
                 isUrlNaviButtonArrow = true;
-                object->removeEventFilter(this);
+//                 object->removeEventFilter(this);
                 if (w->text() == "/")
                     w->setText("/.");
                 if (isLastNavigatorButton(w, b?"KUrlButton":"BreadcrumbItemButton"))
@@ -1022,10 +1022,10 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 }
                 else if (w->foregroundRole() != QPalette::Link)
                     w->setForegroundRole(QPalette::Link);
-                QCoreApplication::sendEvent(object, ev);
-                object->installEventFilter(this);
+//                 QCoreApplication::sendEvent(object, ev);
+//                 object->installEventFilter(this);
                 isUrlNaviButtonArrow = false;
-                return true;
+                return false;
             }
         }
         return false;
