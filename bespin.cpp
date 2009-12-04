@@ -1010,7 +1010,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
             bool b = false;
             if ((b = object->inherits("KUrlButton")) || object->inherits("BreadcrumbItemButton"))
             {
-                qDebug() << "urlbutton" << w;
                 isUrlNaviButtonArrow = true;
 //                 object->removeEventFilter(this);
                 if (w->text() == "/")
