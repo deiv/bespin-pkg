@@ -157,6 +157,7 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
     pm.fill(Qt::transparent);
     QPainter painter(&pm);
     QPainterPath shape;
+    Shapes::Style style = (Shapes::Style)config.winBtnStyle;
 
     switch (standardPixmap)
     {
@@ -220,29 +221,29 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
     case SP_TitleBarCloseButton:
     case SP_BrowserStop:
     case SP_MediaStop:
-        shape = Shapes::close(pm.rect(), config.newWinBtns);
+        shape = Shapes::close(pm.rect(), style);
         goto paint;
     case SP_TitleBarMinButton:
-        shape = Shapes::min(pm.rect(), config.newWinBtns);
+        shape = Shapes::min(pm.rect(), style);
         goto paint;
     case SP_TitleBarMaxButton:
-        shape = Shapes::max(pm.rect(), config.newWinBtns);
+        shape = Shapes::max(pm.rect(), style);
         goto paint;
     case SP_TitleBarMenuButton:
-        shape = Shapes::menu(pm.rect(), false, config.newWinBtns);
+        shape = Shapes::menu(pm.rect(), false, style);
         goto paint;
     case SP_TitleBarShadeButton:
     case SP_TitleBarUnshadeButton:
-        shape = Shapes::shade(pm.rect(), config.newWinBtns);
+        shape = Shapes::shade(pm.rect(), style);
         goto paint;
     case SP_TitleBarNormalButton:
         if (dock)
-            shape = Shapes::dockControl(pm.rect(), dock->isFloating(), config.newWinBtns);
+            shape = Shapes::dockControl(pm.rect(), dock->isFloating(), style);
         else
-            shape = Shapes::restore(pm.rect(), config.newWinBtns);
+            shape = Shapes::restore(pm.rect(), style);
         goto paint;
     case SP_TitleBarContextHelpButton:
-        shape = Shapes::help(pm.rect(), config.newWinBtns);
+        shape = Shapes::help(pm.rect(), style);
         goto paint;
     case SP_ArrowDown:
     case SP_ArrowUp:

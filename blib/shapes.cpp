@@ -25,71 +25,124 @@ using namespace Bespin;
 #define _S(_I_) const float s##_I_ = bound.height() / (float)_I_;
 
 QPainterPath
-Shapes::close(const QRectF &bound, bool round)
+Shapes::close(const QRectF &bound, Style style)
 {
-    _S(3)
+    _S(3) _S(4) _S(8)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        path.addEllipse(bound);
-        path.addEllipse(bound.adjusted(s3, s3, -s3, -s3));
-    }
-    else
-    {
-        _S(4)
+    case Square:
         path.addRect(bound);
         path.addRect(bound.adjusted(s4,s4,-s4,-s4));
         path.addRect(bound.adjusted(s3,s3,-s3,-s3));
+        break;
+    case LasseKongo:
+        path.addRect(bound);
+        path.addRect(bound.adjusted(s8,s8,-s8,-s8));
+        path.addRect(bound.adjusted(s3,s3,-s3,-s3));
+        break;
+    default:
+    case Round:
+        path.addEllipse(bound);
+        path.addEllipse(bound.adjusted(s3, s3, -s3, -s3));
+        break;
+    case TheRob:
+        path.addEllipse(bound);
+        path.addEllipse(bound.adjusted(s8,s8,-s8,-s8));
+        path.addEllipse(bound.adjusted(s4,s4,-s4,-s4));
     }
     return path;
 }
 
 QPainterPath
-Shapes::min(const QRectF &bound, bool round)
+Shapes::min(const QRectF &bound, Style style)
 {
+    _S(3) _S(4) _S(8)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        path.moveTo(bound.center());
-        path.arcTo(bound, 180, 180);
-        path.closeSubpath();
-    }
-    else
+    case Square:
     {
-        _S(3) _S(4)
         path.addRect(bound);
         path.addRect(bound.adjusted(s4, 0, 0, -s4));
         path.addRect(bound.adjusted(2*s3, 0, 0, -2*s3));
+        break;
+    }
+    case LasseKongo:
+        break;
+    default:
+    case Round:
+        path.moveTo(bound.center());
+        path.arcTo(bound, 180, 180);
+        path.closeSubpath();
+        break;
+    case TheRob:
+        path.moveTo(bound.center());
+        path.arcTo(bound, 180, 180);
+        path.closeSubpath();
+        path.moveTo(bound.center());
+        path.arcTo(bound.adjusted(s8,s8,-s8,-s8), 180, 180);
+        path.closeSubpath();
+        path.addEllipse(bound.adjusted(s4,s4,-s4,-s4));
+        break;
     }
     return path;
 }
 
 QPainterPath
-Shapes::max(const QRectF &bound, bool round)
+Shapes::max(const QRectF &bound, Style style)
 {
+    _S(3) _S(4) _S(8)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        path.moveTo(bound.center());
-        path.arcTo(bound, 0, 180);
-        path.closeSubpath();
-    }
-    else
-    {
-        _S(3) _S(4)
+    case Square:
         path.addRect(bound);
         path.addRect(bound.adjusted(0, s4, -s4, 0));
         path.addRect(bound.adjusted(0, 2*s3, -2*s3, 0));
+        break;
+    case LasseKongo:
+        break;
+    default:
+    case Round:
+        path.moveTo(bound.center());
+        path.arcTo(bound, 0, 180);
+        path.closeSubpath();
+        break;
+    case TheRob:
+        path.moveTo(bound.center());
+        path.arcTo(bound, 0, 180);
+        path.closeSubpath();
+        path.moveTo(bound.center());
+        path.arcTo(bound.adjusted(s8,s8,-s8,-s8), 0, 180);
+        path.closeSubpath();
+        path.addEllipse(bound.adjusted(s4,s4,-s4,-s4));
+        break;
     }
     return path;
 }
 
 QPainterPath
-Shapes::dockControl(const QRectF &bound, bool floating, bool round)
+Shapes::dockControl(const QRectF &bound, bool floating, Style style)
 {
+    _S(4)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
+    case Square:
+    case LasseKongo:
+        if (floating)
+            path.addRect(bound.adjusted(0, s4, 0, -s4));
+        else
+        {
+            _S(2) _S(3)
+            path.addRect(bound.adjusted(0, 0, -3*s4, -s3));
+            path.addRect(bound.adjusted(s3, s2, -s3, 0));
+        }
+        break;
+    default:
+    case Round:
+    case TheRob:
         if (floating)
         {
             _S(6)
@@ -101,74 +154,97 @@ Shapes::dockControl(const QRectF &bound, bool floating, bool round)
             path.closeSubpath();
         }
         else
-            path = Shapes::unAboveBelow(bound, true);
-    }
-    else
-    {
-        _S(4)
-        if (floating)
-            path.addRect(bound.adjusted(0, s4, 0, -s4));
-        else
-        {
-            _S(2) _S(3)
-            path.addRect(bound.adjusted(0, 0, -3*s4, -s3));
-            path.addRect(bound.adjusted(s3, s2, -s3, 0));
-        }
+            path = Shapes::unAboveBelow(bound, style);
+        break;
     }
     return path;
 }
 
 QPainterPath
-Shapes::restore(const QRectF &bound, bool round)
+Shapes::restore(const QRectF &bound, Style style)
 {
+    _S(3) _S(4)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        path.moveTo(bound.center());
-        path.arcTo(bound, 225, 180);
-        path.closeSubpath();
-    }
-    else
-    {
-        _S(3) _S(4)
+    case Square:
         path.addRect(bound);
         path.addRect(bound.adjusted(0, 0, -s4, -s4));
         path.addRect(bound.adjusted(0, 0, -2*s3, -2*s3));
+        break;
+    case LasseKongo:
+        break;
+    default:
+    case Round:
+        path.moveTo(bound.center());
+        path.arcTo(bound, 225, 180);
+        path.closeSubpath();
+        break;
+    case TheRob:
+        break;
     }
     return path;
 }
 
 QPainterPath
-Shapes::stick(const QRectF &bound, bool round)
+Shapes::stick(const QRectF &bound, Style style)
 {
     _S(6)
     QPainterPath path;
-    if (round)
-        path.addEllipse(bound.adjusted(s6, s6, -s6, -s6));
-    else
+    switch (style)
+    {
+    case Square:
         path.addRect(bound.adjusted(s6, s6, -s6, -s6));
+        break;
+    case LasseKongo:
+        break;
+    default:
+    case Round:
+    case TheRob:
+        path.addEllipse(bound.adjusted(s6, s6, -s6, -s6));
+        break;
+    }
     return path;
 }
 
 QPainterPath
-Shapes::unstick(const QRectF &bound, bool round)
+Shapes::unstick(const QRectF &bound, Style style)
 {
     _S(3)
     QPainterPath path;
-    if (round)
-        path.addEllipse(bound.adjusted(s3, s3, -s3, -s3));
-    else
+    switch (style)
+    {
+    case Square:
         path.addRect(bound.adjusted(s3, s3, -s3, -s3));
+        break;
+    case LasseKongo:
+        break;
+    default:
+    case Round:
+    case TheRob:
+        path.addEllipse(bound.adjusted(s3, s3, -s3, -s3));
+        break;
+    }
     return path;
 }
 
 QPainterPath
-Shapes::keepAbove(const QRectF &bound, bool round)
+Shapes::keepAbove(const QRectF &bound, Style style)
 {
+    _S(3) _S(4) _S(2) _S(6)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        _S(2) _S(6)
+    case Square:
+        path.addRect(bound.adjusted(s4, 0, -s4, -2*s3));
+        path.addRect(bound.adjusted(0, 2*s3, -2*s3, 0));
+        path.addRect(bound.adjusted(2*s3, 2*s3, 0, 0));
+        break;
+    case LasseKongo:
+        break;
+    default:
+    case Round:
+    case TheRob:
         QRectF rect = bound.adjusted(0, s2+s6, -s2, s6);
         path.moveTo(bound.center());
         path.arcTo(bound, 0, 180);
@@ -180,152 +256,178 @@ Shapes::keepAbove(const QRectF &bound, bool round)
         path.moveTo(rect.center());
         path.arcTo(rect, 0, 180);
         path.closeSubpath();
-    }
-    else
-    {
-        _S(3) _S(4)
-        path.addRect(bound.adjusted(s4, 0, -s4, -2*s3));
-        path.addRect(bound.adjusted(0, 2*s3, -2*s3, 0));
-        path.addRect(bound.adjusted(2*s3, 2*s3, 0, 0));
+        break;
     }
     return path;
 }
 
 QPainterPath
-Shapes::keepBelow(const QRectF &bound, bool round)
+Shapes::keepBelow(const QRectF &bound, Style style)
 {
+    _S(2) _S(6) _S(3) _S(4)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        _S(2) _S(6)
-        QRectF rect = bound.adjusted(0, -s6, -s2, -(s2+s6));
-        path.moveTo(bound.center());
-        path.arcTo(bound, 180, 180);
-        path.closeSubpath();
-        path.moveTo(rect.center());
-        path.arcTo(rect, 180, 180);
-        path.closeSubpath();
-        rect.translate(s2, 0);
-        path.moveTo(rect.center());
-        path.arcTo(rect, 180, 180);
-        path.closeSubpath();
-    }
-    else
-    {
-        _S(3) _S(4)
+    case Square:
         path.addRect(bound.adjusted(s4, 2*s3, -s4, 0));
         path.addRect(bound.adjusted(0, 0, -2*s3, -2*s3));
         path.addRect(bound.adjusted(2*s3, 0, 0, -2*s3));
+        break;
+    case LasseKongo:
+        break;
+    default:
+    case Round:
+    case TheRob:
+        QRectF rect = bound.adjusted(0, 0, -s2, -s2);
+        path.moveTo(bound.center() + QPointF(0, s2));
+        path.arcTo(bound.translated(0, s2), 0, 180);
+        path.closeSubpath();
+        path.moveTo(rect.center());
+        path.arcTo(rect, 0, 180);
+        path.closeSubpath();
+        rect.translate(s2, 0);
+        path.moveTo(rect.center());
+        path.arcTo(rect, 0, 180);
+        path.closeSubpath();
+        break;
     }
     return path;
 }
 
 QPainterPath
-Shapes::unAboveBelow(const QRectF &bound, bool round)
+Shapes::unAboveBelow(const QRectF &bound, Style style)
 {
+    _S(6) _S(3) _S(4)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        _S(6)
-        QRectF rect = bound.adjusted(0,0,-s6, 0);
-        path.moveTo(rect.center());
-        path.arcTo(rect, 90, 180);
-        path.closeSubpath();
-        rect.translate(s6,0);
-        path.moveTo(rect.center());
-        path.arcTo(rect, -90, 180);
-        path.closeSubpath();
-    }
-    else
-    {
-        _S(3) _S(4)
-        path.addRect(bound.adjusted(0, s4, -2*s3, -s4));
-        path.addRect(bound.adjusted(2*s3, s4, 0, -s4));
+        case Square:
+            path.addRect(bound.adjusted(0, s4, -2*s3, -s4));
+            path.addRect(bound.adjusted(2*s3, s4, 0, -s4));
+            break;
+        case LasseKongo:
+            break;
+        default:
+        case Round:
+        case TheRob:
+            QRectF rect = bound.adjusted(0,0,-s6, 0);
+            path.moveTo(rect.center());
+            path.arcTo(rect, 90, 180);
+            path.closeSubpath();
+            rect.translate(s6,0);
+            path.moveTo(rect.center());
+            path.arcTo(rect, -90, 180);
+            path.closeSubpath();
+            break;
     }
     return path;
 }
 
 QPainterPath
-Shapes::menu(const QRectF &bound, bool leftSide, bool round)
+Shapes::menu(const QRectF &bound, bool leftSide, Style style)
 {
-    QPainterPath path;
     _S(2)
-    if (round)
+    QPainterPath path;
+    switch (style)
+    {
+    case Square:
+    {
+        _S(4)
+        path.addRect(bound);
+        path.addRect(bound.adjusted(leftSide ? s2 : 0, s4, leftSide ? 0 : -s2, 0));
+        break;
+    }
+    case LasseKongo:
+        break;
+    default:
+    case Round:
+    case TheRob:
     {
         _S(9)
         path.moveTo(bound.center());
         path.arcTo(bound, leftSide ? -90 : 0, 270);
         path.closeSubpath();
         path.addRect(bound.adjusted(leftSide ? 0 : 5*s9, 5*s9, leftSide ? -5*s9 : 0, 0));
+        break;
     }
-    else
-    {
-        _S(4)
-        path.addRect(bound);
-        path.addRect(bound.adjusted(leftSide ? s2 : 0, s4, leftSide ? 0 : -s2, 0));
     }
     return path;
 }
 
 QPainterPath
-Shapes::help(const QRectF &bound, bool round)
+Shapes::help(const QRectF &bound, Style style)
 {
+    _S(2) _S(3) _S(4) _S(6)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        _S(2) _S(6)
-        path.moveTo(bound.center());
-        path.arcTo(bound, -30, 180);
-        path.addEllipse(bound.adjusted(s2, s2+s6, -s6, 0));
-    }
-    else
-    {
-        _S(2) _S(3) _S(4) _S(6)
+    case Square:
         path.addRect(bound.adjusted(s2-s3, 0, -s4 , -s3));
         path.addRect(bound.adjusted(s2-s3, s4, -s2 , -s3));
         path.addRect(bound.adjusted(s2, 5*s6, -s4 , 0));
+        break;
+    case LasseKongo:
+        break;
+    default:
+    case Round:
+    case TheRob:
+        path.moveTo(bound.center());
+        path.arcTo(bound, -30, 180);
+        path.addEllipse(bound.adjusted(s2, s2+s6, -s6, 0));
+        break;
     }
     return path;
 }
 
 QPainterPath
-Shapes::shade(const QRectF &bound, bool round)
+Shapes::shade(const QRectF &bound, Style style)
 {
     _S(3)
     QPainterPath path;
-    if (round)
-        path.addEllipse(bound.adjusted(0, s3, 0, -s3));
-    else
+    switch (style)
+    {
+    case Square:
+    case LasseKongo:
         path.addRect(bound.adjusted(0, s3, 0, -s3));
+        break;
+    default:
+    case Round:
+    case TheRob:
+        path.addEllipse(bound.adjusted(0, s3, 0, -s3));
+        break;
+    }
     return path;
 }
 
 QPainterPath
-Shapes::unshade(const QRectF &bound, bool round)
+Shapes::unshade(const QRectF &bound, Style style)
 {
     _S(3)
     QPainterPath path;
-    if (round)
-        path.addEllipse(bound.adjusted(0, s3, 0, -s3));
-    else
+    switch (style)
+    {
+    case Square:
+    case LasseKongo:
         path.addRect(bound.adjusted(0, s3, 0, -s3));
+        break;
+    default:
+    case Round:
+    case TheRob:
+        path.addEllipse(bound.adjusted(0, s3, 0, -s3));
+        break;
+    }
     return path;
 }
 
 QPainterPath
-Shapes::exposee(const QRectF &bound, bool round)
+Shapes::exposee(const QRectF &bound, Style style)
 {
     _S(2)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        QRectF rect = bound.adjusted(0,0,-s2,-s2);
-        path.addEllipse(rect);
-        path.addEllipse(rect.translated(s2,0));
-        path.addEllipse(rect.translated(0,s2));
-        path.addEllipse(rect.translated(s2,s2));
-    }
-    else
+    case Square:
+    case LasseKongo:
     {
         _S(3)
         QRectF rect = bound.adjusted(0,0,-2*s3,-2*s3);
@@ -334,24 +436,40 @@ Shapes::exposee(const QRectF &bound, bool round)
         path.addRect(rect.translated(0,s2));
         path.addRect(rect.translated(s2,s2));
     }
+        break;
+    default:
+    case Round:
+    case TheRob:
+    {
+        QRectF rect = bound.adjusted(0,0,-s2,-s2);
+        path.addEllipse(rect);
+        path.addEllipse(rect.translated(s2,0));
+        path.addEllipse(rect.translated(0,s2));
+        path.addEllipse(rect.translated(s2,s2));
+        break;
+    }
+    }
     return path;
 }
 
 QPainterPath
-Shapes::info(const QRectF &bound, bool round)
+Shapes::info(const QRectF &bound, Style style)
 {
-    _S(3)
+    _S(3) _S(4)
     QPainterPath path;
-    if (round)
+    switch (style)
     {
-        path.addEllipse(bound.adjusted(s3, 0, -s3, -2*s3));
-        path.addEllipse(bound.adjusted(s3, s3, -s3, 0));
-    }
-    else
-    {
-        _S(4)
+    case Square:
+    case LasseKongo:
         path.addRect(bound.adjusted(s3, 0, -s3, -3*s4));
         path.addRect(bound.adjusted(s3, s3, -s3, 0));
+        break;
+    default:
+    case Round:
+    case TheRob:
+        path.addEllipse(bound.adjusted(s3, 0, -s3, -2*s3));
+        path.addEllipse(bound.adjusted(s3, s3, -s3, 0));
+        break;
     }
     return path;
 }

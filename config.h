@@ -97,7 +97,7 @@ typedef struct Config
         QPalette::ColorRole __role[2];
     } progress;
 
-    bool newWinBtns;
+    int winBtnStyle;
 
     float scale;
    

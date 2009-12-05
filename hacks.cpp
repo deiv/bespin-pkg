@@ -1298,6 +1298,10 @@ Hacks::add(QWidget *w)
 #endif
     else if (*appType == KMix)
     {
+//         if (qobject_cast<QProgressBar*>(w))
+//             qDebug() << w << w->window();
+//         else if (w->isWindow())
+//             qDebug() << w;
         if (w->isWindow())
         if (QProgressBar *pb = qobject_cast<QProgressBar*>(w))
         {

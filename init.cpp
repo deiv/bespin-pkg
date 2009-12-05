@@ -155,7 +155,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         config.menu.showIcons = appType == Opera || readBool(MENU_SHOWICONS);
         config.menu.shadow = readBool(MENU_SHADOW);
 
-        config.newWinBtns = true; // this is a kwin deco setting, TODO: read from there?
+        config.winBtnStyle = 2; // this is a kwin deco setting, TODO: read from there?
         
         Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));
         Animator::Tab::setDuration(clamp(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));

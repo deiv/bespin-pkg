@@ -344,7 +344,10 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
         role = widget->foregroundRole();
         if (role == QPalette::ButtonText &&
             widget->parentWidget() && widget->parentWidget()->inherits("QMenu"))
+        {
             role = config.menu.std_role[Fg]; // this is a f**** KMenu Header
+            step = 0;
+        }
     }
 
     QColor text = PAL.color(role);
