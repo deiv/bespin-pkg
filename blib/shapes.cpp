@@ -163,7 +163,7 @@ Shapes::dockControl(const QRectF &bound, bool floating, Style style)
 QPainterPath
 Shapes::restore(const QRectF &bound, Style style)
 {
-    _S(3) _S(4)
+    _S(3) _S(4) _S(8)
     QPainterPath path;
     switch (style)
     {
@@ -181,6 +181,13 @@ Shapes::restore(const QRectF &bound, Style style)
         path.closeSubpath();
         break;
     case TheRob:
+        path.moveTo(bound.center());
+        path.arcTo(bound, 225, 180);
+        path.closeSubpath();
+        path.moveTo(bound.center());
+        path.arcTo(bound.adjusted(s8,s8,-s8,-s8), 225, 180);
+        path.closeSubpath();
+        path.addEllipse(bound.adjusted(s4,s4,-s4,-s4));
         break;
     }
     return path;
