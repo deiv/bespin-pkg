@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>575</width>
-    <height>293</height>
+    <width>665</width>
+    <height>288</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -562,6 +562,11 @@
            <item>
             <property name="text">
              <string>TheRob (3rd gen)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>LasseKongo (nogen)</string>
             </property>
            </item>
           </widget>
