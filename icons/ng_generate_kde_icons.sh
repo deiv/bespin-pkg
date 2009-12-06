@@ -1,7 +1,8 @@
 #!/bin/bash
 setname="nmfnms"
 sizes="128:64:48:32:22:16"
-types="actions:animations:apps:categories:devices:emblems:emotes:filesystems:intl:mimetypes:places:status"
+types="actions:animations:apps:categories:devices:emblems:emotes:intl:mimetypes:places:status"
+contexts=("Actions" "Animations" "Applications" "Categories" "Devices" "Emblems" "Emotes" "International" "MimeTypes" "Places" "Status")
 
 # create setnamed dir
 IFS=':' # set delimiter
@@ -23,9 +24,14 @@ while read line; do
     # split line into source and destination references
     src=${line%%:*}
     dsts=${line#*:}
+    if [ "$src" = "$dsts" ]; then
+        echo -e "\nWARNING: ignoring \"$src\""
+        continue
+    fi
+
     svg="$src.svg"; [ -e "$svg" ] || svg="$src.svgz"
     if [ ! -e "$svg" ]; then
-        echo "ERROR: source does not exist: \"$src\""
+        echo -e "\nERROR: source does not exist: \"$src\""
         continue
     fi
     for sz in $sizes; do
@@ -41,7 +47,7 @@ while read line; do
             typ=${dst%/*}
             path="$setname/${sz}x${sz}/$typ"
             if [ ! -d "$path" ]; then
-                echo "ERROR: invalid type: \"$typ\""
+                echo -e "\nERROR: invalid type: \"$typ\""
                 continue
             fi
             files=${dst##*/}
@@ -54,4 +60,61 @@ while read line; do
     done
 done < alias.txt
 
-echo 
+echo
+
+IFS=""
+
+echo "generate theme file"
+
+echo "
+[Icon Theme]
+Name=$setname
+Comment=question everything!
+DisplayDepth=32
+Inherits=oxygen
+
+Example=folder
+
+LinkOverlay=link
+LockOverlay=lockoverlay
+ShareOverlay=share
+ZipOverlay=zip
+
+DesktopDefault=48
+DesktopSizes=$sizes
+ToolbarDefault=22
+ToolbarSizes=16,22,32,48
+MainToolbarDefault=22
+MainToolbarSizes=16,22,32,48
+SmallDefault=16
+SmallSizes=16,22
+PanelDefault=22
+PanelSizes=$sizes
+
+" > index.theme
+
+IFS=":"
+
+directories="Directories="
+for sz in $sizes; do
+for typ in $types; do
+    directories="${directories}${sz}x${sz}/$typ,"
+done
+done
+
+echo "
+$directories
+" >> index.theme
+
+for sz in $sizes; do
+i=0
+for typ in $types; do
+echo "
+[${sz}x${sz}/$typ]
+Size=$sz
+Context=${contexts[$i]}
+Type=Threshold
+" >> index.theme
+((++i))
+done
+done

@@ -135,6 +135,6 @@ wireless:devices/network-wireless
 xml:mimetypes/application-xml:text-xml
 zoom-in:actions/zoom-in
 zoom-out:actions/zoom-out
-ark: 
+ark:
 digikam:apps/digikam
 kalculator:apps/kalculator:accessories-calculator
