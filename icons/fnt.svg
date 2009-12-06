@@ -12,7 +12,7 @@
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
+   inkscape:version="0.46"
    version="1.0"
    sodipodi:docname="fnt.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -34,17 +34,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="53.538769"
+     inkscape:cx="-78.246945"
      inkscape:cy="31.146971"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="1600"
-     inkscape:window-height="1155"
-     inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-width="1440"
+     inkscape:window-height="854"
+     inkscape:window-x="-4"
+     inkscape:window-y="-1"
      inkscape:snap-global="false">
     <inkscape:grid
        type="xygrid"
@@ -70,16 +70,16 @@
      id="layer1">
     <text
        xml:space="preserve"
-       style="font-size:103.41218567px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:end;line-height:110.00000238%;writing-mode:lr-tb;text-anchor:end;opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:4.00000048;stroke-miterlimit:4;stroke-dasharray:none;font-family:Segoe;-inkscape-font-specification:Segoe Bold"
-       x="125.65408"
-       y="99.825668"
+       style="font-size:95.52188873000000058px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:end;line-height:110.00000238000001218%;writing-mode:lr-tb;text-anchor:end;opacity:0.66000000999999997;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:3.69480252000000009;stroke-miterlimit:4;stroke-dasharray:none;font-family:Segoe;-inkscape-font-specification:Segoe Bold"
+       x="136.66644"
+       y="91.978615"
        id="text3408"
        sodipodi:linespacing="110%"
-       transform="scale(1.003156,0.9968539)"><tspan
+       transform="scale(0.922939,1.0834953)"><tspan
          sodipodi:role="line"
          id="tspan3410"
-         x="125.65408"
-         y="99.825668"
-         style="font-size:103.41218567px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:end;line-height:110.00000238%;writing-mode:lr-tb;text-anchor:end;stroke-width:4.00000048;font-family:Segoe;-inkscape-font-specification:Segoe Bold">aA</tspan></text>
+         x="136.66646"
+         y="91.978615"
+         style="font-size:95.52188873000000058px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:end;line-height:110.00000238000001218%;writing-mode:lr-tb;text-anchor:end;stroke-width:3.69480252000000009;font-family:Segoe;-inkscape-font-specification:Segoe Bold;fill:#000000">aA</tspan></text>
   </g>
 </svg>

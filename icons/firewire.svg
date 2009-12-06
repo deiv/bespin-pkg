@@ -18,7 +18,7 @@
    enable-background="new 0 0 200 230"
    xml:space="preserve"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
+   inkscape:version="0.46"
    sodipodi:docname="firewire.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"><metadata
    id="metadata5687"><rdf:RDF><cc:Work
@@ -31,7 +31,7 @@
      inkscape:vp_z="200 : 115 : 1"
      inkscape:persp3d-origin="100 : 76.666667 : 1"
      id="perspective5689" /></defs><sodipodi:namedview
-   inkscape:window-height="675"
+   inkscape:window-height="715"
    inkscape:window-width="913"
    inkscape:pageshadow="2"
    inkscape:pageopacity="0.0"
@@ -44,10 +44,10 @@
    id="base"
    showgrid="false"
    inkscape:zoom="2.026087"
-   inkscape:cx="51.642697"
+   inkscape:cx="-39.419533"
    inkscape:cy="115"
    inkscape:window-x="37"
-   inkscape:window-y="456"
+   inkscape:window-y="133"
    inkscape:current-layer="Layer_1" />
 <g
    id="g5634">
@@ -63,7 +63,7 @@
 
 <g
    id="g5691"
-   style="fill:#000000"
+   style="fill:#000000;opacity:0.66"
    transform="matrix(2.8278806,0,0,2.8278806,-184.41364,-170.82379)"><path
      id="path5640"
      d="m 84.578,98.68 c 0,-8.615 6.985,-15.601 15.601,-15.601 8.615,0 15.6,6.985 15.6,15.601 0,8.616 -6.984,15.604 -15.6,15.604 -8.616,-0.001 -15.601,-6.989 -15.601,-15.604 m 15.601,8.738 c 4.827,0 8.734,-3.912 8.734,-8.738 0,-4.823 -3.907,-8.739 -8.734,-8.739 -4.825,0 -8.735,3.916 -8.735,8.739 -0.001,4.826 3.91,8.738 8.735,8.738 z"
