@@ -91,7 +91,7 @@ SmallSizes=16,22
 PanelDefault=22
 PanelSizes=$sizes
 
-" > index.theme
+" > "$setname/index.theme"
 
 IFS=":"
 
@@ -104,7 +104,7 @@ done
 
 echo "
 $directories
-" >> index.theme
+" >> "$setname/index.theme"
 
 for sz in $sizes; do
 i=0
@@ -114,7 +114,7 @@ echo "
 Size=$sz
 Context=${contexts[$i]}
 Type=Threshold
-" >> index.theme
+" >> "$setname/index.theme"
 ((++i))
 done
 done
