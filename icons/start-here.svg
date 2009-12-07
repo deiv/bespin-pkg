@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,8 +12,10 @@
    height="64px"
    id="svg2816"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="New document 2">
+   inkscape:version="0.46+devel"
+   sodipodi:docname="start-here.svg"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2818">
     <inkscape:perspective
@@ -34,15 +35,15 @@
      inkscape:pageshadow="2"
      inkscape:zoom="10.90625"
      inkscape:cx="31.312321"
-     inkscape:cy="31.954155"
+     inkscape:cy="20.95129"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
      inkscape:window-width="1086"
      inkscape:window-height="1089"
-     inkscape:window-x="229"
-     inkscape:window-y="0"
+     inkscape:window-x="494"
+     inkscape:window-y="111"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -60,7 +61,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -70,11 +71,11 @@
      inkscape:groupmode="layer">
     <path
        id="rect3606"
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="m 52,32 0,16 -12,0 12,-16 z m 0,0 12,0 0,16 -12,0 0,-16 z m -20,16 32,0 0,16 -32,0 0,-16 z m 0.08226,15.999894 C 14.40921,64.045327 0.04553843,49.755317 1.0573812e-4,32.082263 -0.04532695,14.40921 14.244683,0.04553843 31.917737,1.0573812e-4 31.997139,-9.8382982e-5 32.076541,-6.9712035e-6 32.155942,3.7997156e-4 L 32,32 z" />
     <path
        sodipodi:type="arc"
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="path3609"
        sodipodi:cx="48"
        sodipodi:cy="16"
