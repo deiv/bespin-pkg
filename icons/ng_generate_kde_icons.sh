@@ -13,6 +13,7 @@ basename="nmfnms"
 
 # Example:
 # color="#2B74C7FF" # Apples blue
+halo="white"
 
 ###### ICON THEME MANAGEMENT #######################################################################
 
@@ -74,10 +75,23 @@ while read line; do
         png="$setname/${sz}x${sz}/.pool/$src.png"
         # convert and colorize
         if [ ! -e $png ] || [ $svg -nt $png ]; then
-            inkscape -w $sz -e "$png" "$svg" > /dev/null
-            if [ -n "$color" ]; then
-                mogrify -fill $color -colorize 100% "$png"
+            if [ -n "$halo" ]; then
+                inkscape -w $((sz-4)) -e ".tmp.png" "$svg" > /dev/null
+                if [ -n "$color" ]; then
+                    mogrify -fill $color -colorize 100% ".tmp.png"
+                fi
+                mogrify -bordercolor transparent -border 2x2 ".tmp.png"
+                convert -channel RGBA -blur 0x3 ".tmp.png" ".halo.png"
+                mogrify -fill $halo -colorize 100% ".halo.png"
+                convert ".halo.png" ".tmp.png" -gravity Center -composite "$png"
+                rm -f ".halo.png" ".tmp.png"
+            else
+                inkscape -w $sz -e "$png" "$svg" > /dev/null
+                if [ -n "$color" ]; then
+                    mogrify -fill $color -colorize 100% "$png"
+                fi
             fi
+            
         fi
 
         # print progress
