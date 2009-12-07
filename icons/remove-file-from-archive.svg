@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,7 +12,7 @@
    height="128"
    id="svg4289"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre2 r22153"
+   inkscape:version="0.46+devel"
    version="1.0"
    sodipodi:docname="remove-file-from-archive.svg"
    inkscape:export-filename="/home/andreas/project/gnome-icon-theme/scalable/actions/list-add.png"
@@ -62,8 +61,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.78125"
-     inkscape:cx="29.490196"
+     inkscape:zoom="2.390625"
+     inkscape:cx="4.4967319"
      inkscape:cy="64"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -75,8 +74,8 @@
      inkscape:guide-bbox="true"
      inkscape:window-width="1440"
      inkscape:window-height="846"
-     inkscape:window-x="278"
-     inkscape:window-y="132"
+     inkscape:window-x="51"
+     inkscape:window-y="99"
      objecttolerance="10000"
      gridtolerance="10000"
      guidetolerance="10000"
@@ -105,8 +104,8 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 17.715729,16.686292 c -6.457898,6.457897 -6.457898,16.85581 0,23.313708 L 41.029437,63.313709 17.715729,86.627417 c -6.457898,6.457898 -6.457898,16.855813 0,23.313703 6.457898,6.4579 16.85581,6.4579 23.313708,0 L 64.343146,86.627417 87.656854,109.94112 c 6.457898,6.4579 16.855816,6.4579 23.313706,0 6.4579,-6.45789 6.4579,-16.855805 0,-23.313703 L 87.656854,63.313709 110.97056,40 c 6.4579,-6.457898 6.4579,-16.855811 0,-23.313708 -6.45789,-6.457898 -16.855808,-6.457898 -23.313706,0 L 64.343146,40 41.029437,16.686292 c -6.457898,-6.457898 -16.85581,-6.457898 -23.313708,0 z"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="m 6.0224249,6.0224279 c -8.0298955,8.0298942 -8.0298955,20.958893 0,28.988788 l 28.988788,28.98879 -28.988788,28.988788 c -8.0298955,8.0298955 -8.0298955,20.958897 0,28.988782 8.0298955,8.0298979 20.958893,8.0298979 28.988788,0 l 28.98879,-28.988782 28.988788,28.988782 c 8.0298955,8.0298979 20.9589,8.0298979 28.988786,0 8.0298979,-8.0298855 8.0298979,-20.958887 0,-28.988782 L 92.988788,64.000006 121.97758,35.011217 c 8.0298979,-8.0298955 8.0298979,-20.958894 0,-28.988788 -8.0298855,-8.0298955 -20.95889,-8.0298955 -28.988786,0 L 64.000003,35.011217 35.011213,6.0224279 c -8.0298955,-8.0298955 -20.958893,-8.0298955 -28.988788,0 z"
        id="rect2820" />
   </g>
 </svg>
