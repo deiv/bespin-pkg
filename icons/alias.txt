@@ -47,7 +47,7 @@ edit-redo:actions/edit-redo
 eject:actions/media-eject
 extract:actions/archive-extract
 eye:actions/view-preview
-file-sound-wave:apps/audio-aac:audio-ac3:audio-basic:audio-mp4:audio-mpeg:audio-vnd.rn-realaudio:audio-vnd.rn-realvideo:audio-x-adpcm:audio-x-aiff:audio-x-flac+ogg:audio-x-flac:audio-x-generic:audio-x-matroska:audio-x-mod:audio-x-monkey:audio-x-mp2:audio-x-mpegurl:audio-x-ms-asx:audio-x-ms-wma:audio-x-musepack:audio-x-pn-realaudio-plugin:audio-x-scpls:audio-x-speex+ogg:audio-x-vorbis+ogg:audio-x-wav
+file-sound-wave:mimetypes/audio-aac:audio-ac3:audio-basic:audio-mp4:audio-mpeg:audio-vnd.rn-realaudio:audio-vnd.rn-realvideo:audio-x-adpcm:audio-x-aiff:audio-x-flac+ogg:audio-x-flac:audio-x-generic:audio-x-matroska:audio-x-mod:audio-x-monkey:audio-x-mp2:audio-x-mpegurl:audio-x-ms-asx:audio-x-ms-wma:audio-x-musepack:audio-x-pn-realaudio-plugin:audio-x-scpls:audio-x-speex+ogg:audio-x-vorbis+ogg:audio-x-wav
 file-video:mimetypes/video-x-generic:video-x-mng
 filter:actions/view-filter
 firefox:apps/firefox
@@ -67,7 +67,7 @@ go-next:actions/go-next:arrow-right
 go-previous:actions/go-previous:arrow-left
 go-top:actions/go-top:arrow-up-double
 go-up:actions/go-up:arrow-up
-gwenview:apps/gwenview
+horus:apps/gwenview
 help:apps/help-browser:system-help,actions/help-about:help-contents:help-contextual:help-hint
 hex:mimetypes/text-x-hex
 home:places/user-home,actions/go-home
@@ -80,7 +80,7 @@ im-set-status:
 im-show-all:
 information:status/dialog-information
 inkscape:apps/inkscape
-juk:apps/juk
+juk:apps/juk,mimetypes/audio-mid:audio-prs.sid
 kget:mimetypes/application-x-kgetlist
 kgpg:apps/kgpg
 klipper:apps/klipper
