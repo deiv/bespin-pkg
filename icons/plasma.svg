@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,8 +14,7 @@
    height="128"
    id="svg1291"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docbase="/home/pinheiro"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="plasma.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
@@ -432,14 +432,6 @@
        fx="-20.545176"
        fy="47.667152"
        r="0.30664441" />
-    <filter
-       inkscape:collect="always"
-       id="filter3430">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="0.039810557"
-         id="feGaussianBlur3432" />
-    </filter>
     <clipPath
        clipPathUnits="userSpaceOnUse"
        id="clipPath3436">
@@ -489,22 +481,6 @@
        x2="-9.098712"
        y2="49.158356"
        gradientUnits="userSpaceOnUse" />
-    <filter
-       id="filter3162"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur3164"
-         stdDeviation="0.96794009"
-         inkscape:collect="always" />
-    </filter>
-    <filter
-       id="filter3138"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur3140"
-         stdDeviation="5.6513927"
-         inkscape:collect="always" />
-    </filter>
     <linearGradient
        y2="87.759453"
        x2="336.98077"
@@ -541,14 +517,6 @@
        id="linearGradient8922"
        xlink:href="#linearGradient7321"
        inkscape:collect="always" />
-    <filter
-       id="filter7317"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur7319"
-         stdDeviation="2.8805897"
-         inkscape:collect="always" />
-    </filter>
     <clipPath
        id="clipPath5163"
        clipPathUnits="userSpaceOnUse">
@@ -881,14 +849,6 @@
        y1="123.12172"
        x2="241.80727"
        y2="71.63022" />
-    <filter
-       inkscape:collect="always"
-       id="filter3809">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.2684156"
-         id="feGaussianBlur3811" />
-    </filter>
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3448"
@@ -1092,8 +1052,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.738316"
-     inkscape:cx="36.72808"
-     inkscape:cy="64.609523"
+     inkscape:cx="-15.128609"
+     inkscape:cy="64.792117"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:document-units="px"
@@ -1104,7 +1064,8 @@
      inkscape:window-height="773"
      inkscape:window-x="389"
      inkscape:window-y="75"
-     width="128px">
+     width="128px"
+     inkscape:window-maximized="0">
     <sodipodi:guide
        orientation="horizontal"
        position="173.82946"
@@ -1126,7 +1087,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <path
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.10000000000000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;opacity:0.66"
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.10000000000000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;opacity:1"
        d="M 105.4686,86.459759 C 106.58673,90.660107 106.8174,108.08194 91.00306,116.71744 C 79.216754,123.15337 44.403881,128.43325 20.536178,101.81408 C -4.2242594,74.199352 12.172643,42.04883 30.610944,25.916796 C 40.210205,17.518202 51.352272,14.120804 55.419632,16.559933 C 59.728689,19.144008 59.851403,24.342997 56.412554,26.786892 C 48.1525,32.657062 40.799844,49.347713 48.959725,60.907782 C 58.593051,74.555128 74.968941,68.917797 83.44312,67.861962 C 90.445831,66.989483 101.42223,71.25894 105.4686,86.459759 z"
        id="path3196"
        sodipodi:nodetypes="cssssssss" />
@@ -1135,7 +1096,7 @@
        sodipodi:rx="36"
        sodipodi:cy="92"
        sodipodi:cx="343.99899"
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1"
+       style="opacity:1;fill:#000000;fill-opacity:1"
        r="36"
        rx="8.0010004"
        cx="343.99899"
@@ -1151,7 +1112,7 @@
        cx="343.99899"
        rx="8.0010004"
        r="36"
-       style="fill:#000000;fill-opacity:1;opacity:0.66"
+       style="fill:#000000;fill-opacity:1;opacity:1"
        sodipodi:cx="343.99899"
        sodipodi:cy="92"
        sodipodi:rx="36"
@@ -1161,7 +1122,7 @@
        sodipodi:rx="36"
        sodipodi:cy="92"
        sodipodi:cx="343.99899"
-       style="fill:#000000;fill-opacity:1;opacity:0.66"
+       style="fill:#000000;fill-opacity:1;opacity:1"
        r="36"
        rx="8.0010004"
        cx="343.99899"
