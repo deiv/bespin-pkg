@@ -14,22 +14,10 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="file-sound-wave.svg">
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="file-sound-wave-alt.svg">
   <defs
      id="defs4">
-    <linearGradient
-       id="linearGradient3763"
-       inkscape:collect="always">
-      <stop
-         id="stop3765"
-         offset="0"
-         style="stop-color:#000000;stop-opacity:1;" />
-      <stop
-         id="stop3767"
-         offset="1"
-         style="stop-color:#646464;stop-opacity:1" />
-    </linearGradient>
     <linearGradient
        inkscape:collect="always"
        id="linearGradient3752">
@@ -79,25 +67,6 @@
        x2="128"
        y2="32.001472"
        gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3763"
-       id="linearGradient3761"
-       gradientUnits="userSpaceOnUse"
-       x1="96"
-       y1="64"
-       x2="96"
-       y2="0" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3763"
-       id="linearGradient3771"
-       gradientUnits="userSpaceOnUse"
-       x1="92"
-       y1="63.44022"
-       x2="92"
-       y2="-0.55978"
-       gradientTransform="matrix(1,0,0,-1,0,1051.8024)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -107,8 +76,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.9222329"
-     inkscape:cx="51.161214"
-     inkscape:cy="79.088323"
+     inkscape:cx="14.957347"
+     inkscape:cy="79.215801"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -133,7 +102,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -143,7 +112,7 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="opacity:0.66000000999999997;fill:url(#linearGradient3761);fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 20 0 C 8.92 0 -3.5850952e-17 8.92 0 20 L 0 64 C 16 60 20 52 24 40 L 28 64 L 28 32 C 30.445245 44.8809 32.891094 57.75571 36 64 L 36 0 L 20 0 z M 36.09375 0 C 37.555538 1.1664261 43.083763 62.852607 47.78125 64 L 48 64 L 48 48.09375 C 48.541308 49.581125 57.45671 64.241257 60 64 L 60 20.5625 C 59.975642 20.218017 59.954034 19.996707 59.96875 19.96875 C 59.973655 19.959431 59.98737 19.959831 60 20 L 60 20.5625 C 60.354732 25.579122 65.317913 64.169308 68 64 L 68 40 C 66.642327 34.20467 77.378549 62.987256 83.3125 64 L 84 64 L 84 15.25 C 83.764688 13.282548 83.721982 12.067841 83.90625 11.96875 C 83.932574 11.954594 83.964351 11.96778 84 12 L 84 15.25 C 85.233693 25.564939 91.867701 57.1932 100 64 L 100.0625 64 C 100.21012 62.171492 100.12928 55.53609 100.0625 52.8125 C 101.00738 60.156574 114.28704 62.575107 115.84375 64 L 116 64 C 115.928 57.2205 116 44 116 40 C 120 56.00002 124 60 128 64 L 128 20 C 128 8.92 119.08 -2.810252e-16 108 0 L 36.09375 0 z "
        transform="translate(0,924.36218)"
        id="path3750" />
@@ -160,6 +129,6 @@
     <path
        id="path3769"
        d="m 20,1051.8024 c -11.08,0 -20,-8.92 -20,-20 l 0,-44.00003 c 16,4 20,12 24,24.00003 l 4,-24.00003 0,32.00003 c 2.445245,-12.8809 4.891094,-25.75573 8,-32.00003 l 0,64.00003 -16,0 z m 16.09375,0 c 1.461788,-1.1664 6.990013,-62.85263 11.6875,-64.00003 l 0.21875,0 0,15.90633 c 0.541308,-1.4874 9.45671,-16.14753 12,-15.90633 l 0,43.43753 c -0.02436,0.3445 -0.04597,0.5658 -0.03125,0.5938 0.0049,0.01 0.01862,0.01 0.03125,-0.031 l 0,-0.5625 c 0.354732,-5.0166 5.317913,-43.60683 8,-43.43753 l 0,24.00003 c -1.357673,5.7953 9.378549,-22.98723 15.3125,-24.00003 l 0.6875,0 0,48.75003 c -0.235312,1.9675 -0.278018,3.1822 -0.09375,3.2812 0.02632,0.014 0.0581,10e-4 0.09375,-0.031 l 0,-3.25 c 1.233693,-10.3149 7.867701,-41.94318 16,-48.74998 l 0.0625,0 c 0.14762,1.8285 0.0668,8.4639 0,11.1875 0.94488,-7.3441 14.22454,-9.7626 15.78125,-11.1875 l 0.15625,0 c -0.072,6.7795 0,19.99998 0,23.99998 4,-15.99998 8,-19.99998 12,-23.99998 l 0,43.99998 c 0,11.08 -8.92,20 -20,20 l -71.90625,0 z"
-       style="opacity:0.66000000999999997;fill:url(#linearGradient3771);fill-opacity:1;fill-rule:nonzero;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
   </g>
 </svg>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,9 +13,9 @@
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47 r22583"
    version="1.0"
-   sodipodi:docname="filter.alt.svg"
+   sodipodi:docname="filter.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
@@ -34,8 +35,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="-60.051319"
-     inkscape:cy="69.789734"
+     inkscape:cx="-161.47989"
+     inkscape:cy="70.146877"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -47,7 +48,8 @@
      inkscape:window-width="853"
      inkscape:window-height="715"
      inkscape:window-x="348"
-     inkscape:window-y="133">
+     inkscape:window-y="133"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid2425"
@@ -77,7 +79,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3197"
        width="8"
        height="8"
@@ -89,9 +91,9 @@
        height="16"
        width="16"
        id="rect3199"
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3201"
        width="16"
        height="16"
@@ -103,9 +105,9 @@
        height="16"
        width="16"
        id="rect3203"
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3207"
        width="16"
        height="16"
@@ -117,23 +119,23 @@
        height="16"
        width="16"
        id="rect3209"
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3211"
        width="16"
        height="16"
        x="24"
        y="112" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3213"
        width="8"
        height="128"
        x="56"
        y="0" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3235"
        width="16"
        height="16"
@@ -145,9 +147,9 @@
        height="8"
        width="8"
        id="rect3237"
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3239"
        width="8"
        height="8"
@@ -159,9 +161,9 @@
        height="8"
        width="8"
        id="rect3241"
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3243"
        width="8"
        height="8"
@@ -173,9 +175,9 @@
        height="8"
        width="8"
        id="rect3245"
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3247"
        width="8"
        height="8"
@@ -187,9 +189,9 @@
        height="8"
        width="8"
        id="rect3249"
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3251"
        width="8"
        height="8"
@@ -201,9 +203,9 @@
        height="8"
        width="8"
        id="rect3253"
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none" />
     <rect
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect3255"
        width="8"
        height="8"
@@ -215,6 +217,6 @@
        height="8"
        width="8"
        id="rect3269"
-       style="opacity:0.66;fill:#000000;fill-opacity:1;stroke:none" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none" />
   </g>
 </svg>

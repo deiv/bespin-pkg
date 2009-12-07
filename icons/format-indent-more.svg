@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,8 +13,7 @@
    height="48"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docbase="/home/christof/themes_and_icons/meinICONtheme/BRIT ICONS/scalable/actions"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="format-indent-more.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0">
@@ -35,8 +35,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.9999996"
-     inkscape:cx="20.729345"
-     inkscape:cy="35.222081"
+     inkscape:cx="2.9793441"
+     inkscape:cy="35.284581"
      inkscape:document-units="pt"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -47,10 +47,11 @@
      inkscape:guide-points="true"
      inkscape:window-width="1440"
      inkscape:window-height="846"
-     inkscape:window-x="-4"
-     inkscape:window-y="-1"
+     inkscape:window-x="0"
+     inkscape:window-y="15"
      width="48px"
-     height="48px">
+     height="48px"
+     inkscape:window-maximized="0">
     <inkscape:grid
        id="GridFromPre046Settings"
        type="xygrid"
@@ -113,7 +114,7 @@
          sodipodi:nodetypes="cccc"
          id="path6808"
          d="M 44.054201,14.686893 L 44.054201,44.363638 L 27.591753,29.525266 L 44.054201,14.686893 z"
-         style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.72279549;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.72279549000000021;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
          rx="2.2813299"
          y="3.64395"
@@ -121,9 +122,9 @@
          height="6.5151501"
          width="29.318174"
          id="rect2416"
-         style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
-         style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect2418"
          width="29.318174"
          height="6.5151501"

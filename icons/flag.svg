@@ -13,8 +13,8 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="bookmarks.svg">
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="flag.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -33,8 +33,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.2578125"
-     inkscape:cx="63.809807"
-     inkscape:cy="56.297177"
+     inkscape:cx="36.802378"
+     inkscape:cy="56.392274"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -59,7 +59,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -69,18 +69,18 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 32 8 C 27.568 8 24 11.568 24 16 L 24 112.9375 C 26.508038 112.3448 29.187233 112 32 112 C 34.812767 112 37.491962 112.3448 40 112.9375 L 40 16 C 40 11.568 36.432 8 32 8 z "
        transform="translate(0,924.36218)"
        id="rect2864" />
     <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 32 112 C 18.745166 112 8 119.16344 8 128 L 56 128 C 56 119.16344 45.254834 112 32 112 z "
        transform="translate(0,924.36218)"
        id="path2866" />
     <path
        transform="translate(0,924.36218)"
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 40,16 C 63.467828,31.820673 95.595362,36.095073 128,40 107.83526,54.661365 95.42056,64.551336 40,72 l 0,-56 z"
        id="rect2874"
        sodipodi:nodetypes="cccc" />
