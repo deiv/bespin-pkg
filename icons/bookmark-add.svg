@@ -13,7 +13,7 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.46"
    sodipodi:docname="bookmark-add.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -42,15 +42,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4"
-     inkscape:cx="16.552644"
-     inkscape:cy="67.96936"
+     inkscape:cx="5.927644"
+     inkscape:cy="67.84436"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1024"
      inkscape:window-height="1103"
-     inkscape:window-x="0"
-     inkscape:window-y="15"
+     inkscape:window-x="335"
+     inkscape:window-y="5"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -83,7 +83,7 @@
        id="rect2433"
        sodipodi:nodetypes="cccccc" />
     <path
-       style="opacity:0.8;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        d="M 108,924.36218 C 105.784,924.36218 104,926.14618 104,928.36218 L 104,940.36218 L 92,940.36218 C 89.784,940.36218 88,942.14618 88,944.36218 C 88,946.57818 89.784,948.36218 92,948.36218 L 104,948.36218 L 104,960.36218 C 104,962.57818 105.784,964.36218 108,964.36218 C 110.216,964.36218 112,962.57818 112,960.36218 L 112,948.36218 L 124,948.36218 C 126.216,948.36218 128,946.57818 128,944.36218 C 128,942.14618 126.216,940.36218 124,940.36218 L 112,940.36218 L 112,928.36218 C 112,926.14618 110.216,924.36218 108,924.36218 z"
        id="rect2437" />
   </g>

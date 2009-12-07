@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,8 +12,10 @@
    height="64px"
    id="svg2816"
    version="1.1"
-   inkscape:version="0.47 r22583"
-   sodipodi:docname="desktop.svg">
+   inkscape:version="0.46"
+   sodipodi:docname="desktop.svg"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2818">
     <inkscape:perspective
@@ -46,17 +47,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="10.9375"
-     inkscape:cx="19.463963"
-     inkscape:cy="32.045714"
+     inkscape:zoom="5.46875"
+     inkscape:cx="-3.4712962"
+     inkscape:cy="50.838316"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
      inkscape:window-width="1126"
-     inkscape:window-height="1045"
-     inkscape:window-x="519"
-     inkscape:window-y="44"
+     inkscape:window-height="846"
+     inkscape:window-x="306"
+     inkscape:window-y="0"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
