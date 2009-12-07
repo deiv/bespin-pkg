@@ -12,7 +12,7 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.46"
+   inkscape:version="0.46+devel"
    sodipodi:docname="im-busy.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -54,16 +54,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.484375"
+     inkscape:zoom="2.7421875"
      inkscape:cx="33.985834"
-     inkscape:cy="71.80265"
+     inkscape:cy="57.215755"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1418"
      inkscape:window-height="841"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="359"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -91,7 +91,7 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 64 0 C 28.653776 7.1054274e-15 -1.110223e-16 28.653776 0 64 C 0 99.346224 28.653776 128 64 128 C 99.346224 128 128 99.346224 128 64 C 128 28.653776 99.346224 -1.4321877e-14 64 0 z M 21.1875 56.40625 L 63.6875 56.40625 L 64.28125 56.40625 L 106.78125 56.40625 C 111.99548 56.40625 116.1875 59.764659 116.1875 63.96875 C 116.1875 68.17284 111.99548 71.562503 106.78125 71.5625 L 64.28125 71.5625 L 63.6875 71.5625 L 21.1875 71.5625 C 15.973266 71.56251 11.75 68.172849 11.75 63.96875 C 11.75 59.76466 15.973266 56.406249 21.1875 56.40625 z "
        transform="translate(0,924.36218)"
        id="path3798" />

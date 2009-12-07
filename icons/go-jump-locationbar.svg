@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,8 +12,10 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="go-jump-locationbar.svg">
+   inkscape:version="0.46+devel"
+   sodipodi:docname="go-jump-locationbar.svg"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -40,8 +41,8 @@
      showgrid="true"
      inkscape:window-width="1285"
      inkscape:window-height="1088"
-     inkscape:window-x="113"
-     inkscape:window-y="19"
+     inkscape:window-x="181"
+     inkscape:window-y="49"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -59,7 +60,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -71,7 +72,7 @@
     <path
        id="path3200"
        transform="translate(7.9999996,984.36218)"
-       style="opacity:0.66000007;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 40,64 C 32.240413,68.43405 -8.2885051,44.793432 -8.2487114,35.856407 -8.2089177,26.919382 32.528917,3.6406184 40.248711,8.1435933 47.968505,12.646568 47.759588,59.56595 40,64 z m 68,-124 c -6,0 -12,4 -12,12 0,65.176083 -0.18491,71.320796 -50.625,71.90625 0.777083,7.537975 0.728607,16.49287 -0.09375,24.0625 C 119.96357,47.5649 120,41.55324 120,-48 c 0,-8 -6,-12 -12,-12 z" />
   </g>
 </svg>

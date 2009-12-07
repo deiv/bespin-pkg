@@ -12,7 +12,7 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.46"
+   inkscape:version="0.46+devel"
    sodipodi:docname="im-away.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -54,16 +54,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.68554688"
+     inkscape:zoom="1.3710938"
      inkscape:cx="-44.718819"
-     inkscape:cy="-27.702229"
+     inkscape:cy="30.645349"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1418"
      inkscape:window-height="841"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="26"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -91,7 +91,7 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 64 0 C 28.653776 7.1054274e-15 -1.110223e-16 28.653776 0 64 C 0 99.346224 28.653776 128 64 128 C 99.346224 128 128 99.346224 128 64 C 128 28.653776 99.346224 -1.4321877e-14 64 0 z M 61.84375 11.46875 C 66.047842 11.46875 69.4375 15.660766 69.4375 20.875 L 69.4375 58.25 L 106.78125 58.25 C 111.99548 58.249999 116.1875 61.608409 116.1875 65.8125 C 116.1875 70.01659 111.99548 73.40625 106.78125 73.40625 L 63.6875 73.40625 C 63.340264 73.40625 62.993531 73.404261 62.65625 73.375 C 62.645883 73.374101 62.635357 73.375926 62.625 73.375 C 62.369273 73.407018 62.106506 73.40625 61.84375 73.40625 C 59.859291 73.406251 58.06822 72.473534 56.71875 70.9375 C 55.191694 69.589503 54.25 67.790444 54.25 65.8125 C 54.25 65.549744 54.280482 65.286977 54.3125 65.03125 C 54.313779 65.021038 54.311172 65.0102 54.3125 65 C 54.311621 64.989543 54.313352 64.979218 54.3125 64.96875 C 54.286685 64.651578 54.25 64.32589 54.25 64 L 54.25 20.875 C 54.25 15.660767 57.639659 11.46875 61.84375 11.46875 z "
        transform="translate(0,924.36218)"
        id="path3798" />

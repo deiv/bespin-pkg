@@ -199,7 +199,7 @@
        xlink:href="#linearGradient7609"
        id="linearGradient7653"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.9433211,0,0,0.7562807,-9.6181694,4.6998152)"
+       gradientTransform="matrix(1.9741675,0,0,0.7682852,-9.9930611,4.4887012)"
        x1="11.149511"
        y1="11.311405"
        x2="11.149511"
@@ -216,13 +216,13 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="12.581096"
+     inkscape:cx="1.9114531"
      inkscape:cy="13.814066"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="640"
-     inkscape:window-height="685"
+     inkscape:window-width="895"
+     inkscape:window-height="718"
      inkscape:window-x="557"
      inkscape:window-y="89" />
   <metadata
@@ -242,7 +242,7 @@
      id="layer1">
     <path
        style="fill:url(#linearGradient7653);fill-opacity:1;stroke:none"
-       d="M 6.53125 0.28125 L 6.53125 1.15625 L 15.46875 1.15625 L 15.46875 0.28125 L 6.53125 0.28125 z M 6.53125 2.5 L 6.53125 4.0625 L 15.46875 4.0625 L 15.46875 2.5 L 6.53125 2.5 z M 6.53125 5.40625 L 6.53125 7.59375 L 15.46875 7.59375 L 15.46875 5.40625 L 6.53125 5.40625 z M 6.53125 8.9375 L 6.53125 11.40625 C 4.3352998 11.182796 2.2116065 10.810673 0.3125 10.25 L 11.03125 21.9375 L 21.78125 10.25 C 19.839972 10.808996 17.686016 11.182267 15.46875 11.40625 L 15.46875 8.9375 L 6.53125 8.9375 z "
+       d="m 6.4126983,-1.3877788e-17 0,0.88888889 9.0793651,0 0,-0.88888889 z m 0,2.2539683 0,1.5873016 9.0793651,0 0,-1.5873016 z m 0,2.952381 0,2.2222222 9.0793651,0 0,-2.2222222 z m 0,3.5873016 0,2.5079365 C 4.1818918,11.074586 2.024489,10.696557 0.095238,10.126984 L 10.984127,22 21.904762,10.126984 c -1.972092,0.567869 -4.160238,0.947065 -6.412699,1.174603 l 0,-2.5079365 z"
        id="path2425" />
   </g>
 </svg>
