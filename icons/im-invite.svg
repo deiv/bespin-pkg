@@ -13,12 +13,24 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47 r22583"
-   sodipodi:docname="bookmark-missing.alt.svg"
-   sodipodi:version="0.32"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:version="0.47pre2 r22153"
+   sodipodi:docname="im-invite.svg">
   <defs
      id="defs4">
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect3666"
+       is_visible="true"
+       pattern="M 0,0 0,10 10,5 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 526.18109 : 1"
@@ -27,11 +39,11 @@
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective10" />
     <inkscape:perspective
-       id="perspective3223"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       id="perspective3622"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
@@ -41,16 +53,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="-158.56657"
-     inkscape:cy="77.430997"
+     inkscape:zoom="5.4609375"
+     inkscape:cx="64"
+     inkscape:cy="79.525312"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1097"
-     inkscape:window-height="841"
-     inkscape:window-x="0"
-     inkscape:window-y="15"
+     inkscape:window-width="1290"
+     inkscape:window-height="936"
+     inkscape:window-x="269"
+     inkscape:window-y="78"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -68,7 +80,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -78,13 +90,40 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="fill:#000000;fill-opacity:1;stroke:none;opacity:1"
-       d="m 40,924.36218 48,0 0,128 -24,-32 -24,32 z"
-       id="rect2433"
-       sodipodi:nodetypes="cccccc" />
+       sodipodi:type="arc"
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none"
+       id="path2820"
+       sodipodi:cx="32"
+       sodipodi:cy="32"
+       sodipodi:rx="16"
+       sodipodi:ry="16"
+       d="m 48,32 a 16,16 0 1 1 -32,0 16,16 0 1 1 32,0 z"
+       transform="translate(0,932.36218)" />
+    <rect
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none"
+       id="rect2822"
+       width="48"
+       height="128"
+       x="8"
+       y="988.36218"
+       ry="24" />
     <path
-       style="opacity:0.8;fill:#000000;fill-opacity:1;stroke:none"
-       d="M 89.842476,926.29883 C 87.827208,928.30524 87.820074,931.54291 89.826483,933.55817 L 100.69151,944.4712 L 89.778501,955.33622 C 87.763234,957.34262 87.756101,960.58029 89.762508,962.59556 C 91.768917,964.61083 95.006591,964.61796 97.021855,962.61156 L 107.93488,951.74653 L 118.79991,962.65953 C 120.80629,964.6748 124.04397,964.68194 126.05924,962.67553 C 128.0745,960.66912 128.08163,957.43145 126.07524,955.41619 L 115.2102,944.50316 L 126.12321,933.63814 C 128.13848,931.63174 128.14562,928.39407 126.13921,926.3788 C 124.13281,924.36353 120.89512,924.3564 118.87986,926.3628 L 107.96685,937.22783 L 97.101823,926.31483 C 95.095407,924.29956 91.857745,924.29242 89.842476,926.29883 z"
-       id="rect2437" />
+       transform="translate(64,924.36218)"
+       d="m 48,32 a 16,16 0 1 1 -32,0 16,16 0 1 1 32,0 z"
+       sodipodi:ry="16"
+       sodipodi:rx="16"
+       sodipodi:cy="32"
+       sodipodi:cx="32"
+       id="path2824"
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none"
+       sodipodi:type="arc" />
+    <rect
+       ry="24"
+       y="980.36218"
+       x="72"
+       height="128"
+       width="48"
+       id="rect2826"
+       style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none" />
   </g>
 </svg>

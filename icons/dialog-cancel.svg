@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,8 +13,8 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.46"
-   sodipodi:docname="dialog-cancel-alt.svg"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="dialog-cancel.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
@@ -41,15 +42,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.3164063"
-     inkscape:cx="-50.252189"
-     inkscape:cy="74.002623"
+     inkscape:cx="-93.069621"
+     inkscape:cy="74.153389"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1285"
      inkscape:window-height="841"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="15"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -77,7 +78,7 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 64.121612,924.3622 C 28.874755,924.3622 0.3015312,952.93543 0.3015312,988.18229 C 0.3015312,1023.4291 28.874755,1052.0024 64.121612,1052.0024 C 99.368469,1052.0024 127.94169,1023.4291 127.94169,988.18229 C 127.94169,952.93543 99.368469,924.3622 64.121612,924.3622 z M 64.121612,951.71367 C 84.262673,951.71367 100.59023,968.04122 100.59023,988.18229 C 100.59023,1008.3233 84.262673,1024.6509 64.121612,1024.6509 C 43.980551,1024.6509 27.652994,1008.3233 27.652994,988.18229 C 27.652994,968.04122 43.980551,951.71367 64.121612,951.71367 z"
        id="path3978" />
   </g>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,7 +13,7 @@
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
+   inkscape:version="0.47 r22583"
    version="1.0"
    sodipodi:docname="bin.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -34,8 +35,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="-243.91896"
-     inkscape:cy="52.575542"
+     inkscape:cx="-35.934086"
+     inkscape:cy="133.89282"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -43,9 +44,10 @@
      inkscape:guide-bbox="true"
      inkscape:window-width="1066"
      inkscape:window-height="761"
-     inkscape:window-x="248"
-     inkscape:window-y="359"
-     inkscape:snap-global="false">
+     inkscape:window-x="236"
+     inkscape:window-y="222"
+     inkscape:snap-global="false"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid3227"
@@ -100,17 +102,17 @@
       <path
          id="path2489"
          d="m 62.96875,8 0,56 0,56 c 30.336152,0 54.9375,-25.088 54.9375,-56 0,-30.912 -24.601347,-56 -54.9375,-56 z"
-         style="opacity:0.66000001;fill:#000000;stroke:none" />
+         style="opacity:1;fill:#000000;stroke:none" />
       <path
          sodipodi:open="true"
          sodipodi:type="arc"
-         style="opacity:0.66000001;fill:none;stroke:#000000;stroke-width:19.67390823;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         style="opacity:1;fill:none;stroke:#000000;stroke-width:19.67390822999999855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
          id="path3282"
          sodipodi:cx="5.3571429"
          sodipodi:cy="84.071426"
          sodipodi:rx="68.214287"
          sodipodi:ry="68.214287"
-         d="M 5.3571443,15.85714 A 68.214287,68.214287 0 0 1 5.3571452,152.28571"
+         d="m 5.3571443,15.85714 c 37.6737107,0 68.2142857,30.540577 68.2142857,68.214288 -1e-6,37.673712 -30.540576,68.214282 -68.2142848,68.214282"
          sodipodi:start="4.712389"
          sodipodi:end="7.8539816"
          transform="matrix(-0.8056494,0,0,0.8209424,67.272779,-5.0177986)" />
