@@ -21,10 +21,10 @@ bookmark-list:actions/bookmark-new-list
 bookmark:actions/bookmarks-organize:bookmark-toolbar
 centrejust:actions/align-horizontal-center
 color-line:apps/preferences-desktop-color
-compressed-pack:apps/ark:utilities-file-archiver,mimetypes/application-zip:application-x-tarz:application-x-rar
+compressed-pack:apps/ark:utilities-file-archiver,mimetypes/application-zip:application-x-tarz:application-x-rar:application-x-bzip-compressed-tar:application-x-compressed-tar:application-x-lzma-compressed-tar
 computer:devices/computer
 configure:actions/configure-shortcuts:configure-toolbars:configure:run-build-configure
-desktop:apps/preferences-desktop-display:preferences-desktop-wallpaper
+desktop:apps/preferences-desktop-display:preferences-desktop-wallpaper,mimetypes/application-x-desktop,places/user-desktop
 dialog-cancel:actions/dialog-cancel
 dialog-close:actions/application-exit:dialog-close:irc-close-channel:project-development-close-all:project-development-close:view-close:window-close:view-right-close:view-left-close
 dialog-ok:actions/dialog-ok-apply:dialog-ok
@@ -46,8 +46,7 @@ edit-redo:actions/edit-redo
 eject:actions/media-eject
 extract:actions/archive-extract
 eye:actions/view-preview
-file-sound-wave:mimetypes/audio-aac:audio-ac3:audio-basic:audio-mp4:audio-mpeg:audio-vnd.rn-realaudio:audio-vnd.rn-realvideo:audio-x-adpcm:audio-x-aiff:audio-x-flac+ogg:audio-x-flac:audio-x-generic:audio-x-matroska:audio-x-mod:audio-x-monkey:audio-x-mp2:audio-x-mpegurl:audio-x-ms-asx:audio-x-ms-wma:audio-x-musepack:audio-x-pn-realaudio-plugin:audio-x-scpls:audio-x-speex+ogg:audio-x-vorbis+ogg:audio-x-wav
-juk:mimetypes/audio-midi:audio-prs.sid
+file-sound-wave:apps/audio-aac:audio-ac3:audio-basic:audio-mp4:audio-mpeg:audio-vnd.rn-realaudio:audio-vnd.rn-realvideo:audio-x-adpcm:audio-x-aiff:audio-x-flac+ogg:audio-x-flac:audio-x-generic:audio-x-matroska:audio-x-mod:audio-x-monkey:audio-x-mp2:audio-x-mpegurl:audio-x-ms-asx:audio-x-ms-wma:audio-x-musepack:audio-x-pn-realaudio-plugin:audio-x-scpls:audio-x-speex+ogg:audio-x-vorbis+ogg:audio-x-wav
 file-video:mimetypes/video-x-generic:video-x-mng
 filter:actions/view-filter
 firefox:apps/firefox
@@ -67,7 +66,7 @@ go-next:actions/go-next:arrow-right
 go-previous:actions/go-previous:arrow-left
 go-top:actions/go-top:arrow-up-double
 go-up:actions/go-up:arrow-up
-horus:apps/gwenview
+gwenview:apps/gwenview
 help:apps/help-browser:system-help,actions/help-about:help-contents:help-contextual:help-hint
 hex:mimetypes/text-x-hex
 home:places/user-home,actions/go-home
@@ -95,12 +94,12 @@ lirc:apps/lirc
 mail:apps/internet-mail,places/mail-message
 media-playback-pause:actions/media-playback-pause
 media-playback-start:actions/media-playback-start
-media-playback-stop:actions/media-playback-stop
+media-playback-stop:actions/media-playback-stop:process-stop
 media-skip-backward:actions/media-skip-backward
 media-skip-forward:actions/media-skip-forward
 nepomuk:apps/nepomuk
 new-mail:actions/mail-message-new
-node:mimetypes/inode-directory
+node:mimetypes/inode-directory,apps/dolphin:system-file-manager,places/folder:folder-documents:folder-downloads:folder-favorites:folder-image:folder-red:folder-sound
 plasma:mimetypes/application-x-plasma,apps/plasma
 playlist-layouts:actions/view-media-playlist
 print:apps/preferences-desktop-printer,devices/printer,status/printer-printing
@@ -117,7 +116,7 @@ start-here:places/start-here-kde:start-here
 system-search:actions/system-search
 tab-close:actions/tab-close
 tab-new:actions/tab-new
-text-editor:apps/accessories-text-editor
+text-editor:apps/accessories-text-editor:kate
 trash:mimetypes/application-x-trash,places/user-trash,status/user-trash-full
 trash-empty:actions/trash-empty
 ttf:mimetypes/application-x-font-ttf
@@ -127,11 +126,11 @@ utilities-terminal:apps/utilities-terminal
 view-file-columns:actions/view-file-columns
 view-file-details:actions/view-file-details
 view-icons:actions/view-icons:actions
-view-list-details:actions/system-shutdown
+view-list-details:actions/view-list-details
 view-refresh:actions/view-refresh
 view-right-close:actions/view-right-close
 view-right-new:actions/view-right-new
-web-browser:
+web-browser:apps/internet-web-browser
 wireless:devices/network-wireless
 xml:mimetypes/application-xml:text-xml
 zoom-in:actions/zoom-in
@@ -139,3 +138,5 @@ zoom-out:actions/zoom-out
 ark:
 digikam:apps/digikam
 kalculator:apps/kalculator:accessories-calculator
+preferences-system:categories/preferences-system
+chromium:apps/chromium-browser
