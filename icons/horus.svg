@@ -12,7 +12,7 @@
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
+   inkscape:version="0.46"
    version="1.0"
    sodipodi:docname="horus.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -34,7 +34,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="65.922189"
+     inkscape:cx="-27.264383"
      inkscape:cy="75.53288"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -42,8 +42,8 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:window-width="900"
-     inkscape:window-height="690"
-     inkscape:window-x="782"
+     inkscape:window-height="715"
+     inkscape:window-x="531"
      inkscape:window-y="128" />
   <metadata
      id="metadata7">
@@ -62,12 +62,13 @@
      id="layer1">
     <g
        id="g3229"
-       transform="translate(0,10.500804)">
+       transform="translate(0,10.500804)"
+       style="opacity:0.66">
       <path
          sodipodi:nodetypes="ccscc"
          id="path2425"
          d="m 45.309785,32.602394 c -15.178031,0 -26.538686,10.780716 -37.097501,21.050762 C 20.361556,56.38473 30.650137,63.75575 45.309785,64.097317 59.666416,64.431824 69.704713,55.04756 84.907253,47.592241 74.348439,37.322195 60.487818,32.602393 45.309785,32.602394 z"
-         style="fill:none;stroke:#000000;stroke-width:7.99999905;stroke-miterlimit:4;stroke-dasharray:none" />
+         style="fill:none;stroke:#000000;stroke-width:7.99999904999999956;stroke-miterlimit:4;stroke-dasharray:none" />
       <path
          sodipodi:nodetypes="ccccc"
          id="rect2430"
@@ -99,7 +100,7 @@
          sodipodi:cy="25.469517"
          sodipodi:cx="-67.680222"
          id="path3207"
-         style="fill:none;stroke:#000000;stroke-width:9.22041035;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         style="fill:none;stroke:#000000;stroke-width:9.22041034999999987;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
          sodipodi:type="spiral" />
       <path
          sodipodi:nodetypes="ccscccccccc"

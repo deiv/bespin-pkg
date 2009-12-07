@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,8 +13,10 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="applications-graphics.svg">
+   inkscape:version="0.46"
+   sodipodi:docname="applications-graphics.svg"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
     <linearGradient
@@ -54,16 +55,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="6.1875"
-     inkscape:cx="39.191919"
-     inkscape:cy="64"
+     inkscape:zoom="1.546875"
+     inkscape:cx="-87.09203"
+     inkscape:cy="68.043365"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer3"
      showgrid="true"
-     inkscape:window-width="1447"
-     inkscape:window-height="1026"
-     inkscape:window-x="118"
-     inkscape:window-y="22"
+     inkscape:window-width="1440"
+     inkscape:window-height="851"
+     inkscape:window-x="-4"
+     inkscape:window-y="-1"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -91,24 +92,34 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="opacity:0.19999999;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="M 64 0 C 28.653776 7.1054274e-15 -1.110223e-16 28.653776 0 64 C 0 99.346224 28.653776 128 64 128 L 64 116 C 35.281193 116 12 92.718807 12 64 C 12 35.281193 35.281193 12 64 12 L 64 0 z "
-       transform="translate(0,924.36218)"
-       id="path2842" />
-    <path
-       style="opacity:0.39999996;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="M 64 20 L 64 32 C 81.673112 32 96 46.326888 96 64 C 96 81.673112 81.673112 96 64 96 L 64 108 C 88.300529 108 108 88.300529 108 64 C 108 39.699471 88.300529 20 64 20 z "
-       transform="translate(0,924.36218)"
-       id="path2850" />
-    <path
        sodipodi:type="arc"
-       style="opacity:0.65999996;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="path2858"
        sodipodi:cx="64"
        sodipodi:cy="64"
        sodipodi:rx="24"
        sodipodi:ry="24"
-       d="m 88,64 a 24,24 0 1 1 -48,0 24,24 0 1 1 48,0 z"
-       transform="translate(0,924.36218)" />
+       d="M 88,64 A 24,24 0 1 1 40,64 A 24,24 0 1 1 88,64 z"
+       transform="translate(6.7878785,925.00864)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Alpha1"
+     style="opacity:0.66">
+    <path
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="M 70.787878,20.646463 L 70.787878,32.646464 C 88.46099,32.646464 102.78788,46.973353 102.78788,64.646466 C 102.78788,82.319576 88.46099,96.646466 70.787878,96.646466 L 70.787878,108.64646 C 95.088407,108.64646 114.78788,88.946996 114.78788,64.646466 C 114.78788,40.345933 95.088407,20.646463 70.787878,20.646463 z"
+       id="path2850" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Alpha2"
+     style="opacity:0.36">
+    <path
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="M 70.787878,0.64646393 C 35.441654,0.64646393 6.7878785,29.300243 6.7878785,64.646467 C 6.7878785,99.992687 35.441654,128.64646 70.787878,128.64646 L 70.787878,116.64646 C 42.069071,116.64646 18.787878,93.365277 18.787878,64.646467 C 18.787878,35.927658 42.069071,12.646464 70.787878,12.646464 L 70.787878,0.64646393 z"
+       id="path2842" />
   </g>
 </svg>
