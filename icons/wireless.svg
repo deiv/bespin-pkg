@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,8 +12,10 @@
    height="64px"
    id="svg2816"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="information.svg">
+   inkscape:version="0.46+devel"
+   sodipodi:docname="wireless.svg"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2818">
     <inkscape:perspective
@@ -32,16 +33,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="12.1875"
+     inkscape:zoom="6.09375"
      inkscape:cx="32"
-     inkscape:cy="32.248249"
+     inkscape:cy="25.684146"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
      inkscape:window-width="1337"
      inkscape:window-height="1020"
-     inkscape:window-x="451"
+     inkscape:window-x="242"
      inkscape:window-y="69"
      inkscape:window-maximized="0">
     <inkscape:grid
@@ -60,7 +61,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -70,11 +71,11 @@
      inkscape:groupmode="layer">
     <path
        id="rect4223"
-       style="opacity:0.65999995;fill:#000000;fill-opacity:1"
+       style="opacity:1;fill:#000000;fill-opacity:1"
        d="m 30,36 4,0 c 1.108,0 2,0.892 2,2 l 0,24 c 0,1.108 -0.892,2 -2,2 l -4,0 c -1.108,0 -2,-0.892 -2,-2 l 0,-24 c 0,-1.108 0.892,-2 2,-2 z m 10,-4 c 0,4.418278 -3.581722,8 -8,8 -4.418278,0 -8,-3.581722 -8,-8 0,-4.418278 3.581722,-8 8,-8 4.418278,0 8,3.581722 8,8 z" />
     <path
        sodipodi:type="arc"
-       style="opacity:0.65999995;fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="opacity:0.88000000000000000;fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-linecap:round"
        id="path4230"
        sodipodi:cx="32"
        sodipodi:cy="28"
@@ -96,11 +97,11 @@
        sodipodi:cy="28"
        sodipodi:cx="32"
        id="path4236"
-       style="opacity:0.65999995;fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="opacity:0.77000000000000002;fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-linecap:round"
        sodipodi:type="arc" />
     <path
        sodipodi:type="arc"
-       style="opacity:0.65999995;fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="opacity:0.66000000000000003;fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-linecap:round"
        id="path4238"
        sodipodi:cx="32"
        sodipodi:cy="28"
