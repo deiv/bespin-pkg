@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,8 +12,10 @@
    height="64px"
    id="svg2816"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="tab-new.svg">
+   inkscape:version="0.46+devel"
+   sodipodi:docname="tab-new.svg"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2818">
     <inkscape:perspective
@@ -32,8 +33,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="12.21875"
-     inkscape:cx="31.918159"
+     inkscape:zoom="6.109375"
+     inkscape:cx="12.030691"
      inkscape:cy="32.040921"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -41,7 +42,7 @@
      inkscape:grid-bbox="true"
      inkscape:window-width="1337"
      inkscape:window-height="1015"
-     inkscape:window-x="267"
+     inkscape:window-x="242"
      inkscape:window-y="71"
      inkscape:window-maximized="0">
     <inkscape:grid
@@ -60,7 +61,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -68,10 +69,10 @@
      id="layer1"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     style="opacity:0.66">
+     style="opacity:1">
     <path
        id="path4740"
-       style="fill:none;stroke:#000000;stroke-width:3.99999990000000016;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;opacity:0.65999998"
+       style="fill:none;stroke:#000000;stroke-width:3.99999990000000016;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;opacity:0.65999998000000004"
        d="m 60,32 0,-12 m 0,0 c 0.03182,-2.713951 -1.683145,-3.859317 -4,-4 m 0,0 0,-8 m 0,0 C 55.931752,4.6160529 53.988164,4.158449 52,4 m 0,0 -20,0 m 0,0 c -2.165706,0.038532 -3.789298,0.9203514 -4,4 m 0,0 0,8 m 0,0 -16,0 m 0,0 C 9.9267801,16.131018 8.3354389,17.045088 8,20 M 8,32 8,20"
        sodipodi:nodetypes="cccccccccccccccccccc" />
     <path

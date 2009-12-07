@@ -12,8 +12,8 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.46"
-   sodipodi:docname="text_editor.svg"
+   inkscape:version="0.46+devel"
+   sodipodi:docname="text-editor.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
@@ -106,7 +106,7 @@
      inkscape:window-width="1097"
      inkscape:window-height="841"
      inkscape:window-x="0"
-     inkscape:window-y="8"
+     inkscape:window-y="359"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -134,7 +134,7 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99780886999999996px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.66"
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99780886999999996px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:1"
        d="M 48,925.0999 L 48,925.13115 L 33.322561,925.19365 C 34.424943,925.34613 42.432365,927.95118 16.260038,971.9749 C 46.633896,981.63172 59.448404,1052.6312 59.448402,1052.6312 L 59.448402,961.44365 C 55.545681,959.90932 52.843555,956.56144 52.843555,952.6624 C 52.843557,947.31735 57.90575,942.9749 64.181877,942.9749 C 70.458005,942.9749 75.556892,947.31735 75.556892,952.6624 C 75.556892,956.56144 72.854766,959.90932 68.952044,961.44365 L 68.952044,1052.6312 C 68.952043,1052.6312 81.766555,981.63172 112.14041,971.9749 C 85.968084,927.95119 93.975503,925.34613 95.077886,925.19365 L 79.593188,925.13115 L 79.593188,925.0999 L 68.952044,925.0999 L 59.448402,925.0999 L 48,925.0999 z"
        id="path2396" />
   </g>

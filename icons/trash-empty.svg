@@ -12,7 +12,7 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.46"
+   inkscape:version="0.46+devel"
    sodipodi:docname="trash-empty.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -48,8 +48,8 @@
      showgrid="true"
      inkscape:window-width="977"
      inkscape:window-height="846"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-x="216"
+     inkscape:window-y="239"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -77,13 +77,13 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 64 0 C 28.653776 7.1054274e-15 -1.1242185e-16 28.653776 0 64 C 0 99.346224 28.653776 128 64 128 C 99.346224 128 128 99.346224 128 64 C 128 28.653776 99.346224 -1.4323277e-14 64 0 z M 64 8 C 94.927946 8 120 33.072054 120 64 C 120 94.927946 94.927946 120 64 120 C 33.072054 120 8 94.927946 8 64 C 8 33.072054 33.072054 8 64 8 z "
        transform="translate(0,924.36218)"
        id="path2818" />
     <g
        id="g2446"
-       style="opacity:0.66;fill:#000000"
+       style="opacity:1;fill:#000000"
        transform="matrix(0.1860237,0,0,0.1860237,17.029016,1006.418)">
       <path
          id="path11522"
