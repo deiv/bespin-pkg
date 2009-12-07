@@ -13,7 +13,7 @@
    height="128"
    id="svg2383"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre2 r22153"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="edit-undo.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/view-refresh.png"
@@ -38,8 +38,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="6.5234375"
-     inkscape:cx="63.846707"
-     inkscape:cy="51.736527"
+     inkscape:cx="42.079042"
+     inkscape:cy="51.813174"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
@@ -74,12 +74,12 @@
      inkscape:groupmode="layer"
      transform="translate(0,64)">
     <path
-       style="fill:#8f8f8f;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;opacity:0.5"
        d="M 30.90625 9.21875 C 30.582651 9.4147041 30.257315 9.6110068 29.9375 9.8125 C 30.257226 9.6111638 30.582746 9.414554 30.90625 9.21875 z M 2 48 C 0.68466566 53.112292 -1.7565914e-17 58.477153 0 64 C 0 99.346224 28.653776 128 64 128 C 69.522847 128 74.887708 127.31533 80 126 L 80 72 C 80 58.704 69.296 48 56 48 L 2 48 z M 118.78125 97.09375 C 118.58545 97.417254 118.38884 97.742774 118.1875 98.0625 C 118.38899 97.742685 118.5853 97.417349 118.78125 97.09375 z "
        transform="translate(0,-64)"
        id="path2858" />
     <path
-       style="fill:#424242;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 64 0 C 43.767509 4.0672095e-15 25.759289 9.4044379 14.03125 24.0625 C 14.684254 24.031108 15.338948 24 16 24 L 64 24 C 86.16 24 104 41.84 104 64 L 104 68 L 104 112 C 104 112.66105 103.96889 113.31575 103.9375 113.96875 C 103.96039 113.95043 103.97713 113.9246 104 113.90625 L 104 132 C 104 134.216 105.784 136 108 136 L 124 136 C 126.216 136 128 134.216 128 132 L 128 68 C 128 67.765055 127.94475 67.536121 127.90625 67.3125 C 127.9621 66.217317 128 65.109223 128 64 C 128 28.653776 99.346224 -1.4321877e-14 64 0 z "
        transform="translate(0,-64)"
        id="path2842" />

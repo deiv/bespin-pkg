@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,7 +13,7 @@
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
+   inkscape:version="0.47 r22583"
    version="1.0"
    sodipodi:docname="edit-copy.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -34,18 +35,19 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="6.5357142"
-     inkscape:cy="31.146971"
+     inkscape:cx="-44.178572"
+     inkscape:cy="31.325542"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:window-width="1600"
-     inkscape:window-height="1155"
+     inkscape:window-height="1103"
      inkscape:window-x="0"
      inkscape:window-y="24"
-     inkscape:snap-global="false">
+     inkscape:snap-global="false"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid3227"
@@ -70,7 +72,7 @@
      id="layer1">
     <path
        sodipodi:type="arc"
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="path2433"
        sodipodi:cx="-65.949318"
        sodipodi:cy="54.964287"
@@ -79,7 +81,7 @@
        d="M -29.342175,54.964287 A 36.607143,36.607143 0 1 1 -102.55646,54.964287 36.607143,36.607143 0 1 1 -29.342175,54.964287 z"
        transform="matrix(0.9834146,0,0,0.9834146,108.85552,-10.052681)" />
     <rect
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect2435"
        width="32"
        height="72"
@@ -89,7 +91,7 @@
        ry="11.785714" />
     <path
        sodipodi:type="star"
-       style="opacity:0.22;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:0.6;fill:#000000;fill-opacity:1;stroke:none"
        id="path2449"
        sodipodi:sides="3"
        sodipodi:cx="-187.85715"

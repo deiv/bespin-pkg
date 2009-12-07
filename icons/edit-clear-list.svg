@@ -13,7 +13,7 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="edit-clear-list.svg"
    inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/media-skip-backward.png"
    inkscape:export-xdpi="33.75"
@@ -36,8 +36,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5117188"
-     inkscape:cx="114.45463"
-     inkscape:cy="38.40088"
+     inkscape:cx="20.521817"
+     inkscape:cy="38.731629"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -72,7 +72,7 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <rect
-       style="opacity:0.20000008;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:0.5;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="rect2818"
        width="112"
        height="16"
@@ -82,7 +82,7 @@
        rx="8"
        ry="8" />
     <rect
-       style="opacity:0.20000008;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:0.5;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="rect2820"
        width="112"
        height="15.999972"
@@ -91,7 +91,7 @@
        rx="8"
        ry="7.9999862" />
     <rect
-       style="opacity:0.20000008;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:0.5;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="rect2822"
        width="112"
        height="16"
@@ -101,7 +101,7 @@
        rx="8"
        ry="8" />
     <rect
-       style="opacity:0.20000008;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:0.5;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="rect2826"
        width="112"
        height="16.000008"
@@ -112,7 +112,7 @@
        ry="8" />
     <path
        id="rect3620"
-       style="opacity:0.66000007;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="m 118.9881,935.55755 -1.87101,-1.871 c -2.61563,-2.61563 -7.24431,-2.1984 -10.37821,0.9355 l -96.166517,96.16655 c -3.133897,3.1339 -3.551133,7.7625 -0.935502,10.3782 l 1.871004,1.871 c 2.615631,2.6156 7.244309,2.1984 10.378206,-0.9355 l 96.166519,-96.16654 c 3.1339,-3.1339 3.55114,-7.76258 0.93551,-10.37821 z M 15.812498,931.95593 c -1.621212,0.01 -3.168164,0.57441 -4.312503,1.71875 l -1.875,1.875 c -2.61563,2.61563 -2.196394,7.2411 0.937504,10.375 L 53,988.36218 64.312499,977.04968 21.874998,934.61218 c -1.762817,-1.76282 -3.978084,-2.66885 -6.0625,-2.65625 z m 59.812501,56.40625 -11.3125,11.3125 42.437501,42.43752 c 3.1339,3.1339 7.75937,3.5531 10.375,0.9375 l 1.875,-1.875 c 2.61563,-2.6157 2.1964,-7.2411 -0.9375,-10.375 L 75.624999,988.36218 z" />
   </g>
 </svg>

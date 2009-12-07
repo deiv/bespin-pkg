@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,7 +13,7 @@
    height="22"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
+   inkscape:version="0.47 r22583"
    version="1.0"
    sodipodi:docname="eject.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
@@ -35,46 +36,6 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 526.18109 : 1"
        sodipodi:type="inkscape:persp3d" />
-    <filter
-       inkscape:collect="always"
-       x="-0.12256312"
-       width="1.2451262"
-       y="-0.17750549"
-       height="1.355011"
-       id="filter6116">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.0368781"
-         id="feGaussianBlur6118" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter5558">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="0.61029092"
-         id="feGaussianBlur5560" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       x="-0.073310807"
-       width="1.1466216"
-       y="-0.13902833"
-       height="1.2780566"
-       id="filter2844">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="0.73249726"
-         id="feGaussianBlur2846" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter3619">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="0.69944247"
-         id="feGaussianBlur3621" />
-    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -87,15 +48,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="10.606461"
-     inkscape:cy="6.6677449"
+     inkscape:cx="-2.0721104"
+     inkscape:cy="6.7123878"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="768"
-     inkscape:window-height="814"
+     inkscape:window-width="1030"
+     inkscape:window-height="729"
      inkscape:window-x="189"
-     inkscape:window-y="149" />
+     inkscape:window-y="149"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -113,7 +75,7 @@
      id="layer1">
     <path
        sodipodi:type="star"
-       style="opacity:0.8;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="path2471"
        sodipodi:sides="3"
        sodipodi:cx="-10.892857"
@@ -128,7 +90,7 @@
        d="M -4.7321423,-3.625 C -5.3352672,-2.557933 -16.366293,-2.4570244 -16.988838,-3.5128793 -17.611383,-4.5687343 -12.183259,-14.172337 -10.95759,-14.183549 -9.73192,-14.194762 -4.1290175,-4.692067 -4.7321423,-3.625 z"
        transform="matrix(1.5865966,0,0,0.8107658,28.242995,14.934679)" />
     <rect
-       style="opacity:0.8;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none"
        id="rect2473"
        width="21"
        height="4.4216366"
