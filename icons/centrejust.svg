@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,9 +13,8 @@
    height="128"
    id="svg4289"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47 r22583"
    version="1.0"
-   sodipodi:docbase="/home/qwerty/.icons/MonoBlack/scalable/actions"
    sodipodi:docname="centrejust.svg"
    inkscape:export-filename="/home/andreas/project/gnome-icon-theme/scalable/actions/list-add.png"
    inkscape:export-xdpi="90"
@@ -63,8 +63,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8284273"
-     inkscape:cx="19.865282"
-     inkscape:cy="65.956381"
+     inkscape:cx="-30.339296"
+     inkscape:cy="66.133158"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
@@ -75,11 +75,12 @@
      inkscape:guide-bbox="true"
      inkscape:window-width="1440"
      inkscape:window-height="846"
-     inkscape:window-x="-4"
-     inkscape:window-y="-1"
+     inkscape:window-x="0"
+     inkscape:window-y="15"
      objecttolerance="10000"
      gridtolerance="10000"
-     guidetolerance="10000" />
+     guidetolerance="10000"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata4294">
     <rdf:RDF>
@@ -98,7 +99,7 @@
     <g
        id="g2433">
       <rect
-         style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect2387"
          width="68"
          height="12.999999"
@@ -114,9 +115,9 @@
          height="12.999999"
          width="68"
          id="rect2425"
-         style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
-         style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect2429"
          width="93.279068"
          height="12.999999"
@@ -132,7 +133,7 @@
          height="12.999999"
          width="93.279068"
          id="rect2431"
-         style="opacity:0.66000001;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
 </svg>

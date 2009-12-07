@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,7 +14,7 @@
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="drive-removable-media-usb.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -41,11 +42,12 @@
      id="base"
      showgrid="false"
      inkscape:zoom="2.6303113"
-     inkscape:cx="54.049662"
+     inkscape:cx="0.063656617"
      inkscape:cy="55.506739"
      inkscape:window-x="508"
      inkscape:window-y="56"
-     inkscape:current-layer="svg2" />
+     inkscape:current-layer="svg2"
+     inkscape:window-maximized="0" />
   <defs
      id="defs4">
     <inkscape:perspective
@@ -57,7 +59,7 @@
        id="perspective5509" />
   </defs>
   <g
-     style="display:inline;opacity:0.66"
+     style="display:inline;opacity:1"
      id="layer2"
      transform="matrix(0.4822717,0,0,0.4822717,-23.410241,-21.493697)">
     <rect
