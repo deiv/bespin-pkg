@@ -11,6 +11,7 @@ applications-graphics:categories/applications-graphics
 applications-internet:categories/applications-internet
 applications-multimedia:categories/applications-multimedia
 applications-office:categories/applications-office
+applications-other:categories/applications-other
 applications-system:categories/applications-system
 applications-wine:apps/wine
 appointment:actions/appointment-new
@@ -33,7 +34,7 @@ document-open:actions/document-open
 document-save:actions/document-save:document-save-as:document-save-all
 download-mail:places/mail-folder-inbox
 drive-harddrive:devices/drive-harddisk
-drive-removable-media-usb:devices/drive-removable-media-usb-pendrive:drive-removable-media:drive-removable-media-usb
+drive-removable-media-usb:devices/drive-removable-media-usb-pendrive:drive-removable-media:drive-removable-media-usb,apps/device-notifier
 edit-clear-list:actions/edit-clear-list
 edit-clear-locationbar:actions/edit-clear-locationbar-rtl:edit-clear-locationbar-rtl
 edit-cut:actions/edit-cut
@@ -139,4 +140,5 @@ ark:
 digikam:apps/digikam
 kalculator:apps/kalculator:accessories-calculator
 preferences-system:categories/preferences-system
-chromium:apps/chromium-browser
+chromium:apps/chromium-browser:chromium:chrome:chrome-browser
+favorite:places/favorites

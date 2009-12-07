@@ -13,8 +13,8 @@
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
-   sodipodi:docname="usb.svg"
+   inkscape:version="0.46"
+   sodipodi:docname="drive-removable-media-usb.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata5507">
@@ -28,7 +28,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="675"
+     inkscape:window-height="789"
      inkscape:window-width="923"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -41,10 +41,10 @@
      id="base"
      showgrid="false"
      inkscape:zoom="2.6303113"
-     inkscape:cx="125.334"
+     inkscape:cx="54.049662"
      inkscape:cy="55.506739"
-     inkscape:window-x="564"
-     inkscape:window-y="357"
+     inkscape:window-x="508"
+     inkscape:window-y="56"
      inkscape:current-layer="svg2" />
   <defs
      id="defs4">
@@ -57,7 +57,7 @@
        id="perspective5509" />
   </defs>
   <g
-     style="display:inline"
+     style="display:inline;opacity:0.66"
      id="layer2"
      transform="matrix(0.4822717,0,0,0.4822717,-23.410241,-21.493697)">
     <rect
@@ -83,15 +83,15 @@
        id="path4608" />
     <path
        d="m 105.26052,171.85683 c 29.11504,-2.74237 43.80379,-42.36574 60.69526,-42.36574 11.42079,0 16.41714,0.52924 30.94969,0.52924"
-       style="fill:none;stroke:#000000;stroke-width:9.56692886;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:none;stroke:#000000;stroke-width:9.56692886000000087;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="path2766" />
     <path
        d="m 139.78853,172.06998 c 30.07966,0 37.16402,28.45664 59.41407,42.56265 3.77011,2.15435 37.77275,0.75371 39.94619,0.75371"
-       style="fill:none;stroke:#000000;stroke-width:9.56692886;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:none;stroke:#000000;stroke-width:9.56692886000000087;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="path3653" />
     <path
        d="m 74.032648,171.98191 215.13126,0"
-       style="fill:none;stroke:#000000;stroke-width:9.56692886;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       style="fill:none;stroke:#000000;stroke-width:9.56692886000000087;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        id="path5436" />
   </g>
 </svg>
