@@ -80,7 +80,7 @@ im-set-status:
 im-show-all:
 information:status/dialog-information
 inkscape:apps/inkscape
-juk:apps/juk,mimetypes/audio-mid:audio-prs.sid
+juk:apps/juk,mimetypes/audio-midi:audio-prs.sid
 kget:mimetypes/application-x-kgetlist
 kgpg:apps/kgpg
 klipper:apps/klipper
