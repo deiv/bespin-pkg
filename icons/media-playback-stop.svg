@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,11 +12,13 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="media-playback-start.svg"
+   inkscape:version="0.46+devel"
+   sodipodi:docname="media-playback-stop.svg"
    inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/media-skip-backward.png"
    inkscape:export-xdpi="33.75"
-   inkscape:export-ydpi="33.75">
+   inkscape:export-ydpi="33.75"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -35,8 +36,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.75"
-     inkscape:cx="67.364685"
+     inkscape:zoom="2.875"
+     inkscape:cx="46.582076"
      inkscape:cy="64"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -44,7 +45,7 @@
      inkscape:window-width="1162"
      inkscape:window-height="1084"
      inkscape:window-x="412"
-     inkscape:window-y="20"
+     inkscape:window-y="26"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -62,7 +63,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -72,19 +73,18 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="M 64 4 C 33.581855 4 8.4818301 26.654221 4.5625 56 L 20.75 56 C 24.514591 35.522195 42.43367 20 64 20 C 85.56633 20 103.48541 35.522195 107.25 56 L 123.4375 56 C 119.51817 26.654221 94.418145 4 64 4 z M 4.5625 72 C 8.4818301 101.34578 33.581855 124 64 124 C 94.418145 124 119.51817 101.34578 123.4375 72 L 107.25 72 C 103.48541 92.477805 85.56633 108 64 108 C 42.43367 108 24.514591 92.477805 20.75 72 L 4.5625 72 z "
-       transform="translate(0,924.36218)"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="m 64,924.36218 c -32.446021,0 -59.219381,24.164502 -63.4,55.466667 l 17.266667,0 c 4.0155637,-21.842992 23.129248,-38.4 46.133333,-38.4 23.004085,0 42.117771,16.557008 46.133333,38.4 l 17.266667,0 C 123.21938,948.52668 96.44602,924.36218 64,924.36218 z M 0.6,996.89551 c 4.1806188,31.302165 30.953979,55.466667 63.4,55.466667 32.446021,0 59.219381,-24.164501 63.4,-55.466667 l -17.266667,0 c -4.0155627,21.842992 -23.129248,38.4 -46.133333,38.4 -23.004085,0 -42.11777,-16.557008 -46.133333,-38.4 z"
        id="path3038" />
     <path
        sodipodi:type="arc"
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="path3043"
        sodipodi:cx="64"
        sodipodi:cy="64"
        sodipodi:rx="28"
        sodipodi:ry="28"
-       d="m 92,64 a 28,28 0 1 1 -56,0 28,28 0 1 1 56,0 z"
-       transform="translate(0,924.36218)" />
+       d="M 92,64 A 28,28 0 1 1 36,64 28,28 0 1 1 92,64 z"
+       transform="matrix(1.0666667,0,0,1.0666667,-4.2666688,920.09551)" />
   </g>
 </svg>

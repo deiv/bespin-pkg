@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,8 +12,10 @@
    height="64"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre2 r22153"
-   sodipodi:docname="media-playback-pause-alt.svg">
+   inkscape:version="0.46+devel"
+   sodipodi:docname="media-playback-stop-alt.svg"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -59,7 +60,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -69,7 +70,7 @@
      id="layer1"
      transform="translate(0,-988.36218)">
     <path
-       style="opacity:0.66000001;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 16 8 C 11.568 8 8 11.568 8 16 L 8 30 L 16 30 L 16 20 C 16 17.688173 17.875673 15.8125 20.1875 15.8125 L 43.8125 15.8125 C 46.124327 15.8125 48 17.688173 48 20 L 48 30 L 56 30 L 56 16 C 56 11.568 52.432 8 48 8 L 16 8 z M 8 34 L 8 48 C 8 52.432 11.568 56 16 56 L 48 56 C 52.432 56 56 52.432 56 48 L 56 34 L 48 34 L 48 43.8125 C 48 46.124327 46.124327 48 43.8125 48 L 20.1875 48 C 17.875673 48 16 46.124327 16 43.8125 L 16 34 L 8 34 z "
        transform="translate(0,988.36218)"
        id="rect3046" />
