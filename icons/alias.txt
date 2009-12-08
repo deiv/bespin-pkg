@@ -142,5 +142,5 @@ ark:
 digikam:apps/digikam
 kalculator:apps/kalculator:accessories-calculator
 preferences-system:categories/preferences-system
-favorite:places/favorites
+favorites:places/favorites
 chromium:apps/chromium-browser:chromium:chrome:chrome-browser
