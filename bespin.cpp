@@ -917,7 +917,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             const bool glassy = window->testAttribute(Qt::WA_MacBrushedMetal);
             if (config.bg.mode == Plain || glassy)
             {
-                QColor c = window->palette().color(QPalette::Window);
+                QColor c = window->palette().color(window->backgroundRole());
                 c.setAlpha(config.bg.opacity);
                 p.setBrush(c);
                 p.drawRect(window->rect());

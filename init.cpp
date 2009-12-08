@@ -243,12 +243,10 @@ Style::readSettings(const QSettings* settings, QString appName)
         QStringList blacklist = iSettings->value(ARGB_BLACKLIST).toString().split(',', QString::SkipEmptyParts);
         if (blacklist.contains(appName))
             config.bg.opacity = 0xff;
-        else if (config.bg.glassy = readBool(ARGB_GLASSY))
-            config.bg.mode = Plain;
         Animator::Tab::setTransition(Animator::Jump);
     }
-    else
-        config.bg.glassy = false;
+    if (config.bg.glassy = readBool(ARGB_GLASSY))
+        config.bg.mode = Plain;
 #else
     config.bg.opacity = 0xff;
 #endif

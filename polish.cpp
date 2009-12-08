@@ -352,10 +352,12 @@ Style::polish( QWidget * widget )
             // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
             widget->move(10000,10000);
         }
+#endif
         if (config.bg.glassy)
             widget->setAttribute(Qt::WA_MacBrushedMetal);
-#endif
-        if (config.bg.mode > Plain || config.bg.opacity != 0xff || config.bg.ringOverlay)
+
+        if (config.bg.mode > Plain || widget->testAttribute(Qt::WA_MacBrushedMetal) ||
+            config.bg.opacity != 0xff || config.bg.ringOverlay)
         {
             if (config.bg.opacity != 0xff)
             {
