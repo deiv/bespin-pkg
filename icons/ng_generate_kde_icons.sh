@@ -9,11 +9,15 @@ basename="nmfnms"
 # A 32bit HEXADECIMAL notation, PREFIXED with a cross ('#')
 # Case doesn't matter, but
 # It MUST be DOUBLE quoted ("#12345678", the cross is a comment indicator to bash)
-# The last two letters are for the alpha channel,  "FF" is opaque, "00" is invisible
 
 # Example:
-# color="#2B74C7FF" # Apples blue
+# color="#2B74C7" # Apples blue
+
+# A halo around the icon, works exactly like the color above
 halo="white"
+
+# The alpha level of the final icon in percent [0-100]
+alpha=85
 
 ###### ICON THEME MANAGEMENT #######################################################################
 
@@ -91,7 +95,7 @@ while read line; do
                     mogrify -fill $color -colorize 100% "$png"
                 fi
             fi
-            
+            composite -blend ${alpha}x0 "$png" -size 128x128 xc:transparent -matte "$png"
         fi
 
         # print progress
