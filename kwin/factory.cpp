@@ -54,7 +54,7 @@ KDE_EXPORT KDecorationFactory* create_factory()
 using namespace Bespin;
 
 bool Factory::weAreInitialized = false;
-Config Factory::ourConfig = { false, false, false, true, false,
+Config Factory::ourConfig = { false, false, false, true, true, false,
                               Qt::AlignHCenter, 0, {
                                   {Gradients::None, Gradients::Button},
                                   {Gradients::None, Gradients::None}
@@ -277,6 +277,10 @@ bool Factory::readConfig()
     oldBool = ourConfig.hideInactiveButtons;
     ourConfig.hideInactiveButtons = !settings.value("InactiveButtons", false).toBool();
     if (oldBool != ourConfig.hideInactiveButtons) ret = true;
+
+    oldBool = ourConfig.roundCorners;
+    ourConfig.roundCorners = settings.value("RoundCorners", true).toBool();
+    if (oldBool != ourConfig.roundCorners) ret = true;
 
     int oldInt = ourConfig.slickButtons;
     ourConfig.slickButtons = settings.value("SlickButtons", 0).toInt();

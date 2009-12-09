@@ -52,7 +52,7 @@ typedef struct _Preset
 
 typedef struct
 {
-    bool forceUserColors, trimmCaption, resizeCorner, hideInactiveButtons, verticalTitle;
+    bool forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons, verticalTitle;
     int slickButtons, titleAlign;
     Gradients::Type gradient[2][2];
     QStringList smallTitleClasses;
@@ -82,6 +82,7 @@ public:
     static WindowData *decoInfo(QString WMclass, NET::WindowType type);
     static int defaultBgMode() { return ourBgMode; }
     inline static const QVector<Button::Type> &multiButtons() { return ourMultiButton; }
+    inline static bool roundCorners() { return ourConfig.roundCorners; }
     inline static int slickButtons() { return ourConfig.slickButtons; }
     static inline float smallFactor() { return 0.75; }
     static void showDesktopMenu(const QPoint &p, Client *client);

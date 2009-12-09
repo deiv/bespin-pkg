@@ -301,7 +301,9 @@ Client::eventFilter(QObject *o, QEvent *e)
             repaint(p, bgMode < 2 && gType[isActive()]);
         }
         repaint(p);
-        if ( realWindow && maximizeMode() != MaximizeFull && KWindowSystem::compositingActive() )
+
+        if ( Factory::roundCorners() && realWindow && maximizeMode() != MaximizeFull &&
+             KWindowSystem::compositingActive() )
         {
             const bool full = isShade() || borderSize > 3;
             const int sw = Factory::mask.width() / 2 + 1;
@@ -320,6 +322,7 @@ Client::eventFilter(QObject *o, QEvent *e)
             if ( full )
                 p.drawPixmap( x2,y2, Factory::mask, sx,sy, sw,sh ); // btmRight
         }
+
         p.end();
 
         if (realWindow)
@@ -456,6 +459,7 @@ Client::init()
     if (Factory::config()->resizeCorner && isResizable())
         corner = new ResizeCorner(this);
     reset(63);
+
     if (Factory::verticalTitle())
         captionChange();
 }
@@ -1107,7 +1111,7 @@ Client::reset(unsigned long changed)
 
     // WORKAROUND a bug apparently in QPaintEngine which seems to
     // fail to paint IMAGE_RGB -> QPixmap -> device while device is redirected
-    dirty[0] = dirty[1] = true;
+    dirty[0] = dirty[1] = color(ColorTitleBar, isActive()).alpha() == 0xff;
     if (changed)
         activeChange(); // handles bg pixmaps in case and triggers update
    
@@ -1205,8 +1209,8 @@ Client::resize( const QSize& s )
     left = QRect(0, t2, Factory::verticalTitle() ? myTitleSize : borderSize, sideHeight);
     right = QRect(w-borderSize, t2, borderSize, sideHeight);
 
-//     if ( !KWindowSystem::compositingActive() )
-//     {
+    if ( Factory::roundCorners() /*&& !KWindowSystem::compositingActive()*/ )
+    {
         if (maximizeMode() == MaximizeFull)
             { clearMask(); widget()->update(); return; }
 
@@ -1227,9 +1231,10 @@ Client::resize( const QSize& s )
             mask += QRegion(1, 2, w-2, h-d/2);
         }
         setMask(mask);
-//     }
-//     else
-//         clearMask();
+    }
+    else
+        clearMask();
+
     widget()->update(); // force! there're painting errors otherwise
 }
 
