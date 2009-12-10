@@ -42,8 +42,8 @@ edit-copy:actions/edit-copy
 edit-delete:actions/edit-delete
 edit-find:actions/edit-find
 edit-paste:actions/edit-paste
-edit-undo:actions/edit-undo
-edit-redo:actions/edit-redo
+edit-undo.alt2:actions/edit-undo
+edit-redo.alt2:actions/edit-redo
 eject:actions/media-eject
 extract:actions/archive-extract
 eye:actions/view-preview
