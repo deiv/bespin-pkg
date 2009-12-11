@@ -144,3 +144,5 @@ kalculator:apps/kalculator:accessories-calculator
 preferences-system:categories/preferences-system
 favorites:places/favorites:bookmarks
 chromium:apps/chromium-browser:chromium:chrome:chrome-browser
+applications-science:categories/applications-science
+applications-education:categories/applications-education
