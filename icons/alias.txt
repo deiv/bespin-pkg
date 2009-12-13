@@ -28,7 +28,8 @@ configure:actions/configure-shortcuts:configure-toolbars:configure:run-build-con
 desktop:apps/preferences-desktop-display:preferences-desktop-wallpaper,mimetypes/application-x-desktop,places/user-desktop
 dialog-cancel:actions/dialog-cancel
 dialog-close:actions/application-exit:dialog-close:irc-close-channel:project-development-close-all:project-development-close:view-close:window-close:view-right-close:view-left-close
-dialog-ok:actions/dialog-ok-apply:dialog-ok
+dialog-ok:actions/dialog-ok
+dialog-apply:actions/dialog-ok-apply
 document-new:actions/document-new
 document-open:actions/document-open
 document-save:actions/document-save:document-save-as:document-save-all
