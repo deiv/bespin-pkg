@@ -258,9 +258,9 @@ Client::captionChange()
 {
     myCaption = trimm(caption());
     myCaption.replace(i18n("[modified]"), "*");
-    if (Factory::verticalTitle() && buttons[Button::Multi])
-        buttons[Button::Multi]->setToolTip(myCaption);
-    else
+//     if (Factory::verticalTitle() && buttons[Button::Multi])
+//         buttons[Button::Multi]->setToolTip(myCaption);
+//     else
         widget()->update();
 }
 
@@ -390,14 +390,11 @@ Client::eventFilter(QObject *o, QEvent *e)
 void
 Client::fadeButtons()
 {
-    if (Factory::config()->hideInactiveButtons)
+    if (Factory::config()->hideInactiveButtons && !myActiveChangeTimer)
     {
-        if (!myActiveChangeTimer)
-        {
-            myActiveChangeTimer = startTimer(40);
-            QTimerEvent te(myActiveChangeTimer);
-            timerEvent(&te);
-        }
+        myActiveChangeTimer = startTimer(40);
+        QTimerEvent te(myActiveChangeTimer);
+        timerEvent(&te);
     }
 }
 
@@ -772,9 +769,10 @@ Client::repaint(QPainter &p, bool paintTitle)
         }
     }
 
-    paintTitle = paintTitle && !Factory::verticalTitle();
+//     paintTitle = paintTitle && !Factory::verticalTitle();
+    const int sz = Factory::verticalTitle() ? label.height() : label.width();
     // title ==============
-    if (paintTitle && label.width() > 0)
+    if (paintTitle && sz > 0)
     {
         const QColor titleColor = color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive());
         const int tf = Factory::config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
@@ -784,9 +782,9 @@ Client::repaint(QPainter &p, bool paintTitle)
         if (iAmSmall)
             shrink(fnt, Factory::smallFactor());
         qreal tw = 1.07*QFontMetrics(fnt).size(tf, myCaption).width();
-        if (tw > label.width())
+        if (tw > sz)
         {
-            qreal f = label.width()/tw;
+            qreal f = sz/tw;
             if (f > 0.9)
                 fnt.setStretch(qRound(fnt.stretch()*f));
             else
@@ -794,7 +792,15 @@ Client::repaint(QPainter &p, bool paintTitle)
         }
         p.setFont(fnt);
         // ===============
-
+        if ( Factory::verticalTitle() )
+        {
+            p.translate(label.center());
+            p.rotate(-90.0);
+            p.translate(-label.center());
+            const int d = (label.height() - label.width()) / 2;
+            label.setRect( label.x() - d, label.y() + d, label.height(), label.width() );
+        }
+        
         if (isActive())
         {
             // emboss?!
@@ -806,9 +812,10 @@ Client::repaint(QPainter &p, bool paintTitle)
                 { p.setPen(light); d = 1; }
 
             QRect tr;
-            p.drawText ( label.translated(0,d), tf, myCaption, &tr );
+            QPoint off(0,0); Factory::verticalTitle() ? off.setX(-d) : off.setY(d);
+            p.drawText ( label.translated(off), tf, myCaption, &tr );
 
-            if (!Factory::config()->hideInactiveButtons)
+            if ( !(Factory::config()->hideInactiveButtons || Factory::verticalTitle()) )
             {
                 if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
                     maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
@@ -822,8 +829,17 @@ Client::repaint(QPainter &p, bool paintTitle)
                 }
             }
         }
+        
         p.setPen(titleColor);
         p.drawText ( label, tf, myCaption );
+        if ( Factory::verticalTitle() )
+        {
+            p.translate(label.center());
+            p.rotate(90.0);
+            p.translate(-label.center());
+            const int d = (label.width() - label.height()) / 2;
+            label.setRect( label.x() + d, label.y() - d, label.height(), label.width() );
+        }
     }
 
     // bar =========================
