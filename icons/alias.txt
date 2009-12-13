@@ -139,7 +139,6 @@ wireless:devices/network-wireless
 xml:mimetypes/application-xml:text-xml
 zoom-in:actions/zoom-in
 zoom-out:actions/zoom-out
-ark:
 digikam:apps/digikam
 kalculator:apps/kalculator:accessories-calculator
 preferences-system:categories/preferences-system
@@ -147,3 +146,5 @@ favorites:places/favorites:bookmarks
 chromium:apps/chromium-browser:chromium:chrome:chrome-browser
 applications-science:categories/applications-science
 applications-education:categories/applications-education
+applications-utilities:apps/utilities-system-monitor:utilities-desktop-extra,categories/applications-utilities
+ark:

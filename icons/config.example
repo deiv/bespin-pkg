@@ -24,7 +24,7 @@ halo="white"
 
 ## ALPHA #########
 # The alpha level of the final icon in percent [0-100], i.e. how much transparent it will be
-alpha=85
+alpha=20
 
 # keep an empty trailing line
 

@@ -17,7 +17,7 @@ basename="nmfnms"
 halo="white"
 
 # The alpha level of the final icon in percent [0-100]
-alpha=85
+alpha=77
 
 ###### ICON THEME MANAGEMENT #######################################################################
 
