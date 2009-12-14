@@ -17,6 +17,7 @@ applications-wine:apps/wine
 appointment:actions/appointment-new
 arora:apps/arora
 bin:mimetypes/unknown
+biohazard:actions/mail-mark-junk
 bookmark-add:actions/bookmark-new
 bookmark-list:actions/bookmark-new-list
 bookmark:actions/bookmarks-organize:bookmark-toolbar:flag:flag-grene:flag-red:flag-yellow:mail-flag
@@ -83,7 +84,7 @@ inkscape:apps/inkscape
 juk:apps/juk,mimetypes/audio-midi:audio-prs.sid
 kget:mimetypes/application-x-kgetlist
 kgpg:apps/kgpg
-klipper:apps/klipper
+klipper.alt:apps/klipper
 kmail:apps/kmail
 kmess:apps/kmess
 konqueror:apps/konqueror
