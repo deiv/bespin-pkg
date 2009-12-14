@@ -155,4 +155,4 @@ rotate-right:actions/object-rotate-right
 rotate-left:actions/object-rotate-left
 flag:actions/services
 fullscreen:actions/view-fullscreen
-
+k3b:apps/k3b
