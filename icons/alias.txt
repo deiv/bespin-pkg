@@ -41,7 +41,7 @@ edit-clear-locationbar:actions/edit-clear-locationbar-rtl:edit-clear-locationbar
 edit-cut:actions/edit-cut
 edit-copy:actions/edit-copy
 edit-delete:actions/edit-delete
-edit-find:actions/edit-find:document-preview-archive:document-preview:edit-fint-user
+edit-find:actions/edit-find:document-preview-archive:document-preview:edit-fint-user:page-zoom
 edit-paste:actions/edit-paste
 edit-undo.alt2:actions/edit-undo
 edit-redo.alt2:actions/edit-redo
@@ -153,4 +153,6 @@ download:actions/download:download-later
 contact-new:actions/contact-new
 rotate-right:actions/object-rotate-right
 rotate-left:actions/object-rotate-left
+flag:actions/services
+fullscreen:actions/view-fullscreen
 
