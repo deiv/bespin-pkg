@@ -1,6 +1,6 @@
 accessibility:apps/preferences-desktop-accessibility
-add-file-to-archive:actions/archive-insert
-add-folder-to-archive:actions/archive-insert-directory
+add-file-to-archive:actions/archive-insert:list-add
+add-folder-to-archive:actions/archive-insert-directory:folder-new
 address-book-new:actions/address-book-new
 akonadi:apps/akonadi
 amarok:apps/amarok
@@ -31,7 +31,7 @@ dialog-close:actions/application-exit:dialog-close:irc-close-channel:project-dev
 dialog-ok:actions/dialog-ok
 dialog-apply:actions/dialog-ok-apply
 document-new:actions/document-new
-document-open:actions/document-open
+document-open:actions/document-open:document-open-recent
 document-save:actions/document-save:document-save-as:document-save-all
 download-mail:actions/mail-receive
 drive-harddrive:devices/drive-harddisk
@@ -41,7 +41,7 @@ edit-clear-locationbar:actions/edit-clear-locationbar-rtl:edit-clear-locationbar
 edit-cut:actions/edit-cut
 edit-copy:actions/edit-copy
 edit-delete:actions/edit-delete
-edit-find:actions/edit-find
+edit-find:actions/edit-find:document-preview-archive:document-preview:edit-fint-user
 edit-paste:actions/edit-paste
 edit-undo.alt2:actions/edit-undo
 edit-redo.alt2:actions/edit-redo
@@ -103,8 +103,8 @@ new-mail:
 node:mimetypes/inode-directory,apps/dolphin:system-file-manager,places/folder:folder-documents:folder-downloads:folder-favorites:folder-image:folder-red:folder-sound
 plasma:mimetypes/application-x-plasma,apps/plasma
 playlist-layouts:actions/view-media-playlist
-print:apps/preferences-desktop-printer,devices/printer,status/printer-printing
-remove-file-from-archive:
+print:apps/preferences-desktop-printer,devices/printer,status/printer-printing,actions:document-print-direct:document-print-preview:document-print
+remove-file-from-archive:actions/archive-remove:list-remove
 reply:actions/mail-reply-all:mail-reply-custom-all:mail-reply-custom:mail-reply-list:mail-reply-sender
 run-command:actions/system-run,mimetypes/application-x-executable-script:application-x-executable
 shaman:apps/shaman
@@ -150,4 +150,7 @@ applications-utilities:apps/utilities-system-monitor:utilities-desktop-extra,cat
 network:apps/preferences-system-network-sharing,devices/network-wired,actions/network-connect:lc_networkmonitor_plugin,places/network-server-database:network-server,categories/preferences-system-network
 ark:
 download:actions/download:download-later
+contact-new:actions/contact-new
+rotate-right:actions/object-rotate-right
+rotate-left:actions/object-rotate-left
 
