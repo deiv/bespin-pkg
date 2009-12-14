@@ -149,4 +149,5 @@ applications-education:categories/applications-education
 applications-utilities:apps/utilities-system-monitor:utilities-desktop-extra,categories/applications-utilities
 network:apps/preferences-system-network-sharing,devices/network-wired,actions/network-connect:lc_networkmonitor_plugin,places/network-server-database:network-server,categories/preferences-system-network
 ark:
+download:actions/download:download-later
 
