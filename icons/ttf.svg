@@ -33,9 +33,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.959798"
-     inkscape:cx="31.282446"
-     inkscape:cy="73.051868"
+     inkscape:zoom="2.5169109"
+     inkscape:cx="175.76294"
+     inkscape:cy="-13.586737"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -68,19 +68,10 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <text
-       xml:space="preserve"
-       style="font-size:77.18734741px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:end;line-height:110.00000238%;writing-mode:lr-tb;text-anchor:end;opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:3.2870481;stroke-miterlimit:4;stroke-dasharray:none;font-family:Segoe;-inkscape-font-specification:Segoe Bold"
-       x="140.37949"
-       y="89.047539"
+    <path
+       style="font-size:77.18734741px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:end;line-height:110.00000238%;writing-mode:lr-tb;text-anchor:end;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:3.2870481;stroke-miterlimit:4;font-family:Segoe;-inkscape-font-specification:Segoe Bold"
+       d="M 2.0133817,32.777661 L 53.873631,32.777661 L 53.873631,43.745199 L 35.217509,43.745199 L 35.217509,89.047539 L 20.707192,89.047539 L 20.707192,43.745199 L 2.0133817,43.745199 L 2.0133817,32.777661 M 40.419189,32.777661 L 92.279438,32.777661 L 92.279438,43.745199 L 73.623317,43.745199 L 73.623317,89.047539 L 59.113,89.047539 L 59.113,43.745199 L 40.419189,43.745199 L 40.419189,32.777661 M 94.700258,32.777661 L 133.85927,32.777661 L 133.85927,43.745199 L 109.21057,43.745199 L 109.21057,54.222778 L 132.38939,54.222778 L 132.38939,65.190317 L 109.21057,65.190317 L 109.21057,89.047539 L 94.700258,89.047539 L 94.700258,32.777661"
        id="text3408"
-       sodipodi:linespacing="110%"
-       transform="scale(0.945898,1.0571965)"><tspan
-         sodipodi:role="line"
-         id="tspan3410"
-         x="140.37949"
-         y="89.047539"
-         style="font-size:77.18734741px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:end;line-height:110.00000238%;writing-mode:lr-tb;text-anchor:end;stroke-width:3.2870481;font-family:Segoe;-inkscape-font-specification:Segoe Bold"
-         dx="0 -14.208226 -5.0416298">TTF</tspan></text>
+       transform="scale(0.945898,1.0571965)" />
   </g>
 </svg>
