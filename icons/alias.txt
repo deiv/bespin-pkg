@@ -157,3 +157,4 @@ rotate-left:actions/object-rotate-left
 flag:actions/services
 fullscreen:actions/view-fullscreen
 k3b:apps/k3b
+pdf:mimetypes/application-pdf,apps/okular
