@@ -19,6 +19,8 @@ halo="white"
 # The alpha level of the final icon in percent [0-100]
 alpha=77
 
+source ./config
+
 ###### ICON THEME MANAGEMENT #######################################################################
 
 sizes="128:64:48:32:22:16"

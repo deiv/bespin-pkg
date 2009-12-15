@@ -83,7 +83,7 @@ inkscape:apps/inkscape
 juk:apps/juk,mimetypes/audio-midi:audio-prs.sid
 kget:mimetypes/application-x-kgetlist
 kgpg:apps/kgpg
-klipper.alt:apps/klipper
+klipper:apps/klipper
 kmail:apps/kmail
 kmess:apps/kmess
 konqueror:apps/konqueror
