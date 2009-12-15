@@ -12,9 +12,9 @@
    height="128"
    id="svg4289"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
+   inkscape:version="0.46"
    version="1.0"
-   sodipodi:docname="remove-file-from-archive.svg"
+   sodipodi:docname="add-file-to-archive.svg"
    inkscape:export-filename="/home/andreas/project/gnome-icon-theme/scalable/actions/list-add.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
@@ -62,8 +62,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.390625"
-     inkscape:cx="4.4967319"
-     inkscape:cy="64"
+     inkscape:cx="37.411151"
+     inkscape:cy="74.18171"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
@@ -73,9 +73,9 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:window-width="1440"
-     inkscape:window-height="846"
-     inkscape:window-x="51"
-     inkscape:window-y="99"
+     inkscape:window-height="853"
+     inkscape:window-x="-4"
+     inkscape:window-y="-2"
      objecttolerance="10000"
      gridtolerance="10000"
      guidetolerance="10000"
@@ -105,7 +105,7 @@
      inkscape:groupmode="layer">
     <path
        style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 6.0224249,6.0224279 c -8.0298955,8.0298942 -8.0298955,20.958893 0,28.988788 l 28.988788,28.98879 -28.988788,28.988788 c -8.0298955,8.0298955 -8.0298955,20.958897 0,28.988782 8.0298955,8.0298979 20.958893,8.0298979 28.988788,0 l 28.98879,-28.988782 28.988788,28.988782 c 8.0298955,8.0298979 20.9589,8.0298979 28.988786,0 8.0298979,-8.0298855 8.0298979,-20.958887 0,-28.988782 L 92.988788,64.000006 121.97758,35.011217 c 8.0298979,-8.0298955 8.0298979,-20.958894 0,-28.988788 -8.0298855,-8.0298955 -20.95889,-8.0298955 -28.988786,0 L 64.000003,35.011217 35.011213,6.0224279 c -8.0298955,-8.0298955 -20.958893,-8.0298955 -28.988788,0 z"
+       d="M 108.69258,18.745166 C 102.51169,12.477371 92.559779,12.477371 86.378882,18.745166 L 64.065174,41.372583 L 41.751466,18.745166 C 35.57057,12.477372 25.618655,12.477371 19.437758,18.745166 C 13.256861,25.01296 13.256861,35.104788 19.437758,41.372583 L 41.751466,63.999999 L 19.437761,86.627413 C 13.256862,92.89521 13.256862,102.98704 19.437759,109.25483 C 25.618658,115.52263 35.57057,115.52263 41.751468,109.25483 L 64.065173,86.627416 L 86.378878,109.25483 C 92.559778,115.52263 102.51169,115.52263 108.69258,109.25483 C 114.87348,102.98704 114.87349,92.895211 108.69258,86.627414 L 86.378882,64 L 108.69258,41.372582 C 114.87349,35.104788 114.87349,25.01296 108.69258,18.745166 z"
        id="rect2820" />
   </g>
 </svg>

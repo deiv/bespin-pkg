@@ -17,7 +17,6 @@ applications-wine:apps/wine
 appointment:actions/appointment-new
 arora:apps/arora
 bin:mimetypes/unknown
-biohazard:actions/mail-mark-junk
 bookmark-add:actions/bookmark-new
 bookmark-list:actions/bookmark-new-list
 bookmark:actions/bookmarks-organize:bookmark-toolbar:flag:flag-grene:flag-red:flag-yellow:mail-flag
@@ -119,7 +118,7 @@ system-search:actions/system-search
 tab-close:actions/tab-close
 tab-new:actions/tab-new
 text-editor:apps/accessories-text-editor:kate:kwrite,actions/mail-message-new
-trash:mimetypes/application-x-trash,places/user-trash,status/user-trash-full
+trash:mimetypes/application-x-trash,places/user-trash,status/user-trash-full,actions/mail-mark-junk
 trash-empty:actions/trash-empty
 ttf:mimetypes/application-x-font-ttf
 txt:mimetypes/text-rdf:text-rtf:application-vnd.oasis.opendocument.text:application-x-subrip:text-enriched:text-plain:text-sgml:text-x-authors:text-x-changelog:text-x-cmake:text-x-copying:text-x-generic:text-x-install:text-x-log:text-x-nfo:text-x-readme:text-x-sql
