@@ -125,9 +125,8 @@ txt:mimetypes/text-rdf:text-rtf:application-vnd.oasis.opendocument.text:applicat
 user-icon:places/user-identity
 utilities-terminal:apps/utilities-terminal
 view-file-columns:actions/view-file-columns
-view-file-details:actions/view-file-details
-view-icons:actions/view-icons:actions
-view-list-details:actions/view-list-details
+view-icons:actions/view-icons:view-list-icons:actions
+view-list-details:actions/view-list-details:view-list-text:view-file-details
 view-refresh:actions/view-refresh
 view-right-close:actions/view-right-close
 view-right-new:actions/view-right-new
