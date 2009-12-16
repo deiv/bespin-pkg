@@ -156,3 +156,7 @@ flag:actions/services
 fullscreen:actions/view-fullscreen
 k3b:apps/k3b
 pdf:mimetypes/application-pdf,apps/okular
+reboot:actions/system-reboot
+ram-suspend:actions/system-suspend
+disk-suspend:actions/system-suspend-hibernate
+user-switch:actions/system-switch-user
