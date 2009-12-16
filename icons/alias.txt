@@ -91,7 +91,7 @@ konversation:apps/konversation
 kopete:apps/kopete
 ktorrent:apps/ktorrent
 kwalletmanager:apps/kwalletmanager
-lirc:apps/lirc
+lirc:apps/lirc:irkick,devices/infrared-remote,actions/irkickoff:irkickflash
 mail:apps/internet-mail,places/mail-message
 media-playback-pause:actions/media-playback-pause
 media-playback-start:actions/media-playback-start
