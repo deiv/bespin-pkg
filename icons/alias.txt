@@ -27,7 +27,7 @@ computer:devices/computer
 configure:actions/configure-shortcuts:configure-toolbars:configure:run-build-configure
 desktop:apps/preferences-desktop-display:preferences-desktop-wallpaper,mimetypes/application-x-desktop,places/user-desktop
 dialog-cancel:actions/dialog-cancel
-dialog-close:actions/application-exit:dialog-close:irc-close-channel:project-development-close-all:project-development-close:view-close:window-close:view-right-close:view-left-close
+dialog-close:actions/application-exit:dialog-close:irc-close-channel:project-development-close-all:project-development-close:view-close:window-close:view-right-close:view-left-close:actions:system-log-out
 dialog-ok:actions/dialog-ok
 dialog-apply:actions/dialog-ok-apply
 document-new:actions/document-new
@@ -160,3 +160,6 @@ reboot:actions/system-reboot
 ram-suspend:actions/system-suspend
 disk-suspend:actions/system-suspend-hibernate
 user-switch:actions/system-switch-user
+lock:actions/system-lock-screen
+
+
