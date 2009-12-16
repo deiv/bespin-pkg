@@ -114,7 +114,7 @@ smplayer:apps/smplayer
 snd:apps/preferences-desktop-sound
 speaker:actions/speaker,status/audio-volume-high,apps/kmix
 start-here:places/start-here-kde:start-here
-system-search:actions/system-search
+system-search:actions/system-search,apps/kfind
 tab-close:actions/tab-close
 tab-new:actions/tab-new
 text-editor:apps/accessories-text-editor:kate:kwrite,actions/mail-message-new
@@ -148,7 +148,7 @@ applications-education:categories/applications-education
 applications-utilities:apps/utilities-system-monitor:utilities-desktop-extra,categories/applications-utilities
 network:apps/preferences-system-network-sharing,devices/network-wired,actions/network-connect:lc_networkmonitor_plugin,places/network-server-database:network-server:network-workgroup,categories/preferences-system-network
 ark:
-download:actions/download:download-later
+download:actions/download:download-later,apps/kget
 contact-new:actions/contact-new
 rotate-right:actions/object-rotate-right
 rotate-left:actions/object-rotate-left
@@ -161,5 +161,7 @@ ram-suspend:actions/system-suspend
 disk-suspend:actions/system-suspend-hibernate
 user-switch:actions/system-switch-user
 lock:actions/system-lock-screen
-
+skype:apps/skype
+gimp:apps/gimp
+ksnapshot:apps/ksnapshot
 
