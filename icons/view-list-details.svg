@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,12 +13,13 @@
    height="64px"
    id="svg2383"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="view-list-details.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/view-list-details.png"
    inkscape:export-xdpi="67.5"
-   inkscape:export-ydpi="67.5">
+   inkscape:export-ydpi="67.5"
+   version="1.1">
   <defs
      id="defs2385">
     <inkscape:perspective
@@ -36,7 +38,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="6.2890625"
-     inkscape:cx="32"
+     inkscape:cx="7.5925466"
      inkscape:cy="33.602041"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -45,10 +47,15 @@
      inkscape:window-width="1580"
      inkscape:window-height="1009"
      inkscape:window-x="0"
-     inkscape:window-y="26">
+     inkscape:window-y="26"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
-       id="grid3165" />
+       id="grid3165"
+       empspacing="4"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <metadata
      id="metadata2388">
@@ -65,50 +72,9 @@
      id="layer1"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
-    <rect
-       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88971215000000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3438"
-       width="56.398487"
-       height="6.4655676"
-       x="3.8405082"
-       y="4.4775043"
-       ry="1.4446441"
-       rx="1.7524954" />
-    <rect
-       rx="1.7524954"
-       ry="1.4446441"
-       y="16.489441"
-       x="3.9200113"
-       height="6.4655676"
-       width="56.398487"
-       id="rect3440"
-       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88971215000000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    <rect
-       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88971215000000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3442"
-       width="56.398487"
-       height="6.4655676"
-       x="3.9200113"
-       y="28.487444"
-       ry="1.4446441"
-       rx="1.7524954" />
-    <rect
-       rx="1.7524954"
-       ry="1.4446441"
-       y="40.41291"
-       x="3.6815021"
-       height="6.4655676"
-       width="56.398487"
-       id="rect3444"
-       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88971215000000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    <rect
-       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88971215000000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3446"
-       width="56.398487"
-       height="6.4655676"
-       x="3.8405082"
-       y="52.576885"
-       ry="1.4446441"
-       rx="1.7524954" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       d="M 8 4 C 5.784 4 4 5.784 4 8 C 4 10.216 5.784 12 8 12 L 12 12 L 12 4 L 8 4 z M 20 4 L 20 12 L 56 12 C 58.216 12 60 10.216 60 8 C 60 5.784 58.216 4 56 4 L 20 4 z M 8 20 C 5.784 20 4 21.784 4 24 C 4 26.216 5.784 28 8 28 L 12 28 L 12 20 L 8 20 z M 20 20 L 20 28 L 56 28 C 58.216 28 60 26.216 60 24 C 60 21.784 58.216 20 56 20 L 20 20 z M 8 36 C 5.784 36 4 37.784 4 40 C 4 42.216 5.784 44 8 44 L 12 44 L 12 36 L 8 36 z M 20 36 L 20 44 L 56 44 C 58.216 44 60 42.216 60 40 C 60 37.784 58.216 36 56 36 L 20 36 z M 8 52 C 5.784 52 4 53.784 4 56 C 4 58.216 5.784 60 8 60 L 12 60 L 12 52 L 8 52 z M 20 52 L 20 60 L 56 60 C 58.216 60 60 58.216 60 56 C 60 53.784 58.216 52 56 52 L 20 52 z "
+       id="rect2818" />
   </g>
 </svg>
