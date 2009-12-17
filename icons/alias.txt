@@ -81,7 +81,7 @@ im-show-all:
 information:status/dialog-information
 inkscape:apps/inkscape
 juk:apps/juk,mimetypes/audio-midi:audio-prs.sid
-kget:mimetypes/application-x-kgetlist
+kget:mimetypes/application-x-kgetlist,apps/kget
 kgpg:apps/kgpg
 klipper:apps/klipper
 kmail:apps/kmail
@@ -148,7 +148,7 @@ applications-education:categories/applications-education
 applications-utilities:apps/utilities-system-monitor:utilities-desktop-extra,categories/applications-utilities
 network:apps/preferences-system-network-sharing,devices/network-wired,actions/network-connect:lc_networkmonitor_plugin,places/network-server-database:network-server:network-workgroup,categories/preferences-system-network
 ark:
-download:actions/download:download-later,apps/kget
+download:actions/download:download-later
 contact-new:actions/contact-new
 rotate-right:actions/object-rotate-right
 rotate-left:actions/object-rotate-left
