@@ -167,6 +167,6 @@ ksnapshot:apps/ksnapshot
 vlc:apps/vlc
 xbmc:apps/xbmc
 quassel:apps/quassel
-txt-zerosize:mimetypes/application-x-zerosize
+txt-zerosize:mimetypes/application-x-zerosize:x-office-document
 
 
