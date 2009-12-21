@@ -164,4 +164,8 @@ lock:actions/system-lock-screen
 skype:apps/skype
 gimp:apps/gimp
 ksnapshot:apps/ksnapshot
+vlc:apps/vlc
+xbmc:apps/xbmc
+quassel:apps/quassel
+
 
