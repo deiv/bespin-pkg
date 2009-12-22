@@ -500,11 +500,9 @@ Style::drawTabCloser(const QStyleOption *option, QPainter *painter, const QWidge
     if (sunken) hover = false;
     
     QRect rect = RECT;
-    sunken ?
-        rect.adjust(F(5),F(3),-F(4),-F(6)) :
-        hover ?
-            rect.adjust(F(3),F(1),-F(2),-F(4)) :
-            rect.adjust(F(4),F(2),-F(3),-F(5));
+    sunken ? rect.adjust(F(5),F(4),-F(4),-F(5)) :
+    hover ?  rect.adjust(F(3),F(2),-F(2),-F(3)) :
+             rect.adjust(F(4),F(3),-F(3),-F(4));
 
     painter->setRenderHint(QPainter::Antialiasing);
 
