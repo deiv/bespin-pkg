@@ -169,5 +169,5 @@ vlc:apps/vlc
 xbmc:apps/xbmc
 quassel:apps/quassel
 txt-zerosize:mimetypes/application-x-zerosize:x-office-document
-
+ipod:devices/multimedia-player-apple-ipod
 
