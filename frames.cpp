@@ -19,6 +19,7 @@
 #include <QListView>
 #include <QTableView>
 #include <QTreeView>
+#include <QTextEdit>
 #include "visualframe.h"
 #include "draw.h"
 
@@ -27,15 +28,17 @@
 #include <QtDebug>
 
 bool
-Style::isSpecialFrame(const QWidget *w)
+Style::isSpecialFrame(const QWidget *widget)
 {
     if (appType == Opera)
         return true;
-    if (const QListView *view = qobject_cast<const QListView*>(w))
+    if IS_HTML_WIDGET
+        return true;
+    if (const QListView *view = qobject_cast<const QListView*>(widget))
     {
         return view->viewMode() == QListView::IconMode || view->inherits("KCategorizedView");
     }
-    return w->inherits("QTextEdit") || w->objectName() == "RenderFormElementWidget";
+    return bool(qobject_cast<const QTextEdit*>(widget));
 //     || (w->parentWidget() && w->parentWidget()->inherits("KateView")); // kate repaints the frame anyway
 }
 
