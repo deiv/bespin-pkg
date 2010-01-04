@@ -37,8 +37,8 @@ verticalTabs(QTabBar::Shape shape)
 }
 
 QRect
-Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * option,
-                                SubControl subControl, const QWidget * widget) const
+Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
+                      SubControl subControl, const QWidget *widget) const
 {
     QRect ret;
     switch (control)
@@ -187,24 +187,19 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             {
             case SC_ScrollBarGroove:
             {
-                if (!config.scroll.groove)
-                {
-                    const int off = F(4);
-                    ret = RECT.adjusted(off, off, -off, -off);
-                    break;
-                }
+                ret = RECT;
                 int off = 0, d = 0;
                 if (scrollbar->orientation == Qt::Horizontal)
                 {
                     if (config.scroll.groove == Groove::Groove)
                         { off = F(2); d = RECT.height() / 3; }
-                    ret.setRect(off, d, RECT.width() - (buttonSpace + 2*off), RECT.height()-(2*d + off));
+                    ret.adjust(off, d, -(buttonSpace + off), -(d+off));
                 }
                 else
                 {
                     if (config.scroll.groove == Groove::Groove)
                         { off = F(2); d = RECT.width() / 3; }
-                    ret.setRect(d, off, RECT.width()-2*d, RECT.height() - (buttonSpace + 2*off));
+                    ret.adjust(d, off, -d, -(buttonSpace + off));
                 }
                 break;
             }
@@ -219,12 +214,12 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
                 else if (scrollbar->orientation == Qt::Horizontal)
                 {
                     const int buttonWidth = qMin(RECT.width() / 2, sbextent);
-                    ret.setRect(RECT.width() - f*buttonWidth, 0, buttonWidth, sbextent);
+                    ret.setRect(RECT.right() + 1 - f*buttonWidth, RECT.y(), buttonWidth, sbextent);
                 }
                 else
                 {
                     const int buttonHeight = qMin(scrollbar->rect.height() / 2, sbextent);
-                    ret.setRect(0, RECT.height() - f*buttonHeight, sbextent, buttonHeight);
+                    ret.setRect(RECT.x(), RECT.bottom() + 1 - f*buttonHeight, sbextent, buttonHeight);
                 }
                 break;
             }
@@ -233,22 +228,22 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
             }
             if (needSlider)
             {
+                const uint range = scrollbar->maximum - scrollbar->minimum;
                 const int maxlen = ((scrollbar->orientation == Qt::Horizontal) ? RECT.width() : RECT.height()) - buttonSpace;
-                int sliderlen;
+                int sliderlen = maxlen;
                 // calculate slider length
                 if (scrollbar->maximum != scrollbar->minimum)
                 {
-                    const uint range = scrollbar->maximum - scrollbar->minimum;
-                    sliderlen = (qint64(scrollbar->pageStep) * maxlen) / (range + scrollbar->pageStep);
-
-                    int slidermin = pixelMetric(PM_ScrollBarSliderMin, scrollbar, widget);
-                    if (sliderlen < slidermin || range > INT_MAX / 2)
-                        sliderlen = slidermin;
+                    sliderlen = (maxlen * scrollbar->pageStep) / (range + scrollbar->pageStep);
                     if (sliderlen > maxlen)
                         sliderlen = maxlen;
+                    else
+                    {
+                        const int slidermin = Dpi::target.ScrollBarSliderMin;
+                        if (sliderlen < slidermin || range > INT_MAX / 2)
+                            sliderlen = slidermin;
+                    }
                 }
-                else
-                    sliderlen = maxlen;
 
                 const int sliderstart = sliderPositionFromValue(scrollbar->minimum, scrollbar->maximum,
                                                                 scrollbar->sliderPosition, maxlen - sliderlen,
@@ -258,22 +253,24 @@ Style::subControlRect (   ComplexControl control, const QStyleOptionComplex * op
                 // between top/left button and slider
                 case SC_ScrollBarSubPage:
                     if (scrollbar->orientation == Qt::Horizontal)
-                        ret.setRect(F(2), 0, sliderstart, sbextent);
+                        ret.setRect(RECT.x() + F(2), RECT.y(), sliderstart, sbextent);
                     else
-                        ret.setRect(0, F(2), sbextent, sliderstart);
+                        ret.setRect(RECT.x(), RECT.y() + F(2), sbextent, sliderstart);
                     break;
                 // between bottom/right button and slider
                 case SC_ScrollBarAddPage:
                     if (scrollbar->orientation == Qt::Horizontal)
-                        ret.setRect(sliderstart + sliderlen - F(2), 0, maxlen - sliderstart - sliderlen, sbextent);
+                        ret.setRect(RECT.x() + sliderstart + sliderlen - F(2), RECT.y(),
+                                    maxlen - (sliderstart + sliderlen), sbextent);
                     else
-                        ret.setRect(0, sliderstart + sliderlen - F(3), sbextent, maxlen - sliderstart - sliderlen);
+                        ret.setRect(RECT.x(), RECT.y() + sliderstart + sliderlen - F(3),
+                                    sbextent, maxlen - (sliderstart + sliderlen));
                     break;
                 case SC_ScrollBarSlider:
                     if (scrollbar->orientation == Qt::Horizontal)
-                        ret.setRect(sliderstart, 0, sliderlen, sbextent);
+                        ret.setRect(RECT.x() + sliderstart, RECT.y(), sliderlen, sbextent);
                     else
-                        ret.setRect(0, sliderstart, sbextent, sliderlen + F(1) );
+                        ret.setRect(RECT.x(), RECT.y() + sliderstart, sbextent, sliderlen + F(1) );
                     break;
                 default:
                     break;
