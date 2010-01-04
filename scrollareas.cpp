@@ -342,9 +342,9 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
         painter->setPen(QPen(bg, F(1)));
         QPoint c = RECT.center();
         if (option->state & QStyle::State_Horizontal)
-            painter->drawLine(RECT.left(), c.y(), RECT.right(), c.y());
+            painter->drawLine(RECT.left() + F(4), c.y(), RECT.right() - F(4), c.y());
         else
-            painter->drawLine(c.x(), RECT.top(), c.x(), RECT.bottom());
+            painter->drawLine(c.x(), RECT.top() + F(4), c.x(), RECT.bottom() - F(4));
         RESTORE_PEN;
     }
     else if (gType == Groove::Groove)
