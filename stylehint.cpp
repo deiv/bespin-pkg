@@ -110,6 +110,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return config.fadeInactive; // Gray out selected items when losing focus.
 ///    case SH_Widget_ShareActivation: // Turn on sharing activation with floating modeless dialogs.
     case SH_TabBar_SelectMouseType:
+        return QEvent::MouseButtonPress; // NOTICE WORKAROUND! MouseButtonRelease causes trouble with konqueror's doubleclicking
         return QEvent::MouseButtonRelease; // QEvent::MouseButtonPress?
     case SH_Q3ListViewExpand_SelectMouseType:
         return QEvent::MouseButtonPress;
