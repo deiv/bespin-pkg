@@ -297,6 +297,8 @@ TabInfo::rewind()
     tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space    
 }
 
+#define TOO_SLOW clock.elapsed() > maxRenderTime
+
 void
 TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 {
@@ -307,11 +309,13 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
     QWidget *cw = sw->widget(newIdx);
     currentWidget = cw;
     index = newIdx;
+
+    if (!(sw->isVisible() && ow && cw))
+        return;
+    
     int maxRenderTime = qMin(200, (int)(_duration - _timeStep));
 
-    #define _RESET_SIZE_
-    #define AVOID(_COND_) if (_COND_) { _RESET_SIZE_ rewind(); return; } //
-    #define TOO_SLOW clock.elapsed() > maxRenderTime
+#define AVOID(_COND_) if (_COND_) { rewind(); return; } //
 
     AVOID(!ow); // this is the first time the tab changes, nothing to blend
     AVOID(ow == cw); // this can happen on destruction etc... and thus lead to segfaults...
@@ -323,9 +327,21 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 // TODO: remove this once widget->render(.) does no more trigger resizes!
 #undef _RESET_SIZE_
 #define _RESET_SIZE_ window->setMinimumSize(minSz); window->setMaximumSize(maxSz);
+#undef AVOID
+#define AVOID(_COND_) if (_COND_) { _RESET_SIZE_ rewind(); return; } //
     // fix the window size
     QWidget *window = sw->window();
     QSize minSz = window->minimumSize(), maxSz = window->maximumSize();
+    QSizePolicy::Policy pol = window->sizePolicy().horizontalPolicy();
+    if (pol & (QSizePolicy::ShrinkFlag | QSizePolicy::IgnoreFlag) )
+        minSz.setWidth(0);
+    if (pol & (QSizePolicy::GrowFlag | QSizePolicy::IgnoreFlag) )
+        maxSz.setWidth(QWIDGETSIZE_MAX);
+    pol = window->sizePolicy().verticalPolicy();
+    if (pol & (QSizePolicy::ShrinkFlag | QSizePolicy::IgnoreFlag) )
+        minSz.setHeight(0);
+    if (pol & (QSizePolicy::GrowFlag | QSizePolicy::IgnoreFlag) )
+        maxSz.setHeight(QWIDGETSIZE_MAX);
     window->setFixedSize(window->size());
 //-----------------------------------------------------------------
 
