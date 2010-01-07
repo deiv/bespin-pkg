@@ -127,9 +127,10 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_TitleBar_NoBorder:
         return true; // The title bar has no border.
     case SH_ScrollBar_StopMouseOverSlider:
-        return false; // Stops auto-repeat when the slider reaches the mouse position. (h�hh?)
+        return false; // Stops auto-repeat when the slider reaches the mouse position. (hähh?)
     case SH_BlinkCursorWhenTextSelected:
-        return false; // that's annoying
+        //false; // that's annoying
+        return true; // ...but Qt4.6 or KDE is buggy - why am i surrounded by all idiots?!
     case SH_RichText_FullWidthSelection:
         return true;
     case SH_GroupBox_TextLabelVerticalAlignment:
