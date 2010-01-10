@@ -122,7 +122,7 @@ text-editor:apps/accessories-text-editor:kate:kwrite,actions/mail-message-new
 trash:mimetypes/application-x-trash,places/user-trash,status/user-trash-full,actions/mail-mark-junk
 trash-empty:actions/trash-empty
 ttf:mimetypes/application-x-font-ttf
-txt:mimetypes/text-rdf:text-rtf:application-vnd.oasis.opendocument.text:application-x-subrip:text-enriched:text-plain:text-sgml:text-x-authors:text-x-changelog:text-x-cmake:text-x-copying:text-x-generic:text-x-install:text-x-log:text-x-nfo:text-x-readme:text-x-sql
+txt:mimetypes/text-rdf:text-rtf:application-vnd.oasis.opendocument.text:application-x-subrip:text-enriched:text-plain:text-sgml:text-x-authors:text-x-changelog:text-x-cmake:text-x-copying:text-x-generic:text-x-install:text-x-log:text-x-nfo:text-x-readme:text-x-sql,apps/write:openoffice-write
 user-icon:places/user-identity
 utilities-terminal:apps/utilities-terminal
 view-file-columns:actions/view-file-columns
@@ -171,4 +171,11 @@ quassel:apps/quassel
 txt-zerosize:mimetypes/application-x-zerosize:x-office-document
 ipod:devices/multimedia-player-apple-ipod
 image-svg+xml:mimetypes/image-svg+xml:image-svg+xml-compressed
+base:apps/base:openoffice-base
+draw:apps/draw:openoffice-draw
+math:apps/math:openoffice-math
+korganizer:apps/korganizer
+kadressbook:apps/kadressbook
+impress:apps/impress:openoffice-impress
+calc:apps/calc:openoffice-calc
 
