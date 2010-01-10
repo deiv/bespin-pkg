@@ -170,4 +170,5 @@ xbmc:apps/xbmc
 quassel:apps/quassel
 txt-zerosize:mimetypes/application-x-zerosize:x-office-document
 ipod:devices/multimedia-player-apple-ipod
+image-svg+xml:mimetypes/image-svg+xml:image-svg+xml-compressed
 
