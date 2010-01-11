@@ -151,8 +151,12 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.opaqueDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_VIEWS);
         // PW Echo Char ===========================
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
-        // TODO: redundant, kwin and afaik compiz can handle this
-        config.menu.opacity = readInt(MENU_OPACITY);
+#if BESPIN_ARGB_WINDOWS
+        config.menu.opacity = clamp(readInt(MENU_OPACITY), 0, 0xff);
+#else
+        config.menu.opacity = 0xff;
+#endif
+        config.menu.glassy = (config.menu.opacity < 0xff) || readBool(MENU_GLASSY);
         config.menu.showIcons = appType == Opera || readBool(MENU_SHOWICONS);
         config.menu.shadow = readBool(MENU_SHADOW);
 
@@ -351,7 +355,6 @@ Style::readSettings(const QSettings* settings, QString appName)
     else
     {
         config.UNO.used = readBool(UNO_UNO);
-        config.menu.glassy = readBool(MENU_GLASSY);
         readRole(menu.active, MENU_ACTIVEROLE);
         readRole(menu.std, MENU_ROLE);
     }

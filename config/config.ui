@@ -233,7 +233,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -512,8 +512,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>463</width>
-               <height>175</height>
+               <width>352</width>
+               <height>114</height>
               </rect>
              </property>
              <attribute name="label">
@@ -824,8 +824,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>448</width>
-               <height>184</height>
+               <width>450</width>
+               <height>180</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1137,8 +1137,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>295</width>
-               <height>187</height>
+               <width>464</width>
+               <height>225</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1336,8 +1336,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>283</width>
-               <height>137</height>
+               <width>282</width>
+               <height>131</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1852,73 +1852,21 @@
              <bool>false</bool>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_8">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>194</width>
-               <height>191</height>
+               <width>450</width>
+               <height>259</height>
               </rect>
              </property>
              <attribute name="label">
               <string>Popup Menu</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_8">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_25">
-                <property name="text">
-                 <string>Opacity:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1" colspan="3">
-               <widget class="QSlider" name="menuOpacity">
-                <property name="minimum">
-                 <number>40</number>
-                </property>
-                <property name="maximum">
-                 <number>100</number>
-                </property>
-                <property name="singleStep">
-                 <number>10</number>
-                </property>
-                <property name="value">
-                 <number>100</number>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="4">
-               <widget class="QLabel" name="label_27">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>100</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="5">
-               <widget class="QLabel" name="label_31">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>%</string>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_49">
                 <property name="sizePolicy">
@@ -1951,7 +1899,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="3">
+              <item row="1" column="2">
                <spacer name="horizontalSpacer_13">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -1967,42 +1915,42 @@
                 </property>
                </spacer>
               </item>
-              <item row="2" column="0" colspan="5">
+              <item row="2" column="0" colspan="4">
                <widget class="QCheckBox" name="menuRound">
                 <property name="text">
                  <string>Round corners</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="0" colspan="6">
+              <item row="3" column="0" colspan="5">
                <widget class="QCheckBox" name="menuGlas">
                 <property name="text">
                  <string>Glassy</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="0" colspan="6">
+              <item row="4" column="0" colspan="5">
                <widget class="QCheckBox" name="menuShadow">
                 <property name="text">
                  <string>Outline</string>
                 </property>
                </widget>
               </item>
-              <item row="5" column="0" colspan="6">
+              <item row="5" column="0" colspan="5">
                <widget class="QCheckBox" name="menuBoldText">
                 <property name="text">
                  <string>Bold text</string>
                 </property>
                </widget>
               </item>
-              <item row="6" column="0" colspan="6">
+              <item row="6" column="0" colspan="5">
                <widget class="QCheckBox" name="showMenuIcons">
                 <property name="text">
                  <string>Show icons</string>
                 </property>
                </widget>
               </item>
-              <item row="7" column="0" colspan="6">
+              <item row="7" column="0" colspan="5">
                <spacer name="verticalSpacer_17">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
@@ -2015,6 +1963,58 @@
                 </property>
                </spacer>
               </item>
+              <item row="0" column="0" colspan="3">
+               <widget class="QWidget" name="popup_ARGB" native="true">
+                <layout class="QGridLayout" name="gridLayout_7">
+                 <item row="1" column="2">
+                  <widget class="QLabel" name="label_27">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>255</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_25">
+                   <property name="text">
+                    <string>Opacity:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QSlider" name="menuOpacity">
+                   <property name="minimum">
+                    <number>0</number>
+                   </property>
+                   <property name="maximum">
+                    <number>255</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>10</number>
+                   </property>
+                   <property name="value">
+                    <number>255</number>
+                   </property>
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0" colspan="3">
+                  <widget class="QLabel" name="label_31">
+                   <property name="text">
+                    <string>&lt;b&gt;WARNING:&lt;/b&gt;&lt;br&gt;This is now &lt;u&gt;real&lt;/u&gt; ARGB translucency.  Use with care!&lt;br&gt;(Set popup window opacity in your Windowmanager)</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
              </layout>
             </widget>
             <widget class="QWidget" name="page_9">
@@ -2022,8 +2022,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>235</width>
-               <height>92</height>
+               <width>464</width>
+               <height>133</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2942,7 +2942,7 @@
                <x>0</x>
                <y>0</y>
                <width>127</width>
-               <height>81</height>
+               <height>79</height>
               </rect>
              </property>
              <attribute name="label">

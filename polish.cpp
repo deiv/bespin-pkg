@@ -356,8 +356,8 @@ Style::polish( QWidget * widget )
         if (config.bg.glassy)
             widget->setAttribute(Qt::WA_MacBrushedMetal);
 
-        if (config.bg.mode > Plain || widget->testAttribute(Qt::WA_MacBrushedMetal) ||
-            config.bg.opacity != 0xff || config.bg.ringOverlay)
+        if ( config.bg.mode > Plain || config.bg.opacity != 0xff || config.bg.ringOverlay ||
+             widget->testAttribute(Qt::WA_MacBrushedMetal) )
         {
             if (config.bg.opacity != 0xff)
             {
@@ -376,15 +376,24 @@ Style::polish( QWidget * widget )
                 menu->setAttribute(Qt::WA_StyledBackground);
             }
             // opacity
+#if BESPIN_ARGB_WINDOWS
             menu->setWindowOpacity( config.menu.opacity/100.0 );
+            if ( !(config.menu.opacity == 0xff || widget->testAttribute(Qt::WA_TranslucentBackground)) )
+            {
+                widget->setAttribute(Qt::WA_TranslucentBackground);
+                widget->setAttribute(Qt::WA_StyledBackground);
+                menu->setAutoFillBackground(false);
+            }
+            else
+#endif
+                menu->setAutoFillBackground(true);
             // color swapping
-            menu->setAutoFillBackground(true);
             menu->setBackgroundRole ( config.menu.std_role[Bg] );
             menu->setForegroundRole ( config.menu.std_role[Fg] );
             if (config.menu.boldText)
                 setBoldFont(menu);
             
-            // eventfiltering to reposition MDI windows and correct distance to menubars
+            // eventfiltering to reposition MDI windows, shaping, paint ARGB bg and correct distance to menubars
             menu->removeEventFilter(this);
             menu->installEventFilter(this);
 #if 0

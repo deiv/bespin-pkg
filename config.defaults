@@ -84,7 +84,7 @@
 #define KWIN_ACTIVE_TEXT_ROLE "KWin.ActiveText", QPalette::WindowText
 
 #define MENU_GLASSY "Menu.Glassy", true
-#define MENU_OPACITY "Menu.Opacity", 100
+#define MENU_OPACITY "Menu.OpacityARGB", 255
 #define MENU_ROUND "Menu.Round", true
 #define MENU_ITEMGRADIENT "Menu.ItemGradient", Gradients::None
 #define MENU_SHOWICONS "Menu.ShowIcons", false

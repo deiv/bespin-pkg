@@ -124,9 +124,12 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     if (c == Qt::transparent) // plasma uses this
         return;
 
+    const bool isPopup = widget->windowFlags() & (Qt::Popup & ~Qt::Window);
+    const int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
+
 #if BESPIN_ARGB_WINDOWS
-    if (config.bg.opacity < c.alpha())
-        c.setAlpha(config.bg.opacity);
+    if (opacity < c.alpha())
+        c.setAlpha(opacity);
 #endif
     bool translucent = false;
     if (c.alpha() < 0xff)
@@ -138,13 +141,14 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
 #endif
             c.setAlpha(0xff);
     }
+
     bool drawRings = false;
     if (config.bg.ringOverlay)
     {
-        drawRings = !(widget->windowFlags() & (Qt::Popup & ~Qt::Window));
+        drawRings = !isPopup;
         if (drawRings && !rings)
         {
-            createRingPix(config.bg.opacity);
+            createRingPix(opacity);
             disconnect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
             connect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
         }

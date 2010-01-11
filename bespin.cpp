@@ -908,7 +908,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         return false; // just for performance - they can occur really often
     case QEvent::Paint:
 #if BESPIN_ARGB_WINDOWS
-        if (config.bg.opacity != 0xff)
+        if (!(config.bg.opacity == 0xff && config.menu.opacity == 0xff))
         if (QWidget *window = qobject_cast<QWidget*>(object))
         if (window->isWindow())
         {
@@ -918,7 +918,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             if (config.bg.mode == Plain || glassy)
             {
                 QColor c = window->palette().color(window->backgroundRole());
-                c.setAlpha(config.bg.opacity);
+                c.setAlpha((window->windowFlags() & (Qt::Popup & ~Qt::Window)) ? config.menu.opacity : config.bg.opacity);
                 p.setBrush(c);
                 p.drawRect(window->rect());
             }

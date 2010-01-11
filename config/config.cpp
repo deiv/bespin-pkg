@@ -319,6 +319,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.argbGlassy, ARGB_GLASSY);
 #else
     ui.argbSupport->hide();
+    ui.popup_ARGB->hide();
 #endif
     handleSettings(ui.fadeInactive, FADE_INACTIVE);
     handleSettings(ui.structure, BG_STRUCTURE);
