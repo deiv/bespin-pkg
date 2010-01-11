@@ -110,6 +110,7 @@ typedef struct Config
     } scroll;
 
     float shadowIntensity;
+    bool shadowTitlebar;
     bool showOff;
     bool sunkenGroups;
 

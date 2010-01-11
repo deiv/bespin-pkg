@@ -333,7 +333,7 @@ Style::drawTree(const QStyleOptionComplex *option, QPainter *painter, const QWid
                     ++lh;
                 linebot = y + lh / 2;
                 if (child.features & QStyleOptionQ3ListViewItem::Expandable ||
-                    child.childCount > 0 && child.height > 0)
+                    (child.childCount > 0 && child.height > 0))
                 {
                     if (child.state & State_Open)
                     {
@@ -519,7 +519,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
     {
         // NOTE: single list/treeviews are typically single selected - but amarok doesn't set this..
         const QTreeView *tree = qobject_cast<const QTreeView*>(view);
-        const bool single =  tree || view && view->selectionMode() == QAbstractItemView::SingleSelection;
+        const bool single =  tree || (view && view->selectionMode() == QAbstractItemView::SingleSelection);
         bool round = !tree; // looks ultimatly CRAP!
 #if QT_VERSION >= 0x040400
         switch (item->viewItemPosition)

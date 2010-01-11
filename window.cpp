@@ -188,6 +188,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     {
         if (drawRings)
             painter->drawPixmap(widget->width()-450, 0, *rings);
+        if (config.shadowTitlebar)
+        {
+            const QPixmap &shadow = shadows.sunken[false][true].tile(Tile::TopMid);
+            painter->drawTiledPixmap( 0,0, widget->width(), shadow.height(), shadow );
+        }
         return;
     }
 
@@ -198,6 +203,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         painter->setPen(Qt::NoPen);
         painter->setBrush(Gradients::structure(c, light));
         painter->drawRect(widget->rect());
+        if (config.shadowTitlebar)
+        {
+            const QPixmap &shadow = shadows.sunken[false][true].tile(Tile::TopMid);
+            painter->drawTiledPixmap( 0,0, widget->width(), shadow.height(), shadow );
+        }
         painter->restore();
         return;
     }
@@ -294,6 +304,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     }
     if (drawRings)
         painter->drawPixmap(widget->width()-450, 0, *rings);
+    if (config.shadowTitlebar)
+    {
+        const QPixmap &shadow = shadows.sunken[false][true].tile(Tile::TopMid);
+        painter->drawTiledPixmap( 0,0, widget->width(), shadow.height(), shadow );
+    }
 }
 
 void

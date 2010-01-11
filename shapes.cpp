@@ -226,8 +226,8 @@ Style::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter, cons
     // don't need antialiasing, our triangles are PERFECT ;)
     SAVE_ANTIALIAS
     painter->setRenderHint(QPainter::Antialiasing, false);
-    bool reset_pen = false;
-    if (reset_pen = (painter->pen() == Qt::NoPen))
+    bool reset_pen = (painter->pen() == Qt::NoPen);
+    if (reset_pen)
         painter->setPen(QPen(painter->brush(), 1));
     painter->drawPolygon(points, 3);
     if (reset_pen)

@@ -117,7 +117,7 @@ while (v <= slider->maximum) { \
     QRect handle = subControlRect(CC_Slider, slider, SC_SliderHandle, widget);
 
     isEnabled = isEnabled && (slider->maximum > slider->minimum);
-    hover = isEnabled && (appType == GTK) || (hover && (slider->activeSubControls & SC_SliderHandle));
+    hover = isEnabled && (appType == GTK || (hover && (slider->activeSubControls & SC_SliderHandle)));
     sunken = sunken && (slider->activeSubControls & SC_SliderHandle);
 //    const int ground = 0;
 
@@ -217,8 +217,8 @@ Style::drawDial(const QStyleOptionComplex *option, QPainter *painter, const QWid
     QPoint cp = rect.center();
 
     // fallback for small dials ============================
-    bool small = false;
-    if (small = (rect.width() < 8*Dpi::target.SliderThickness/3))
+    bool small(rect.width() < 8*Dpi::target.SliderThickness/3);
+    if ( small )
     {
         painter->setRenderHint( QPainter::Antialiasing );
         painter->setPen(Qt::NoPen);

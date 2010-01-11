@@ -328,8 +328,8 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     // Arrow type always overrules and is always shown
     const bool hasArrow = toolbutton->features & QStyleOptionToolButton::Arrow;
-    const bool justText = (!hasArrow && toolbutton->icon.isNull()) &&
-                            !toolbutton->text.isEmpty() || toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly;
+    const bool justText = toolbutton->toolButtonStyle == Qt::ToolButtonTextOnly ||
+                          (!hasArrow && toolbutton->icon.isNull() && !toolbutton->text.isEmpty() );
 
     QPalette::ColorRole role = QPalette::WindowText;
     QPalette::ColorRole bgRole = QPalette::Window;

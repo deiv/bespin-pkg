@@ -98,6 +98,7 @@
 #define MENU_ITEM_SUNKEN "Menu.ItemSunken", false
 #define MENU_ACTIVEITEMSUNKEN "Menu.ActiveItemSunken", false
 
+#define SHADOW_TITLEBAR "ShadowTitlebar", false
 #define SHOW_MNEMONIC "ShowMnemonic", false
 #define SHOW_OFF "ShowOff", false
 

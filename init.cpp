@@ -129,10 +129,11 @@ Style::readSettings(const QSettings* settings, QString appName)
             config.appDataPath = iSettings->value("App.Arora.Path", "").toString();
         // flanders
         config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
-        if (config.showOff = readBool(SHOW_OFF))
+        if ((config.showOff = readBool(SHOW_OFF)))
             { ori[0] = Qt::Vertical; ori[1] = Qt::Horizontal; }
         else
             { ori[0] = Qt::Horizontal; ori[1] = Qt::Vertical; }
+        config.shadowTitlebar = readBool(SHADOW_TITLEBAR);
         // item single vs. double click, wizard appereance
         config.macStyle = readBool(MACSTYLE);
         config.fadeInactive = readBool(FADE_INACTIVE);
@@ -245,7 +246,7 @@ Style::readSettings(const QSettings* settings, QString appName)
             config.bg.opacity = 0xff;
         Animator::Tab::setTransition(Animator::Jump);
     }
-    if (config.bg.glassy = readBool(ARGB_GLASSY))
+    if ((config.bg.glassy = readBool(ARGB_GLASSY)))
         config.bg.mode = Plain;
 #else
     config.bg.opacity = 0xff;
