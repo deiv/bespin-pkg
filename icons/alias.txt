@@ -47,7 +47,7 @@ edit-undo.alt2:actions/edit-undo
 edit-redo.alt2:actions/edit-redo
 eject:actions/media-eject
 extract:actions/archive-extract
-eye:actions/view-preview
+eye:actions/view-preview,mimetypes/application-vnd.stardivision.draw:application-vnd.sun.xml.draw:application-vnd.sun.xml.draw.template:application-x-egon:image-x-generic:video-x-mng
 file-sound-wave:mimetypes/audio-aac:audio-ac3:audio-basic:audio-mp4:audio-mpeg:audio-vnd.rn-realaudio:audio-vnd.rn-realvideo:audio-x-adpcm:audio-x-aiff:audio-x-flac+ogg:audio-x-flac:audio-x-generic:audio-x-matroska:audio-x-mod:audio-x-monkey:audio-x-mp2:audio-x-mpegurl:audio-x-ms-asx:audio-x-ms-wma:audio-x-musepack:audio-x-pn-realaudio-plugin:audio-x-scpls:audio-x-speex+ogg:audio-x-vorbis+ogg:audio-x-wav
 file-video.alt:mimetypes/video-x-generic:video-x-mng
 filter:actions/view-filter
