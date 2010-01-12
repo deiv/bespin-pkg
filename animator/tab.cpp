@@ -320,6 +320,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
     AVOID(!ow); // this is the first time the tab changes, nothing to blend
     AVOID(ow == cw); // this can happen on destruction etc... and thus lead to segfaults...
 
+#if 0
 // this works around a possible bug in some handcrafted scrollareas?
 // not sure, but as soon as i call window->render(.) on them, the window resizes
 // worse: this behaviour seems to be arbitrary (happens e.g. with kate/gwenview, but not everytime...)
@@ -344,6 +345,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
         maxSz.setHeight(QWIDGETSIZE_MAX);
     window->setFixedSize(window->size());
 //-----------------------------------------------------------------
+#endif
 
     // prepare the pixmaps we use to pretend the animation
     QRect contentsRect(ow->mapTo(sw, QPoint(0,0)), ow->size());
@@ -387,8 +389,9 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
     }
     else
         curtain->raise();
-
+#if 0
     _RESET_SIZE_
+#endif
 }
 
 void
