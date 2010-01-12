@@ -63,7 +63,6 @@
 
 class EventKiller : public QObject
 {
-//     Q_OBJECT
 public:
     bool eventFilter( QObject *, QEvent *)
     { return true; }
@@ -377,7 +376,6 @@ Style::polish( QWidget * widget )
             }
             // opacity
 #if BESPIN_ARGB_WINDOWS
-            menu->setWindowOpacity( config.menu.opacity/100.0 );
             if ( !(config.menu.opacity == 0xff || widget->testAttribute(Qt::WA_TranslucentBackground)) )
             {
                 widget->setAttribute(Qt::WA_TranslucentBackground);

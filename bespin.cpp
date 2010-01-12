@@ -915,14 +915,16 @@ Style::eventFilter( QObject *object, QEvent *ev )
             QPainter p(window);
             p.setPen(Qt::NoPen);
             const bool glassy = window->testAttribute(Qt::WA_MacBrushedMetal);
-            if (config.bg.mode == Plain || glassy)
+            const bool isPopup = window->windowFlags() & (Qt::Popup & ~Qt::Window);
+            const bool isPlain = config.bg.mode == Plain || (isPopup && !glassy);
+            if (isPlain || glassy)
             {
                 QColor c = window->palette().color(window->backgroundRole());
-                c.setAlpha((window->windowFlags() & (Qt::Popup & ~Qt::Window)) ? config.menu.opacity : config.bg.opacity);
+                c.setAlpha(isPopup ? config.menu.opacity : config.bg.opacity);
                 p.setBrush(c);
                 p.drawRect(window->rect());
             }
-            if (config.bg.mode != Plain || glassy || config.bg.ringOverlay)
+            if (!isPlain || glassy || config.bg.ringOverlay)
                 drawWindowBg(0, &p, window);
             p.end();
             return false;

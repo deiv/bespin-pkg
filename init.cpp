@@ -156,7 +156,7 @@ Style::readSettings(const QSettings* settings, QString appName)
 #else
         config.menu.opacity = 0xff;
 #endif
-        config.menu.glassy = (config.menu.opacity < 0xff) || readBool(MENU_GLASSY);
+        config.menu.glassy = readBool(MENU_GLASSY);
         config.menu.showIcons = appType == Opera || readBool(MENU_SHOWICONS);
         config.menu.shadow = readBool(MENU_SHADOW);
 
