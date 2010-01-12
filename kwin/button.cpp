@@ -224,13 +224,16 @@ Button::mousePressEvent ( QMouseEvent * event )
 void
 Button::mouseReleaseEvent ( QMouseEvent * event )
 {
+    qWarning("mouse released!");
     state &= ~Sunken;
-    if (!isEnabled() || !QRect(mapToGlobal(QPoint(0,0)), size()).contains(QCursor::pos()))
+    // used to be "QRect(mapToGlobal(QPoint(0,0)), size()).contains(QCursor::pos()))" instead of under mouse,
+    // probably on purpose, but i forgot and this fails with compiz kde4-window-decorator
+    if (!(isEnabled() && underMouse()))
     {
         repaint();
         return;
     }
-   
+    qWarning("stage2");
     KDecorationFactory* f = client->factory(); // needs to be saved before
 
     const bool lb = (event->button() == Qt::LeftButton);
@@ -242,6 +245,7 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
             client->closeWindow();
         break;
     case Min:
+        qWarning("minimize"); client->minimize(); break;
         if (lb && client->isMinimizable ())
             client->minimize();
     //       else if (rb) // TODO get dbus interface or whatever to show the Desktop
