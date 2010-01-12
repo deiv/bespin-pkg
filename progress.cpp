@@ -91,10 +91,13 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
         if (tr.width() <= RECT.width() - w)
         {   // paint on free part
             tr = RECT;
-            if (cb->direction == Qt::LeftToRight)
-                tr.setRight(r.left());
-            else
-                tr.setLeft(r.right());
+            if (r.isValid())
+            {
+                if (cb->direction == Qt::LeftToRight)
+                    tr.setRight(r.left());
+                else
+                    tr.setLeft(r.right());
+            }
         }
         else if (tr.width() <= r.width()) // paint on used part
             tr = r;
