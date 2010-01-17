@@ -239,8 +239,8 @@ Style::registerRoutines()
     registerCE(drawRubberBand, CE_RubberBand);
     registerPE(drawHeaderArrow, PE_IndicatorHeaderArrow);
 #if QT_VERSION >= 0x040400
-    registerPE(drawItem, PE_PanelItemViewRow);
-    registerPE(drawItem, PE_PanelItemViewItem);
+    registerPE(drawItemRow, PE_PanelItemViewRow);
+    registerPE(drawItemItem, PE_PanelItemViewItem);
 #endif
     // window.cpp
     registerPE(drawWindowFrame, PE_FrameWindow);

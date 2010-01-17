@@ -183,7 +183,7 @@ Style::drawHeaderArrow(const QStyleOption * option, QPainter * painter, const QW
 static const int decoration_size = 9;
 
 void
-Style::drawBranch(const QStyleOption * option, QPainter * painter, const QWidget *widget) const
+Style::drawBranch(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
 
     if ( !RECT.isValid() )
@@ -452,7 +452,7 @@ Style::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidg
 }
 
 void
-Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *widget, bool isItem) const
 {
 #if QT_VERSION >= 0x040400
     ASSURE_OPTION(item, ViewItemV4);
@@ -509,16 +509,19 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
             { bg = QPalette::WindowText; fg = QPalette::Window; }
     }
 
-   // this could just leads to cluttered listviews...?!^
+   // this could just lead to cluttered listviews...?!^
 //    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
 //    if (cg == QPalette::Normal && !(item->state & QStyle::State_Active))
 //       cg = QPalette::Inactive;
 
-   
+    const QTreeView *tree = 0;
     if (hover || selected)
     {
-        // NOTE: single list/treeviews are typically single selected - but amarok doesn't set this..
-        const QTreeView *tree = qobject_cast<const QTreeView*>(view);
+        tree = qobject_cast<const QTreeView*>(view);
+        hover = hover && (isItem || (tree && tree->itemsExpandable()));
+    }
+    if (hover || selected)
+    {
         const bool single =  tree || (view && view->selectionMode() == QAbstractItemView::SingleSelection);
         bool round = !tree; // looks ultimatly CRAP!
 #if QT_VERSION >= 0x040400

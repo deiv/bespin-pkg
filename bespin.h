@@ -250,7 +250,11 @@ protected:
     void drawTree(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
     void drawRubberBand(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawHeaderArrow(const QStyleOption*, QPainter*, const QWidget*) const;
-    void drawItem(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawItem(const QStyleOption*, QPainter*, const QWidget*, bool isItem) const;
+    inline void
+    drawItemRow(const QStyleOption *o, QPainter *p, const QWidget *w) const { drawItem(o, p, w, false); }
+    inline void
+    drawItemItem(const QStyleOption *o, QPainter *p, const QWidget *w) const { drawItem(o, p, w, true); }
     // window.cpp
     void drawWindowFrame(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawWindowBg(const QStyleOption*, QPainter*, const QWidget*) const;
