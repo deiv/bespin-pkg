@@ -190,6 +190,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return QPalette::Window;
     case SH_ComboBox_LayoutDirection:
         return config.leftHanded ? Qt::RightToLeft : Qt::LeftToRight;
+    case SH_ItemView_ArrowKeysNavigateIntoChildren:
+        return true;
     case SH_ItemView_EllipsisLocation:
         return Qt::AlignTrailing;
     case SH_ItemView_ShowDecorationSelected:
