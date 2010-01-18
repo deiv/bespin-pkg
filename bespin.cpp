@@ -154,6 +154,9 @@ Style::registerRoutines()
 #endif
     registerPE(drawFocusFrame, PE_FrameFocusRect);
     registerPE(drawFrame, PE_Frame);
+#if QT_VERSION >= 0x040500
+    registerCE(drawFrame, CE_ShapedFrame);
+#endif
     registerCC(drawGroupBox, CC_GroupBox);
     registerPE(drawGroupBoxFrame, PE_FrameGroupBox);
     // input.cpp
@@ -930,6 +933,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
 #endif
+#if  QT_VERSION < 0x040500 // 4.5 has a CE_ for this =)
         if (QFrame *frame = qobject_cast<QFrame*>(object))
         {
             if ((frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine) &&
@@ -944,8 +948,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 return true;
             }
             return false;
-        }
-        else if (QTabBar *tabBar = qobject_cast<QTabBar*>(object))
+        } else
+#endif
+        if (QTabBar *tabBar = qobject_cast<QTabBar*>(object))
         {
             if (tabBar->testAttribute(Qt::WA_NoSystemBackground))
                 return false; // shall be translucent

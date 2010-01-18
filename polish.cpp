@@ -471,20 +471,21 @@ Style::polish( QWidget * widget )
         }
         else if (frame->frameShape() != QFrame::NoFrame )
         {
+#if  QT_VERSION < 0x040500 // 4.5 has a CE_ for this =)
             // Kill ugly line look (we paint our styled v and h lines instead ;)
             if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
             {
                 widget->removeEventFilter(this);
                 widget->installEventFilter(this);
             }
-
-            // Kill ugly winblows frames... (qShadeBlablabla stuff)
             else if (frame->frameShape() != QFrame::StyledPanel)
+            // Kill ugly winblows frames... (qShadeBlablabla stuff)
             {
-                frame->setFrameShape(QFrame::StyledPanel);
                 if ( frame->frameShape() == QFrame::Box )
                     frame->setFrameShadow( QFrame::Plain );
+                frame->setFrameShape(QFrame::StyledPanel);
             }
+#endif
         }
 
         // scrollarea hovering

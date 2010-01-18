@@ -20,6 +20,11 @@
 #include <QTableView>
 #include <QTreeView>
 #include <QTextEdit>
+
+#if QT_VERSION >= 0x040500
+#include <QStyleOptionFrameV3>
+#endif
+
 #include "visualframe.h"
 #include "draw.h"
 
@@ -58,12 +63,28 @@ void
 Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_FOCUS
+    bool raised = option->state & State_Raised;
 
+#if QT_VERSION >= 0x040500
+    // lines via CE_ShapedFrame instead the ugly eventfilter override
+    if HAVE_OPTION(v3frame, FrameV3)
+    {
+        const bool v = (v3frame->frameShape == QFrame::VLine);
+        if (v || v3frame->frameShape == QFrame::HLine)
+        {
+            shadows.line[v][sunken?Sunken:raised?Raised:Relief].render(RECT, painter);
+            return;
+        }
+        if ( v3frame->frameShape == QFrame::Box )
+            sunken = raised = false;
+    }
+#endif
+    // all other frame kinds look the same
     if (!widget || (appType == GTK))
     {   // fallback, we cannot paint shaped frame contents
         if (sunken)
             shadows.fallback.render(RECT,painter);
-        else if (option->state & State_Raised)
+        else if (raised)
             shadows.fallback.render(RECT,painter);
             // TODO !
 //          shadows.raised.render(RECT,painter);
@@ -110,7 +131,7 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
 
     if (sunken)
         rect.setBottom(rect.bottom() - F(2));
-    else if (option->state & State_Raised)
+    else if (raised)
         rect.adjust(F(2), F(1), -F(2), -F(4));
     else
         rect.adjust(F(2), F(2), -F(2), -F(2));
@@ -118,7 +139,7 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
     const Tile::Set *mask = &masks.rect[false], *shadow = 0L;
     if (sunken)
         shadow = &shadows.sunken[false][isEnabled];
-    else if (option->state & State_Raised)
+    else if (raised)
         shadow = &shadows.group;
 
     if (brush)
