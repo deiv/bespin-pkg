@@ -472,7 +472,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
 
     const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
     hover = hover && (!view || view->selectionMode() != QAbstractItemView::NoSelection);
-    const bool selected = item->state & QStyle::State_Selected;
+    bool selected = item->state & QStyle::State_Selected;
     const QWidget *viewport = 0;
     if (view)
         viewport = view->viewport();
@@ -514,14 +514,17 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
 //    if (cg == QPalette::Normal && !(item->state & QStyle::State_Active))
 //       cg = QPalette::Inactive;
 
-    const QTreeView *tree = 0;
-    if (hover || selected)
-    {
-        tree = qobject_cast<const QTreeView*>(view);
-        hover = hover && (isItem || (tree && tree->itemsExpandable()));
+    bool dolphinhack = false;
+    if (!isItem && (hover || selected))
+    {   // dolphin constrains selection to the text and really REALLY hates a non winblows look :-(
+        // TODO: write a better finder clone...
+        dolphinhack = view && !qstrcmp(view->className(), "DolphinDetailsView");
+        if ( dolphinhack )
+            hover = selected = false;
     }
     if (hover || selected)
     {
+        const QTreeView *tree = qobject_cast<const QTreeView*>(view);
         const bool single =  tree || (view && view->selectionMode() == QAbstractItemView::SingleSelection);
         bool round = !tree; // looks ultimatly CRAP!
 #if QT_VERSION >= 0x040400
@@ -595,8 +598,8 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         if (item->backgroundBrush.style() != Qt::NoBrush)
         {
             QPoint oldBO = painter->brushOrigin();
-            painter->setBrushOrigin(item->rect.topLeft());
-            painter->fillRect(item->rect, item->backgroundBrush);
+            painter->setBrushOrigin(RECT.topLeft());
+            painter->fillRect(RECT, item->backgroundBrush);
             painter->setBrushOrigin(oldBO);
         } else
 #endif
