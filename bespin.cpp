@@ -915,7 +915,11 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (QWidget *window = qobject_cast<QWidget*>(object))
         if (window->isWindow())
         {
-            const bool isPopup = window->windowFlags() & (Qt::Popup & ~Qt::Window);
+            // NOTICE this fast check fails, because -guess who- PLAMSA [sic] or at least some stupid
+            // plamsoids apparently have fun in removing it (together with dropshadows - TROTTEL!)
+            // const bool isPopup = (window->windowFlags() & (Qt::Popup & ~Qt::Window));
+            // so we use qobject_cast... *GRRRRRRrrrrrRRRRRRRRrr*
+            const bool isPopup = bool(qobject_cast<QMenu*>(window));
             const int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
             if (opacity == 0xff)
                 return false;
