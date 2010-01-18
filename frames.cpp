@@ -69,6 +69,8 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
     // lines via CE_ShapedFrame instead the ugly eventfilter override
     if HAVE_OPTION(v3frame, FrameV3)
     {
+        if (v3frame->frameShape == QFrame::NoFrame)
+            return;
         const bool v = (v3frame->frameShape == QFrame::VLine);
         if (v || v3frame->frameShape == QFrame::HLine)
         {
