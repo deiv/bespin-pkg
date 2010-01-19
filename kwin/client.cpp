@@ -531,6 +531,7 @@ if (bg.alpha() != 0xff){\
     0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);\
 }\
 else\
+    _PREF_##Buffer.fill(bg);\
     XRenderComposite(QX11Info::display(), PictOpSrc, _PICT_, 0, _PREF_##Buffer.x11PictureHandle(),\
     0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);\
 
