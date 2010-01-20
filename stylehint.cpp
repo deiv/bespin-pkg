@@ -210,7 +210,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_FormLayoutLabelAlignment:
         return Qt::AlignRight;
     case SH_ItemView_PaintAlternatingRowColorsForEmptyArea:
-        // NOTICE WORKAROUND:
+        // return true; // NOTICE WORKAROUND: // works with 4.3 and now 4.4 but not in the betas
         return false; // true // kcmshell4 kfontinst atm segfaults on this due to an uncatched static_cast!
 #endif
     case SH_KCustomStyleElement:

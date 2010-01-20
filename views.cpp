@@ -604,7 +604,12 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         } else
 #endif
         if (item->features & QStyleOptionViewItemV2::Alternate)
-            painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
+        {
+            if (bg == QPalette::Base)
+                painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
+            else
+                painter->fillRect(RECT, Colors::mid(COLOR(bg), COLOR(fg), 100, 8));
+        }
         // reset the painter for normal items. our above workaround otherwise might kill things...
         painter->setPen(COLOR(fg));
     }
