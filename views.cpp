@@ -451,6 +451,27 @@ Style::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidg
     painter->restore();
 }
 
+enum IVI_Flags { Crumb = 1, DolphinDetail = 2 };
+
+static const QWidget *last_widget = 0;
+static int last_flags = 0;
+
+static void updateLastWidget( const QWidget *widget, QPainter *p )
+{
+    if (widget != last_widget)
+    {
+        last_widget = widget;
+        last_flags = 0;
+        if (qobject_cast<const QPushButton*>(widget))
+        {
+            if (widget->inherits("KUrlButton") && !widget->inherits("KFilePlacesSelector"))
+                last_flags |= Crumb;
+            else if (widget->inherits("BreadcrumbItemButton"))
+                last_flags |= Crumb;
+        }
+    }
+}
+
 void
 Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *widget, bool isItem) const
 {
@@ -460,13 +481,10 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
     ASSURE_OPTION(item, ViewItemV2);
 #endif
 
-    if (widget && qobject_cast<const QPushButton*>(widget))
-    {
-        if (widget->inherits("KUrlButton") && !widget->inherits("KFilePlacesSelector"))
-            return;
-        if (widget->inherits("BreadcrumbItemButton"))
-            return;
-    }
+    updateLastWidget( widget, painter );
+    
+    if (widget && (last_flags & Crumb))
+        return;
 
     OPT_HOVER
 
@@ -579,6 +597,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
             if (round)
             {
                 masks.rect[true].render(RECT, painter, fill);
+//                 painter->drawTiledPixmap(RECT, fill);
                 if (selected && strongSelect)
                     shadows.sunken[true][true].render(RECT, painter);
             }

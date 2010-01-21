@@ -162,6 +162,14 @@ if (!dump.isNull())\
 #undef finishPixmap
 }
 
+void Set::sharpenEdges()
+{
+    pixmap[TopMid] = QPixmap(pixmap[TopMid].size());
+    pixmap[BtmMid] = QPixmap(pixmap[BtmMid].size());
+    pixmap[MidLeft] = QPixmap(pixmap[MidLeft].size());
+    pixmap[MidRight] = QPixmap(pixmap[MidRight].size());
+}
+
 QRect
 Set::rect(const QRect &rect, PosFlags pf) const
 {
@@ -187,16 +195,40 @@ void
 Set::render(const QRect &r, QPainter *p) const
 {
 
+//     filledPix.fill(Qt::transparent);
+
+#if 0
 #define MAKE_FILL(_OFF_)\
 if (!tile->isNull())\
 {\
-    if (_texPix || _texColor)\
+    if ((_texPix || _texColor))\
     {\
         if (filledPix.size() != tile->size())\
             filledPix = QPixmap(tile->size());\
         if (_texPix)\
         {\
-            filledPix.fill(Qt::transparent); \
+            pixPainter.begin(&filledPix);\
+            pixPainter.drawTiledPixmap(filledPix.rect(), *_texPix, _OFF_-off);\
+            pixPainter.end();\
+            filledPix = FX::applyAlpha(filledPix, *tile);\
+        }\
+        else\
+            filledPix = FX::tint(*tile, *_texColor);\
+        tile = &filledPix;\
+    }\
+} // skip semicolon
+#endif
+
+#define MAKE_FILL(_OFF_)\
+if (!tile->isNull())\
+{\
+    if ((_texPix || _texColor))\
+    {\
+        if (filledPix.size() != tile->size())\
+            filledPix = tile->copy();\
+        filledPix.fill(Qt::transparent);\
+        if (_texPix)\
+        {\
             pixPainter.begin(&filledPix);\
             pixPainter.drawTiledPixmap(filledPix.rect(), *_texPix, _OFF_-off);\
             pixPainter.end();\
@@ -265,11 +297,11 @@ if (!tile->isNull())\
     const bool unclipped = !p->hasClipping() || p->clipRegion().isEmpty();
 #define UNCLIPPED (unclipped || p->clipRegion().intersects(checkRect))
 
-#define NEED_RECT_FILL(_TILE_)\
+#define NEED_RECT_FILL(_TILE_) \
 _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
 (_texPix->width() > pixmap[_TILE_].width() && checkRect.width() > pixmap[_TILE_].width()) ||\
 (_texPix->height() > pixmap[_TILE_].height() && checkRect.height() > pixmap[_TILE_].height()))
-   
+
     if (pf & Top)
     {
         yOff += tlh;

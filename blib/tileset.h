@@ -89,6 +89,8 @@ public:
 
     void render(const QRect &rect, QPainter *p,
                 const QPixmap &pix, const QPoint &offset = QPoint()) const;
+
+    void sharpenEdges();
    
     inline void
     render( const QRect &rect, QPainter *p, Bespin::Gradients::Type type, Qt::Orientation o,
@@ -117,6 +119,7 @@ public:
 
     inline void
     setDefaultShape(PosFlags pf) { _defShape = pf; }
+
 
     inline const QPixmap &
     tile(Section s) const { return pixmap[s]; }

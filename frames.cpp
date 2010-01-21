@@ -32,18 +32,27 @@
 
 #include <QtDebug>
 
+static const QWidget *last_widget = 0;
+static bool last_isSpecialFrame = false;
+
 bool
 Style::isSpecialFrame(const QWidget *widget)
 {
+    if (!widget)
+        return false;
+    if ( widget == last_widget )
+        return last_isSpecialFrame;
+    last_widget = widget;
     if (appType == Opera)
-        return true;
+        return (last_isSpecialFrame = true);
     if IS_HTML_WIDGET
-        return true;
+        return (last_isSpecialFrame = true);
     if (const QListView *view = qobject_cast<const QListView*>(widget))
     {
-        return view->viewMode() == QListView::IconMode || view->inherits("KCategorizedView");
+        last_isSpecialFrame = (view->viewMode() == QListView::IconMode || view->inherits("KCategorizedView"));
+        return last_isSpecialFrame;
     }
-    return bool(qobject_cast<const QTextEdit*>(widget));
+    return (last_isSpecialFrame = bool(qobject_cast<const QTextEdit*>(widget)));
 //     || (w->parentWidget() && w->parentWidget()->inherits("KateView")); // kate repaints the frame anyway
 }
 

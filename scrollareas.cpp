@@ -103,13 +103,39 @@ Style::clearScrollbarCache()
     delete scrollBgCache; scrollBgCache = 0L;
 }
 
+enum SA_Flags { WebKit = 1, ComboBox = 2 };
+
+static const QWidget *last_widget = 0;
+static int last_flags = 0;
+
+static void updateLastWidget( const QWidget *widget )
+{
+    if (widget != last_widget)
+    {
+        last_widget = widget;
+        last_flags = 0;
+        if (widget->inherits("QWebView"))
+            last_flags |= WebKit;
+        else if (widget->testAttribute(Qt::WA_OpaquePaintEvent) &&
+                                    widget->parentWidget() &&
+                    widget->parentWidget()->parentWidget() &&
+                    widget->parentWidget()->parentWidget()->inherits("QComboBoxListView"))
+            last_flags |= ComboBox;
+    }
+}
+
 void
 Style::drawScrollAreaCorner(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     // ouchhh...!
-    if (widget && widget->inherits("QWebView"))
-        erase(option, painter, widget);
+    if (widget)
+    {
+        updateLastWidget(widget);
+        if (last_flags & WebKit)
+            erase(option, painter, widget);
+    }
 }
+
 
 void
 Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
@@ -119,7 +145,12 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
 
     cPainter = painter;
     bool useCache = false, needsPaint = true;
-    const bool isWebKit = widget && widget->inherits("QWebView"); // ouchhh...
+    bool isWebKit = false; // ouchhh... needs some specials
+    if (widget)
+    {
+        updateLastWidget(widget);
+        isWebKit = last_flags & WebKit;
+    }
 
     // we paint the slider bg ourselves, as otherwise a frame repaint would be
     // triggered (for no sense)
@@ -129,9 +160,8 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
     else if (widget->testAttribute(Qt::WA_OpaquePaintEvent))
     {   /// fake a transparent bg (real transparency leads to frame22 painting overhead)
         // i.e. we erase the bg with the window background or any autofilled element between
-        
-        if (widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-            widget->parentWidget()->parentWidget()->inherits("QComboBoxListView"))
+
+        if ( last_flags & ComboBox )
         {   /// catch combobox dropdowns ==========
             painter->fillRect(RECT, PAL.brush(QPalette::Base));
             isComboDropDownSlider = true;
@@ -257,8 +287,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
 #undef PAINT_ELEMENT
 
 void
-Style::drawScrollBarButton(const QStyleOption * option, QPainter * painter,
-                                 const QWidget *, bool up) const
+Style::drawScrollBarButton(const QStyleOption *option, QPainter *painter, const QWidget*, bool up) const
 {
     ASSURE_OPTION(opt, Slider);
 

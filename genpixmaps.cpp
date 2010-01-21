@@ -38,6 +38,7 @@ Style::generatePixmaps()
         else
             { s = f9; r = 70; }
         masks.rect[i] = Tile::Set(Elements::roundedMask(s, r),s/2,s/2,1,1, r);
+        masks.rect[i].sharpenEdges();
     }
 
     // SHADOWS ===============================
