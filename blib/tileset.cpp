@@ -164,10 +164,10 @@ if (!dump.isNull())\
 
 void Set::sharpenEdges()
 {
-    pixmap[TopMid] = QPixmap(pixmap[TopMid].size());
-    pixmap[BtmMid] = QPixmap(pixmap[BtmMid].size());
-    pixmap[MidLeft] = QPixmap(pixmap[MidLeft].size());
-    pixmap[MidRight] = QPixmap(pixmap[MidRight].size());
+    pixmap[TopMid] = QPixmap(pixmap[TopMid].size()); pixmap[TopMid].fill(Qt::black);
+    pixmap[BtmMid] = QPixmap(pixmap[BtmMid].size()); pixmap[BtmMid].fill(Qt::black);
+    pixmap[MidLeft] = QPixmap(pixmap[MidLeft].size()); pixmap[MidLeft].fill(Qt::black);
+    pixmap[MidRight] = QPixmap(pixmap[MidRight].size()); pixmap[MidRight].fill(Qt::black);
 }
 
 QRect
