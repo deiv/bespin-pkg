@@ -115,8 +115,6 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
                 brush = &view->viewport()->palette().color(view->viewport()->backgroundRole());
             if (!brush)
                 brush = &PAL.color(QPalette::Base);
-            if (sunken)
-                rect.setBottom(rect.bottom() + F(2));
         }
         else
         {   // usually painted on visual frame, but...
@@ -156,7 +154,7 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
             painter->setClipping(false);
     }
     if (shadow)
-            shadow->render(RECT, painter);
+        shadow->render(RECT, painter);
     else
     {   // plain frame
         //horizontal
@@ -168,8 +166,7 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
     }
     if (hasFocus)
     {
-//         rect.adjust(-F(2), -F(2), F(2), F(2));
-        QColor h = FCOLOR(Highlight); h.setAlpha(128);
+        rect = RECT;
         if (!fastFrame)
         if (const VisualFramePart* vfp = qobject_cast<const VisualFramePart*>(widget))
         {   // Looks somehow dull if a views header get's surrounded by the focus, ...but it
@@ -186,16 +183,15 @@ Style::drawFrame(const QStyleOption *option, QPainter *painter, const QWidget *w
             if (vHeader && vHeader->isVisible())
             {
                 Tile::setShape(Tile::shape() & ~Tile::Left);
-                rect.setLeft(rect.left() + /*F(2) +*/ vHeader->width());
+                rect.setLeft(rect.left() + vHeader->width());
             }
             if (hHeader && hHeader->isVisible())
             {
                 Tile::setShape(Tile::shape() & ~Tile::Top);
-                rect.setTop(rect.top() + /*F(2) +*/ hHeader->height());
+                rect.setTop(rect.top() + hHeader->height());
             }
         }
-//         lights.rect[false].render(rect, painter, FCOLOR(Highlight));
-        mask->outline(rect, painter, h, F(3));
+        lights.glow[false].render(rect, painter, FCOLOR(Highlight));
         Tile::reset();
     }
 }
@@ -319,8 +315,6 @@ Style::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QW
         rect.setBottom(RECT.bottom()-F(32));
         Tile::setShape(Tile::Full);
         shadows.group.render(RECT, painter);
-    //       Tile::setShape(Tile::Full & ~Tile::Bottom);
-    //       masks.button.outline(rect, painter, FCOLOR(Window).light(120));
         Tile::reset();
     }
 }

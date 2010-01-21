@@ -60,6 +60,20 @@ void
 Elements::setScale(float scale) { ourScale = scale; }
 
 QPixmap
+Elements::glow(int size)
+{
+    EMPTY_PIX(size, size);
+    float d = size/2.0;
+    QRadialGradient rg(d, d, d);
+    rg.setColorAt(0.5, BLACK(0));
+    rg.setColorAt(0.75, BLACK(192));
+    rg.setColorAt(1.0, BLACK(0));
+    p.fillRect(pix.rect(), rg);
+    p.end();
+    return pix;
+}
+
+QPixmap
 Elements::shadow(int size, bool opaque, bool sunken, float factor)
 {
     EMPTY_PIX(size, size);
@@ -121,9 +135,9 @@ Elements::sunkenShadow(int size, bool enabled)
 
     // add bottom highlight
     p.setCompositionMode( QPainter::CompositionMode_SourceOver );
-    p.fillRect(F(3),size-F(2),size-2*F(3),F(1), BLACK(10));
+    p.fillRect(F(3),size-F(2),size-2*F(3),F(1), BLACK(7+3*enabled));
     int w = size/F(3);
-    p.fillRect(w,size-F(1),size-2*w,F(1), WHITE(30));
+    p.fillRect(w,size-F(1),size-2*w,F(1), WHITE(20+10*enabled));
 
     p.end();
 

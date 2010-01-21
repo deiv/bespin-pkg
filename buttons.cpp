@@ -58,12 +58,12 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
     {   // more like a toolbtn
         if (option->state & State_Enabled)
         {
-            if (option->state & State_HasFocus)
-                masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
             if (sunken)
                 shadows.sunken[true][true].render(RECT, painter);
             else
                 shadows.relief[true][true].render(RECT, painter);
+            if (option->state & State_HasFocus)
+                lights.glow[true].render(sunken?RECT:RECT.adjusted(0,-F(1),0,0), painter, FCOLOR(Highlight));
         }
     }
     else
@@ -233,7 +233,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
             if (hasFocus)
             {
                 if (config.btn.active_role[Bg] == QPalette::Highlight)
-                    { c2 = FCOLOR(Highlight); c2.setAlpha(212); }
+                    { c2 = FCOLOR(Highlight); }
             }
             else if ( anim.step  && config.btn.backLightHover )
                 { c2 = CCOLOR(btn.active, Bg); c2.setAlpha(c2.alpha()*anim.step/8); }
@@ -241,7 +241,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
             if (c2 != Qt::transparent)
             {
                 QRect r = RECT; if (config.btn.layer == 1) r.setBottom(r.bottom()-F(1));
-                masks.rect[round].outline(r, painter, c2, F(3));
+                lights.glow[round].render(r, painter, c2);
             }
             // ---- alpha notice ----------
         }
@@ -289,7 +289,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
 
         // outline
         if (Gradients::isReflective(GRAD(btn)))
-            masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter, c.lighter(120), f1);
+            lights.glow[round].render(r, painter, c.lighter(120));
 
     }
     
@@ -548,7 +548,7 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
         const int contrast = Colors::contrast(bg, FCOLOR(Highlight));
         if (contrast > 10)
         {
-            masks.rect[true].outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), F(3));
+            lights.glow[true].render(RECT, painter, FCOLOR(Highlight));
             bg = Colors::mid(bg, FCOLOR(Highlight), contrast/5, 1);
         }
     }

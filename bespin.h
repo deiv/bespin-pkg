@@ -305,10 +305,11 @@ private:
    
     typedef struct
     {
-        Tile::Line top;
+//         Tile::Line top;
         QPixmap slider;
 //         QPixmap slider[4];
         Tile::Set rect[2];
+        Tile::Set glow[2];
     } Lights;
    
     // gtk-qt and other workarounds

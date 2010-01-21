@@ -274,13 +274,7 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
 
             // outline
             if (Gradients::isReflective(GRAD(btn)))
-            {
-                rect.adjust((pf & Tile::Left) ? F(1) : 0,
-                            (pf & Tile::Top) ? F(1) : 0,
-                            (pf & Tile::Right) ? -F(1) : 0,
-                            (pf & Tile::Bottom) ? -F(1) : 0);
-                masks.rect[round].outline(rect, painter, c.lighter(120), F(1));
-            }
+                lights.glow[round].render(rect, painter, c.lighter(120));
 
         }
         Tile::reset();

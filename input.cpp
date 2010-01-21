@@ -37,10 +37,7 @@ Style::drawLineEditFrame(const QStyleOption *option, QPainter *painter, const QW
         shadows.fallback.render(RECT,painter);
 
     if (hasFocus)
-    {
-        QColor h = FCOLOR(Highlight); h.setAlpha(128);
-        masks.rect[false].outline(r, painter, h, F(3));
-    }
+        lights.glow[false].render(RECT, painter, FCOLOR(Highlight));
 }
 
 static QPixmap *bgBuffer(const QPalette &pal, const QRect &r)
@@ -94,9 +91,7 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
                     c = c.light(112);
                 mask.render(r, painter, c);
             }
-            r.setBottom(r.bottom() + F(1));
-            c = FCOLOR(Highlight); c.setAlpha(102);
-            mask.outline(r, painter, c, F(3));
+            lights.glow[false].render(RECT, painter, FCOLOR(Highlight));
         }
         else if (r.height() > 2*option->fontMetrics.height()) // no lineEdit... like some input frames in QWebKit
             mask.render(r, painter, FCOLOR(Base));
@@ -251,7 +246,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
                 if (hasFocus)
                 {
                     if (config.btn.backLightHover)
-                        mask.outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), f3);
+                        lights.glow[round_].render(RECT, painter, FCOLOR(Highlight));
                     else
                     {
                         const int contrast =  (config.btn.fullHover && animStep) ?
@@ -259,7 +254,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
                         Colors::contrast(c, FCOLOR(Highlight));
                         if (contrast > 10)
                         {
-                            mask.outline(RECT, painter, Colors::mid(FCOLOR(Window), FCOLOR(Highlight)), f3);
+                            lights.glow[round_].render(RECT, painter, FCOLOR(Highlight));
                             c = Colors::mid(c, FCOLOR(Highlight), contrast/4, 1);
                         }
                     }
@@ -280,7 +275,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
                     {   // we MUST use alpha blending as this crosses between combo and bg
                         QColor c2 = CCOLOR(btn.active, Bg);
                         c2.setAlpha(c2.alpha()*animStep/8);
-                        mask.outline(RECT, painter, c2, F(3));
+                        lights.glow[round_].render(RECT, painter, c2);
                     }
                 }
             }
