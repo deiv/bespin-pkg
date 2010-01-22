@@ -118,7 +118,7 @@ Style::generatePixmaps()
     for (int r = 0; r < 2; ++r)
     {
         int s = r ? f17 : f9;
-        lights.glow[r] = Tile::Set(Elements::glow(s), s/2,s/2,1,1);
+        lights.glow[r] = Tile::Set(Elements::glow(s, 2.25*config.scale), s/2,s/2,1,1);
         lights.glow[r].setDefaultShape(Tile::Ring);
     }
 

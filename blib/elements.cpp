@@ -60,13 +60,14 @@ void
 Elements::setScale(float scale) { ourScale = scale; }
 
 QPixmap
-Elements::glow(int size)
+Elements::glow(int size, float width)
 {
     EMPTY_PIX(size, size);
-    float d = size/2.0;
+    const float d = size/2.0;
+    const float w = width/size;
     QRadialGradient rg(d, d, d);
-    rg.setColorAt(0.5, BLACK(0));
-    rg.setColorAt(0.75, BLACK(192));
+    rg.setColorAt(1.0-2.0*w, BLACK(0));
+    rg.setColorAt(1.0-w, BLACK(192));
     rg.setColorAt(1.0, BLACK(0));
     p.fillRect(pix.rect(), rg);
     p.end();
