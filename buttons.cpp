@@ -58,12 +58,14 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
     {   // more like a toolbtn
         if (option->state & State_Enabled)
         {
-            if (sunken)
-                shadows.sunken[true][true].render(RECT, painter);
-            else
-                shadows.relief[true][true].render(RECT, painter);
             if (option->state & State_HasFocus)
-                lights.glow[true].render(sunken?RECT:RECT.adjusted(0,-F(1),0,0), painter, FCOLOR(Highlight));
+            {
+                Tile::setShape(Tile::Top | Tile::Bottom);
+                lights.glow[true].render(RECT, painter, FCOLOR(Highlight));
+                Tile::reset();
+            }
+            shadows.line[0][Sunken].render(RECT, painter, Tile::Full, false);
+            shadows.line[0][Sunken].render(RECT, painter, Tile::Full, true);
         }
     }
     else
@@ -305,7 +307,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
 
         if (config.btn.bevelEnds && !isCheckbox)
         {   // and a bevel in case (e.g. for Aqua look)
-            QRect bevelRect = r; bevelRect.setWidth(F(8));
+            QRect bevelRect = r; bevelRect.setWidth(Gradients::bevel().width());
             masks.rect[round].render(bevelRect, painter, Gradients::bevel());
             bevelRect.moveTopRight(r.topRight());
             masks.rect[round].render(bevelRect, painter, Gradients::bevel(false));
