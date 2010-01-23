@@ -100,14 +100,14 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
 {
     ASSURE_OPTION(toolbutton, ToolButton);
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
+    QStyleOption tool(*toolbutton);
+    QWidget *daddy = widget ? widget->parentWidget() : 0L;
+    const QPalette &pal = daddy ? daddy->palette() : PAL;
 
     // special handling for the tabbar scrollers ------------------------------
-    if (toolbutton->features & QStyleOptionToolButton::Arrow &&
-        widget && widget->parentWidget() && qobject_cast<QTabBar*>(widget->parentWidget()))
+    if (toolbutton->features & QStyleOptionToolButton::Arrow && qobject_cast<QTabBar*>(daddy))
     {
-        QWidget *tabbar = widget->parentWidget();
-        QColor bg = tabbar->palette().color(config.tab.std_role[Bg]),
-               fg = tabbar->palette().color(config.tab.std_role[Fg]);
+        QColor bg = pal.color(config.tab.std_role[Bg]), fg = pal.color(config.tab.std_role[Fg]);
         Qt::Orientation o = Qt::Vertical;
         QRect r = RECT; int dy2 = 0;
         Tile::Position pos = Tile::Right;
@@ -159,9 +159,8 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
     QToolBar *bar = 0;
     QMainWindow *mwin = 0;
     connected = config.btn.tool.connected && // we want them at all
-                widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-                (bar = qobject_cast<QToolBar*>(widget->parentWidget())) && // daddy is a toolbar
-                (mwin = qobject_cast<QMainWindow*>(widget->parentWidget()->parentWidget())) && // in a mainwindow
+                daddy && daddy->parentWidget() && (bar = qobject_cast<QToolBar*>(daddy)) && // daddy is a toolbar
+                (mwin = qobject_cast<QMainWindow*>(daddy->parentWidget())) && // in a mainwindow
 //                 mwin->toolBarArea(bar) != Qt::NoToolBarArea && // kills floaters...
                 true;
 
@@ -169,7 +168,7 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
     if (connected || option->state & State_On)
     {
         QStyleOption tool(0);
-        tool.palette = toolbutton->palette;
+        tool.palette = pal;
         tool.rect = RECT;
         tool.state = bflags;
         drawToolButtonShape(&tool, painter, widget);
@@ -179,7 +178,7 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
     {
         QRect menuarea = subControlRect(CC_ToolButton, toolbutton, SC_ToolButtonMenu, widget);
         QPen oldPen = painter->pen();
-        painter->setPen(Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 8-step, step+3));
+        painter->setPen(Colors::mid(pal.color(QPalette::Window), pal.color(QPalette::WindowText), 8-step, step+3));
         drawSolidArrow(Navi::S, menuarea, painter);
         painter->setPen(oldPen);
     }
@@ -187,6 +186,7 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
    // label in the toolbutton area
    QStyleOptionToolButton label = *toolbutton;
    label.rect = button;
+   label.palette = pal;
    drawToolButtonLabel(&label, painter, widget);
    step = 0;
    connected = false;
@@ -334,10 +334,13 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
     }
     if (widget && bgRole == QPalette::Window)
     {
-        bgRole = widget->backgroundRole();
-        role = widget->foregroundRole();
-        if (role == QPalette::ButtonText &&
-            widget->parentWidget() && widget->parentWidget()->inherits("QMenu"))
+        const QWidget *dad = widget->parentWidget();
+
+        const QWidget *w = dad ? dad : widget;
+        bgRole = w->backgroundRole();
+        role = w->foregroundRole();
+        
+        if (role == QPalette::ButtonText && dad && dad->inherits("QMenu"))
         {
             role = config.menu.std_role[Fg]; // this is a f**** KMenu Header
             step = 0;
