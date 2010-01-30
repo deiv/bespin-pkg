@@ -20,6 +20,8 @@ extern QPixmap *transSrc;
 void
 Style::generatePixmaps()
 {
+    Elements::setShadowIntensity( config.shadowIntensity );
+    
     const int f9 = F(9); const int f11 = SCALE(11);
     const int f13 = SCALE(13); const int f17 = SCALE(17);
     const int f49 = SCALE(49);
