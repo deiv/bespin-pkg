@@ -245,18 +245,14 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
                 c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover, translucent);
                 if (hasFocus)
                 {
-                    if (config.btn.backLightHover)
-                        lights.glow[round_].render(RECT, painter, FCOLOR(Highlight));
-                    else
+                    lights.glow[round_].render(RECT, painter, FCOLOR(Highlight));
+                    if ( !config.btn.backLightHover )
                     {
                         const int contrast =  (config.btn.fullHover && animStep) ?
                         Colors::contrast(btnBg(PAL, isEnabled, hasFocus, 0, true, translucent), FCOLOR(Highlight)):
                         Colors::contrast(c, FCOLOR(Highlight));
                         if (contrast > 10)
-                        {
-                            lights.glow[round_].render(RECT, painter, FCOLOR(Highlight));
                             c = Colors::mid(c, FCOLOR(Highlight), contrast/4, 1);
-                        }
                     }
                 }
 
@@ -272,7 +268,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
                         r = RECT.adjusted(f1, f1, -f1, -f2); // RESET 'r' !!!
                     }
                     else if (config.btn.backLightHover)
-                    {   // we MUST use alpha blending as this crosses between combo and bg
+                    {
                         QColor c2 = CCOLOR(btn.active, Bg);
                         c2.setAlpha(c2.alpha()*animStep/8);
                         lights.glow[round_].render(RECT, painter, c2);
