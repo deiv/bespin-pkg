@@ -120,7 +120,7 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
         {
         case SC_GroupBoxFrame:
             ret = groupBox->rect;
-            if (config.sunkenGroups && !groupBox->text.isEmpty())
+            if (!(config.groupBoxMode || groupBox->text.isEmpty()))
                 ret.setTop(ret.top() + groupBox->fontMetrics.height());
             break;
         case SC_GroupBoxContents:
@@ -136,7 +136,7 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
         }
         case SC_GroupBoxCheckBox:
         {
-            if (!(config.sunkenGroups || groupBox->features & QStyleOptionFrameV2::Flat))
+            if (config.groupBoxMode && !(groupBox->features & QStyleOptionFrameV2::Flat))
                 ret = groupBox->rect.adjusted(F(7), F(7), 0, 0);
             ret.setWidth(Dpi::target.ExclusiveIndicator);
             ret.setHeight(Dpi::target.ExclusiveIndicator);
@@ -151,7 +151,7 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
             const int marg = flat ? 0 : F(3);
             Qt::Alignment align;
         
-            if (flat || config.sunkenGroups)
+            if (flat || !config.groupBoxMode)
             {
                 int left = marg;
                 if (groupBox->subControls & SC_GroupBoxCheckBox)

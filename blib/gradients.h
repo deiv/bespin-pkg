@@ -97,7 +97,9 @@ BLIB_EXPORT const BgSet &bgSet(const QColor &c);
 BLIB_EXPORT BgSet *bgSet(const QColor &c, BgMode mode, int bgBevelIntesity = 110);
 // const QPixmap &bgCorner(const QColor &c, bool other = false);
 
-BLIB_EXPORT void init(BgMode mode = BevelV, int structure = 0, int bgBevelIntesity = 110, int btnBevelSize = 16, bool force = false);
+BLIB_EXPORT void init(BgMode mode = BevelV, int structure = 0,
+                      int bgBevelIntesity = 110, int btnBevelSize = 16,
+                      bool force = false, bool invertedGroups = false);
 
 BLIB_EXPORT const QPixmap &borderline(const QColor &c, Position pos);
 BLIB_EXPORT void wipe();

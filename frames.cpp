@@ -265,7 +265,7 @@ Style::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, const 
 //             textRect.setRight(RECT.right()); textRect.setLeft(x);
 //             shadows.line[0][Sunken].render(textRect, painter, Tile::Center | Tile::Right, true);
         }
-        else if (!config.sunkenGroups)
+        else if (config.groupBoxMode)
         {
             const int x = textRect.width()/8;
             textRect.adjust(x,0,-x,0);
@@ -299,31 +299,31 @@ Style::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QW
         Tile::reset();
         return;
     }
-    if (config.sunkenGroups)
+    if (config.groupBoxMode)
+    {
+        QRect rect = RECT.adjusted(F(4), F(2), -F(4), 0);
+        rect.setHeight(qMin(2*F(32), RECT.height()));
+        Tile::setShape(Tile::Full & ~Tile::Bottom);
+        if ( config.groupBoxMode != 3 )
+            masks.rect[false].render(rect, painter, Gradients::light(rect.height()) );
+        rect.setBottom(RECT.bottom()-F(32));
+        Tile::setShape(Tile::Full);
+        shadows.group.render(RECT, painter);
+        Tile::reset();
+    }
+    else
     {
 #if BESPIN_ARGB_WINDOWS
         if (config.bg.opacity != 0xff)
             masks.rect[false].render( RECT.adjusted(0,0,0,-F(2)), painter, QColor(0,0,0,48) );
         else
 #endif
-        if (config.bg.mode == Scanlines)
-            masks.rect[false].render(   RECT.adjusted(0,0,0,-F(2)), painter,
-                                        Gradients::structure(FCOLOR(Window).darker(108)),
-                                        widget ? widget->mapTo(widget->window(), RECT.topLeft()) :
-                                        QPoint() );
+            if (config.bg.mode == Scanlines)
+            masks.rect[false].render( RECT.adjusted(0,0,0,-F(2)), painter,
+                                      Gradients::structure(FCOLOR(Window).darker(108)),
+                                      widget ? widget->mapTo(widget->window(), RECT.topLeft()) : QPoint() );
         else
-            masks.rect[false].render(RECT.adjusted(0,0,0,-F(2)), painter, FCOLOR(Window).darker(105));
+            masks.rect[false].render( RECT.adjusted(0,0,0,-F(2)), painter, FCOLOR(Window).darker(105));
         shadows.sunken[false][true].render(RECT, painter);
-    }
-    else
-    {
-        QRect rect = RECT.adjusted(F(4), F(2), -F(4), 0);
-        rect.setHeight(qMin(2*F(32), RECT.height()));
-        Tile::setShape(Tile::Full & ~Tile::Bottom);
-        masks.rect[false].render(rect, painter, Gradients::light(rect.height()));
-        rect.setBottom(RECT.bottom()-F(32));
-        Tile::setShape(Tile::Full);
-        shadows.group.render(RECT, painter);
-        Tile::reset();
     }
 }

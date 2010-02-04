@@ -66,6 +66,7 @@ typedef struct Config
     } chooser;
 
     bool fadeInactive;
+    int  groupBoxMode;
    
     struct input
     {
@@ -112,8 +113,7 @@ typedef struct Config
     float shadowIntensity;
     bool shadowTitlebar;
     bool showOff;
-    bool sunkenGroups;
-
+    
     struct tab
     {
         QPalette::ColorRole std_role[2], active_role[2];

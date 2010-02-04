@@ -435,7 +435,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         else fnt.setPixelSize(fnt.pixelSize()*config.scale);
         qApp->setFont(fnt);
     }
-    config.sunkenGroups = readBool(SUNKEN_GROUPS);
+    config.groupBoxMode = readInt(GROUP_BOX_MODE);
 
     //NOTICE gtk-qt fails on several features
     // a key problem seems to be fixed text colors
@@ -557,7 +557,7 @@ Style::init(const QSettings* settings)
     Elements::setScale(config.scale);
     generatePixmaps();
     Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
-                    config.bg.structure, config.bg.intensity, F(8));
+                    config.bg.structure, config.bg.intensity, F(8), false, config.groupBoxMode == 2);
     int f1 = F(1), f3 = F(3), f4 = F(4);
     QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
     inner.adjust(f4,f4,-f4,-f1); outer.adjust(0,0,0,F(2));

@@ -377,6 +377,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         rect.setBottom(rect.bottom() + F(2));
         shadows.sunken[true][true].render(rect, painter);
     }
+    
     Tile::reset();
 }
 

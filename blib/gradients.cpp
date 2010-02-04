@@ -304,6 +304,7 @@ static inline uint costs(BgSet *set)
 
 static int _struct = 0;
 static int _bgIntensity = 110;
+static bool _invertedGroups = false;
 static Gradients::BgMode _mode = Gradients::BevelV;
 static PixmapCache _btnAmbient, _tabShadow, _groupLight, _structure[2];
 typedef QCache<uint, BgSet> BgSetCache;
@@ -672,16 +673,20 @@ const QPixmap
 const QPixmap
 &Gradients::light(int height)
 {
+    height = (height + 2)/3;
+    height *= 3;
+    
     if (height <= 0)
     {
         qWarning("NULL Pixmap requested, height was %d",height);
         return nullPix;
     }
+
     QPixmap *pix = _groupLight.object(height);
     if (pix)
         return *pix;
 
-    const int v = 255;
+    const int v = _invertedGroups ? 0 : 255;
     const int a = v ? 80 : 20;
     pix = new QPixmap(32, height);
     pix->fill(Qt::transparent);
@@ -995,7 +1000,7 @@ Gradients::bgSet(const QColor &c, BgMode mode, int bgIntensity)
 static bool _initialized = false;
 
 void
-Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bool force)
+Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bool force, bool invertedGroups)
 {
     if (_initialized && !force)
         return;
@@ -1003,6 +1008,7 @@ Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bo
     _mode = mode;
     _struct = structure;
     _bgIntensity = bgIntesity;
+    _invertedGroups = invertedGroups;
     _bgSet.setMaxCost( 900<<10 ); // 832 should be enough - we keep some safety
     _btnAmbient.setMaxCost( 64<<10 );
     _tabShadow.setMaxCost( 64<<10 );
