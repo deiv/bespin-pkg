@@ -351,6 +351,9 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         }
 
         c = CCOLOR(tab.active, Bg);
+        if (option->state & State_HasFocus)
+            c = Colors::mid(c, FCOLOR(Highlight), 2, 1);
+
         if (sameRoles)
             rect = RECT.adjusted(0,0,0,-F(2));
         else if (config.tab.activeTabSunken && Colors::value(CCOLOR(tab.std, Bg)) < 164)

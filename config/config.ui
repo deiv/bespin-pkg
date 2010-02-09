@@ -158,6 +158,11 @@
          <string>Hacks</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>Colors</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
@@ -233,7 +238,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>11</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -841,7 +846,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>436</width>
+               <width>438</width>
                <height>180</height>
               </rect>
              </property>
@@ -1876,8 +1881,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>450</width>
-               <height>289</height>
+               <width>317</width>
+               <height>258</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3012,8 +3017,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>450</width>
-               <height>85</height>
+               <width>187</width>
+               <height>39</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3139,6 +3144,7 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="page_11"/>
        </widget>
       </item>
      </layout>

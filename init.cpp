@@ -250,11 +250,11 @@ Style::readSettings(const QSettings* settings, QString appName)
             config.bg.opacity = 0xff;
         Animator::Tab::setTransition(Animator::Jump);
     }
-    if ((config.bg.glassy = readBool(ARGB_GLASSY)))
-        config.bg.mode = Plain;
 #else
     config.bg.opacity = 0xff;
 #endif
+    if ((config.bg.glassy = readBool(ARGB_GLASSY)))
+        config.bg.mode = Plain;
 
     config.bg.docks.invert = readBool(BG_DOCKS_INVERT);
     config.bg.docks.shape = config.bg.docks.invert ? readBool(BG_DOCKS_SHAPE) : false;
