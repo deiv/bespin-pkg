@@ -82,7 +82,7 @@ information:status/dialog-information
 inkscape:apps/inkscape
 juk:apps/juk,mimetypes/audio-midi:audio-prs.sid
 kget:mimetypes/application-x-kgetlist,apps/kget
-kgpg:apps/kgpg
+kgpg:apps/kgpg,actions/document-encrypt
 klipper:apps/klipper
 kmail:apps/kmail
 kmess:apps/kmess
@@ -123,6 +123,7 @@ trash:mimetypes/application-x-trash,places/user-trash,status/user-trash-full,act
 trash-empty:actions/trash-empty
 ttf:mimetypes/application-x-font-ttf
 txt:mimetypes/text-rdf:text-rtf:application-vnd.oasis.opendocument.text:application-x-subrip:text-enriched:text-plain:text-sgml:text-x-authors:text-x-changelog:text-x-cmake:text-x-copying:text-x-generic:text-x-install:text-x-log:text-x-nfo:text-x-readme:text-x-sql,apps/write:openoffice-write
+unlock:actions/document-decrypt
 user-icon:places/user-identity
 utilities-terminal:apps/utilities-terminal
 view-file-columns:actions/view-file-columns
