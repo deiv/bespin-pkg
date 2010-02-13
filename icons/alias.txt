@@ -51,6 +51,7 @@ eye:actions/view-preview,mimetypes/application-vnd.stardivision.draw:application
 file-sound-wave:mimetypes/audio-aac:audio-ac3:audio-basic:audio-mp4:audio-mpeg:audio-vnd.rn-realaudio:audio-vnd.rn-realvideo:audio-x-adpcm:audio-x-aiff:audio-x-flac+ogg:audio-x-flac:audio-x-generic:audio-x-matroska:audio-x-mod:audio-x-monkey:audio-x-mp2:audio-x-mpegurl:audio-x-ms-asx:audio-x-ms-wma:audio-x-musepack:audio-x-pn-realaudio-plugin:audio-x-scpls:audio-x-speex+ogg:audio-x-vorbis+ogg:audio-x-wav
 file-video.alt:mimetypes/video-x-generic:video-x-mng
 filter:actions/view-filter
+fingerprint:mimetypes/application-pkcs7-signature:application-pgp-signature,actions/mail-signed:mail-signed-full:mail-signed-part:mail-signed-verified:document-sign
 firefox:apps/firefox
 firewire:
 fnt:apps/preferences-desktop-font,mimetypes/application-x-font-afm:application-x-font-bdf:application-x-font-otf:application-x-font-pcf:application-x-font-snf:application-x-font-ttf:application-x-font-type1
