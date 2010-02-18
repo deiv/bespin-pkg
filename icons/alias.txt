@@ -103,6 +103,7 @@ media-skip-forward:actions/media-skip-forward
 nepomuk:apps/nepomuk
 new-mail:
 node:mimetypes/inode-directory,apps/dolphin:system-file-manager,places/folder:folder-documents:folder-downloads:folder-favorites:folder-image:folder-red:folder-sound
+notes:apps/knotes
 plasma:mimetypes/application-x-plasma,apps/plasma
 playlist-layouts:actions/view-media-playlist
 print:apps/preferences-desktop-printer,devices/printer,status/printer-printing,actions/document-print-direct:document-print-preview:document-print
