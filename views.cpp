@@ -475,6 +475,12 @@ static void updateLastWidget( const QWidget *widget, QPainter *p )
 void
 Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *widget, bool isItem) const
 {
+    // kwin tabbox, painting plasma and animation - this looks really lousy :-(
+    if ( appType == KWin &&
+         widget && widget->parentWidget() &&
+         widget->parentWidget()->inherits("KWin::TabBox::TabBoxView") )
+        return;
+
 #if QT_VERSION >= 0x040400
     ASSURE_OPTION(item, ViewItemV4);
 #else
