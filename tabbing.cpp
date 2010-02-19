@@ -282,7 +282,11 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
         copy.rect = RECT;
     else if HAVE_OPTION(tabV3, TabV3)
     {
+#if QT_VERSION >= 0x040600	
+        int d[4] = {0,1,0,0};
+#else
         int d[4] = {0,0,0,0};
+#endif
         if (verticalTabs(tab->shape))
         {
             if ( tabV3->leftButtonSize.isValid() ) d[1] = tabV3->leftButtonSize.height() + F(2);
