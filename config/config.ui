@@ -231,6 +231,9 @@
      <layout class="QGridLayout" name="gridLayout_25">
       <item row="0" column="0" rowspan="2">
        <widget class="QStackedWidget" name="sections">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
           <horstretch>2</horstretch>
@@ -238,7 +241,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>11</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -525,7 +528,7 @@
            </layout>
           </item>
           <item row="0" column="0">
-           <widget class="QToolBox" name="toolBox">
+           <widget class="QToolBox" name="windowSettings">
             <property name="currentIndex">
              <number>2</number>
             </property>
@@ -534,8 +537,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>320</width>
-               <height>114</height>
+               <width>322</width>
+               <height>113</height>
               </rect>
              </property>
              <attribute name="label">
@@ -750,8 +753,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>172</width>
-               <height>63</height>
+               <width>169</width>
+               <height>62</height>
               </rect>
              </property>
              <attribute name="label">
@@ -846,8 +849,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>438</width>
-               <height>180</height>
+               <width>245</width>
+               <height>178</height>
               </rect>
              </property>
              <attribute name="label">
@@ -960,8 +963,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>113</width>
-               <height>90</height>
+               <width>110</width>
+               <height>88</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1058,8 +1061,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>108</width>
-               <height>59</height>
+               <width>106</width>
+               <height>57</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1159,8 +1162,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>271</width>
-               <height>185</height>
+               <width>266</width>
+               <height>179</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1358,8 +1361,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>259</width>
-               <height>131</height>
+               <width>260</width>
+               <height>134</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1881,8 +1884,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>317</width>
-               <height>258</height>
+               <width>316</width>
+               <height>248</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2044,8 +2047,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>208</width>
-               <height>90</height>
+               <width>197</width>
+               <height>89</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2907,8 +2910,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>307</width>
-               <height>114</height>
+               <width>305</width>
+               <height>110</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2958,67 +2961,13 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="page_4">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>125</width>
-               <height>77</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>Arora</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_24">
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="aroraPath"/>
-              </item>
-              <item row="1" column="2">
-               <widget class="QPushButton" name="aroraPathChooser">
-                <property name="text">
-                 <string>Select...</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <spacer name="verticalSpacer_10">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>1</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="label_38">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Icon path:</string>
-                </property>
-                <property name="wordWrap">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
             <widget class="QWidget" name="page_7">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>187</width>
-               <height>39</height>
+               <width>186</width>
+               <height>38</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3052,8 +3001,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>200</width>
-               <height>64</height>
+               <width>445</width>
+               <height>117</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3144,7 +3093,20 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="page_11"/>
+        <widget class="QWidget" name="Colors">
+         <layout class="QFormLayout" name="formLayout_10">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_38">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>&lt;h1&gt;DUMMY&lt;/h1&gt;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>

@@ -49,54 +49,7 @@ static inline uint qt_intensity(uint r, uint g, uint b)
     return (77 * r + 150 * g + 28 * b) / 255;
 }
 
-QIcon
-Style::standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const
-{
-    if (appType == Arora && !config.appDataPath.isEmpty())
-    {
-        QString file = config.appDataPath;
-        switch (standardIcon)
-        {
-        case SP_BrowserReload:
-            file += "/reload.png"; break;
-        case SP_ArrowBack:
-        case SP_ArrowLeft:
-            file += "/prev.png"; break;
-        case SP_ArrowRight:
-        case SP_ArrowForward:
-            file += "/next.png"; break;
-        case SP_BrowserStop:
-            file += "/stop.png"; break;
-        default:
-            goto no_broser_icon;
-        }
-        if (QImageReader(file).canRead())
-            return QIcon(file);
-    }
-no_broser_icon:
-    if (!option)
-    {
-        QStyleOption opt; opt.rect.setRect(0,0,64,64);
-        return QStyle::standardIconImplementation(standardIcon, &opt, widget);
-    }
-    return QStyle::standardIconImplementation(standardIcon, option, widget);
 #if 0
-    QIcon icon;
-    QStyleOption copy = option ? *option : QStyleOption();
-
-    if (widget)
-        copy.initFrom(widget);
-
-    copy.rect.setRect(0,0,16,16);
-    icon.addPixmap( standardPixmap(standardIcon, &copy, widget ) );
-    copy.rect.setRect(0,0,22,22);
-    icon.addPixmap( standardPixmap(standardIcon, &copy, widget ) );
-    copy.rect.setRect(0,0,32,32);
-    icon.addPixmap( standardPixmap(standardIcon, &copy, widget ) );
-    return icon;
-#endif
-}
-
 static
 QPainterPath arrow( const QRect &rect, bool right = false )
 {
@@ -112,7 +65,7 @@ QPainterPath arrow( const QRect &rect, bool right = false )
     shape.quadTo( x1+s*rect.width()/5, cy, x1, rect.top() );
     return shape;
 }
-
+#endif
 QPixmap
 Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option, const QWidget *widget ) const
 {
@@ -161,7 +114,7 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
 
     switch (standardPixmap)
     {
-#if 1
+#if 0
     case SP_ArrowBack:
     case SP_ArrowLeft:
         shape = arrow( pm.rect() ).subtracted(arrow( pm.rect().translated(pm.rect().width()/2, 0) ));
@@ -219,8 +172,8 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
 
     case SP_DockWidgetCloseButton:
     case SP_TitleBarCloseButton:
-    case SP_BrowserStop:
-    case SP_MediaStop:
+//     case SP_BrowserStop:
+//     case SP_MediaStop:
         shape = Shapes::close(pm.rect(), style);
         goto paint;
     case SP_TitleBarMinButton:
@@ -243,7 +196,9 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
             shape = Shapes::restore(pm.rect(), style);
         goto paint;
     case SP_TitleBarContextHelpButton:
+    {
         shape = Shapes::help(pm.rect(), style);
+#if 0
         goto paint;
     case SP_ArrowDown:
     case SP_ArrowUp:
@@ -290,7 +245,7 @@ Style::standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
                 shape.closeSubpath();
             }
         }
-
+#endif
 paint:
         const QColor c = Colors::mid(pal.color(fg), pal.color(bg), (sz > 16) ? 16 : 2, sunken ? 2 : (hover ? 4 : 2) );
         painter.setRenderHint ( QPainter::Antialiasing );
@@ -372,6 +327,7 @@ paint:
 //     case SP_DirClosedIcon: //  22
 //     case SP_DirLinkIcon: //  23
 //         break;
+#if 0
     case SP_FileDialogNewFolder: //  31
     {
         const float t = rect.width()/8.0;
@@ -421,6 +377,7 @@ paint:
         }
         break;
     }
+
 //    case SP_FileDialogInfoView: //  33   
 //    case SP_FileDialogContentsView: //  34   
     case SP_FileDialogListView: //  35
@@ -435,6 +392,7 @@ paint:
         r.moveLeft(pm.rect().left()); painter.drawEllipse(r);
         break;
     }
+#endif
 //     case SP_FileDialogBack: //  36
 //         break;
 

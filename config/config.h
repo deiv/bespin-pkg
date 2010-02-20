@@ -67,7 +67,6 @@ private slots:
     void learnPwChar();
     void filterPresets(const QString & text);
     void presetAppsChanged(QTreeWidgetItem *, int);
-    void selectAroraPath();
 };
 
 #endif

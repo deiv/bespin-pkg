@@ -33,7 +33,7 @@ class Hacks : public QObject
    Q_OBJECT
 public:
     Hacks() {}
-    enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM, Amarok, KMix };
+    enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM, KMix };
     bool eventFilter( QObject *, QEvent *);
     static bool add(QWidget *w);
     static void releaseApp();
@@ -41,18 +41,11 @@ public:
     static struct Config
     {
         bool    messages, KHTMLView, treeViews, windowMovement, krunner, killThrobber,
-                amarokContext, amarokFrames, amarokDisplay, amarokListView,
                 opaqueDolphinViews;
     } config;
 private:
     Q_DISABLE_COPY(Hacks)
 private slots:
-// #if BESPIN_HACK_AMAROK // moc doesn't talk preproc...
-    void setAmarokMetaInfo(int);
-    void swapAmarokPalette();
-    void toggleAmarokContext();
-    void toggleAmarokCompact();
-// #endif
     void setKmixMask(int);
 };
 } // namespace

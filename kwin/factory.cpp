@@ -44,22 +44,15 @@
 #include <QtDebug>
 
 extern "C"
-{
-KDE_EXPORT KDecorationFactory* create_factory()
-{
-   return new Bespin::Factory();
-}
-}
+{ KDE_EXPORT KDecorationFactory* create_factory() { return new Bespin::Factory(); } }
 
 using namespace Bespin;
 
 bool Factory::weAreInitialized = false;
-Config Factory::ourConfig = { false, false, false, true, true, false,
-                              Qt::AlignHCenter, 0, {
-                                  {Gradients::None, Gradients::Button},
-                                  {Gradients::None, Gradients::None}
-                              }, QStringList()
-                            };
+Config Factory::ourConfig =
+    { false, false, false, true, true, false, Qt::AlignHCenter, 0,
+      { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
+      QStringList() };
 int Factory::ourButtonSize[2] = {-1, -1};
 int Factory::ourBorderSize = 4;
 int Factory::ourTitleSize[2] = {18,16};
@@ -111,10 +104,8 @@ bool Factory::reset(unsigned long changed)
     const bool configChanged = readConfig();
     weAreInitialized = true;
 
-    if (configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder)))
-    {
+    if ( configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder)) )
         return true;
-    }
     else
     {
         resetDecorations(changed);
@@ -489,7 +480,8 @@ Factory::showWindowList(const QPoint &p, Client *client)
 static QString
 winType2string(NET::WindowType type)
 {
-   switch (type) {
+   switch (type)
+   {
    default:
    case NET::Unknown: return "Unknown";
    case NET::Normal: return "Normal";
@@ -512,7 +504,8 @@ winType2string(NET::WindowType type)
 }
 
 void
-Factory::showInfo(const QPoint &p, WId id) {
+Factory::showInfo(const QPoint &p, WId id)
+{
 
    // build info widget - in case
    if (!ourWindowInfo) {
@@ -614,35 +607,37 @@ ClassName: <b>%7</b><br/>\
 bool
 Factory::supports( Ability ability ) const
 {
-	switch( ability ) {
-	// announce
-	case AbilityAnnounceButtons: ///< decoration supports AbilityButton* values (always use)
-	case AbilityAnnounceColors: ///< decoration supports AbilityColor* values (always use)
-	// buttons
-	case AbilityButtonMenu:   ///< decoration supports the menu button
-	case AbilityButtonOnAllDesktops: ///< decoration supports the on all desktops button
-	case AbilityButtonSpacer: ///< decoration supports inserting spacers between buttons
-	case AbilityButtonHelp:   ///< decoration supports what's this help button
-	case AbilityButtonMinimize:  ///< decoration supports a minimize button
-	case AbilityButtonMaximize: ///< decoration supports a maximize button
-	case AbilityButtonClose: ///< decoration supports a close button
-	case AbilityButtonAboveOthers: ///< decoration supports an above button
-	case AbilityButtonBelowOthers: ///< decoration supports a below button
-   case AbilityButtonShade: ///< decoration supports a shade button
+    switch( ability )
+    {
+    // announce
+    case AbilityAnnounceButtons: ///< decoration supports AbilityButton* values (always use)
+    case AbilityAnnounceColors: ///< decoration supports AbilityColor* values (always use)
+    // buttons
+    case AbilityButtonMenu:   ///< decoration supports the menu button
+    case AbilityButtonOnAllDesktops: ///< decoration supports the on all desktops button
+    case AbilityButtonSpacer: ///< decoration supports inserting spacers between buttons
+    case AbilityButtonHelp:   ///< decoration supports what's this help button
+    case AbilityButtonMinimize:  ///< decoration supports a minimize button
+    case AbilityButtonMaximize: ///< decoration supports a maximize button
+    case AbilityButtonClose: ///< decoration supports a close button
+    case AbilityButtonAboveOthers: ///< decoration supports an above button
+    case AbilityButtonBelowOthers: ///< decoration supports a below button
+    case AbilityButtonShade: ///< decoration supports a shade button
 
-	// colors
-	case AbilityColorTitleBack: ///< decoration supports titlebar background color
-	case AbilityColorTitleFore: ///< decoration supports titlebar foreground color
-	case AbilityColorTitleBlend: ///< decoration supports second titlebar background color
-	case AbilityColorButtonBack: ///< decoration supports button background color
-		return true;
-   case AbilityColorButtonFore: ///< decoration supports button foreground color
-   case AbilityColorFrame: ///< decoration supports frame color
-   case AbilityButtonResize: ///< decoration supports a resize button
-   case AbilityColorHandle: ///< decoration supports resize handle color
-	default:
-		return false;
-	};
+    // colors
+    case AbilityColorTitleBack: ///< decoration supports titlebar background color
+    case AbilityColorTitleFore: ///< decoration supports titlebar foreground color
+    case AbilityColorTitleBlend: ///< decoration supports second titlebar background color
+    case AbilityColorButtonBack: ///< decoration supports button background color
+        return true;
+        
+    case AbilityColorButtonFore: ///< decoration supports button foreground color
+    case AbilityColorFrame: ///< decoration supports frame color
+    case AbilityButtonResize: ///< decoration supports a resize button
+    case AbilityColorHandle: ///< decoration supports resize handle color
+    default:
+        return false;
+    }
 }
 
 BgSet *
@@ -710,30 +705,25 @@ Factory::decoInfo(qint64 pid)
 WindowData*
 Factory::decoInfo(QString wmClass, NET::WindowType type)
 {
-//     qDebug() << "BESPIN, looking for" << wmClass << type;
     WindowData *data = 0;
     bool matchesType = false;
     foreach (Preset *preset, ourPresets)
     {
-//         qDebug() << "BESPIN, test preset" << preset->classes << preset->types;
         matchesType = false;
         if (preset->types.contains(type)) // type match
         {
-//             qDebug() << "BESPIN, found type";
             matchesType = true;
             if (!data) // class not yet matched
                 data = &preset->data;
         }
         if (preset->classes.contains(wmClass)) // class matched
         {
-//             qDebug() << "BESPIN, found class";
             if (matchesType) // we won't find a better one
                 return &preset->data;
             else
                 data = &preset->data;
         }
     }
-//     qDebug() << "BESPIN, returning" << data;
     return data; // we may have found a class OR type match
 }
 

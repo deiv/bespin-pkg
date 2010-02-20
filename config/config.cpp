@@ -17,6 +17,7 @@ Boston, MA 02110-1301, USA.
 */
 
 #include <QApplication>
+#include <QColorDialog>
 #include <QFileDialog>
 #include <QDir>
 #include <QSettings>
@@ -209,7 +210,17 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     ui.btnExport->setEnabled(false);
     ui.btnDelete->setEnabled(false);
     ui.storeLine->hide();
-   
+
+    /** set up color page, not of interest 
+    QList<int> allRoles;
+    allRoles << 0 << 1 << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9;
+    generateColorModes(ui.colorRoles, &allRoles );
+    QColorDialog *cd = new QColorDialog;
+    cd->setWindowFlags( 0 );
+    cd->setParent( ui.Colors );
+    ui.colorRoleLayout->addWidget( cd );
+    cd->show();
+   */
     /** fill some comboboxes, not of interest */
     generateColorModes(ui.tooltipRole);
     generateColorModes(ui.uno_role);
@@ -285,9 +296,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     connect (ui.pwEchoChar->lineEdit(), SIGNAL(returnPressed()), this, SLOT (learnPwChar()));
     ui.pwEchoChar->setInsertPolicy(QComboBox::NoInsert);
 
-    connect(ui.aroraPathChooser, SIGNAL(clicked()), this, SLOT(selectAroraPath()));
-   
-   
     /** connection between the bgmode and the structure combo - not of interest*/
     connect(ui.bgMode, SIGNAL(currentIndexChanged(int)), this, SLOT(handleBgMode(int)));
     connect(ui.sliderGroove, SIGNAL(valueChanged(int)), this, SLOT(handleGrooveMode(int)));
@@ -318,6 +326,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Some apps just don't work too god with this. Add them to a comma separated list here.");
     handleSettings(ui.argbGlassy, ARGB_GLASSY);
 #else
+    ui.windowSettings->removeItem( ui.windowSettings->indexOf( ui.argbSupport ) );
     ui.argbSupport->hide();
     ui.popup_ARGB->hide();
 #endif
@@ -422,15 +431,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.kwinInactiveRole, KWIN_INACTIVE_ROLE);
     handleSettings(ui.kwinActiveText, KWIN_ACTIVE_TEXT_ROLE);
     handleSettings(ui.kwinInactiveText, KWIN_INACTIVE_TEXT_ROLE);
-
-    handleSettings(ui.aroraPath, "App.Arora.Path", "");
-    setContextHelp(ui.aroraPath, "<b>Skinnig support</b><hr>\
-    Place icons named<br>\
-    - <b>stop.png</b><br>\
-    - <b>reload.png</b><br>\
-    - <b>prev.png</b><br>\
-    - <b>next.png</b><br>\
-    into the selected path");
 
     handleSettings(ui.dolphinViews, HACK_DOLPHIN_VIEWS);
     setContextHelp(ui.dolphinViews, "<b>Dolphin sidebar</b><hr>\
@@ -900,13 +900,6 @@ Config::import()
     }
 }
 
-void
-Config::selectAroraPath()
-{
-    QString dir = QFileDialog::getExistingDirectory(this, "Select a path to your Arora icons", ui.aroraPath->text());
-    if (!dir.isEmpty())
-        ui.aroraPath->setText(dir);
-}
 
 void
 Config::presetAppsChanged(QTreeWidgetItem *changingItem, int idx)
@@ -1284,7 +1277,8 @@ static const char* roleStrings[] =
    "Window", "Window Text",
    "Base (text editor)", "Text (text editor)",
    "Button", "Button Text",
-   "Highlight", "Highlighted Text"
+   "Highlight", "Highlighted Text",
+   "ToolTip", "ToolTip Text"
 };
 
 static void ensureIcons()

@@ -266,9 +266,6 @@ protected:
 //private slots:
 //   void fakeMouse();
 
-protected slots:
-    QIcon standardIconImplementation(StandardPixmap , const QStyleOption *o = 0, const QWidget *w = 0 ) const;
-   
 private:
     Q_DISABLE_COPY(Style)
     void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;

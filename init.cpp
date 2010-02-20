@@ -125,8 +125,6 @@ Style::readSettings(const QSettings* settings, QString appName)
         iSettings = new QSettings("Bespin", "Style");
         iSettings->beginGroup("Style");
         //BEGIN read some user personal settings (i.e. not preset related)
-        if (appType == Arora)
-            config.appDataPath = iSettings->value("App.Arora.Path", "").toString();
         // flanders
         config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
         if ((config.showOff = readBool(SHOW_OFF)))
@@ -138,10 +136,6 @@ Style::readSettings(const QSettings* settings, QString appName)
         config.macStyle = readBool(MACSTYLE);
         config.fadeInactive = readBool(FADE_INACTIVE);
         // Hacks ==================================
-        Hacks::config.amarokContext = readBool(HACK_AMAROK_CONTEXT);
-        Hacks::config.amarokListView = readBool(HACK_AMAROK_LISTVIEW);
-        Hacks::config.amarokFrames = Hacks::config.amarokListView ? false : readBool(HACK_AMAROK_FRAMES);
-        Hacks::config.amarokDisplay = readBool(HACK_AMAROK_DISPLAY);
         Hacks::config.messages = readBool(HACK_MESSAGES);
         Hacks::config.KHTMLView = readBool(HACK_KHTMLVIEW);
         Hacks::config.krunner= readBool(HACK_KRUNNER);
@@ -544,12 +538,12 @@ Style::init(const QSettings* settings)
             appType = KWin;
         else if (appName == "amarok")
             appType = Amarok;
-        else if (appName.isEmpty() && !QCoreApplication::arguments().isEmpty())
-        {
-            appName = QCoreApplication::arguments().at(0).section('/', -1);
-            if (appName == "arora")
-                appType = Arora;
-        }
+//         else if (appName.isEmpty() && !QCoreApplication::arguments().isEmpty())
+//         {
+//             appName = QCoreApplication::arguments().at(0).section('/', -1);
+//             if (appName == "arora")
+//                 appType = Arora;
+//         }
     }
     // ==========================
     readSettings(settings, appName);

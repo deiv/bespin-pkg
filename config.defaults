@@ -63,10 +63,6 @@
    
 #define CHOOSER_GRADIENT "Chooser.Gradient", Gradients::Sunken
 
-#define HACK_AMAROK_CONTEXT "Hack.AmarokContext", false
-#define HACK_AMAROK_DISPLAY "Hack.AmarokDisplay", false
-#define HACK_AMAROK_FRAMES "Hack.AmarokFrames", false
-#define HACK_AMAROK_LISTVIEW "Hack.AmarokListView", false
 #define HACK_DOLPHIN_VIEWS "Hack.DolphinViews", false
 #define HACK_MESSAGES "Hack.Messages", false
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false
