@@ -834,7 +834,7 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars)
         foreach ( QObject *o, mwin->children() )
         {
             if (( b = qobject_cast<QToolBar*>(o) ))
-            if ( b->isVisible() )
+            if ( b->isVisibleTo(mwin) )
                 bars << b;
         }
         foreach (QToolBar *tbar, bars)
