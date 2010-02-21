@@ -65,8 +65,8 @@ forward:actions/mail-forward:mail-forwarded
 go-bottom:actions/go-bottom:arrow-down-double
 go-down:actions/go-down:arrow-down
 go-jump-locationbar:actions/go-jump-locationbar
-go-next:actions/go-next:arrow-right
-go-previous:actions/go-previous:arrow-left
+go-next:actions/go-next:arrow-right:media-skip-forward
+go-previous:actions/go-previous:arrow-left:media-skip-backward
 go-top:actions/go-top:arrow-up-double
 go-up:actions/go-up:arrow-up
 horus:apps/gwenview
@@ -98,8 +98,6 @@ mail:apps/internet-mail,places/mail-message
 media-playback-pause:actions/media-playback-pause
 media-playback-start:actions/media-playback-start
 media-playback-stop:actions/media-playback-stop:process-stop
-media-skip-backward:actions/media-skip-backward
-media-skip-forward:actions/media-skip-forward
 nepomuk:apps/nepomuk
 new-mail:
 node:mimetypes/inode-directory,apps/dolphin:system-file-manager,places/folder:folder-documents:folder-downloads:folder-favorites:folder-image:folder-red:folder-sound
@@ -141,8 +139,9 @@ volume2:status/audio-volume-medium
 web-browser:apps/internet-web-browser
 wireless:devices/network-wireless
 xml:mimetypes/application-xml:text-xml
-zoom-in:actions/zoom-in
-zoom-out:actions/zoom-out
+zoom-in:actions/zoom-in:lc_zoomin
+zoom-orig:actions/zoom-original:lc_zoomreset:zoom-fit-best
+zoom-out:actions/zoom-out:lc_zoomout
 digikam:apps/digikam
 kalculator:apps/kalculator:accessories-calculator
 preferences-system:categories/preferences-system
