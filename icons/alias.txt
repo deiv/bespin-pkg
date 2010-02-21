@@ -181,4 +181,4 @@ korganizer:apps/korganizer
 kadressbook:apps/kadressbook
 impress:apps/impress:openoffice-impress
 calc:apps/calc:openoffice-calc
-
+torrent:mimetypes/application-x-bittorrent
