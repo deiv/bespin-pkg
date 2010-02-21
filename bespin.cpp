@@ -34,6 +34,7 @@
 #include <QStyleOptionTabWidgetFrame>
 #include <QStylePlugin>
 #include <QScrollBar>
+#include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeView>
@@ -259,7 +260,7 @@ Style::registerRoutines()
 }
 
 /**THE STYLE ITSELF*/
-#include <QTimer>
+
 Style::Style() : QCommonStyle()
 {
     setObjectName(QLatin1String("Bespin"));
@@ -828,7 +829,14 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars)
     QList<QWidget*> dirty;
     if (includeToolbars)
     {
-        QList<QToolBar*> bars = mwin->findChildren<QToolBar*>();
+        QToolBar *b;
+        QList<QToolBar*> bars; //= mwin->findChildren<QToolBar*>();
+        foreach ( QObject *o, mwin->children() )
+        {
+            if (( b = qobject_cast<QToolBar*>(o) ))
+            if ( b->isVisible() )
+                bars << b;
+        }
         foreach (QToolBar *tbar, bars)
         {
             if ( mwin->toolBarArea(tbar) == Qt::TopToolBarArea )
