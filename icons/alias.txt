@@ -108,7 +108,7 @@ print:apps/preferences-desktop-printer,devices/printer,status/printer-printing,a
 qmmp:apps/qmmp
 remove-file-from-archive:actions/archive-remove:list-remove
 reply:actions/mail-reply-all:mail-reply-custom-all:mail-reply-custom:mail-reply-list:mail-reply-sender
-run-command:actions/system-run,mimetypes/application-x-executable-script:application-x-executable
+run-command:actions/system-run,mimetypes/application-x-executable-script:application-x-executable:application-x-shellscript
 shaman:apps/shaman
 show-hidden:
 shutdown:actions/system-shutdown
