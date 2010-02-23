@@ -538,12 +538,14 @@ Style::init(const QSettings* settings)
             appType = KWin;
         else if (appName == "amarok")
             appType = Amarok;
-//         else if (appName.isEmpty() && !QCoreApplication::arguments().isEmpty())
-//         {
-//             appName = QCoreApplication::arguments().at(0).section('/', -1);
+        else if (appName.isEmpty() && !QCoreApplication::arguments().isEmpty())
+        {
+            appName = QCoreApplication::arguments().at(0).section('/', -1);
+            if (appName == "designer")
+                appType = QtDesigner;
 //             if (appName == "arora")
 //                 appType = Arora;
-//         }
+        }
     }
     // ==========================
     readSettings(settings, appName);
