@@ -179,6 +179,6 @@ draw:apps/draw:openoffice-draw
 math:apps/math:openoffice-math
 korganizer:apps/korganizer
 kadressbook:apps/kadressbook
-impress:apps/impress:openoffice-impress
+impress:apps/impress:openoffice-impress:kpresenter,mimetypes/application-vnd.oasis.opendocument.presentation:application-vnd.oasis.opendocument.presentation-template:application-vnd.ms-powerpoint
 calc:apps/calc:openoffice-calc
 torrent:mimetypes/application-x-bittorrent
