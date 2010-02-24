@@ -274,8 +274,10 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
 
     // cause most chunks will look the same we render ONE into a buffer and then just dump that multiple times...
     if (renderPix.width() != ss+2)
+    {
         renderPix = QPixmap(ss+2, ss+2);
-    renderPix.fill(Qt::transparent);
+        renderPix.fill(Qt::transparent);
+    }
 
     QPainter p(&renderPix);
     p.setRenderHint(QPainter::Antialiasing);
@@ -303,6 +305,9 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
     else // x is as expected... - gee my math teacher was actually right: "always label the axis!"
         for (int i = 0; i < nn; ++i)
             { painter->drawPixmap(x,y, renderPix); x+=s; }
+
+    // cleanup for later
+    renderPix.fill(Qt::transparent);
 
     // if we're painting the actual progress, ONE chunk may be "semifinished" - that's done below
     if (content)
