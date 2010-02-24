@@ -12,17 +12,15 @@ using namespace Bespin;
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 // #define fillRect2(_R_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_R_)
 
-#if QT_VERSION >= 0x040400
 #define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) drawRoundedRect(_X_, _Y_, _W_, _H_, _RX_, _RY_, Qt::RelativeSize)
-#else
-#define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) drawRoundRect(_X_, _Y_, _W_, _H_, _RX_, _RY_)
-#endif
 
 #define SCALE(_N_) lround(_N_*ourScale)
 
+
 #define EMPTY_PIX(_W_, _H_) \
-QPixmap pix = transSrc->copy(0,0,_W_,_H_);\
-QPainter p(&pix); p.setRenderHint(QPainter::Antialiasing);\
+QImage img(_W_,_H_, QImage::Format_ARGB32);\
+img.fill(Qt::transparent);\
+QPainter p(&img); p.setRenderHint(QPainter::Antialiasing);\
 p.setPen(Qt::NoPen)
 
 static QColor black = Qt::black;
@@ -50,8 +48,6 @@ Elements::renderButtonLight(Tile::Set &set)
 }
 #endif
 
-BLIB_EXPORT QPixmap *transSrc = 0;
-
 static float ourShadowIntensity = 1.0;
 void
 Elements::setShadowIntensity(float intensity) { ourShadowIntensity = intensity; }
@@ -69,9 +65,9 @@ Elements::glow(int size, float width)
     rg.setColorAt(1.0-2.0*w, BLACK(0));
     rg.setColorAt(1.0-w, BLACK(192));
     rg.setColorAt(1.0, BLACK(0));
-    p.fillRect(pix.rect(), rg);
+    p.fillRect(img.rect(), rg);
     p.end();
-    return pix;
+    return QPixmap::fromImage(img);
 }
 
 QPixmap
@@ -83,38 +79,32 @@ Elements::shadow(int size, bool opaque, bool sunken, float factor)
     const int alpha = (int) (ourShadowIntensity * factor * (sunken ? 70 : (opaque ? 48 : 20)));
     rg.setColorAt(0.7, BLACK(CLAMP(alpha,0,255)));
     rg.setColorAt(1.0, BLACK(0));
-    p.fillRect(pix.rect(), rg);
+    p.fillRect(img.rect(), rg);
     p.end();
-    return pix;
+    return QPixmap::fromImage(img);
 }
 
 QPixmap
 Elements::roundMask(int size)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
-    p.drawEllipse(pix.rect()); p.end();
-    return pix;
+    p.drawEllipse(img.rect()); p.end();
+    return QPixmap::fromImage(img);
 }
 
 QPixmap
 Elements::roundedMask(int size, int factor)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
-#if QT_VERSION >= 0x040400
-    p.drawRoundedRect(pix.rect(), factor, factor, Qt::RelativeSize);
-#else
-    p.drawRoundRect(pix.rect(), factor, factor);
-#endif
+    p.drawRoundedRect(img.rect(), factor, factor, Qt::RelativeSize);
     p.end();
-    return pix;
+    return QPixmap::fromImage(img);
 }
 
 QPixmap
 Elements::sunkenShadow(int size, bool enabled)
 {
-    QImage *tmpImg = new QImage(size,size, QImage::Format_ARGB32);
-    tmpImg->fill(Qt::transparent); QPainter p(tmpImg);
-    p.setRenderHint(QPainter::Antialiasing); p.setPen(Qt::NoPen);
+    EMPTY_PIX(size, size);
 
     int add = enabled*30;
     const int add2 = lround(80./F(4));
@@ -141,10 +131,8 @@ Elements::sunkenShadow(int size, bool enabled)
     p.fillRect(w,size-F(1),size-2*w,F(1), WHITE(20+10*enabled));
 
     p.end();
-
-    // create pixmap from image
-    QPixmap ret = QPixmap::fromImage(*tmpImg);
-    delete tmpImg; return ret;
+    
+    return QPixmap::fromImage(img);
 }
 
 QPixmap
@@ -166,7 +154,8 @@ Elements::relief(int size, bool enabled)
     p.setPen(QPen(WHITE(int(f*50)), F(1)));
     p.drawLine(d1, size-1, d2, size-1); // bottom
 #endif
-    p.end(); return pix;
+    p.end();
+    return QPixmap::fromImage(img);
 }
 
 #define DRAW_ROUND_ALPHA_RECT(_A_, _X_, _Y_, _W_,_R_)\
@@ -176,11 +165,7 @@ QPixmap
 Elements::groupShadow(int size)
 {
     const int ss = 2*size;
-    QImage *tmpImg = new QImage(size,size, QImage::Format_ARGB32);
-    tmpImg->fill(Qt::transparent);
-    QPainter p(tmpImg);
-    p.setRenderHint(QPainter::Antialiasing);
-    p.setPen(Qt::NoPen);
+    EMPTY_PIX(size, size);
 
     DRAW_ROUND_ALPHA_RECT(5, 0, 0, size, 48);
     DRAW_ROUND_ALPHA_RECT(9, F(1), F(1), size-F(2), 32);
@@ -204,9 +189,7 @@ Elements::groupShadow(int size)
     }
     p.end();
 
-    // create pixmap from image
-    QPixmap ret = QPixmap::fromImage(*tmpImg);
-    delete tmpImg; return ret;
+    return QPixmap::fromImage(img);
 }
 
 #if 0

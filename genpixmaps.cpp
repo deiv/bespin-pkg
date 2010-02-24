@@ -15,8 +15,6 @@ static QColor black = Qt::black;
 #define BLACK(_A_) QColor(0,0,0, _A_)
 #define SCALE(_N_) lround(_N_*config.scale)
 
-extern QPixmap *transSrc;
-
 void
 Style::generatePixmaps()
 {
@@ -25,11 +23,6 @@ Style::generatePixmaps()
     const int f9 = F(9); const int f11 = SCALE(11);
     const int f13 = SCALE(13); const int f17 = SCALE(17);
     const int f49 = SCALE(49);
-
-    // NOTICE!!! dpi.SliderControl is currently the biggest item using the transpix,
-    // increase this in case we need it for bigger things...
-    transSrc = new QPixmap(Dpi::target.SliderControl, Dpi::target.SliderControl);
-    transSrc->fill(Qt::transparent);
 
     // MASKS =======================================
     for (int i = 0; i < 2; ++i)
@@ -81,7 +74,7 @@ Style::generatePixmaps()
 
     
     // fallback ( sunken ) // TODO: raised
-    QPixmap tmp = transSrc->copy(0, 0, f9, f9);
+    QImage tmp(f9, f9, QImage::Format_ARGB32);
     QPainter p;
     p.begin(&tmp);
     p.fillRect(F(1),0,f9-F(2),F(1), BLACK(10));
@@ -105,7 +98,7 @@ Style::generatePixmaps()
     p.fillRect(f9-F(4),F(3),F(1),f9-F(6), QColor(128,128,128,80));
 
     p.end();
-    shadows.fallback = Tile::Set(tmp,f9/2,f9/2,1,1);
+    shadows.fallback = Tile::Set(QPixmap::fromImage(tmp),f9/2,f9/2,1,1);
     shadows.fallback.setDefaultShape(Tile::Ring);
     // ================================================================
 
@@ -186,7 +179,7 @@ Style::generatePixmaps()
             w = f49; h = F(2);
             lg = QLinearGradient(0,0,f49,0);
         }
-        tmp = QPixmap(w,h);
+        tmp = QImage(w,h,QImage::Format_ARGB32);
         for (int j = 0; j < 3; ++j)
         {   // direction
             c1 = (j > 0) ? 255 : 111; c2 = (j > 0) ? 111 : 255;
@@ -213,7 +206,7 @@ Style::generatePixmaps()
             stops.clear();
 
             p.end();
-            shadows.line[i][j] = Tile::Line(tmp, i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);
+            shadows.line[i][j] = Tile::Line(QPixmap::fromImage(tmp), i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);
         }
     }
     // ================================================================
@@ -239,7 +232,5 @@ Style::generatePixmaps()
     masks.corner[3] = circle & QRegion(f5,f5,f5,f5); // br
     masks.corner[3].translate(-masks.corner[3].boundingRect().topLeft());
     // ================================================================
-
-    delete transSrc;
 }
 #undef fillRect

@@ -200,7 +200,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return config.macStyle;
     case SH_WizardStyle:
         return config.macStyle ? 2 : 1; // QWizard::MacStyle / QWizard::ModernStyle
-#if QT_VERSION >= 0x040400
+
     case SH_FormLayoutWrapPolicy:
         return 0; //  QFormLayout::RowWrapPolicy
     case SH_FormLayoutFieldGrowthPolicy:
@@ -212,7 +212,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_ItemView_PaintAlternatingRowColorsForEmptyArea:
         // return true; // NOTICE WORKAROUND: // works with 4.3 and now 4.4 but not in the betas
         return false; // true // kcmshell4 kfontinst atm segfaults on this due to an uncatched static_cast!
-#endif
+
     case SH_KCustomStyleElement:
     {
         if (!widget)

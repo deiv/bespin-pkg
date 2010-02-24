@@ -414,12 +414,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         if (sunken || (hover && !complexStep))
             complexStep = 6;
         painter->setBrush(Colors::mid(FCOLOR(Base), FCOLOR(Text), 6-complexStep, complexStep+1));
-#if QT_VERSION >= 0x040400
         painter->drawRoundedRect(r, F(4), F(4));
-#else
-// NOTICE: this is no really working substitute, as r.width() >> rx and roundness has only 100 deg...
-        painter->drawRoundRect(r, (99*F(4))/qMax(r.width(), F(4)), (99*F(4))/qMax(F(4), r.height()));
-#endif
         painter->restore();
         return;
     }

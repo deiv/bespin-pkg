@@ -248,9 +248,8 @@ FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
     {
         QPixmap tmp = upper;
         QPainter p;
-        if (opacity != 1.0)
+        if (opacity < 1.0)
         {
-            tmp = upper.copy();
             p.begin(&tmp);
             p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
             p.fillRect(tmp.rect(), QColor(0,0,0, opacity*255.0));

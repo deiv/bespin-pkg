@@ -241,7 +241,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>11</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -537,8 +537,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>322</width>
-               <height>113</height>
+               <width>318</width>
+               <height>112</height>
               </rect>
              </property>
              <attribute name="label">
@@ -850,7 +850,7 @@
                <x>0</x>
                <y>0</y>
                <width>245</width>
-               <height>178</height>
+               <height>176</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1162,8 +1162,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>266</width>
-               <height>179</height>
+               <width>264</width>
+               <height>178</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1361,8 +1361,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>260</width>
-               <height>134</height>
+               <width>258</width>
+               <height>131</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1885,7 +1885,7 @@
                <x>0</x>
                <y>0</y>
                <width>316</width>
-               <height>248</height>
+               <height>247</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2047,8 +2047,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>197</width>
-               <height>89</height>
+               <width>193</width>
+               <height>88</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3001,8 +3001,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>445</width>
-               <height>117</height>
+               <width>198</width>
+               <height>62</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3094,16 +3094,99 @@
          </layout>
         </widget>
         <widget class="QWidget" name="Colors">
-         <layout class="QFormLayout" name="formLayout_10">
+         <layout class="QGridLayout" name="gridLayout_11">
           <item row="0" column="0">
-           <widget class="QLabel" name="label_38">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
+           <widget class="QPushButton" name="windowRole">
             <property name="text">
-             <string>&lt;h1&gt;DUMMY&lt;/h1&gt;</string>
+             <string>Window</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
             </property>
            </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="windowTextRole">
+            <property name="text">
+             <string>Window Text</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="buttonRole">
+            <property name="text">
+             <string>Button</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="buttonTextRole">
+            <property name="text">
+             <string>Button Text</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="baseRole">
+            <property name="text">
+             <string>Base</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="textRole">
+            <property name="text">
+             <string>Text</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QPushButton" name="highlightRole">
+            <property name="text">
+             <string>Highlight</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QPushButton" name="highlightedTextRole">
+            <property name="text">
+             <string>Highlighted Text</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <spacer name="verticalSpacer_10">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

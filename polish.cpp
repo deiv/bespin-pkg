@@ -152,11 +152,9 @@ void Style::polish( QPalette &pal, bool onInit )
         pal.setColor(QPalette::Midlight, QColor(220,220,220));
         pal.setColor(QPalette::Light, QColor(240,240,240));
 
-#if QT_VERSION >= 0x040400
         // tooltip (NOTICE not configurable by qtconfig, kde can, let's see what we're gonna do on this...)
         pal.setColor(QPalette::ToolTipBase, pal.color(QPalette::Active, config.bg.tooltip_role[Bg]));
         pal.setColor(QPalette::ToolTipText, pal.color(QPalette::Active, config.bg.tooltip_role[Fg]));
-#endif
     }
 
     // inactive palette
@@ -197,10 +195,8 @@ void Style::polish( QPalette &pal, bool onInit )
     toolPal.setColor(QPalette::ButtonText, fg);
     toolPal.setColor(QPalette::Highlight, fg); // sic!
     toolPal.setColor(QPalette::HighlightedText, bg); // sic!
-#if QT_VERSION >= 0x040400
     toolPal.setColor(QPalette::ToolTipBase, bg);
     toolPal.setColor(QPalette::ToolTipText, fg);
-#endif
     QToolTip::setPalette(toolPal);
 
 

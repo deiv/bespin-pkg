@@ -499,7 +499,7 @@ void Style::initMetrics()
 }
 
 #undef SCALE
-
+#include <QTime>
 void
 Style::init(const QSettings* settings)
 {
@@ -551,7 +551,10 @@ Style::init(const QSettings* settings)
     readSettings(settings, appName);
     initMetrics();
     Elements::setScale(config.scale);
+    QTime t;
+    t.start();
     generatePixmaps();
+    qDebug() << t.elapsed();
     Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
                     config.bg.structure, config.bg.intensity, F(8), false, config.groupBoxMode == 2);
     int f1 = F(1), f3 = F(3), f4 = F(4);

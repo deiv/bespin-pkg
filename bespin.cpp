@@ -147,12 +147,8 @@ Style::registerRoutines()
     registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
     // frames.cpp
     registerCE(skip, CE_FocusFrame);
-#if QT_VERSION >= 0x040400
     registerPE(skip, PE_PanelStatusBar);
     registerPE(skip, PE_FrameStatusBarItem);
-#else
-    registerPE(skip, PE_FrameStatusBar);
-#endif
     registerPE(drawFocusFrame, PE_FrameFocusRect);
     registerPE(drawFrame, PE_Frame);
 #if QT_VERSION >= 0x040500
@@ -242,10 +238,9 @@ Style::registerRoutines()
 #endif
     registerCE(drawRubberBand, CE_RubberBand);
     registerPE(drawHeaderArrow, PE_IndicatorHeaderArrow);
-#if QT_VERSION >= 0x040400
     registerPE(drawItemRow, PE_PanelItemViewRow);
     registerPE(drawItemItem, PE_PanelItemViewItem);
-#endif
+
     // window.cpp
     registerPE(drawWindowFrame, PE_FrameWindow);
     if (config.menu.shadow)
@@ -640,11 +635,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
         ints[8] = data.style;
 
         QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco");
-#if QT_VERSION < 0x040400
-        const qint64 pid = getpid();
-#else
         const qint64 pid = QCoreApplication::applicationPid();
-#endif
         bespinDeco.call(QDBus::NoBlock, "styleByPid", pid, ba);
     }
 #endif // X11

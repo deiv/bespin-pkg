@@ -320,11 +320,6 @@ Style::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidge
 {
    painter->save();
    
-#if QT_VERSION < 0x040400
-#define ToolTipBase WindowText
-#define ToolTipText Window
-#endif
-
 //    painter->setBrush(Gradients::pix(FCOLOR(ToolTipBase), RECT.height(), Qt::Vertical, Gradients::Button));
    painter->setBrush(FCOLOR(ToolTipBase));
 //    painter->setPen(Qt::NoPen);
@@ -334,11 +329,6 @@ Style::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidge
    QPen pen(FCOLOR(ToolTipText), f1);
    painter->setPen(pen);
    painter->drawRect(RECT.adjusted(f1/2,f1/2,-f1,-f1));
-
-#if QT_VERSION < 0x040400
-#undef ToolTipBase
-#undef ToolTipText
-#endif
 
    painter->restore();
 }

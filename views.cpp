@@ -481,11 +481,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
          widget->parentWidget()->inherits("KWin::TabBox::TabBoxView") )
         return;
 
-#if QT_VERSION >= 0x040400
     ASSURE_OPTION(item, ViewItemV4);
-#else
-    ASSURE_OPTION(item, ViewItemV2);
-#endif
 
     updateLastWidget( widget, painter );
     
@@ -551,7 +547,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         const QTreeView *tree = qobject_cast<const QTreeView*>(view);
         const bool single =  tree || (view && view->selectionMode() == QAbstractItemView::SingleSelection);
         bool round = !tree; // looks ultimatly CRAP!
-#if QT_VERSION >= 0x040400
+
         switch (item->viewItemPosition)
         {
             default:
@@ -571,7 +567,6 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         }
 //         if  (item->viewItemPosition != QStyleOptionViewItemV4::OnlyOne)
 //             round = false;
-#endif
 
         Gradients::Type gt = Gradients::None;
         if (round)
@@ -619,16 +614,14 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
     }
     else
     {
-#if QT_VERSION >= 0x040400
         if (item->backgroundBrush.style() != Qt::NoBrush)
         {
             QPoint oldBO = painter->brushOrigin();
             painter->setBrushOrigin(RECT.topLeft());
             painter->fillRect(RECT, item->backgroundBrush);
             painter->setBrushOrigin(oldBO);
-        } else
-#endif
-        if (item->features & QStyleOptionViewItemV2::Alternate)
+        }
+        else if (item->features & QStyleOptionViewItemV2::Alternate)
         {
             if (bg == QPalette::Base)
                 painter->fillRect(RECT, PAL.brush(QPalette::AlternateBase));
