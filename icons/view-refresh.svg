@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,7 +13,7 @@
    height="64px"
    id="svg2383"
    sodipodi:version="0.32"
-   inkscape:version="0.46+devel"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="view-refresh.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.1">
@@ -34,7 +35,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.9765625"
-     inkscape:cx="59.232365"
+     inkscape:cx="11.526328"
      inkscape:cy="21.582744"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -42,8 +43,8 @@
      inkscape:grid-bbox="true"
      inkscape:window-width="1580"
      inkscape:window-height="1009"
-     inkscape:window-x="0"
-     inkscape:window-y="26"
+     inkscape:window-x="259"
+     inkscape:window-y="48"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -74,7 +75,7 @@
        id="path3591" />
     <path
        sodipodi:type="arc"
-       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="opacity:0.6;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="path3618"
        sodipodi:cx="32"
        sodipodi:cy="32"
