@@ -35,6 +35,7 @@ public:
     static void updatePalette(QPalette &pal, QPalette::ColorGroup group, const QStringList &list);
 protected:
     void changeEvent(QEvent *event);
+    bool eventFilter( QObject *o, QEvent *e );
 public slots:
     /** We'll reimplement the im/export functions to handle color settings as well*/
     void store();
@@ -56,7 +57,9 @@ private:
     bool infoIsManage;
     void store3(const QString &, bool);
     static void savePalette(const QPalette &pal);
+    void setColorsFromPalette( const QPalette &pal );
 private slots:
+    void applyPalette();
     void setHeader(const QString&);
     void storedSettigSelected(QTreeWidgetItem *);
     void store2a();

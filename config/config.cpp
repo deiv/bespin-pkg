@@ -32,6 +32,7 @@ Boston, MA 02110-1301, USA.
 #include "kdeini.h"
 #include "../config.defaults"
 #include "config.h"
+#include "ui_uiDemo.h"
 
 typedef QMap<QString,QString> StringMap;
 
@@ -57,7 +58,6 @@ namespace Gradients {
     };
     enum BgMode { BevelV = 2, BevelH };
 }
-
 
 static const char* defInfo1 =
 "<b>Bespin Style</b><hr>\
@@ -211,16 +211,22 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     ui.btnDelete->setEnabled(false);
     ui.storeLine->hide();
 
-    /** set up color page, not of interest 
-    QList<int> allRoles;
-    allRoles << 0 << 1 << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9;
-    generateColorModes(ui.colorRoles, &allRoles );
+    /** set up color page, not of interest */
     QColorDialog *cd = new QColorDialog;
-    cd->setWindowFlags( 0 );
-    cd->setParent( ui.Colors );
-    ui.colorRoleLayout->addWidget( cd );
-    cd->show();
-   */
+    cd->hide();
+    connect ( ui.colorButton, SIGNAL(clicked()), cd, SLOT(show()) );
+    connect ( ui.colorButton, SIGNAL(clicked()), cd, SLOT(raise()) );
+    connect ( ui.colorApply, SIGNAL(clicked()), this, SLOT(applyPalette()) );
+    ui.role_window->installEventFilter(this);
+    ui.role_windowText->installEventFilter(this);
+    ui.role_button->installEventFilter(this);
+    ui.role_buttonText->installEventFilter(this);
+    ui.role_base->installEventFilter(this);
+    ui.role_text->installEventFilter(this);
+    ui.role_highlight->installEventFilter(this);
+    ui.role_highlightedText->installEventFilter(this);
+    setColorsFromPalette( QApplication::palette() );
+
     /** fill some comboboxes, not of interest */
     generateColorModes(ui.tooltipRole);
     generateColorModes(ui.uno_role);
@@ -704,6 +710,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     at the end of this file as well - but there's nothing special about it...
         =========================================== */
 
+    QDialog *demoW = new QDialog;
+    Ui::Demo ui2;
+    ui2.setupUi( demoW );
+    ui2.bottomBar->hide();
+    ui.sections->addWidget( demoW );
     ui.sections->setCurrentIndex(0);
 }
 
@@ -734,6 +745,47 @@ Config::changeEvent(QEvent *event)
     p.drawPath(path);
     p.end();
     ui.logo->setPixmap(logo);
+}
+
+bool
+Config::eventFilter( QObject *o, QEvent *e )
+{
+    if ( e->type() == QEvent::DragEnter )
+    {
+        QDropEvent *de = static_cast<QDragMoveEvent*>(e);
+        if (de->mimeData()->hasColor())
+            de->accept();
+        else
+            de->ignore();
+        return false;
+    }
+    if ( e->type() == QEvent::Drop )
+    {
+        QDropEvent *de = static_cast<QDropEvent*>(e);
+        if (de->mimeData()->hasColor())
+        {
+            QColor c = qvariant_cast<QColor>(de->mimeData()->colorData());
+            QWidget *w = static_cast<QWidget*>(o);
+            QPalette pal = w->palette();
+            bool fg = false;
+            QWidget *counter = 0L;
+            if ( w == ui.role_window ) counter = ui.role_windowText;
+            else if ( w == ui.role_button ) counter = ui.role_buttonText;
+            else if ( w == ui.role_base ) counter = ui.role_text;
+            else if ( w == ui.role_highlight ) counter = ui.role_highlightedText;
+            else if ( (fg = (w == ui.role_windowText)) ) counter = ui.role_window;
+            else if ( (fg = (w == ui.role_buttonText)) ) counter = ui.role_button;
+            else if ( (fg = (w == ui.role_text)) ) counter = ui.role_base;
+            else if ( (fg = (w == ui.role_highlightedText)) ) counter = ui.role_highlight;
+            else return false; // whatever this might be...
+
+            pal.setColor( fg ? w->foregroundRole() : w->backgroundRole(), c );
+            w->setPalette(pal);
+            counter->setPalette(pal);
+        }
+        return false;
+    }
+    return false;
 }
 
 
@@ -938,6 +990,13 @@ Config::restore()
     restore(ui.store->currentItem(), 0);
 }
 
+class BStyle : public QStyle
+{
+    public:
+        BStyle() : QStyle (){}
+        virtual void init(const QSettings *settings) = 0;
+};
+#include <QtDebug>
 void
 Config::restore(QTreeWidgetItem *item, int col)
 {
@@ -969,7 +1028,13 @@ Config::restore(QTreeWidgetItem *item, int col)
     list = settings.value ( "disabled", colors(pal, QPalette::Disabled) ).toStringList();
     updatePalette(*loadedPal, QPalette::Disabled, list);
 
+    setColorsFromPalette( *loadedPal );
+    applyPalette();
+
     settings.endGroup();
+    if ( QApplication::style()->objectName() == "bespin" || QApplication::setStyle("Bespin") )
+        static_cast<BStyle*>(QApplication::style())->init(&settings);
+    
     settings.endGroup();
 }
 
@@ -1009,6 +1074,53 @@ static QColor mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
                     (w1*c1.alpha() + w2*c2.alpha())/sum);
 }
 
+void
+Config::setColorsFromPalette( const QPalette &pal )
+{
+    QPalette p = ui.role_window->palette();
+    p.setColor( ui.role_window->backgroundRole(), pal.color( QPalette::Active, QPalette::Window ) );
+    p.setColor( ui.role_windowText->foregroundRole(), pal.color( QPalette::Active, QPalette::WindowText ) );
+    ui.role_window->setPalette( p );
+    ui.role_windowText->setPalette( p );
+
+    p = ui.role_button->palette();
+    p.setColor( ui.role_button->backgroundRole(), pal.color( QPalette::Active, QPalette::Button ) );
+    p.setColor( ui.role_buttonText->foregroundRole(), pal.color( QPalette::Active, QPalette::ButtonText ) );
+    ui.role_button->setPalette( p );
+    ui.role_buttonText->setPalette( p );
+
+    p = ui.role_base->palette();
+    p.setColor( ui.role_base->backgroundRole(), pal.color( QPalette::Active, QPalette::Base ) );
+    p.setColor( ui.role_text->foregroundRole(), pal.color( QPalette::Active, QPalette::Text ) );
+    ui.role_base->setPalette( p );
+    ui.role_text->setPalette( p );
+
+    p = ui.role_highlight->palette();
+    p.setColor( ui.role_highlight->backgroundRole(), pal.color( QPalette::Active, QPalette::Highlight ) );
+    p.setColor( ui.role_highlightedText->foregroundRole(), pal.color( QPalette::Active, QPalette::HighlightedText ) );
+    ui.role_highlight->setPalette( p );
+    ui.role_highlightedText->setPalette( p );
+}
+
+void
+Config::applyPalette()
+{
+    if (!loadedPal)
+        loadedPal = new QPalette;
+    loadedPal->setColor( QPalette::Window, ui.role_window->palette().color( ui.role_window->backgroundRole() ) );
+    loadedPal->setColor( QPalette::WindowText, ui.role_window->palette().color( ui.role_windowText->foregroundRole() ) );
+    loadedPal->setColor( QPalette::Button, ui.role_button->palette().color( ui.role_button->backgroundRole() ) );
+    loadedPal->setColor( QPalette::ButtonText, ui.role_buttonText->palette().color( ui.role_buttonText->foregroundRole() ) );
+    loadedPal->setColor( QPalette::Base, ui.role_base->palette().color( ui.role_base->backgroundRole() ) );
+    loadedPal->setColor( QPalette::Text, ui.role_text->palette().color( ui.role_text->foregroundRole() ) );
+    loadedPal->setColor( QPalette::Highlight, ui.role_highlight->palette().color( ui.role_highlight->backgroundRole() ) );
+    loadedPal->setColor( QPalette::HighlightedText, ui.role_highlightedText->palette().color( ui.role_highlightedText->foregroundRole() ) );
+    QApplication::setPalette( *loadedPal );
+    emit changed(true);
+    emit changed();
+//     haveIcons = false; // force
+//     ensureIcons();
+}
 
 void
 Config::savePalette(const QPalette &pal)
@@ -1285,10 +1397,11 @@ static void ensureIcons()
 {
     if (haveIcons)
         return;
+    haveIcons = true;
     QPixmap pix(16,16);
     pix.fill(Qt::transparent);
     QPainter p;
-    QPalette *pal = /*loadedPal ? loadedPal :*/ &qApp->palette();
+    QPalette *pal = /*loadedPal ? loadedPal : */&qApp->palette();
     for (int i = 0; i < 8; ++i)
     {
         pix.fill(Qt::transparent);

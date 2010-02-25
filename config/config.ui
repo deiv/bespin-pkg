@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>765</width>
-    <height>461</height>
+    <height>406</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -161,6 +161,11 @@
        <item>
         <property name="text">
          <string>Colors</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Demo</string>
         </property>
        </item>
       </widget>
@@ -537,8 +542,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>318</width>
-               <height>112</height>
+               <width>322</width>
+               <height>114</height>
               </rect>
              </property>
              <attribute name="label">
@@ -783,7 +788,7 @@
               <item row="0" column="1">
                <widget class="QSlider" name="shadowIntensity">
                 <property name="minimum">
-                 <number>50</number>
+                 <number>0</number>
                 </property>
                 <property name="maximum">
                  <number>350</number>
@@ -850,7 +855,7 @@
                <x>0</x>
                <y>0</y>
                <width>245</width>
-               <height>176</height>
+               <height>180</height>
               </rect>
              </property>
              <attribute name="label">
@@ -866,6 +871,9 @@
               </item>
               <item>
                <widget class="QWidget" name="widget" native="true">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <layout class="QGridLayout" name="gridLayout_4">
                  <item row="0" column="0" colspan="2">
                   <widget class="QCheckBox" name="uno_toolbars">
@@ -1162,8 +1170,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>264</width>
-               <height>178</height>
+               <width>266</width>
+               <height>180</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1361,8 +1369,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>258</width>
-               <height>131</height>
+               <width>260</width>
+               <height>137</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1885,7 +1893,7 @@
                <x>0</x>
                <y>0</y>
                <width>316</width>
-               <height>247</height>
+               <height>249</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2047,8 +2055,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>193</width>
-               <height>88</height>
+               <width>197</width>
+               <height>90</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3095,87 +3103,220 @@
         </widget>
         <widget class="QWidget" name="Colors">
          <layout class="QGridLayout" name="gridLayout_11">
-          <item row="0" column="0">
-           <widget class="QPushButton" name="windowRole">
+          <item row="1" column="0">
+           <widget class="QLabel" name="role_window">
+            <property name="acceptDrops">
+             <bool>true</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
             <property name="text">
              <string>Window</string>
             </property>
-            <property name="flat">
-             <bool>true</bool>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="windowTextRole">
-            <property name="text">
-             <string>Window Text</string>
+            <property name="margin">
+             <number>8</number>
             </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="buttonRole">
-            <property name="text">
-             <string>Button</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QPushButton" name="buttonTextRole">
-            <property name="text">
-             <string>Button Text</string>
-            </property>
-            <property name="flat">
+           <widget class="QLabel" name="role_windowText">
+            <property name="acceptDrops">
              <bool>true</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string>Window Text</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>8</number>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QPushButton" name="baseRole">
-            <property name="text">
-             <string>Base</string>
-            </property>
-            <property name="flat">
+           <widget class="QLabel" name="role_button">
+            <property name="acceptDrops">
              <bool>true</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string>Button</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>8</number>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QPushButton" name="textRole">
-            <property name="text">
-             <string>Text</string>
-            </property>
-            <property name="flat">
+           <widget class="QLabel" name="role_buttonText">
+            <property name="acceptDrops">
              <bool>true</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string>Button Text</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>8</number>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
             </property>
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QPushButton" name="highlightRole">
-            <property name="text">
-             <string>Highlight</string>
-            </property>
-            <property name="flat">
+           <widget class="QLabel" name="role_base">
+            <property name="acceptDrops">
              <bool>true</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string>Base</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>8</number>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QPushButton" name="highlightedTextRole">
-            <property name="text">
-             <string>Highlighted Text</string>
-            </property>
-            <property name="flat">
+           <widget class="QLabel" name="role_text">
+            <property name="acceptDrops">
              <bool>true</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string>Text</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>8</number>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
+          <item row="4" column="0">
+           <widget class="QLabel" name="role_highlight">
+            <property name="acceptDrops">
+             <bool>true</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string>Highlight</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>8</number>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="role_highlightedText">
+            <property name="acceptDrops">
+             <bool>true</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string>Highlighted Text</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>8</number>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="label_67">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>&lt;h2&gt;Drag and Drop colors on the roles&lt;/h2&gt;(Colors are not applied to running applications)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0" colspan="2">
            <spacer name="verticalSpacer_10">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -3184,6 +3325,36 @@
              <size>
               <width>20</width>
               <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="9" column="1">
+           <widget class="QPushButton" name="colorButton">
+            <property name="text">
+             <string>Color dialog</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QPushButton" name="colorApply">
+            <property name="text">
+             <string>Apply palette</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <spacer name="verticalSpacer_22">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>12</height>
              </size>
             </property>
            </spacer>
