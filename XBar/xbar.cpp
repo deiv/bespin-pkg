@@ -90,9 +90,9 @@ XBar::~XBar()
 {
     if (instance == this)
     {
+        byeMenus();
         instance = NULL;
         delete dummy; dummy = NULL;
-        byeMenus();
     }
 }
 

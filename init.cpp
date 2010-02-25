@@ -420,15 +420,32 @@ Style::readSettings(const QSettings* settings, QString appName)
 
     // General ===========================
     config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;
-    // TODO: better make this an env var???
-    config.scale = iSettings->value(DEF_SCALE).toDouble();
-    if (config.scale != 1.0)
+    config.scale = 1.0f;
+    const char *scale = getenv("BESPIN_SCALE");
+    if ( scale )
     {
-        QFont fnt = qApp->font();
-        if (fnt.pointSize() > -1) fnt.setPointSize(fnt.pointSize()*config.scale);
-        else fnt.setPixelSize(fnt.pixelSize()*config.scale);
-        qApp->setFont(fnt);
+        bool ok = false;
+        config.scale = QString(scale).toFloat(&ok);
+        if ( !ok )
+            config.scale = 1.0f;
+        else
+            config.scale = CLAMP( config.scale, 1.0f, 3.0f );
+
+        if (config.scale != 1.0)
+        {
+            scale = getenv("BESPIN_SCALE_FONT");
+            if (!qstrcmp( scale, "true" ))
+            {
+                QFont fnt = qApp->font();
+                if (fnt.pointSize() > -1) fnt.setPointSize(fnt.pointSize()*config.scale);
+                else fnt.setPixelSize(fnt.pixelSize()*config.scale);
+                qApp->setFont(fnt);
+            }
+        }
     }
+#if 0
+    
+#endif
     config.groupBoxMode = readInt(GROUP_BOX_MODE);
 
     //NOTICE gtk-qt fails on several features

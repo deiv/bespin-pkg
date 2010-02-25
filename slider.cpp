@@ -138,19 +138,19 @@ while (v <= slider->maximum) { \
         if (slider->minimum == 0 && slider->sliderPosition != slider->minimum)
         {
             SAVE_PEN;
-            painter->setPen(QPen(FCOLOR(Highlight), gType ? F(2) : F(1)));
+            painter->setPen(QPen(FCOLOR(Highlight), gType ? F(3) : F(1), Qt::SolidLine, Qt::RoundCap));
             if ( slider->orientation == Qt::Horizontal )
             {
                 const int y = groove.center().y() + (gType ? 1 : 0);
                 bool ltr = slider->direction == Qt::LeftToRight;
                 if (slider->upsideDown) ltr = !ltr;
-                const int x2 = ltr ? groove.left() + F(4) : groove.right() - F(4);
+                const int x2 = ltr ? groove.left() + F(5) : groove.right() - F(5);
                 painter->drawLine(handle.center().x(), y, x2, y);
             }
             else
             {
                 const int x = groove.center().x();
-                const int y2 = slider->upsideDown ? groove.bottom() - F(4) : groove.top() + F(4);
+                const int y2 = slider->upsideDown ? groove.bottom() - F(5) : groove.top() + F(5);
                 painter->drawLine(x, handle.center().y(), x, y2);
             }
             RESTORE_PEN;

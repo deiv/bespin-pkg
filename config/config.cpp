@@ -996,7 +996,7 @@ class BStyle : public QStyle
         BStyle() : QStyle (){}
         virtual void init(const QSettings *settings) = 0;
 };
-#include <QtDebug>
+
 void
 Config::restore(QTreeWidgetItem *item, int col)
 {
