@@ -15,6 +15,7 @@ static QColor black = Qt::black;
 #define BLACK(_A_) QColor(0,0,0, _A_)
 #define SCALE(_N_) lround(_N_*config.scale)
 
+
 void
 Style::generatePixmaps()
 {

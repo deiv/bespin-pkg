@@ -46,14 +46,12 @@ void Tile::reset()
     _shape = 0;
 }
 
-static void
-simplify(QPixmap &pix)
+static QPixmap simple(QImage &img)
 {
-    if (!pix.hasAlpha())
-        return;
+    if (!img.hasAlphaChannel())
+        return QPixmap::fromImage(img);
         
     bool translucent = false, content = false;
-    QImage img =  pix.toImage();
     uint *data = ( uint * ) img.bits();
     int total = img.width() * img.height();
     int alpha;
@@ -72,15 +70,18 @@ simplify(QPixmap &pix)
     }
 
     if (!content)
-        pix = QPixmap();
-    else if (!translucent)
+        return QPixmap();
+
+    if (!translucent)
     {
-        QPixmap tmp(pix.size());
-        QPainter p(&tmp);
-        p.drawPixmap(0,0, pix);
+        QPixmap pix(img.size());
+        QPainter p(&pix);
+        p.drawImage(0,0, img);
         p.end();
-        pix = tmp;
+        return pix;
     }
+
+    return QPixmap::fromImage(img);
 }
 #if 0
 static QPixmap invertAlpha(const QPixmap & pix)
@@ -99,30 +100,30 @@ static QPixmap invertAlpha(const QPixmap & pix)
 }
 #endif
 
-Set::Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round)
+Set::Set(const QImage &img, int xOff, int yOff, int width, int height, int round)
 {
-    if (pix.isNull())
+    if (img.isNull())
         { _isBitmap = false; return; }
         
-    _isBitmap = pix.isQBitmap();
+    _isBitmap = img.depth() == 1;
     int w = qMax(1, width), h = qMax(1, height);
 
     int i = xOff*2*round/100;
     rndRect = QRect(i, i, i, i);
 
-    int rOff = pix.width() - xOff - w;
-    int bOff = pix.height() - yOff - h;
+    int rOff = img.width() - xOff - w;
+    int bOff = img.height() - yOff - h;
     int tileWidth = qMax(32, width);
     int tileHeight = qMax(32, height);
 
     QPainter p;
+    QImage hook;
     QPixmap dump;
-    QPixmap transSrc(qMax(32, pix.width()), qMax(32, pix.height()));
+    QPixmap transSrc(qMax(32, img.width()), qMax(32, img.height()));
     transSrc.fill(Qt::transparent);
 
 #define DUMP(_SECTION_, _WIDTH_, _HEIGHT_, _X_, _Y_, _W_, _H_)\
-dump = pix.copy(_X_, _Y_, _W_, _H_);\
-simplify(dump);\
+dump = simple(hook = img.copy(_X_, _Y_, _W_, _H_));\
 if (!dump.isNull())\
 {\
     if (dump.hasAlphaChannel())\
@@ -134,13 +135,11 @@ if (!dump.isNull())\
     p.end();\
 } //
 
-    pixmap[TopLeft] = pix.copy(0, 0, xOff, yOff);
-    simplify(pixmap[TopLeft]);
+    pixmap[TopLeft] = simple(hook = img.copy(0, 0, xOff, yOff));
 
     DUMP(TopMid,   tileWidth, yOff,   xOff, 0, w, yOff);
 
-    pixmap[TopRight] = pix.copy(xOff+w, 0, rOff, yOff);
-    simplify(pixmap[TopRight]);
+    pixmap[TopRight] = simple(hook = img.copy(xOff+w, 0, rOff, yOff));
 
     //----------------------------------
     DUMP(MidLeft,   xOff, tileHeight,   0, yOff, xOff, h);
@@ -148,15 +147,13 @@ if (!dump.isNull())\
     DUMP(MidRight,   rOff, tileHeight,   xOff+w, yOff, rOff, h);
     //----------------------------------
 
-    pixmap[BtmLeft] = pix.copy(0, yOff+h, xOff, bOff);
-    simplify(pixmap[BtmLeft]);
+    pixmap[BtmLeft] = simple(hook = img.copy(0, yOff+h, xOff, bOff));
 
     DUMP(BtmMid,   tileWidth, bOff,   xOff, yOff+h, w, bOff);
 
-    pixmap[BtmRight] = pix.copy(xOff+w, yOff+h, rOff, bOff);
-    simplify(pixmap[BtmRight]);
+    pixmap[BtmRight] = simple(hook = img.copy(xOff+w, yOff+h, rOff, bOff));
 
-    _hasCorners = !pix.isNull();
+    _hasCorners = !img.isNull();
     _defShape = Full;
 #undef initPixmap
 #undef finishPixmap

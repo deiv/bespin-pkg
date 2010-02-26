@@ -61,7 +61,7 @@ inline static bool matches(PosFlags This, PosFlags That){return (This & That) ==
 class BLIB_EXPORT Set
 {
 public:
-    Set(const QPixmap &pix, int xOff, int yOff, int width, int height, int round = 99);
+    Set(const QImage &img, int xOff, int yOff, int width, int height, int round = 99);
     Set()
     {
         setDefaultShape(Ring);

@@ -1,7 +1,7 @@
 
 #include <cmath>
 #include <QPainter>
-#include <QPixmap>
+#include <QImage>
 
 #include "../makros.h"
 #include "dpi.h"
@@ -55,7 +55,7 @@ static float ourScale = 1.0;
 void
 Elements::setScale(float scale) { ourScale = scale; }
 
-QPixmap
+QImage
 Elements::glow(int size, float width)
 {
     EMPTY_PIX(size, size);
@@ -67,10 +67,10 @@ Elements::glow(int size, float width)
     rg.setColorAt(1.0, BLACK(0));
     p.fillRect(img.rect(), rg);
     p.end();
-    return QPixmap::fromImage(img);
+    return img;
 }
 
-QPixmap
+QImage
 Elements::shadow(int size, bool opaque, bool sunken, float factor)
 {
     EMPTY_PIX(size, size);
@@ -81,27 +81,27 @@ Elements::shadow(int size, bool opaque, bool sunken, float factor)
     rg.setColorAt(1.0, BLACK(0));
     p.fillRect(img.rect(), rg);
     p.end();
-    return QPixmap::fromImage(img);
+    return img;
 }
 
-QPixmap
+QImage
 Elements::roundMask(int size)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
     p.drawEllipse(img.rect()); p.end();
-    return QPixmap::fromImage(img);
+    return img;
 }
 
-QPixmap
+QImage
 Elements::roundedMask(int size, int factor)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
     p.drawRoundedRect(img.rect(), factor, factor, Qt::RelativeSize);
     p.end();
-    return QPixmap::fromImage(img);
+    return img;
 }
 
-QPixmap
+QImage
 Elements::sunkenShadow(int size, bool enabled)
 {
     EMPTY_PIX(size, size);
@@ -132,10 +132,10 @@ Elements::sunkenShadow(int size, bool enabled)
 
     p.end();
     
-    return QPixmap::fromImage(img);
+    return img;
 }
 
-QPixmap
+QImage
 Elements::relief(int size, bool enabled)
 {
     const float f = ourShadowIntensity * (enabled ? 1.0 : 0.7);
@@ -155,13 +155,13 @@ Elements::relief(int size, bool enabled)
     p.drawLine(d1, size-1, d2, size-1); // bottom
 #endif
     p.end();
-    return QPixmap::fromImage(img);
+    return img;
 }
 
 #define DRAW_ROUND_ALPHA_RECT(_A_, _X_, _Y_, _W_,_R_)\
 p.setBrush(BLACK(_A_)); p.DRAW_ROUND_RECT(_X_, _Y_, _W_, ss, (_R_+1)/2, _R_)
 
-QPixmap
+QImage
 Elements::groupShadow(int size)
 {
     const int ss = 2*size;
@@ -189,7 +189,7 @@ Elements::groupShadow(int size)
     }
     p.end();
 
-    return QPixmap::fromImage(img);
+    return img;
 }
 
 #if 0
