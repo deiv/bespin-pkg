@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## CONFIGURATION FOR THE ICON GENERATION SCRIPT ####################################################
-# Do NOT edit "config.example" bug copy it to "config" and edit that file
+#  Do NOT edit "config.example" but copy it to "config" and edit that file
 # "config.example" is NOT read by the script, only "config" (no suffix at all) is
 ####################################################################################################
 
