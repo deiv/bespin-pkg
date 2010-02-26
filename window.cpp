@@ -68,7 +68,7 @@ static QPixmap *rings = 0L;
 #include <QTimer>
 static QTimer ringResetTimer;
 static inline void
-createRingPix(int alpha)
+createRingPix(int alpha, int value)
 {
     QPainterPath ringPath;
     ringPath.addEllipse(0,0,200,200);
@@ -92,7 +92,7 @@ createRingPix(int alpha)
     rings = new QPixmap(450,360);
     rings->fill(Qt::transparent);
     QPainter p(rings);
-    QColor white(255,255,255,(alpha+16)*112/255);
+    QColor white(value,value,value,(alpha+16)*112/255);
     p.setPen(white);
     white.setAlpha(24*(alpha+16)/255);
     p.setBrush(white);
@@ -148,7 +148,8 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         drawRings = !isPopup;
         if (drawRings && !rings)
         {
-            createRingPix(opacity);
+            const int ringValue = qMin(3*Colors::value(pal.color(widget->backgroundRole()))/2, 255);
+            createRingPix(opacity, ringValue);
             disconnect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
             connect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
         }
