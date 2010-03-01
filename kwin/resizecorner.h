@@ -44,6 +44,7 @@ public slots:
     void raise();
 protected:
     bool eventFilter(QObject *obj, QEvent *e);
+    void mouseMoveEvent ( QMouseEvent * );
     void mousePressEvent ( QMouseEvent * );
     void mouseReleaseEvent ( QMouseEvent * );
     void paintEvent ( QPaintEvent * );

@@ -53,10 +53,10 @@ ResizeCorner::ResizeCorner(Client * parent) : QWidget(parent->widget())
         return;
     }
     client = parent;
-    setCursor(QCursor(Qt::SizeFDiagCursor));
     setFixedSize(CORNER_SIZE, CORNER_SIZE);
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_PaintOnScreen);
+    setMouseTracking(true);
 //     XSetWindowBackgroundPixmap(QX11Info::display(), winId(), ParentRelative);
 //     setUpdatesEnabled(false);
 //     setAttribute(Qt::WA_OpaquePaintEvent); // lately broken, above works
@@ -143,6 +143,16 @@ ResizeCorner::eventFilter(QObject *obj, QEvent *e)
 }
 
 static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
+
+void
+ResizeCorner::mouseMoveEvent ( QMouseEvent *mev )
+{
+    if ( mev->modifiers() == Factory::commandKey() )
+        setCursor(QCursor(Qt::ArrowCursor));
+    else
+        setCursor(QCursor(Qt::SizeFDiagCursor));
+    QWidget::mouseMoveEvent( mev );
+}
 
 void
 ResizeCorner::mousePressEvent ( QMouseEvent *mev )
