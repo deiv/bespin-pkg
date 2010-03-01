@@ -68,6 +68,7 @@ public:
     bool supports( Ability ability ) const;
     inline static int buttonSize(bool small) {return ourButtonSize[small];}
     inline static int borderSize() {return ourBorderSize;}
+    inline static Qt::KeyboardModifier commandKey() { return ourCommandKey; }
     inline static int initialized() {return weAreInitialized;}
     QList< BorderSize > borderSizes() const
     {
@@ -101,6 +102,7 @@ protected:
 private:
     bool readConfig();
 private:
+    static Qt::KeyboardModifier ourCommandKey;
     static QHash<qint64, WindowData*> ourDecoInfos;
     static QHash<qint64, BgSet*> ourBgSets;
     static QList<Preset*> ourPresets;

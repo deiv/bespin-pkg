@@ -77,6 +77,8 @@ public:
     void showWindowList(const QPoint &p);
     void showWindowMenu(const QPoint &p);
     void showWindowMenu(const QRect &r);
+    inline QPoint titleOffset() const
+        { return Factory::verticalTitle() ? QPoint(myTitleSize, 0) : QPoint(0, myTitleSize); }
     void toggleOnAllDesktops();
     QString trimm(const QString &string);
     void shadeChange();

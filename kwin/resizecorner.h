@@ -37,18 +37,19 @@ class ResizeCorner : public QWidget
 {
    Q_OBJECT
 public:
-   ResizeCorner(Client *parent);
-   void move ( int x, int y );
-   void setColor(const QColor &c);
+    ResizeCorner(Client *parent);
+    void move ( int x, int y );
+    void setColor(const QColor &c);
 public slots:
-   void raise();
+    void raise();
 protected:
-   void mousePressEvent ( QMouseEvent * );
-   void mouseReleaseEvent ( QMouseEvent * );
-   void paintEvent ( QPaintEvent * );
+    bool eventFilter(QObject *obj, QEvent *e);
+    void mousePressEvent ( QMouseEvent * );
+    void mouseReleaseEvent ( QMouseEvent * );
+    void paintEvent ( QPaintEvent * );
 private:
-   bool eventFilter(QObject *obj, QEvent *e);
-   Client *client;
+    bool imCompiz;
+    Client *client;
 };
 
 } // namespace

@@ -86,7 +86,8 @@ ResizeCorner::raise()
         WId *kids = 0L;
         uint numKids = 0;
         XQueryTree(QX11Info::display(), window, &root, &daddy, &kids, &numKids);
-        if (daddy != root)
+        imCompiz = (daddy == root);
+        if (!imCompiz)
             window = daddy;
         if (window)
         {
@@ -117,8 +118,9 @@ ResizeCorner::setColor(const QColor &c)
 void
 ResizeCorner::move ( int x, int y )
 {
-    int l,r,t,b;
-    client->borders( l, r, t, b );
+    int l = 0, r = 0, t = 0, b = 0;
+    if (!imCompiz)
+        client->borders( l, r, t, b );
     QWidget::move(x-(l+r), y-(t+b));
 }
 

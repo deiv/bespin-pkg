@@ -36,6 +36,9 @@
 #include <QTextBrowser>
 #include <QVBoxLayout>
 #include <kwindowsystem.h>
+#include <KGlobal>
+#include <KSharedConfig>
+#include <KConfigGroup>
 // #include "button.h"
 #include "client.h"
 #include "factory.h"
@@ -53,6 +56,7 @@ Config Factory::ourConfig =
     { false, false, false, true, true, false, Qt::AlignHCenter, 0,
       { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
       QStringList() };
+Qt::KeyboardModifier Factory::ourCommandKey = Qt::AltModifier;
 int Factory::ourButtonSize[2] = {-1, -1};
 int Factory::ourBorderSize = 4;
 int Factory::ourTitleSize[2] = {18,16};
@@ -241,6 +245,8 @@ qDebug() << "BESPIN" << winecfg.childKeys();
 
 bool Factory::readConfig()
 {
+    ourCommandKey = KConfigGroup( KGlobal::config(), "Windows" ).readEntry("CommandAllKey","Alt") == "Meta" ? Qt::MetaModifier : Qt::AltModifier;
+    
     bool ret = false;
     bool oldBool;
     QString oldString;
