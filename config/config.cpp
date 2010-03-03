@@ -485,47 +485,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     treeview in order to be used - can be cute, can be annoying: choose by yourself<br>\
     This way it's activated globally." );
 
-#if BESPIN_HACK_AMAROK
-    setContextHelp(ui.appSpecific->widget(0), "<b>Amarok Hacks</b/><hr>\
-    Notice that this can potentially cause trouble on Amarok<br>\
-    Also this is legacy code and supposed to be redundant due to (future) changes to Amarok.<br>\
-    <b>By activating one of them, you confirm that you know what you're doing!</b>");
-    handleSettings(ui.hackAmarokContext, HACK_AMAROK_CONTEXT);
-    setContextHelp(ui.hackAmarokContext, "<b>Hide Amarok's Context</b><hr>\
-    Did i mention that i don't get a resonable internet connection ;-)\
-    Anyway. You should be able to toggle this as an Amarok feature (QDockWidget instead QSplitter\
-    would imho be a good idea) but it seems as if this layout is gonna sty hardcoded for a while.\
-    Atm it is <b><i>not</i></b> possible to change this dynamically while amarok is running, but\
-    you can toggle it here and the next time you startup Amarok, the Context will be gone.\
-    (I.e. to reshow, you must quit Amarok, toggle it off and restart Amarok afterwards - i'll look\
-    for a smarter solution)" );
-
-    handleSettings(ui.hackAmarokFrames, HACK_AMAROK_FRAMES);
-    setContextHelp(ui.hackAmarokFrames, "<b>Unframe Amarok</b><hr>\
-    Amarok uses lists with a window background. Therefore it might be resonable to not use sunken\
-    frames on them. Choose yourself." );
-
-    handleSettings(ui.hackAmarokDisplay, HACK_AMAROK_DISPLAY);
-    setContextHelp(ui.hackAmarokDisplay, "<b>Bespinification ;-P</b><hr>\
-    You get a system frame, inverted colors, system sliders and the current track above the position\
-    slider. Also a button to toggle the context view (plasma thing in the middle).<hr>\
-    <b>RANT:</b><br>\
-    Amarok uses overheaded svg theming, but (though possible) custom theming isn't wanted, ending up\
-    with the UI halfwise themed by the system style and a static svg theme.<br>\
-    <br>UPDATE:</b><br>\
-    Well, guess what - starting with Amarok 2.1.1 you're officially allowed to configure the UI layout ;-P<br>\
-    Thanks to all Amarok Developers, it sucks much less now <b>=D</b>" );
-
-    handleSettings(ui.hackAmarokListview, HACK_AMAROK_LISTVIEW);
-    setContextHelp(ui.hackAmarokListview, "<b>Traditional Listviews</b><hr>\
-    Amarok uses lists with a window background. Unfortunately the foreground color role is hardcoded\
-    (to the wrong value...) Therefore you might (depending on your color scheme) end up with white text\
-    on a bright ground :-(<br/>\
-    Check this to make e.g. the collection browser etc. look like a normal list with a solid background." );
-#else
-    delete ui.appSpecific->widget(0);
-#endif
-
     /** setContextHelp(.) attaches a context help string to a widget on your form */
     setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
     The default and the hovered color of a button.<br>\

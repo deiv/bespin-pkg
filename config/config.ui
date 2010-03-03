@@ -246,7 +246,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>11</number>
+         <number>9</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -2908,74 +2908,31 @@
         </widget>
         <widget class="QWidget" name="AppSpecific">
          <layout class="QGridLayout" name="gridLayout_27">
+          <item row="1" column="0">
+           <spacer name="verticalSpacer_18">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item row="0" column="0">
            <widget class="QToolBox" name="appSpecific">
             <property name="currentIndex">
-             <number>2</number>
+             <number>0</number>
             </property>
-            <widget class="QWidget" name="page_3">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>305</width>
-               <height>110</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>Amarok</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_26">
-              <item row="0" column="0">
-               <widget class="QCheckBox" name="hackAmarokFrames">
-                <property name="text">
-                 <string>Remove frames around all splitter children</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QCheckBox" name="hackAmarokListview">
-                <property name="text">
-                 <string>Force traditional Listviews (Playlist, Collection, etc.)</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QCheckBox" name="hackAmarokContext">
-                <property name="text">
-                 <string>Hide context view</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QCheckBox" name="hackAmarokDisplay">
-                <property name="text">
-                 <string>&quot;Bespinify&quot; display (the bar on the top)</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <spacer name="verticalSpacer_9">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
             <widget class="QWidget" name="page_7">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>186</width>
-               <height>38</height>
+               <width>445</width>
+               <height>112</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3009,8 +2966,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>198</width>
-               <height>62</height>
+               <width>445</width>
+               <height>102</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3047,19 +3004,6 @@
              </layout>
             </widget>
            </widget>
-          </item>
-          <item row="1" column="0">
-           <spacer name="verticalSpacer_18">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>
