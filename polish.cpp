@@ -69,6 +69,7 @@ public:
 };
 
 static EventKiller eventKiller;
+static QPalette *amarokPalette = 0;
 
 using namespace Bespin;
 
@@ -91,7 +92,15 @@ void Style::polish ( QApplication * app )
     polish(pal);
     QPalette *opal = originalPalette;
     originalPalette = 0; // so our eventfilter won't react on this... ;-P
-    app->setPalette(pal);
+    if ( appType == Amarok && !amarokPalette )
+    {
+        amarokPalette = new QPalette(pal);
+        app->setPalette(opal ? *opal : pal);
+        foreach (QWidget *w, QApplication::topLevelWidgets())
+            w->setPalette( *amarokPalette );
+    }
+    else
+        app->setPalette(pal);
     originalPalette = opal;
 }
 
@@ -312,6 +321,8 @@ Style::polish( QWidget * widget )
     if (!widget)
         return;
 
+//     qDebug() << widget << widget->parent();
+
 //     if (widget->inherits("QGraphicsView"))
 //         qDebug() << "BESPIN" << widget;
 #ifdef MOUSEDEBUG
@@ -332,7 +343,7 @@ Style::polish( QWidget * widget )
 //          widget->internalWinId() &&
          !widget->inherits("QTipLabel") )
     {
-        QPalette pal = widget->palette();
+//         QPalette pal = widget->palette();
 
         /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
         /// also doesn't work bgs get transparent and applying this to everythign causes funny sideeffects...
@@ -361,6 +372,9 @@ Style::polish( QWidget * widget )
             }
             widget->setAttribute(Qt::WA_StyledBackground);
         }
+
+        if ( appType == Amarok && amarokPalette )
+            widget->setPalette( *amarokPalette );
 
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
@@ -697,6 +711,12 @@ Style::polish( QWidget * widget )
         // QAbstractSlider::setAttribute(Qt::WA_OpaquePaintEvent) saves surprisinlgy little CPU
         // so that'd just gonna add more complexity for literally nothing...
         // ...as the slider is usually not bound to e.g. a "scrollarea"
+//         if ( appType == Amarok && widget->inherits("VolumeDial") )
+//         {   // OMG - i'm hacking myself =D
+//             QPalette pal = widget->palette();
+//             pal.setColor( QPalette::Highlight, pal.color( QPalette::Active, QPalette::WindowText ) );
+//             widget->setPalette( pal );
+//         }
         if (widget->inherits("QScrollBar"))
         {
             // TODO: find a general catch for the plasma problem
