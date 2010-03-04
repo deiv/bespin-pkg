@@ -566,18 +566,6 @@ Style::init(const QSettings* settings)
 
     if (appType == Amarok)
     {
-        // the debatable Highlight background of the context has been on the amarok-devel table
-        // change has been denied then. well - i'll change it here for the moment.
-        // palette adjustment is no hack and this thing is visually unbearable ;-P
-        // also see polish.cpp where the original palette is set back for top level windows
-        // i'd also like to point out that if the context would not refer to the global palette,
-        // this would have been _much_ easier and cleaner. sorry - no offense :)
-        delete originalPalette;
-        originalPalette = new QPalette(qApp->palette());
-        originalPalette->setColor( QPalette::Highlight, originalPalette->color(QPalette::Active, QPalette::Window) );
-        originalPalette->setColor( QPalette::HighlightedText, originalPalette->color(QPalette::Active, QPalette::WindowText) );
-        originalPalette->setColor( QPalette::Base, originalPalette->color(QPalette::Active, QPalette::Window) );
-        originalPalette->setColor( QPalette::Text, originalPalette->color(QPalette::Active, QPalette::WindowText) );
         polish(qApp);
         qApp->removeEventFilter(this);
         qApp->installEventFilter(this);

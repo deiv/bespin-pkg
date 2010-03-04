@@ -10,6 +10,7 @@
 using namespace Bespin;
 
 static QColor black = Qt::black;
+static float scale = 0.0, intensity = 0.0;
 #define SET_ALPHA(_A_) black.setAlpha(_A_); p.setBrush(black)
 #define WHITE(_A_) QColor(255,255,255, _A_)
 #define BLACK(_A_) QColor(0,0,0, _A_)
@@ -19,6 +20,13 @@ static QColor black = Qt::black;
 void
 Style::generatePixmaps()
 {
+    // interestingly every kde application creates _2_ style instances... OUCH!
+    if (config.scale == scale && intensity == config.shadowIntensity)
+        return;
+
+    intensity = config.shadowIntensity;
+    scale = config.scale;
+
     Elements::setShadowIntensity( config.shadowIntensity );
     
     const int f9 = F(9); const int f11 = SCALE(11);

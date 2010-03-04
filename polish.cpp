@@ -94,10 +94,26 @@ void Style::polish ( QApplication * app )
     originalPalette = 0; // so our eventfilter won't react on this... ;-P
     if ( appType == Amarok && !amarokPalette )
     {
+        // the debatable Highlight background of the context has been on the amarok-devel table
+        // change has been denied then. well - i'll change it here for the moment.
+        // palette adjustment is no hack and this thing is visually unbearable ;-P
+        // also see init.cpp where this gets called
+        // i'd also like to point out that if the context would not refer to the global palette,
+        // this would have been _much_ easier and cleaner. sorry - no offense :)
+        delete opal;
+        opal = new QPalette(pal);
+        opal->setColor( QPalette::Highlight, opal->color(QPalette::Active, QPalette::Window) );
+        opal->setColor( QPalette::HighlightedText, opal->color(QPalette::Active, QPalette::WindowText) );
+        opal->setColor( QPalette::Base, opal->color(QPalette::Active, QPalette::Window) );
+        opal->setColor( QPalette::Text, opal->color(QPalette::Active, QPalette::WindowText) );
         amarokPalette = new QPalette(pal);
         app->setPalette(opal ? *opal : pal);
         foreach (QWidget *w, QApplication::topLevelWidgets())
+        {
+            if (w->windowType() != Qt::Desktop && // makes no sense + QDesktopWidget is often misused
+                !w->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) )
             w->setPalette( *amarokPalette );
+        }
     }
     else
         app->setPalette(pal);
@@ -373,7 +389,9 @@ Style::polish( QWidget * widget )
             widget->setAttribute(Qt::WA_StyledBackground);
         }
 
-        if ( appType == Amarok && amarokPalette )
+        if ( appType == Amarok && amarokPalette &&
+             widget->windowType() != Qt::Desktop && // makes no sense + QDesktopWidget is often misused
+             !widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) )
             widget->setPalette( *amarokPalette );
 
         //BEGIN Popup menu handling                                                                -
