@@ -566,7 +566,7 @@ Style::init(const QSettings* settings)
 
     if (appType == Amarok)
     {
-        polish(qApp);
+        polish(qApp, false);
         qApp->removeEventFilter(this);
         qApp->installEventFilter(this);
         QTimer::singleShot(10000, this, SLOT(removeAppEventFilter()));

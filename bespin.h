@@ -99,7 +99,8 @@ public:
     int pixelMetric ( PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0 ) const;
 
     void polish( QWidget *w );
-    void polish( QApplication * );
+    inline void polish( QApplication *a ) { polish(a, true); }
+    void polish( QApplication *a, bool vf );
     void polish( QPalette &pal, bool onInit );
     inline void polish(QPalette &pal) { polish(pal, true); }
 

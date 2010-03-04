@@ -85,9 +85,10 @@ setBoldFont(QWidget *w, bool bold = true)
     w->setFont(fnt);
 }
 
-void Style::polish ( QApplication * app )
+void Style::polish ( QApplication * app, bool initVFrame )
 {
-    VisualFrame::setStyle(this);
+    if (initVFrame)
+        VisualFrame::setStyle(this);
     QPalette pal = app->palette();
     polish(pal);
     QPalette *opal = originalPalette;
