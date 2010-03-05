@@ -101,7 +101,7 @@ Style::drawPushButtonBevel(const QStyleOption *option, QPainter *painter, const 
     if (btn->features & QStyleOptionButton::Flat)
         return;
 
-    OPT_SUNKEN OPT_HOVER
+    OPT_SUNKEN OPT_HOVER OPT_ENABLED
 
     bool resetAnim = false;
     if ( !widget || widget != anim.widget )
@@ -146,7 +146,8 @@ Style::drawPushButtonBevel(const QStyleOption *option, QPainter *painter, const 
                         Colors::mid(CCOLOR(btn.std, Fg), CCOLOR(btn.active, Fg), 6-animStep, animStep);
         if (option->state & State_On)
         {
-            const QPixmap &fill = Gradients::pix(c, config.showOff ? r.width() : r.height(), ori[1], GRAD(btn));
+            const Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
+            const QPixmap &fill = Gradients::pix(c, config.showOff ? r.width() : r.height(), ori[1], gt);
             painter->setBrush(fill);
             painter->setBrushOrigin(r.topLeft());
         }
@@ -183,7 +184,8 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
     int iOff[4] = {0,0,0,0};
     QRect r = RECT;
 
-    Gradients::Type gt = GRAD(btn);
+    const Gradients::Type bgt = isEnabled ? GRAD(btn) : Gradients::None;
+    Gradients::Type gt = bgt;
 
     QColor c = btnBg(PAL, isEnabled, hasFocus, anim.step, fullHover, Gradients::isTranslucent(gt));
     QColor iC = CCOLOR(btn.std, Bg);
@@ -287,7 +289,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         }
 
         // plate
-        masks.rect[round].render(r, painter, GRAD(btn), ori[1], c);
+        masks.rect[round].render(r, painter, bgt, ori[1], c);
 
         // outline
         if (Gradients::isReflective(GRAD(btn)))

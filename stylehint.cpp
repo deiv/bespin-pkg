@@ -20,13 +20,16 @@
 #include <QEvent>
 #include <QFrame>
 #include <QMenuBar>
-// #include <QStyleOptionTab>
-// #include <QTabBar>
-// #include <QTabWidget>
 #include "blib/colors.h"
 #include "bespin.h"
 #include "macmenu.h"
 #include "makros.h"
+
+#if  0 // QT_VERSION >= 0x040500 - no. see below!
+#include <QStyleOptionTab>
+#include <QTabBar>
+#include <QTabWidget>
+#endif
 
 using namespace Bespin;
 
@@ -50,20 +53,17 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_ScrollBar_ScrollWhenPointerLeavesControl:
         return true; // UIs are no ego shooters...
     case SH_TabBar_Alignment:
-//         if (const QStyleOptionTabV3 *tab = qstyleoption_cast<const QStyleOptionTabV3*>(option))
-//             return (tab->documentMode ? Qt::AlignLeft : Qt::AlignCenter);
-//         if (tab->shape == QTabBar::RoundedSouth || tab->shape == QTabBar::TriangularSouth)
-//             return Qt::AlignRight;
-//         if (const QTabWidget *tab = qobject_cast<const QTabWidget*>(widget))
-//         if (tab->tabPosition() == QTabWidget::South )
-//             return Qt::AlignRight;
-//             return Qt::AlignCenter;
-//         if (const QTabBar *tab = qobject_cast<const QTabBar*>(widget))
-//         if (tab->shape() == QTabBar::RoundedSouth || tab->shape() == QTabBar::TriangularSouth)
-//             return Qt::AlignRight;
-//         if (tab->count() == 1)
-//             return Qt::AlignCenter;
+#if  0 // QT_VERSION >= 0x040500 DON'T TRY AGAIN, other thomas - it looks crap :-(
+        qDebug() << option << widget;
+        if (const QStyleOptionTabV3 *tab = qstyleoption_cast<const QStyleOptionTabV3*>(option))
+            return (tab->documentMode ? Qt::AlignLeft : Qt::AlignCenter);
+        if (const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget))
+            return (tabBar->documentMode() ? Qt::AlignLeft : Qt::AlignCenter);
+        if (const QTabWidget *tabWidget = qobject_cast<const QTabWidget*>(widget))
+            return (tabWidget->documentMode() ? Qt::AlignLeft : Qt::AlignCenter);
+#else
         return Qt::AlignLeft;
+#endif
     case SH_Header_ArrowAlignment:
         return Qt::AlignLeft; // we move it to text center though...
     case SH_Slider_SnapToValue:
@@ -210,8 +210,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_FormLayoutLabelAlignment:
         return Qt::AlignRight;
     case SH_ItemView_PaintAlternatingRowColorsForEmptyArea:
-        // return true; // NOTICE WORKAROUND: // works with 4.3 and now 4.4 but not in the betas
-        return false; // true // kcmshell4 kfontinst atm segfaults on this due to an uncatched static_cast!
+        return true; // NOTICE WORKAROUND: // works with 4.3 and now 4.4 but not in the betas
+//         return false; // true // kcmshell4 kfontinst atm segfaults on this due to an uncatched static_cast!
 
     case SH_KCustomStyleElement:
     {

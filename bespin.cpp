@@ -278,7 +278,7 @@ Style::btnBg( const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool
 {
 
     if (!isEnabled)
-        return Colors::mid(Qt::black, FCOLOR(Window),5,100);
+        return FCOLOR(Window); //Colors::mid(Qt::black, FCOLOR(Window),5,100);
 
     QColor c = CCOLOR(btn.std, Bg);
     if (hasFocus && config.btn.active_role[Bg] != QPalette::Highlight)
