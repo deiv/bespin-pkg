@@ -969,6 +969,16 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 if ( !(tw->styleSheet().contains("pane", Qt::CaseInsensitive) && tw->styleSheet().contains("border", Qt::CaseInsensitive)) )
                     return false;
             }
+            if ( appType == KDevelop )
+            {   // KDevelop does that... weird. - and of course /after/ painting the label string...
+                QWidget *dad = tabBar->parentWidget();
+                while ( dad )
+                {
+                    if (dad->inherits("QMenuBar"))
+                        return false;
+                    dad = dad->parentWidget();
+                }
+            }
 
             QPainter p(tabBar);
             QStyleOptionTabBarBase opt;

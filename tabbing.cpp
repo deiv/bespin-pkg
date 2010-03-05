@@ -93,7 +93,7 @@ if (baseHeight < 0) \
     // the bar
     drawTabBar(&tbb, painter, widget);
 }
-
+#include <QtDebug>
 void
 Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -102,14 +102,12 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
     // this has completely changed with recent KDE, KTabWidget doesn't call the style at all?!
     if (widget)
     {
-        if (widget->inherits("QLabel"))
-            return; // KDevelop does that... weird. (and of course /after/ painting the label string...)
         if (widget->parentWidget() && qobject_cast<QTabWidget*>(widget->parentWidget()))
         {
 #if 1 // QT_VERSION < 0x040500
             // in general we don't want a tabbar on a tabwidget
             // that's nonsense, looks crap... and still used by some KDE apps
-            // the konqueror / kdevelop guys however want the konqueror tabbar to look
+            // the konqueror guys however want the konqueror tabbar to look
             // somewhat like Bespin =)
             // so permit the proxystyle solution
             if (widget->parentWidget()->style() == this)
