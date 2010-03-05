@@ -1,5 +1,13 @@
 project (kwin3-bespin)
 
+set (KWIN_HEADER_FOUND true )
+
+if (EXISTS ${CMAKE_INSTALL_PREFIX}/include/kdecoration.h)
+    MESSAGE( STATUS "KWin headers found" )
+else()
+MESSAGE( "WARNING: KWin headers NOT found, compiling the decoration might fail.\n\n  -> Ensure you've installed the kdebase[-workspace]-dev package" )
+endif()
+
 set (kwin3_bespin_SOURCES button.cpp client.cpp resizecorner.cpp factory.cpp )
 # kde4_add_plugin automocs, so either use automoc or postcompile rename
 # set (kwin3_bespin_MOC_HDRS button.h client.h resizecorner.h)
