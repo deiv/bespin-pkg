@@ -1468,6 +1468,12 @@ Client::trimm(const QString &string)
     if (!Factory::config()->trimmCaption)
         return string;
 
+    KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
+    QString appName(info.windowClassName());
+
+    if (!appName.compare("amarok", Qt::CaseInsensitive))
+        return "Amarok";
+
     const QString kwin_sep = QString(" %1 ").arg(QChar(0x2013));
 
     /* Ok, *some* apps have really long and nasty window captions
@@ -1481,20 +1487,17 @@ Client::trimm(const QString &string)
     more important to the user) ------------------------------------- */
 
     // Amarok 2 is however different...
-    if (ret.contains(" :: "))
-        ret = ret.section(" :: ", 0, -2, QString::SectionSkipEmpty );
+//     if (ret.contains(" :: "))
+//         ret = ret.section(" :: ", 0, -2, QString::SectionSkipEmpty );
 
     // ok, here's currently some conflict
     // in e.g. amarok, i'd like to snip "amarok" and preserve "<song> by <artist>"
     // but for e.g. k3b, i'd like to get rid of stupid
     // "the kde application to burn cds and dvds" ...
-    else if (ret.contains(" - "))
+    /*else*/ if (ret.contains(" - "))
         ret = ret.section(" - ", 0, -2, QString::SectionSkipEmpty );
     else if (ret.contains(kwin_sep)) // newer kwin versions use this uf8 dash (stupid idea?)
         ret = ret.section(kwin_sep, 0, -2, QString::SectionSkipEmpty );
-
-    KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
-    QString appName(info.windowClassName());
 
     /* Browsers set the title to <html><title/></html> - appname
     Now the page titles can be ridiculously looooong, especially on news

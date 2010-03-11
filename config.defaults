@@ -63,6 +63,8 @@
    
 #define CHOOSER_GRADIENT "Chooser.Gradient", Gradients::Sunken
 
+#define DIALOG_BTN_LAYOUT "DialogButtonLayout", 2
+
 #define HACK_DOLPHIN_VIEWS "Hack.DolphinViews", false
 #define HACK_MESSAGES "Hack.Messages", false
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false

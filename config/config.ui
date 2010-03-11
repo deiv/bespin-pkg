@@ -246,7 +246,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>9</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -530,20 +530,40 @@
               </item>
              </widget>
             </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_50">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Titebar casts shadow</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QCheckBox" name="titleShadow">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item row="0" column="0">
            <widget class="QToolBox" name="windowSettings">
             <property name="currentIndex">
-             <number>2</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="page">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>322</width>
-               <height>114</height>
+               <width>427</width>
+               <height>143</height>
               </rect>
              </property>
              <attribute name="label">
@@ -758,8 +778,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>169</width>
-               <height>62</height>
+               <width>166</width>
+               <height>61</height>
               </rect>
              </property>
              <attribute name="label">
@@ -854,8 +874,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>245</width>
-               <height>180</height>
+               <width>429</width>
+               <height>168</height>
               </rect>
              </property>
              <attribute name="label">
@@ -971,8 +991,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>110</width>
-               <height>88</height>
+               <width>417</width>
+               <height>123</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1170,8 +1190,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>266</width>
-               <height>180</height>
+               <width>261</width>
+               <height>173</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1369,8 +1389,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>260</width>
-               <height>137</height>
+               <width>258</width>
+               <height>125</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1893,7 +1913,7 @@
                <x>0</x>
                <y>0</y>
                <width>316</width>
-               <height>249</height>
+               <height>240</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2055,8 +2075,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>197</width>
-               <height>90</height>
+               <width>193</width>
+               <height>84</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2752,6 +2772,37 @@
             </property>
            </widget>
           </item>
+          <item row="5" column="1">
+           <widget class="QComboBox" name="dialogBtnLayout">
+            <item>
+             <property name="text">
+              <string>Windows</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OS X</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>KDE</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Gnome</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_38">
+            <property name="text">
+             <string>Dialog button layout</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
         <widget class="QWidget" name="KWin">
@@ -2931,7 +2982,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>445</width>
+               <width>417</width>
                <height>112</height>
               </rect>
              </property>
@@ -2966,8 +3017,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>445</width>
-               <height>102</height>
+               <width>195</width>
+               <height>60</height>
               </rect>
              </property>
              <attribute name="label">

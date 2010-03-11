@@ -65,6 +65,7 @@ typedef struct Config
         Gradients::Type gradient;
     } chooser;
 
+    int dialogBtnLayout;
     bool fadeInactive;
     int  groupBoxMode;
    

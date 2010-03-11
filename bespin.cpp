@@ -960,8 +960,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             if (tabBar->testAttribute(Qt::WA_NoSystemBackground))
                 return false; // shall be translucent
-//             if (!tabBar->drawBase())
-//                 return false;
+            if (!tabBar->drawBase())
+                return false;
             if (QTabWidget *tw = qobject_cast<QTabWidget*>(tabBar->parentWidget()))
             {   // no extra tabbar here please... unless the border is StyleShitted away ;)
                 if (tw->styleSheet().isEmpty())

@@ -20,6 +20,8 @@ Boston, MA 02110-1301, USA.
 #include <QColorDialog>
 #include <QFileDialog>
 #include <QDir>
+#include <QDragMoveEvent>
+#include <QDropEvent>
 #include <QSettings>
 #include <QTimer>
 // #include <QDialogButtonBox>
@@ -343,6 +345,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.modalInvert, BG_MODAL_INVERT);
     handleSettings(ui.tooltipRole, BG_TOOLTIP_ROLE);
     handleSettings(ui.groupBoxMode, GROUP_BOX_MODE);
+    handleSettings(ui.titleShadow, SHADOW_TITLEBAR);
 
     handleSettings(ui.uno, UNO_UNO);
     handleSettings(ui.uno_toolbars, UNO_TOOLBAR);
@@ -387,6 +390,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.showMnemonics, SHOW_MNEMONIC);
     handleSettings(ui.leftHanded, LEFTHANDED);
     handleSettings(ui.macStyle, MACSTYLE);
+    handleSettings(ui.dialogBtnLayout, DIALOG_BTN_LAYOUT);
+    setContextHelp(ui.dialogBtnLayout, "<b>Dialog button layout</b><hr>\
+    This controls the order of the Yes/No/Cancel buttons, use with care, you might accidently\
+    misclick if you revert it from e.g. KDE to OS X");
 
     handleSettings(ui.crMenuActive, MENU_ACTIVEROLE);
     handleSettings(ui.menuRound, MENU_ROUND);
@@ -806,10 +813,12 @@ blackListed(QString &key)
 //         key.startsWith("ARGB.") || // don't im/export ARGB stuff
         key.startsWith("App.") || // don't im/export app specific stuff
         key == "Bg.Opacity" || // or dimmed inactive wins
+        key == "DialogButtonLayout" || // or OS conventions
+        key == "ShowOff" || // or whether we're a pretender ;-)
         key == "FadeInactive" || // or dimmed inactive wins
         key == "Tab.Duration" || key == "Tab.Transition" || // or tab trans settings
         key == "MacStyle" || // or macfeeling
-        key == "ShowMnemonics" || // or macfeeling
+        key == "ShowMnemonic" || // or macfeeling
         key == "Menu.Opacity" || // or menu opacity (interferes with e.g. kwin/compiz)
         key == "LeftHanded" || // or flanders mode
         key == "Scroll.ShowButtons" || // or the scrollbar look
