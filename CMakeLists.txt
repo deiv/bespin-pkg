@@ -60,7 +60,7 @@ set (bespin_SOURCES animator/basic.cpp animator/aprogress.cpp animator/hover.cpp
 animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp
 bespin.cpp buttons.cpp docks.cpp frames.cpp genpixmaps.cpp hacks.cpp init.cpp
 input.cpp macmenu.cpp menus.cpp pixelmetric.cpp polish.cpp progress.cpp qsubcmetrics.cpp
-scrollareas.cpp shapes.cpp sizefromcontents.cpp slider.cpp stdpix.cpp stylehint.cpp
+scrollareas.cpp indicators.cpp sizefromcontents.cpp slider.cpp stdpix.cpp stylehint.cpp
 tabbing.cpp toolbars.cpp views.cpp visualframe.cpp window.cpp )
 
 # if ( X11_FOUND )

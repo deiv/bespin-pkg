@@ -184,7 +184,7 @@ Style::registerRoutines()
     registerCE(drawScrollBarGroove, CE_ScrollBarSubPage);
     registerCE(drawScrollBarGroove, CE_ScrollBarAddPage);
     registerCE(drawScrollBarSlider, CE_ScrollBarSlider);
-    // shapes.cpp
+    // indicators.cpp
     registerPE(drawItemCheck, PE_IndicatorViewItemCheck);
 #ifdef QT3_SUPPORT
     registerPE(drawItemCheck, PE_Q3CheckListIndicator);

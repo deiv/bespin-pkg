@@ -32,7 +32,7 @@ SOURCES = animator/basic.cpp animator/aprogress.cpp animator/hover.cpp \
           bespin.cpp stylehint.cpp sizefromcontents.cpp qsubcmetrics.cpp \
           pixelmetric.cpp stdpix.cpp  visualframe.cpp init.cpp genpixmaps.cpp polish.cpp \
           buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp \
-          scrollareas.cpp shapes.cpp slider.cpp tabbing.cpp toolbars.cpp \
+          scrollareas.cpp indicators.cpp slider.cpp tabbing.cpp toolbars.cpp \
           views.cpp window.cpp hacks.cpp
           
 
@@ -46,4 +46,4 @@ QT += qt3support
 
 VERSION       = 0.1
 target.path += $$[QT_INSTALL_PLUGINS]/styles
-INSTALLS += target DATA
+INSTALLS += target
