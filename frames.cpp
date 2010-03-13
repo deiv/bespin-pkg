@@ -57,10 +57,13 @@ Style::isSpecialFrame(const QWidget *widget)
 }
 
 void
-Style::drawFocusFrame(const QStyleOption *option, QPainter *painter, const QWidget *) const
+Style::drawFocusFrame(const QStyleOption *option, QPainter *painter, const QWidget *w) const
 {
     if (option->state & State_Selected || option->state & State_MouseOver)
         return; // looks crap...
+    if ( w && w->style() != this && w->inherits("QAbstractButton"))
+        return; // from QtCssStyle...
+
     painter->save();
     painter->setBrush(Qt::NoBrush);
     painter->setPen(FCOLOR(Highlight));
