@@ -20,6 +20,8 @@
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
 #include <QDesktopWidget>
+#include <QDomElement>
+#include <QFile>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsScene>
 #include <QGraphicsSceneWheelEvent>
@@ -34,6 +36,11 @@
 #include <QTimer>
 
 #include <kwindowsystem.h>
+#include <KDirWatch>
+#include <KIcon>
+#include <KStandardDirs>
+#include <KUriFilterData>
+#include <KRun>
 
 #include <Plasma/Containment>
 #include <Plasma/Theme>
@@ -42,7 +49,6 @@
 
 // #include "button.h"
 #include "menubar.h"
-#include "taskbar.h"
 #include "xbar.h"
 #include "dbus.h"
 
@@ -71,7 +77,8 @@ QTimer XBar::bodyCleaner;
 
 XBar::XBar(QObject *parent, const QVariantList &args) : Plasma::Applet(parent, args)
 {
-    d.taskbar = 0;
+    myMainMenu = 0;
+    myMainMenuDefWatcher = 0;
     d.currentBar = 0; // important!
     dummy = 0;
     if (instance)
@@ -106,14 +113,7 @@ XBar::init()
         QTimer::singleShot(100, this, SLOT(init()));
         return;
     }
-    QWidget *panel = view()->window();
-    if ( panel )
-    {
-        QSizePolicy sp = panel->sizePolicy();
-        sp.setVerticalPolicy( QSizePolicy::Fixed );
-        panel->setSizePolicy( sp );
-    }
-    
+
     if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(containment()->layout()))
         lLayout->setStretchFactor(this, 1000);
     
@@ -131,25 +131,23 @@ XBar::init()
 //     Plasma::Applet::init();
     //TODO : Qt's bug??
     setAspectRatioMode(Plasma::IgnoreAspectRatio);
-    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding));
     setMaximumSize(INT_MAX, INT_MAX);
 
 //     setFlag(ItemClipsChildrenToShape); setFlag(ItemClipsToShape);
     
     // TODO: use plasmoid popup and make this dynamic -> update all menubars...
-    QSettings settings("Bespin", "XBar");
-    settings.beginGroup("XBar");
-    d.extraTitle = settings.value("WindowList", false).toBool();
+//     QSettings settings("Bespin", "XBar");
+//     settings.beginGroup("XBar");
+    d.extraTitle = false; //settings.value("WindowList", false).toBool();
 
-    if (settings.value("ShowTaskbar", true).toBool())
-        d.taskbar = new TaskBar(this, dummy);
-    else
-        d.taskbar = new MenuBar("", 0, this, dummy);
-    d.currentBar = d.taskbar;
+    repopulateMainMenu();
+    
+    d.currentBar = myMainMenu;
 
     updatePalette();
     
-    show(d.taskbar);
+    show(myMainMenu);
     
     new XBarAdaptor(this);
     QDBusConnection::sessionBus().registerService("org.kde.XBar");
@@ -172,7 +170,7 @@ XBar::updatePalette()
     QPalette pal(fg, bg, Qt::white, Qt::black, Qt::gray, fg, fg, bg, bg );
     pal.setColor(QPalette::ButtonText, fg);
     setPalette(pal);
-    d.taskbar->setPalette(pal);
+    myMainMenu->setPalette(pal);
     foreach (MenuBar *menu, d.menus)
         menu->setPalette(pal);
     d.windowList.setPalette(QApplication::palette());
@@ -312,7 +310,7 @@ XBar::mapToGlobal(const QPointF &pt)
 void
 XBar::raiseCurrentWindow()
 {
-    if (!d.currentBar || d.currentBar == d.taskbar)
+    if (!d.currentBar || d.currentBar == myMainMenu)
         return; // nothing to raise...
     dbusAction(d.currentBar, -1, "raise");
 }
@@ -358,8 +356,8 @@ XBar::releaseFocus(qlonglong key)
     }
     if (!n)
     {
-        d.currentBar = d.taskbar;
-        show(d.taskbar);
+        d.currentBar = myMainMenu;
+        show(myMainMenu);
     }
 }
 
@@ -374,6 +372,216 @@ XBar::reparent(qlonglong oldKey, qlonglong newKey)
     d.menus.insert(newKey, bar);
 }
 
+#define LABEL_ERROR "missing \"label\" attribute"
+#define MENU_FUNC(_FUNC_) menu ? menu->_FUNC_ : menubar->_FUNC_
+
+void
+XBar::runFromAction()
+{
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    const QString &command = action->data().toString();
+    KUriFilterData execLineData( command );
+    KUriFilter::self()->filterUri( execLineData, QStringList() << "kurisearchfilter" << "kshorturifilter" );
+    QString cmd = ( execLineData.uri().isLocalFile() ? execLineData.uri().path() : execLineData.uri().url() );
+    
+    if ( cmd.isEmpty() )
+        return;
+    
+    switch( execLineData.uriType() )
+    {
+        case KUriFilterData::LocalFile:
+        case KUriFilterData::LocalDir:
+        case KUriFilterData::NetProtocol:
+        case KUriFilterData::Help:
+        {
+            new KRun( execLineData.uri(), 0 );
+            break;
+        }
+        case KUriFilterData::Executable:
+        case KUriFilterData::Shell:
+        {
+            QString args = cmd;
+            if( execLineData.hasArgsAndOptions() )
+                cmd += execLineData.argsAndOptions();
+            KRun::runCommand( cmd, args, "", 0 );
+            break;
+        }
+        case KUriFilterData::Unknown:
+        case KUriFilterData::Error:
+        default:
+            break;
+    }
+}
+
+void
+XBar::callFromAction()
+{
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    const QString &instruction = action->data().toString();
+    QStringList list = instruction.split(';');
+    if (list.count() < 5)
+    {
+        qWarning("invalid dbus chain, must be: \"bus;service;path;interface;method[;arg1;arg2;...]\", bus is \"session\" or \"system\"");
+        return;
+    }
+    
+    QDBusInterface *caller = 0;
+    if (list.at(0) == "session")
+        caller = new QDBusInterface( list.at(1), list.at(2), list.at(3), QDBusConnection::sessionBus() );
+    else if (list.at(0) == "system")
+        caller = new QDBusInterface( list.at(1), list.at(2), list.at(3), QDBusConnection::systemBus() );
+    else
+    {
+        qWarning("unknown bus, must be \"session\" or \"system\"");
+        return;
+    }
+    
+    QList<QVariant> args;
+    if (list.count() > 5)
+    {
+        for (int i = 5; i < list.count(); ++i)
+        {
+            bool ok = false;
+            short Short = list.at(i).toShort(&ok);
+            if (ok) { args << Short; continue; }
+            unsigned short UShort = list.at(i).toUShort(&ok);
+            if (ok) { args << UShort; continue; }
+            int Int = list.at(i).toInt(&ok);
+            if (ok) { args << Int; continue; }
+            uint UInt = list.at(i).toUInt(&ok);
+            if (ok) { args << UInt; continue; }
+            double Double = list.at(i).toDouble(&ok);
+            if (ok) { args << Double; continue; }
+            
+            args << list.at(i);
+        }
+    }
+    caller->asyncCallWithArgumentList(list.at(4), args);
+    delete caller;
+}
+
+void
+XBar::rBuildMenu(const QDomElement &node, QObject *widget)
+{
+    MenuBar *menubar = 0;
+    QMenu *menu = qobject_cast<QMenu*>(widget);
+    if (!menu)
+    {
+        menubar = qobject_cast<MenuBar*>(widget);
+        if (!menubar)
+            return;
+    }
+    
+    QDomNode kid = node.firstChild();
+    while(!kid.isNull())
+    {
+        QDomElement e = kid.toElement(); // try to convert the node to an element.
+        if(!e.isNull())
+        {
+            if (e.tagName() == "menu")
+            {
+                QString type = e.attribute("menu");
+                if (!type.isEmpty())
+                    buildMenu(type, widget, "submenu");
+                else
+                {
+                    QMenu *newMenu = MENU_FUNC(addMenu(e.attribute("label", LABEL_ERROR)));
+                    rBuildMenu(e, newMenu);
+                }
+            }
+            else if (e.tagName() == "action")
+            {
+                QAction *action = new QAction(widget);
+                QString cmd = e.attribute("dbus");
+                if (!cmd.isEmpty())
+                    connect ( action, SIGNAL(triggered()), SLOT(callFromAction()) );
+                else
+                {
+                    cmd = e.attribute("exec");
+                    if (cmd.isEmpty())
+                    {
+                        cmd = KGlobal::dirs()->locate("services", e.attribute("service") + ".desktop");
+                        if (!cmd.isEmpty())
+                        {
+                            KService kservice(cmd);
+                            action->setIcon(KIcon(kservice.icon()));
+                            action->setText(kservice.name());
+                            cmd = kservice.desktopEntryName();
+                        }
+                    }
+                    if (!cmd.isEmpty())
+                        connect ( action, SIGNAL(triggered()), SLOT(runFromAction()) );
+                    else
+                        qWarning("MainMenu action without effect, add \"dbus\" or \"exec\" attribute!");
+                }
+                action->setData(cmd);
+                if (action->text().isEmpty())
+                    action->setText(e.attribute("label", LABEL_ERROR));
+                QString icn = e.attribute("icon");
+                if (!icn.isEmpty())
+                    action->setIcon(KIcon(icn));
+                MENU_FUNC(addAction(action));
+            }
+            else if (e.tagName() == "separator")
+                MENU_FUNC(addSeparator());
+        }
+        kid = kid.nextSibling();
+    }
+}
+
+
+void
+XBar::buildMenu(const QString &name, QObject *widget, const QString &type)
+{
+    if (!instance)
+        return;
+    
+    QDomDocument menu(name);
+    QFile file(KGlobal::dirs()->locate("data", "XBar/" + name + ".xml"));
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+    if (!menu.setContent(&file))
+    {
+        file.close();
+        return;
+    }
+    file.close();
+    
+    QDomElement element = menu.documentElement();
+    if (!element.isNull() /*&& element.tagName() == type*/)
+        instance->rBuildMenu(element, widget);
+}
+
+void
+XBar::repopulateMainMenu()
+{
+    if (d.currentBar == myMainMenu)
+        d.currentBar = 0;
+    delete myMainMenu;
+    myMainMenu = new MenuBar("", 0, this, dummy);
+    myMainMenu->setAppTitle("Plasma");
+    myMainMenu->addAction("Plasma",-1, &d.windowList);
+
+    delete myMainMenuDefWatcher;
+
+    buildMenu("MainMenu", myMainMenu, "menubar");
+
+    myMainMenuDefWatcher = new KDirWatch(this);
+    myMainMenuDefWatcher->addFile(KGlobal::dirs()->locate("data", "XBar/MainMenu.xml"));
+    connect( myMainMenuDefWatcher, SIGNAL(created(const QString &)), this, SLOT(repopulateMainMenu()) );
+    connect( myMainMenuDefWatcher, SIGNAL(deleted(const QString &)), this, SLOT(repopulateMainMenu()) );
+    connect( myMainMenuDefWatcher, SIGNAL(dirty(const QString &)), this, SLOT(repopulateMainMenu()) );
+
+    if (d.currentBar)
+        myMainMenu->hide();
+    else
+        d.currentBar = myMainMenu;
+}
+
 void
 XBar::requestFocus(qlonglong key)
 {
@@ -381,7 +589,7 @@ XBar::requestFocus(qlonglong key)
     {
         if (i.key() == key)
         {
-            hide(d.taskbar);
+            hide(myMainMenu);
             show(i.value());
         }
         else
@@ -392,7 +600,7 @@ XBar::requestFocus(qlonglong key)
 void
 XBar::setOpenPopup(int idx)
 {
-    if (d.currentBar && d.currentBar != d.taskbar)
+    if (d.currentBar && d.currentBar != myMainMenu)
     {
         d.currentBar->setOpenPopup(idx + d.extraTitle);
         d.currentBar->update();
@@ -416,13 +624,13 @@ XBar::show(MenuBar *item)
 }
 
 void
-XBar::showTaskbar()
+XBar::showMainMenu()
 {
     foreach (MenuBar *menu, d.menus)
         hide(menu);
 
-    d.currentBar = d.taskbar;
-    show(d.taskbar);
+    d.currentBar = myMainMenu;
+    show(myMainMenu);
     if (view())
         view()->activateWindow();
     update();
@@ -445,7 +653,7 @@ XBar::unregisterMenu(qlonglong key)
 void
 XBar::unregisterCurrentMenu()
 {
-    if (!d.currentBar || d.currentBar == d.taskbar)
+    if (!d.currentBar || d.currentBar == myMainMenu)
         return;
     qlonglong key = d.menus.key(d.currentBar, 0);
     if (key)
@@ -489,6 +697,7 @@ XBar::updateWindowlist()
             act->setDisabled(id == KWindowSystem::activeWindow());
         }
     }
+    d.windowList.setTitle("Windows");
     d.windowList.addSeparator();
     d.windowList.addAction ( "Embed menu in window", this, SLOT(unregisterCurrentMenu()) );
 }
@@ -504,9 +713,9 @@ XBar::wheelEvent(QGraphicsSceneWheelEvent *ev)
 
     MenuMap::iterator n;
 
-    if (d.currentBar == d.taskbar)
+    if (d.currentBar == myMainMenu)
     {
-        hide(d.taskbar);
+        hide(myMainMenu);
         if (ev->delta() < 0)
             n = d.menus.begin();
         else
@@ -530,7 +739,7 @@ XBar::wheelEvent(QGraphicsSceneWheelEvent *ev)
         }
     }
     if (n == d.menus.end())
-        show(d.taskbar);
+        show(myMainMenu);
     else
         show(n.value());
 }

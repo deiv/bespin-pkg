@@ -30,10 +30,13 @@ class MenuBar : public QGraphicsWidget
 {
     Q_OBJECT
 public:
-    MenuBar ( const QString &service = QString(), qlonglong key = 0, QGraphicsWidget *parent = 0, const QWidget *dummy = 0);
+    MenuBar ( const QString &service = QString(), qlonglong key = 0, QGraphicsWidget *parent = 0, QWidget *dummy = 0);
 //    virtual ~MenuBar();
     QAction *addAction(const QString & text, int idx = -1, QMenu *menu = 0);
     void addAction(QAction *action, int idx = -1);
+    QAction *addMenu(QMenu *menu);
+    QMenu *addMenu(const QString &title);
+    QAction *addSeparator();
     const QRect &actionGeometry(int idx) const;
     void removeAction(int idx);
     QAction *takeAction(int idx);
@@ -94,7 +97,7 @@ private:
         qlonglong key;
         int hoverIndex;
         int openPopup;
-        const QWidget *widget;
+        QWidget *widget;
     } d;
 };
 

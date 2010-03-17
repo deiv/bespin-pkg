@@ -20,16 +20,15 @@ This library is distributed in the hope that it will be useful,
 #define XBAR_H
 
 class QGraphicsLinearLayout;
+class MenuBar;
+class QGraphicsLinearLayout;
+class KDirWatch;
 
 #include <QMap>
 #include <QMenu>
 #include <QWidget>
 
 #include <Plasma/Applet>
-
-class MenuBar;
-class TaskBar;
-class QGraphicsLinearLayout;
 
 class XBar : public Plasma::Applet
 {
@@ -54,17 +53,22 @@ private:
     void hide(MenuBar *item);
     void show(MenuBar *item);
     bool dbusAction(const QObject *o, int idx, const QString &cmd);
+    void rBuildMenu(const QDomElement &node, QObject *menu);
+    void buildMenu(const QString &name, QObject *widget, const QString &type);
 private:
     typedef QMap<qlonglong, MenuBar*> MenuMap;
     friend class DummyWidget;
     struct {
         MenuMap menus;
         QMenu windowList;
-        MenuBar *taskbar, *currentBar;
-        bool extraTitle, showTaskBar;
+        MenuBar *currentBar;
+        bool extraTitle;
     } d;
+    KDirWatch *myMainMenuDefWatcher;
+    MenuBar *myMainMenu;
     static QTimer bodyCleaner;
 private slots:
+    void callFromAction();
     void hover(int);
     void trigger(int);
     void updatePalette();
@@ -74,7 +78,9 @@ private slots:
     void callMenus();
     void byeMenus();
     void raiseCurrentWindow();
-    void showTaskbar();
+    void runFromAction();
+    void repopulateMainMenu();
+    void showMainMenu();
     void cleanBodies();
 };
 

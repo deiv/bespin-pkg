@@ -41,7 +41,7 @@ This library is distributed in the hope that it will be useful,
 static QBasicTimer mousePoll;
 static QPointF lastMousePos;
 
-MenuBar::MenuBar( const QString &service, qlonglong key, QGraphicsWidget *parent, const QWidget *dummy) :
+MenuBar::MenuBar( const QString &service, qlonglong key, QGraphicsWidget *parent, QWidget *dummy) :
 QGraphicsWidget(parent)
 {
     setFocusPolicy(Qt::NoFocus);
@@ -51,9 +51,12 @@ QGraphicsWidget(parent)
     d.service = service;
     d.key = key;
     d.widget = dummy;
-    if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(parent->layout()))
-        lLayout->insertItem(0, this);
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+    if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(parent->layout()))
+    {
+        lLayout->insertItem(0, this);
+        lLayout->setAlignment(this, Qt::AlignCenter|Qt::AlignLeft);
+    }
 //     setFont();
 //    setObjectName( "XBarMenubar" );
 }
@@ -151,6 +154,26 @@ MenuBar::addAction(QAction *action, int idx)
     
     connect (action, SIGNAL(changed()), this, SLOT(actionChanged()));
     updateSize();
+}
+
+QAction *
+MenuBar::addMenu(QMenu *menu)
+{
+    return addAction(menu->title(), -1, menu);
+}
+
+QMenu *
+MenuBar::addMenu(const QString &title)
+{
+    QMenu *menu = new QMenu(d.widget);
+    addAction(title, -1, menu);
+    return menu;
+}
+
+QAction*
+MenuBar::addSeparator()
+{
+    return addAction("<XBAR_SEPARATOR/>", -1);
 }
 
 void
