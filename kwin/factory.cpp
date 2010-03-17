@@ -637,6 +637,13 @@ Factory::supports( Ability ability ) const
     case AbilityColorButtonBack: ///< decoration supports button background color
         return true;
         
+    // composite
+    case AbilityUsesAlphaChannel: /// don't clip - it's expensive with composition
+        
+    case AbilityProvidesShadow: /// rather not
+    case AbilityExtendIntoClientArea: /// i don't even know what this is :-)
+    case AbilityClientGrouping: /// errr - NO
+
     case AbilityColorButtonFore: ///< decoration supports button foreground color
     case AbilityColorFrame: ///< decoration supports frame color
     case AbilityButtonResize: ///< decoration supports a resize button
