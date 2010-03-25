@@ -918,7 +918,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
             // plamsoids apparently have fun in removing it (together with dropshadows - TROTTEL!)
             // const bool isPopup = (window->windowFlags() & (Qt::Popup & ~Qt::Window));
             // so we use qobject_cast... *GRRRRRRrrrrrRRRRRRRRrr*
-            const bool isPopup = bool(qobject_cast<QMenu*>(window));
+            const bool isPopup = (appType == Plasma) ? bool(qobject_cast<QMenu*>(window)) :
+                                                       (window->windowFlags() & (Qt::Popup & ~Qt::Window));
             const int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
             if (opacity == 0xff)
                 return false;

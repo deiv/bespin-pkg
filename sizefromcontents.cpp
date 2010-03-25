@@ -19,6 +19,7 @@
 #include <QAbstractButton>
 #include <QStyleOptionComboBox>
 #include <QStyleOptionMenuItem>
+#include <QTabBar>
 #include "bespin.h"
 #include "makros.h"
 
@@ -170,11 +171,17 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         if HAVE_OPTION(tab, Tab)
         {
             int add = F(9);
+            int other = 0;
+#if QT_VERSION >= 0x040500
+            if ( appType == Dolphin && widget )
+            if ( const QTabBar *bar = qobject_cast<const QTabBar*>(widget) )
+                other = qMax( 0, 16+F(8)-contentsSize.height() ); // compensate the close buttons
+#endif
             switch (tab->shape)
             {
             case QTabBar::RoundedNorth: case QTabBar::TriangularNorth:
             case QTabBar::RoundedSouth: case QTabBar::TriangularSouth:
-                return contentsSize + QSize(add, 0);
+                return contentsSize + QSize(add, other);
             case QTabBar::RoundedEast: case QTabBar::TriangularEast:
             case QTabBar::RoundedWest: case QTabBar::TriangularWest:
                 return contentsSize + QSize(0, add);

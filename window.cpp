@@ -112,7 +112,8 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
 {
     if (!(widget && widget->isWindow()))
         return; // can't do anything here
-//     if ( widget->windowFlags() & (Qt::SplashScreen & ~Qt::Window) ) // err... no. splashscreens want their own bg?
+        // err... no. splashscreens want their own bg? but this applies to popups as well ???
+//     if ( widget->windowFlags() & (Qt::SplashScreen & ~Qt::Window) )
 //         return;
 
 //     if (widget->testAttribute(Qt::WA_NoSystemBackground))

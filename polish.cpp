@@ -359,7 +359,7 @@ Style::polish( QWidget * widget )
     if ( widget->isWindow() &&
 //          widget->testAttribute(Qt::WA_WState_Created) &&
 //          widget->internalWinId() &&
-         !widget->inherits("QTipLabel") )
+         !(widget->inherits("QTipLabel") || widget->inherits("QSplashScreen")) )
     {
 //         QPalette pal = widget->palette();
 
@@ -812,15 +812,16 @@ Style::polish( QWidget * widget )
         widget->removeEventFilter(this);
         widget->installEventFilter(this);
     }
-    else if (widget->inherits("KUrlNavigator"))
+    else if (appType == Dolphin && widget->inherits("KUrlNavigator"))
     {
-        QList<QAbstractButton*> btns = widget->findChildren<QAbstractButton*>();
-        foreach (QAbstractButton *btn, btns)
-        {
+        widget->setContentsMargins(0,0,0,F(1));
+//         QList<QAbstractButton*> btns = widget->findChildren<QAbstractButton*>();
+//         foreach (QAbstractButton *btn, btns)
+//         {
 //             KUrlDropDownButton, KUrlNavigatorButton, KProtocolCombo
-            if ( btn->inherits("KFilePlacesSelector") || btn->inherits("KUrlToggleButton") )
-                btn->setIconSize(QSize(17,17));
-        }
+//             if ( btn->inherits("KFilePlacesSelector") || btn->inherits("KUrlToggleButton") )
+//                 btn->setIconSize(QSize(17,17));
+//         }
     }
     else if (config.bg.docks.invert)
     {
