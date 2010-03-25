@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLCDNumber>
+#include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
 #include <QPainter>
@@ -394,7 +395,11 @@ Style::polish( QWidget * widget )
              widget->windowType() != Qt::Desktop && // makes no sense + QDesktopWidget is often misused
              !widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) )
             widget->setPalette( *amarokPalette );
-
+#if QT_VERSION >= 0x040500
+        if ( appType == Dolphin )
+        if ( QMainWindow *mw = qobject_cast<QMainWindow*>(widget) )
+            mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );
+#endif
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
         {
@@ -787,11 +792,11 @@ Style::polish( QWidget * widget )
     }
 
 #if QT_VERSION >= 0x040500
-        else if ( widget->inherits( "QTabWidget" ) )
-        {
-            widget->removeEventFilter(this);
-            widget->installEventFilter( this );
-        }
+    else if ( widget->inherits( "QTabWidget" ) )
+    {
+        widget->removeEventFilter(this);
+        widget->installEventFilter( this );
+    }
 #endif
 
     //BEGIN Tab animation, painting override                                                       -
@@ -806,6 +811,16 @@ Style::polish( QWidget * widget )
         // the eventfilter overtakes the widget painting to allow tabs ABOVE the tabbar
         widget->removeEventFilter(this);
         widget->installEventFilter(this);
+    }
+    else if (widget->inherits("KUrlNavigator"))
+    {
+        QList<QAbstractButton*> btns = widget->findChildren<QAbstractButton*>();
+        foreach (QAbstractButton *btn, btns)
+        {
+//             KUrlDropDownButton, KUrlNavigatorButton, KProtocolCombo
+            if ( btn->inherits("KFilePlacesSelector") || btn->inherits("KUrlToggleButton") )
+                btn->setIconSize(QSize(17,17));
+        }
     }
     else if (config.bg.docks.invert)
     {

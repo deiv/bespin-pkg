@@ -88,9 +88,9 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case QStyle::PM_DockWidgetTitleBarButtonMargin:
         return 0;//F(0);
     case QStyle::PM_DockWidgetTitleMargin:
-        if (widget && widget->windowTitle().isEmpty())
+        if (widget &&widget->windowTitle().isEmpty())
             return 0;
-        return F(4);
+        return (appType == Dolphin) ? F(5) : F(4);
     case PM_DockWidgetSeparatorExtent: // Width of a separator in a horizontal dock window and the height of a separator in a vertical dock window
         return F(10);
     case PM_DockWidgetHandleExtent: // Width of the handle in a horizontal dock window and the height of the handle in a vertical dock window

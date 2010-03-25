@@ -453,7 +453,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     // a key problem seems to be fixed text colors
     // also it will segfault if we hide scrollbar buttons
     // so we adjust some settings here
-    if (appType == GTK)
+    if (appType == GTK || appType == OpenOffice)
     {
         config.bg.mode = Plain;
         config.bg.modal.glassy = false;
@@ -558,6 +558,8 @@ Style::init(const QSettings* settings)
             appType = KWin;
         else if (appName == "amarok")
             appType = Amarok;
+        else if (appName == "OpenOffice.org")
+            appType = OpenOffice;
 //             if (appName == "arora")
 //                 appType = Arora;
     }

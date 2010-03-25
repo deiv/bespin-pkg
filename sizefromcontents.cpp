@@ -48,11 +48,13 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
     case CT_ComboBox: // A combo box, like QComboBox
         if HAVE_OPTION(cb, ComboBox)
         {
+            if (cb->editable)
+                return contentsSize + QSize(F(4), F(2));
             int hgt = contentsSize.height();
             int d = F(2);
             if ( cb->frame )
             {
-                hgt += (cb->editable || config.btn.fullHover) ? F(2) : F(4);
+                hgt += (config.btn.fullHover) ? F(2) : F(4);
                 d = F(10);
             }
 //             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
@@ -74,7 +76,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
             return sz;
         }
     case CT_LineEdit: // A line edit, like QLineEdit
-        return contentsSize + QSize(F(4),F(2));
+        return contentsSize + QSize(F(4), F(2));
     case CT_MenuBarItem:
     {   // A menu bar item, like the buttons in a QMenuBar
         const int h = contentsSize.height()+F(4);

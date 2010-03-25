@@ -112,6 +112,8 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
 {
     if (!(widget && widget->isWindow()))
         return; // can't do anything here
+//     if ( widget->windowFlags() & (Qt::SplashScreen & ~Qt::Window) ) // err... no. splashscreens want their own bg?
+//         return;
 
 //     if (widget->testAttribute(Qt::WA_NoSystemBackground))
 //         return; // those shall be translucent - but should be catched by Qt
