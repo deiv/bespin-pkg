@@ -5,19 +5,18 @@ if [ $# != 2 ]; then
     exit;
 fi
 
-if [ ! -e background.png ]; then
-    convert ../kdm/background.jpg background.png
-fi
-
 X=$(( ($1-740)/2 ))
 Y=$(( ($2-420)/2 ))
 DIR="${1}x${2}"
 
 mkdir "$DIR" 2>/dev/null
 
-echo "SCALE ON
-BACKGROUND_IMAGE 0 0 ../background.png
-SCALE OFF
+if [ ! -e "$DIR/background.png" ]; then
+    convert -scale $DIR! -filter lanczos ../kdm/background.jpg "$DIR/background.png"
+fi
+
+echo "SCALE OFF
+BACKGROUND_IMAGE 0 0 background.png
 
 ANIM 1 $X $Y 10 ../init.png 80 1
 WAIT_STATE kded
