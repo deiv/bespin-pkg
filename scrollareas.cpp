@@ -502,9 +502,13 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         o = Qt::Vertical; size = r.height();
     }
 
+    QPoint offset;
+    if (!config.showOff)
+        offset = -r.topLeft()/2;
+
     QColor bc = config.btn.fullHover ? c : CCOLOR(scroll._, Bg);
     bc.setAlpha(255); // CCOLOR(scroll._, Bg) pot. reintroduces translucency...
-    masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size);
+    masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size, offset);
 
     // reflexive outline
     if (!sunken && Gradients::isReflective(GRAD(btn)))
@@ -520,7 +524,8 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     else
         { dw /= 4; dh /= 8; }
     r.adjust(dw, dh, -dw, -dh);
-    masks.rect[false].render(r, painter, GRAD(scroll), o, c, size, QPoint(dw,dh));
+    offset += QPoint(dw, dh);
+    masks.rect[false].render(r, painter, GRAD(scroll), o, c, size, offset);
 }
 
 //    case CE_ScrollBarFirst: // Scroll bar first line indicator (i.e., home).
