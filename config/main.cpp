@@ -26,6 +26,7 @@
 #include <QTimer>
 
 #define CHAR(_QSTRING_) _QSTRING_.toLatin1().data()
+#define RETURN_APP_ERROR int ret = app->exec(); delete window; delete app; return ret
 
 class BStyle : public QStyle
 {
@@ -98,7 +99,7 @@ main(int argc, char *argv[])
         BConfigDialog *window = new BConfigDialog(config, BConfigDialog::All &
                                                           ~(BConfigDialog::Import | BConfigDialog::Export));
         window->show();
-        return app->exec();
+        RETURN_APP_ERROR;
     }
     case Presets:
     {
@@ -216,7 +217,7 @@ main(int argc, char *argv[])
         QObject::connect (ui.rtl, SIGNAL(toggled(bool)), window, SLOT(setLayoutDirection(bool)));
         window->setWindowTitle ( title );
         window->show();
-        return app->exec();
+        RETURN_APP_ERROR;
     }
     case Screenshot:
     {
@@ -241,6 +242,8 @@ main(int argc, char *argv[])
         if (argc > 4)
             image = image.scaledToWidth(atoi(argv[4]), Qt::SmoothTransformation);
         image.save ( argv[2], "png" );
+        delete window;
+        delete app;
         return 0;
     }
     case ListStyles:
