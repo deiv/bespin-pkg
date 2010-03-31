@@ -27,6 +27,7 @@
 #ifndef QT_NO_XRENDER
 
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include <X11/extensions/Xrender.h>
 #include "fixx11h.h"
 
@@ -57,6 +58,7 @@ namespace FX
 #endif
 
     BLIB_EXPORT void init();
+    BLIB_EXPORT bool compositingActive();
     BLIB_EXPORT bool usesXRender();
     BLIB_EXPORT bool blend(const QPixmap &upper, QPixmap &lower, double opacity = 0.5, int x = 0, int y = 0);
     BLIB_EXPORT void desaturate(QImage &img, const QColor &c);

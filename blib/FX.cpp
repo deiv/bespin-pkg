@@ -17,11 +17,13 @@
  */
 
 #include <QPainter>
+
 #ifdef Q_WS_X11
     #ifndef QT_NO_XRENDER
         #include <QX11Info>
         #include <QPaintEngine>
     #endif
+    
 #else
     #define QT_NO_XRENDER #
 #endif
@@ -31,7 +33,12 @@
 // #include <QWidget>
 // #include <QtCore/QVarLengthArray>
 #include <cmath>
+#include <stdio.h>
 #include "FX.h"
+
+#ifdef Q_WS_X11
+static Atom net_wm_cm;
+#endif
 
 using namespace FX;
 
@@ -197,11 +204,27 @@ FX::expblur( QImage &img, int radius )
 }
 // ======================================================
 
+// stolen from KWindowSystem
+bool FX::compositingActive()
+{
+#ifdef Q_WS_X11
+    return XGetSelectionOwner( QX11Info::display(), net_wm_cm ) != None;
+#else
+    return true;
+#endif
+}
+
 static bool useRender = false;
 
 void
 FX::init()
 {
+#ifdef Q_WS_X11
+    Display *dpy = QX11Info::display();
+    char string[ 100 ];
+    sprintf(string, "_NET_WM_CM_S%d", DefaultScreen( dpy ));
+    net_wm_cm = XInternAtom(dpy, string, False);
+#endif
 #ifndef QT_NO_XRENDER
     QPixmap pix(1,1);
     QPainter p(&pix);

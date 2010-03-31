@@ -575,7 +575,8 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     else
         data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
 #if BESPIN_ARGB_WINDOWS
-    if (!uno)
+    const bool ARGB_deco = !uno && FX::compositingActive();
+    if (ARGB_deco)
         bg.setAlpha(config.bg.opacity);
 #endif
     data.inactiveWindow = bg.rgba();
@@ -587,7 +588,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
         bg = bg.light(115-Colors::value(bg)/20);
     
 #if BESPIN_ARGB_WINDOWS
-    if (!uno)
+    if (ARGB_deco)
         bg.setAlpha(config.bg.opacity);
 #endif
     data.activeWindow = bg.rgba();
@@ -910,19 +911,17 @@ Style::eventFilter( QObject *object, QEvent *ev )
         return false; // just for performance - they can occur really often
     case QEvent::Paint:
 #if BESPIN_ARGB_WINDOWS
-        if (!(config.bg.opacity == 0xff && config.menu.opacity == 0xff))
-        if (QWidget *window = qobject_cast<QWidget*>(object))
+        if (object->isWidgetType())
+        if (QWidget *window = static_cast<QWidget*>(object))
+        if (window->testAttribute(Qt::WA_TranslucentBackground))
         if (window->isWindow())
         {
-            // NOTICE this fast check fails, because -guess who- PLAMSA [sic] or at least some stupid
-            // plamsoids apparently have fun in removing it (together with dropshadows - TROTTEL!)
-            // const bool isPopup = (window->windowFlags() & (Qt::Popup & ~Qt::Window));
-            // so we use qobject_cast... *GRRRRRRrrrrrRRRRRRRRrr*
-            const bool isPopup = (appType == Plasma) ? bool(qobject_cast<QMenu*>(window)) :
-                                                       (window->windowFlags() & (Qt::Popup & ~Qt::Window));
+            const bool isPopup =  window->windowFlags() & (Qt::Popup & ~Qt::Window);
             const int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
-            if (opacity == 0xff)
+
+            if (opacity == 0xff && !(isPopup && FX::compositingActive()))
                 return false;
+
             QPainter p(window);
             p.setPen(Qt::NoPen);
             const bool glassy = window->testAttribute(Qt::WA_MacBrushedMetal);

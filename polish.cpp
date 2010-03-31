@@ -42,6 +42,7 @@
 #include <cmath>
 
 #include "blib/colors.h"
+#include "blib/FX.h"
 
 #ifdef Q_WS_X11
 #include "macmenu.h"
@@ -410,10 +411,11 @@ Style::polish( QWidget * widget )
             }
             // opacity
 #if BESPIN_ARGB_WINDOWS
-            if ( !(config.menu.opacity == 0xff || widget->testAttribute(Qt::WA_TranslucentBackground)) )
+            if ( !widget->testAttribute(Qt::WA_TranslucentBackground) &&
+                (config.menu.opacity != 0xff || FX::compositingActive()) )
             {
-                widget->setAttribute(Qt::WA_TranslucentBackground);
-                widget->setAttribute(Qt::WA_StyledBackground);
+                menu->setAttribute(Qt::WA_TranslucentBackground);
+                menu->setAttribute(Qt::WA_StyledBackground);
                 menu->setAutoFillBackground(false);
             }
             else
@@ -424,6 +426,9 @@ Style::polish( QWidget * widget )
             menu->setForegroundRole ( config.menu.std_role[Fg] );
             if (config.menu.boldText)
                 setBoldFont(menu);
+
+            if (appType == Plasma) // GNARF!
+                menu->setWindowFlags( menu->windowFlags()|Qt::Popup);
             
             // eventfiltering to reposition MDI windows, shaping, paint ARGB bg and correct distance to menubars
             menu->removeEventFilter(this);

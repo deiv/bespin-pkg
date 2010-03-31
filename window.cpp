@@ -107,6 +107,42 @@ Style::resetRingPix()
     delete rings; rings = 0L;
 }
 
+static const bool rounderAlphaCorners = true;
+
+static void shapeCorners( QPainter *p, const QRect &r, const Tile::Set &mask )
+{
+    p->setCompositionMode(QPainter::CompositionMode_DestinationIn);
+    p->drawPixmap( r.topLeft(), mask.corner(Tile::Top|Tile::Left) );
+    QPixmap cnr = mask.corner(Tile::Top|Tile::Right);
+    p->drawPixmap( r.right()+1-cnr.width(), r.top(), cnr );
+    cnr = mask.corner(Tile::Bottom|Tile::Left);
+    p->drawPixmap( r.left(), r.bottom()+1-cnr.height(), cnr );
+    cnr = mask.corner(Tile::Bottom|Tile::Right);
+    p->drawPixmap( r.bottomRight() - cnr.rect().bottomRight(), cnr );
+    p->setCompositionMode(QPainter::CompositionMode_SourceOver);
+}
+
+void
+Style::drawTitleShadow( QPainter *painter, const QWidget *widget ) const
+{
+    const bool uno = config.UNO.toolbar && !config.UNO.sunken;
+    if (config.shadowTitlebar || uno)
+    {
+        int y = 0;
+        if ( config.UNO.toolbar )
+        {
+            y = widget->property("UnoHeight").toInt();
+            if ( y > 0 )
+                ++y;
+            else if ( !config.shadowTitlebar )
+                return;
+        }
+        const QPixmap &shadow = shadows.sunken[false][true].tile(Tile::TopMid);
+        painter->drawTiledPixmap( 0,y, widget->width(), shadow.height(), shadow );
+    }
+}
+
+
 void
 Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widget) const
 {
@@ -128,20 +164,24 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         return;
 
     const bool isPopup = widget->windowFlags() & (Qt::Popup & ~Qt::Window);
-    const int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
+    const int opacity = FX::compositingActive()  ? (isPopup ? config.menu.opacity : config.bg.opacity) : 0xff;
 
 #if BESPIN_ARGB_WINDOWS
     if (opacity < c.alpha())
         c.setAlpha(opacity);
 #endif
+#if QT_VERSION >= 0x040500
+    const bool isARGB = widget->testAttribute(Qt::WA_TranslucentBackground);
+#else
+    const bool isARGB = false;
+#endif
+
     bool translucent = false;
     if (c.alpha() < 0xff)
     {
-#if QT_VERSION >= 0x040500
-        if (widget->testAttribute(Qt::WA_TranslucentBackground))
+    if (isARGB)
             translucent = true;
         else
-#endif
             c.setAlpha(0xff);
     }
 
@@ -187,20 +227,18 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         if (drawRings)
             painter->drawPixmap(widget->width()-450, 0, *rings);
 
+        if (isARGB && isPopup)
+            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
         painter->restore();
         return;
     }
 
     // cause of scrollbars - kinda optimization
-    if (config.bg.mode == Plain)
+    if (config.bg.mode == Plain && !isPopup)
     {
         if (drawRings)
             painter->drawPixmap(widget->width()-450, 0, *rings);
-        if (config.shadowTitlebar)
-        {
-            const QPixmap &shadow = shadows.sunken[false][true].tile(Tile::TopMid);
-            painter->drawTiledPixmap( 0,0, widget->width(), shadow.height(), shadow );
-        }
+        drawTitleShadow(painter, widget);
         return;
     }
 
@@ -211,20 +249,23 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         painter->setPen(Qt::NoPen);
         painter->setBrush(Gradients::structure(c, light));
         painter->drawRect(widget->rect());
-        if (config.shadowTitlebar)
+        if (isPopup)
         {
-            const QPixmap &shadow = shadows.sunken[false][true].tile(Tile::TopMid);
-            painter->drawTiledPixmap( 0,0, widget->width(), shadow.height(), shadow );
+            if (isARGB)
+                shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
         }
+        else
+            drawTitleShadow(painter, widget);
         painter->restore();
         return;
     }
 
 #if BESPIN_ARGB_WINDOWS
-    if (translucent)
+    if (isARGB)
     {
         painter->fillRect(widget->rect(), c);
-        c = Qt::transparent;
+        if (translucent)
+            c = Qt::transparent;
     }
 #endif
 
@@ -312,11 +353,14 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     }
     if (drawRings)
         painter->drawPixmap(widget->width()-450, 0, *rings);
-    if (config.shadowTitlebar)
+    if (isPopup)
     {
-        const QPixmap &shadow = shadows.sunken[false][true].tile(Tile::TopMid);
-        painter->drawTiledPixmap( 0,0, widget->width(), shadow.height(), shadow );
+        if (isARGB)
+            shapeCorners( painter, rect, masks.rect[rounderAlphaCorners] );
     }
+    else
+        drawTitleShadow(painter, widget);
+    
 }
 
 void

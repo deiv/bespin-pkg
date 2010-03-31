@@ -261,6 +261,7 @@ protected:
     void drawWindowBg(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawToolTip(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawTitleBar(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
+    void drawTitleShadow(QPainter*, const QWidget*) const;
     void drawSizeGrip(const QStyleOption*, QPainter*, const QWidget*) const;
     // ==========================================
     void fillWithMask(QPainter *painter, const QPoint &xy, const QBrush &brush, const QPixmap &mask, QPoint offset = QPoint()) const;
