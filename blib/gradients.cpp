@@ -545,6 +545,7 @@ const QPixmap
         i = _bgIntensity - 100;
         p.setPen(Qt::NoPen);
         p.setBrush( c.light(100+3*i/10) );
+        p.drawRect( pix->rect() );
         p.setPen(QPen(light ? c.light(100+i/10) : c, 2));
         p.setBrush( c.dark(100+2*i/10) );
         p.drawRect(-3,8,70,8);
