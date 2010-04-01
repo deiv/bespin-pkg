@@ -381,8 +381,8 @@ Style::polish( QWidget * widget )
         if (config.bg.glassy)
             widget->setAttribute(Qt::WA_MacBrushedMetal);
 
-        if ( config.bg.mode > Plain || config.bg.opacity != 0xff || config.bg.ringOverlay ||
-             widget->testAttribute(Qt::WA_MacBrushedMetal) )
+        if ( config.bg.mode > Plain || (config.UNO.toolbar && !config.UNO.sunken) ||
+             config.bg.opacity != 0xff || config.bg.ringOverlay || widget->testAttribute(Qt::WA_MacBrushedMetal) )
         {
             if (config.bg.opacity != 0xff)
             {
@@ -412,7 +412,7 @@ Style::polish( QWidget * widget )
             // opacity
 #if BESPIN_ARGB_WINDOWS
             if ( !widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                (config.menu.opacity != 0xff || FX::compositingActive()) )
+                (config.menu.opacity != 0xff || (config.menu.round && FX::compositingActive())) )
             {
                 menu->setAttribute(Qt::WA_TranslucentBackground);
                 menu->setAttribute(Qt::WA_StyledBackground);

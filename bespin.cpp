@@ -916,11 +916,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (window->testAttribute(Qt::WA_TranslucentBackground))
         if (window->isWindow())
         {
+            const bool isARGB = FX::compositingActive();
             const bool isPopup =  window->windowFlags() & (Qt::Popup & ~Qt::Window);
-            const int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
-
-            if (opacity == 0xff && !(isPopup && FX::compositingActive()))
-                return false;
+            const int opacity = isARGB ? (isPopup ? config.menu.opacity : config.bg.opacity) : 0xff;
 
             QPainter p(window);
             p.setPen(Qt::NoPen);
