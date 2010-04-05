@@ -16,35 +16,26 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <QAbstractItemView>
+#include <QApplication>
 #include <QCoreApplication>
 #include <QDesktopWidget>
-#include <QDial>
 #include <QDockWidget>
 #include <QEvent>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
-#include <QMainWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPointer>
-#include <QProgressBar>
-#include <QPushButton>
-#include <QSplitter>
-#include <QSlider>
+#include <QProgressBar> // kmix
 #include <QStatusBar>
 #include <QStyle>
 #include <QStyleOption>
 #include <QStyleOptionGroupBox>
-#include <QStyleOptionSlider>
-#include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
-#include <QUrl>
-#include <QWidgetAction>
 
 #ifdef Q_WS_X11
 
@@ -71,44 +62,14 @@ using namespace Bespin;
 
 #define ENSURE_INSTANCE if (!bespinHacks) bespinHacks = new Hacks
 
-#if 0
-class ClickLabel : public QLabel {
-public:
-    ClickLabel(QWidget *p = 0, Qt::WindowFlags f = 0) : QLabel(p,f) { setAttribute(Qt::WA_PaintOnScreen); }
-    void setPixmap(const QPixmap &pix, const QWidget *relative = 0)
-    {
-        QLabel::setPixmap(pix);
-        resize(pix.size());
-        QRect r = rect();
-        QRect desktop = QDesktopWidget().availableGeometry();
-        if (relative)
-        {
-            r.moveCenter(relative->mapToGlobal(relative->rect().center()));
-            if (r.right() > desktop.right()) r.moveRight(desktop.right());
-            if (r.bottom() > desktop.bottom()) r.moveBottom(desktop.bottom());
-            if (r.left() < desktop.left()) r.moveLeft(desktop.left());
-            if (r.top() < desktop.top()) r.moveTop(desktop.top());
-        }
-        else
-            r.moveCenter(desktop.center());
-        move(r.topLeft());
-    }
-protected:
-    void mousePressEvent(QMouseEvent * me)
-    {
-        if (me->button() != Qt::LeftButton)
-            return;
-        hide(); deleteLater();
-    }
-};
-#endif
 
 static Hacks *bespinHacks = 0;
 static Hacks::HackAppType *appType = 0;
 const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
+static QPointer<QWidget> dragCandidate = NULL;
 static QPointer<QWidget> dragWidget = NULL;
-static bool dragHadTrack = false;
+static bool dragWidgetHadTrack = false;
 
 static void
 triggerWMMove(const QWidget *w, const QPoint &p)
@@ -264,20 +225,21 @@ isWindowDragWidget(QObject *o)
             (qobject_cast<QMenuBar*>(o) && !static_cast<QMenuBar*>(o)->activeAction()) ||
             qobject_cast<QGroupBox*>(o) ||
         
-            (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled()) ||
+            (qobject_cast<QToolButton*>(o) && !static_cast<QWidget*>(o)->isEnabled()) ||
             qobject_cast<QToolBar*>(o) || qobject_cast<QDockWidget*>(o) ||
 //         o->inherits("QMainWindow") || // this is mostly useles... PLUS triggers problems
 
             ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
             ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
 
-            o->inherits("QStatusBar") ||
-            (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar")));
+            qobject_cast<QStatusBar*>(o) || (qobject_cast<QLabel*>(o) && qobject_cast<QStatusBar*>(o->parent())) );
 }
 
 static bool
 hackMoveWindow(QWidget* w, QEvent *e)
 {
+    if (w->mouseGrabber())
+        return false;
     // general validity ================================
     QMouseEvent *mev = static_cast<QMouseEvent*>(e);
 //         !w->rect().contains(w->mapFromGlobal(QCursor::pos()))) // KColorChooser etc., catched by mouseGrabber ?!
@@ -315,11 +277,8 @@ hackMoveWindow(QWidget* w, QEvent *e)
         (mev->pos().y() < w->fontMetrics().height()+4 && qobject_cast<QDockWidget*>(w)))
         return false;
 
-//     QMouseEvent rel(QEvent::MouseButtonRelease, mev->pos(), mev->button(),
-//                     mev->buttons(), mev->modifiers());
-//     QCoreApplication::sendEvent( w, &rel );
     triggerWMMove(w, mev->globalPos());
-//     w->setWindowState ( w->windowState() | Qt::WindowActive );
+
     return true;
 }
 
@@ -362,6 +321,8 @@ Hacks::setKmixMask(int)
     }
     pb->setMask(mask);
 }
+
+QWidget *dummy = 0;
 
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
@@ -412,6 +373,9 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     if (QMessageBox* box = qobject_cast<QMessageBox*>(o))
         return hackMessageBox(box, e);
 
+    if ( o == dummy )
+        qDebug() << e->type();
+
     if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o))
     {
         QWidget *w = static_cast<QWidget*>(o);
@@ -421,23 +385,42 @@ Hacks::eventFilter(QObject *o, QEvent *e)
             (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
             return false;
         
-        dragWidget = w;
-        dragHadTrack = dragWidget->hasMouseTracking();
-        dragWidget->setMouseTracking(true);
+        dragCandidate = w;
         return false;
     }
-    else if (e->type() == QEvent::MouseButtonRelease && dragWidget)
+    else if (e->type() == QEvent::MouseButtonRelease && dragCandidate)
     {
-        dragWidget->setMouseTracking(dragHadTrack);
-        dragWidget = NULL;
+        dragCandidate = 0L;
         return false;
     }
-    else if (e->type() == QEvent::MouseMove && dragWidget)
+    else if (e->type() == QEvent::MouseMove)
     {
-        dragWidget->setMouseTracking(dragHadTrack);
-        bool ret = hackMoveWindow(dragWidget, e);
-        dragWidget = NULL;
-        return ret;
+        if ( dragCandidate ) // gonna be draged
+        {
+            const bool wmDrag = hackMoveWindow(dragCandidate, e);
+            if ( wmDrag )
+            {
+                dragWidget = dragCandidate;
+                dragWidgetHadTrack = dragWidget->hasMouseTracking();
+                dragWidget->setMouseTracking(true);
+                // the release would set "dragCandidate = 0L;", therfore it cannot be done in hackMoveWindow
+                // it's probably not required either
+                QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+                QMouseEvent mbr(QEvent::MouseButtonRelease, mev->pos(), mev->button(), mev->buttons(), mev->modifiers());
+                QCoreApplication::sendEvent( dragWidget, &mbr );
+            }
+            dragCandidate = 0L;
+            return wmDrag;
+        }
+        else if ( dragWidget ) // has been dragged
+        {
+            dragWidget->setMouseTracking(dragWidgetHadTrack);
+            const QPoint cursor = QCursor::pos();
+            QCursor::setPos(-1, -1);
+            QCursor::setPos(cursor);
+            dragWidget = 0L;
+            return false;
+        }
     }
 
     return false;
