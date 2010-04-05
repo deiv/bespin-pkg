@@ -69,7 +69,7 @@ const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
 static QPointer<QWidget> dragCandidate = NULL;
 static QPointer<QWidget> dragWidget = NULL;
-// static bool dragWidgetHadTrack = false;
+static bool dragWidgetHadTrack = false;
 
 static void
 triggerWMMove(const QWidget *w, const QPoint &p)
@@ -325,6 +325,19 @@ Hacks::setKmixMask(int)
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
+    if (dragWidget && e->type() == QEvent::MouseMove)
+    {
+        qApp->removeEventFilter(this);
+        dragWidget->setMouseTracking(dragWidgetHadTrack);
+        // the widget needs an leave/enter to update the mouse state
+        // sending events doesn't work, so we generate a wink-of-an-eye cursor repositioning ;-P
+        const QPoint cursor = QCursor::pos();
+        QCursor::setPos(-1, -1);
+        QCursor::setPos(cursor);
+        dragWidget = 0L;
+        return false;
+    }
+    
     if (*appType == KMix)
     {
         if (e->type() == QEvent::Paint)
@@ -368,20 +381,14 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         }
     }
 
+    if (e->type() == QEvent::Timer || e->type() == QEvent::Move)
+        return false;
+
     if (QMessageBox* box = qobject_cast<QMessageBox*>(o))
         return hackMessageBox(box, e);
 
-    if (dragWidget && e->type() == QEvent::Paint)
-    {
-//         dragWidget->setMouseTracking(dragWidgetHadTrack);
-        // the widget needs an leave/enter to update the mouse state
-        // sending events doesn't work, so we generate a wink-of-an-eye cursor repositioning ;-P
-        const QPoint cursor = QCursor::pos();
-        QCursor::setPos(-1, -1);
-        QCursor::setPos(cursor);
-        dragWidget = 0L;
+    if ( e->type() == QEvent::Paint )
         return false;
-    }
 
     if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o))
     {
@@ -396,7 +403,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         return false;
     }
 
-    if (e->type() == QEvent::MouseButtonRelease && dragCandidate)
+    if (dragCandidate && e->type() == QEvent::MouseButtonRelease)
     {   // was just a click
         dragCandidate = 0L;
         return false;
@@ -414,8 +421,9 @@ Hacks::eventFilter(QObject *o, QEvent *e)
             QMouseEvent *mev = static_cast<QMouseEvent*>(e);
             QMouseEvent mbr(QEvent::MouseButtonRelease, mev->pos(), mev->button(), mev->buttons(), mev->modifiers());
             QCoreApplication::sendEvent( dragWidget, &mbr );
-//             dragWidgetHadTrack = dragWidget->hasMouseTracking();
-//             dragWidget->setMouseTracking(true);
+            qApp->installEventFilter(this);
+            dragWidgetHadTrack = dragWidget->hasMouseTracking();
+            dragWidget->setMouseTracking(true);
         }
         dragCandidate = 0L;
         return wmDrag;
