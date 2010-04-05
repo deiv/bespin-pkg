@@ -488,8 +488,6 @@ Style::polish( QWidget * widget )
             lcd->setSegmentStyle(QLCDNumber::Flat);
             lcd->setAutoFillBackground(true);
         }
-        else if ( widget->inherits("KColorPatch") ) // breaks the window drag hack and is wrong anyway...
-            widget->setAttribute( Qt::WA_NoMousePropagation, true );
 #if 0 // i want them centered, but titlewidget fights back, and it's not worth the eventfilter monitor
         else if (QLabel *label = qobject_cast<QLabel*>(frame))
         {   // i want them center aligned
