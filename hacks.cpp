@@ -332,7 +332,8 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         // the widget needs an leave/enter to update the mouse state
         // sending events doesn't work, so we generate a wink-of-an-eye cursor repositioning ;-P
         const QPoint cursor = QCursor::pos();
-        QCursor::setPos(-1, -1);
+        QWidget *window = dragWidget->window();
+        QCursor::setPos(window->mapToGlobal( window->rect().topRight() ) + QPoint(2, 0) );
         QCursor::setPos(cursor);
         dragWidget = 0L;
         return false;
