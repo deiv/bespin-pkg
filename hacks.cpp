@@ -34,6 +34,7 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <QStyleOptionGroupBox>
+#include <QTabBar>
 #include <QToolBar>
 #include <QToolButton>
 
@@ -65,8 +66,8 @@ using namespace Bespin;
 
 static Hacks *bespinHacks = 0;
 static Hacks::HackAppType *appType = 0;
-const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
-const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
+// const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
+// const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
 static QPointer<QWidget> dragCandidate = NULL;
 static QPointer<QWidget> dragWidget = NULL;
 static bool dragWidgetHadTrack = false;
@@ -218,21 +219,37 @@ hackMessageBox(QMessageBox* box, QEvent *e)
 }
 
 static bool
-isWindowDragWidget(QObject *o)
+isWindowDragWidget(QObject *o, const QPoint *pt = 0L)
 {
-    return Hacks::config.windowMovement &&
-           (qobject_cast<QDialog*>(o) ||
-            (qobject_cast<QMenuBar*>(o) && !static_cast<QMenuBar*>(o)->activeAction()) ||
-            qobject_cast<QGroupBox*>(o) ||
+    if (!Hacks::config.windowMovement)
+        return false;
+
+    if ( qobject_cast<QDialog*>(o) ||
+         (qobject_cast<QMenuBar*>(o) && !static_cast<QMenuBar*>(o)->activeAction()) ||
+         qobject_cast<QGroupBox*>(o) ||
         
-            (qobject_cast<QToolButton*>(o) && !static_cast<QWidget*>(o)->isEnabled()) ||
-            qobject_cast<QToolBar*>(o) || qobject_cast<QDockWidget*>(o) ||
-//         o->inherits("QMainWindow") || // this is mostly useles... PLUS triggers problems
+         (qobject_cast<QToolButton*>(o) && !static_cast<QWidget*>(o)->isEnabled()) ||
+         qobject_cast<QToolBar*>(o) || qobject_cast<QDockWidget*>(o) ||
 
-            ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
-            ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
+         qobject_cast<QStatusBar*>(o) ||
 
-            qobject_cast<QStatusBar*>(o) || (qobject_cast<QLabel*>(o) && qobject_cast<QStatusBar*>(o->parent())) );
+        // now catched by QMainWindow
+//          ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
+//          ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
+
+         o->inherits("QMainWindow") )
+        return true;
+
+    if ( QLabel *label = qobject_cast<QLabel*>(o) )
+    if (!(label->textInteractionFlags() & Qt::TextSelectableByMouse))
+    if (qobject_cast<QStatusBar*>(o->parent()))
+        return true;
+
+    if ( QTabBar *bar = qobject_cast<QTabBar*>(o) )
+    if ( !pt || (bar->tabAt(*pt) < 0 && !bar->childAt(*pt)) )
+        return true;
+
+    return false;
 }
 
 static bool
@@ -391,21 +408,26 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     if ( e->type() == QEvent::Paint )
         return false;
 
-    if (e->type() == QEvent::MouseButtonPress && isWindowDragWidget(o))
+    if (e->type() == QEvent::MouseButtonPress)
     {
-        QWidget *w = static_cast<QWidget*>(o);
         QMouseEvent *mev = static_cast<QMouseEvent*>(e);
-        if ( w->mouseGrabber() || // someone else is more interested in this
-            (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
-            (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
-            return false;
-        
-        dragCandidate = w;
+        if (isWindowDragWidget(o, &mev->pos()))
+        {
+            QWidget *w = static_cast<QWidget*>(o);
+            if ( w->mouseGrabber() || // someone else is more interested in this
+                (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
+                (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
+                return false;
+
+            dragCandidate = w;
+            qApp->installEventFilter(this);
+        }
         return false;
     }
 
     if (dragCandidate && e->type() == QEvent::MouseButtonRelease)
     {   // was just a click
+        qApp->removeEventFilter(this);
         dragCandidate = 0L;
         return false;
     }
@@ -417,12 +439,11 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         {
             dragWidget = dragCandidate;
 
-                // the release would set "dragCandidate = 0L;", therfore it cannot be done in hackMoveWindow
-                // it's probably not required either
-            QMouseEvent *mev = static_cast<QMouseEvent*>(e);
-            QMouseEvent mbr(QEvent::MouseButtonRelease, mev->pos(), mev->button(), mev->buttons(), mev->modifiers());
-            QCoreApplication::sendEvent( dragWidget, &mbr );
-            qApp->installEventFilter(this);
+            // the release would set "dragCandidate = 0L;", therfore it cannot be done in hackMoveWindow
+            // it's probably not required either
+//             QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+//             QMouseEvent mbr(QEvent::MouseButtonRelease, mev->pos(), mev->button(), mev->buttons(), mev->modifiers());
+//             QCoreApplication::sendEvent( dragWidget, &mbr );
             dragWidgetHadTrack = dragWidget->hasMouseTracking();
             dragWidget->setMouseTracking(true);
         }
@@ -441,11 +462,11 @@ Hacks::add(QWidget *w)
         appType = new HackAppType((HackAppType)Unknown);
         if (qApp->inherits("GreeterApp")) // KDM segfaults on QCoreApplication::arguments()...
             *appType = KDM;
-        else if (QCoreApplication::applicationName() == "dragonplayer")
-            *appType = Dragon;
-        else if (!QCoreApplication::arguments().isEmpty() &&
-                 QCoreApplication::arguments().at(0).endsWith("smplayer"))
-            *appType = SMPlayer;
+//         else if (QCoreApplication::applicationName() == "dragonplayer")
+//             *appType = Dragon;
+//         else if (!QCoreApplication::arguments().isEmpty() &&
+//                  QCoreApplication::arguments().at(0).endsWith("smplayer"))
+//             *appType = SMPlayer;
         else if (QCoreApplication::applicationName() == "kmix")
             *appType = KMix;
     }
