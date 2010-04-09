@@ -115,7 +115,10 @@ XBar::init()
     }
 
     if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(containment()->layout()))
+    {
         lLayout->setStretchFactor(this, 1000);
+        lLayout->setAlignment( this, Qt::AlignLeft|Qt::AlignVCenter );
+    }
     
 //     if (!view()->inherits("PanelView"))
 //     {
@@ -619,7 +622,8 @@ void
 XBar::show(MenuBar *item)
 {
     d.currentBar = item;
-    item->setPos(contentsRect().topLeft());
+    int dy = (contentsRect().height() - item->rect().height())/2;
+    item->setPos(contentsRect().x(), contentsRect().y()+dy);
     item->show();
 }
 
