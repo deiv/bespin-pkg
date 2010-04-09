@@ -84,6 +84,7 @@ Style::Lights Style::lights;
 Style::Masks Style::masks;
 QPalette *Style::originalPalette = 0;
 Style::Shadows Style::shadows;
+EventKiller Style::eventKiller;
 Qt::Orientation Style::ori[2] = { Qt::Horizontal, Qt::Vertical };
 
 
@@ -1045,9 +1046,34 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 QCoreApplication::sendEvent(object, ev);
                 object->installEventFilter(this);
                 isUrlNaviButtonArrow = false;
-                return false;
             }
+            return false;
         }
+#if 0 // TODO this _should_ work, but does not - i HATE plasma!
+        else if (appType == Amarok && object->inherits("Context::ContextView"))
+        {
+            QPalette pal = qApp->palette();
+            QPalette pal2 = pal;
+            pal2.setColor( QPalette::Highlight, pal.color(QPalette::Active, QPalette::Window) );
+            pal2.setColor( QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::WindowText) );
+            pal2.setColor( QPalette::Base, pal.color(QPalette::Active, QPalette::Window) );
+            pal2.setColor( QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText) );
+
+            qApp->installEventFilter(&eventKiller);
+            qApp->setPalette(pal2);
+            qApp->removeEventFilter(&eventKiller);
+
+            object->removeEventFilter(this);
+            QCoreApplication::sendEvent(object, ev);
+            object->installEventFilter(this);
+
+            qApp->installEventFilter(&eventKiller);
+            qApp->setPalette(pal);
+            qApp->removeEventFilter(&eventKiller);
+
+            return true;
+        }
+#endif
         return false;
 
     case QEvent::Enter:

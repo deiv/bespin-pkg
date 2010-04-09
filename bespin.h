@@ -45,6 +45,13 @@ namespace Bespin
 typedef struct _WindowData WindowData;
 #endif
 
+class EventKiller : public QObject
+{
+    public:
+        bool eventFilter( QObject *, QEvent *)
+        { return true; }
+};
+
 class
 #ifndef Q_WS_WIN
 Q_GUI_EXPORT
@@ -320,6 +327,7 @@ private:
     static Shadows shadows;
     static Lights lights;
     static Qt::Orientation ori[2];
+    static EventKiller eventKiller;
 public:
     static Config config;
 private slots:
