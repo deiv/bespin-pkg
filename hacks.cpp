@@ -451,6 +451,13 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         return wmDrag;
     }
 
+    if (e->type() == QEvent::Show)
+    {
+        o->removeEventFilter(this);
+        o->installEventFilter(this);
+        return false;
+    }  // >-)
+
     return false;
 }
 
