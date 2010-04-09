@@ -88,8 +88,7 @@ if (scrollbar->subControls & SC_ScrollBar##_E_)\
 
 static bool isComboDropDownSlider, scrollAreaHovered_;
 static int complexStep, widgetStep;
-#define round_ config.scroll.fatSlider
-// static const bool round_ = true;
+
 
 static QPixmap *scrollBgCache = 0;
 static QTimer cacheCleaner;
@@ -356,11 +355,13 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
         painter->fillRect(r, Colors::mid(FCOLOR(Base), FCOLOR(Text), 10, 1));
         return;
     }
+
+    const Groove::Mode gType = config.scroll.groove;
+    const bool round = config.scroll.sliderWidth + (gType > Groove::Groove) > 13;
     // opera paints groove and slider directly, but messes up with bg, does not pass a widget and ignores the opaquePaintevent hint...
     if (appType == Opera)
         painter->fillRect(RECT, FCOLOR(Window));
 
-    const Groove::Mode gType = config.scroll.groove;
     QColor bg = config.scroll.invertBg ?
                 Colors::mid(FCOLOR(WindowText), FCOLOR(Window), 2 + gType*gType*gType, 1):
                 Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 2 + gType*gType*gType, 1);
@@ -377,12 +378,12 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
         RESTORE_PEN;
     }
     else if (gType == Groove::Groove)
-        masks.rect[round_].render(RECT, painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
+        masks.rect[round].render(RECT, painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
     else
     {
         if (gType == Groove::SunkenGroove)
-            masks.rect[round_].render(RECT.adjusted(0,0,0,-F(2)), painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
-        shadows.sunken[round_][isEnabled].render(RECT, painter);
+            masks.rect[round].render(RECT.adjusted(0,0,0,-F(2)), painter, Gradients::Sunken, horizontal ? Qt::Vertical : Qt::Horizontal, bg);
+        shadows.sunken[round][isEnabled].render(RECT, painter);
     }
     return;
 }
@@ -458,6 +459,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
    
     QRect r = RECT;
     const int f1 = F(1), f2 = F(2);
+    const bool round = config.scroll.sliderWidth + (config.scroll.groove > Groove::Groove) > 13;
     const bool grooveIsSunken = config.scroll.groove >= Groove::Sunken;
 
     // draw shadow
@@ -475,7 +477,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     if (sunken && !grooveIsSunken)
     {
         r.adjust(f1, f1, -f1, -f1);
-        shadows.raised[round_][true][true].render(r, painter);
+        shadows.raised[round][true][true].render(r, painter);
         r.adjust(f1, f1, -f1, -f2 );
     }
     else
@@ -483,9 +485,9 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         if (!sunken && config.btn.backLightHover && complexStep)
         {
             QColor blh = Colors::mid(c, CCOLOR(scroll._, Fg), 6-complexStep, complexStep);
-            lights.rect[round_].render(r, painter, blh); // backlight
+            lights.rect[round].render(r, painter, blh); // backlight
         }
-        shadows.raised[round_][true][false].render(r, painter);
+        shadows.raised[round][true][false].render(r, painter);
         r.adjust(f2, f2, -f2, horizontal && grooveIsSunken ? -f2 : -F(3) );
     }
     // restore clip---------------
@@ -506,16 +508,17 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     if (!config.showOff)
         offset = -r.topLeft()/2;
 
-    QColor bc = config.btn.fullHover ? c : CCOLOR(scroll._, Bg);
+    bool fullHover = config.btn.fullHover || config.scroll.sliderWidth < 10;
+    QColor bc = fullHover ? c : CCOLOR(scroll._, Bg);
     bc.setAlpha(255); // CCOLOR(scroll._, Bg) pot. reintroduces translucency...
-    masks.rect[round_].render(r, painter, GRAD(scroll), o, bc, size, offset);
+    masks.rect[round].render(r, painter, GRAD(scroll), o, bc, size, offset);
 
     // reflexive outline
     if (!sunken && Gradients::isReflective(GRAD(btn)))
-        masks.rect[round_].outline(r.adjusted(f1,f1,-f1,-f1), painter, bc.lighter(120), f1);
+        masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter, bc.lighter(120), f1);
 
     // the hover indicator (in case...)
-    if (config.btn.fullHover || !(hover || complexStep || widgetStep))
+    if (fullHover || !(hover || complexStep || widgetStep))
         return;
 
     int dw = r.width(), dh = r.height();

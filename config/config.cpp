@@ -415,9 +415,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.sliderGroove, SCROLL_GROOVE);
     handleSettings(ui.gradScroll, SCROLL_GRADIENT);
     handleSettings(ui.invertGroove, SCROLL_INVERT_BG);
-    handleSettings(ui.slimSlider, SCROLL_SLIM_SLIDER);
-    setContextHelp(ui.slimSlider, "<b>Slim slider</b><hr>\
-    This will reduce the thickness of scrollbars by 2 pixel and in addition apply a more rectangular shape.");
+    handleSettings(ui.sliderWidth, SCROLL_SLIDER_WIDTH);
     // THIS MUST! happen after the buttons are loaded!
     handleSettings(ui.scrollRole, "Scroll.Role", QPalette::Button);
     handleSettings(ui.scrollActiveRole, "Scroll.ActiveRole", QPalette::Highlight);

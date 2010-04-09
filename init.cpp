@@ -391,8 +391,12 @@ Style::readSettings(const QSettings* settings, QString appName)
     // ScrollStuff ===========================
     GRAD(scroll) = readGrad(SCROLL_GRADIENT);
     config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
-    config.scroll.fatSlider = !readBool(SCROLL_SLIM_SLIDER);
     config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
+    config.scroll.sliderWidth = readInt(SCROLL_SLIDER_WIDTH);
+    if (config.scroll.sliderWidth > 33)
+        config.scroll.sliderWidth = 33;
+    else if ( config.scroll.sliderWidth < 6 + 2*(config.scroll.groove < Groove::Sunken) )
+        config.scroll.sliderWidth = 6 + 2*(config.scroll.groove < Groove::Sunken);
     config.scroll.invertBg = readBool(SCROLL_INVERT_BG);
     // this MUST happen after reading the button role, which it will default to!
     config.scroll.__role[Bg] = (QPalette::ColorRole) readInt(SCROLL_ROLE);
@@ -502,8 +506,8 @@ void Style::initMetrics()
    Dpi::target.f16 = SCALE(16); Dpi::target.f18 = SCALE(18);
    Dpi::target.f20 = SCALE(20); Dpi::target.f32 = SCALE(32);
    Dpi::target.f80 = SCALE(80);
-   
-   Dpi::target.ScrollBarExtent = SCALE((config.scroll.groove > Groove::Groove ? 15 : 17) - config.btn.fullHover - 2*!config.scroll.fatSlider);
+
+   Dpi::target.ScrollBarExtent = SCALE(config.scroll.sliderWidth);
    Dpi::target.ScrollBarSliderMin = SCALE(40);
    Dpi::target.SliderThickness = SCALE(20);
    Dpi::target.SliderControl = SCALE(20);
