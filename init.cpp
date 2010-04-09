@@ -139,7 +139,6 @@ Style::readSettings(const QSettings* settings, QString appName)
         // Hacks ==================================
         Hacks::config.messages = readBool(HACK_MESSAGES);
         Hacks::config.KHTMLView = readBool(HACK_KHTMLVIEW);
-        Hacks::config.krunner= readBool(HACK_KRUNNER);
         Hacks::config.treeViews = readBool(HACK_TREEVIEWS);
         Hacks::config.windowMovement = readBool(HACK_WINDOWMOVE);
         Hacks::config.killThrobber = readBool(HACK_THROBBER);

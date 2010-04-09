@@ -29,7 +29,6 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPointer>
-#include <QProgressBar> // kmix
 #include <QStatusBar>
 #include <QStyle>
 #include <QStyleOption>
@@ -299,46 +298,6 @@ hackMoveWindow(QWidget* w, QEvent *e)
     return true;
 }
 
-static QVector<QRect>
-kmixRegion(const QProgressBar *pb)
-{
-    QVector<QRect> ret;
-    const int n = pb->maximum() - pb->minimum();
-    if (n < 1)
-        return ret;
-
-    const int chunks = pb->width()/8;
-    const int last = lround((pb->value() * chunks) / (float)n);
-    const float unit = 2.0 * pb->height() / (6 * chunks);
-    int y;
-    for (int i = 0; i < last; ++i)
-    {
-        y = (int)(chunks-i)*unit;
-        ret << QRect(i*8, y, 5, pb->height() - 2*y);
-    }
-    return ret;
-}
-
-void
-Hacks::setKmixMask(int)
-{
-    QProgressBar *pb = qobject_cast<QProgressBar*>(sender());
-    if ( !(pb && pb->isWindow()) )
-        return;
-    QRegion mask; 
-    if (pb->value() == pb->minimum())
-    {
-        const int sz = qMin(pb->width(), pb->height());
-        mask = QRegion( 0/*(pb->width()-sz)/2*/, (pb->height()-sz)/2, sz, sz, QRegion::Ellipse );
-    }
-    else
-    {
-        QVector<QRect> rects = kmixRegion(pb);
-        mask.setRects(rects.constData(), rects.count());
-    }
-    pb->setMask(mask);
-}
-
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
@@ -354,49 +313,6 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         QCursor::setPos(cursor);
         dragWidget = 0L;
         return false;
-    }
-    
-    if (*appType == KMix)
-    {
-        if (e->type() == QEvent::Paint)
-        if (QProgressBar *pb = qobject_cast<QProgressBar*>(o))
-        if (pb->isWindow())
-        {
-            QPainter p(pb);
-            p.setPen(QColor(230,230,230));
-            p.setBrush(Qt::black);
-            if (pb->value() == pb->minimum())
-            {
-                int sz = qMin(pb->width(), pb->height());
-                QRect r(/*(pb->width()-sz)/2+*/1, (pb->height()-sz)/2+1, sz-1, sz-1);
-                p.setRenderHint(QPainter::Antialiasing);
-                p.drawEllipse(r);
-                p.setBrush(QColor(255,255,255,128));
-                p.setPen(Qt::NoPen);
-                sz /= 5;
-                QRect r2 = r.adjusted(sz, sz, -sz, -sz);
-                sz = r2.width();
-                QPainterPath shape(QPoint(r2.x(), r2.y()+sz/4));
-                shape.lineTo(r2.x()+sz/2, r2.y()+sz/4);
-                shape.lineTo(r2.right(), r2.y());
-                shape.lineTo(r2.right(), r2.bottom());
-                shape.lineTo(r2.x()+sz/2, r2.bottom()-sz/4);
-                shape.lineTo(r2.x(), r2.bottom()-sz/4);
-                shape.closeSubpath();
-                p.drawPath(shape);
-                p.setBrush(Qt::NoBrush);
-                p.setPen(QPen(QColor(255,255,255,128), 2));
-                p.drawLine(r.bottomLeft(), r.topRight());
-            }
-            else
-            {
-                QVector<QRect> rects = kmixRegion(pb);
-                foreach (QRect r, rects)
-                    p.drawRect(r.adjusted(0,0,-1,-1));
-            }
-            p.end();
-            return true;
-        }
     }
 
     if (e->type() == QEvent::Timer || e->type() == QEvent::Move)
@@ -474,26 +390,6 @@ Hacks::add(QWidget *w)
 //         else if (!QCoreApplication::arguments().isEmpty() &&
 //                  QCoreApplication::arguments().at(0).endsWith("smplayer"))
 //             *appType = SMPlayer;
-        else if (QCoreApplication::applicationName() == "kmix")
-            *appType = KMix;
-    }
-    else if (*appType == KMix)
-    {
-//         if (qobject_cast<QProgressBar*>(w))
-//             qDebug() << w << w->window();
-//         else if (w->isWindow())
-//             qDebug() << w;
-        if (w->isWindow())
-        if (QProgressBar *pb = qobject_cast<QProgressBar*>(w))
-        {
-            ENSURE_INSTANCE;
-            pb->removeEventFilter(bespinHacks); // just to be sure
-            pb->installEventFilter(bespinHacks);
-            pb->setWindowOpacity(0.7);
-            bespinHacks->disconnect(pb);
-            bespinHacks->connect(pb, SIGNAL(valueChanged(int)), SLOT(setKmixMask(int)));
-            return true;
-        }
     }
     
     if (config.messages && qobject_cast<QMessageBox*>(w))

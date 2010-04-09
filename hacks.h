@@ -21,32 +21,24 @@
 
 class QWidget;
 
-#include <QObject>
-#include <QDial>
-#include <QPointer>
-
 namespace Bespin
 {
 
 class Hacks : public QObject
 {
-   Q_OBJECT
 public:
     Hacks() {}
-    enum HackAppType { Unknown = 0, KRunner, SMPlayer, Dragon, KDM, KMix };
+    enum HackAppType { Unknown = 0, SMPlayer, Dragon, KDM };
     bool eventFilter( QObject *, QEvent *);
     static bool add(QWidget *w);
     static void releaseApp();
     static void remove(QWidget *w);
     static struct Config
     {
-        bool    messages, KHTMLView, treeViews, windowMovement, krunner, killThrobber,
-                opaqueDolphinViews;
+        bool messages, KHTMLView, treeViews, windowMovement, killThrobber, opaqueDolphinViews;
     } config;
 private:
     Q_DISABLE_COPY(Hacks)
-private slots:
-    void setKmixMask(int);
 };
 } // namespace
 #endif // BESPIN_HACKS_H
