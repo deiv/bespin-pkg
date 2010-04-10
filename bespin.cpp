@@ -1120,8 +1120,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (QDockWidget *dock = qobject_cast<QDockWidget*>(object))
         if (re->oldSize().height() != re->size().height())
         {
-//             if (!(area & (Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea)))
-//                 return;
+            if (dock->allowedAreas() & Qt::BottomDockWidgetArea)
+                return false;
             int l,t,r,b;
             dock->getContentsMargins(&l, &t, &r, &b);
             if ( dock->isFloating() )
