@@ -21,7 +21,7 @@
 #include <QAbstractScrollArea>
 #include <QApplication>
 #include <QComboBox>
-// #include <QDockWidget>
+#include <QDockWidget>
 #include <QEvent>
 #include <QFrame>
 #include <QListView>
@@ -1115,7 +1115,24 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
             return false;
         }
-        
+
+        if (appType == Dolphin)
+        if (QDockWidget *dock = qobject_cast<QDockWidget*>(object))
+        if (re->oldSize().height() != re->size().height())
+        {
+//             if (!(area & (Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea)))
+//                 return;
+            int l,t,r,b;
+            dock->getContentsMargins(&l, &t, &r, &b);
+            if ( dock->isFloating() )
+                b = 6;
+            else if (dock->geometry().bottom() == dock->window()->rect().bottom())
+                b = 22;
+            else
+                b = 0;
+            dock->setContentsMargins(l, t, r, b);
+            return false;
+        }
         QWidget *widget = 0/*, *dock = 0*/;
         if ((config.menu.round && (widget = qobject_cast<QMenu*>(object)))
 #if 0
@@ -1191,16 +1208,16 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
 
-        if (object->objectName() == "qt_scrollarea_viewport")
-        {
-            if (QListView *list = qobject_cast<QListView*>(object->parent()))
-            if (list->verticalScrollBar() && list->inherits("KateFileList"))
-            { // suck it, jerks!
-                QCoreApplication::sendEvent(list->verticalScrollBar(), ev); // tell the scrollbar to do this ;-P
-                return true; // eat it
-            }
-            return false;
-        }
+//         if (object->objectName() == "qt_scrollarea_viewport")
+//         {
+//             if (QListView *list = qobject_cast<QListView*>(object->parent()))
+//             if (list->verticalScrollBar() && list->inherits("KateFileList"))
+//             { // suck it, jerks!
+//                 QCoreApplication::sendEvent(list->verticalScrollBar(), ev); // tell the scrollbar to do this ;-P
+//                 return true; // eat it
+//             }
+//             return false;
+//         }
         if (QListView *list = qobject_cast<QListView*>(object))
         {
 //             if (list->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) // this should be, but semms to be not

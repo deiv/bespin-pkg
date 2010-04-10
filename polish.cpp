@@ -550,11 +550,11 @@ Style::polish( QWidget * widget )
                     itemView->removeEventFilter(this);
                     itemView->installEventFilter(this);
                 }
-                else if (itemView->inherits("KateFileList") && itemView->viewport())
-                {   // fix fucking "switch dock on wheel CRAP"
-                    itemView->viewport()->removeEventFilter(this);
-                    itemView->viewport()->installEventFilter(this);
-                }
+//                 else if (itemView->inherits("KateFileList") && itemView->viewport())
+//                 {   // fix fucking "switch dock on wheel CRAP"
+//                     itemView->viewport()->removeEventFilter(this);
+//                     itemView->viewport()->installEventFilter(this);
+//                 }
 
 #if QT_VERSION >= 0x040500
                 itemView->viewport()->setAttribute(Qt::WA_Hover);
@@ -794,11 +794,16 @@ Style::polish( QWidget * widget )
 //                 btn->setIconSize(QSize(17,17));
 //         }
     }
-    else if (config.bg.docks.invert)
+    else if (config.bg.docks.invert || appType == Dolphin)
     {
         if (QDockWidget *dock = qobject_cast<QDockWidget*>(widget))
         {
-            if (dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable))
+            if (appType == Dolphin)
+            {
+                dock->removeEventFilter(this);
+                dock->installEventFilter(this);
+            }
+            if (config.bg.docks.invert && (dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable)))
             {
                 QPalette pal = dock->palette();
                 QColor c = pal.color(QPalette::Window);
