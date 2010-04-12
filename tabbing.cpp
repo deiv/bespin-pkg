@@ -93,7 +93,7 @@ if (baseHeight < 0) \
     // the bar
     drawTabBar(&tbb, painter, widget);
 }
-#include <QtDebug>
+// #include <QtDebug>
 void
 Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -115,7 +115,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
                 return; // otherwise it's a proxystyle like on konqueror / kdevelop...
 
         }
-        else if (qobject_cast<const QTabBar*>(widget))
+        else if (qobject_cast<const QTabBar*>(widget) || (appType == KDevelop && widget->inherits("QLabel")))
             return; // usually we alter the paintevent by eventfiltering
         win = widget->window();
     }
@@ -159,7 +159,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
 
 static int animStep = -1;
 static bool customColor = false;
-#include <QtDebug>
+
 void
 Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {

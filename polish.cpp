@@ -22,7 +22,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QDockWidget>
-#include <QLabel>
+// #include <QLabel>
 #include <QLayout>
 #include <QLCDNumber>
 #include <QMainWindow>
