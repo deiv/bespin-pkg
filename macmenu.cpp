@@ -71,8 +71,12 @@ MacMenu::manage(QMenuBar *menu)
     
     // we only accept menus that are placed on a QMainWindow - for the moment, and probably ever
     QWidget *dad = menu->parentWidget();
-    if (!(dad && dad->inherits("QMainWindow") && dad->layout() && dad->layout()->menuBar() == menu))
+    if (!(dad && dad->isWindow() && dad->inherits("QMainWindow") && dad->layout() && dad->layout()->menuBar() == menu))
         return;
+
+//     if ((dad = dad->parentWidget()) && dad->inherits("QMdiSubWindow"))
+//         return;
+    
 
     if (!instance)
     {

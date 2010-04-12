@@ -829,7 +829,7 @@ Style::polish( QWidget * widget )
             mbar->installEventFilter(this);
         }
 #ifdef Q_WS_X11
-        if ( appType != KDevelop && !(appType == QtDesigner && mbar->inherits("QDesignerMenuBar")) )
+        if ( appType != KDevelop ) //&& !(appType == QtDesigner && mbar->inherits("QDesignerMenuBar")) )
             MacMenu::manage(mbar);
 #endif
     }
