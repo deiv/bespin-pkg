@@ -352,26 +352,33 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
                 noBase = false;
         }
 
-        c = CCOLOR(tab.active, Bg);
+        c = sameRoles ? Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 60, 6) : CCOLOR(tab.active, Bg);
         if (option->state & State_HasFocus)
             c = Colors::mid(c, FCOLOR(Highlight), 2, 1);
 
-        if (sameRoles)
-            rect = RECT.adjusted(0,0,0,-F(2));
         else if (config.tab.activeTabSunken && Colors::value(CCOLOR(tab.std, Bg)) < 164)
             vertical ?  rect.adjust(0, F(1), 0, -F(2)) : rect.adjust(F(2), -F(1), -F(2), 0);
         else
             vertical ? rect.adjust(-F(1), F(2), F(1), -F(2)) : rect.adjust(F(2), -F(1), -F(2), F(1));
     }
+    else if (sameRoles)
+        c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 66-animStep, animStep);
     else
         c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 10-animStep, animStep);
 
     // gradient
-    if (sunken && sameRoles)
-    {   // active tab has same color as inactive one, we must do sth. on the gradient...
-        Gradients::Type gt = (GRAD(tab) == Gradients::Sunken ? Gradients::Simple : Gradients::Sunken);
-        painter->drawTiledPixmap(RECT, Gradients::pix(c, size, o, gt));
+    if (sameRoles)
+    {
+        rect = RECT.adjusted(F(1),F(2),-F(1),0);
         Tile::setShape( (o == Qt::Vertical) ? (Tile::Left|Tile::Right) : (Tile::Top|Tile::Bottom) );
+        Gradients::Type gt = GRAD(tab);
+        if (sunken) // active tab has same color as inactive one, we must do sth. on the gradient...
+        {
+            rect.adjust(0,-F(2),0,0);
+            gt = (gt == Gradients::Sunken ? Gradients::Simple : Gradients::Sunken);
+        }
+        painter->drawTiledPixmap(rect, Gradients::pix(c, size, o, gt));
+        rect.adjust(0,0,0,-F(2));
     }
     else
         masks.rect[true].render(rect, painter, GRAD(tab), o, c, size, rect.topLeft());
