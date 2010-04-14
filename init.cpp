@@ -570,13 +570,13 @@ Style::init(const QSettings* settings)
 
     readSettings(settings, appName);
 
-    if (appType == Amarok)
-    {
-        polish(qApp, false);
-        qApp->removeEventFilter(this);
-        qApp->installEventFilter(this);
-        QTimer::singleShot(10000, this, SLOT(removeAppEventFilter()));
-    }
+//     if (appType == Amarok)
+//     {
+//         polish(qApp, false);
+//         qApp->removeEventFilter(this);
+//         qApp->installEventFilter(this);
+//         QTimer::singleShot(10000, this, SLOT(removeAppEventFilter()));
+//     }
 
     initMetrics();
     Elements::setScale(config.scale);
