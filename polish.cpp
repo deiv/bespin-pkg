@@ -586,6 +586,8 @@ Style::polish( QWidget * widget )
         if (widget->inherits("QStackedWidget"))
             // NOTICE do NOT(!) apply this on tabs explicitly, as they contain a stack!
             Animator::Tab::manage(widget);
+        else if (widget->inherits("KColorPatch"))
+            widget->setAttribute(Qt::WA_NoMousePropagation);
 
         /// QToolBox handling - a shame they look that crap by default!
         if (widget->inherits("QToolBox"))

@@ -312,6 +312,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         QCursor::setPos(window->mapToGlobal( window->rect().topRight() ) + QPoint(2, 0) );
         QCursor::setPos(cursor);
         dragWidget = 0L;
+        dragCandidate = 0L;
         return false;
     }
 
@@ -327,14 +328,13 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     if (e->type() == QEvent::MouseButtonPress)
     {
         QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+        QWidget *w = qobject_cast<QWidget*>(o);
+        if ( !w || w->mouseGrabber() || // someone else is more interested in this
+             (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
+             (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
+                return false;
         if (isWindowDragWidget(o, &mev->pos()))
         {
-            QWidget *w = static_cast<QWidget*>(o);
-            if ( w->mouseGrabber() || // someone else is more interested in this
-                (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
-                (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
-                return false;
-
             dragCandidate = w;
             qApp->installEventFilter(this);
         }
