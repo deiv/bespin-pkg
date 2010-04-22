@@ -55,7 +55,7 @@ extern "C"
 integers - not of interest for you*/
 namespace Gradients {
     enum Type {
-        None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, //RadialGloss,
+        None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, Shiny, //RadialGloss,
         TypeAmount
     };
     enum BgMode { BevelV = 2, BevelH };
@@ -1415,6 +1415,7 @@ Config::generateGradientTypes(QComboBox *box)
     box->addItem("Glass");
     box->addItem("Metal");
     box->addItem("Cloudy");
+    box->addItem("Shiny");
 }
 
 

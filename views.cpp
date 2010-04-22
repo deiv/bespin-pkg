@@ -571,10 +571,6 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         Gradients::Type gt = Gradients::None;
         if (round)
         {
-            // TODO: obsolete now
-            if (appType == KRunner)
-                return; // ahhh... this has annoyed me from the beginning on...
-
             if (!strongSelect)
                 gt = hover ? Gradients::Button : Gradients::Sunken;
             else if (selected)

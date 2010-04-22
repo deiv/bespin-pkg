@@ -64,10 +64,6 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
         painter->fillRect(RECT, FCOLOR(Base));
         return;
     }
-#if 0 // does not work for all plasma versions...
-    if (appType == KRunner && widget && widget->inherits("KHistoryComboBox"))
-        return;
-#endif
 
     OPT_ENABLED OPT_FOCUS
 

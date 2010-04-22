@@ -545,10 +545,8 @@ Style::init(const QSettings* settings)
             appType = Konversation;
         else if (appName == "be.shell")
             appType = BEshell;
-        else if (appName == "plasma" || appName.startsWith("plasma-"))
+        else if (appName == "plasma" || appName.startsWith("plasma-") || appName == "krunner")
             appType = Plasma;
-        else if (appName == "krunner")
-            appType = KRunner;
         else if (appName == "kget")
             appType = KGet;
         else if (appName == "ktorrent")

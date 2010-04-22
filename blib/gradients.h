@@ -44,7 +44,7 @@ public:
 namespace Gradients {
 
 enum Type {
-   None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, //RadialGloss,
+   None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, Shiny, //RadialGloss,
    TypeAmount
 };
 
@@ -66,12 +66,12 @@ BLIB_EXPORT inline QBrush brush(const QColor &c, int size, Qt::Orientation o, Ty
 
 BLIB_EXPORT inline bool isReflective(Type type = Simple)
 {
-    return type == Button || type == Metal;
+    return type == Button || type == Metal || type == Shiny;
 }
 
 BLIB_EXPORT inline bool isTranslucent(Type type = Simple)
 {
-    return type > Sunken && type != Metal;
+    return type > Sunken && type != Metal && type != Shiny;
 }
 
 BLIB_EXPORT QColor endColor(const QColor &c, Position p, Type type = Simple, bool checkValue = false);

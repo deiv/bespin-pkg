@@ -109,9 +109,19 @@ simpleGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 }
 
 static inline QLinearGradient
+shinyGradient(const QColor &c, const QPoint &start, const QPoint &stop)
+{
+    QLinearGradient lg(start, stop);
+    lg.setColorAt(0, Gradients::endColor(c, Gradients::Top, Gradients::Shiny));
+    lg.setColorAt(1, Gradients::endColor(c, Gradients::Bottom, Gradients::Shiny));
+    return lg;
+}
+
+static inline QLinearGradient
 metalGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 {
     QLinearGradient lg(start, stop);
+    //
     lg.setColorAt(0, Gradients::endColor(c, Gradients::Top, Gradients::Metal));
     lg.setColorAt(0.45, c.lighter(105));
     lg.setColorAt(0.451, c.darker(105));
@@ -349,6 +359,8 @@ Gradients::borderline(const QColor &c, Position pos)
 static QColor
 checkValue(QColor c, int type)
 {
+    if (type == Gradients::Simple || type == Gradients::Sunken || type == Gradients::Metal || type == Gradients::Shiny)
+        return c;
     int v = Colors::value(c);
     const int minV = type ? ((type < Gradients::Gloss) ? 60 : 40) : 0;
     if (v < minV)
@@ -404,6 +416,11 @@ Gradients::endColor(const QColor &oc, Position p, Type type, bool cv)
         }
         case Metal:
             return begin ? c.lighter(108) : c.darker(112);
+        case Shiny:
+        {
+            int h,s,v,a; c.getHsv(&h,&s,&v,&a);
+            return begin ? QColor::fromHsv(h,s,qMin(255,v+40), a) : QColor::fromHsv(h,s,qMax(0,v-40), a);
+        }
     }
 }
 
