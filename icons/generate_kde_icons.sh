@@ -1,17 +1,17 @@
 #!/bin/bash
 SHELL=$_
-if [ ${SHELL##*/} != bash ]; then
-    echo -e "\n\
-============== THIS SCRIPT NEEDS TO RUN AS BASH ============\n\n\
-    Please call either\n\
-    \tbash $0\n\
-    or just\n\
-    \t./$0\n\n\
-============================================================\n\
-(sorry if $SHELL links to /bin/bash \n\t this not catched by this script)
-============================================================\n"
-    exit 1
-fi
+#if [ ${SHELL##*/} != bash ]; then
+#    echo -e "\n\
+#============== THIS SCRIPT NEEDS TO RUN AS BASH ============\n\n\
+#    Please call either\n\
+#    \tbash $0\n\
+#    or just\n\
+#    \t./$0\n\n\
+#============================================================\n\
+#(sorry if $SHELL links to /bin/bash \n\t this not catched by this script)
+#============================================================\n"
+#    exit 1
+#fi
 ## CONFIG ##########################################################################################
 
 basename="nmfnms"
