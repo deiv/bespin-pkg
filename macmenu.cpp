@@ -18,8 +18,8 @@ This library is distributed in the hope that it will be useful,
 
 #include <QActionEvent>
 #include <QApplication>
-#include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusConnectionInterface>
+#include <QtDBus/QDBusMessage>
 #include <QLayout>
 #include <QMenuBar>
 #include <QWindowStateChangeEvent>
@@ -32,7 +32,8 @@ This library is distributed in the hope that it will be useful,
 using namespace Bespin;
 
 static MacMenu *instance = 0;
-static QDBusInterface *xbar = 0;
+#define MSG(_FNC_) QDBusMessage::createMethodCall( "org.kde.XBar", "/XBar", "org.kde.XBar", _FNC_ )
+#define XBAR_SEND( _MSG_ ) QDBusConnection::sessionBus().send( _MSG_ )
 
 bool
 FullscreenWatcher::eventFilter(QObject *o, QEvent *ev)
@@ -51,9 +52,7 @@ static FullscreenWatcher *fullscreenWatcher = 0;
 
 MacMenu::MacMenu() : QObject()
 {
-    QDBusConnectionInterface *session = QDBusConnection::sessionBus().interface();
-
-    usingMacMenu = session->isServiceRegistered("org.kde.XBar");
+    usingMacMenu = QDBusConnection::sessionBus().interface()->isServiceRegistered("org.kde.XBar");
     service = QString("org.kde.XBar-%1").arg(QCoreApplication::applicationPid());
     // register me
     QDBusConnection::sessionBus().registerService(service);
@@ -81,7 +80,6 @@ MacMenu::manage(QMenuBar *menu)
     if (!instance)
     {
         instance = new MacMenu;
-        xbar = new QDBusInterface( "org.kde.XBar", "/XBar", "org.kde.XBar" );
         /*MacMenuAdaptor *adapt = */new MacMenuAdaptor(instance);
         fullscreenWatcher = new FullscreenWatcher;
     }
@@ -113,7 +111,7 @@ MacMenu::isActive()
 void
 MacMenu::_release(QObject *o)
 {
-    xbar->call(QDBus::NoBlock, "unregisterMenu", (qlonglong)o);
+    XBAR_SEND( MSG("unregisterMenu") << (qlonglong)o );
 
     QMenuBar *menu = qobject_cast<QMenuBar*>(o);
     if (!menu) return;
@@ -176,7 +174,7 @@ MacMenu::activate(QMenuBar *menu)
     {
         if (!menu->actions().isEmpty())
             title = menu->actions().at(0)->text();
-        if (title.isEmpty())    
+        if (title.isEmpty())
             title = "QApplication";
     }
     
@@ -187,10 +185,10 @@ MacMenu::activate(QMenuBar *menu)
             entries << "<XBAR_SEPARATOR/>";
         else
             entries << action->text();
-    xbar->call(QDBus::NoBlock, "registerMenu", service, (qlonglong)menu, title, entries);
+    XBAR_SEND( MSG("registerMenu") << service << (qlonglong)menu << title << entries );
     // TODO cause of now async call, the following should - maybe - attached to the above?!!
     if (menu->isActiveWindow())
-        xbar->call(QDBus::NoBlock, "requestFocus", (qlonglong)menu);
+        XBAR_SEND( MSG("requestFocus") << (qlonglong)menu );
     
     // take care of several widget events!
     menu->installEventFilter(this);
@@ -306,12 +304,12 @@ MacMenu::popup(qlonglong key, int idx, int x, int y)
             if (!pop->isVisible())
             {
                 connect (pop, SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
-                xbar->call(QDBus::NoBlock, "setOpenPopup", idx);
+                XBAR_SEND( MSG("setOpenPopup") << idx );
                 pop->popup(QPoint(x,y));
             }
             else
             {
-                xbar->call(QDBus::NoBlock, "setOpenPopup", -1000);
+                XBAR_SEND( MSG("setOpenPopup") << -1000 );
                 pop->hide();
             }
         }
@@ -384,7 +382,7 @@ MacMenu::menuClosed()
     disconnect (sender(), SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
     if (!inHover)
     {
-        xbar->call(QDBus::NoBlock, "setOpenPopup", -500);
+        XBAR_SEND( MSG("setOpenPopup") << -500 );
 
         if (QMenu *menu = qobject_cast<QMenu*>(_sender))
         if (QMenuBar *bar = bar4menu(menu))
@@ -400,20 +398,20 @@ MacMenu::changeAction(QMenuBar *menu, QActionEvent *ev)
     if (ev->type() == QEvent::ActionAdded)
     {
         idx = ev->before() ? menu->actions().indexOf(ev->before())-1 : -1;
-        xbar->call(QDBus::NoBlock, "addEntry", (qlonglong)menu, idx, title);
+        XBAR_SEND( MSG("addEntry") << (qlonglong)menu << idx << title );
         actions[menu].insert(idx, ev->action());
         return;
     }
     if (ev->type() == QEvent::ActionChanged)
     {
         idx = menu->actions().indexOf(ev->action());
-        xbar->call(QDBus::NoBlock, "changeEntry", (qlonglong)menu, idx, title);
+        XBAR_SEND( MSG("changeEntry") << (qlonglong)menu << idx << title );
     }
     else
     { // remove
         idx = actions[menu].indexOf(ev->action());
         actions[menu].removeAt(idx);
-        xbar->call(QDBus::NoBlock, "removeEntry", (qlonglong)menu, idx);
+        XBAR_SEND( MSG("removeEntry") << (qlonglong)menu << idx );
     }
 }
 
@@ -462,21 +460,25 @@ MacMenu::eventFilter(QObject *o, QEvent *ev)
 //         return false;
     case QEvent::EnabledChange:
         if (static_cast<QWidget*>(o)->isEnabled())
-            xbar->call(QDBus::NoBlock, "requestFocus", (qlonglong)menu);
+            XBAR_SEND( MSG("requestFocus") << (qlonglong)menu );
         else
-            xbar->call(QDBus::NoBlock, "releaseFocus", (qlonglong)menu);
+            XBAR_SEND( MSG("releaseFocus") << (qlonglong)menu );
         break;
 
-//     case QEvent::ApplicationActivate:
     // TODO: test whether this is the only one and show it? (e.g. what about dialogs...?!)
+    case QEvent::ApplicationActivate:
+//         if (items.count() > 1)
+//             break;
     case QEvent::WindowActivate:
-        xbar->call(QDBus::NoBlock, "requestFocus", (qlonglong)menu);
+        XBAR_SEND( MSG("requestFocus") << (qlonglong)menu );
         break;
 
-    case QEvent::WindowBlocked:
     case QEvent::WindowDeactivate:
+//         if (items.count() == 1)
+//             break;
+    case QEvent::WindowBlocked:
     case QEvent::ApplicationDeactivate:
-        xbar->call(QDBus::NoBlock, "releaseFocus", (qlonglong)menu);
+        XBAR_SEND( MSG("releaseFocus") << (qlonglong)menu );
         break;
     default:
         return false;
@@ -495,3 +497,6 @@ MacMenu::eventFilter(QObject *o, QEvent *ev)
     }
     return false;
 }
+
+#undef MSG
+#undef XBAR_SEND
