@@ -35,6 +35,7 @@
 #include <QStyleOption>
 #include <QTimer>
 
+#include <kglobalsettings.h>
 #include <kwindowsystem.h>
 #include <KDirWatch>
 #include <KIcon>
@@ -140,8 +141,15 @@ XBar::init()
 //     setFlag(ItemClipsChildrenToShape); setFlag(ItemClipsToShape);
     
     // TODO: use plasmoid popup and make this dynamic -> update all menubars...
-//     QSettings settings("Bespin", "XBar");
-//     settings.beginGroup("XBar");
+    QSettings settings("Bespin", "XBar");
+    settings.beginGroup("XBar");
+    float scale = settings.value("FontScale", 1.0f).toFloat();
+    if (scale > 0.0 && scale != 1.0)
+    {
+        myFont = KGlobalSettings::menuFont();
+        myFont.setPointSize(scale*myFont.pointSize());
+        setFont(myFont);
+    }
     d.extraTitle = false; //settings.value("WindowList", false).toBool();
 
     repopulateMainMenu();
@@ -324,6 +332,7 @@ XBar::registerMenu(const QString &service, qlonglong key, const QString &title, 
     MenuBar *newBar = new MenuBar(service, key, this, dummy);
     newBar->setAppTitle(title);
     newBar->setPalette(palette());
+    newBar->setFont(myFont);
     connect (newBar, SIGNAL(hovered(int)), this, SLOT(hover(int)));
     connect (newBar, SIGNAL(triggered(int)), this, SLOT(trigger(int)));
 
@@ -566,6 +575,7 @@ XBar::repopulateMainMenu()
         d.currentBar = 0;
     delete myMainMenu;
     myMainMenu = new MenuBar("", 0, this, dummy);
+    myMainMenu->setFont(myFont);
     myMainMenu->setAppTitle("Plasma");
     myMainMenu->addAction("Plasma",-1, &d.windowList);
 

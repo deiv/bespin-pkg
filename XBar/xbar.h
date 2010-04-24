@@ -66,6 +66,7 @@ private:
     } d;
     KDirWatch *myMainMenuDefWatcher;
     MenuBar *myMainMenu;
+    QFont myFont;
     static QTimer bodyCleaner;
 private slots:
     void callFromAction();

@@ -29,11 +29,10 @@ This library is distributed in the hope that it will be useful,
 #include <QStyle>
 #include <QStyleOptionMenuItem>
 
-#include <kglobalsettings.h>
-
 #include <Plasma/Applet>
 
 #include "menubar.h"
+// #include "xbar.h"
 
 #include <QtDebug>
 
@@ -252,7 +251,7 @@ MenuBar::initStyleOption(QStyleOptionMenuItem *option, int idx) const
         return;
 
     QAction *action = d.actions.at(idx);
-    option->font = KGlobalSettings::menuFont(); //action->font();
+    option->font = font(); //action->font();
     option->icon = action->icon();
     if (idx)
         option->text = action->text();
