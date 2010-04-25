@@ -246,7 +246,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>6</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -562,8 +562,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>322</width>
-               <height>114</height>
+               <width>318</width>
+               <height>112</height>
               </rect>
              </property>
              <attribute name="label">
@@ -875,7 +875,7 @@
                <x>0</x>
                <y>0</y>
                <width>245</width>
-               <height>180</height>
+               <height>176</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1183,15 +1183,15 @@
           <item row="1" column="0">
            <widget class="QToolBox" name="toolBox_3">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page_5">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>266</width>
-               <height>180</height>
+               <width>444</width>
+               <height>192</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1389,8 +1389,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>260</width>
-               <height>137</height>
+               <width>444</width>
+               <height>131</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1482,6 +1482,11 @@
                      <item>
                       <property name="text">
                        <string>Sunken</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Embedded</string>
                       </property>
                      </item>
                     </widget>
@@ -1912,8 +1917,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>316</width>
-               <height>249</height>
+               <width>435</width>
+               <height>247</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2075,8 +2080,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>197</width>
-               <height>90</height>
+               <width>193</width>
+               <height>88</height>
               </rect>
              </property>
              <attribute name="label">

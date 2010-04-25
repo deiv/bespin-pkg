@@ -170,7 +170,27 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
     if (!pix.isNull())
         drawItemPixmap(painter,r, alignment, pix);
     else
+    {
+#if 0
+        QPalette::ColorRole ffg = (hover || step > 3) ? fg : fg2;
+        if (isEnabled && appType == BEshell)
+        {
+            const QPen save = painter->pen();
+            if (Colors::value(COLOR(ffg)) > 112)
+            {
+                painter->setPen(QColor(0,0,0,128));
+                painter->drawText( r.translated(0,-1), alignment, mbi->text );
+            }
+            else
+            {
+                painter->setPen(QColor(255,255,255,200));
+                painter->drawText( r.translated(0,1), alignment, mbi->text );
+            }
+            painter->setPen(save);
+        }
+#endif
         drawItemText(painter, r, alignment, mbi->palette, isEnabled, mbi->text, (hover || step > 3) ? fg : fg2);
+    }
     painter->setFont(pFont);
 }
 

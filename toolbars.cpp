@@ -202,7 +202,7 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
     {
         QToolBar *tb = static_cast<QToolBar*>(widget->parentWidget()); // guaranteed by "connected", see above
         OPT_SUNKEN
-        const bool round = config.btn.tool.sunken;
+        const bool round = (config.btn.tool.frame == 1);
 
         QPalette pal = PAL;
 #undef PAL
@@ -211,7 +211,7 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
             pal.setCurrentColorGroup(widget->parentWidget()->palette().currentColorGroup());
         else
             pal.setCurrentColorGroup(QPalette::Active);
-        
+
         QColor c  = config.btn.tool.std_role[Bg] == QPalette::Window ? Colors::bg(pal, widget) : CCOLOR(btn.tool.std, Bg);
         QColor c2 = /*config.btn.tool.active_role[Bg] == QPalette::Window ? Colors::bg(pal, widget) : */CCOLOR(btn.tool.active, Bg);
 #undef PAL
@@ -252,12 +252,22 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(btn.tool);
         o = (o == Qt::Horizontal) ? Qt::Vertical : Qt::Horizontal;
         Tile::setShape(pf);
-        if (config.btn.tool.sunken)
+        if (config.btn.tool.frame)
         {
             if (pf & Tile::Bottom)
                 rect.setBottom(rect.bottom()-F(2));
-            masks.rect[round].render(rect, painter, gt, o, c);
-            shadows.sunken[round][true].render(RECT, painter);
+            bool relief = false;
+            if (config.btn.tool.frame == 2)
+                relief = !(sunken || option->state & State_On);
+//             if (step || !relief)
+                masks.rect[round].render(rect, painter, gt, o, c);
+            if (relief)
+            {
+                OPT_HOVER
+                shadows.relief[round][hover].render(RECT, painter);
+            }
+            else
+                shadows.sunken[round][true].render(RECT, painter);
         }
         else
         {

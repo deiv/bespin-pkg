@@ -497,12 +497,16 @@ Style::polish( QWidget * widget )
                 {
                     if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
                     {
-                        if (appType == Dolphin && Hacks::config.opaqueDolphinViews)
+                        if (/*itemView->inherits("KFilePlacesView") || */(appType == Dolphin && Hacks::config.opaqueDolphinViews))
                         {
                             itemView->setPalette(QPalette());
+                            QPalette pal = itemView->palette();
+                            pal.setColor(QPalette::WindowText, pal.color(QPalette::Text));
+                            itemView->setPalette(pal);
                             itemView->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
                             itemView->setAlternatingRowColors(false);
                             itemView->setBackgroundRole(QPalette::AlternateBase);
+                            itemView->setForegroundRole(QPalette::Text);
                             vp->setBackgroundRole(QPalette::AlternateBase);
                             vp->setPalette(QPalette());
                             vp->setAutoFillBackground(true);

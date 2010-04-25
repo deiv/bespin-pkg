@@ -303,14 +303,14 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.btn.tool.disabledStyle = readInt(BTN_DISABLED_TOOLS);
     if (config.btn.tool.connected)
     {
-        config.btn.tool.sunken = readBool(BTN_SUNKEN_TOOLS);
+        config.btn.tool.frame = readInt(BTN_SUNKEN_TOOLS);
         readRole(btn.tool.std, BTN_TOOL_ROLE);
         readRole(btn.tool.active, BTN_TOOL_ACTIVEROLE);
         GRAD(btn.tool) = readGrad(BTN_TOOL_GRADIENT);
     }
     else
     {
-        config.btn.tool.sunken = false;
+        config.btn.tool.frame = false;
         config.btn.tool.std_role[Bg] = config.btn.tool.active_role[Bg] = QPalette::Window;
         config.btn.tool.std_role[Fg] = config.btn.tool.active_role[Fg] = QPalette::WindowText;
     }

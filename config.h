@@ -53,8 +53,8 @@ typedef struct Config
         Gradients::Type gradient;
         QPalette::ColorRole std_role[2], active_role[2];
         struct tool {
-            int disabledStyle;
-            bool connected, sunken;
+            int disabledStyle, frame;
+            bool connected;
             Gradients::Type gradient;
             QPalette::ColorRole std_role[2], active_role[2];
         } tool;
