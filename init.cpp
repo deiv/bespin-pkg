@@ -307,9 +307,11 @@ Style::readSettings(const QSettings* settings, QString appName)
         readRole(btn.tool.std, BTN_TOOL_ROLE);
         readRole(btn.tool.active, BTN_TOOL_ACTIVEROLE);
         GRAD(btn.tool) = readGrad(BTN_TOOL_GRADIENT);
+        config.btn.tool.separator = readBool(BTN_TOOL_SEPARATOR);
     }
     else
     {
+        config.btn.tool.separator = false;
         config.btn.tool.frame = false;
         config.btn.tool.std_role[Bg] = config.btn.tool.active_role[Bg] = QPalette::Window;
         config.btn.tool.std_role[Fg] = config.btn.tool.active_role[Fg] = QPalette::WindowText;

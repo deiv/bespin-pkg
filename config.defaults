@@ -48,6 +48,7 @@
 #define BTN_TOOL_ROLE "Btn.Tool.Role", QPalette::Window
 #define BTN_TOOL_ACTIVEROLE "Btn.Tool.ActiveRole", QPalette::Highlight
 #define BTN_TOOL_GRADIENT "Btn.Tool.Gradient", Gradients::Button
+#define BTN_TOOL_SEPARATOR "Btn.Tool.Separator", true
 #define BTN_GRADIENT "Btn.Gradient", Gradients::Button
 #define BTN_BACKLIGHTHOVER "Btn.BackLightHover", false
 #define BTN_LAYER "Btn.Layer", 0

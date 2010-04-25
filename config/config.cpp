@@ -372,6 +372,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.toolbuttonRole, BTN_TOOL_ROLE);
     handleSettings(ui.toolbuttonActiveRole, BTN_TOOL_ACTIVEROLE);
     handleSettings(ui.toolbuttonGradient, BTN_TOOL_GRADIENT);
+    handleSettings(ui.toolbuttonSeparator, BTN_TOOL_SEPARATOR);
     handleSettings(ui.disabledToolbuttonStyle, BTN_DISABLED_TOOLS);
     setContextHelp(ui.disabledToolbuttonStyle, "<b>Disabled Toolbuttons</b><hr>\
     Qt has a \"standard\" way to gray out disabled toolbuttons, which can be altered by the style.\

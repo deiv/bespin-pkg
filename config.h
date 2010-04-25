@@ -54,7 +54,7 @@ typedef struct Config
         QPalette::ColorRole std_role[2], active_role[2];
         struct tool {
             int disabledStyle, frame;
-            bool connected;
+            bool connected, separator;
             Gradients::Type gradient;
             QPalette::ColorRole std_role[2], active_role[2];
         } tool;

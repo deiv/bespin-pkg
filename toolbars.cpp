@@ -287,6 +287,16 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
                 lights.glow[round].render(rect, painter, c.lighter(120));
 
         }
+        if (config.btn.tool.separator)
+        {
+            QPen pen = painter->pen();
+            painter->setPen(Colors::mid(c,QColor(0,0,0),8,1));
+            if (!(pf & Tile::Bottom))
+                painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+            else if (!(pf & Tile::Right))
+                painter->drawLine(rect.topRight(), rect.bottomRight());
+            painter->setPen(pen);
+        }
         Tile::reset();
     }
     else if (isEnabled && (option->state & State_On))
