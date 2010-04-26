@@ -263,8 +263,8 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
                 masks.rect[round].render(rect, painter, gt, o, c);
             if (relief)
             {
-                OPT_HOVER
-                shadows.relief[round][hover].render(RECT, painter);
+//                 OPT_HOVER
+                shadows.relief[round][true].render(RECT, painter);
             }
             else
                 shadows.sunken[round][true].render(RECT, painter);
