@@ -891,7 +891,7 @@ Style::updateUno(QToolBar *bar)
             QList<QWidget*> kids = bar->findChildren<QWidget*>();
             foreach (QWidget *kid, kids)
             {
-                if (kid->isWindow())
+                if (kid->window() != mwin)
                     continue;
                 kid->setBackgroundRole(bg);
                 kid->setForegroundRole(fg);
