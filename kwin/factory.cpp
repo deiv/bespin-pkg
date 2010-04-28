@@ -25,6 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <QDBusConnection>
+#include <QDBusMessage>
 // #include <QDir>
 #include <QFontMetrics>
 #include <QLabel>
@@ -35,10 +36,10 @@
 #include <QStyleOptionHeader>
 #include <QTextBrowser>
 #include <QVBoxLayout>
-#include <kwindowsystem.h>
 #include <KGlobal>
 #include <KSharedConfig>
 #include <KConfigGroup>
+#include <kwindowsystem.h>
 // #include "button.h"
 #include "client.h"
 #include "factory.h"
@@ -52,6 +53,7 @@ extern "C"
 using namespace Bespin;
 
 bool Factory::weAreInitialized = false;
+bool Factory::weAreComposited = true; // just guessing, kwin isn't up yet ... :(
 Config Factory::ourConfig =
     { false, false, false, true, true, false, Qt::AlignHCenter, 0,
       { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
@@ -61,6 +63,7 @@ int Factory::ourButtonSize[2] = {-1, -1};
 int Factory::ourBorderSize = 4;
 int Factory::ourTitleSize[2] = {18,16};
 int Factory::ourBgMode = 1;
+int Factory::compositingPollTimer = 0;
 QVector<Button::Type> Factory::ourMultiButton(0);
 QMenu *Factory::ourDesktopMenu = 0;
 QMenu *Factory::ourWindowList = 0;
@@ -85,6 +88,7 @@ Factory::Factory() : QObject()
     p.drawEllipse(mask.rect());
     p.end();
 
+    compositingPollTimer = startTimer( 30000 ); // 30 seconds
     weAreInitialized = true;
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
@@ -95,6 +99,7 @@ Factory::~Factory() { weAreInitialized = false; Gradients::wipe(); }
 
 KDecoration* Factory::createDecoration(KDecorationBridge* b)
 {
+    timerEvent(0L);
     return new Client(b, this);
 }
 
@@ -650,6 +655,19 @@ Factory::supports( Ability ability ) const
     case AbilityColorHandle: ///< decoration supports resize handle color
     default:
         return false;
+    }
+}
+
+void Factory::timerEvent(QTimerEvent *te)
+{
+    if (te && te->timerId() != compositingPollTimer)
+        return;
+    const bool beenComposited = weAreComposited;
+    weAreComposited = KWindowSystem::compositingActive();
+    if (beenComposited != weAreComposited)
+    {
+        resetDecorations(SettingBorder);
+        QDBusConnection::sessionBus().send( QDBusMessage::createMethodCall( "org.kde.kwin", "/KWin", "org.kde.KWin", "reconfigure" ) );
     }
 }
 

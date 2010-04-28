@@ -105,7 +105,7 @@ private:
     void fadeButtons();
     void updateTitleLayout( const QSize& s );
     void updateButtonCorner(bool right = false);
-    
+private:
     QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
     Button *buttons[4];
     int borderSize, myTitleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;

@@ -60,6 +60,8 @@ typedef struct
 
 class Factory : public QObject, public KDecorationFactory
 {
+    friend class BespinDecoAdaptor;
+    friend class Client;
 public:
     Factory();
     ~Factory();
@@ -67,9 +69,10 @@ public:
     bool reset(unsigned long changed);
     bool supports( Ability ability ) const;
     inline static int buttonSize(bool small) {return ourButtonSize[small];}
-    inline static int borderSize() {return ourBorderSize;}
+    inline static int borderSize() { return ourBorderSize ? ourBorderSize : !weAreComposited; }
     inline static Qt::KeyboardModifier commandKey() { return ourCommandKey; }
-    inline static int initialized() {return weAreInitialized;}
+    inline static bool compositingActive() { return weAreComposited; }
+    inline static int initialized() { return weAreInitialized; }
     QList< BorderSize > borderSizes() const
     {
         return QList< BorderSize >() << BorderTiny << BorderNormal <<
@@ -91,14 +94,12 @@ public:
     static void showWindowList(const QPoint &p, Client *client);
     inline static bool verticalTitle() { return ourConfig.verticalTitle; }
 protected:
-    friend class BespinDecoAdaptor;
-    static void learn(qint64 pid, QByteArray data);
-    static void forget(qint64 pid);
-protected:
-    friend class Client;
     static BgSet *bgSet(const QColor &c, bool vertical, int intensity, qint64 *hash = 0);
-    static QPixmap mask;
+    static void forget(qint64 pid);
     static void kickBgSet(qint64 hash);
+    static void learn(qint64 pid, QByteArray data);
+    static QPixmap mask;
+    void timerEvent(QTimerEvent*);
 private:
     bool readConfig();
 private:
@@ -106,8 +107,8 @@ private:
     static QHash<qint64, WindowData*> ourDecoInfos;
     static QHash<qint64, BgSet*> ourBgSets;
     static QList<Preset*> ourPresets;
-    static bool weAreInitialized;
-    static int ourButtonSize[2], ourBorderSize, ourTitleSize[2], ourBgMode;
+    static bool weAreInitialized, weAreComposited;
+    static int ourButtonSize[2], ourBorderSize, ourTitleSize[2], ourBgMode, compositingPollTimer;
     static QVector<Button::Type> ourMultiButton;
     static Config ourConfig;
     static QMenu *ourDesktopMenu, *ourWindowList;
