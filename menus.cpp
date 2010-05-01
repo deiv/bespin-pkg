@@ -27,6 +27,12 @@ static const bool round_ = true;
 void
 Style::drawMenuBarBg(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
+    QMainWindow *mwin = 0;
+    if (widget)
+        mwin = qobject_cast<QMainWindow*>(widget->parentWidget());
+    if (!mwin)
+        return;
+
     const bool needScanlines = config.bg.mode == Scanlines && config.bg.structure < 5;
     if (!(config.UNO.used || needScanlines))
         return;
@@ -43,8 +49,7 @@ Style::drawMenuBarBg(const QStyleOption *option, QPainter *painter, const QWidge
 
     if (config.UNO.used)
     {
-        if (widget)
-        if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(widget->parentWidget()) )
+        if ( mwin )
         {
             QVariant var = mwin->property("UnoHeight");
             const int h = var.isValid() ? var.toInt() : 0;
