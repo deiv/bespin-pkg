@@ -120,12 +120,14 @@ shinyGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 static inline QLinearGradient
 metalGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 {
+    QColor ic = c;
+    int h,s,v,a;
+    ic.getHsv(&h,&s,&v,&a);
     QLinearGradient lg(start, stop);
-    //
-    lg.setColorAt(0, Gradients::endColor(c, Gradients::Top, Gradients::Metal));
-    lg.setColorAt(0.45, c.lighter(105));
-    lg.setColorAt(0.451, c.darker(105));
-    lg.setColorAt(1, Gradients::endColor(c, Gradients::Bottom, Gradients::Metal));
+    ic.setHsv(h,s,qMin(255,v+12),a); lg.setColorAt(0, ic);
+    ic.setHsv(h,s,qMin(255,v+7),a); lg.setColorAt(0.45, ic);
+    ic.setHsv(h,s,qMax(0,v-7),a); lg.setColorAt(0.451, ic);
+    ic.setHsv(h,s,qMax(0,v-12),a); lg.setColorAt(1, ic);
     return lg;
 }
 
@@ -415,7 +417,10 @@ Gradients::endColor(const QColor &oc, Position p, Type type, bool cv)
             return bb;
         }
         case Metal:
-            return begin ? c.lighter(108) : c.darker(112);
+        {
+            int h,s,v,a; c.getHsv(&h,&s,&v,&a);
+            return begin ? QColor::fromHsv(h,s,qMin(255,v+10), a) : QColor::fromHsv(h,s,qMax(0,v-10), a);
+        }
         case Shiny:
         {
             int h,s,v,a; c.getHsv(&h,&s,&v,&a);
