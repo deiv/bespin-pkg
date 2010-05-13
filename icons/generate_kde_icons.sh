@@ -23,10 +23,10 @@ basename="nmfnms"
 # It MUST be DOUBLE quoted ("#12345678", the cross is a comment indicator to bash)
 
 # Example:
-# color="#2B74C7" # Apples blue
+color="#2B74C7" # Apples blue
 
 # A halo around the icon, works exactly like the color above
-#halo="white"
+halo="white"
 
 # The alpha level of the final icon in percent [0-100]
 #alpha=77
