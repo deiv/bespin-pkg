@@ -16,7 +16,7 @@ applications-system:categories/applications-system
 applications-wine:apps/wine
 appointment:actions/appointment-new
 arora:apps/arora
-bin:mimetypes/unknown
+bin:mimetypes/unknown,apps/preferences-desktop-filetype-association
 biohazard:actions/mail-mark-junk
 bookmark-add:actions/bookmark-new
 bookmark-list:actions/bookmark-new-list
@@ -35,7 +35,7 @@ document-new:actions/document-new
 document-open:actions/document-open:document-open-recent
 document-save:actions/document-save:document-save-as:document-save-all
 download-mail:actions/mail-receive
-drive-harddrive:devices/drive-harddisk
+drive-harddrive:devices/drive-harddisk,apps/partitionmanager
 drive-removable-media-usb:devices/drive-removable-media-usb-pendrive:drive-removable-media:drive-removable-media-usb,apps/device-notifier
 edit-clear-list:actions/edit-clear-list
 edit-clear-locationbar:actions/edit-clear-locationbar-rtl:edit-clear-locationbar-rtl
@@ -50,7 +50,7 @@ eject:actions/media-eject
 extract:actions/archive-extract
 eye:actions/view-preview,mimetypes/application-vnd.stardivision.draw:application-vnd.sun.xml.draw:application-vnd.sun.xml.draw.template:application-x-egon:image-x-generic:video-x-mng
 file-sound-wave:mimetypes/audio-aac:audio-ac3:audio-basic:audio-mp4:audio-mpeg:audio-vnd.rn-realaudio:audio-vnd.rn-realvideo:audio-x-adpcm:audio-x-aiff:audio-x-flac+ogg:audio-x-flac:audio-x-generic:audio-x-matroska:audio-x-mod:audio-x-monkey:audio-x-mp2:audio-x-mpegurl:audio-x-ms-asx:audio-x-ms-wma:audio-x-musepack:audio-x-pn-realaudio-plugin:audio-x-scpls:audio-x-speex+ogg:audio-x-vorbis+ogg:audio-x-wav
-file-video.alt:mimetypes/video-x-generic:video-x-mng
+file-video.alt2:mimetypes/video-x-generic:video-x-mng
 filter:actions/view-filter
 fingerprint:mimetypes/application-pkcs7-signature:application-pgp-signature,actions/mail-signed:mail-signed-full:mail-signed-part:mail-signed-verified:document-sign
 firefox:apps/firefox
@@ -184,3 +184,7 @@ calc:apps/calc:openoffice-calc,mimetypes/application-vnd.ms-excel:application-vn
 torrent:mimetypes/application-x-bittorrent
 keyboard:apps/preferences-desktop-keyboard,devices/input-keyboard
 locale:apps/preferences-desktop-locale
+desktop-preferences:apps/preferences-desktop-display
+notify:apps/preferences-desktop-notification
+disc:mimetypes/application-x-cd-image,devices/media-optical
+disc-sound:devices/media-optical-audio
