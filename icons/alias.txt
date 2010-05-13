@@ -11,7 +11,7 @@ applications-graphics:categories/applications-graphics
 applications-internet:categories/applications-internet
 applications-multimedia:categories/applications-multimedia
 applications-office:categories/applications-office
-applications-other:categories/applications-other
+applications-other:categories/applications-other,apps/preferences-desktop-default-applications
 applications-system:categories/applications-system
 applications-wine:apps/wine
 appointment:actions/appointment-new
@@ -125,7 +125,7 @@ trash-empty:actions/trash-empty
 ttf:mimetypes/application-x-font-ttf
 txt:mimetypes/text-rdf:text-rtf:application-vnd.oasis.opendocument.text:application-x-subrip:text-enriched:text-plain:text-sgml:text-x-authors:text-x-changelog:text-x-cmake:text-x-copying:text-x-generic:text-x-install:text-x-log:text-x-nfo:text-x-readme:text-x-sql,apps/write:openoffice-write
 unlock:actions/document-decrypt
-user-icon:places/user-identity
+user-icon:places/user-identity,apps/preferences-desktop-user:kuser
 utilities-terminal:apps/utilities-terminal
 view-file-columns:actions/view-file-columns
 view-icons:actions/view-icons:view-list-icons:actions
@@ -182,3 +182,5 @@ kadressbook:apps/kadressbook
 impress:apps/impress:openoffice-impress:kpresenter,mimetypes/application-vnd.oasis.opendocument.presentation:application-vnd.oasis.opendocument.presentation-template:application-vnd.ms-powerpoint
 calc:apps/calc:openoffice-calc,mimetypes/application-vnd.ms-excel:application-vnd.stardivision.calc:application-vnd.sun.xml.calc:application-vnd.sun.xml.calc.template
 torrent:mimetypes/application-x-bittorrent
+keyboard:apps/preferences-desktop-keyboard,devices/input-keyboard
+locale:apps/preferences-desktop-locale
