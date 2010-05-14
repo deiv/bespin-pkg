@@ -18,9 +18,9 @@ set(xbar_SRCS menubar.cpp xbar.cpp)
 
 kde4_add_plugin(plasma_applet_xbar ${xbar_SRCS})
 if (KDE_VERSION_MINOR LESS 2 AND KDE_VERSION_RELEASE LESS 96)
-    target_link_libraries(plasma_applet_xbar kworkspace ${KDE4_KDEUI_LIBS} ${KDE4_KFILE_LIBS} ${PLASMA_LIBS} QtXml )
+    target_link_libraries(plasma_applet_xbar kworkspace ${KDE4_KDEUI_LIBS} ${KDE4_KFILE_LIBS} ${PLASMA_LIBS} QtXml ${KDE4_KIO_LIBS} )
 else()
-    target_link_libraries(plasma_applet_xbar kworkspace ${KDE4_KDEUI_LIBS} ${KDE4_KFILE_LIBS} ${KDE4_PLASMA_LIBS} QtXml )
+    target_link_libraries(plasma_applet_xbar kworkspace ${KDE4_KDEUI_LIBS} ${KDE4_KFILE_LIBS} ${KDE4_PLASMA_LIBS} QtXml ${KDE4_KIO_LIBS})
 endif()
 
 install(TARGETS plasma_applet_xbar DESTINATION ${PLUGIN_INSTALL_DIR})
