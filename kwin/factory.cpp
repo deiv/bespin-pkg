@@ -40,12 +40,15 @@
 #include <KSharedConfig>
 #include <KConfigGroup>
 #include <kwindowsystem.h>
+#include <kdeversion.h>
 // #include "button.h"
 #include "client.h"
 #include "factory.h"
 #include "dbus.h"
 
 #include <QtDebug>
+
+#include <kdemacros.h>
 
 extern "C"
 { KDE_EXPORT KDecorationFactory* create_factory() { return new Bespin::Factory(); } }
@@ -643,12 +646,15 @@ Factory::supports( Ability ability ) const
         return true;
         
     // composite
+#if KDE_IS_VERSION(4,3,0)
     case AbilityUsesAlphaChannel: /// don't clip - it's expensive with composition
-        
+
     case AbilityProvidesShadow: /// rather not
+#if KDE_IS_VERSION(4,4,0)
     case AbilityExtendIntoClientArea: /// i don't even know what this is :-)
     case AbilityClientGrouping: /// errr - NO
-
+#endif
+#endif
     case AbilityColorButtonFore: ///< decoration supports button foreground color
     case AbilityColorFrame: ///< decoration supports frame color
     case AbilityButtonResize: ///< decoration supports a resize button
