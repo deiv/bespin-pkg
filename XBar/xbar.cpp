@@ -143,7 +143,7 @@ XBar::init()
     // TODO: use plasmoid popup and make this dynamic -> update all menubars...
     QSettings settings("Bespin", "XBar");
     settings.beginGroup("XBar");
-    float scale = settings.value("FontScale", 1.0f).toFloat();
+    double scale = settings.value("FontScale", 1.0f).toDouble();
     if (scale > 0.0 && scale != 1.0)
     {
         myFont = KGlobalSettings::menuFont();
