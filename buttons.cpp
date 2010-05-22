@@ -410,9 +410,11 @@ Style::drawCheckBox(const QStyleOption *option, QPainter *painter, const QWidget
         copy.rect.adjust(F(1),F(1),-F(1),0); // get rect appereance again
     bool resetAnim = false;
     isCheckbox = true;
-    if (config.btn.backLightHover)
-        { hover = 0; anim.widget = widget; anim.step = 0; }
-    else if ( !widget || widget != anim.widget )
+    // NOTICE: i do not recall why i excluded this, waiting for a bug report
+//     if (config.btn.backLightHover)
+//         { hover = 0; anim.widget = widget; anim.step = 0; }
+    /*else */
+    if ( !widget || widget != anim.widget )
         { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
     drawButtonFrame(&copy, painter, widget);
     isCheckbox = false;
