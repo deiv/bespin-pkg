@@ -38,7 +38,6 @@ Style::hasMenuIndicator(const QStyleOptionToolButton *tb)
                            == (QStyleOptionToolButton::HasMenu | QStyleOptionToolButton::PopupDelay);
     return ret;
 }
-
 void
 Style::drawToolBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -49,15 +48,16 @@ Style::drawToolBar(const QStyleOption *option, QPainter *painter, const QWidget 
     if ( mwin->toolBarArea(const_cast<QToolBar*>(bar)) == Qt::TopToolBarArea )
     {
         QVariant var = mwin->property("UnoHeight");
-        const int h = var.isValid() ? var.toInt() : 0;
+        int h = var.isValid() ? var.toInt() : 0;
         if (config.UNO.gradient)
         {
             if (h)
             {
-                const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), h, Qt::Vertical, config.UNO.gradient);
-                painter->drawTiledPixmap(RECT, fill, QPoint(0,bar->geometry().y()));
+                const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), (h & 0xffffff), Qt::Vertical, config.UNO.gradient);
+                painter->drawTiledPixmap(RECT, fill, QPoint(0,bar->geometry().y() + ((h>>24) & 0xff)));
             }
         }
+        h = (h & 0xffffff) - ((h>>24) & 0xff);
         if (h == bar->geometry().bottom())
         {
             SAVE_PEN;

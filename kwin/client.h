@@ -86,6 +86,7 @@ public slots:
     void activate();
     void throwOnDesktop();
     void updateStylePixmaps();
+    void updateUnoHeight();
 signals:
     void maximizeChanged(bool);
     void stickyChanged(bool);
@@ -112,7 +113,7 @@ private:
     int myButtonOpacity;
     int myActiveChangeTimer;
     Picture topTile, btmTile, cnrTile, lCorner, rCorner;
-    uint bgMode;
+    uint bgMode, unoHeight;
     Gradients::Type gType[2];
     bool iAmSmall;
     QBoxLayout *myTitleBar;

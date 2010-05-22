@@ -551,12 +551,15 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     // the title region in the center
     WindowData data;
     QPalette::ColorRole active[2] = { QPalette::Window, QPalette::WindowText};
+
+    // MODE ======================================
     const bool glassy = (widget && widget->testAttribute(Qt::WA_MacBrushedMetal));
-    bool uno = false;
+    int uno = 0;
     if (config.UNO.title && widget)
     {
         QVariant h = widget->property("UnoHeight");
-        uno = h.isValid() && h.toInt() > 0;
+        if ( h.isValid() )
+            uno = qMax(0, (h.toInt() & 0xffffff));
         if (uno)
         {
             active[Bg] = config.UNO.__role[Bg];
@@ -565,13 +568,22 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     }
 
     QColor bg = pal.color(QPalette::Inactive, active[Bg]);
-    if (glassy || uno)
+
+    // STYLE ===================================
+    if (uno)
     {
+        if (uno < 0)
+            uno = 0;
+        else if (uno > 0xff)
+            uno = 0xff;
+        if (mode == 1)
+            mode = 0;
+        data.style = ((uno & 0xff) << 24) | ((mode & 0xff) << 16) | ((config.UNO.gradient & 0xff) << 8) | (config.UNO.gradient & 0xff);
+    }
+    else if (glassy)
+    {
+        bg = bg.light(115-Colors::value(bg)/20);
         data.style = (((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff));
-        if (uno)
-            bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient, true);
-        else
-            bg = bg.light(115-Colors::value(bg)/20);
     }
     else
         data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
@@ -582,10 +594,11 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 #endif
     data.inactiveWindow = bg.rgba();
 
+    // COLORS =======================
     bg = pal.color(QPalette::Active, active[Bg]);
-    if (uno)
-        bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient, true);
-    else if (glassy)
+//     if (uno)
+//         bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient, true);
+    /*else */if (glassy)
         bg = bg.light(115-Colors::value(bg)/20);
     
 #if BESPIN_ARGB_WINDOWS
@@ -812,7 +825,7 @@ Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*
 static QList<QPointer<QToolBar> > unoUpdates;
 
 static bool
-updateUnoHeight(QMainWindow *mwin, bool includeToolbars)
+updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle)
 {
     const QVariant var = mwin->property("UnoHeight");
     int oldH = 0, newH = 0;
@@ -846,13 +859,25 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars)
         newH += mwin->menuBar()->height();
         dirty << mwin->menuBar();
     }
+#ifdef Q_WS_X11
+    if (includeTitle)
+    {
+        uint *decoDimP = XProperty::get<uint>(mwin->winId(), XProperty::decoDim, XProperty::LONG);
+        if (decoDimP)
+        {
+            const uint decoDim = ((*decoDimP) >> 16);
+            newH = ((newH + decoDim) & 0xffffff) | ((decoDim & 0xff) << 24);
+        }
+    }
+#endif
     if ( oldH != newH )
     {
         mwin->setProperty("UnoHeight", newH);
         foreach (QWidget *w, dirty)
             w->update();
+        return true;
     }
-    return !(oldH && newH);
+    return false;
 }
 
 void
@@ -871,7 +896,7 @@ Style::updateUno(QToolBar *bar)
 {
     if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget()) )
     {
-        if (updateUnoHeight(mwin,config.UNO.toolbar) && config.UNO.title)
+        if (updateUnoHeight(mwin,config.UNO.toolbar,config.UNO.title) && config.UNO.title)
             setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
         
         QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
@@ -1112,7 +1137,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
              mwin->toolBarArea(static_cast<QToolBar*>(object)) == Qt::TopToolBarArea) ||
              qobject_cast<QMenuBar*>(object))
         {
-            if (updateUnoHeight(mwin,config.UNO.toolbar) && config.UNO.title)
+            if (updateUnoHeight(mwin,config.UNO.toolbar,config.UNO.title) && config.UNO.title)
                 setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
             return false;
         }

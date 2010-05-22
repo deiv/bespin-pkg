@@ -99,7 +99,7 @@ Client::updateStylePixmaps()
         {
             qint64 hash = 0;
             /// NOTICE style encodes the intensity in btmTile!
-            BgSet *set = Factory::bgSet(colors[isActive()][0], bgMode==2, pics->btmTile, &hash);
+            BgSet *set = Factory::bgSet(colors[isActive()][0], bgMode == 2, pics->btmTile, &hash);
             if (!bg)
             {
                 ++set->clients;
@@ -135,15 +135,26 @@ Client::updateStylePixmaps()
 }
 
 void
+Client::updateUnoHeight()
+{
+    WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
+    if (data)
+    {
+        unoHeight = ((data->style >> 24) & 0xff);
+        widget()->update();
+    }
+}
+
+void
 Client::activeChange()
 {
     if (gType[0] != gType[1])
         updateTitleLayout(widget()->size());
     fadeButtons();
     if (bgMode > 1)
-    {
         updateStylePixmaps();
-    }
+    if (unoHeight)
+        updateUnoHeight();
     if (corner)
     {
         corner->setColor(color(ColorTitleBar, isActive()));
@@ -749,6 +760,13 @@ Client::repaint(QPainter &p, bool paintTitle)
         }
     }
 
+    if (unoHeight && !Factory::verticalTitle())
+    {
+        const Gradients::Type gradient = gType[isActive()];
+        if (gradient != Gradients::None)
+            p.fillRect(top, Gradients::brush(bg, unoHeight, Qt::Vertical, gradient));
+    }
+
     if (paintTitle && isShade())
     {   // splitter
         QColor bg2 = color(ColorTitleBlend, isActive());
@@ -844,7 +862,7 @@ Client::repaint(QPainter &p, bool paintTitle)
     }
 
     // bar =========================
-    if (bgMode != 1)
+    if (!(unoHeight || bgMode == 1))
     {
         const QColor bg2 = color(ColorTitleBlend, isActive());
 
@@ -1057,12 +1075,15 @@ Client::reset(unsigned long changed)
                 colors[0][ColorButtonBg].setRgba(data->inactiveButton);
                 colors[1][ColorButtonBg].setRgba(data->activeButton);
                 bgMode = ((data->style >> 16) & 0xff);
+                if ( unoHeight = ((data->style >> 24) & 0xff) )
+                    QTimer::singleShot(750, this, SLOT(updateUnoHeight()));
                 gType[0] = (Gradients::Type)((data->style >> 8) & 0xff);
                 gType[1] = (Gradients::Type)(data->style & 0xff);
             }
         }
         if (def)
         {   // the fallback solution
+            unoHeight = 0;
             if ((bgMode = Factory::defaultBgMode()) > 1)
             {
                 WindowPics pics;
@@ -1226,7 +1247,7 @@ Client::resize( const QSize& s )
     left = QRect(0, t2, Factory::verticalTitle() ? myTitleSize : borderSize, sideHeight);
     right = QRect(w-borderSize, t2, borderSize, sideHeight);
 
-    if ( Factory::roundCorners() /* && !Factory::compositingActive()*/ )
+    if ( Factory::roundCorners() && !Factory::compositingActive() )
     {
         if (maximizeMode() == MaximizeFull)
             { clearMask(); widget()->update(); return; }

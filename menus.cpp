@@ -50,17 +50,19 @@ Style::drawMenuBarBg(const QStyleOption *option, QPainter *painter, const QWidge
     if (config.UNO.used)
     {
         QVariant var = mwin->property("UnoHeight");
-        const int h = var.isValid() ? var.toInt() : 0;
+        int h = var.isValid() ? var.toInt() : 0;
         if (config.UNO.gradient)
         {
             if (h)
             {
-                const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), h, Qt::Vertical, config.UNO.gradient);
-                painter->drawTiledPixmap(RECT, fill, QPoint(0,widget->geometry().y())); //the offset should be 0,0 though...
+                const QPixmap &fill = Gradients::pix(CCOLOR(UNO._, Bg), (h & 0xffffff), Qt::Vertical, config.UNO.gradient);
+                painter->drawTiledPixmap(RECT, fill, QPoint(0,widget->geometry().y() + ((h>>24) & 0xff)));
             }
         }
         else if (config.bg.mode == Scanlines)
             painter->fillRect(rect, Gradients::structure(c, needScanlines));
+
+        h = (h & 0xffffff) - ((h>>24) & 0xff);
 
         if (config.UNO.sunken && h == widget->geometry().bottom()+1) // i.e. no toolbar
             pf |= Tile::Bottom;
