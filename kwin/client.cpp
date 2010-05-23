@@ -1247,7 +1247,7 @@ Client::resize( const QSize& s )
     left = QRect(0, t2, Factory::verticalTitle() ? myTitleSize : borderSize, sideHeight);
     right = QRect(w-borderSize, t2, borderSize, sideHeight);
 
-    if ( Factory::roundCorners() && !Factory::compositingActive() )
+    if ( Factory::roundCorners() /*&& !Factory::compositingActive()*/ )
     {
         if (maximizeMode() == MaximizeFull)
             { clearMask(); widget()->update(); return; }
