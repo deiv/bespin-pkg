@@ -865,8 +865,8 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle)
         uint *decoDimP = XProperty::get<uint>(mwin->winId(), XProperty::decoDim, XProperty::LONG);
         if (decoDimP)
         {
-            const uint decoDim = ((*decoDimP) >> 16);
-            newH = ((newH + decoDim) & 0xffffff) | ((decoDim & 0xff) << 24);
+            const uint decoDim = ((*decoDimP) >> 16) & 0xff;
+            newH = ((newH + decoDim) & 0xffffff) | (decoDim << 24);
         }
     }
 #endif

@@ -38,6 +38,7 @@ Style::hasMenuIndicator(const QStyleOptionToolButton *tb)
                            == (QStyleOptionToolButton::HasMenu | QStyleOptionToolButton::PopupDelay);
     return ret;
 }
+
 void
 Style::drawToolBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {

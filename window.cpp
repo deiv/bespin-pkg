@@ -132,8 +132,9 @@ Style::drawTitleShadow( QPainter *painter, const QWidget *widget ) const
         if ( config.UNO.toolbar )
         {
             y = widget->property("UnoHeight").toInt();
+                y = (y & 0xffffff) - ((y>>24) & 0xff);
             if ( y > 0 )
-                y = (y & 0xffffff) - ((y>>24) & 0xff) + 1;
+                ++y;
             else if ( !config.shadowTitlebar )
                 return;
         }
