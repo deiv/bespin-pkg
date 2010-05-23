@@ -133,7 +133,7 @@ Style::drawTitleShadow( QPainter *painter, const QWidget *widget ) const
         {
             y = widget->property("UnoHeight").toInt();
             if ( y > 0 )
-                ++y;
+                y = (y & 0xffffff) - ((y>>24) & 0xff) + 1;
             else if ( !config.shadowTitlebar )
                 return;
         }
