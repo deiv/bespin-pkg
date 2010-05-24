@@ -38,7 +38,8 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeView>
-#include <QtDBus/QDBusInterface>
+#include <QtDBus/QDBusConnectionInterface>
+#include <QtDBus/QDBusMessage>
 
 /**============= Bespin includes ==========================*/
 
@@ -525,6 +526,10 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 }
 
 // X11 properties for the deco ---------------
+
+#define MSG(_FNC_) QDBusMessage::createMethodCall( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco", _FNC_ )
+#define KWIN_SEND( _MSG_ ) QDBusConnection::sessionBus().send( _MSG_ )
+
 void
 Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
 {
@@ -583,10 +588,10 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     else if (glassy)
     {
         bg = bg.light(115-Colors::value(bg)/20);
-        data.style = (((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff));
+        data.style = (0 << 24) | (((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff));
     }
     else
-        data.style = (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
+        data.style = (0 << 24) | (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
 #if BESPIN_ARGB_WINDOWS
     const bool ARGB_deco = !uno && FX::compositingActive();
     if (ARGB_deco)
@@ -596,9 +601,8 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 
     // COLORS =======================
     bg = pal.color(QPalette::Active, active[Bg]);
-//     if (uno)
-//         bg = Gradients::endColor(bg, Gradients::Top, config.UNO.gradient, true);
-    /*else */if (glassy)
+
+    if (glassy)
         bg = bg.light(115-Colors::value(bg)/20);
     
 #if BESPIN_ARGB_WINDOWS
@@ -634,7 +638,12 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     data.activeButton   = pal.color(QPalette::Active, active[Fg]).rgba();
     
     if (widget)
-        XProperty::set<uint>(widget->winId(), XProperty::winData, (uint*)&data, XProperty::WORD, 9);
+    {
+        WId id = widget->winId();
+        XProperty::set<uint>(id, XProperty::winData, (uint*)&data, XProperty::WORD, 9);
+        XSync(QX11Info::display(), False);
+        KWIN_SEND( MSG("updateDeco") << (uint)id );
+    }
     else
     {   // dbus solution, currently for gtk
         QByteArray ba(36, 'a');
@@ -649,12 +658,14 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
         ints[7] = data.activeButton;
         ints[8] = data.style;
 
-        QDBusInterface bespinDeco( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco");
         const qint64 pid = QCoreApplication::applicationPid();
-        bespinDeco.call(QDBus::NoBlock, "styleByPid", pid, ba);
+        KWIN_SEND( MSG("styleByPid") << pid << ba );
     }
 #endif // X11
 }
+
+#undef MSG
+#undef KWIN_SEND
 
 static const
 QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
@@ -860,7 +871,7 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle)
         dirty << mwin->menuBar();
     }
 #ifdef Q_WS_X11
-    if (includeTitle)
+    if (newH && includeTitle)
     {
         uint *decoDimP = XProperty::get<uint>(mwin->winId(), XProperty::decoDim, XProperty::LONG);
         if (decoDimP)

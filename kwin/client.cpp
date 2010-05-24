@@ -59,7 +59,10 @@ using namespace Bespin;
 Client::Client(KDecorationBridge *b, Factory *f) :
 KDecoration(b, f), retry(0), myButtonOpacity(0), myActiveChangeTimer(0),
 topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
-bgMode(Factory::defaultBgMode()), corner(0), bg(0) { }
+bgMode(Factory::defaultBgMode()), corner(0), bg(0)
+{
+    setParent( f );
+}
 
 Client::~Client()
 {
@@ -137,12 +140,15 @@ Client::updateStylePixmaps()
 void
 Client::updateUnoHeight()
 {
+#if 0
+    // NOTICE: this should be superflous!
     WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
     if (data)
     {
         unoHeight = ((data->style >> 24) & 0xff);
         widget()->update();
     }
+#endif
 }
 
 void
@@ -153,8 +159,8 @@ Client::activeChange()
     fadeButtons();
     if (bgMode > 1)
         updateStylePixmaps();
-    if (unoHeight)
-        updateUnoHeight();
+//     if (unoHeight)
+//         updateUnoHeight();
     if (corner)
     {
         corner->setColor(color(ColorTitleBar, isActive()));
@@ -1075,8 +1081,8 @@ Client::reset(unsigned long changed)
                 colors[0][ColorButtonBg].setRgba(data->inactiveButton);
                 colors[1][ColorButtonBg].setRgba(data->activeButton);
                 bgMode = ((data->style >> 16) & 0xff);
-                if ( unoHeight = ((data->style >> 24) & 0xff) )
-                    QTimer::singleShot(750, this, SLOT(updateUnoHeight()));
+                unoHeight = ((data->style >> 24) & 0xff); // if (..)
+//                     QTimer::singleShot(2500, this, SLOT(updateUnoHeight()));
                 gType[0] = (Gradients::Type)((data->style >> 8) & 0xff);
                 gType[1] = (Gradients::Type)(data->style & 0xff);
             }

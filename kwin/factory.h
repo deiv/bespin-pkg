@@ -100,6 +100,7 @@ protected:
     static void learn(qint64 pid, QByteArray data);
     static QPixmap mask;
     void timerEvent(QTimerEvent*);
+    void updateDeco(WId id);
 private:
     bool readConfig();
 private:

@@ -673,6 +673,7 @@ void Factory::timerEvent(QTimerEvent *te)
     if (beenComposited != weAreComposited)
     {
         resetDecorations(SettingBorder);
+        // required to enfore a widget resize (noticed by kwin core)
         QDBusConnection::sessionBus().send( QDBusMessage::createMethodCall( "org.kde.kwin", "/KWin", "org.kde.KWin", "reconfigure" ) );
     }
 }
@@ -731,6 +732,18 @@ Factory::forget(qint64 pid)
         delete i.value(); i.value() = 0;
         ourDecoInfos.erase(i);
     }
+}
+
+void
+Factory::updateDeco(WId id)
+{
+    QList<KDecoration*> decos = findChildren<KDecoration*>();
+    foreach (KDecoration *deco, decos)
+        if (deco->windowId() == id)
+        {
+            deco->reset(63);
+            return;
+        }
 }
 
 WindowData*
