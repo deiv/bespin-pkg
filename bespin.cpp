@@ -581,9 +581,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
             uno = 0;
         else if (uno > 0xff)
             uno = 0xff;
-        if (mode == 1)
-            mode = 0;
-        data.style = ((uno & 0xff) << 24) | ((mode & 0xff) << 16) | ((config.UNO.gradient & 0xff) << 8) | (config.UNO.gradient & 0xff);
+        data.style = ((uno & 0xff) << 24) | (Plain << 16) | ((config.UNO.gradient & 0xff) << 8) | (config.UNO.gradient & 0xff);
     }
     else if (glassy)
     {
