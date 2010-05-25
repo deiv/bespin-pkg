@@ -741,7 +741,7 @@ Factory::updateDeco(WId id)
     foreach (KDecoration *deco, decos)
         if (deco->windowId() == id)
         {
-            deco->reset(63);
+            deco->reset(SettingColors);
             return;
         }
 }
