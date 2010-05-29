@@ -871,6 +871,7 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle)
 #ifdef Q_WS_X11
     if (newH && includeTitle)
     {
+        XSync(QX11Info::display(), False);
         uint *decoDimP = XProperty::get<uint>(mwin->winId(), XProperty::decoDim, XProperty::LONG);
         if (decoDimP)
         {
