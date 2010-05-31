@@ -844,7 +844,7 @@ Style::polish( QWidget * widget )
     /// hover some leftover widgets
     else if (widget->inherits("QAbstractSpinBox") || widget->inherits("QSplitterHandle") ||
         widget->inherits("QWebView") || // to update the scrollbars
-        /*widget->inherits("QDockWidget") ||*/ widget->inherits("QWorkspaceTitleBar") ||
+        qobject_cast<QDockWidget*>(widget) || widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("Q3DockWindowResizeHandle"))
         widget->setAttribute(Qt::WA_Hover);
     // this is a WORKAROUND for amarok filebrowser, see above on itemviews...

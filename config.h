@@ -65,7 +65,8 @@ typedef struct Config
         Gradients::Type gradient;
     } chooser;
 
-    int dialogBtnLayout;
+    int  dialogBtnLayout;
+    bool drawSplitters;
     bool fadeInactive;
     int  groupBoxMode;
    
@@ -113,8 +114,8 @@ typedef struct Config
     } scroll;
 
     float shadowIntensity;
-    bool shadowTitlebar;
-    bool showOff;
+    bool  shadowTitlebar;
+    bool  showOff;
     
     struct tab
     {

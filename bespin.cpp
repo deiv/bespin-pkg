@@ -146,7 +146,10 @@ Style::registerRoutines()
     registerPE(drawDockBg, PE_FrameDockWidget);
     registerCE(drawDockTitle, CE_DockWidgetTitle);
     registerCC(drawMDIControls, CC_MdiControls);
-    registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
+    if (config.drawSplitters)
+        registerPE(drawDockHandle, PE_IndicatorDockWidgetResizeHandle);
+    else
+        registerPE(skip, PE_IndicatorDockWidgetResizeHandle);
     // frames.cpp
     registerCE(skip, CE_FocusFrame);
     registerPE(skip, PE_PanelStatusBar);
@@ -252,7 +255,10 @@ Style::registerRoutines()
     registerPE(drawWindowBg, PE_Widget);
     registerPE(drawToolTip, PE_PanelTipLabel);
     registerCC(drawTitleBar, CC_TitleBar);
-    registerCE(drawDockHandle, CE_Splitter);
+    if (config.drawSplitters)
+        registerCE(drawDockHandle, CE_Splitter);
+    else
+        registerCE(skip, CE_Splitter);
     registerCE(drawSizeGrip, CE_SizeGrip);
 }
 
@@ -1282,7 +1288,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (widget->isWindow() && !(widget->windowFlags() & ignoreForDecoHints))
         {
             if (widget->isModal())
-            { // setup some special stuff for modal windows
+            {   // setup some special stuff for modal windows
                 if (config.bg.modal.invert)
                     swapPalette(widget, this);
                 if (config.bg.modal.glassy)
