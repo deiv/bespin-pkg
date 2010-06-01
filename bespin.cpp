@@ -1300,6 +1300,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
 #ifdef Q_WS_X11
             setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
+            if (config.UNO.title) // WM might have updated hints
+            if (QMainWindow *mwin = qobject_cast<QMainWindow*>(widget))
+                updateUnoHeight(mwin, config.UNO.toolbar, true);
 #endif
             return false;
         }
