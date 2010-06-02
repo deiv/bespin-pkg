@@ -1085,6 +1085,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 }
                 else if (fg == QPalette::WindowText && w->foregroundRole() != QPalette::Link)
                     w->setForegroundRole(QPalette::Link);
+                else if (w->foregroundRole() != fg)
+                    w->setForegroundRole(fg);
+                    
                 QCoreApplication::sendEvent(object, ev);
                 object->installEventFilter(this);
                 isUrlNaviButtonArrow = false;
