@@ -1288,6 +1288,10 @@ Style::eventFilter( QObject *object, QEvent *ev )
         // talk to kwin about colors, gradients, etc.
         if (widget->isWindow() && !(widget->windowFlags() & ignoreForDecoHints))
         {
+            if (config.UNO.title)
+            if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(widget) )
+                updateUnoHeight(mwin,config.UNO.toolbar,config.UNO.title);
+
             if (widget->isModal())
             {   // setup some special stuff for modal windows
                 if (config.bg.modal.invert)
