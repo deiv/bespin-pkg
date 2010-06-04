@@ -1078,15 +1078,13 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 if (w->text() == "/")
                     w->setText("/.");
                 QPalette::ColorRole fg = w->parentWidget() ? w->parentWidget()->foregroundRole() : QPalette::WindowText;
-                if (isLastNavigatorButton(w, b?"KUrlButton":"BreadcrumbItemButton"))
+                if (fg != QPalette::WindowText || isLastNavigatorButton(w, b?"KUrlButton":"BreadcrumbItemButton"))
                 {
                     if (w->foregroundRole() != fg)
                         w->setForegroundRole(fg);
                 }
-                else if (fg == QPalette::WindowText && w->foregroundRole() != QPalette::Link)
+                else if (w->foregroundRole() != QPalette::Link)
                     w->setForegroundRole(QPalette::Link);
-                else if (w->foregroundRole() != fg)
-                    w->setForegroundRole(fg);
                     
                 QCoreApplication::sendEvent(object, ev);
                 object->installEventFilter(this);
