@@ -1288,9 +1288,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
         // talk to kwin about colors, gradients, etc.
         if (widget->isWindow() && !(widget->windowFlags() & ignoreForDecoHints))
         {
-            if (config.UNO.title)
-            if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(widget) )
-                updateUnoHeight(mwin,config.UNO.toolbar,config.UNO.title);
+//             if (config.UNO.title)
+//             if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(widget) )
+//                 updateUnoHeight(mwin,config.UNO.toolbar,config.UNO.title);
 
             if (widget->isModal())
             {   // setup some special stuff for modal windows
@@ -1340,7 +1340,10 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if ( QToolBar *bar = qobject_cast<QToolBar*>(object) )
         {
             if (unoUpdates.isEmpty())
-                QTimer::singleShot(0, this, SLOT(updateUno()));
+            {
+                QTimer::singleShot(1, this, SLOT(updateUno()));
+//                 QTimer::singleShot(100, this, SLOT(updateUno()));
+            }
             unoUpdates << bar;
             return false;
         }
