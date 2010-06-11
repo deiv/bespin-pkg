@@ -18,6 +18,7 @@
 
 #include <QApplication>
 #include <QAbstractButton>
+#include <QAbstractItemView>
 #include <QStyleOptionButton>
 
 #include "draw.h"
@@ -38,18 +39,26 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
 
     QRect oldRect = btn->rect;
     QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
-    if ( widget && widget->inherits("QWebView") )
+    if ( widget )
     {
-        if (!isCheckbox)
-        {   // paints hardcoded black text bypassing the style?! grrr...
-            if (Colors::value(CCOLOR(btn.std, Bg)) < 100)
-                _btn->palette.setColor(config.btn.std_role[Bg], QColor(230,230,230,255));
-            _btn->palette.setColor(config.btn.std_role[Fg], Qt::black);
-            if (Colors::value(CCOLOR(btn.active, Bg)) < 100)
-                _btn->palette.setColor(config.btn.active_role[Bg], Qt::white);
-            _btn->palette.setColor(config.btn.active_role[Fg], Qt::black);
+        if ( qobject_cast<const QAbstractItemView*>(widget) )
+        {
+            painter->fillRect(RECT, Colors::mid(FCOLOR(Base), FCOLOR(Text), 3,1));
+            return;
         }
-        widget = 0; // leads to false UnderMouse assumptions...
+        else if (widget->inherits("QWebView") )
+        {
+            if (!isCheckbox)
+            {   // paints hardcoded black text bypassing the style?! grrr...
+                if (Colors::value(CCOLOR(btn.std, Bg)) < 100)
+                    _btn->palette.setColor(config.btn.std_role[Bg], QColor(230,230,230,255));
+                _btn->palette.setColor(config.btn.std_role[Fg], Qt::black);
+                if (Colors::value(CCOLOR(btn.active, Bg)) < 100)
+                    _btn->palette.setColor(config.btn.active_role[Bg], Qt::white);
+                _btn->palette.setColor(config.btn.active_role[Fg], Qt::black);
+            }
+            widget = 0; // leads to false UnderMouse assumptions...
+        }
     }
     anim.widget = widget;
     anim.step = HOVER_STEP;

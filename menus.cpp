@@ -78,11 +78,12 @@ Style::drawMenuBarBg(const QStyleOption *option, QPainter *painter, const QWidge
     }
 }
 
-
 void
 Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(mbi, MenuItem);
+    if (mbi->menuItemType == QStyleOptionMenuItem::Separator)
+        return;
 
 #if 1 // was necessary once, not anymore?!
     if (appType != GTK && mbi->menuRect.height() > mbi->rect.height())
@@ -96,7 +97,8 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
 #endif
         drawMenuBarBg(option, painter, widget);
 
-    OPT_SUNKEN OPT_ENABLED OPT_HOVER
+    OPT_SUNKEN OPT_ENABLED
+
     QPalette::ColorRole bg = config.menu.active_role[Bg];
     QPalette::ColorRole fg = config.menu.active_role[Fg];
     if (bg == config.UNO.__role[Bg])
@@ -105,11 +107,13 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         fg = config.UNO.__role[Bg];
     }
 
-    hover = option->state & State_Selected;
+    bool hover = isEnabled && (option->state & State_Selected);
     Animator::IndexInfo *info = 0;
     int step = 0;
     QFont pFont = painter->font();
-    if (sunken)
+    if (!isEnabled)
+        step = 0;
+    else if (sunken)
         step = 6;
     else
     {   // check for hover animation ==========================
