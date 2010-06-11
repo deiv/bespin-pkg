@@ -107,13 +107,12 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         fg = config.UNO.__role[Bg];
     }
 
-    bool hover = isEnabled && (option->state & State_Selected);
+    bool hover = option->state & State_Selected;
     Animator::IndexInfo *info = 0;
     int step = 0;
     QFont pFont = painter->font();
-    if (!isEnabled)
-        step = 0;
-    else if (sunken)
+
+    if (isEnabled && sunken)
         step = 6;
     else
     {   // check for hover animation ==========================
@@ -140,7 +139,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
     }
     
     QRect r = RECT.adjusted(0, F(2), 0, -F(4));
-    if (step || hover)
+    if (isEnabled && (step || hover))
     {
         if (!step)
             step = 6;
