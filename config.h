@@ -32,7 +32,7 @@ typedef struct Config
     {
         BGMode mode;
         bool glassy, ringOverlay;
-        int structure, intensity, minValue, opacity;
+        int structure, intensity, minValue, opacity, blur;
         struct
         {
             bool invert, shape;

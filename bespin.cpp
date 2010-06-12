@@ -942,6 +942,30 @@ Style::updateUno(QToolBar *bar)
     }
 }
 
+static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &blur)
+{
+    const QObjectList &kids = widget->children();
+    QObjectList::const_iterator i;
+    for ( i = kids.begin(); i != kids.end(); ++i )
+    {
+        QObject *o = (*i);
+        if ( !o->isWidgetType() )
+            continue;
+        QWidget *w = static_cast<QWidget*>(o);
+        if ( w->autoFillBackground() )
+        {
+            QPoint offset = w->mapTo(window, QPoint(0,0));
+            if (w->mask().isEmpty())
+                blur -= w->rect().translated(offset);
+            else
+                blur -= w->mask().translated(offset);
+            continue; // ne nood for deeper checks
+        }
+        else
+            detectBlurRegion(window, w, blur);
+    }
+}
+
 bool
 Style::eventFilter( QObject *object, QEvent *ev )
 {
@@ -1146,13 +1170,81 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::Resize:
     {
         QResizeEvent *re = static_cast<QResizeEvent*>(ev);
+        QWidget *widget = qobject_cast<QWidget*>(object); // dock = 0;
+        
+        if ( widget && widget->isWindow() )
+        {
+            if ((config.menu.round && qobject_cast<QMenu*>(object))
+#if 0
+                || (config.bg.docks.shape && (widget = dock = qobject_cast<QDockWidget*>(object))))
+            {
+                if (dock && dock->isWindow()) // kwin yet cannot. compiz can't even menus...
+                {
+                    dock->clearMask();
+                    return false;
+                }
+#else
+                    )
+            {
+#endif
+#if 0 // xPerimental code for ribbon like looking menus - not atm.
+                QAction *head = menu->actions().at(0);
+                QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
+                Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
+                head->iconText());
+                r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
+                QResizeEvent *rev = (QResizeEvent*)ev;
+                QRegion mask(menu->rect());
+                mask -= QRect(0,0,menu->width(),r.bottom());
+                mask += r;
+                mask -= masks.corner[0]; // tl
+                QRect br = masks.corner[1].boundingRect();
+                mask -= masks.corner[1].translated(r.right()-br.width(), 0); // tr
+                br = masks.corner[2].boundingRect();
+                mask -= masks.corner[2].translated(0, menu->height()-br.height()); // bl
+                br = masks.corner[3].boundingRect();
+                mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
+#endif
+                const int w = widget->width();
+                const int h = widget->height();
+                QRegion mask(4, 0, w-8, h);
+                mask += QRegion(0, 4, w, h-8);
+                mask += QRegion(2, 1, w-4, h-2);
+                mask += QRegion(1, 2, w-2, h-4);
+                // only top rounded - but looks nasty
+                //          QRegion mask(0, 0, w, h-4);
+                //          mask += QRect(1, h-4, w-2, 2);
+                //          mask += QRect(2, h-2, w-4, 1);
+                //          mask += QRect(4, h-1, w-8, 1);
+                        
+                widget->setMask(mask);
+            }
+#ifdef Q_WS_X11 // hint blur region for the kwin plugin
 
-        if (config.UNO.used)
-        if (re->size().height() != re->oldSize().height())
-        if (QMainWindow *mwin = qobject_cast<QMainWindow*>(object->parent()))
-        if ((config.UNO.toolbar && qobject_cast<QToolBar*>(object) &&
-             mwin->toolBarArea(static_cast<QToolBar*>(object)) == Qt::TopToolBarArea) ||
-             qobject_cast<QMenuBar*>(object))
+            if ( config.bg.blur && widget->testAttribute(Qt::WA_TranslucentBackground) )
+            {
+                if (!FX::usesXRender() && widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
+                    return false; // protect against pseudo widgets, see setupDecoFor()
+
+                QRegion blur = widget->mask().isEmpty() ? widget->rect() : widget->mask();
+                detectBlurRegion(widget, widget, blur);
+                if (blur.isEmpty())
+                    return false;
+                QVector<unsigned long> data(blur.rectCount() * 4);
+                QVector<QRect> rects = blur.rects();
+                QVector<QRect>::const_iterator i;
+                for ( i = rects.begin(); i != rects.end(); ++i )
+                    data << i->x() << i->y() << i->width() << i->height();
+                XProperty::set<unsigned long>(widget->winId(), XProperty::blurRegion, (unsigned long*)data.constData(), XProperty::LONG, data.size());
+            }
+#endif
+            return false;
+        }
+
+        if ( config.UNO.used && re->size().height() != re->oldSize().height() )
+        if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(object->parent()) )
+        if ( (config.UNO.toolbar && qobject_cast<QToolBar*>(object) && mwin->toolBarArea(static_cast<QToolBar*>(object)) == Qt::TopToolBarArea) 
+                                                                                                                || qobject_cast<QMenuBar*>(object) )
         {
             if (updateUnoHeight(mwin,config.UNO.toolbar,config.UNO.title) && config.UNO.title)
                 setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
@@ -1176,54 +1268,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             dock->setContentsMargins(l, t, r, b);
             return false;
         }
-        QWidget *widget = 0/*, *dock = 0*/;
-        if ((config.menu.round && (widget = qobject_cast<QMenu*>(object)))
-#if 0
-            || (config.bg.docks.shape && (widget = dock = qobject_cast<QDockWidget*>(object))))
-        {
-            // kwin yet cannot. compiz can't even menus...
-            if (dock && dock->isWindow())
-            {
-                dock->clearMask();
-                return false;
-            }
-#else
-            )
-        {
-#endif
-#if 0 // xPerimental code for ribbon like looking menus - not atm.
-            QAction *head = menu->actions().at(0);
-            QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
-            Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
-            head->iconText());
-            r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
-            QResizeEvent *rev = (QResizeEvent*)ev;
-            QRegion mask(menu->rect());
-            mask -= QRect(0,0,menu->width(),r.bottom());
-            mask += r;
-            mask -= masks.corner[0]; // tl
-            QRect br = masks.corner[1].boundingRect();
-            mask -= masks.corner[1].translated(r.right()-br.width(), 0); // tr
-            br = masks.corner[2].boundingRect();
-            mask -= masks.corner[2].translated(0, menu->height()-br.height()); // bl
-            br = masks.corner[3].boundingRect();
-            mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
-#endif
-            const int w = widget->width();
-            const int h = widget->height();
-            QRegion mask(4, 0, w-8, h);
-            mask += QRegion(0, 4, w, h-8);
-            mask += QRegion(2, 1, w-4, h-2);
-            mask += QRegion(1, 2, w-2, h-4);
-// only top rounded - but looks nasty
-//          QRegion mask(0, 0, w, h-4);
-//          mask += QRect(1, h-4, w-2, 2);
-//          mask += QRect(2, h-2, w-4, 1);
-//          mask += QRect(4, h-1, w-8, 1);
-
-            widget->setMask(mask);
-            return false;
-        }
+        
         return false;
     }
 //    case QEvent::MouseButtonRelease:

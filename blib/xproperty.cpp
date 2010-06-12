@@ -36,6 +36,7 @@ BLIB_EXPORT Atom XProperty::winData = XInternAtom(QX11Info::display(), "BESPIN_W
 BLIB_EXPORT Atom XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", False);
 BLIB_EXPORT Atom XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
 BLIB_EXPORT Atom XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
+BLIB_EXPORT Atom XProperty::blurRegion = XInternAtom(QX11Info::display(), "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
 
 void
 XProperty::handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n)

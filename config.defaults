@@ -28,6 +28,7 @@
 
 #define ARGB_BLACKLIST "ARGB.Blacklist", "smplayer,amarok,dragonplayer,vlc,vlc-wrapper,kscreenlocker"
 #define ARGB_GLASSY "ARGB.Glassy", false
+#define ARGB_BLUR "Bg.Blur", false
 
 #define BG_INTENSITY "Bg.Intensity", 10
 #define BG_MINVALUE "Bg.MinValue", 70

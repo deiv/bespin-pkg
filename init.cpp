@@ -233,6 +233,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         config.bg.mode = BevelV;
 
     config.bg.intensity = clamp(100+readInt(BG_INTENSITY), 30, 300);
+    config.bg.blur = false;
 #if BESPIN_ARGB_WINDOWS
     if (appType == KWin || appType == Plasma)
         config.bg.opacity = 0xff;
@@ -243,6 +244,8 @@ Style::readSettings(const QSettings* settings, QString appName)
         QStringList blacklist = iSettings->value(ARGB_BLACKLIST).toString().split(',', QString::SkipEmptyParts);
         if (blacklist.contains(appName))
             config.bg.opacity = 0xff;
+        else
+            config.bg.blur = readBool(ARGB_BLUR);
         Animator::Tab::setTransition(Animator::Jump);
     }
 #else

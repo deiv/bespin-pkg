@@ -333,6 +333,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     setContextHelp(ui.argbBlacklist, "<b>Blacklist</b><hr>\
     Some apps just don't work too god with this. Add them to a comma separated list here.");
     handleSettings(ui.argbGlassy, ARGB_GLASSY);
+    handleSettings(ui.argbBlur, ARGB_BLUR);
 #else
     ui.windowSettings->removeItem( ui.windowSettings->indexOf( ui.argbSupport ) );
     ui.argbSupport->hide();

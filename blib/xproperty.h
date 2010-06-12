@@ -53,7 +53,7 @@ class BLIB_EXPORT XProperty
 {
 public:
     enum Type { BYTE = 8, WORD = 16, LONG = 32 };
-    static Atom winData, bgPics, decoDim, pid;
+    static Atom winData, bgPics, decoDim, pid, blurRegion;
 
     template <typename T> inline static T *get(WId window, Atom atom, Type type, unsigned long n = 1)
     {
