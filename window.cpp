@@ -367,19 +367,16 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
 void
 Style::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidget *) const
 {
-   painter->save();
-   
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, false);
 //    painter->setBrush(Gradients::pix(FCOLOR(ToolTipBase), RECT.height(), Qt::Vertical, Gradients::Button));
-   painter->setBrush(FCOLOR(ToolTipBase));
-//    painter->setPen(Qt::NoPen);
-//    painter->drawRect(RECT);
-   const int f1 = F(1);
-//    QPen pen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),6,1), f1);
-   QPen pen(FCOLOR(ToolTipText), f1);
-   painter->setPen(pen);
-   painter->drawRect(RECT.adjusted(f1/2,f1/2,-f1,-f1));
+//    painter->setBrush(FCOLOR(ToolTipBase));
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),4,1));
+    painter->drawRect(RECT.adjusted(0,0,-1,-1));
+//     painter->drawRoundedRect(RECT.adjusted(0,0,-1,-1),4,4);
 
-   painter->restore();
+    painter->restore();
 }
 
 #define PAINT_WINDOW_BUTTON(_btn_) {\
