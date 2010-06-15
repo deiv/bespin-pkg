@@ -288,7 +288,7 @@ private:
     void readSettings(const QSettings *settings = 0L, QString appName = QString());
     void registerRoutines();
     void setupDecoFor(QWidget *w, const QPalette &pal, int mode, const Gradients::Type (&gt)[2]);
-    void updateUno(QToolBar *);
+    void updateUno(QToolBar *, bool *gotTitle = 0);
 private:
     typedef struct
     {

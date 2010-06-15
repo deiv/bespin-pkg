@@ -838,9 +838,9 @@ Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::
 Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
 static QList<QPointer<QToolBar> > unoUpdates;
-
+static QTimer *unoUpdateTimer = 0;
 static bool
-updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle)
+updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool *gotTitle = 0)
 {
     const QVariant var = mwin->property("UnoHeight");
     int oldH = 0, newH = 0;
@@ -881,9 +881,12 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle)
         uint *decoDimP = XProperty::get<uint>(mwin->winId(), XProperty::decoDim, XProperty::LONG);
         if (decoDimP)
         {
+            if (gotTitle) *gotTitle = true;
             const uint decoDim = ((*decoDimP) >> 16) & 0xff;
             newH = ((newH + decoDim) & 0xffffff) | (decoDim << 24);
         }
+        else if (gotTitle) 
+            *gotTitle = false;
     }
 #endif
     if ( oldH != newH )
@@ -899,20 +902,42 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle)
 void
 Style::updateUno()
 {
+    int interval = 0;
+    if (unoUpdateTimer && unoUpdateTimer == sender())
+    {
+        interval = unoUpdateTimer->interval();
+        if (interval == 0)
+            interval = 100;
+        else if (interval == 100)
+            interval = 1000;
+        else
+            interval = 0;
+    }
+
+    bool clear = true;
     foreach (QToolBar *bar, unoUpdates)
     {
         if (bar)
-            updateUno(bar);
+            updateUno(bar, (clear && config.UNO.title) ? &clear : 0);
     }
-    unoUpdates.clear();
+    if (clear || !interval)
+    {
+//         qWarning("CLEAR!");
+        unoUpdates.clear();
+    }
+    else if (interval)
+    {
+//         qWarning("RESTART!");
+        unoUpdateTimer->start(interval);
+    }
 }
 
 void
-Style::updateUno(QToolBar *bar)
+Style::updateUno(QToolBar *bar, bool *gotTitle)
 {
     if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget()) )
     {
-        if (updateUnoHeight(mwin,config.UNO.toolbar,config.UNO.title) && config.UNO.title)
+        if (updateUnoHeight(mwin, config.UNO.toolbar, config.UNO.title, gotTitle) && config.UNO.title)
             setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
         
         QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
@@ -1386,8 +1411,13 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             if (unoUpdates.isEmpty())
             {
-                QTimer::singleShot(1, this, SLOT(updateUno()));
-//                 QTimer::singleShot(100, this, SLOT(updateUno()));
+                if (!unoUpdateTimer)
+                {
+                    unoUpdateTimer = new QTimer(this);
+                    unoUpdateTimer->setSingleShot(true);
+                    connect (unoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateUno()));
+                }
+                unoUpdateTimer->start(0);
             }
             unoUpdates << bar;
             return false;
