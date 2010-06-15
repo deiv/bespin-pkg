@@ -77,13 +77,13 @@ Style::drawMenuBarBg(const QStyleOption *option, QPainter *painter, const QWidge
         Tile::reset();
     }
 }
-
+#include <QtDebug>
 void
 Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(mbi, MenuItem);
-    if (mbi->menuItemType == QStyleOptionMenuItem::Separator)
-        return;
+//     if (mbi->menuItemType == QStyleOptionMenuItem::Separator && ) //NOTICE a)bused in XBar, b)ut shouldn't happen anyway
+//         return;
 
 #if 1 // was necessary once, not anymore?!
     if (appType != GTK && mbi->menuRect.height() > mbi->rect.height())
@@ -107,7 +107,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         fg = config.UNO.__role[Bg];
     }
 
-    bool hover = option->state & State_Selected;
+    bool hover = (option->state & State_Selected);
     Animator::IndexInfo *info = 0;
     int step = 0;
     QFont pFont = painter->font();
