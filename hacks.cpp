@@ -236,7 +236,7 @@ isWindowDragWidget(QObject *o, const QPoint *pt = 0L)
 //          ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
 //          ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
 
-         o->inherits("QMainWindow") )
+            (o->inherits("QMainWindow") && !o->inherits("KoMainWindow")) )
         return true;
 
     if ( QLabel *label = qobject_cast<QLabel*>(o) )
