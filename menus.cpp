@@ -77,12 +77,13 @@ Style::drawMenuBarBg(const QStyleOption *option, QPainter *painter, const QWidge
         Tile::reset();
     }
 }
-#include <QtDebug>
+
 void
 Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(mbi, MenuItem);
-//     if (mbi->menuItemType == QStyleOptionMenuItem::Separator && ) //NOTICE a)bused in XBar, b)ut shouldn't happen anyway
+    // NOTICE a)bused in XBar, b)ut shouldn't happen anyway
+//     if (mbi->menuItemType == QStyleOptionMenuItem::Separator && appType != Plasma)
 //         return;
 
 #if 1 // was necessary once, not anymore?!
@@ -178,7 +179,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         drawItemPixmap(painter,r, alignment, pix);
     else
     {
-#if 0
+#if 0 // emboss
         QPalette::ColorRole ffg = (hover || step > 3) ? fg : fg2;
         if (isEnabled && appType == BEshell)
         {
