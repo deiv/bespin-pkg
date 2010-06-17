@@ -849,7 +849,7 @@ Client::repaint(QPainter &p, bool paintTitle)
                     int y = label.center().y();
                     if ( !(tf & Qt::AlignLeft) )
                         p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
-                    if ( !(tf & Qt::Right) )
+                    if ( !(tf & Qt::AlignRight) )
                         p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
                 }
             }
