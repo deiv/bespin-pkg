@@ -490,6 +490,8 @@ Style::polish( QWidget * widget )
 #endif
             )
         {
+            // just broadsword here - the stupid viewport should use the mouse...
+            frame->setAttribute(Qt::WA_NoMousePropagation);
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
