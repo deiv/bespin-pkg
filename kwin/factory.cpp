@@ -66,7 +66,6 @@ int Factory::ourButtonSize[2] = {-1, -1};
 int Factory::ourBorderSize = 4;
 int Factory::ourTitleSize[2] = {18,16};
 int Factory::ourBgMode = 1;
-int Factory::compositingPollTimer = 0;
 QVector<Button::Type> Factory::ourMultiButton(0);
 QMenu *Factory::ourDesktopMenu = 0;
 QMenu *Factory::ourWindowList = 0;
@@ -91,7 +90,6 @@ Factory::Factory() : QObject()
     p.drawEllipse(mask.rect());
     p.end();
 
-    compositingPollTimer = startTimer( 30000 ); // 30 seconds
     weAreInitialized = true;
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
@@ -102,7 +100,6 @@ Factory::~Factory() { weAreInitialized = false; Gradients::wipe(); }
 
 KDecoration* Factory::createDecoration(KDecorationBridge* b)
 {
-    timerEvent(0L);
     return new Client(b, this);
 }
 
@@ -115,14 +112,23 @@ bool Factory::reset(unsigned long changed)
     weAreInitialized = false;
     const bool configChanged = readConfig();
     weAreInitialized = true;
-
-    if ( configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder)) )
-        return true;
-    else
+    
+    bool ret = configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder));
+    
+    bool wasComposited = weAreComposited;
+    weAreComposited = KWindowSystem::compositingActive();
+    if (wasComposited != weAreComposited)
+        ret = false;
+    
+    if (!ret)
     {
-        resetDecorations(changed);
-        return false;
-    }
+        if (wasComposited != weAreComposited)
+            QDBusConnection::sessionBus().send( QDBusMessage::createMethodCall( "org.kde.kwin", "/KWin", "org.kde.KWin", "reconfigure" ) );
+        else
+            resetDecorations(changed);
+    }   
+    
+    return ret;
 }
 
 static void
@@ -661,20 +667,6 @@ Factory::supports( Ability ability ) const
     case AbilityColorHandle: ///< decoration supports resize handle color
     default:
         return false;
-    }
-}
-
-void Factory::timerEvent(QTimerEvent *te)
-{
-    if (te && te->timerId() != compositingPollTimer)
-        return;
-    const bool beenComposited = weAreComposited;
-    weAreComposited = KWindowSystem::compositingActive();
-    if (beenComposited != weAreComposited)
-    {
-        resetDecorations(SettingBorder);
-        // required to enfore a widget resize (noticed by kwin core)
-        QDBusConnection::sessionBus().send( QDBusMessage::createMethodCall( "org.kde.kwin", "/KWin", "org.kde.KWin", "reconfigure" ) );
     }
 }
 

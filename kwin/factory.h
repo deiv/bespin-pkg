@@ -99,7 +99,6 @@ protected:
     static void kickBgSet(qint64 hash);
     static void learn(qint64 pid, QByteArray data);
     static QPixmap mask;
-    void timerEvent(QTimerEvent*);
     void updateDeco(WId id);
 private:
     bool readConfig();
@@ -109,7 +108,7 @@ private:
     static QHash<qint64, BgSet*> ourBgSets;
     static QList<Preset*> ourPresets;
     static bool weAreInitialized, weAreComposited;
-    static int ourButtonSize[2], ourBorderSize, ourTitleSize[2], ourBgMode, compositingPollTimer;
+    static int ourButtonSize[2], ourBorderSize, ourTitleSize[2], ourBgMode;
     static QVector<Button::Type> ourMultiButton;
     static Config ourConfig;
     static QMenu *ourDesktopMenu, *ourWindowList;
