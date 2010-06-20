@@ -617,9 +617,9 @@ const QPixmap
         p.drawRect(pix->rect());
         p.setBrush(c.dark(i));
         p.setRenderHint(QPainter::Antialiasing);
-        for (int j = 0; j < 64; j+=8)
-        for (i = bool(j%16)*8; i < 64; i+=16)
-            p.drawEllipse(i,j,8,8);
+        for (int j = 0; j < 64; j+=4)
+        for (i = bool(j%8)*4; i < 64; i+=8)
+            p.drawEllipse(i,j,4,4);
         break;
     case 7: // fence
         p.setPen(Qt::NoPen);
