@@ -80,8 +80,8 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
         ASSURE_OPTION(cb, ComboBox) ret;
         int x,y,wi,he;
         cb->rect.getRect(&x,&y,&wi,&he);
-        int fh = cb->fontMetrics.ascent() + F(2);
-        int margin = cb->frame ? (cb->editable ? 1 : config.btn.fullHover ? F(2) : F(4)) : 0;
+        const int fh = cb->fontMetrics.ascent() + F(2);
+        const int margin = cb->frame ? (cb->editable ? 1 : config.btn.fullHover ? F(2) : F(4)) : 0;
 
         switch (subControl)
         {
