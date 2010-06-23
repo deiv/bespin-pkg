@@ -50,7 +50,8 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         if HAVE_OPTION(cb, ComboBox)
         {
             if (cb->editable)
-                return contentsSize + QSize(F(4), F(2));
+                return contentsSize + QSize(F(9) + (cb->fontMetrics.ascent() + F(2))*1.1, F(2));
+            
             int hgt = contentsSize.height();
             int d = F(2);
             if ( cb->frame )
@@ -60,7 +61,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
             }
 //             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
 //                 hgt += F(2);
-            return QSize(contentsSize.width() + d +( int)(hgt/1.1), qMax(config.btn.minHeight, hgt));
+            return QSize(contentsSize.width() + d + ( int)(hgt/1.1), qMax(config.btn.minHeight, hgt));
         }
 //    case CT_DialogButtons: //
 //       return QSize((contentsSize.width()+16 < 80) ? 80 : contentsSize.width()+16, contentsSize.height()+10);
