@@ -587,15 +587,15 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
             uno = 0;
         else if (uno > 0xff)
             uno = 0xff;
-        data.style = ((uno & 0xff) << 24) | (Plain << 16) | ((config.UNO.gradient & 0xff) << 8) | (config.UNO.gradient & 0xff);
+        data.style = ((uno & 0xff) << 24) | ((Plain & 0xff) << 16) | ((config.UNO.gradient & 0xff) << 8) | (config.UNO.gradient & 0xff);
     }
     else if (glassy)
     {
         bg = bg.light(115-Colors::value(bg)/20);
-        data.style = (0 << 24) | (((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff));
+        data.style = (0 << 24) | ((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff);
     }
     else
-        data.style = (0 << 24) | (((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff));
+        data.style = (0 << 24) | ((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff);
 #if BESPIN_ARGB_WINDOWS
     const bool ARGB_deco = !uno && FX::compositingActive();
     if (ARGB_deco)
@@ -606,7 +606,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     // COLORS =======================
     bg = pal.color(QPalette::Active, active[Bg]);
 
-    if (glassy)
+    if (glassy && !uno)
         bg = bg.light(115-Colors::value(bg)/20);
     
 #if BESPIN_ARGB_WINDOWS
