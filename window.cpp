@@ -373,7 +373,7 @@ Style::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidge
     painter->setRenderHint(QPainter::Antialiasing, false);
 //    painter->setBrush(Gradients::pix(FCOLOR(ToolTipBase), RECT.height(), Qt::Vertical, Gradients::Button));
 //    painter->setBrush(FCOLOR(ToolTipBase));
-    painter->setBrush(Qt::NoBrush);
+    painter->setBrush(FCOLOR(ToolTipBase));
     painter->setPen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),4,1));
     painter->drawRect(RECT.adjusted(0,0,-1,-1));
 //     painter->drawRoundedRect(RECT.adjusted(0,0,-1,-1),4,4);
