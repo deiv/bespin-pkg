@@ -177,8 +177,13 @@ Style::readSettings(const QSettings* settings, QString appName)
                 cmd = QCoreApplication::arguments().at(0).section('/', -1);
             if (!cmd.isEmpty())
                 qPreset = iSettings->value(cmd, QString()).toString();
-            if (qPreset.isEmpty() && appType == GTK)
-                qPreset = iSettings->value("GTK", QString()).toString();
+            if (qPreset.isEmpty())
+            {
+                if (appType == GTK)
+                    qPreset = iSettings->value("GTK", QString()).toString();
+                if (appType == OpenOffice)
+                    qPreset = iSettings->value("OOo", QString()).toString();
+            }
             iSettings->endGroup();
             iSettings->beginGroup("Style");
         }
@@ -339,7 +344,7 @@ Style::readSettings(const QSettings* settings, QString appName)
                                               !(config.menu.itemGradient == Gradients::Glass ||
                                               config.menu.itemGradient == Gradients::Gloss)).toBool();
     
-    if (appType == GTK)
+    if (appType == GTK || appType == OpenOffice)
     {
         config.menu.glassy = false;
         config.menu.std_role[Bg] = QPalette::Window;
@@ -472,7 +477,6 @@ Style::readSettings(const QSettings* settings, QString appName)
             config.bg.tooltip_role[Bg] = QPalette::Window;
             config.bg.tooltip_role[Fg] = QPalette::WindowText;
         }
-        readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 
 //       config.btn.std_role[Bg] = QPalette::Window;
 //       config.btn.active_role[Bg] = QPalette::Highlight;
@@ -569,7 +573,7 @@ Style::init(const QSettings* settings)
             appType = KWin;
         else if (appName == "amarok")
             appType = Amarok;
-        else if (appName == "OpenOffice.org")
+        else if (appName == "OpenOffice.org" || appName == "soffice.bin")
             appType = OpenOffice;
 //             if (appName == "arora")
 //                 appType = Arora;
