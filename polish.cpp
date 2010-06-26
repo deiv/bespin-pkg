@@ -484,14 +484,16 @@ Style::polish( QWidget * widget )
         }
 
         // scrollarea hovering
-        if (qobject_cast<QAbstractScrollArea*>(frame)
+        QAbstractScrollArea *area = 0;
+        if ((area = qobject_cast<QAbstractScrollArea*>(frame))
 #ifdef QT3_SUPPORT
             || frame->inherits("Q3ScrollView")
 #endif
             )
         {
-            // just broadsword here - the stupid viewport should use the mouse...
-            frame->setAttribute(Qt::WA_NoMousePropagation);
+            // just <strike>broadsword</strike> gladius here - the stupid viewport should use the mouse...
+            if (area && area->viewport())
+                area->viewport()->setAttribute(Qt::WA_NoMousePropagation);
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
