@@ -467,6 +467,12 @@ Style::readSettings(const QSettings* settings, QString appName)
         config.bg.modal.opacity = 100;
         config.bg.modal.invert = false;
         config.bg.intensity = 0;
+        if (appType == OpenOffice)
+        {
+            config.bg.tooltip_role[Bg] = QPalette::Window;
+            config.bg.tooltip_role[Fg] = QPalette::WindowText;
+        }
+        readRole(bg.tooltip, BG_TOOLTIP_ROLE);
 
 //       config.btn.std_role[Bg] = QPalette::Window;
 //       config.btn.active_role[Bg] = QPalette::Highlight;
