@@ -112,8 +112,8 @@ static inline QLinearGradient
 shinyGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 {
     QLinearGradient lg(start, stop);
-    lg.setColorAt(0, Gradients::endColor(c, Gradients::Top, Gradients::Shiny));
-    lg.setColorAt(1, Gradients::endColor(c, Gradients::Bottom, Gradients::Shiny));
+    lg.setColorAt(0.1, Gradients::endColor(c, Gradients::Top, Gradients::Shiny));
+    lg.setColorAt(0.9, Gradients::endColor(c, Gradients::Bottom, Gradients::Shiny));
     return lg;
 }
 
@@ -423,8 +423,8 @@ Gradients::endColor(const QColor &oc, Position p, Type type, bool cv)
         }
         case Shiny:
         {
-            int h,s,v,a; c.getHsv(&h,&s,&v,&a);
-            return begin ? QColor::fromHsv(h,s,qMin(255,v+40), a) : QColor::fromHsv(h,s,qMax(0,v-40), a);
+            const int v = Colors::value(c);
+            return begin ? Colors::mid(c, Qt::white, 255, 64+v) : Colors::mid(c, Qt::black, 255, 288-v);
         }
     }
 }
@@ -489,6 +489,8 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
             grad = gl_ssGradient(iC, start, stop); break;
         case Gradients::Metal:
             grad = metalGradient(iC, start, stop); break;
+        case Gradients::Shiny:
+            grad = shinyGradient(iC, start, stop); break;
         }
         if (c.alpha() < 255)
             pix->fill(Qt::transparent);
