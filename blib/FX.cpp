@@ -226,10 +226,15 @@ FX::init()
     net_wm_cm = XInternAtom(dpy, string, False);
 #endif
 #ifndef QT_NO_XRENDER
-    QPixmap pix(1,1);
-    QPainter p(&pix);
-    useRender = p.paintEngine()->type() == QPaintEngine::X11;
-    p.end();
+    if (getenv("QT_X11_NO_XRENDER"))
+        useRender = false;
+    else
+    {
+        QPixmap pix(1,1);
+        QPainter p(&pix);
+        useRender = p.paintEngine()->type() == QPaintEngine::X11;
+        p.end();
+    }
 #endif
 }
 
@@ -261,7 +266,7 @@ FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
 #ifndef QT_NO_XRENDER
     if (useRender)
     {
-        OXPicture alpha = (opacity == 1.0) ? NULL : blendPicture(opacity);
+        OXPicture alpha = (opacity == 1.0) ? 0 : blendPicture(opacity);
         XRenderComposite (dpy, PictOpOver, upper.x11PictureHandle(), alpha,
                           lower.x11PictureHandle(), 0, 0, 0, 0, x, y,
                           upper.width(), upper.height());
