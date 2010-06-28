@@ -45,7 +45,7 @@ public:
     void requestFocus(qlonglong key);
     void releaseFocus(qlonglong key);
 public slots:
-        void init();
+    void init();
 protected:
     void wheelEvent( QGraphicsSceneWheelEvent *ev );
     virtual QSizeF sizeHint ( Qt::SizeHint which, const QSizeF & constraint = QSizeF() ) const;
@@ -69,20 +69,21 @@ private:
     QFont myFont;
     static QTimer bodyCleaner;
 private slots:
-    void callFromAction();
-    void hover(int);
-    void trigger(int);
-    void updatePalette();
-    void updateWindowlist();
-    void unregisterCurrentMenu();
     void activateWin();
-    void callMenus();
     void byeMenus();
+    void callFromAction();
+    void callMenus();
+    void cleanBodies();
+    void hover(int);
     void raiseCurrentWindow();
     void runFromAction();
     void repopulateMainMenu();
+    void setCurrentDesktop();
     void showMainMenu();
-    void cleanBodies();
+    void trigger(int);
+    void updatePalette();
+    void updateWindowlist();
+    void unregisterCurrentMenu();   
 };
 
 #endif //XBAR_H

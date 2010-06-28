@@ -26,6 +26,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
+#include <QLabel>
 #include <QMessageBox>
 #include <QPaintEvent>
 #include <QPainter>
@@ -34,6 +35,7 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <QTimer>
+#include <QWidgetAction>
 
 #include <kglobalsettings.h>
 #include <kwindowsystem.h>
@@ -681,8 +683,91 @@ XBar::unregisterCurrentMenu()
 
 
 void
+XBar::setCurrentDesktop()
+{
+    if ( QAction *act = qobject_cast<QAction*>(sender()) )
+        KWindowSystem::setCurrentDesktop(act->data().toInt());
+}
+
+void
 XBar::updateWindowlist()
 {
+    d.windowList.clear();
+    
+    KWindowInfo info;
+    int currentDesktop = KWindowSystem::currentDesktop();
+    int n = KWindowSystem::numberOfDesktops();
+    QList<WId> *windowTable = new QList<WId>[n];
+    
+    const QList<WId>& windows = KWindowSystem::windows();
+    foreach (WId id, windows)
+    {
+        info = KWindowInfo(id, NET::WMDesktop | NET::WMWindowType, 0);
+        if (info.windowType( NET::NormalMask | NET::DialogMask | NET::UtilityMask ) != -1)
+            if (int d = info.desktop())
+            {
+                if (info.onAllDesktops()) d = currentDesktop;
+                windowTable[d-1].append(id);
+            }
+    }
+    
+    QAction *act(0);
+    int desk;
+    bool needSep = false;
+    for (int i = 0; i < n; ++i)
+    {
+        desk = i+1;
+        
+        if (needSep)
+            d.windowList.addSeparator();
+        if ( desk == KWindowSystem::currentDesktop() )
+        {
+            //             d.windowList.addSeparator()->setText(KWindowSystem::desktopName(d));
+            // because QMenu cannot handle text separators right, patch submitted
+            QLabel *dummy = new QLabel(KWindowSystem::desktopName(desk), &d.windowList);
+            QWidgetAction *dummyAction = new QWidgetAction( &d.windowList );
+            dummyAction->setDefaultWidget( dummy );
+            d.windowList.addAction( dummyAction );
+            dummy->setAlignment( Qt::AlignCenter );
+            QPalette pal = d.windowList.palette();
+            pal.setColor( QPalette::WindowText, pal.color(d.windowList.foregroundRole()) );
+            dummy->setPalette(pal);
+            QFont fnt = d.windowList.font();
+            fnt.setPointSize( fnt.pointSize() * 1.4 );
+            fnt.setBold(true);
+            dummy->setFont(fnt);
+            //----------------------
+        }
+        else
+        {
+            act = d.windowList.addAction( KWindowSystem::desktopName(desk), this, SLOT(setCurrentDesktop()) );
+            act->setData(desk);
+            if (i < n-1)
+                d.windowList.addSeparator();
+        }
+        
+        needSep = false;
+        foreach (WId id, windowTable[i])
+        {
+            info = KWindowInfo(id, NET::WMVisibleIconName | NET::WMState | NET::XAWMState, 0);
+            {
+                if (info.hasState(NET::SkipTaskbar))
+                    continue;
+                QString title = info.visibleIconName();
+                if (info.isMinimized())
+                    title = "( " + title + " )";
+                title = "    " + title;
+                if (title.length() > 52)
+                    title = title.left(22) + "..." + title.right(22);
+                act = d.windowList.addAction( KWindowSystem::icon(id, 32, 32, false ), title, this, SLOT(activateWin()) );
+                act->setData((uint)id);
+                act->setDisabled(id == KWindowSystem::activeWindow());
+                needSep = true;
+            }
+        }
+    }
+    delete[] windowTable;
+#if 0
     d.windowList.clear();
 
     d.windowList.addAction ( "Raise Window", this, SLOT(raiseCurrentWindow()) );
@@ -714,6 +799,7 @@ XBar::updateWindowlist()
     d.windowList.setTitle("Windows");
     d.windowList.addSeparator();
     d.windowList.addAction ( "Embed menu in window", this, SLOT(unregisterCurrentMenu()) );
+#endif
 }
 
 void
