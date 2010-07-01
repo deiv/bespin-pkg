@@ -285,7 +285,7 @@ VisualFrame::correctPosition()
     //    qDebug() << myFrame->frameRect() << rect << right->geometry();
 }
 
-#define PARTS(_FUNC_) top->_FUNC_; left->_FUNC_; right->_FUNC_; bottom->_FUNC_
+#define PARTS(_FUNC_) if (top) { top->_FUNC_; left->_FUNC_; right->_FUNC_; bottom->_FUNC_; } void(0)
 
 void
 VisualFrame::show()
@@ -293,6 +293,12 @@ VisualFrame::show()
     hidden = false;
     if (myStyle != QFrame::StyledPanel)
         return;
+    
+    if (!top)
+    {
+        updateShape();
+        return; // calls "show" anyway
+    }
 
     QWidget *window = myFrame;
     while (window->parentWidget())
@@ -307,10 +313,12 @@ VisualFrame::show()
 
     if (window != myWindow)
     {
-        myWindow = window;
-        myWindow->installEventFilter(&stdChildAdd);
-        PARTS(setParent(myWindow));
-        myWindow->removeEventFilter(&stdChildAdd);
+        if (top->parentWidget() != myWindow)
+        {
+            myWindow->installEventFilter(&stdChildAdd);
+            PARTS(setParent(myWindow));
+            myWindow->removeEventFilter(&stdChildAdd);
+        }
     }
 
     raise();
@@ -328,6 +336,14 @@ void
 VisualFrame::hide()
 {
     hideMe();
+    QWidget *window = myFrame;
+    while ( (window = window->parentWidget()) )
+    {
+        window->removeEventFilter(this);
+        if ((window->isWindow() || window->inherits("QMdiSubWindow") ||
+            (window != myFrame && window->inherits("QAbstractScrollArea"))))
+            break;
+    }
     if (myStyle != QFrame::StyledPanel)
         return;
     PARTS(hide());
@@ -427,10 +443,11 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
         return false;
     }
 
-//    if (ev->type() == QEvent::ParentChange) {
-//       qDebug() << "reparented" << o << myWindow << myFrame->window();
-//       return false;
-//    }
+//     if (ev->type() == QEvent::ParentChange) {
+//         myWindow = myFrame->window();
+//         qDebug() << "reparented" << o << myWindow << myFrame->window();
+//         return false;
+//     }
    
     if (o != myFrame)
     {   // now we're only interested in frame events

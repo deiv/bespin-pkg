@@ -26,6 +26,7 @@ class QPaintEvent;
 
 #include <QWidget>
 #include <QPoint>
+#include <QPointer>
 #include <QFrame>
 
 namespace VFrame
@@ -85,7 +86,7 @@ private:
     QFrame *myFrame; // parent
     QWidget *myWindow;
     QFrame::Shape myStyle;
-    VisualFramePart *top, *bottom, *left, *right;
+    QPointer<VisualFramePart> top, bottom, left, right;
     QRect myFrameRect;
     bool hidden;
     static QStyle *ourStyle;
