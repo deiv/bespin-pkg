@@ -338,7 +338,9 @@ Style::polish( QWidget * widget )
                 widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) || // makes no sense
                 widget->testAttribute(Qt::WA_TranslucentBackground)))
         {
+            QIcon icn = widget->windowIcon();
             widget->setAttribute(Qt::WA_TranslucentBackground);
+            widget->setWindowIcon(icn);
             // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
             // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
             widget->move(10000,10000);
