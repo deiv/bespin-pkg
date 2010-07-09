@@ -145,7 +145,7 @@ Elements::relief(int size, bool enabled)
     p.setPen(QPen(BLACK(int(f*70)), F(1)));
     p.DRAW_ROUND_RECT(f1_2, f1_2, size-F(1), size-F(2), 99, 99);
     p.setPen(QPen(WHITE(int(f*35)), F(1)));
-    p.DRAW_ROUND_RECT(f1_2, f1_2, size-F(1), size-F(1), 99, 99);
+    p.DRAW_ROUND_RECT(f1_2, F(1)+f1_2, size-F(1), size-F(2), 99, 99);
     p.end();
     return img;
 }
