@@ -12,7 +12,7 @@ using namespace Bespin;
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 // #define fillRect2(_R_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_R_)
 
-#define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) drawRoundedRect(_X_, _Y_, _W_, _H_, _RX_, _RY_, Qt::RelativeSize)
+#define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) drawRoundedRect(QRectF(_X_, _Y_, _W_, _H_), _RX_, _RY_, Qt::RelativeSize)
 
 #define SCALE(_N_) lround(_N_*ourScale)
 
@@ -141,19 +141,11 @@ Elements::relief(int size, bool enabled)
     const float f = ourShadowIntensity * (enabled ? 1.0 : 0.7);
     EMPTY_PIX(size, size);
     p.setBrush(Qt::NoBrush);
+    const float f1_2 = F(1)/2.0;
     p.setPen(QPen(BLACK(int(f*70)), F(1)));
-    p.DRAW_ROUND_RECT(0, F(1)/2.0, size, size-.75*F(2), 99, 99);
+    p.DRAW_ROUND_RECT(f1_2, f1_2, size-F(1), size-F(2), 99, 99);
     p.setPen(QPen(WHITE(int(f*35)), F(1)));
-    p.DRAW_ROUND_RECT(0, F(1)/2.0, size, size-F(1), 99, 99);
-#if 0
-    // the borders cross the pixmap boundings, thus they're too weak, thus we stregth them a bit
-    const int d1 = 0.3*size, d2 = 0.7*size;
-    p.drawLine(d1, 0, d2, 0); // top
-    p.drawLine(0, d1, 0, d2); // left
-    p.drawLine(size, d1, size, d2); // right
-    p.setPen(QPen(WHITE(int(f*50)), F(1)));
-    p.drawLine(d1, size-1, d2, size-1); // bottom
-#endif
+    p.DRAW_ROUND_RECT(f1_2, f1_2, size-F(1), size-F(1), 99, 99);
     p.end();
     return img;
 }
