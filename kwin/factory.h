@@ -54,7 +54,7 @@ typedef struct
 {
     bool forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons, verticalTitle;
     int slickButtons, titleAlign;
-    Gradients::Type gradient[2][2];
+    Gradients::Type gradient[2][2], buttonGradient;
     QStringList smallTitleClasses;
 } Config;
 
@@ -68,6 +68,7 @@ public:
     KDecoration *createDecoration(KDecorationBridge *b);
     bool reset(unsigned long changed);
     bool supports( Ability ability ) const;
+    inline static Gradients::Type buttonGradient() {return ourConfig.buttonGradient;}
     inline static int buttonSize(bool small) {return ourButtonSize[small];}
     inline static int borderSize() { return ourBorderSize ? ourBorderSize : !weAreComposited; }
     inline static Qt::KeyboardModifier commandKey() { return ourCommandKey; }

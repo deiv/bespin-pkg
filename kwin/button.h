@@ -27,6 +27,8 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+#include "../blib/gradients.h"
+
 #include <QWidget>
 
 namespace Bespin
@@ -61,11 +63,11 @@ protected:
     void wheelEvent(QWheelEvent*);
 private:
     Q_DISABLE_COPY(Button)
-    QColor color() const;
-    bool zoomOut, left;
+    QColor color( bool background = false ) const;
+    bool hoverOut, left;
     Client *client;
     Type myType;
-    int state, multiIdx, zoomTimer, zoomLevel;
+    int state, multiIdx, hoverTimer, hoverLevel;
     QPixmap bgPix;
     static QPainterPath shape[NumTypes];
     static QString tip[NumTypes];

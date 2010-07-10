@@ -49,6 +49,7 @@ private:
 private slots:
     void catchClones(QListWidgetItem*);
     void watchBgMode();
+    void watchButtonGradient();
     void watchDecoGradient();
 private:
    Ui::Config ui;

@@ -30,6 +30,7 @@
 #include <cmath>
 
 #include "../blib/colors.h"
+#include "../blib/FX.h"
 #include "../blib/shapes.h"
 #include "client.h"
 #include "factory.h"
@@ -41,7 +42,7 @@ QPainterPath Button::shape[NumTypes];
 bool Button::fixedColors = false;
 
 Button::Button(Client *parent, Type type, bool left) : QWidget(parent->widget()),
-client(parent), state(0), multiIdx(0), zoomTimer(0), zoomLevel(0)
+client(parent), state(0), multiIdx(0), hoverTimer(0), hoverLevel(0)
 {
     setAutoFillBackground(false);
     setAttribute(Qt::WA_Hover, true);
@@ -166,19 +167,19 @@ Button::enterEvent(QEvent *)
     if (!isEnabled())
         return;
 
-    state |= Hovered; zoomOut = false;
-    zoomLevel += 2;
-    if (zoomLevel > 6)
+    state |= Hovered; hoverOut = false;
+    hoverLevel += 2;
+    if (hoverLevel > 6)
     {
-        zoomLevel = 6;
-        if (zoomTimer)
-            killTimer(zoomTimer);
-        zoomTimer = 0;
+        hoverLevel = 6;
+        if (hoverTimer)
+            killTimer(hoverTimer);
+        hoverTimer = 0;
         return;
     }
     repaint();
-    if (!zoomTimer)
-        zoomTimer = startTimer ( 50 );
+    if (!hoverTimer)
+        hoverTimer = startTimer ( 50 );
 }
 
 void
@@ -187,19 +188,19 @@ Button::leaveEvent(QEvent *)
     if (!isEnabled())
         return;
 
-    state &= ~Hovered; zoomOut = true;
-    --zoomLevel;
-    if (zoomLevel < 0)
+    state &= ~Hovered; hoverOut = true;
+    --hoverLevel;
+    if (hoverLevel < 0)
     {
-        zoomLevel = 0;
-        if (zoomTimer)
-            killTimer(zoomTimer);
-        zoomTimer = 0;
+        hoverLevel = 0;
+        if (hoverTimer)
+            killTimer(hoverTimer);
+        hoverTimer = 0;
         return;
     }
     repaint();
-    if (!zoomTimer)
-        zoomTimer = startTimer ( 50 );
+    if (!hoverTimer)
+        hoverTimer = startTimer ( 50 );
 }
 
 void
@@ -304,7 +305,7 @@ Button::mouseReleaseEvent ( QMouseEvent * event )
 static uint fcolors[3] = {0xFFBF0303, 0xFFF3C300, 0xFF00892B};
 
 QColor
-Button::color() const
+Button::color( bool background ) const
 {
     KDecorationDefines::ColorType   fgt = KDecorationDefines::ColorButtonBg,
                                     bgt = KDecorationDefines::ColorTitleBlend;
@@ -314,13 +315,16 @@ Button::color() const
         fgt = KDecorationDefines::ColorFont;
         bgt = KDecorationDefines::ColorTitleBar;
     }
+    if ( background )
+        return client->color(bgt, client->isActive());
+    
     QColor c = client->color(fgt, client->isActive());
     if (fixedColors && myType < Multi)
         c = client->isActive() ? QColor(fcolors[myType]) :
-            Colors::mid(c, QColor(fcolors[myType]), 6-zoomLevel, zoomLevel);
+            Colors::mid(c, QColor(fcolors[myType]), 6-hoverLevel, hoverLevel);
     const QColor bg = client->color(bgt, client->isActive());
     if (isEnabled())
-        c = Colors::mid(bg, c, 6-zoomLevel, 4);
+        c = Colors::mid(bg, c, 6-hoverLevel, 4);
     else
         c = Colors::mid(bg, c, 6, 1);
     c.setAlpha(c.alpha()*client->buttonOpacity()/100);
@@ -334,43 +338,78 @@ Button::paintEvent(QPaintEvent *)
     if (!bgPix.isNull())
         p.drawPixmap(0,0, bgPix);
 
+    if ( Factory::buttonGradient() != Gradients::None )
+    {
+        const QColor bg = color(true);
+        const float t = (height()-2)/2.0;
+        const float fs = (height()-2)/99.0;
+        
+        p.end();
+        QPixmap mask(size());
+        mask.fill(Qt::transparent);
+        p.begin(&mask);
+        p.setPen(Qt::NoPen);
+        p.setBrush( Qt::white );
+        p.setRenderHint(QPainter::Antialiasing);
+        p.translate( QPoint(t,t) );
+        p.scale ( fs, fs );
+        p.drawPath(shape[myType]);
+        p.end();
+        
+        p.begin(this);
+        const QColor c = color();
+        QPixmap texture(size());
+        texture.fill(Colors::mid(c, Qt::black, 5,4));
+        p.drawPixmap(0,0, FX::applyAlpha( texture, mask ) );
+        texture.fill(Colors::mid(bg, Qt::white ));
+        p.drawPixmap(0,2, FX::applyAlpha( texture, mask ) );
+        QPainter p2(&texture);
+        p2.drawTiledPixmap(texture.rect(), Gradients::pix(c, height(), Qt::Vertical, Factory::buttonGradient()));
+        p2.end();
+        p.drawPixmap(0,1, FX::applyAlpha( texture, mask ) );
+        p.end();
+
+        return;
+    }
+    // else
+
     p.setRenderHint(QPainter::Antialiasing);
     p.setPen(Qt::NoPen);
     p.setBrush(color());
     const int slick = Factory::slickButtons();
     
     float fx, fy;
-    const float fs = height()/99.0;
     if (state & Sunken)
         fx = fy = .75;
     else if (slick == 2)
     {
-        if (!zoomLevel)
+        if (!hoverLevel)
         {
             const float s = width()/5.0;
             p.drawRoundRect(s, 2*s, 3*s, s);
             p.end(); return;
         }
 //             6/(b/a-1) = x
-        fx = (9+zoomLevel)/15.0;
-        fy = (1.5+zoomLevel)/7.5;
+        fx = (9+hoverLevel)/15.0;
+        fy = (1.5+hoverLevel)/7.5;
         }
     else if (slick)
     {
-        if (!zoomLevel)
+        if (!hoverLevel)
         {
             const float s = height()/3.0;
             p.drawEllipse(QRectF(s, s, s, s));
             p.end(); return;
         }
-        fx = fy = (3+zoomLevel)/9.0;
+        fx = fy = (3+hoverLevel)/9.0;
     }
     else
-        fx = fy = (18 + zoomLevel)/24.0;
+        fx = fy = (18 + hoverLevel)/24.0;
+    const float fs = height()/99.0;
     const float t = height()/2.0;
     p.translate( QPoint(t,t) );
     p.scale ( fs*fx, fs*fy );
-//    p.rotate(60*zoomLevel); // too annoying, especially for fast zoom in...
+//    p.rotate(60*hoverLevel); // too annoying, especially for fast zoom in...
     p.drawPath(shape[myType]);
     p.end();
 }
@@ -378,17 +417,17 @@ Button::paintEvent(QPaintEvent *)
 void
 Button::timerEvent ( QTimerEvent * )
 {
-    if (zoomOut)
+    if (hoverOut)
     {
-        --zoomLevel;
-        if (zoomLevel < 1)
-            { killTimer(zoomTimer); zoomTimer = 0; }
+        --hoverLevel;
+        if (hoverLevel < 1)
+            { killTimer(hoverTimer); hoverTimer = 0; }
     }
     else
     {
-        zoomLevel += 2;
-        if (zoomLevel > 5)
-            { zoomLevel = 6; killTimer(zoomTimer); zoomTimer = 0; }
+        hoverLevel += 2;
+        if (hoverLevel > 5)
+            { hoverLevel = 6; killTimer(hoverTimer); hoverTimer = 0; }
     }
     repaint();
 }

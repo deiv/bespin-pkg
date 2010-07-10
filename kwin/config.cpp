@@ -49,17 +49,20 @@ Config::Config(QWidget* parent) : BConfig(parent)
 {
     ui.setupUi(this);
     // designer can't do this atm.
-    ui.actGrad->setItemData( 8, -1);
-    ui.actGrad->setItemData( 9, -3);
-    ui.actGrad->setItemData( 10, -4);
-    ui.inactGrad->setItemData( 8, -1);
-    ui.inactGrad->setItemData( 9, -3);
-    ui.inactGrad->setItemData( 10, -4);
+    const int Gradients_TypeAmount = 9;
+    ui.actGrad->setItemData( Gradients_TypeAmount, -1);
+    ui.actGrad->setItemData( Gradients_TypeAmount+1, -3);
+    ui.actGrad->setItemData( Gradients_TypeAmount+2, -4);
+    ui.inactGrad->setItemData( Gradients_TypeAmount, -1);
+    ui.inactGrad->setItemData( Gradients_TypeAmount+1, -3);
+    ui.inactGrad->setItemData( Gradients_TypeAmount+2, -4);
     connect (ui.actGrad, SIGNAL(currentIndexChanged(int)), this, SLOT(watchBgMode()));
     connect (ui.inactGrad, SIGNAL(currentIndexChanged(int)), this, SLOT(watchBgMode()));
 
     connect (ui.actGrad2, SIGNAL(currentIndexChanged(int)), this, SLOT(watchDecoGradient()));
     connect (ui.inactGrad2, SIGNAL(currentIndexChanged(int)), this, SLOT(watchDecoGradient()));
+    
+    connect (ui.buttonGradient, SIGNAL(currentIndexChanged(int)), this, SLOT(watchButtonGradient()));
     
     ui.onlinehelp->setOpenExternalLinks( true ); /** i've an internet link here */
     ui.onlinehelp->viewport()->setAutoFillBackground(false);
@@ -155,6 +158,11 @@ Config::Config(QWidget* parent) : BConfig(parent)
     handleSettings(ui.slickButtons, "SlickButtons", 0);
     setContextHelp(ui.slickButtons, "The appereance of unhovered buttons. Morphs to icon on hover<br>\
     Dots and bricks look slick, but may be considered less usable, as unhovered buttons look all the same");
+    
+    handleSettings(ui.buttonGradient, "ButtonGradient", 0);
+    setContextHelp(ui.buttonGradient, "The button gradient. <br>\
+    \"None\" is the default and behaves a bit different from all others.<br>\
+    You cannot choose the icon variant or the unhovered look if this is a real gradient.");
 
     handleSettings(ui.titlePadding, "TitlePadding", 0);
     setContextHelp(ui.titlePadding, "<b>Titlebar padding</b><hr>\
@@ -242,7 +250,7 @@ void Config::catchClones(QListWidgetItem *item)
     for (int i = 0; i < ui.presets->count(); ++i)
     {
         QListWidgetItem *other = ui.presets->item(i);
-        if (isClone = (item != other && item->text() == other->text()))
+        if ((isClone = (item != other && item->text() == other->text())))
             break;
     }
     if (isClone)
@@ -473,6 +481,13 @@ void Config::watchBgMode()
         other = ui.actGrad;
     if (other)
         other->setEnabled(variant(sender()).toInt() >= 0);
+}
+
+void Config::watchButtonGradient()
+{
+    const bool enabled = ui.buttonGradient->currentIndex() == 0;
+    ui.iconVariant->setEnabled(enabled);
+    ui.slickButtons->setEnabled(enabled);
 }
 
 void Config::watchDecoGradient()
