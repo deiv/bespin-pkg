@@ -42,6 +42,7 @@ public:
     QAction *takeAction(int idx);
     void changeAction(int idx, const QString & text);
     void clear();
+    inline int count() const { return d.actions.count(); }
     QAction *action(int idx) const;
 //    void show();
     void hide();

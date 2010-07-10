@@ -583,10 +583,26 @@ XBar::repopulateMainMenu()
 
     delete myMainMenuDefWatcher;
 
-    buildMenu("MainMenu", myMainMenu, "menubar");
-
+    QString xmlPath = KGlobal::dirs()->locate("data", "XBar/MainMenu.xml");
+    QFile xmlFile(xmlPath);
+    if (xmlFile.open(QIODevice::ReadOnly))
+    {
+        xmlFile.close();
+        buildMenu("MainMenu", myMainMenu, "menubar");
+    }
+    else
+    {
+        QAction *action = new QAction(myMainMenu);
+        action->setText("Customizable menu, see http://CloudCity.SF.net/xbar.html");
+        action->setData("http://CloudCity.SF.net/xbar.html");
+        connect ( action, SIGNAL(triggered()), SLOT(runFromAction()) );
+        myMainMenu->addAction(action);
+    }
+    
+    if (xmlPath.isNull())
+        xmlPath = KGlobal::dirs()->locate("data", "XBar");
     myMainMenuDefWatcher = new KDirWatch(this);
-    myMainMenuDefWatcher->addFile(KGlobal::dirs()->locate("data", "XBar/MainMenu.xml"));
+    myMainMenuDefWatcher->addFile(xmlPath);
     connect( myMainMenuDefWatcher, SIGNAL(created(const QString &)), this, SLOT(repopulateMainMenu()) );
     connect( myMainMenuDefWatcher, SIGNAL(deleted(const QString &)), this, SLOT(repopulateMainMenu()) );
     connect( myMainMenuDefWatcher, SIGNAL(dirty(const QString &)), this, SLOT(repopulateMainMenu()) );
