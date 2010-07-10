@@ -909,6 +909,12 @@ Style::polish( QWidget * widget )
         widget->parentWidget()->setAutoFillBackground(false);
         widget->setAutoFillBackground(false);
     }
+    
+    if (widget->autoFillBackground() || widget->testAttribute(Qt::WA_OpaquePaintEvent))
+    {
+        widget->removeEventFilter(this);
+        widget->installEventFilter(this);
+    }
 
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors
     /// are set or KHtml does wrong OR (mainly) by html "designers"

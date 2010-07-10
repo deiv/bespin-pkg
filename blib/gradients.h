@@ -48,6 +48,8 @@ enum Type {
    TypeAmount
 };
 
+// static const char *string{ "None", "Simple", "Button", "Sunken", "Gloss", "Glass", "Metal", "Cloudy", "Shiny" };
+
 enum BgMode { BevelV = 2, BevelH };
 
 enum Position { Top = 0, Bottom, Left, Right };

@@ -335,6 +335,7 @@ private slots:
     void removeAppEventFilter();
     void resetRingPix();
     void updateUno();
+    void updateBlurRegions() const;
 };
 
 } // namespace Bespin

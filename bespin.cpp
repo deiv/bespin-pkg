@@ -1,5 +1,5 @@
 /* Bespin widget style for Qt4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
+   Copyright (C) 2007-2010 Thomas Luebking <thomas.luebking@web.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -837,7 +837,7 @@ static const
 Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::SubWindow |
 Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
-static QList<QPointer<QToolBar> > unoUpdates;
+static QList<QPointer<QToolBar> > pendingUnoUpdates;
 static QTimer *unoUpdateTimer = 0;
 static bool
 updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool *gotTitle = 0)
@@ -915,7 +915,7 @@ Style::updateUno()
     }
 
     bool clear = true;
-    foreach (QToolBar *bar, unoUpdates)
+    foreach (QToolBar *bar, pendingUnoUpdates)
     {
         if (bar)
             updateUno(bar, (clear && config.UNO.title) ? &clear : 0);
@@ -923,7 +923,7 @@ Style::updateUno()
     if (clear || !interval)
     {
 //         qWarning("CLEAR!");
-        unoUpdates.clear();
+        pendingUnoUpdates.clear();
     }
     else if (interval)
     {
@@ -977,7 +977,8 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
         if ( !o->isWidgetType() )
             continue;
         QWidget *w = static_cast<QWidget*>(o);
-        if ( w->autoFillBackground() )
+        if ( w->isVisible() && 
+            (w->autoFillBackground() || (w->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(w))) )
         {
             QPoint offset = w->mapTo(window, QPoint(0,0));
             if (w->mask().isEmpty())
@@ -989,6 +990,36 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
         else
             detectBlurRegion(window, w, blur);
     }
+}
+
+static QList<QWidget*> pendingBlurUpdates;
+
+void 
+Style::updateBlurRegions() const
+{
+#ifdef Q_WS_X11 // hint blur region for the kwin plugin
+    foreach (QWidget *widget, pendingBlurUpdates)
+    {
+        if (!FX::usesXRender() && widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
+            continue; // protect against pseudo widgets, see setupDecoFor()
+            
+        QRegion blur = widget->mask().isEmpty() ? widget->rect() : widget->mask();
+        detectBlurRegion(widget, widget, blur);
+        if (blur.isEmpty())
+            continue;
+        
+        QVector<unsigned long> data(blur.rectCount() * 4);
+        QVector<QRect> rects = blur.rects();
+        QVector<QRect>::const_iterator i;
+        for ( i = rects.begin(); i != rects.end(); ++i )
+        {
+            if (i->width() > 0 && i->height() > 0)
+                data << i->x() << i->y() << i->width() << i->height();
+        }
+        XProperty::set<unsigned long>(widget->winId(), XProperty::blurRegion, (unsigned long*)data.constData(), XProperty::LONG, data.size());
+    }
+#endif
+    pendingBlurUpdates.clear();
 }
 
 bool
@@ -1196,8 +1227,10 @@ Style::eventFilter( QObject *object, QEvent *ev )
     {
         QResizeEvent *re = static_cast<QResizeEvent*>(ev);
         QWidget *widget = qobject_cast<QWidget*>(object); // dock = 0;
+        if (!widget)
+            return false;
         
-        if ( widget && widget->isWindow() )
+        if ( widget->isWindow() )
         {
             if ((config.menu.round && qobject_cast<QMenu*>(object))
 #if 0
@@ -1244,26 +1277,23 @@ Style::eventFilter( QObject *object, QEvent *ev )
                         
                 widget->setMask(mask);
             }
-#ifdef Q_WS_X11 // hint blur region for the kwin plugin
-
-            if ( config.bg.blur && widget->testAttribute(Qt::WA_TranslucentBackground) )
+        }
+        
+        if ( config.bg.blur && 
+            (widget->isWindow() || widget->autoFillBackground() ||
+            (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
+            appType != Plasma  )
+        {
+            QWidget *window = widget->window();
+            if ( window->testAttribute(Qt::WA_TranslucentBackground) )
             {
-                if (!FX::usesXRender() && widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
-                    return false; // protect against pseudo widgets, see setupDecoFor()
-
-                QRegion blur = widget->mask().isEmpty() ? widget->rect() : widget->mask();
-                detectBlurRegion(widget, widget, blur);
-                if (blur.isEmpty())
-                    return false;
-                QVector<unsigned long> data(blur.rectCount() * 4);
-                QVector<QRect> rects = blur.rects();
-                QVector<QRect>::const_iterator i;
-                for ( i = rects.begin(); i != rects.end(); ++i )
-                    data << i->x() << i->y() << i->width() << i->height();
-                XProperty::set<unsigned long>(widget->winId(), XProperty::blurRegion, (unsigned long*)data.constData(), XProperty::LONG, data.size());
+                if (pendingBlurUpdates.isEmpty())
+                    QTimer::singleShot(1,this,SLOT(updateBlurRegions()));
+                if (!pendingBlurUpdates.contains(window))
+                    pendingBlurUpdates << window;
             }
-#endif
-            return false;
+            if (widget->isWindow())
+                return false;
         }
 
         if ( config.UNO.used && re->size().height() != re->oldSize().height() )
@@ -1405,11 +1435,25 @@ Style::eventFilter( QObject *object, QEvent *ev )
 #endif
             return false;
         }
+        
+        if ( config.bg.blur && !widget->isWindow() && 
+            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
+            appType != Plasma  )
+        {
+            QWidget *window = widget->window();
+            if ( window->testAttribute(Qt::WA_TranslucentBackground) )
+            {
+                if (pendingBlurUpdates.isEmpty())
+                    QTimer::singleShot(1,this,SLOT(updateBlurRegions()));
+                if (!pendingBlurUpdates.contains(window))
+                    pendingBlurUpdates << window;
+            }
+        }
 
         if ( config.UNO.toolbar )
         if ( QToolBar *bar = qobject_cast<QToolBar*>(object) )
         {
-            if (unoUpdates.isEmpty())
+            if (pendingUnoUpdates.isEmpty())
             {
                 if (!unoUpdateTimer)
                 {
@@ -1419,16 +1463,31 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 }
                 unoUpdateTimer->start(0);
             }
-            unoUpdates << bar;
+            pendingUnoUpdates << bar;
             return false;
         }
     }
     case QEvent::Hide:
-        if (config.bg.modal.invert)
-        if (QWidget * widget = qobject_cast<QWidget*>(object))
-        if (widget->isModal())
+    {
+        QWidget * widget = qobject_cast<QWidget*>(object);
+        if (config.bg.modal.invert && widget && widget->isModal())
             swapPalette(widget, this);
+        
+        if ( config.bg.blur && !widget->isWindow() && 
+            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
+            appType != Plasma  )
+        {
+            QWidget *window = widget->window();
+            if ( window->testAttribute(Qt::WA_TranslucentBackground) )
+            {
+                if (pendingBlurUpdates.isEmpty())
+                    QTimer::singleShot(1,this,SLOT(updateBlurRegions()));
+                if (!pendingBlurUpdates.contains(window))
+                    pendingBlurUpdates << window;
+            }
+        }
         return false;
+    }
 #if 1
     case QEvent::PaletteChange:
     {
