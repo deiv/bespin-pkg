@@ -82,7 +82,6 @@ typedef QHash<QString, QHash<NET::WindowType, WindowData*> > DoubleHash;
 Factory::Factory() : QObject()
 {
     weAreCompiz = QCoreApplication::applicationName() != "kwin";
-    qDebug() << QCoreApplication::applicationName();
     readConfig();
     Gradients::init();
 
