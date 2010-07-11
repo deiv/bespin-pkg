@@ -992,7 +992,7 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
     }
 }
 
-static QList<QWidget*> pendingBlurUpdates;
+static QList<QPointer<QWidget> > pendingBlurUpdates;
 
 void 
 Style::updateBlurRegions() const
@@ -1000,6 +1000,8 @@ Style::updateBlurRegions() const
 #ifdef Q_WS_X11 // hint blur region for the kwin plugin
     foreach (QWidget *widget, pendingBlurUpdates)
     {
+        if (!widget)
+            continue;
         if (!FX::usesXRender() && widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
             continue; // protect against pseudo widgets, see setupDecoFor()
             
