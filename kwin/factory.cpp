@@ -24,6 +24,7 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QCoreApplication>
 #include <QDBusConnection>
 #include <QDBusMessage>
 // #include <QDir>
@@ -57,6 +58,7 @@ using namespace Bespin;
 
 bool Factory::weAreInitialized = false;
 bool Factory::weAreComposited = true; // just guessing, kwin isn't up yet ... :(
+bool Factory::weAreCompiz = false; // just guessing, isn't up yet ... :(
 Config Factory::ourConfig =
     { false, false, false, true, true, false, Qt::AlignHCenter, 0,
       { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
@@ -79,6 +81,8 @@ typedef QHash<QString, QHash<NET::WindowType, WindowData*> > DoubleHash;
 
 Factory::Factory() : QObject()
 {
+    weAreCompiz = QCoreApplication::applicationName() != "kwin";
+    qDebug() << QCoreApplication::applicationName();
     readConfig();
     Gradients::init();
 

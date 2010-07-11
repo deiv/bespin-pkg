@@ -226,9 +226,9 @@ void
 Button::mouseReleaseEvent ( QMouseEvent * event )
 {
     state &= ~Sunken;
-    // used to be "QRect(mapToGlobal(QPoint(0,0)), size()).contains(QCursor::pos()))" instead of under mouse,
-    // probably on purpose, but i forgot and this fails with compiz kde4-window-decorator
-    if (!(isEnabled() && underMouse()))
+    const bool under_mouse = Factory::isCompiz() ? underMouse() :
+                             QRect(mapToGlobal(QPoint(0,0)), size()).contains(QCursor::pos());
+    if (!(isEnabled() && under_mouse))
     {
         repaint();
         return;
@@ -359,12 +359,18 @@ Button::paintEvent(QPaintEvent *)
         p.begin(this);
         const QColor c = color();
         QPixmap texture(size());
+        
         texture.fill(Colors::mid(c, Qt::black, 5,4));
         p.drawPixmap(0,0, FX::applyAlpha( texture, mask ) );
+        
         texture.fill(Colors::mid(bg, Qt::white ));
         p.drawPixmap(0,2, FX::applyAlpha( texture, mask ) );
+        
+        QRectF br = shape[myType].boundingRect();
+        br.setRect( 0, t + br.y()*fs, texture.width(), br.height() * fs );
+        texture.fill(Qt::transparent);
         QPainter p2(&texture);
-        p2.drawTiledPixmap(texture.rect(), Gradients::pix(c, height(), Qt::Vertical, Factory::buttonGradient()));
+        p2.drawTiledPixmap(br, Gradients::pix(c, br.height(), Qt::Vertical, (state & Sunken) ? Gradients::Sunken : Factory::buttonGradient()));
         p2.end();
         p.drawPixmap(0,1, FX::applyAlpha( texture, mask ) );
         p.end();

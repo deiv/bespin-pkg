@@ -74,6 +74,7 @@ public:
     inline static Qt::KeyboardModifier commandKey() { return ourCommandKey; }
     inline static bool compositingActive() { return weAreComposited; }
     inline static int initialized() { return weAreInitialized; }
+    inline static bool isCompiz() { return weAreCompiz; }
     QList< BorderSize > borderSizes() const
     {
         return QList< BorderSize >() << BorderTiny << BorderNormal <<
@@ -108,7 +109,7 @@ private:
     static QHash<qint64, WindowData*> ourDecoInfos;
     static QHash<qint64, BgSet*> ourBgSets;
     static QList<Preset*> ourPresets;
-    static bool weAreInitialized, weAreComposited;
+    static bool weAreInitialized, weAreComposited, weAreCompiz;
     static int ourButtonSize[2], ourBorderSize, ourTitleSize[2], ourBgMode;
     static QVector<Button::Type> ourMultiButton;
     static Config ourConfig;
