@@ -5,7 +5,7 @@ add_definitions( ${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} -DQT3_SUPPORT )
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules )
 
-option(ENABLE_ARGB "Enable translucent windows" OFF)
+option(ENABLE_ARGB "Enable translucent windows" ON)
 option(ENABLE_AMAROK_HACK "Legacy Amarok hacks" OFF)
 option(ENABLE_KDE "Enable Bespin support for KDE4" ON)
 option(ENABLE_KWIN "Build Bespin KWin decoration" ON)
