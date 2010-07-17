@@ -372,6 +372,8 @@ Style::polish( QWidget * widget )
                 menu->setAttribute(Qt::WA_MacBrushedMetal);
                 menu->setAttribute(Qt::WA_StyledBackground);
             }
+            else
+                widget->setAttribute(Qt::WA_MacBrushedMetal, false);
             // opacity
 #if BESPIN_ARGB_WINDOWS
             if ( !widget->testAttribute(Qt::WA_TranslucentBackground) &&
