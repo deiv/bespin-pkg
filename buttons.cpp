@@ -245,7 +245,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
             QColor c2 = Qt::transparent;
             if (hasFocus)
             {
-                if (config.btn.active_role[Bg] == QPalette::Highlight)
+                if ( config.btn.layer == 1 || config.btn.active_role[Bg] == QPalette::Highlight)
                     { c2 = FCOLOR(Highlight); }
             }
             else if ( anim.step  && config.btn.backLightHover )
