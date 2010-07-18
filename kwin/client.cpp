@@ -319,8 +319,7 @@ Client::eventFilter(QObject *o, QEvent *e)
         }
         repaint(p);
 
-        if ( Factory::roundCorners() && realWindow && maximizeMode() != MaximizeFull &&
-             Factory::compositingActive() )
+        if ( Factory::roundCorners() && realWindow && maximizeMode() != MaximizeFull && Factory::compositingActive() )
         {
             const bool full = isShade() || borderSize > 3;
             const int sw = Factory::mask.width() / 2 + 1;
@@ -490,7 +489,7 @@ Client::maximizeChange()
 KDecorationDefines::Position
 Client::mousePosition( const QPoint& p ) const
 {
-    if (!isResizable())
+    if (isShade() || !isResizable())
         return PositionCenter;
    
     if (p.y() < 4)
@@ -970,7 +969,7 @@ Client::reset(unsigned long changed)
             if (corner)
                 corner->show();
         }
-
+        
         bottom = QRect(0, height()-borderSize, width(), borderSize);
         const int sideHeight = height() - (myTitleSize + borderSize);
         if (Factory::verticalTitle())

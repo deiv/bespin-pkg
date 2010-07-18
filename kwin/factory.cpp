@@ -122,11 +122,14 @@ bool Factory::reset(unsigned long changed)
     weAreComposited = KWindowSystem::compositingActive();
     if (wasComposited != weAreComposited)
         ret = false;
-    
+
     if (!ret)
     {
         if (wasComposited != weAreComposited)
+        {
+            resetDecorations(changed | SettingBorder);
             QDBusConnection::sessionBus().send( QDBusMessage::createMethodCall( "org.kde.kwin", "/KWin", "org.kde.KWin", "reconfigure" ) );
+        }
         else
             resetDecorations(changed);
     }   
