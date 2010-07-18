@@ -596,12 +596,17 @@ Style::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const 
 
     QColor c = CCOLOR(tab.std, Bg);
     Gradients::Type gt = GRAD(tab);
+    
     if (gt == Gradients::Sunken) // looks freaky
         gt = Gradients::Button;
     if (sunken)
         { c = FCOLOR(Window); gt = Gradients::Sunken; }
     else if (hover)
+    {
         c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 4, 1);
+        if ( config.tab.std_role[Bg] == config.tab.active_role[Bg] )
+            gt = (gt == Gradients::Button) ? Gradients::Glass : Gradients::Button;
+    }
 
     Tile::setShape(pf);
     masks.rect[true].render(r, painter, gt, Qt::Vertical, c);
