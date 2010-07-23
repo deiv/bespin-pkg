@@ -39,6 +39,8 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
 
     QRect oldRect = btn->rect;
     QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
+    const bool blh = config.btn.backLightHover;
+    
     if ( widget )
     {
         if ( qobject_cast<const QAbstractItemView*>(widget) )
@@ -50,12 +52,10 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
         {
             if (!isCheckbox)
             {   // paints hardcoded black text bypassing the style?! grrr...
+                config.btn.backLightHover = true;
                 if (Colors::value(CCOLOR(btn.std, Bg)) < 100)
                     _btn->palette.setColor(config.btn.std_role[Bg], QColor(230,230,230,255));
                 _btn->palette.setColor(config.btn.std_role[Fg], Qt::black);
-                if (Colors::value(CCOLOR(btn.active, Bg)) < 100)
-                    _btn->palette.setColor(config.btn.active_role[Bg], Qt::white);
-                _btn->palette.setColor(config.btn.active_role[Fg], Qt::black);
             }
             widget = 0; // leads to false UnderMouse assumptions...
         }
@@ -88,6 +88,8 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
         }
         drawPushButtonBevel(btn, painter, widget);
     }
+
+    config.btn.backLightHover = blh;
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
     if (appType == GTK)
         return; // GTK paints the label itself
