@@ -194,15 +194,11 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
     B_STATES
     if ( widget && widget->inherits("WebView") )
     {
-        if (!cmb->editable)
+        if (!(config.btn.backLightHover || cmb->editable))
         {   // paints hardcoded black text bypassing the style?! grrr...
             QStyleOptionComboBox *_cmb = const_cast<QStyleOptionComboBox*>(cmb);
-            if (Colors::value(CCOLOR(btn.std, Bg)) < 100)
-                _cmb->palette.setColor(config.btn.std_role[Bg], QColor(230,230,230,255));
-            _cmb->palette.setColor(config.btn.std_role[Fg], Qt::black);
-            if (Colors::value(CCOLOR(btn.active, Bg)) < 100)
-                _cmb->palette.setColor(config.btn.active_role[Bg], Qt::white);
-            _cmb->palette.setColor(config.btn.active_role[Fg], Qt::black);
+            _cmb->palette.setColor(config.btn.std_role[Bg], QColor(230,230,230,255));
+            _cmb->palette.setColor(config.btn.active_role[Bg], QColor(255,255,255,255));
         }
         widget = 0;
     }
@@ -233,7 +229,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
             if (!ar.isNull())
             {
                 // ground
-                animStep = Animator::Hover::step(widget);
+                animStep = (appType == GTK || !widget) ? 6*hover : Animator::Hover::step(widget);
                 if (listShown)
                     animStep = 6;
 

@@ -39,8 +39,7 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
 
     QRect oldRect = btn->rect;
     QStyleOptionButton *_btn = const_cast<QStyleOptionButton*>(btn);
-    const bool blh = config.btn.backLightHover;
-    
+
     if ( widget )
     {
         if ( qobject_cast<const QAbstractItemView*>(widget) )
@@ -48,14 +47,12 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
             painter->fillRect(RECT, Colors::mid(FCOLOR(Base), FCOLOR(Text), 3,1));
             return;
         }
-        else if (widget->inherits("QWebView") )
+        else if ( widget->inherits("QWebView") )
         {
-            if (!isCheckbox)
+            if (!(config.btn.backLightHover || isCheckbox))
             {   // paints hardcoded black text bypassing the style?! grrr...
-                config.btn.backLightHover = true;
-                if (Colors::value(CCOLOR(btn.std, Bg)) < 100)
-                    _btn->palette.setColor(config.btn.std_role[Bg], QColor(230,230,230,255));
-                _btn->palette.setColor(config.btn.std_role[Fg], Qt::black);
+                _btn->palette.setColor(config.btn.std_role[Bg], QColor(230,230,230,255));
+                _btn->palette.setColor(config.btn.active_role[Bg], QColor(255,255,255,255));
             }
             widget = 0; // leads to false UnderMouse assumptions...
         }
@@ -63,7 +60,8 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
     anim.widget = widget;
     anim.step = HOVER_STEP;
 
-    if (btn->features & QStyleOptionButton::Flat)
+    const bool isFlat = btn->features & QStyleOptionButton::Flat;
+    if (isFlat)
     {   // more like a toolbtn
         if (option->state & State_Enabled)
         {
@@ -89,13 +87,13 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
         drawPushButtonBevel(btn, painter, widget);
     }
 
-    config.btn.backLightHover = blh;
 //    tmpBtn.rect = subElementRect(SE_PushButtonContents, btn, widget);
     if (appType == GTK)
         return; // GTK paints the label itself
-//     _btn->rect.adjust(F(6), (config.btn.layer == 1) ? F(2) : F(3), -F(6), -F(4));
-    _btn->rect.adjust(F(6), F(1), -F(6), -F(2));
+
+    _btn->rect.adjust(F(6), F(1), -F(6), (isFlat || config.btn.layer == 1) ? -F(1) : -F(2));
     drawPushButtonLabel(btn, painter, widget);
+    
     _btn->rect = oldRect;
     anim.widget = 0; anim.step = 0;
 }
@@ -373,15 +371,15 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
         return;
 
     // The TEXT ============================================
-    const bool flat = btn->features & QStyleOptionButton::Flat;
+    const bool isFlat = btn->features & QStyleOptionButton::Flat;
     bool resetAnim = false;
     if (config.btn.backLightHover)
         { hover = 0; anim.widget = widget; anim.step = 0; }
     else if ( !widget || widget != anim.widget )
         { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
 
-    const QColor fg = btnFg(PAL, isEnabled, hasFocus, anim.step, flat);
-    const QColor &bg = flat ? FCOLOR(Window) : (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
+    const QColor fg = btnFg(PAL, isEnabled, hasFocus, anim.step, isFlat);
+    const QColor &bg = isFlat ? FCOLOR(Window) : (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
 
     painter->save();
     if (!sunken && btn->features & QStyleOptionButton::DefaultButton)
@@ -394,7 +392,7 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
             painter->setPen(bg.light(120));
         else
             { d = -1; painter->setPen(bg.dark(120)); }
-        ir.translate(0, d-flat);
+        ir.translate(0, d);
         drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
         ir.translate(0,-d);
     }
