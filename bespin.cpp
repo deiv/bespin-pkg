@@ -1557,6 +1557,11 @@ Style::eventFilter( QObject *object, QEvent *ev )
         return false;
     }
 #endif
+    case QEvent::WindowActivate:
+    case QEvent::WindowDeactivate:
+        if ( object->isWidgetType() && object->inherits("QWebView") )
+            static_cast<QWidget*>(object)->update();
+        return false;
     case QEvent::ApplicationPaletteChange:
     {
         if (object == qApp && originalPalette)

@@ -575,6 +575,8 @@ Style::init(const QSettings* settings)
             appType = Amarok;
         else if (appName == "OpenOffice.org" || appName == "soffice.bin")
             appType = OpenOffice;
+        else if (appName == "vlc")
+            appType = VLC;
 //             if (appName == "arora")
 //                 appType = Arora;
     }

@@ -20,6 +20,7 @@
 #include <Qt3Support/Q3ScrollView>
 #endif
 #include <QAbstractScrollArea>
+#include <QApplication>
 #include <QTimer>
 #include "draw.h"
 #include "animator/hover.h"
@@ -135,7 +136,6 @@ Style::drawScrollAreaCorner(const QStyleOption *option, QPainter *painter, const
     }
 }
 
-
 void
 Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
@@ -148,7 +148,15 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
     if (widget)
     {
         updateLastWidget(widget);
-        isWebKit = last_flags & WebKit;
+        if ((isWebKit = last_flags & WebKit))
+        {
+            const bool isFrame = RECT.height() == widget->height() || RECT.height() == widget->height() - RECT.width() ||
+                                 RECT.width() == widget->width() || RECT.width() == widget->width() - RECT.height();
+            if (isFrame)
+                last_flags &= ~ComboBox;
+            else
+                last_flags |= ComboBox;
+        }
     }
 
     // we paint the slider bg ourselves, as otherwise a frame repaint would be
@@ -156,7 +164,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
     if (!widget) // fallback ===========
         painter->fillRect(RECT, FCOLOR(Window));
     
-    else if (widget->testAttribute(Qt::WA_OpaquePaintEvent))
+    else if (isWebKit || widget->testAttribute(Qt::WA_OpaquePaintEvent))
     {   /// fake a transparent bg (real transparency leads to frame22 painting overhead)
         // i.e. we erase the bg with the window background or any autofilled element between
 
@@ -206,6 +214,8 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
    
     // Make a copy here and reset it for each primitive.
     QStyleOptionSlider optCopy = *scrollbar;
+    if (isWebKit)
+        optCopy.palette = QApplication::palette();
     State saveFlags = optCopy.state;
     if (scrollbar->minimum == scrollbar->maximum)
         saveFlags &= ~State_Enabled; // there'd be nothing to scroll anyway...
@@ -433,27 +443,33 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
 
     // COLOR: the hover indicator (inside area)
 #define SCROLL_COLOR(_X_) \
-(widgetStep ? Colors::mid(  CCOLOR(scroll._, Bg), CCOLOR(scroll._, Fg), \
-                            (config.btn.backLightHover ? (Gradients::isReflective(GRAD(scroll)) ? 48 : 72) : 6) - _X_, _X_) :\
-            CCOLOR(scroll._, Bg))
+(widgetStep ? Colors::mid(  bgC, fgC, (config.btn.backLightHover ? (Gradients::isReflective(GRAD(scroll)) ? 48 : 72) : 6) - _X_, _X_) : bgC)
 
     if (scrollAreaHovered_ && !widgetStep)
         widgetStep = 6;
 
-    QColor c;
+    QColor c, bgC = CCOLOR(scroll._, Bg), fgC = CCOLOR(scroll._, Fg);
+    if ( widget && widget->isActiveWindow() )
+    { 
+        if ( complexStep )
+            { if (hover || !scrollAreaHovered_) complexStep = 6; }
+        else if (!hover)
+            { hover = !widgetStep; bgC = CCOLOR(scroll._, Fg); fgC = CCOLOR(scroll._, Bg); }
+    }
+
     if (sunken)
         c = SCROLL_COLOR(6);
     else if (complexStep)
     {
-        c = Colors::mid(CCOLOR(scroll._, Bg), SCROLL_COLOR(widgetStep));
-        c = Colors::mid(c, SCROLL_COLOR(complexStep),6-complexStep,complexStep);
+        c = Colors::mid(bgC, SCROLL_COLOR(widgetStep));
+        c = Colors::mid(c, SCROLL_COLOR(complexStep), 6-complexStep, complexStep);
     }
     else if (hover)
         { complexStep = 6; c = SCROLL_COLOR(6); }
     else if (widgetStep)
-        c = Colors::mid(CCOLOR(scroll._, Bg), SCROLL_COLOR(widgetStep));
+        c = Colors::mid(bgC, SCROLL_COLOR(widgetStep));
     else
-        c = CCOLOR(scroll._, Bg);
+        c = bgC;
     c.setAlpha(255); // bg could be transparent, i don't want scrollers translucent, though.
 #undef SCROLL_COLOR
    

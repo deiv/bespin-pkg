@@ -326,24 +326,46 @@ Style::polish( QWidget * widget )
     if ( widget->isWindow() &&
 //          widget->testAttribute(Qt::WA_WState_Created) &&
 //          widget->internalWinId() &&
-         !(widget->inherits("QTipLabel") || widget->inherits("QSplashScreen")) )
+            !(widget->inherits("QTipLabel") || widget->inherits("QSplashScreen") || 
+            widget->inherits("KScreenSaver") /*|| widget->inherits("QGLWidget")*/ ) )
     {
 //         QPalette pal = widget->palette();
-
         /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
         /// also doesn't work bgs get transparent and applying this to everythign causes funny sideeffects...
 #if BESPIN_ARGB_WINDOWS
         if (!(  config.bg.opacity == 0xff || // opaque
                 widget->windowType() == Qt::Desktop || // makes no sense + QDesktopWidget is often misused
                 widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) || // makes no sense
-                widget->testAttribute(Qt::WA_TranslucentBackground)))
+                widget->testAttribute(Qt::WA_TranslucentBackground) ||
+                widget->testAttribute(Qt::WA_NoSystemBackground) || 
+                widget->testAttribute(Qt::WA_OpaquePaintEvent) ) )
         {
-            QIcon icn = widget->windowIcon();
-            widget->setAttribute(Qt::WA_TranslucentBackground);
-            widget->setWindowIcon(icn);
-            // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
-            // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
-            widget->move(10000,10000);
+#if 0
+            bool skip = false;
+            QList<QWidget*> kids = widget->findChildren<QWidget*>();
+            QList<QWidget*>::const_iterator kid = kids.constBegin();
+            while ( kid != kids.constEnd() )
+            {
+                if ( (*kid)->inherits("QX11EmbedContainer") || (*kid)->inherits("QX11EmbedWidget") ||
+                    (*kid)->inherits("Phonon::VideoWidget") || (*kid)->inherits("KSWidget") ||
+                    (*kid)->inherits("MplayerWindow") )
+                {
+                    skip = true;
+                    break;
+                }
+                ++kid;
+            }    
+            if (!skip)
+#endif
+            {
+                QIcon icn = widget->windowIcon();
+                widget->setAttribute(Qt::WA_TranslucentBackground);
+                widget->setWindowIcon(icn);
+                // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
+                // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
+                if (!widget->isVisible())
+                    widget->move(10000,10000);
+            }
         }
 #endif
         if (config.bg.glassy)
@@ -854,7 +876,14 @@ Style::polish( QWidget * widget )
         widget->inherits("QWebView") || // to update the scrollbars
         qobject_cast<QDockWidget*>(widget) || widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("Q3DockWindowResizeHandle"))
+    {
         widget->setAttribute(Qt::WA_Hover);
+        if (widget->inherits("QWebView"))
+        {
+            widget->removeEventFilter(this);
+            widget->installEventFilter(this);
+        }
+    }
     // this is a WORKAROUND for amarok filebrowser, see above on itemviews...
     else if (widget->inherits("KDirOperator"))
     {
@@ -869,15 +898,29 @@ Style::polish( QWidget * widget )
     }
 #if 0
 // #ifdef Q_WS_X11
-    if ( config.bg.opacity != 0xff && widget->window() &&
-         (widget->inherits("QX11EmbedContainer") ||
+    if ( config.bg.opacity != 0xff && /*widget->window() &&*/
+        (widget->inherits("MplayerWindow") ||
+         widget->inherits("KSWidget") || 
+         widget->inherits("QX11EmbedContainer") ||
          widget->inherits("QX11EmbedWidget") ||
          widget->inherits("Phonon::VideoWidget")) )
     {
-        QWidget *window = widget->window();
-        qDebug() << "BESPIN, reverting" << widget << window;
-        window->setAttribute(Qt::WA_TranslucentBackground, false);
-        window->setAttribute(Qt::WA_NoSystemBackground, false);
+        bool vis = widget->isVisible();
+        widget->setWindowFlags(Qt::Window);
+        widget->show();
+        printf("%s %s %d\n", widget->className(), widget->parentWidget()->className(), widget->winId());
+        widget->setAttribute(Qt::WA_DontCreateNativeAncestors, widget->testAttribute(Qt::WA_DontCreateNativeAncestors));
+        widget->setAttribute(Qt::WA_NativeWindow);
+        widget->setAttribute(Qt::WA_TranslucentBackground, false);
+        widget->setAttribute(Qt::WA_PaintOnScreen, true);
+        widget->setAttribute(Qt::WA_NoSystemBackground, false);
+        if (QWidget *window = widget->window())
+        {
+            qDebug() << "BESPIN, reverting" << widget << window;
+            window->setAttribute(Qt::WA_TranslucentBackground, false);
+            window->setAttribute(Qt::WA_NoSystemBackground, false);
+        }
+        QApplication::setColorSpec(QApplication::NormalColor);
     }
 #endif
 
@@ -947,6 +990,11 @@ Style::unpolish( QWidget *widget )
 
     if (widget->isWindow())
     {
+//         if (config.bg.opacity != 0xff)
+//         {
+//             window->setAttribute(Qt::WA_TranslucentBackground, false);
+//             window->setAttribute(Qt::WA_NoSystemBackground, false);
+//         }
 #ifdef Q_WS_X11
         XProperty::remove(widget->winId(), XProperty::winData);
         XProperty::remove(widget->winId(), XProperty::bgPics);

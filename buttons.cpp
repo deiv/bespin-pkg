@@ -410,13 +410,23 @@ void
 Style::drawCheckBox(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     B_STATES
-    if ( widget && widget->inherits("QWebView") )
-        widget = 0;
-
     // the button -----------------
     QStyleOption copy = *option;
     if (config.btn.layer == 0)
         copy.rect.adjust(F(1),F(1),-F(1),0); // get rect appereance again
+        
+    if ( widget && widget->inherits("QWebView") )
+    {
+        widget = 0;
+        #if 0
+        if (!hover && painter->hasClipping())
+        {
+            QVector<QRect> rects = painter->clipRegion().rects();
+            if (rects.count() == 1)
+                copy.rect.moveCenter( rects.at(0).center() );
+        }
+        #endif
+    }
     bool resetAnim = false;
     isCheckbox = true;
     // NOTICE: i do not recall why i excluded this, waiting for a bug report

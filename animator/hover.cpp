@@ -222,6 +222,7 @@ Hover::eventFilter( QObject* object, QEvent *e )
     case QEvent::MouseButtonPress:
     case QEvent::Wheel:
         return false; // just for performance - they can occur really often
+    case QEvent::WindowActivate:
     case QEvent::Enter:
     {
         if (QAbstractScrollArea* area = qobject_cast<QAbstractScrollArea*>(object))
@@ -249,9 +250,12 @@ Hover::eventFilter( QObject* object, QEvent *e )
             }
             return false;
         }
+        if (e->type() == QEvent::WindowActivate)
+            return false;
         play(widget);
         return false;
     }
+    case QEvent::WindowDeactivate:
     case QEvent::Leave:
     {
         if (QAbstractScrollArea* area = qobject_cast<QAbstractScrollArea*>(object))
@@ -277,6 +281,8 @@ Hover::eventFilter( QObject* object, QEvent *e )
             }
             return false;
         }
+        if (e->type() == QEvent::WindowDeactivate)
+            return false;
         play(widget, true);
         return false;
     }
