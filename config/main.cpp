@@ -58,14 +58,15 @@ usage(const char* appname)
 %s import <some_config.bespin>\t\t\tImport an exported setting\n\
 %s update <some_config.bespin>\t\t\tLike import, but overrides existing\n\
 %s export <some_preset> <some_config.bespin>\tExport an imported setting\n\
-%s listStyles \t\t\t\t\tList all styles on this System\n",
-appname, appname, appname, appname, appname, appname, appname, appname, appname, appname, appname );
+%s listStyles \t\t\t\t\tList all styles on this System\n\
+%s loadPaletteFrom <style>\t\t\t\tLoad and store the default palette of a style\n",
+appname, appname, appname, appname, appname, appname, appname, appname, appname, appname, appname, appname );
    return 1;
 }
 
 enum Mode
 {
-    Invalid = 0, Configure, Presets, Import, Update, Export, Load, Demo, Try, Screenshot, ListStyles, Show
+    Invalid = 0, Configure, Presets, Import, Update, Export, Load, Demo, Try, Screenshot, ListStyles, Show, LoadPalette
 };
 
 int
@@ -88,6 +89,7 @@ main(int argc, char *argv[])
         else if (!qstrcmp( argv[1], "sshot" )) mode = Screenshot;
         else if (!qstrcmp( argv[1], "load" )) mode = Load;
         else if (!qstrcmp( argv[1], "listStyles" )) mode = ListStyles;
+        else if (!qstrcmp( argv[1], "loadPaletteFrom" )) mode = LoadPalette;
     }
 
     switch (mode)
@@ -146,6 +148,21 @@ main(int argc, char *argv[])
         if (!suc)
             return error("export failed (invalid preset name?)");
         return 0;
+    }
+    case LoadPalette:
+    {
+        if (argc < 3)
+            return error(QString("you lack <some_style>. Try \"%1 listStyles\"").arg(argv[0]));
+        app = new QApplication(argc, argv);
+        QStyle *style = QStyleFactory::create( argv[2] );
+        if (!style)
+        {
+            delete app;
+            return error(QString("Style \"%1\" does not exist. Try \"%2 listStyles\"").arg(argv[2]).arg(argv[0]));
+        }
+        Config::savePalette(style->standardPalette());
+        delete app; delete style;
+        break;
     }
     case Try:
     {

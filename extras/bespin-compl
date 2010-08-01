@@ -29,10 +29,10 @@ _bespin()
     cmd="${COMP_WORDS[1]}"
 
     # all options bespin-executable offers
-    opts="config demo export help import update listStyles load presets show sshot try"
+    opts="config demo export help import update listStyles load presets show sshot try loadPaletteFrom"
 
     case "${cmd}" in
-        demo)
+        demo | loadPaletteFrom)
             local styles=$(bespin listStyles)
             COMPREPLY=( $(compgen -W "${styles}" -- ${cur}) )
             return 0
