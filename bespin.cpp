@@ -848,6 +848,13 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool
         oldH = var.toInt();
     
     QList<QWidget*> dirty;
+    
+    if (mwin->menuBar())
+    {
+        newH = mwin->menuBar()->height();
+        dirty << mwin->menuBar();
+    }
+    
     if (includeToolbars)
     {
         QToolBar *b;
@@ -869,11 +876,7 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool
             }
         }
     }
-    if (mwin->menuBar())
-    {
-        newH += mwin->menuBar()->height();
-        dirty << mwin->menuBar();
-    }
+
 #ifdef Q_WS_X11
     if (newH && includeTitle)
     {
@@ -1452,22 +1455,27 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
         }
 
-        if ( config.UNO.toolbar )
-        if ( QToolBar *bar = qobject_cast<QToolBar*>(object) )
+        if ( config.UNO.used )
         {
-            if (pendingUnoUpdates.isEmpty())
+            QToolBar *bar = 0;
+            if ( qobject_cast<QMenuBar*>(object) || (config.UNO.toolbar && (bar = qobject_cast<QToolBar*>(object))) )
             {
-                if (!unoUpdateTimer)
+                if (pendingUnoUpdates.isEmpty())
                 {
-                    unoUpdateTimer = new QTimer(this);
-                    unoUpdateTimer->setSingleShot(true);
-                    connect (unoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateUno()));
+                    if (!unoUpdateTimer)
+                    {
+                        unoUpdateTimer = new QTimer(this);
+                        unoUpdateTimer->setSingleShot(true);
+                        connect (unoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateUno()));
+                    }
+                    unoUpdateTimer->start(0);
                 }
-                unoUpdateTimer->start(0);
+                if (bar)
+                    pendingUnoUpdates << bar;
+                return false;
             }
-            pendingUnoUpdates << bar;
-            return false;
         }
+        return false;
     }
     case QEvent::Hide:
     {
