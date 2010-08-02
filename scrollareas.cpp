@@ -449,7 +449,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         widgetStep = 6;
 
     QColor c, bgC = CCOLOR(scroll._, Bg), fgC = CCOLOR(scroll._, Fg);
-    if ( widget && widget->isActiveWindow() )
+    if ( !config.btn.backLightHover && widget && widget->isActiveWindow() )
     { 
         if ( complexStep )
             { if (hover || !scrollAreaHovered_) complexStep = 6; }
