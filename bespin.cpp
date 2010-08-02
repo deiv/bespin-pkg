@@ -838,6 +838,7 @@ Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::
 Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
 static QList<QPointer<QToolBar> > pendingUnoUpdates;
+static QList<QPointer<QMainWindow> > pendingUnoWindows;
 static QTimer *unoUpdateTimer = 0;
 static bool
 updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool *gotTitle = 0)
@@ -923,10 +924,19 @@ Style::updateUno()
         if (bar)
             updateUno(bar, (clear && config.UNO.title) ? &clear : 0);
     }
+    foreach (QMainWindow *mwin, pendingUnoWindows)
+    {
+        if (mwin)
+        {
+            if (updateUnoHeight(mwin, config.UNO.toolbar, config.UNO.title, (clear && config.UNO.title) ? &clear : 0) && config.UNO.title)
+                setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
+        }
+    }
     if (clear || !interval)
     {
 //         qWarning("CLEAR!");
         pendingUnoUpdates.clear();
+        pendingUnoWindows.clear();
     }
     else if (interval)
     {
@@ -940,6 +950,7 @@ Style::updateUno(QToolBar *bar, bool *gotTitle)
 {
     if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget()) )
     {
+        pendingUnoWindows.removeAll(mwin);
         if (updateUnoHeight(mwin, config.UNO.toolbar, config.UNO.title, gotTitle) && config.UNO.title)
             setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
         
@@ -951,8 +962,7 @@ Style::updateUno(QToolBar *bar, bool *gotTitle)
             bg = config.UNO.__role[Bg];
             fg = config.UNO.__role[Fg];
         }
-        if (!(autoFill == bar->autoFillBackground() &&
-            bg == bar->backgroundRole() && fg == bar->foregroundRole()))
+        if (!(autoFill == bar->autoFillBackground() && bg == bar->backgroundRole() && fg == bar->foregroundRole()))
         {
             bar->setAutoFillBackground(autoFill);
             bar->setBackgroundRole(bg);
@@ -1472,6 +1482,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 }
                 if (bar)
                     pendingUnoUpdates << bar;
+                else if (QMainWindow *mwin = qobject_cast<QMainWindow*>(widget->window()))
+                    pendingUnoWindows << mwin;
                 return false;
             }
         }
