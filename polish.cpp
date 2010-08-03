@@ -327,7 +327,7 @@ Style::polish( QWidget * widget )
 //          widget->testAttribute(Qt::WA_WState_Created) &&
 //          widget->internalWinId() &&
             !(widget->inherits("QTipLabel") || widget->inherits("QSplashScreen") || 
-            widget->inherits("KScreenSaver") /*|| widget->inherits("QGLWidget")*/ ) )
+            widget->inherits("KScreenSaver") /*|| widget->inherits("QGLWidget")*/ || widget->objectName() == "decoration widget") )
     {
 //         QPalette pal = widget->palette();
         /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
