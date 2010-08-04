@@ -289,9 +289,9 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
 
     int x, y, w, h;
     r.getRect(&x, &y, &w, &h);
-    int tab = menuitem->tabWidth;
-    int cDim = (r.height() - F(6));
-    int xm = windowsItemFrame + iconCol + windowsItemHMargin;
+    const int tab = menuitem->tabWidth;
+    const int cDim = (2*(r.height()+2)/3);
+    const int xm = windowsItemFrame + iconCol + windowsItemHMargin;
     int xpos = r.x() + xm;
     QRect textRect(xpos, y + windowsItemVMargin,
                     w - xm - menuItem->menuHasCheckableItems*(cDim+F(7)) - windowsRightBorder - tab + 1,
