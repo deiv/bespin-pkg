@@ -1022,9 +1022,9 @@ Style::updateBlurRegions() const
         detectBlurRegion(widget, widget, blur);
         if (blur.isEmpty())
             continue;
-        
-        QVector<unsigned long> data(blur.rectCount() * 4);
+
         QVector<QRect> rects = blur.rects();
+        QVector<unsigned long> data(rects.count() * 4);
         QVector<QRect>::const_iterator i;
         for ( i = rects.begin(); i != rects.end(); ++i )
         {
