@@ -152,10 +152,10 @@ void Style::polish( QPalette &pal, bool onInit )
     }
 
     // inactive palette
+    pal.setColor(QPalette::Inactive, QPalette::Highlight,
+                 Colors::mid(pal.color(QPalette::Active, QPalette::Highlight), grey, 1,2));
     if (config.fadeInactive)
     { // fade out inactive foreground and highlight colors...
-        pal.setColor(QPalette::Inactive, QPalette::Highlight,
-                     Colors::mid(pal.color(QPalette::Active, QPalette::Highlight), grey, 2,1));
         pal.setColor(QPalette::Inactive, QPalette::WindowText,
                      Colors::mid(pal.color(QPalette::Active, QPalette::Window), pal.color(QPalette::Active, QPalette::WindowText), 1,4));
         pal.setColor(QPalette::Inactive, QPalette::ButtonText,
