@@ -54,6 +54,8 @@
 
 #include "bespin.h"
 
+#define BESPIN_MOUSE_DEBUG 0
+
 /**=========================================================*/
 
 /**============= extern C stuff ==========================*/
@@ -1244,7 +1246,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         QWidget *widget = qobject_cast<QWidget*>(object); // dock = 0;
         if (!widget)
             return false;
-        
+
         if ( widget->isWindow() )
         {
             if ((config.menu.round && qobject_cast<QMenu*>(object))
@@ -1385,11 +1387,11 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
         return false;
     }
-#ifdef MOUSEDEBUG
+#if BESPIN_MOUSE_DEBUG
     case QEvent::MouseButtonPress:
     {
         QMouseEvent *mev = (QMouseEvent*)ev;
-        qDebug() << "BESPIN:" << object;
+        qDebug() << "BESPIN:" << object << static_cast<QWidget*>(object)->geometry();
         //       DEBUG (object);
         return false;
     }

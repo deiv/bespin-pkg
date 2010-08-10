@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>765</width>
-    <height>378</height>
+    <height>454</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -555,15 +555,15 @@
           <item row="0" column="0">
            <widget class="QToolBox" name="windowSettings">
             <property name="currentIndex">
-             <number>4</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>318</width>
-               <height>112</height>
+               <width>446</width>
+               <height>156</height>
               </rect>
              </property>
              <attribute name="label">
@@ -874,8 +874,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>431</width>
-               <height>176</height>
+               <width>433</width>
+               <height>180</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1089,8 +1089,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>372</width>
-               <height>87</height>
+               <width>316</width>
+               <height>81</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1258,8 +1258,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>264</width>
-               <height>178</height>
+               <width>266</width>
+               <height>180</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1457,8 +1457,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>444</width>
-               <height>155</height>
+               <width>260</width>
+               <height>161</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1932,7 +1932,7 @@
                <x>0</x>
                <y>0</y>
                <width>316</width>
-               <height>247</height>
+               <height>249</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2094,8 +2094,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>193</width>
-               <height>88</height>
+               <width>197</width>
+               <height>90</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2194,6 +2194,34 @@
             </property>
             <property name="text">
              <string>Show mnemonics (accelerators)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_61">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Menubar background:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_62">
+            <property name="text">
+             <string>To configure the menubar background enter the UNO section in the &quot;Windows&quot; page.
+If you disable UNO for titlebar and toolbar the settings will only impact the menubar.</string>
             </property>
            </widget>
           </item>
@@ -3441,12 +3469,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>542</x>
-     <y>161</y>
+     <x>530</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
-     <x>552</x>
-     <y>161</y>
+     <x>540</x>
+     <y>138</y>
     </hint>
    </hints>
   </connection>
@@ -3457,12 +3485,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>285</x>
-     <y>132</y>
+     <x>241</x>
+     <y>86</y>
     </hint>
     <hint type="destinationlabel">
-     <x>560</x>
-     <y>132</y>
+     <x>263</x>
+     <y>86</y>
     </hint>
    </hints>
   </connection>
@@ -3473,11 +3501,11 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>259</x>
+     <x>215</x>
      <y>89</y>
     </hint>
     <hint type="destinationlabel">
-     <x>259</x>
+     <x>215</x>
      <y>89</y>
     </hint>
    </hints>
@@ -3489,11 +3517,11 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>252</x>
+     <x>208</x>
      <y>82</y>
     </hint>
     <hint type="destinationlabel">
-     <x>252</x>
+     <x>208</x>
      <y>82</y>
     </hint>
    </hints>
@@ -3505,12 +3533,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>421</x>
-     <y>179</y>
+     <x>222</x>
+     <y>96</y>
     </hint>
     <hint type="destinationlabel">
-     <x>559</x>
-     <y>179</y>
+     <x>222</x>
+     <y>96</y>
     </hint>
    </hints>
   </connection>
@@ -3521,12 +3549,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>232</x>
-     <y>258</y>
+     <x>398</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
-     <x>570</x>
-     <y>258</y>
+     <x>420</x>
+     <y>109</y>
     </hint>
    </hints>
   </connection>
@@ -3537,7 +3565,7 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>580</x>
+     <x>541</x>
      <y>155</y>
     </hint>
     <hint type="destinationlabel">
@@ -3553,11 +3581,11 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>353</x>
-     <y>109</y>
+     <x>462</x>
+     <y>86</y>
     </hint>
     <hint type="destinationlabel">
-     <x>213</x>
+     <x>169</x>
      <y>114</y>
     </hint>
    </hints>
@@ -3569,11 +3597,11 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>428</x>
-     <y>109</y>
+     <x>537</x>
+     <y>86</y>
     </hint>
     <hint type="destinationlabel">
-     <x>347</x>
+     <x>303</x>
      <y>114</y>
     </hint>
    </hints>
@@ -3585,44 +3613,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>551</x>
-     <y>109</y>
+     <x>554</x>
+     <y>86</y>
     </hint>
     <hint type="destinationlabel">
-     <x>446</x>
+     <x>402</x>
      <y>114</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>uno_title</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>uno_sunken</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>223</x>
-     <y>200</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>218</x>
-     <y>220</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>uno_sunken</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>uno_title</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>186</x>
-     <y>226</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>191</x>
-     <y>203</y>
     </hint>
    </hints>
   </connection>

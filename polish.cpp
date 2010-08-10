@@ -63,6 +63,8 @@
 #define CCOLOR(_TYPE_, _FG_) PAL.color(QPalette::Active, Style::config._TYPE_##_role[_FG_])
 #define FCOLOR(_TYPE_) PAL.color(QPalette::Active, QPalette::_TYPE_)
 
+#define BESPIN_MOUSE_DEBUG 0
+
 using namespace Bespin;
 
 Hacks::Config Hacks::config;
@@ -114,16 +116,17 @@ void Style::polish( QPalette &pal, bool onInit )
     pal.setColor(QPalette::AlternateBase, Colors::mid(pal.color(QPalette::Active, QPalette::Base),
                                                       pal.color(QPalette::Active, config.view.shadeRole),
                                                       100,config.view.shadeLevel));
+    int h,s,v;
     // highlight colors
-    const int highlightGray = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
-    const QColor grey(highlightGray,highlightGray,highlightGray);
-    pal.setColor(QPalette::Disabled, QPalette::Highlight, grey);
+    h = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
+    pal.setColor(QPalette::Inactive, QPalette::Highlight, QColor(h,h,h));
+    pal.setColor(QPalette::Disabled, QPalette::Highlight, Colors::mid(QColor(h,h,h), pal.color(QPalette::Active, QPalette::HighlightedText), 3, 1));
 
     // Link colors can not be set through qtconfig - and the colors suck
     QColor link = pal.color(QPalette::Active, QPalette::Highlight);
     const int vwt = Colors::value(pal.color(QPalette::Active, QPalette::Window));
     const int vt = Colors::value(pal.color(QPalette::Active, QPalette::Base));
-    int h,s,v; link.getHsv(&h,&s,&v);
+    link.getHsv(&h,&s,&v);
     s = sqrt(s/255.0)*255.0;
     
     if (vwt > 128 && vt > 128)
@@ -152,8 +155,6 @@ void Style::polish( QPalette &pal, bool onInit )
     }
 
     // inactive palette
-    pal.setColor(QPalette::Inactive, QPalette::Highlight,
-                 Colors::mid(pal.color(QPalette::Active, QPalette::Highlight), grey, 1,4));
     if (config.fadeInactive)
     { // fade out inactive foreground and highlight colors...
         pal.setColor(QPalette::Inactive, QPalette::WindowText,
@@ -310,7 +311,7 @@ Style::polish( QWidget * widget )
 
 //     if (widget->inherits("QGraphicsView"))
 //         qDebug() << "BESPIN" << widget;
-#ifdef MOUSEDEBUG
+#if BESPIN_MOUSE_DEBUG
     widget->removeEventFilter(this);
     widget->installEventFilter(this);
 #endif
