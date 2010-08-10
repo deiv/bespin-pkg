@@ -17,7 +17,6 @@
  */
 
 #include <QFrame>
-#include <QWidget>
 #include <QSlider>
 #include <QStyleOptionTabWidgetFrame>
 #include <QTabBar>
@@ -131,6 +130,9 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
 #if 1
         if (!widget)
             return F(16);
+        
+        if (appType == KDevelop )
+            return 0;
 
         const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget);
         if (!tabBar)
@@ -148,6 +150,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
         }
         if (!tabBar || !tabBar->isVisible())
             return 0; //F(16);
+        
         if (const QStyleOptionTabWidgetFrame *twf =
             qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
         {
