@@ -222,7 +222,7 @@ void BConfig::setQSetting(const QString organisation, const QString application,
    _qsetting[1] = application;
    _qsetting[2] = group;
 }
-#include <QtDebug>
+
 void BConfig::loadSettings(QSettings *settings, bool updateInit, bool merge) {
    _infoBrowser->setHtml(_defaultContextInfo);
    bool delSettings = false;

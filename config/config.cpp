@@ -766,7 +766,7 @@ Config::eventFilter( QObject *o, QEvent *e )
         }
         return false;
     }
-    return false;
+    return BConfig::eventFilter(o, e);
 }
 
 
