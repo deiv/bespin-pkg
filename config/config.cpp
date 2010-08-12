@@ -445,10 +445,25 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.kwinActiveText, KWIN_ACTIVE_TEXT_ROLE);
     handleSettings(ui.kwinInactiveText, KWIN_INACTIVE_TEXT_ROLE);
 
+    handleSettings(ui.amarokViews, HACK_AMAROK_VIEWS);
+    setContextHelp(ui.amarokViews, "<b>Amarok... again ;-)</b><hr>\
+    Amarok has a \"nice\" attitude to <u>force</u> it's playlist and other views in the window background color.<br>\
+    Not only does this maybe look strange, but it's also badly implemented, breaking certain color combinations.<br>\
+    (To be fair: it's by far not the only program with this broken approach...)<br>\
+    This setting allows to \"normalize\" the views (including a sunken frame) ...<br>\
+    PS: there <u>is</u> a pending merge request to at least fix the bad implementation and\
+    i've actually noted this for the first time in 2007 or 2008... ;-P");
+    
     handleSettings(ui.dolphinViews, HACK_DOLPHIN_VIEWS);
     setContextHelp(ui.dolphinViews, "<b>Dolphin sidebar</b><hr>\
     Dolphin sets some views in the sidebars to look like the window - check this to force a\
     \"traditional\" appearance.<br>(Sunken frame, Base colored background)");
+    
+    handleSettings(ui.placesViews, HACK_PLACES_VIEWS);
+    setContextHelp(ui.placesViews, "<b>Places selectors</b><hr>\
+    The PlacesView also used in Dolphin appears in virtually all filedialogs and probably\
+    some other places...<br>\
+    Check this to hit them all");
 
     handleSettings(ui.hackMessages, HACK_MESSAGES);
     setContextHelp(ui.hackMessages, "<b>Messageboxes</b><hr>\

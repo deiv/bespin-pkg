@@ -68,7 +68,9 @@
 #define DIALOG_BTN_LAYOUT "DialogButtonLayout", 2
 #define DRAW_SPLITTERS "DrawSplitters", true
 
+#define HACK_AMAROK_VIEWS "Hack.AmarokViews", false
 #define HACK_DOLPHIN_VIEWS "Hack.DolphinViews", false
+#define HACK_PLACES_VIEWS "Hack.PlacesViews", false
 #define HACK_MESSAGES "Hack.Messages", false
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false
 #define HACK_KRUNNER "Hack.KRunner", false

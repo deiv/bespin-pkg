@@ -144,6 +144,8 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.windowMovement = readBool(HACK_WINDOWMOVE);
         Hacks::config.killThrobber = readBool(HACK_THROBBER);
         Hacks::config.opaqueDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_VIEWS);
+        Hacks::config.opaqueAmarokViews = appType == Amarok && readBool(HACK_AMAROK_VIEWS);
+        Hacks::config.opaquePlacesViews = readBool(HACK_PLACES_VIEWS);
         // PW Echo Char ===========================
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
 #if BESPIN_ARGB_WINDOWS
@@ -584,14 +586,6 @@ Style::init(const QSettings* settings)
 
     readSettings(settings, appName);
 
-//     if (appType == Amarok)
-//     {
-//         polish(qApp, false);
-//         qApp->removeEventFilter(this);
-//         qApp->installEventFilter(this);
-//         QTimer::singleShot(10000, this, SLOT(removeAppEventFilter()));
-//     }
-
     initMetrics();
     Elements::setScale(config.scale);
     generatePixmaps();
@@ -608,3 +602,4 @@ Style::init(const QSettings* settings)
     inner.adjust(f1,f1,-f1,0); outer.adjust(-f3,-f3,f3,0);
     VisualFrame::setGeometry(QFrame::Raised, inner, outer);
 }
+

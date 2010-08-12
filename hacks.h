@@ -35,7 +35,7 @@ public:
     static void remove(QWidget *w);
     static struct Config
     {
-        bool messages, KHTMLView, treeViews, windowMovement, killThrobber, opaqueDolphinViews;
+        bool messages, KHTMLView, treeViews, windowMovement, killThrobber, opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews;
     } config;
 private:
     Q_DISABLE_COPY(Hacks)

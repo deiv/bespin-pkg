@@ -52,6 +52,7 @@
 #include "blib/colors.h"
 #include "animator/hover.h"
 
+#include "hacks.h"
 #include "bespin.h"
 
 #define BESPIN_MOUSE_DEBUG 0
@@ -1532,6 +1533,37 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
 #endif
         
+        if (Hacks::config.opaqueAmarokViews)
+        {
+            if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
+            {
+                itemView->installEventFilter(&eventKiller);
+                itemView->setPalette(QPalette());
+                QPalette pal = itemView->palette();
+                if (itemView->inherits("Playlist::PrettyListView"))
+                    pal.setColor(QPalette::AlternateBase, pal.color(QPalette::Base));
+                else
+                    pal.setColor(QPalette::Base, pal.color(QPalette::AlternateBase));
+                pal.setColor(QPalette::WindowText, pal.color(QPalette::Text));
+                itemView->setPalette(pal);
+                itemView->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+                itemView->setAlternatingRowColors(false);
+                itemView->setBackgroundRole(QPalette::Base);
+                itemView->setForegroundRole(QPalette::Text);
+                QWidget *vp = itemView->viewport();
+                if (vp && (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180))
+                {
+                    vp->installEventFilter(&eventKiller);
+                    vp->setPalette(QPalette());
+                    vp->setAutoFillBackground(true);
+                    vp->setBackgroundRole(QPalette::Base);
+                    vp->removeEventFilter(&eventKiller);
+                }
+                itemView->removeEventFilter(&eventKiller);
+            }
+            return false;
+        }
+        
         // i think, i hope i got it....
         // 1. khtml sets buttontext, windowtext and text to the fg color - what leads to trouble if e.g. button doesn't contrast window
         // 2. combolists need a special kick (but their palette seems ok, though it isn't...)
@@ -1604,7 +1636,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
         return false;
     }
 }
-
 
 QPalette
 Style::standardPalette () const

@@ -32,6 +32,7 @@
 #include <QPen>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QTimer>
 #include <QToolBar>
 #include <QToolTip>
 #include <QTreeView>
@@ -386,6 +387,9 @@ Style::polish( QWidget * widget )
         if ( appType == Dolphin )
         if ( QMainWindow *mw = qobject_cast<QMainWindow*>(widget) )
             mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );
+        
+        if (appType == Amarok && qobject_cast<QMainWindow*>(widget))
+            QTimer::singleShot(1500, this, SLOT(fixAmarokViews()));
 #endif
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
@@ -524,11 +528,16 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
+                if (Hacks::config.opaqueAmarokViews)
+                {
+                    itemView->removeEventFilter(this);
+                    itemView->installEventFilter(this);
+                }
                 if (QWidget *vp = itemView->viewport())
                 {
                     if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
                     {
-                        if (/*itemView->inherits("KFilePlacesView") || */(appType == Dolphin && Hacks::config.opaqueDolphinViews))
+                        if (Hacks::config.opaqueDolphinViews || (Hacks::config.opaquePlacesViews && itemView->inherits("KFilePlacesView")))
                         {
                             itemView->setPalette(QPalette());
                             QPalette pal = itemView->palette();
