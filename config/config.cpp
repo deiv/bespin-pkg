@@ -506,6 +506,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     This is a plain vanilla Qt feature, but must be activated by developers for each\
     treeview in order to be used - can be cute, can be annoying: choose by yourself<br>\
     This way it's activated globally." );
+    
+    handleSettings(ui.lockToolbars, HACK_TOOLBAR_LOCKING);
+    setContextHelp(ui.lockToolbars, "<b>Lock Toolbars</b><hr>\
+    KDE toolbars allow you (among other) to lock their position, plain Qt Toolbars\
+    (like in eg. arora) don't.<br>\
+    This locks all Qt Toolbars and adds a config item, accessible by pressing CTRL\
+    and rightclicking the Toolbar.");
 
     /** setContextHelp(.) attaches a context help string to a widget on your form */
     setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\

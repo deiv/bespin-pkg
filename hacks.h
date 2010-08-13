@@ -19,6 +19,8 @@
 #ifndef BESPIN_HACKS_H
 #define BESPIN_HACKS_H
 
+#include <QObject>
+
 class QWidget;
 
 namespace Bespin
@@ -26,6 +28,7 @@ namespace Bespin
 
 class Hacks : public QObject
 {
+    Q_OBJECT
 public:
     Hacks() {}
     enum HackAppType { Unknown = 0, SMPlayer, Dragon, KDM };
@@ -35,8 +38,10 @@ public:
     static void remove(QWidget *w);
     static struct Config
     {
-        bool messages, KHTMLView, treeViews, windowMovement, killThrobber, opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews;
+        bool messages, KHTMLView, treeViews, windowMovement, killThrobber, opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews, lockToolBars;
     } config;
+private slots:
+    void toggleToolBarLock();
 private:
     Q_DISABLE_COPY(Hacks)
 };

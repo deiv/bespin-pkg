@@ -63,13 +63,16 @@ using namespace Bespin;
 #define ENSURE_INSTANCE if (!bespinHacks) bespinHacks = new Hacks
 
 
-static Hacks *bespinHacks = 0;
-static Hacks::HackAppType *appType = 0;
+static Hacks *bespinHacks = 0L;
+static Hacks::HackAppType *appType = 0L;
 // const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 // const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
-static QPointer<QWidget> dragCandidate = NULL;
-static QPointer<QWidget> dragWidget = NULL;
+static QPointer<QWidget> dragCandidate = 0L;
+static QPointer<QWidget> dragWidget = 0L;
 static bool dragWidgetHadTrack = false;
+static QMenu *lockToggleMenu = 0L;
+static QToolBar *lockToggleBar = 0L;
+static QAction *lockToggleAction = 0L;
 
 static void
 triggerWMMove(const QWidget *w, const QPoint &p)
@@ -329,6 +332,13 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     {
         QMouseEvent *mev = static_cast<QMouseEvent*>(e);
         QWidget *w = qobject_cast<QWidget*>(o);
+        if (config.lockToolBars &&  (mev->modifiers() & Qt::ControlModifier) && qobject_cast<QToolBar*>(w) && !w->inherits("KToolBar"))
+        {
+            lockToggleBar = static_cast<QToolBar*>(w);
+            lockToggleAction->setChecked(!lockToggleBar->isMovable());
+            lockToggleMenu->popup(QCursor::pos());
+            return true;
+        }
         if ( !w || w->mouseGrabber() || // someone else is more interested in this
              (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
              (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
@@ -377,6 +387,14 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     return false;
 }
 
+void
+Hacks::toggleToolBarLock()
+{
+    if (lockToggleBar)
+        lockToggleBar->setMovable(!lockToggleBar->isMovable());
+    lockToggleBar = 0;
+}
+
 bool
 Hacks::add(QWidget *w)
 {
@@ -399,6 +417,21 @@ Hacks::add(QWidget *w)
         w->removeEventFilter(bespinHacks); // just to be sure
         w->installEventFilter(bespinHacks);
         return true;
+    }
+    
+    if (config.lockToolBars && qobject_cast<QToolBar*>(w) && !w->inherits("KToolBar"))
+    {
+        ENSURE_INSTANCE;
+        if (!lockToggleMenu)
+        {
+            lockToggleMenu = new QMenu();
+            lockToggleAction = lockToggleMenu->addAction( "Lock Toolbar Position", bespinHacks, SLOT(toggleToolBarLock()) );
+            lockToggleAction->setCheckable(true);
+        }
+        static_cast<QToolBar*>(w)->setMovable(false);
+        w->removeEventFilter(bespinHacks); // just to be sure
+        w->installEventFilter(bespinHacks);
+        
     }
     
     if (config.KHTMLView)
@@ -441,6 +474,7 @@ Hacks::remove(QWidget *w)
 
 void
 Hacks::releaseApp()
-{
+{ 
     delete bespinHacks; bespinHacks = 0L;
+    delete lockToggleMenu; lockToggleMenu = 0L;
 }
