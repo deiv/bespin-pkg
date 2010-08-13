@@ -291,6 +291,11 @@ void
 VisualFrame::show()
 {
     hidden = false;
+    if (myFrame->style() != style())
+    {
+        hide();
+        return;
+    }
     if (myStyle != QFrame::StyledPanel)
         return;
     
@@ -440,6 +445,15 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
         blockZEvent = true;
         raise();
         blockZEvent = false;
+        return false;
+    }
+    
+    if (ev->type() == QEvent::StyleChange)
+    {
+        if (myFrame->style() == style() && myFrame->isVisible())
+            show();
+        else
+            hide();
         return false;
     }
 

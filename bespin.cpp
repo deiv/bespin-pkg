@@ -1537,10 +1537,12 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
             {
+                const bool isPlaylist = itemView->inherits("Playlist::PrettyListView");
                 itemView->installEventFilter(&eventKiller);
                 itemView->setPalette(QPalette());
                 QPalette pal = itemView->palette();
-                if (itemView->inherits("Playlist::PrettyListView"))
+                QPalette copy = pal;
+                if (isPlaylist)
                     pal.setColor(QPalette::AlternateBase, pal.color(QPalette::Base));
                 else
                     pal.setColor(QPalette::Base, pal.color(QPalette::AlternateBase));
@@ -1548,7 +1550,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 itemView->setPalette(pal);
                 itemView->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
                 itemView->setAlternatingRowColors(false);
-                itemView->setBackgroundRole(QPalette::Base);
+                itemView->setBackgroundRole(isPlaylist ? QPalette::Base : QPalette::AlternateBase);
                 itemView->setForegroundRole(QPalette::Text);
                 QWidget *vp = itemView->viewport();
                 if (vp && (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180))
@@ -1556,7 +1558,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                     vp->installEventFilter(&eventKiller);
                     vp->setPalette(QPalette());
                     vp->setAutoFillBackground(true);
-                    vp->setBackgroundRole(QPalette::Base);
+                    vp->setBackgroundRole(isPlaylist ? QPalette::Base : QPalette::AlternateBase);
                     vp->removeEventFilter(&eventKiller);
                 }
                 itemView->removeEventFilter(&eventKiller);
