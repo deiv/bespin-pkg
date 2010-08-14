@@ -437,18 +437,22 @@ Style::drawTree(const QStyleOptionComplex *option, QPainter *painter, const QWid
 void
 Style::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidget*) const
 {
-    painter->save();
+    const QBrush oldBrush(painter->brush());
+    const QPen oldPen(painter->brush());
+    const QPainter::RenderHints oldHints(painter->renderHints());
+
     QColor c = FCOLOR(Highlight);
     painter->setPen(c);
-    c.setAlpha(80); painter->setBrush(c);
-#if 0
-    if (config.fastRender)
-        { c.setAlpha(80); painter->setBrush(c); }
-    else
-        painter->setBrush(QBrush(c, Qt::Dense4Pattern));
-#endif
+    c.setAlpha(80); 
+    painter->setBrush(c);
+//     painter->setBrush(QBrush(c, Qt::Dense6Pattern));
+//     painter->setBrush(Qt::NoBrush);
+// //     painter->setCompositionMode(QPainter::RasterOp_NotSourceXorDestination);
+    painter->setRenderHint(QPainter::Antialiasing, false);
     painter->drawRect(RECT.adjusted(0,0,-1,-1));
-    painter->restore();
+    painter->setPen(oldPen);
+    painter->setBrush(oldBrush);
+    painter->setRenderHints(oldHints, true);
 }
 
 enum IVI_Flags { Crumb = 1, DolphinDetail = 2 };
@@ -456,7 +460,7 @@ enum IVI_Flags { Crumb = 1, DolphinDetail = 2 };
 static const QWidget *last_widget = 0;
 static int last_flags = 0;
 
-static void updateLastWidget( const QWidget *widget, QPainter *p )
+static void updateLastWidget( const QWidget *widget, QPainter */*p*/ )
 {
     if (widget != last_widget)
     {
