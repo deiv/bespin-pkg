@@ -214,7 +214,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     ui.storeLine->hide();
 
     /** set up color page, not of interest */
-    QColorDialog *cd = new QColorDialog;
+    QColorDialog *cd = new QColorDialog(this);
     cd->hide();
     connect ( ui.colorButton, SIGNAL(clicked()), cd, SLOT(show()) );
     connect ( ui.colorButton, SIGNAL(clicked()), cd, SLOT(raise()) );
