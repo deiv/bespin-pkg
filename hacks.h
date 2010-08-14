@@ -38,7 +38,9 @@ public:
     static void remove(QWidget *w);
     static struct Config
     {
-        bool messages, KHTMLView, treeViews, windowMovement, killThrobber, opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews, lockToolBars;
+        bool messages, KHTMLView, treeViews, windowMovement, killThrobber, 
+             opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews, 
+             lockToolBars, invertDolphinUrlBar;
     } config;
 private slots:
     void toggleToolBarLock();

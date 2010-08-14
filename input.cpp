@@ -19,6 +19,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include "draw.h"
+#include "hacks.h"
 #include "animator/hover.h"
 
 void
@@ -56,14 +57,16 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
 {
     // spinboxes and combos allready have a lineedit as global frame
     // TODO: exclude Q3Combo??
+    QWidget *daddy = widget ? widget->parentWidget() : 0L;
     if (qstyleoption_cast<const QStyleOptionFrame*>(option) && static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1)
     {
-        if (widget && widget->parentWidget() &&
-            ( qobject_cast<QComboBox*>(widget->parentWidget()) || widget->parentWidget()->inherits("QAbstractSpinBox")))
+        if (daddy && ( qobject_cast<QComboBox*>(daddy) || daddy->inherits("QAbstractSpinBox")))
             return;
         painter->fillRect(RECT, FCOLOR(Base));
         return;
     }
+    if (Hacks::config.invertDolphinUrlBar && daddy && daddy->inherits("KUrlNavigator"))
+        return;
 
     OPT_ENABLED OPT_FOCUS
 

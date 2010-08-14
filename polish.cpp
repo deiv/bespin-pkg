@@ -63,6 +63,7 @@
 #undef FCOLOR
 #define CCOLOR(_TYPE_, _FG_) PAL.color(QPalette::Active, Style::config._TYPE_##_role[_FG_])
 #define FCOLOR(_TYPE_) PAL.color(QPalette::Active, QPalette::_TYPE_)
+#define FILTER_EVENTS(_WIDGET_) { _WIDGET_->removeEventFilter(this); _WIDGET_->installEventFilter(this); } // skip semicolon
 
 #define BESPIN_MOUSE_DEBUG 0
 
@@ -313,8 +314,7 @@ Style::polish( QWidget * widget )
 //     if (widget->inherits("QGraphicsView"))
 //         qDebug() << "BESPIN" << widget;
 #if BESPIN_MOUSE_DEBUG
-    widget->removeEventFilter(this);
-    widget->installEventFilter(this);
+    FILTER_EVENTS(widget);
 #endif
 
     // NONONONONO!!!!! ;)
@@ -377,19 +377,13 @@ Style::polish( QWidget * widget )
              config.bg.opacity != 0xff || config.bg.ringOverlay || widget->testAttribute(Qt::WA_MacBrushedMetal) )
         {
             if (config.bg.opacity != 0xff)
-            {
-                widget->removeEventFilter(this);
-                widget->installEventFilter(this);
-            }
+                FILTER_EVENTS(widget);
             widget->setAttribute(Qt::WA_StyledBackground);
         }
 #if QT_VERSION >= 0x040500
         if ( appType == Dolphin )
         if ( QMainWindow *mw = qobject_cast<QMainWindow*>(widget) )
-            mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );
-        
-        if (appType == Amarok && qobject_cast<QMainWindow*>(widget))
-            QTimer::singleShot(1500, this, SLOT(fixAmarokViews()));
+            mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );       
 #endif
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
@@ -423,8 +417,7 @@ Style::polish( QWidget * widget )
                 menu->setWindowFlags( menu->windowFlags()|Qt::Popup);
             
             // eventfiltering to reposition MDI windows, shaping, paint ARGB bg and correct distance to menubars
-            menu->removeEventFilter(this);
-            menu->installEventFilter(this);
+            FILTER_EVENTS(menu);
 #if 0
             /// NOTE this was intended to be for some menu mock from nuno where the menu
             /// reaches kinda ribbon-like into the bar
@@ -457,8 +450,7 @@ Style::polish( QWidget * widget )
             {
                 if (widget->isVisible())
                     setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
-                widget->removeEventFilter(this);
-                widget->installEventFilter(this); // catch show event and palette changes for deco
+                FILTER_EVENTS(widget); // catch show event and palette changes for deco
             }
         }
     }
@@ -500,10 +492,7 @@ Style::polish( QWidget * widget )
 #if  QT_VERSION < 0x040500 // 4.5 has a CE_ for this =)
             // Kill ugly line look (we paint our styled v and h lines instead ;)
             if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
-            {
-                widget->removeEventFilter(this);
-                widget->installEventFilter(this);
-            }
+                FILTER_EVENTS(widget);
             else if (frame->frameShape() != QFrame::StyledPanel)
             // Kill ugly winblows frames... (qShadeBlablabla stuff)
             {
@@ -528,72 +517,21 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                if (Hacks::config.opaqueAmarokViews)
-                {
-                    itemView->removeEventFilter(this);
-                    itemView->installEventFilter(this);
-                }
                 if (QWidget *vp = itemView->viewport())
                 {
                     if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
                     {
-                        if (Hacks::config.opaqueDolphinViews || (Hacks::config.opaquePlacesViews && itemView->inherits("KFilePlacesView")))
-                        {
-                            itemView->setPalette(QPalette());
-                            QPalette pal = itemView->palette();
-                            pal.setColor(QPalette::WindowText, pal.color(QPalette::Text));
-                            itemView->setPalette(pal);
-                            itemView->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-                            itemView->setAlternatingRowColors(false);
-                            itemView->setBackgroundRole(QPalette::AlternateBase);
-                            itemView->setForegroundRole(QPalette::Text);
-                            vp->setBackgroundRole(QPalette::AlternateBase);
-                            vp->setPalette(QPalette());
-                            vp->setAutoFillBackground(true);
-                        }
-                        else
-                        {
-                            /// NOTE: WORKAROUND for (no more) dolphin but amarok and probably others:
-                            // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
-                            // force this here, hoping it won't cause to many problems - and make a bug report
-                            QPalette pal = itemView->palette();
-                            if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)
-                            {
-                                pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
-                                pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Inactive, QPalette::Window));
-                                pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Disabled, QPalette::Window));
-                                vp->setAutoFillBackground(false);
-                            }
-                            pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
-                            pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
-                            pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
-                            itemView->setPalette(pal);
-                        }
-                    }
-                    if (!vp->autoFillBackground())
-                    {
-                        QPalette pal = itemView->palette();
-//                         Colors::mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::Base),6,1)
-                        #define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
-                        Colors::contrast(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase)), 10)
-                        pal.setColor(QPalette::Active, QPalette::AlternateBase, ALT_BASE(QPalette::Active));
-                        pal.setColor(QPalette::Inactive, QPalette::AlternateBase, ALT_BASE(QPalette::Inactive));
-                        pal.setColor(QPalette::Disabled, QPalette::AlternateBase, ALT_BASE(QPalette::Disabled));
-                        itemView->setPalette(pal);
-                        #undef ALT_BASE
+                        const bool solid = Hacks::config.opaqueAmarokViews || Hacks::config.opaqueDolphinViews || 
+                                           (Hacks::config.opaquePlacesViews && itemView->inherits("KFilePlacesView"));
+                        const bool alternate = !(appType == Amarok && itemView->inherits("Playlist::PrettyListView"));
+                        fixViewPalette(itemView, solid, alternate);
                     }
                 }
+                if (appType == Amarok) // fix the palette anyway. amarok tries to reset it's slooww transparent one... gnagnagna
+                    FILTER_EVENTS(itemView);
 
-                if (itemView->inherits("KCategorizedView"))
-                {   // fix scrolldistance...
-                    itemView->removeEventFilter(this);
-                    itemView->installEventFilter(this);
-                }
-//                 else if (itemView->inherits("KateFileList") && itemView->viewport())
-//                 {   // fix fucking "switch dock on wheel CRAP"
-//                     itemView->viewport()->removeEventFilter(this);
-//                     itemView->viewport()->installEventFilter(this);
-//                 }
+                if (itemView->inherits("KCategorizedView")) // fix scrolldistance...
+                    FILTER_EVENTS(itemView);
 
 #if QT_VERSION >= 0x040500
                 itemView->viewport()->setAttribute(Qt::WA_Hover);
@@ -614,10 +552,7 @@ Style::polish( QWidget * widget )
             }
 #if 0 // does not work
             else if (appType == Amarok && widget->inherits("Context::ContextView"))
-            {
-                widget->removeEventFilter(this);
-                widget->installEventFilter(this);
-            }
+                FILTER_EVENTS(widget);
 #endif
         }
 
@@ -677,8 +612,7 @@ Style::polish( QWidget * widget )
                     pal.setColor(QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::Window));
                     pbtn->setPalette(pal);
                     pbtn->setCursor(Qt::PointingHandCursor);
-                    pbtn->removeEventFilter(this);
-                    pbtn->installEventFilter(this);
+                    FILTER_EVENTS(pbtn);
                     widget->setAttribute(Qt::WA_Hover);
                 }
             }
@@ -741,8 +675,7 @@ Style::polish( QWidget * widget )
     //BEGIN SLIDERS / SCROLLBARS / SCROLLAREAS - hovering/animation                                -
     else if (qobject_cast<QAbstractSlider*>(widget))
     {
-        widget->removeEventFilter(this);
-        widget->installEventFilter(this); // finish animation
+        FILTER_EVENTS(widget); // finish animation
         
         widget->setAttribute(Qt::WA_Hover);
         // NOTICE
@@ -805,10 +738,7 @@ Style::polish( QWidget * widget )
 
 #if QT_VERSION >= 0x040500
     else if ( widget->inherits( "QTabWidget" ) )
-    {
-        widget->removeEventFilter(this);
-        widget->installEventFilter( this );
-    }
+        FILTER_EVENTS(widget)
 #endif
 
     //BEGIN Tab animation, painting override                                                       -
@@ -817,33 +747,43 @@ Style::polish( QWidget * widget )
         widget->setAttribute(Qt::WA_Hover);
         if (bar->drawBase())
         {
-            widget->setBackgroundRole(config.tab.std_role[0]);
-            widget->setForegroundRole(config.tab.std_role[1]);
+            widget->setBackgroundRole(config.tab.std_role[Bg]);
+            widget->setForegroundRole(config.tab.std_role[Fg]);
         }
         // the eventfilter overtakes the widget painting to allow tabs ABOVE the tabbar
-        widget->removeEventFilter(this);
-        widget->installEventFilter(this);
+        FILTER_EVENTS(widget);
     }
-    else if (appType == Dolphin && widget->inherits("KUrlNavigator"))
+    else if (Hacks::config.invertDolphinUrlBar && widget->inherits("KUrlNavigator"))
     {
-        widget->setContentsMargins(0,0,0,F(1));
-//         QList<QAbstractButton*> btns = widget->findChildren<QAbstractButton*>();
-//         foreach (QAbstractButton *btn, btns)
-//         {
+        widget->setContentsMargins(F(4),0,F(1), 0);
+        widget->setAutoFillBackground(false);
+        FILTER_EVENTS(widget);
+        QPalette p = widget->palette();
+        QColor ch = p.color(QPalette::Window);
+        p.setColor(QPalette::Window, p.color(QPalette::WindowText));
+        p.setColor(QPalette::Base, p.color(QPalette::Window));
+        p.setColor(QPalette::WindowText, ch);
+        p.setColor(QPalette::Text, ch);
+        ch = Colors::mid(p.color(QPalette::Highlight), ch, 4, 1);
+        p.setColor(QPalette::Link, ch);
+        p.setColor(QPalette::LinkVisited, ch);
+        widget->setPalette(p);
+        QList<QAbstractButton*> btns = widget->findChildren<QAbstractButton*>();
+        foreach (QAbstractButton *btn, btns)
+        {
 //             KUrlDropDownButton, KUrlNavigatorButton, KProtocolCombo
+            if ( btn->inherits("KFilePlacesSelector") )
+                btn->setFixedSize(0,0);
 //             if ( btn->inherits("KFilePlacesSelector") || btn->inherits("KUrlToggleButton") )
-//                 btn->setIconSize(QSize(17,17));
-//         }
+//                 btn->setIconSize(QSize(10,10));
+        }
     }
     else if (config.bg.docks.invert || appType == Dolphin)
     {
         if (QDockWidget *dock = qobject_cast<QDockWidget*>(widget))
         {
             if (appType == Dolphin)
-            {
-                dock->removeEventFilter(this);
-                dock->installEventFilter(this);
-            }
+                FILTER_EVENTS(dock);
             if (config.bg.docks.invert && (dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable)))
             {
                 QPalette pal = dock->palette();
@@ -866,8 +806,7 @@ Style::polish( QWidget * widget )
         {
             widget->setAutoFillBackground(true);
             // catch resizes for gradient recalculation
-            mbar->removeEventFilter(this);
-            mbar->installEventFilter(this);
+            FILTER_EVENTS(mbar);
         }
 #ifdef Q_WS_X11
         if ( appType != KDevelop ) //&& !(appType == QtDesigner && mbar->inherits("QDesignerMenuBar")) )
@@ -889,10 +828,7 @@ Style::polish( QWidget * widget )
     {
         widget->setAttribute(Qt::WA_Hover);
         if (widget->inherits("QWebView"))
-        {
-            widget->removeEventFilter(this);
-            widget->installEventFilter(this);
-        }
+            FILTER_EVENTS(widget);
     }
     // this is a WORKAROUND for amarok filebrowser, see above on itemviews...
     else if (widget->inherits("KDirOperator"))
@@ -938,8 +874,7 @@ Style::polish( QWidget * widget )
     if ( isTopContainer && config.UNO.toolbar )
     {   // catches show/resize events and manipulates fg/bg role
         updateUno(static_cast<QToolBar *>(widget));
-        widget->removeEventFilter(this);
-        widget->installEventFilter(this);
+        FILTER_EVENTS(widget);
     }
 
 #ifdef QT3_SUPPORT
@@ -965,18 +900,14 @@ Style::polish( QWidget * widget )
         widget->setAutoFillBackground(false);
     }
     
-    if (widget->autoFillBackground() || widget->testAttribute(Qt::WA_OpaquePaintEvent))
-    {
-        widget->removeEventFilter(this);
-        widget->installEventFilter(this);
-    }
+    if (config.bg.blur && (widget->autoFillBackground() || widget->testAttribute(Qt::WA_OpaquePaintEvent)))
+        FILTER_EVENTS(widget);
 
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors
     /// are set or KHtml does wrong OR (mainly) by html "designers"
     if (IS_HTML_WIDGET)
     {   // the eventfilter watches palette changes and ensures contrasted foregrounds...
-        widget->removeEventFilter(this);
-        widget->installEventFilter(this);
+        FILTER_EVENTS(widget);
         QEvent ev(QEvent::PaletteChange);
         eventFilter(widget, &ev);
     }

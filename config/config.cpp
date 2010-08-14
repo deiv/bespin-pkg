@@ -454,6 +454,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     PS: there <u>is</u> a pending merge request to at least fix the bad implementation and\
     i've actually noted this for the first time in 2007 or 2008... ;-P");
     
+    handleSettings(ui.hackDolphinUrl, HACK_DOLPHIN_URLBAR);
+    setContextHelp(ui.hackDolphinUrl, "<b>Dolphin's URL Navigator</b><hr>\
+    Invert colors, paint a TabBar-a-like frame and remove the location icon...");
+    
     handleSettings(ui.dolphinViews, HACK_DOLPHIN_VIEWS);
     setContextHelp(ui.dolphinViews, "<b>Dolphin sidebar</b><hr>\
     Dolphin sets some views in the sidebars to look like the window - check this to force a\

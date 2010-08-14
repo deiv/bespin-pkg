@@ -69,6 +69,7 @@
 #define DRAW_SPLITTERS "DrawSplitters", true
 
 #define HACK_AMAROK_VIEWS "Hack.AmarokViews", false
+#define HACK_DOLPHIN_URLBAR "Hack.DolphinUrlBar", false
 #define HACK_DOLPHIN_VIEWS "Hack.DolphinViews", false
 #define HACK_PLACES_VIEWS "Hack.PlacesViews", false
 #define HACK_MESSAGES "Hack.Messages", false
@@ -78,6 +79,7 @@
 #define HACK_THROBBER "Hack.KillThrobber", false
 #define HACK_TOOLBAR_LOCKING "Hack.ToolBarLocking", false
 #define HACK_WINDOWMOVE "Hack.WindowMovement", false
+
 #define INPUT_PWECHOCHAR "Input.PwEchoChar", 0x26AB
 
 #define KWIN_INACTIVE_ROLE "KWin.InactiveRole", QPalette::Window

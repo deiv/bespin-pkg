@@ -19,6 +19,7 @@
 #ifndef BESPIN_STYLE_H
 #define BESPIN_STYLE_H
 
+class QAbstractItemView;
 class QSettings;
 class QStyleOptionToolButton;
 class QToolBar;
@@ -280,6 +281,7 @@ private:
     void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
     int elementId(const QString &string) const;
     void erase(const QStyleOption*, QPainter*, const QWidget*, const QPoint *off = 0) const;
+    static void fixViewPalette(QAbstractItemView *itemView, bool solid, bool alternate, bool silent = false);
     void generatePixmaps();
     static bool hasMenuIndicator(const QStyleOptionToolButton *tb);
     void initMetrics();

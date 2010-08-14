@@ -1169,7 +1169,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         else if (QPushButton *w = qobject_cast<QPushButton*>(object))
         {
             bool b = false;
-            if ((b = object->inherits("KUrlButton")) || object->inherits("BreadcrumbItemButton"))
+            if ((b = w->inherits("KUrlButton")) || w->inherits("BreadcrumbItemButton"))
             {
                 isUrlNaviButtonArrow = true;
                 object->removeEventFilter(this);
@@ -1190,7 +1190,20 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
             return false;
         }
-#if 0 // TODO this _should_ work, but does not - i HATE plasma!
+        else if (Hacks::config.invertDolphinUrlBar && object->inherits("KUrlNavigator"))
+        {
+            QWidget *w = static_cast<QWidget*>(object);
+            QPainter p(w);
+            Tile::PosFlags pf = Tile::Full & (w->layoutDirection() == Qt::LeftToRight ? ~Tile::Right : ~Tile::Left);
+            Tile::setShape(pf);
+            QRect r = w->rect().adjusted(0,0,0,-F(2));
+            masks.rect[true].render(r, &p, GRAD(tab), Qt::Vertical, w->palette().color(QPalette::Window), r.height());
+            shadows.sunken[true][true].render(w->rect(), &p);
+            Tile::reset();
+            p.end();
+            return true; // sic! we paint
+        }
+#if 0 // TODO this _should_ work, but does not - <strike>i HATE plasma!</strike> actuall amaroks palettehandler fault, sorry :-)
         else if (appType == Amarok && object->inherits("Context::ContextView"))
         {
             QPalette pal = qApp->palette();
@@ -1533,35 +1546,12 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
 #endif
         
-        if (Hacks::config.opaqueAmarokViews)
+        if (appType == Amarok)
         {
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
             {
                 const bool isPlaylist = itemView->inherits("Playlist::PrettyListView");
-                itemView->installEventFilter(&eventKiller);
-                itemView->setPalette(QPalette());
-                QPalette pal = itemView->palette();
-                QPalette copy = pal;
-                if (isPlaylist)
-                    pal.setColor(QPalette::AlternateBase, pal.color(QPalette::Base));
-                else
-                    pal.setColor(QPalette::Base, pal.color(QPalette::AlternateBase));
-                pal.setColor(QPalette::WindowText, pal.color(QPalette::Text));
-                itemView->setPalette(pal);
-                itemView->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-                itemView->setAlternatingRowColors(false);
-                itemView->setBackgroundRole(isPlaylist ? QPalette::Base : QPalette::AlternateBase);
-                itemView->setForegroundRole(QPalette::Text);
-                QWidget *vp = itemView->viewport();
-                if (vp && (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180))
-                {
-                    vp->installEventFilter(&eventKiller);
-                    vp->setPalette(QPalette());
-                    vp->setAutoFillBackground(true);
-                    vp->setBackgroundRole(isPlaylist ? QPalette::Base : QPalette::AlternateBase);
-                    vp->removeEventFilter(&eventKiller);
-                }
-                itemView->removeEventFilter(&eventKiller);
+                fixViewPalette(itemView, Hacks::config.opaqueAmarokViews, !isPlaylist, true);
             }
             return false;
         }
@@ -1639,17 +1629,85 @@ Style::eventFilter( QObject *object, QEvent *ev )
     }
 }
 
+void 
+Style::fixViewPalette(QAbstractItemView *itemView, bool solid, bool alternate, bool silent)
+{
+    QWidget *vp = itemView->viewport();
+    const bool VP_isTranslucent = vp && (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25);
+    
+    if (silent)
+        itemView->installEventFilter(&eventKiller);
+    
+    if (solid)
+    {
+        itemView->setPalette(QPalette());
+        QPalette pal = itemView->palette();
+        if (alternate)
+            pal.setColor(QPalette::Base, pal.color(QPalette::AlternateBase));
+        else
+            pal.setColor(QPalette::AlternateBase, pal.color(QPalette::Base));
+        pal.setColor(QPalette::WindowText, pal.color(QPalette::Text));
+        itemView->setPalette(pal);
+        itemView->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+        itemView->setBackgroundRole(alternate ? QPalette::AlternateBase : QPalette::Base);
+        itemView->setForegroundRole(QPalette::Text);
+    }
+    else if ( vp )
+    {   /// NOTE: WORKAROUND for (no more) dolphin but amarok and probably others:
+        // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
+        // force this here, hoping it won't cause to many problems - and make a bug report
+        QPalette pal = itemView->palette();
+
+        pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
+        pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
+        pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
+        itemView->setPalette(pal);
+    }
+    
+    if ( VP_isTranslucent )
+    {
+        if (silent)
+            vp->installEventFilter(&eventKiller);
+        vp->setPalette(QPalette());
+        vp->setAutoFillBackground(solid);
+        if ( !solid )
+        {
+            QPalette pal = itemView->palette();
+            pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
+            pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Inactive, QPalette::Window));
+            pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Disabled, QPalette::Window));
+//                         Colors::mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::Base),6,1)
+            #define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
+            Colors::contrast(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase)), 10)
+            pal.setColor(QPalette::Active, QPalette::AlternateBase, ALT_BASE(QPalette::Active));
+            pal.setColor(QPalette::Inactive, QPalette::AlternateBase, ALT_BASE(QPalette::Inactive));
+            pal.setColor(QPalette::Disabled, QPalette::AlternateBase, ALT_BASE(QPalette::Disabled));
+            itemView->setPalette(pal);
+            #undef ALT_BASE
+        }
+        else
+            vp->setBackgroundRole(alternate ? QPalette::AlternateBase : QPalette::Base);
+        if (silent)
+            vp->removeEventFilter(&eventKiller);
+    }
+    
+    if (silent)
+        itemView->removeEventFilter(&eventKiller);
+}
+
 QPalette
 Style::standardPalette () const
 {
-   QPalette pal ( QColor(70,70,70), QColor(70,70,70), // windowText, button
-                     Qt::white, QColor(211,211,212), QColor(226,226,227), //light, dark, mid
-                     Qt::black, Qt::white, //text, bright_text
-                     Qt::white, QColor(234,234,236) ); //base, window
-   pal.setColor(QPalette::ButtonText, Qt::white);
-   pal.setColor(QPalette::Highlight, QColor(97, 147, 207));
-   pal.setColor(QPalette::HighlightedText, Qt::white);
-   return pal;
+    qWarning("reads standardPalette");
+//    return QPalette();
+    QPalette pal ( QColor(70,70,70), QColor(70,70,70), // windowText, button
+                        Qt::white, QColor(211,211,212), QColor(226,226,227), //light, dark, mid
+                        Qt::black, Qt::white, //text, bright_text
+                        Qt::white, QColor(234,234,236) ); //base, window
+    pal.setColor(QPalette::ButtonText, Qt::white);
+    pal.setColor(QPalette::Highlight, QColor(97, 147, 207));
+    pal.setColor(QPalette::HighlightedText, Qt::white);
+    return pal;
 }
 
 #undef PAL

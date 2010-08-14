@@ -3123,6 +3123,13 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="hackDolphinUrl">
+            <property name="text">
+             <string>Dolphin: Invert the Url Navigator</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_16">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
