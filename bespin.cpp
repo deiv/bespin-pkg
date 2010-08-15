@@ -1633,13 +1633,13 @@ void
 Style::fixViewPalette(QAbstractItemView *itemView, bool solid, bool alternate, bool silent)
 {
     QWidget *vp = itemView->viewport();
-    const bool VP_isTranslucent = vp && (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25);
     
     if (silent)
         itemView->installEventFilter(&eventKiller);
     
     if (solid)
     {
+        itemView->setAlternatingRowColors(false);
         itemView->setPalette(QPalette());
         QPalette pal = itemView->palette();
         if (alternate)
@@ -1664,7 +1664,7 @@ Style::fixViewPalette(QAbstractItemView *itemView, bool solid, bool alternate, b
         itemView->setPalette(pal);
     }
     
-    if ( VP_isTranslucent )
+    if ( vp && (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25) )
     {
         if (silent)
             vp->installEventFilter(&eventKiller);
