@@ -21,7 +21,7 @@ This library is distributed in the hope that it will be useful,
 
 #include <QMap>
 #include <QObject>
-#include <QPointer>
+#include "bepointer.h"
 
 class QMenuBar;
 class QAction;
@@ -65,7 +65,7 @@ private:
     void activate(QMenuBar *menu);
     void changeAction(QMenuBar *menu, QActionEvent *ev);
     void deactivate(QMenuBar *menu);
-    typedef QPointer<QMenuBar> QMenuBar_p;
+    typedef BePointer<QMenuBar> QMenuBar_p;
     typedef QList<QMenuBar_p> MenuList;
     MenuList items;
     QMenuBar *menuBar(qlonglong key);

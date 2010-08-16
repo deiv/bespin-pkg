@@ -215,6 +215,7 @@ bool FX::compositingActive()
 }
 
 static bool useRender = false;
+static bool useRaster = false;
 
 void
 FX::init()
@@ -233,6 +234,7 @@ FX::init()
         QPixmap pix(1,1);
         QPainter p(&pix);
         useRender = p.paintEngine()->type() == QPaintEngine::X11;
+        useRaster = p.paintEngine()->type() == QPaintEngine::Raster;
         p.end();
     }
 #endif
@@ -257,7 +259,7 @@ static Picture blendPicture(double opacity)
     return _blendPicture;
 }
 #endif
-
+#include <QtDebug>
 bool
 FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
 {
@@ -274,7 +276,18 @@ FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
     else
 #endif
     {
-        QPixmap tmp = upper;
+        QPixmap tmp;
+        if ( useRaster ) // raster engine is broken... :-(
+        {
+            tmp = QPixmap(upper.size());
+            tmp.fill(Qt::transparent);
+            QPainter p(&tmp);
+            p.drawPixmap(0,0, upper);
+            p.end();
+        }
+        else
+            tmp = upper;
+        
         QPainter p;
         if (opacity < 1.0)
         {

@@ -840,8 +840,8 @@ static const
 Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::SubWindow |
 Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
-static QList<QPointer<QToolBar> > pendingUnoUpdates;
-static QList<QPointer<QMainWindow> > pendingUnoWindows;
+static QList<BePointer<QToolBar> > pendingUnoUpdates;
+static QList<BePointer<QMainWindow> > pendingUnoWindows;
 static QTimer *unoUpdateTimer = 0;
 static bool
 updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool *gotTitle = 0)
@@ -1008,7 +1008,7 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
     }
 }
 
-static QList<QPointer<QWidget> > pendingBlurUpdates;
+static QList<BePointer<QWidget> > pendingBlurUpdates;
 
 void 
 Style::updateBlurRegions() const
@@ -1698,7 +1698,6 @@ Style::fixViewPalette(QAbstractItemView *itemView, bool solid, bool alternate, b
 QPalette
 Style::standardPalette () const
 {
-    qWarning("reads standardPalette");
 //    return QPalette();
     QPalette pal ( QColor(70,70,70), QColor(70,70,70), // windowText, button
                         Qt::white, QColor(211,211,212), QColor(226,226,227), //light, dark, mid

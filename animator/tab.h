@@ -18,7 +18,6 @@ Boston, MA 02110-1301, USA.
 
 #include <QHash>
 #include <QPixmap>
-#include <QPointer>
 #include <QTime>
 #include "basic.h"
 
@@ -40,9 +39,9 @@ public:
     bool proceed();
     void switchTab(QStackedWidget *sw, int index);
 protected:
-    QPointer<Curtain> curtain;
+    BePointer<Curtain> curtain;
     float progress;
-    QPointer<QWidget> currentWidget;
+    BePointer<QWidget> currentWidget;
     int index;
     uint duration;
     QTime clock;

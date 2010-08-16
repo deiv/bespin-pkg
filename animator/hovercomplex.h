@@ -46,7 +46,7 @@ class HoverComplex : public HoverIndex
     protected:
         const ComplexInfo *_info(const QWidget *widget, QStyle::SubControls active) const;
         void timerEvent(QTimerEvent * event);
-        typedef QPointer<QWidget> WidgetPtr;
+        typedef BePointer<QWidget> WidgetPtr;
         typedef QMap<WidgetPtr, ComplexInfo> Items;
         Items items;
     private:

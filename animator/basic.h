@@ -21,7 +21,7 @@
 
 #include <QBasicTimer>
 #include <QMap>
-#include <QPointer>
+#include "../bepointer.h"
 
 namespace Animator {
 
@@ -68,7 +68,7 @@ protected:
     QBasicTimer timer;
     uint timeStep;
     uint count;
-    typedef QPointer<QWidget> WidgetPtr;
+    typedef BePointer<QWidget> WidgetPtr;
     typedef QMap<WidgetPtr, Info> Items;
     Items items;
 protected slots:

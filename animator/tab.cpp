@@ -152,9 +152,9 @@ grabWidget(QWidget * root, QPixmap &pix)
     QPixmap *saPix = 0L;
 
     QWidgetList widgets = root->findChildren<QWidget*>();
-    QList< QPointer<QWidget> > widgets2;
+    QList< BePointer<QWidget> > widgets2;
     foreach (QWidget *w, widgets)
-        widgets2.append(QPointer<QWidget>(w));
+        widgets2.append(BePointer<QWidget>(w));
     foreach (QWidget *w, widgets2)
     {
         if (w && w->isVisibleTo(root))

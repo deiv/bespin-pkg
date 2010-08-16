@@ -21,7 +21,7 @@ Boston, MA 02110-1301, USA.
 
 #include <QBasicTimer>
 #include <QMap>
-#include <QPointer>
+#include "../bepointer.h"
 
 namespace Animator {
 

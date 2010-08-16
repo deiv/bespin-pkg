@@ -28,7 +28,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPointer>
+#include "../bepointer.h"
 #include <QStatusBar>
 #include <QStyle>
 #include <QStyleOption>
@@ -67,8 +67,8 @@ static Hacks *bespinHacks = 0L;
 static Hacks::HackAppType *appType = 0L;
 // const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 // const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
-static QPointer<QWidget> dragCandidate = 0L;
-static QPointer<QWidget> dragWidget = 0L;
+static BePointer<QWidget> dragCandidate = 0L;
+static BePointer<QWidget> dragWidget = 0L;
 static bool dragWidgetHadTrack = false;
 static QMenu *lockToggleMenu = 0L;
 static QToolBar *lockToggleBar = 0L;
