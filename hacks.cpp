@@ -61,6 +61,7 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 using namespace Bespin;
 
 #define ENSURE_INSTANCE if (!bespinHacks) bespinHacks = new Hacks
+#define FILTER_EVENTS(_WIDGET_) { _WIDGET_->removeEventFilter(bespinHacks); _WIDGET_->installEventFilter(bespinHacks); } // skip semicolon
 
 
 static Hacks *bespinHacks = 0L;
@@ -379,8 +380,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 
     if (e->type() == QEvent::Show)
     {
-        o->removeEventFilter(this);
-        o->installEventFilter(this);
+        FILTER_EVENTS(o);
         return false;
     }  // >-)
 
@@ -429,9 +429,7 @@ Hacks::add(QWidget *w)
             lockToggleAction->setCheckable(true);
         }
         static_cast<QToolBar*>(w)->setMovable(false);
-        w->removeEventFilter(bespinHacks); // just to be sure
-        w->installEventFilter(bespinHacks);
-        
+        FILTER_EVENTS(w);
     }
     
     if (config.KHTMLView)
@@ -442,17 +440,25 @@ Hacks::add(QWidget *w)
         return true;
     }
 
+    if ( config.killThrobber )
+    if ( QMenuBar *mbar = qobject_cast<QMenuBar*>(w->parentWidget()) )
+    if ( w->inherits("KAnimatedButton") )
+    {   // this is konquerors throbber...
+        w->hide();
+        w->setParent(mbar->parentWidget());
+        mbar->setCornerWidget(NULL);
+        return true;
+    }
+
     if (isWindowDragWidget(w))
     {
         ENSURE_INSTANCE;
-        w->removeEventFilter(bespinHacks); // just to be sure
-        w->installEventFilter(bespinHacks);
+        FILTER_EVENTS(w);
         return true;
     }
 #if 0
     ENSURE_INSTANCE;
-    w->removeEventFilter(bespinHacks);
-    w->installEventFilter(bespinHacks);
+    FILTER_EVENTS(w);
 #endif
 
 //    if (config.hack.konsole)
@@ -475,6 +481,9 @@ Hacks::remove(QWidget *w)
 void
 Hacks::releaseApp()
 { 
-    delete bespinHacks; bespinHacks = 0L;
-    delete lockToggleMenu; lockToggleMenu = 0L;
+    bespinHacks->deleteLater(); bespinHacks = 0L;
+    lockToggleMenu->deleteLater(); lockToggleMenu = 0L;
 }
+
+#undef FILTER_EVENTS
+#undef ENSURE_INSTANCE
