@@ -717,7 +717,7 @@ swapPalette(QWidget *widget, Style *style)
             hasShit = false;
 
             if (kid->inherits("KUrlButton") || kid->inherits("BreadcrumbItemButton"))
-            {   // we mess up with it during painting
+            {   // we mess up with it during painting in Hacks
                 pal.setColor(QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::Window));
                 kid->setPalette(pal);
                 continue;
@@ -1404,8 +1404,16 @@ Style::eventFilter( QObject *object, QEvent *ev )
 #if BESPIN_MOUSE_DEBUG
     case QEvent::MouseButtonPress:
     {
-        QMouseEvent *mev = (QMouseEvent*)ev;
-        qDebug() << "BESPIN:" << object << static_cast<QWidget*>(object)->geometry();
+//         QMouseEvent *mev = (QMouseEvent*)ev;
+        QWidget *w = static_cast<QWidget*>(object);
+//         QString debug("BESPIN: ");
+//         while (w)
+//         {
+//             debug += w->className() + QString(" \"") + w->objectName() + "\"  (" + QString(w->autoFillBackground() ? "solid" : "transparent" ) + ") :: ";
+//             w = w->parentWidget();
+//         }
+//         qDebug() << debug;
+        qDebug() << "BESPIN:" << object << ->geometry() << static_cast<QWidget*>(object)->parentWidget();
         //       DEBUG (object);
         return false;
     }

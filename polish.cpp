@@ -494,13 +494,14 @@ Style::polish( QWidget * widget )
             if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
                 FILTER_EVENTS(widget);
             else if (frame->frameShape() != QFrame::StyledPanel)
-            // Kill ugly winblows frames... (qShadeBlablabla stuff)
-            {
+            {   // Kill ugly winblows frames... (qShadeBlablabla stuff)
                 if ( frame->frameShape() == QFrame::Box )
                     frame->setFrameShadow( QFrame::Plain );
                 frame->setFrameShape(QFrame::StyledPanel);
             }
 #endif
+//             if ( appType == KMail && frame->frameStyle() == (QFrame::StyledPanel|QFrame::Sunken) && frame->inherits("KHBox") )
+//                 frame->setFrameShadow(QFrame::Raised);
         }
 
         // scrollarea hovering
@@ -625,14 +626,6 @@ Style::polish( QWidget * widget )
                 {
                     bg = dad->backgroundRole();
                     fg = dad->foregroundRole();
-
-                    if (QMenuBar *mbar = qobject_cast<QMenuBar*>(dad))
-                    if (Hacks::config.killThrobber && widget->inherits("KAnimatedButton"))
-                    {   // this is konquerors throbber...
-                        widget->hide();
-                        widget->setParent(mbar->parentWidget());
-                        mbar->setCornerWidget(NULL);
-                    }
                 }
                 widget->setBackgroundRole(bg);
                 widget->setForegroundRole(fg);
@@ -911,16 +904,26 @@ Style::polish( QWidget * widget )
         QEvent ev(QEvent::PaletteChange);
         eventFilter(widget, &ev);
     }
+    
+    if ( appType == KMail )
+    {   // This no only has not been fixed in 4 years now, but there's even a new widget with this flag set: head -> desk!
+        if (widget->inherits("KMail::MessageListView::Widget"))
+            widget->setAutoFillBackground(false);
+        else if ( widget->parentWidget() && widget->inherits("RecipientLine") )
+            widget->parentWidget()->setAutoFillBackground(false);
+    }
+        
 }
 #undef PAL
 
 void
 Style::unpolish( QApplication *app )
 {
+    app->removeEventFilter(this);
     VisualFrame::setStyle(0L);
+    app->setPalette(QPalette());
     Hacks::releaseApp();
     Gradients::wipe();
-    app->setPalette(QPalette());
 }
 
 void
@@ -967,3 +970,4 @@ Style::unpolish( QWidget *widget )
 }
 #undef CCOLOR
 #undef FCOLOR
+#undef FILTER_EVENTS
