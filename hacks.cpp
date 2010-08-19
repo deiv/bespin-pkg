@@ -28,7 +28,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
-#include "../bepointer.h"
+#include "bepointer.h"
 #include <QStatusBar>
 #include <QStyle>
 #include <QStyleOption>
