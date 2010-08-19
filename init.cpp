@@ -291,12 +291,12 @@ Style::readSettings(const QSettings* settings, QString appName)
     // Buttons ===========================
     config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
     config.btn.round = readBool(BTN_ROUND);
+    config.btn.backLightHover = readBool(BTN_BACKLIGHTHOVER);
+    config.btn.layer = clamp(readInt(BTN_LAYER), 0, 2);
     GRAD(btn) = readGrad(BTN_GRADIENT);
     if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
         GRAD(btn) = Gradients::None;
 
-    config.btn.backLightHover = readBool(BTN_BACKLIGHTHOVER);
-    config.btn.layer = clamp(readInt(BTN_LAYER), 0, 2);
     config.btn.fullHover = config.btn.backLightHover || readBool(BTN_FULLHOVER);
     config.btn.minHeight = readInt(BTN_MIN_HEIGHT);
 
