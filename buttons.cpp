@@ -284,7 +284,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         else if ( config.btn.backLightHover && anim.step )
             lights.rect[round].render(RECT, painter, iC); // backlight
 
-        else if (sunken && !config.btn.cushion)
+        if (sunken && !config.btn.cushion)
         {   // shadow
             r.adjust(f1, f1, -f1, -f2);
             shadows.raised[round][isEnabled][true].render(r, painter);
