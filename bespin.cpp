@@ -55,7 +55,10 @@
 #include "hacks.h"
 #include "bespin.h"
 
+/**============ Internal Definitions ========================*/
+
 #define BESPIN_MOUSE_DEBUG 0
+#define BESPIN_STANDARD_PALETTE_HACK 0
 
 /**=========================================================*/
 
@@ -91,6 +94,9 @@ Style::Shadows Style::shadows;
 EventKiller Style::eventKiller;
 Qt::Orientation Style::ori[2] = { Qt::Horizontal, Qt::Vertical };
 
+#if BESPIN_STANDARD_PALETTE_HACK
+static bool usingStandardPalette = false;
+#endif
 
 #define N_PE 54
 #define N_CE 50
@@ -271,13 +277,31 @@ Style::Style() : QCommonStyle()
 {
     setObjectName(QLatin1String("Bespin"));
     FX::init();
+#if BESPIN_STANDARD_PALETTE_HACK
+    if (usingStandardPalette)
+    {
+        QPalette pal = standardPalette();
+        polish(pal);
+        qApp->setPalette(pal);
+    }
+#endif
     init();
     registerRoutines();
 }
 
 Style::~Style()
 {
-   Gradients::wipe();
+    Gradients::wipe();
+#if BESPIN_STANDARD_PALETTE_HACK
+    if ( usingStandardPalette )
+    if ( QStyle *newStyle = QApplication::style() )
+    if ( newStyle != this)
+    {
+        QPalette pal = newStyle->standardPalette();
+        newStyle->polish(pal);
+        qApp->setPalette(pal);
+    }
+#endif
 }
 
 #include "makros.h"
@@ -1706,7 +1730,10 @@ Style::fixViewPalette(QAbstractItemView *itemView, bool solid, bool alternate, b
 QPalette
 Style::standardPalette () const
 {
-//    return QPalette();
+#if BESPIN_STANDARD_PALETTE_HACK
+    qDebug() << "BESPIN, requested standardpalette!";
+    usingStandardPalette = true;
+#endif
     QPalette pal ( QColor(70,70,70), QColor(70,70,70), // windowText, button
                         Qt::white, QColor(211,211,212), QColor(226,226,227), //light, dark, mid
                         Qt::black, Qt::white, //text, bright_text
@@ -1718,3 +1745,5 @@ Style::standardPalette () const
 }
 
 #undef PAL
+#undef BESPIN_STANDARD_PALETTE_HACK
+#undef BESPIN_MOUSE_DEBUG
