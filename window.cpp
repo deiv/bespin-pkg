@@ -331,7 +331,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         painter->setClipping(hadClip);
         s1 = set.btmTile.height();
         s2 = qMin(s1, (rect.height())/2);
-        painter->drawTiledPixmap( rect.x(), rect.bottom() - s2, rect.width(), s2, set.btmTile );
+        painter->drawTiledPixmap( rect.x(), rect.bottom() + 1 - s2, rect.width(), s2, set.btmTile );
         break;
     }
     case BevelH:
