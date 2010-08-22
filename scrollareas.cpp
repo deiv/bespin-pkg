@@ -503,7 +503,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
             QColor blh = Colors::mid(c, CCOLOR(scroll._, Fg), 6-complexStep, complexStep);
             lights.rect[round].render(r, painter, blh); // backlight
         }
-        shadows.raised[round][true][false].render(r, painter);
+        shadows.raised[round][true][true].render(r, painter);
         r.adjust(f2, f2, -f2, horizontal && grooveIsSunken ? -f2 : -F(3) );
     }
     // restore clip---------------
@@ -514,15 +514,16 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
 
     // the always shown base
     Qt::Orientation o = Qt::Horizontal;
+    QPoint offset;
     int size = r.width();
     if (horizontal || config.showOff)
     {
         o = Qt::Vertical; size = r.height();
+        if (!config.showOff)
+            offset.setX(-r.left()/2);
     }
-
-    QPoint offset;
-    if (!config.showOff)
-        offset = -r.topLeft()/2;
+    else
+        offset.setY(-r.top()/2);
 
     bool fullHover = config.btn.fullHover || config.scroll.sliderWidth < 10;
     QColor bc = fullHover ? c : CCOLOR(scroll._, Bg);
@@ -530,7 +531,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     masks.rect[round].render(r, painter, GRAD(scroll), o, bc, size, offset);
 
     // reflexive outline
-    if (!sunken && Gradients::isReflective(GRAD(btn)))
+    if ( GRAD(scroll) == Gradients::Shiny || (!sunken && Gradients::isReflective(GRAD(btn))) )
         masks.rect[round].outline(r.adjusted(f1,f1,-f1,-f1), painter, bc.lighter(120), f1);
 
     // the hover indicator (in case...)
