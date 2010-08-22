@@ -93,9 +93,9 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
             return qMax(F(5), (26 - QFontMetrics(widget->font()).height())/2);
         return F(4);
     case PM_DockWidgetSeparatorExtent: // Width of a separator in a horizontal dock window and the height of a separator in a vertical dock window
-        return F(10);
+        return config.drawSplitters ? F(10) : F(2);
     case PM_DockWidgetHandleExtent: // Width of the handle in a horizontal dock window and the height of the handle in a vertical dock window
-        return config.drawSplitters ? F(6) : F(4);
+        return F(6);
     case PM_DockWidgetFrameWidth: // Frame width of a dock window
         return 0; //F(1);
     case PM_MenuBarPanelWidth: // Frame width of a menubar, defaults to PM_DefaultFrameWidth
@@ -173,7 +173,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
 #endif
 //    case PM_ProgressBarChunkWidth: // Width of a chunk in a progress bar indicator
     case PM_SplitterWidth: // Width of a splitter
-        return config.drawSplitters ? F(6) : F(4);
+        return config.drawSplitters ? F(6) : F(2);
     case PM_TitleBarHeight: // Height of the title bar
     case PM_IndicatorWidth: // Width of a check box indicator
     case PM_IndicatorHeight: // Height of a checkbox indicator
