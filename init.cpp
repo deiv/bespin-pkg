@@ -404,6 +404,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     // ScrollStuff ===========================
     GRAD(scroll) = readGrad(SCROLL_GRADIENT);
     config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
+    config.scroll.fullHover = config.btn.backLightHover || readBool(SCROLL_FULLHOVER);
     config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
     config.scroll.sliderWidth = readInt(SCROLL_SLIDER_WIDTH);
     if (config.scroll.sliderWidth > 33)

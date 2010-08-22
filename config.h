@@ -108,7 +108,7 @@ typedef struct Config
     {
         Gradients::Type gradient;
         Groove::Mode groove;
-        bool showButtons, invertBg;
+        bool showButtons, invertBg, fullHover;
         char sliderWidth;
         QPalette::ColorRole __role[2];
     } scroll;

@@ -525,7 +525,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     else
         offset.setY(-r.top()/2);
 
-    bool fullHover = config.btn.fullHover || config.scroll.sliderWidth < 10;
+    bool fullHover = config.scroll.fullHover || config.scroll.sliderWidth < 10;
     QColor bc = fullHover ? c : CCOLOR(scroll._, Bg);
     bc.setAlpha(255); // CCOLOR(scroll._, Bg) pot. reintroduces translucency...
     masks.rect[round].render(r, painter, GRAD(scroll), o, bc, size, offset);

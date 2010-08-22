@@ -25,7 +25,7 @@ Style::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainte
                               int step) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_FOCUS
-    bool fullHover = config.btn.fullHover && !config.btn.backLightHover;
+    bool fullHover = config.scroll.fullHover && !config.btn.backLightHover;
 
     // shadow
     QPoint xy = handle.topLeft();

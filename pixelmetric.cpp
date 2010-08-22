@@ -61,9 +61,14 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_MaximumDragDistance: // Some feels require the scroll bar or other sliders to jump back to the original position when the mouse pointer is too far away while dragging; a value of -1 disables this behavior
         return -1;
     case PM_ScrollBarExtent: // Width of a vertical scroll bar and the height of a horizontal scroll bar
-        return (widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-                widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) ?
-                F(16) : Dpi::target.ScrollBarExtent;
+//         if (const QSlider *slider = qobject_cast<const QSlider*>(widget))
+//         if (slider->orientation() == Qt::Horizontal)
+//             return Dpi::target.ScrollBarExtent + F(20);
+//         else
+            return Dpi::target.ScrollBarExtent;
+//         return (widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+//                 widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) ?
+//                 F(16) : Dpi::target.ScrollBarExtent;
     case PM_ScrollBarSliderMin: // The minimum height of a vertical scroll bar's slider and the minimum width of a horizontal scroll bar's slider
         return Dpi::target.ScrollBarSliderMin;
     case PM_SliderThickness: // Total slider thickness
@@ -74,7 +79,6 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
 //    case PM_SliderTickmarkOffset: // The offset between the tickmarks and the slider
     case PM_SliderSpaceAvailable:
     {   // The available space for the slider to move
-        if (widget)
         if (const QSlider *slider = qobject_cast<const QSlider*>(widget))
         {
             if (slider->orientation() == Qt::Horizontal)

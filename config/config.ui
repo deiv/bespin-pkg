@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>765</width>
-    <height>378</height>
+    <height>391</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -246,7 +246,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>9</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -562,8 +562,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>322</width>
-               <height>114</height>
+               <width>318</width>
+               <height>110</height>
               </rect>
              </property>
              <attribute name="label">
@@ -778,8 +778,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>169</width>
-               <height>62</height>
+               <width>167</width>
+               <height>61</height>
               </rect>
              </property>
              <attribute name="label">
@@ -874,8 +874,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>245</width>
-               <height>180</height>
+               <width>243</width>
+               <height>172</height>
               </rect>
              </property>
              <attribute name="label">
@@ -992,7 +992,7 @@
                <x>0</x>
                <y>0</y>
                <width>110</width>
-               <height>88</height>
+               <height>86</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1089,8 +1089,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>316</width>
-               <height>81</height>
+               <width>314</width>
+               <height>80</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1251,15 +1251,15 @@
           <item row="1" column="0">
            <widget class="QToolBox" name="toolBox_3">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_5">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>266</width>
-               <height>180</height>
+               <width>262</width>
+               <height>175</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1269,7 +1269,7 @@
               <item row="2" column="0">
                <widget class="QTabWidget" name="tabWidget">
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="tab">
                  <attribute name="title">
@@ -1457,8 +1457,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>260</width>
-               <height>161</height>
+               <width>258</width>
+               <height>154</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1932,7 +1932,7 @@
                <x>0</x>
                <y>0</y>
                <width>316</width>
-               <height>249</height>
+               <height>242</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2094,8 +2094,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>197</width>
-               <height>90</height>
+               <width>193</width>
+               <height>86</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2564,7 +2564,7 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
                </property>
               </widget>
              </item>
-             <item row="6" column="0" colspan="7">
+             <item row="7" column="0" colspan="7">
               <widget class="QCheckBox" name="showScrollButtons">
                <property name="text">
                 <string>Show scrollbar buttons</string>
@@ -2630,6 +2630,13 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
               <widget class="QLabel" name="label_57">
                <property name="text">
                 <string>-&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QCheckBox" name="fullScrollHover">
+               <property name="text">
+                <string>Frameless color change</string>
                </property>
               </widget>
              </item>
@@ -3130,6 +3137,13 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="drawSplitters">
+            <property name="text">
+             <string>Draw splitters &amp;&amp; resize handles</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_16">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -3458,12 +3472,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>530</x>
-     <y>138</y>
+     <x>513</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
-     <x>540</x>
-     <y>138</y>
+     <x>523</x>
+     <y>158</y>
     </hint>
    </hints>
   </connection>
@@ -3474,11 +3488,11 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>241</x>
+     <x>239</x>
      <y>86</y>
     </hint>
     <hint type="destinationlabel">
-     <x>263</x>
+     <x>261</x>
      <y>86</y>
     </hint>
    </hints>
@@ -3490,12 +3504,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>215</x>
-     <y>89</y>
+     <x>385</x>
+     <y>165</y>
     </hint>
     <hint type="destinationlabel">
-     <x>215</x>
-     <y>89</y>
+     <x>522</x>
+     <y>165</y>
     </hint>
    </hints>
   </connection>
@@ -3506,12 +3520,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>208</x>
-     <y>82</y>
+     <x>473</x>
+     <y>288</y>
     </hint>
     <hint type="destinationlabel">
-     <x>208</x>
-     <y>82</y>
+     <x>532</x>
+     <y>289</y>
     </hint>
    </hints>
   </connection>
@@ -3522,12 +3536,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>222</x>
-     <y>96</y>
+     <x>187</x>
+     <y>87</y>
     </hint>
     <hint type="destinationlabel">
-     <x>222</x>
-     <y>96</y>
+     <x>203</x>
+     <y>87</y>
     </hint>
    </hints>
   </connection>
@@ -3538,11 +3552,11 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>398</x>
+     <x>396</x>
      <y>109</y>
     </hint>
     <hint type="destinationlabel">
-     <x>420</x>
+     <x>418</x>
      <y>109</y>
     </hint>
    </hints>
@@ -3554,12 +3568,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>541</x>
-     <y>155</y>
+     <x>351</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
-     <x>371</x>
-     <y>239</y>
+     <x>351</x>
+     <y>224</y>
     </hint>
    </hints>
   </connection>
@@ -3570,8 +3584,8 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>462</x>
-     <y>86</y>
+     <x>537</x>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
      <x>169</x>
@@ -3587,11 +3601,11 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <hints>
     <hint type="sourcelabel">
      <x>537</x>
-     <y>86</y>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
-     <x>303</x>
-     <y>114</y>
+     <x>301</x>
+     <y>134</y>
     </hint>
    </hints>
   </connection>
@@ -3602,12 +3616,44 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>554</x>
-     <y>86</y>
+     <x>537</x>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
-     <x>402</x>
-     <y>114</y>
+     <x>398</x>
+     <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>backlightHover</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>fullButtonHover</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>185</x>
+     <y>196</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>188</x>
+     <y>176</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>backlightHover</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>fullScrollHover</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>338</x>
+     <y>200</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>189</x>
+     <y>212</y>
     </hint>
    </hints>
   </connection>

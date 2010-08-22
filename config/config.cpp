@@ -396,7 +396,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     setContextHelp(ui.dialogBtnLayout, "<b>Dialog button layout</b><hr>\
     This controls the order of the Yes/No/Cancel buttons, use with care, you might accidently\
     misclick if you revert it from e.g. KDE to OS X");
-
+    
+    handleSettings(ui.drawSplitters, DRAW_SPLITTERS);
+    setContextHelp(ui.drawSplitters, "<b>Draw Splitters</b><hr>\
+    The things that allow you to adjust the layout in some windows (dolphin, amarok, many ... :)<br>\
+    Warning: Unchecking this will result in VERY thin splitters (2px) - while they look slick, they're also\
+    harder to hit. Test yoursef...");
+    
     handleSettings(ui.crMenuActive, MENU_ACTIVEROLE);
     handleSettings(ui.menuRound, MENU_ROUND);
     handleSettings(ui.menuRoundSelect, "Menu.RoundSelect", true);
@@ -414,6 +420,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.crProgressFg, PROGRESS_ROLE_FG);
 
     handleSettings(ui.showScrollButtons, SCROLL_SHOWBUTTONS);
+    handleSettings(ui.fullScrollHover, SCROLL_FULLHOVER);
+    setContextHelp(ui.fullScrollHover, "<b>Frameless hovering</b><hr>\
+    This used to be bound to the corresponding setting for Pushbuttons, but i figured that i wanted them framed\
+    regardless of the pushbutton behaviour, just looks much better ...");
     handleSettings(ui.sliderGroove, SCROLL_GROOVE);
     handleSettings(ui.gradScroll, SCROLL_GRADIENT);
     handleSettings(ui.invertGroove, SCROLL_INVERT_BG);
@@ -474,11 +484,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Overwrites the painting routines of QMessageBoxes for a custom appereance.<br>\
     Also removes the Window decoration but allows you to drag around the window by\
     clicking anywhere.");
-/*
-    handleSettings(ui.hackKrunner, HACK_KRUNNER);
-    setContextHelp(ui.btnRole, "<b>KRunner</b><hr>\
-    You'll get a window colored glass look and flat buttons.<br>");
-*/
+
     handleSettings(ui.hackKHtml, HACK_KHTMLVIEW);
     setContextHelp(ui.hackKHtml, "<b>Konqueror HTML window</b><hr>\
     By default, Konquerors HTML view has no frame around, but you may force a sunken\
