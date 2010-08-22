@@ -270,8 +270,8 @@ VisualFrame::correctPosition()
     top->move(x - extends[t][West], y - extends[t][North]);
 
     // South element
-    bottom->resize(rect.width() +offs, sizes[t][South]);
-    bottom->move(x - extends[t][West], rect.bottom() + 1 + extends[t][South] - sizes[t][South]);
+    bottom->resize(rect.width() + offs, sizes[t][South]);
+    bottom->move(x - extends[t][West], rect.bottom()  + extends[t][South] - sizes[t][South]);
 
     offs = (sizes[t][North] + sizes[t][South]) - (extends[t][North] + extends[t][South]);
 
