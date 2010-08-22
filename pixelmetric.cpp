@@ -22,6 +22,7 @@
 #include <QTabBar>
 #include <QTabWidget>
 #include "bespin.h"
+#include "hacks.h"
 #include "makros.h"
 
 #include <QtDebug>
@@ -93,7 +94,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case QStyle::PM_DockWidgetTitleMargin:
         if (widget &&widget->windowTitle().isEmpty())
             return 0;
-        if (appType == Dolphin && widget) // align to the urlnavigator...
+        if (appType == Dolphin && !Hacks::config.invertDolphinUrlBar && widget) // align to the urlnavigator...
             return qMax(F(5), (26 - QFontMetrics(widget->font()).height())/2);
         return F(4);
     case PM_DockWidgetSeparatorExtent: // Width of a separator in a horizontal dock window and the height of a separator in a vertical dock window

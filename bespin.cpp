@@ -1220,7 +1220,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             QPainter p(w);
             Tile::PosFlags pf = Tile::Full & (w->layoutDirection() == Qt::LeftToRight ? ~Tile::Right : ~Tile::Left);
             Tile::setShape(pf);
-            QRect r = w->rect().adjusted(0,0,0,-F(2));
+            QRect r = w->rect().adjusted(0,0,0,-F(1));
             masks.rect[true].render(r, &p, GRAD(tab), Qt::Vertical, w->palette().color(QPalette::Window), r.height());
             shadows.sunken[true][true].render(w->rect(), &p);
             Tile::reset();
