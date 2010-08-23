@@ -202,7 +202,10 @@ Style::drawBranch(const QStyleOption *option, QPainter *painter, const QWidget *
     if (widget)
         { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
 
-    const bool firstCol = (RECT.x() ==  -1);
+    bool firstCol = ( RECT.x() < 1 );
+    if HAVE_OPTION(item, ViewItemV4)
+        firstCol = item->viewItemPosition == QStyleOptionViewItemV4::Beginning ||
+                   item->viewItemPosition == QStyleOptionViewItemV4::OnlyOne;
 
     if (option->state & State_Children)
     {
