@@ -71,6 +71,7 @@
 #define HACK_AMAROK_VIEWS "Hack.AmarokViews", false
 #define HACK_DOLPHIN_URLBAR "Hack.DolphinUrlBar", false
 #define HACK_DOLPHIN_VIEWS "Hack.DolphinViews", false
+#define HACK_KMAIL_FOLDERS "Hack.KMailFolderList", false
 #define HACK_PLACES_VIEWS "Hack.PlacesViews", false
 #define HACK_MESSAGES "Hack.Messages", false
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false

@@ -148,6 +148,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.opaquePlacesViews = readBool(HACK_PLACES_VIEWS);
         Hacks::config.lockToolBars = readBool(HACK_TOOLBAR_LOCKING);
         Hacks::config.invertDolphinUrlBar = appType == Dolphin && readBool(HACK_DOLPHIN_URLBAR);
+        Hacks::config.fixKMailFolderList = appType == KMail && readBool(HACK_KMAIL_FOLDERS);
         // PW Echo Char ===========================
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
 #if BESPIN_ARGB_WINDOWS

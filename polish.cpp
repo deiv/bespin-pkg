@@ -22,6 +22,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QDockWidget>
+#include <QHeaderView>
 // #include <QLabel>
 #include <QLayout>
 #include <QLCDNumber>
@@ -537,12 +538,21 @@ Style::polish( QWidget * widget )
 #if QT_VERSION >= 0x040500
                 itemView->viewport()->setAttribute(Qt::WA_Hover);
 #endif
-                if (QTreeView* tv = qobject_cast<QTreeView*>(itemView))
+                if ( QTreeView* tv = qobject_cast<QTreeView*>(itemView) )
                 {   // allow all treeviews to be animated! NOTICE: animation causes visual errors on non autofilling views...
                     if (Hacks::config.treeViews &&
                         tv->viewport()->autoFillBackground() &&
                         tv->viewport()->palette().color(tv->viewport()->backgroundRole()).alpha() > 200) // 255 would be perfect, though
                     tv->setAnimated(true);
+//                     KMail::MainFolderView(0xa16fd68, name = ) 
+                    if ( Hacks::config.fixKMailFolderList && tv->objectName() == "folderTree" )
+                    {
+                        fixViewPalette( tv, /*solid*/true, /*alternate*/true );
+                        tv->setHeaderHidden( true );
+                        tv->sortByColumn ( 0, Qt::AscendingOrder );
+                        tv->setIconSize( QSize(22,22) );
+                        tv->header()->setResizeMode( QHeaderView::Stretch );
+                    }
                 }
                 else
                 {   // Enable hover effects in listview, treeview hovering sucks, as the "tree" doesn't get an update
