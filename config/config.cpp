@@ -478,6 +478,17 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     The PlacesView also used in Dolphin appears in virtually all filedialogs and probably\
     some other places...<br>\
     Check this to hit them all");
+    
+    handleSettings(ui.kmailFolderList, HACK_KMAIL_FOLDERS);
+    setContextHelp(ui.kmailFolderList, "<b>KMail's Folder list</b><hr>\
+    A bit more like Apple mail - the reasons:<br>\
+    * There's usually only one column (did you know you can have more?) so the alternating\
+    row style is way too much.<br>\
+    * For the same reason the header is superflous<br>\
+    * Did you know you can have bigger icons?<br>\
+    * For this usecase one can drop the decoration (arrows) of the root element (un/collapsing \
+    still works by double clicking the item)<br>\
+    * as a minor fix the column autoexpands (would stretch the header, now affects the section)");
 
     handleSettings(ui.hackMessages, HACK_MESSAGES);
     setContextHelp(ui.hackMessages, "<b>Messageboxes</b><hr>\

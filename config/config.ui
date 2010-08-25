@@ -246,7 +246,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>9</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -3140,6 +3140,13 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
            <widget class="QCheckBox" name="drawSplitters">
             <property name="text">
              <string>Draw splitters &amp;&amp; resize handles</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="kmailFolderList">
+            <property name="text">
+             <string>&quot;Fix&quot; KMail folderlist appearance</string>
             </property>
            </widget>
           </item>

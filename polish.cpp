@@ -549,6 +549,7 @@ Style::polish( QWidget * widget )
                     {
                         fixViewPalette( tv, /*solid*/true, /*alternate*/true );
                         tv->setHeaderHidden( true );
+                        tv->setRootIsDecorated ( false );
                         tv->sortByColumn ( 0, Qt::AscendingOrder );
                         tv->setIconSize( QSize(22,22) );
                         tv->header()->setResizeMode( QHeaderView::Stretch );
