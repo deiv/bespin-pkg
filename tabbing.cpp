@@ -39,7 +39,6 @@ Style::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidge
     }
    
     ASSURE_OPTION(twf, TabWidgetFrame);
-
     QLine line[2];
     QStyleOptionTabBarBase tbb;
     if (widget)
@@ -50,6 +49,7 @@ Style::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidge
 
 #define SET_BASE_HEIGHT(_o_) \
 baseHeight = twf->tabBarSize._o_(); \
+if (!baseHeight) return; //  no base -> no tabbing -> no bottom border either. period. \
 if (baseHeight < 0) \
     baseHeight = pixelMetric( PM_TabBarBaseHeight, option, widget )
          
@@ -93,11 +93,12 @@ if (baseHeight < 0) \
     // the bar
     drawTabBar(&tbb, painter, widget);
 }
-// #include <QtDebug>
+
 void
 Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(tbb, TabBarBase);
+
     QWidget *win = 0;
     // this has completely changed with recent KDE, KTabWidget doesn't call the style at all?!
     if (widget)
