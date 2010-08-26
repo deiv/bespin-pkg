@@ -215,12 +215,11 @@ Style::readSettings(const QSettings* settings, QString appName)
             }
             else
                 { delete iSettings; iSettings = 0L; }
-
-            if (qApp->inherits("KApplication"))
-            {   // KDE replaces the palette after styling with an unpolished own version, breaking presets...
-                originalPalette = new QPalette(qApp->palette());
-            }
+            
+            // KDE replaces the palette after styling with an unpolished own version, breaking presets...
+            // used to work by if (qApp->inherits("KApplication")), but now it
             // must be for all apps - KDE does some freaky stuff between the qApp and KApp constructor...
+            originalPalette = new QPalette(qApp->palette());
             qApp->installEventFilter(this);
             QTimer::singleShot(10000, this, SLOT(removeAppEventFilter()));
         }
