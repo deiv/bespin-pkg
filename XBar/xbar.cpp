@@ -1024,27 +1024,23 @@ void
 XBar::ggmUpdate( WId id )
 {
     bool added = false, wasVisible = false;
-    if ( (added = !ggmMenus.contains( id )) )
-        ggmMenus.append( id );
     
     MenuMap::iterator it = d.menus.find( id );
     if ( it == d.menus.end() )
-        it = d.menus.insert( id, ggmCreate(id) );
+    {
+        if ( MenuBar *bar = ggmCreate(id) )
+            d.menus.insert( id, bar );
+        else
+            return; // there's no menu for us
+    }
     else 
     {
         wasVisible = it.value()->isVisible();
         it.value()->setEnabled(false); // invalidate
     }
-    
-    if ( !it.value() ) // can result from "it == d.menus.end()"
-    {
-        if ( wasVisible )
-            releaseFocus( id );
-        wasVisible = added = false;
-        ggmMenus.removeAll( id );
-        d.menus.erase( it );
-    }
-    
+
+    if ( (added = !ggmMenus.contains( id )) )
+        ggmMenus.append( id );
     if ( wasVisible || (added && KWindowSystem::activeWindow() == id) )
         requestFocus( id );
 }
