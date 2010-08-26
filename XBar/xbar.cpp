@@ -16,6 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QAbstractEventDispatcher>
 #include <QApplication>
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
@@ -36,9 +37,11 @@
 #include <QStyleOption>
 #include <QTimer>
 #include <QWidgetAction>
+#include <QX11Info>
 
 #include <kglobalsettings.h>
 #include <kwindowsystem.h>
+#include <kwindowinfo.h>
 #include <KDirWatch>
 #include <KIcon>
 #include <KStandardDirs>
@@ -56,6 +59,11 @@
 #include "dbus.h"
 
 #include <QtDebug>
+
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
 
 static XBar *instance = NULL;
 
@@ -77,6 +85,10 @@ protected:
 static DummyWidget *dummy = NULL;
 
 QTimer XBar::bodyCleaner;
+
+static Atom ggmContext;
+static Atom ggmEvent;
+static QAbstractEventDispatcher::EventFilter formerX11EventFilter = 0;
 
 XBar::XBar(QObject *parent, const QVariantList &args) : Plasma::Applet(parent, args)
 {
@@ -161,6 +173,15 @@ XBar::init()
     updatePalette();
     
     show(myMainMenu);
+
+    ggmLastId = 0;
+    ggmContext = XInternAtom( QX11Info::display(), "_NET_GLOBALMENU_MENU_CONTEXT", false );
+    ggmEvent = XInternAtom( QX11Info::display(), "_NET_GLOBALMENU_MENU_EVENT", false );
+    formerX11EventFilter = QAbstractEventDispatcher::instance()->setEventFilter(globalX11EventFilter);
+
+    connect( KWindowSystem::self(), SIGNAL( activeWindowChanged(WId) ), this, SLOT( ggmWindowActivated(WId) ) );
+    connect( KWindowSystem::self(), SIGNAL( windowAdded(WId) ), this, SLOT( ggmWindowAdded(WId) ) );
+    connect( KWindowSystem::self(), SIGNAL( windowRemoved(WId) ), this, SLOT( ggmWindowRemoved(WId) ) );
     
     new XBarAdaptor(this);
     QDBusConnection::sessionBus().registerService("org.kde.XBar");
@@ -173,6 +194,8 @@ XBar::init()
     connect (&bodyCleaner, SIGNAL(timeout()), this, SLOT(cleanBodies()));
     bodyCleaner.start(30000); // every 5 minutes - it's just to clean menus from crashed windows, so users won't constantly scroll them
     callMenus();
+    foreach ( WId id, KWindowSystem::windows() )
+        ggmWindowAdded( id );
 }
 
 void
@@ -265,7 +288,7 @@ XBar::cleanBodies()
     MenuBar *mBar = 0;
     while (i != d.menus.end())
     {
-        if (services.contains(i.value()->service()))
+        if (ggmMenus.contains(i.key()) ||  services.contains(i.value()->service()))
             ++i;
         else
         {
@@ -621,6 +644,18 @@ XBar::requestFocus(qlonglong key)
         if (i.key() == key)
         {
             hide(myMainMenu);
+            if ( !i.value()->isEnabled() && ggmMenus.contains( key ) )
+            {   // invalidated
+                delete i.value();
+                i.value() = ggmCreate( key );
+                if (!i.value())
+                {
+                    d.menus.erase( i );
+                    ggmMenus.removeAll( key );
+                    show(myMainMenu); // invalid attempt
+                    return;
+                }
+            }
             show(i.value());
         }
         else
@@ -854,11 +889,214 @@ XBar::wheelEvent(QGraphicsSceneWheelEvent *ev)
             }
         }
     }
+    
+    while ( n != d.menus.end() && !n.value()->isEnabled() && ggmMenus.contains( n.key() ) )
+    {   // update invalidated menus - we might have lost them as well...
+        delete n.value();
+        n.value() = ggmCreate( n.key() );
+        if (n.value())
+            break;
+        else
+        {
+            ggmMenus.removeAll( n.key() );
+            n = d.menus.erase( n );
+        }
+    }
+
     if (n == d.menus.end())
         show(myMainMenu);
     else
-        show(n.value());
+        show( n.value() );
 }
+
+
+// ================= GGM support implementation ===============
+
+bool
+XBar::globalX11EventFilter( void *msg )
+{
+    XEvent *ev = static_cast<XEvent*>(msg);
+    if (instance && ev && ev->type == PropertyNotify)
+    {
+        if (ev->xproperty.atom == ggmContext)
+            instance->ggmUpdate( ev->xproperty.window );
+        //         else if (ev->xproperty.atom == mEvtAtom)
+        //             qDebug() << "Evt:" << QString::number(ev->xproperty.window) << XGetAtomName(QX11Info::display(),ev->xproperty.atom);
+    }
+    return formerX11EventFilter && (formerX11EventFilter)( msg );
+}
+
+#define MENU_FUNC(_FUNC_) menu ? menu->_FUNC_ : menubar->_FUNC_
+
+void
+ggmRecursive(const QDomElement &node, QObject *widget, const QString &prefix )
+{
+    if ( node.isNull() )
+        return;
+    
+    MenuBar *menubar = 0;
+    QMenu *menu = qobject_cast<QMenu*>(widget);
+    if (!menu)
+    {
+        menubar = qobject_cast<MenuBar*>(widget);
+        if (!menubar)
+            return;
+    }
+    
+    QDomElement e = node.firstChildElement("item");
+    while ( !e.isNull() )
+    {
+        if (e.attribute("visible") != "0" )
+        {
+            if (e.attribute("type") == "s")
+                MENU_FUNC( addSeparator() );
+            else
+            {
+                QDomElement menuNode = e.firstChildElement("menu");
+                if ( !menuNode.isNull() )
+                {   // submenu
+                QMenu *newMenu = MENU_FUNC( addMenu(e.attribute("label").replace("_","&")) );
+                ggmRecursive(menuNode, newMenu, prefix + "/" + e.attribute("id") );
+                }
+                else if ( !e.attribute("label").isEmpty() )
+                {   // real action item
+                QAction *action = new QAction(widget);
+                action->setText( e.attribute("label").replace("_","&") );
+                action->setData( prefix + "/" + e.attribute("id") );
+                action->setEnabled( e.attribute("sensible") != "0" );
+                QObject::connect ( action, SIGNAL(triggered()), instance, SLOT(runGgmAction()) );
+                MENU_FUNC( addAction(action) );
+                }
+            }
+        }
+        e = e.nextSiblingElement("item");
+    }
+}
+
+MenuBar *
+XBar::ggmCreate( WId id )
+{
+    MenuBar *bar = 0;
+    int nItems;
+    char **list;
+    XTextProperty string;
+    
+    if ( XGetTextProperty(QX11Info::display(), id, &string, ggmContext) && XTextPropertyToStringList(&string, &list, &nItems) )
+    {
+        if (nItems)
+        {
+            QString xml = QString::fromUtf8( list[0] );
+            bar = new MenuBar("", 0, this, dummy);
+            KWindowInfo info(id, 0, NET::WM2WindowClass);
+            bar->setAppTitle(info.windowClassClass());
+            bar->setPalette(palette());
+            bar->setFont(myFont);
+            QDomDocument doc;
+            doc.setContent( xml, false );
+            QDomElement root = doc.firstChildElement();
+            ggmRecursive( root, bar, QString::number(id) );
+            bar->hide();
+        }
+        XFreeStringList(list);
+    }
+    return bar;
+}
+
+void
+XBar::ggmWindowActivated( WId id )
+{
+    if ( !ggmMenus.contains( id ) )
+        id = KWindowSystem::transientFor(id);
+    
+    if ( ggmMenus.contains( id ) )
+    {
+        ggmLastId = id;
+        requestFocus( id );
+    }
+    else if ( ggmLastId )
+    {
+        releaseFocus( ggmLastId );
+        ggmLastId = 0;
+    }
+}
+
+void 
+XBar::ggmUpdate( WId id )
+{
+    bool added = false, wasVisible = false;
+    if ( (added = !ggmMenus.contains( id )) )
+        ggmMenus.append( id );
+    
+    MenuMap::iterator it = d.menus.find( id );
+    if ( it == d.menus.end() )
+        it = d.menus.insert( id, ggmCreate(id) );
+    else 
+    {
+        wasVisible = it.value()->isVisible();
+        it.value()->setEnabled(false); // invalidate
+    }
+    
+    if ( !it.value() ) // can result from "it == d.menus.end()"
+    {
+        if ( wasVisible )
+            releaseFocus( id );
+        wasVisible = added = false;
+        ggmMenus.removeAll( id );
+        d.menus.erase( it );
+    }
+    
+    if ( wasVisible || (added && KWindowSystem::activeWindow() == id) )
+        requestFocus( id );
+}
+
+static const unsigned long supported_types = NET::NormalMask | NET::DialogMask | NET::OverrideMask | NET::UtilityMask;
+
+void
+XBar::ggmWindowAdded( WId id )
+{
+    KWindowInfo info( id, NET::WMWindowType );
+    NET::WindowType type = info.windowType( supported_types );
+    if ( type == NET::Unknown ) // everything that's not a supported_type
+        return;
+    foreach ( QWidget *w, QApplication::topLevelWidgets() )
+    {
+        if ( w->winId() == id )
+            return;
+    }
+    XSelectInput( QX11Info::display(), id, PropertyChangeMask );
+    qApp->syncX();
+    ggmUpdate( id );
+}
+
+void
+XBar::ggmWindowRemoved( WId id )
+{
+    int idx = ggmMenus.indexOf( id );
+    if ( idx > -1 )
+    {
+        releaseFocus( id );
+        delete d.menus.take( id );
+        ggmMenus.removeAt( idx );
+    }
+}
+
+void
+XBar::runGgmAction()
+{
+    if ( QAction *act = qobject_cast<QAction*>(sender()) )
+    {
+        QString string = act->data().toString();
+        int slash = string.indexOf('/');
+        WId id = string.left(slash).toULongLong();
+        string = string.mid(slash);
+        //         qDebug() << id << string;
+        char *data = string.toUtf8().append("\0").data();
+        XTextProperty text;
+        XStringListToTextProperty( &data, 1, &text );
+        XSetTextProperty( QX11Info::display(), id, &text, ggmEvent );
+    }
+}
+
 
 K_EXPORT_PLASMA_APPLET(xbar, XBar)
 

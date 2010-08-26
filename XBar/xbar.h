@@ -55,6 +55,10 @@ private:
     bool dbusAction(const QObject *o, int idx, const QString &cmd);
     void rBuildMenu(const QDomElement &node, QObject *menu);
     void buildMenu(const QString &name, QObject *widget, const QString &type);
+
+    static bool globalX11EventFilter( void *msg );
+    MenuBar *ggmCreate( WId id );
+    void ggmUpdate( WId id );
 private:
     typedef QMap<qlonglong, MenuBar*> MenuMap;
     friend class DummyWidget;
@@ -68,6 +72,9 @@ private:
     MenuBar *myMainMenu;
     QFont myFont;
     static QTimer bodyCleaner;
+    typedef QList<WId> GGMList;
+    GGMList ggmMenus;
+    WId ggmLastId;
 private slots:
     void activateWin();
     void byeMenus();
@@ -83,7 +90,12 @@ private slots:
     void trigger(int);
     void updatePalette();
     void updateWindowlist();
-    void unregisterCurrentMenu();   
+    void unregisterCurrentMenu();
+
+    void ggmWindowActivated( WId id );
+    void ggmWindowAdded( WId id );
+    void ggmWindowRemoved( WId id );
+    void runGgmAction();
 };
 
 #endif //XBAR_H
