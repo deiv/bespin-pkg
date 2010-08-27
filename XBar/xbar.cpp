@@ -1011,8 +1011,13 @@ XBar::ggmCreate( WId id )
 void
 XBar::ggmWindowActivated( WId id )
 {
-    if ( !ggmMenus.contains( id ) )
-        id = KWindowSystem::transientFor(id);
+    while ( id && !ggmMenus.contains( id ) )
+    {
+        if ( KWindowInfo( id, NET::WMState ).state() & NET::Modal )
+            id = 0;
+        else
+            id = KWindowSystem::transientFor(id);
+    }
     
     if ( ggmMenus.contains( id ) )
     {
