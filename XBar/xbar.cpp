@@ -928,6 +928,12 @@ XBar::globalX11EventFilter( void *msg )
 
 #define MENU_FUNC(_FUNC_) menu ? menu->_FUNC_ : menubar->_FUNC_
 
+static inline QString accelMappedLabel( const QDomElement &node )
+{
+    // escape "&", replace "_" accels by "&"
+    return node.attribute("label").replace('&', "&&").replace(QRegExp("_([^_])"), "&\\1");
+}
+
 void
 ggmRecursive(const QDomElement &node, QObject *widget, const QString &prefix )
 {
@@ -955,13 +961,13 @@ ggmRecursive(const QDomElement &node, QObject *widget, const QString &prefix )
                 QDomElement menuNode = e.firstChildElement("menu");
                 if ( !menuNode.isNull() )
                 {   // submenu
-                QMenu *newMenu = MENU_FUNC( addMenu(e.attribute("label").replace("_","&")) );
+                QMenu *newMenu = MENU_FUNC( addMenu( accelMappedLabel(e) ) );
                 ggmRecursive(menuNode, newMenu, prefix + "/" + e.attribute("id") );
                 }
                 else if ( !e.attribute("label").isEmpty() )
                 {   // real action item
                 QAction *action = new QAction(widget);
-                action->setText( e.attribute("label").replace("_","&") );
+                action->setText( accelMappedLabel(e) );
                 action->setData( prefix + "/" + e.attribute("id") );
                 action->setEnabled( e.attribute("sensible") != "0" );
                 QObject::connect ( action, SIGNAL(triggered()), instance, SLOT(runGgmAction()) );
