@@ -970,6 +970,14 @@ ggmRecursive(const QDomElement &node, QObject *widget, const QString &prefix )
                 action->setText( accelMappedLabel(e) );
                 action->setData( prefix + "/" + e.attribute("id") );
                 action->setEnabled( e.attribute("sensible") != "0" );
+                QString state = e.attribute("state");
+                int iState = 0;
+                if ( state == "0" )
+                    iState = 1;
+                else if ( state == "1" )
+                    iState = 2;
+                action->setCheckable( iState > 0 );
+                action->setChecked( (iState == 2) );
                 QObject::connect ( action, SIGNAL(triggered()), instance, SLOT(runGgmAction()) );
                 MENU_FUNC( addAction(action) );
                 }
