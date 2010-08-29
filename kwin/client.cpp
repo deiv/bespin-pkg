@@ -829,11 +829,11 @@ Client::repaint(QPainter &p, bool paintTitle)
         {
             // emboss?!
             int d = 0;
-            QColor dark = Colors::mid(bg, Qt::black, 2, 1), light = Colors::mid(bg, Qt::white);
-            if (Colors::value(bg) < 110) // dark bg -> dark top borderline
-                { p.setPen(dark); d = -1; }
+            const int bgv = Colors::value(bg), fgv = Colors::value(titleColor);
+            if (bgv < fgv) // dark bg -> dark top borderline
+                { p.setPen(Colors::mid(bg, Qt::black, bgv, 160)); d = -1; }
             else // bright bg -> bright bottom borderline
-                { p.setPen(light); d = 1; }
+                { p.setPen(Colors::mid(bg, Qt::white, 16, bgv)); d = 1; }
 
             QRect tr;
             QPoint off(0,0); Factory::verticalTitle() ? off.setX(-d) : off.setY(d);
