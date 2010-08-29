@@ -353,11 +353,12 @@ Style::btnFg(const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool 
 }
 
 void
-Style::drawItemText(QPainter *painter, const QRect &rect, int alignment, const QPalette &pal,
+Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal,
                           bool enabled, const QString& text, QPalette::ColorRole textRole, QRect *boundingRect) const
 {
     if (text.isEmpty())
         return;
+    flags |= config.mnemonic;
     QPen savedPen;
     bool penDirty = false;
     if (textRole != QPalette::NoRole)
@@ -376,16 +377,16 @@ Style::drawItemText(QPainter *painter, const QRect &rect, int alignment, const Q
         c.setAlpha(c.alpha()/4 + 2);
         painter->setPen(QPen(c, savedPen.widthF()));
         r.translate(-1,-1);
-        painter->drawText(r, alignment, text);
+        painter->drawText(r, flags, text);
         r.translate(1,2);
-        painter->drawText(r, alignment, text);
+        painter->drawText(r, flags, text);
         r.translate(2,0);
-        painter->drawText(r, alignment, text);
+        painter->drawText(r, flags, text);
         r.translate(-1,-2);
-        painter->drawText(r, alignment, text);
+        painter->drawText(r, flags, text);
     }
     else
-        painter->drawText(rect, alignment, text, boundingRect);
+        painter->drawText(rect, flags, text, boundingRect);
     if (penDirty)
         painter->setPen(savedPen);
 }
