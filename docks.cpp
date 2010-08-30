@@ -119,11 +119,8 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
 
     OPT_ENABLED
     QRect rect = RECT;
-    const int bw = (dock->closable +  dock->floatable) * (16 + F(2));
-    if (option->direction == Qt::LeftToRight)
-        rect.adjust(F(8), 0, -bw, 0);
-    else
-        rect.adjust(bw, 0, -F(8), 0);
+    const int bo = 16 + F(6);
+    rect.adjust(dock->closable ? bo : F(4), 0, dock->closable ? -bo : -F(4), 0);
 
     // text
     const int itemtextopts = Qt::AlignCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;

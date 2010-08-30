@@ -467,6 +467,18 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
 //    case SE_ComboBoxFocusRect: // Area for the focus indicator
 //    case SE_SliderFocusRect: // Area for the focus indicator
 //    case SE_Q3DockWindowHandleRect: // Area for the tear-off handle
+    case SE_DockWidgetFloatButton:
+    {
+        QRect r = RECT; r.setWidth(16); r.moveRight(RECT.right()-F(4));
+        return r;
+    }
+    case SE_DockWidgetTitleBarText:
+        return RECT;
+    case SE_DockWidgetCloseButton:
+    {
+        QRect r = RECT; r.setWidth(16); r.moveLeft(RECT.left()+F(4));
+        return r;
+    }
     case SE_ProgressBarGroove: // Area for the groove
     case SE_ProgressBarContents: // Area for the progress indicator
     case SE_ProgressBarLabel: // Area for the text label
