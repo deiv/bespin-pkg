@@ -49,7 +49,7 @@ Style::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidge
 
 #define SET_BASE_HEIGHT(_o_) \
 baseHeight = twf->tabBarSize._o_(); \
-if (!baseHeight) return; //  no base -> no tabbing -> no bottom border either. period. \
+if (!baseHeight) return; /*  no base -> no tabbing -> no bottom border either. period.*/\
 if (baseHeight < 0) \
     baseHeight = pixelMetric( PM_TabBarBaseHeight, option, widget )
          
@@ -466,7 +466,7 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
     {
         cF = CCOLOR(tab.active, Fg);
         cB = CCOLOR(tab.active, Bg);
-        if (config.tab.active_role[Bg] == config.tab.std_role[Bg])
+//         if (config.tab.active_role[Bg] == config.tab.std_role[Bg])
             setBold(painter, tab->text);
     }
     else if (animStep)
