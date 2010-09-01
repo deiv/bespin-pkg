@@ -90,6 +90,16 @@ static Atom ggmContext;
 static Atom ggmEvent;
 static QAbstractEventDispatcher::EventFilter formerX11EventFilter = 0;
 
+static void ggmSetLocalMenus(bool on)
+{
+    Atom ggmSettings = XInternAtom( QX11Info::display(), "_NET_GLOBALMENU_SETTINGS", false );
+    XTextProperty text;
+    QString string = QString("[GlobalMenu:Client]\nshow-local-menu=%1\nshow-menu-icons=%1\nchanged-notify-timeout=500\n#").arg(on?"true":"false");
+    char *data = string.toLatin1().append("\0").data();
+    XStringListToTextProperty( &data, 1, &text );
+    XSetTextProperty( QX11Info::display(), QX11Info::appRootWindow(), &text, ggmSettings );
+}
+
 XBar::XBar(QObject *parent, const QVariantList &args) : Plasma::Applet(parent, args)
 {
     myMainMenu = 0;
@@ -194,6 +204,8 @@ XBar::init()
     connect (&bodyCleaner, SIGNAL(timeout()), this, SLOT(cleanBodies()));
     bodyCleaner.start(30000); // every 5 minutes - it's just to clean menus from crashed windows, so users won't constantly scroll them
     callMenus();
+    // activate ggm ...
+    ggmSetLocalMenus(false);
     foreach ( WId id, KWindowSystem::windows() )
         ggmWindowAdded( id );
 }
@@ -227,15 +239,18 @@ XBar::activateWin()
 void
 XBar::byeMenus()
 {
-   QDBusConnectionInterface *session = QDBusConnection::sessionBus().interface();
-   QStringList services = session->registeredServiceNames();
-   foreach (QString service, services) {
-      if (service.startsWith("org.kde.XBar-")) {
-         QDBusInterface interface( service, "/XBarClient", "org.kde.XBarClient" );
-         if (interface.isValid())
-            interface.call("deactivate");
-      }
-   }
+    QDBusConnectionInterface *session = QDBusConnection::sessionBus().interface();
+    QStringList services = session->registeredServiceNames();
+    foreach ( QString service, services ) 
+    {
+        if ( service.startsWith("org.kde.XBar-") ) 
+        {
+            QDBusInterface interface( service, "/XBarClient", "org.kde.XBarClient" );
+            if ( interface.isValid() )
+                interface.call("deactivate");
+        }
+    }
+    ggmSetLocalMenus(true);
 }
 
 void
