@@ -235,14 +235,13 @@ Style::drawArrow(Navi::Direction dir, const QRect &rect, QPainter *painter, cons
 }
 
 extern bool isUrlNaviButtonArrow;
-
 /**static!*/ void
 Style::drawSolidArrow(Navi::Direction dir, const QRect &rect, QPainter *painter, const QWidget *w)
 {
     if (isUrlNaviButtonArrow)
     {
-        if ( painter->brush() != Qt::NoBrush &&
-             (!w || painter->brush().color().rgb() == w->palette().color(QPalette::HighlightedText).rgb()) &&
+        if ( painter->brush() != Qt::NoBrush && 
+             (!w || painter->brush().color().rgb() == w->palette().color(QPalette::HighlightedText).rgb()) && 
              painter->brush().color().alpha() < 255 )
             dir = (dir == Navi::W) ? Navi::SW : Navi::SE;
         if (w)

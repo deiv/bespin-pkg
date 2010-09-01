@@ -19,9 +19,9 @@
 #include <QMainWindow>
 #include <QToolBar>
 #include <QToolButton>
-#include "blib/FX.h"
 #include "draw.h"
 #include "animator/hover.h"
+#include "blib/FX.h"
 
 static int step = 0;
 static bool connected = false;

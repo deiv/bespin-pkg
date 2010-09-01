@@ -547,7 +547,7 @@ Style::polish( QWidget * widget )
 //                     KMail::MainFolderView(0xa16fd68, name = ) 
                     if ( Hacks::config.fixKMailFolderList && tv->objectName() == "folderTree" )
                     {
-                        fixViewPalette( tv, /*solid*/true, /*alternate*/true );
+                        fixViewPalette( tv, Hacks::config.opaqueDolphinViews ? 1 : 2, true );
                         tv->setHeaderHidden( true );
                         tv->setRootIsDecorated ( false );
                         tv->sortByColumn ( 0, Qt::AscendingOrder );
@@ -616,11 +616,12 @@ Style::polish( QWidget * widget )
 
                 // HACK around "weird" original appearance ;-P
                 // also see eventFilter
-                if (pbtn->inherits("KUrlButton") || pbtn->inherits("BreadcrumbItemButton"))
+                if (pbtn->inherits("KUrlNavigatorButtonBase") || pbtn->inherits("BreadcrumbItemButton"))
                 {
                     pbtn->setBackgroundRole(QPalette::Window);
                     pbtn->setForegroundRole(QPalette::Link);
                     QPalette pal = pbtn->palette();
+                    pal.setColor(QPalette::Highlight, Qt::transparent);
                     pal.setColor(QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::Window));
                     pbtn->setPalette(pal);
                     pbtn->setCursor(Qt::PointingHandCursor);
@@ -776,7 +777,7 @@ Style::polish( QWidget * widget )
         foreach (QAbstractButton *btn, btns)
         {
 //             KUrlDropDownButton, KUrlNavigatorButton, KProtocolCombo
-            if ( btn->inherits("KFilePlacesSelector") )
+            if ( btn->inherits("KUrlNavigatorPlacesSelector") )
                 btn->setFixedSize(0,0);
 //             if ( btn->inherits("KFilePlacesSelector") || btn->inherits("KUrlToggleButton") )
 //                 btn->setIconSize(QSize(10,10));

@@ -46,12 +46,7 @@ namespace Bespin
 typedef struct _WindowData WindowData;
 #endif
 
-class EventKiller : public QObject
-{
-    public:
-        bool eventFilter( QObject *, QEvent *)
-        { return true; }
-};
+class EventKiller : public QObject { public: bool eventFilter( QObject *, QEvent *) { return true; } };
 
 class
 #ifndef Q_WS_WIN
@@ -281,7 +276,7 @@ private:
     void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
     int elementId(const QString &string) const;
     void erase(const QStyleOption*, QPainter*, const QWidget*, const QPoint *off = 0) const;
-    static void fixViewPalette(QAbstractItemView *itemView, bool solid, bool alternate, bool silent = false);
+    static void fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bool silent = false);
     void generatePixmaps();
     static bool hasMenuIndicator(const QStyleOptionToolButton *tb);
     void initMetrics();

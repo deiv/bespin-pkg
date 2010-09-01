@@ -741,7 +741,7 @@ swapPalette(QWidget *widget, Style *style)
             fixViewport = false;
             hasShit = false;
 
-            if (kid->inherits("KUrlButton") || kid->inherits("BreadcrumbItemButton"))
+            if (kid->inherits("KUrlNavigatorButtonBase") || kid->inherits("BreadcrumbItemButton"))
             {   // we mess up with it during painting in Hacks
                 pal.setColor(QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::Window));
                 kid->setPalette(pal);
@@ -1194,24 +1194,26 @@ Style::eventFilter( QObject *object, QEvent *ev )
         else if (QPushButton *w = qobject_cast<QPushButton*>(object))
         {
             bool b = false;
-            if ((b = w->inherits("KUrlButton")) || w->inherits("BreadcrumbItemButton"))
+            if ((b = w->inherits("KUrlNavigatorButtonBase")) || w->inherits("BreadcrumbItemButton"))
             {
                 isUrlNaviButtonArrow = true;
                 object->removeEventFilter(this);
                 if (w->text() == "/")
                     w->setText("/.");
                 QPalette::ColorRole fg = w->parentWidget() ? w->parentWidget()->foregroundRole() : QPalette::WindowText;
-                if (fg != QPalette::WindowText || isLastNavigatorButton(w, b?"KUrlButton":"BreadcrumbItemButton"))
+                if (fg != QPalette::WindowText || isLastNavigatorButton(w, b?"KUrlNavigatorButtonBase":"BreadcrumbItemButton"))
                 {
                     if (w->foregroundRole() != fg)
                         w->setForegroundRole(fg);
                 }
                 else if (w->foregroundRole() != QPalette::Link)
                     w->setForegroundRole(QPalette::Link);
-                    
+
                 QCoreApplication::sendEvent(object, ev);
+              
                 object->installEventFilter(this);
                 isUrlNaviButtonArrow = false;
+                return true;
             }
             return false;
         }
@@ -1261,12 +1263,12 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (qobject_cast<QPushButton*>(object))
         {
             bool b = false;
-            if ((b = object->inherits("KUrlButton")) || object->inherits("BreadcrumbItemButton"))
+            if ((b = object->inherits("KUrlNavigatorButtonBase")) || object->inherits("BreadcrumbItemButton"))
             {
                 QWidget *w = static_cast<QWidget*>(object);
                 w->setCursor(Qt::PointingHandCursor);
                 QFont fnt = w->font();
-                if (isLastNavigatorButton(w, b?"KUrlButton":"BreadcrumbItemButton"))
+                if (isLastNavigatorButton(w, b?"KUrlNavigatorButtonBase":"BreadcrumbItemButton"))
                 {
                     w->setCursor(Qt::ArrowCursor);
                     fnt.setUnderline(false);
@@ -1663,14 +1665,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
 }
 
 void 
-Style::fixViewPalette(QAbstractItemView *itemView, bool solid, bool alternate, bool silent)
+Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bool silent)
 {
     QWidget *vp = itemView->viewport();
     
     if (silent)
         itemView->installEventFilter(&eventKiller);
     
-    if (solid)
+    if (style == 1)
     {
         itemView->setAlternatingRowColors(false);
         itemView->setPalette(QPalette());
@@ -1697,24 +1699,34 @@ Style::fixViewPalette(QAbstractItemView *itemView, bool solid, bool alternate, b
         itemView->setPalette(pal);
     }
     
-    if ( vp && (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25) )
+    if ( vp && (style == 2 || (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)) )
     {
         if (silent)
             vp->installEventFilter(&eventKiller);
         vp->setPalette(QPalette());
-        vp->setAutoFillBackground(solid);
-        if ( !solid )
+        vp->setAutoFillBackground(style == 1);
+        if ( style != 1 ) // ! force solid
         {
+            if (style == 2) // force transparent
+            {
+                itemView->setAlternatingRowColors(false);
+                itemView->setFrameStyle(QFrame::NoFrame);
+            }
             QPalette pal = itemView->palette();
-            pal.setColor(QPalette::Active, QPalette::Base, pal.color(QPalette::Active, QPalette::Window));
-            pal.setColor(QPalette::Inactive, QPalette::Base, pal.color(QPalette::Inactive, QPalette::Window));
-            pal.setColor(QPalette::Disabled, QPalette::Base, pal.color(QPalette::Disabled, QPalette::Window));
+            QColor bgc[3] = { pal.color(QPalette::Active, QPalette::Window), 
+                              pal.color(QPalette::Inactive, QPalette::Window), 
+                              pal.color(QPalette::Disabled, QPalette::Window) };
 //                         Colors::mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::Base),6,1)
-            #define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
-            Colors::contrast(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase)), 10)
+#define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
+                                  Colors::contrast(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase)), 10)
             pal.setColor(QPalette::Active, QPalette::AlternateBase, ALT_BASE(QPalette::Active));
             pal.setColor(QPalette::Inactive, QPalette::AlternateBase, ALT_BASE(QPalette::Inactive));
             pal.setColor(QPalette::Disabled, QPalette::AlternateBase, ALT_BASE(QPalette::Disabled));
+            for (int i=0; i<3; ++i)
+                bgc[i].setAlpha(0);
+            pal.setColor(QPalette::Active, QPalette::Base, bgc[0]);
+            pal.setColor(QPalette::Inactive, QPalette::Base, bgc[1]);
+            pal.setColor(QPalette::Disabled, QPalette::Base, bgc[2]);
             itemView->setPalette(pal);
             #undef ALT_BASE
         }

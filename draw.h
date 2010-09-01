@@ -27,6 +27,7 @@
 #include "makros.h"
 
 using namespace Bespin;
+
 #if 0
 Style::Masks Style::masks;
 Style::Shadows Style::shadows;
