@@ -168,6 +168,14 @@ Config::Config(QWidget* parent) : BConfig(parent)
     setContextHelp(ui.titlePadding, "<b>Titlebar padding</b><hr>\
     How much additional space you want above and below the title text");
 
+    handleSettings(ui.baseSize, "BaseSize", 4);
+    setContextHelp(ui.baseSize, "<b>Base Size</b><hr>\
+    The width of the border facing the titlebar");
+    
+    handleSettings(ui.edgeSize, "EdgeSize", 4);
+    setContextHelp(ui.edgeSize, "<b>Edge Size</b><hr>\
+    The width of the borders adjacent to the titlebar");
+
     handleSettings(ui.inactiveButtons, "InactiveButtons", false);
     setContextHelp(ui.inactiveButtons, "<b>Show inactive Buttons</b><hr>\
     By default no buttons are shown on inactive windows but fade in and out.<br>You can force them to be visible here.");
@@ -212,6 +220,15 @@ Config::Config(QWidget* parent) : BConfig(parent)
     connect (ui.deletePreset, SIGNAL(clicked()), this, SLOT(deleteCurrentPreset()));
     connect (ui.presets, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
               this, SLOT(presetChanged(QListWidgetItem*, QListWidgetItem*)));
+
+    connect ( ui.actColor, SIGNAL( changed(const QColor&) ), this, SIGNAL( changed() ) );
+    connect ( ui.actColor2, SIGNAL( changed(const QColor&) ), this, SIGNAL( changed() ) );
+    connect ( ui.actText, SIGNAL( changed(const QColor&) ), this, SIGNAL( changed() ) );
+    connect ( ui.actButtons, SIGNAL( changed(const QColor&) ), this, SIGNAL( changed() ) );
+    connect ( ui.inactColor, SIGNAL( changed(const QColor&) ), this, SIGNAL( changed() ) );
+    connect ( ui.inactColor2, SIGNAL( changed(const QColor&) ), this, SIGNAL( changed() ) );
+    connect ( ui.inactText, SIGNAL( changed(const QColor&) ), this, SIGNAL( changed() ) );
+    connect ( ui.inactButtons, SIGNAL( changed(const QColor&) ), this, SIGNAL( changed() ) );
 
     setContextHelp(ui.presets, "<b>Presets</b><hr>\
     The presets are meant to define the look of <i>some</i> <b>exceptional</b> windows <b>not</b>\
@@ -281,6 +298,8 @@ void Config::createNewPreset()
 
 void Config::presetChanged(QListWidgetItem *item, QListWidgetItem *prev)
 {
+    const bool blocked = signalsBlocked();
+    blockSignals(true); // prevent change notions for sheer ui updates
     if (prev) // store data
     {
         prev->setData(ActiveGradient, variant(ui.actGrad));
@@ -333,6 +352,7 @@ void Config::presetChanged(QListWidgetItem *item, QListWidgetItem *prev)
     ui.wmTypes->setEnabled(enabled);
     ui.actColor2->setEnabled(ui.actGrad2->currentIndex());
     ui.inactColor2->setEnabled(ui.inactGrad2->currentIndex());
+    blockSignals(blocked); // prevent change notions for sheer ui updates
 }
 
 void Config::deleteCurrentPreset()

@@ -70,17 +70,12 @@ public:
     bool supports( Ability ability ) const;
     inline static Gradients::Type buttonGradient() {return ourConfig.buttonGradient;}
     inline static int buttonSize(bool small) {return ourButtonSize[small];}
-    inline static int borderSize() { return ourBorderSize ? ourBorderSize : !weAreComposited; }
+    inline static int edgeSize() { return ourBorderSize[1] ? ourBorderSize[1] : !weAreComposited; }
+    inline static int baseSize() { return ourBorderSize[0] ? ourBorderSize[0] : !weAreComposited; }
     inline static Qt::KeyboardModifier commandKey() { return ourCommandKey; }
     inline static bool compositingActive() { return weAreComposited; }
     inline static int initialized() { return weAreInitialized; }
     inline static bool isCompiz() { return weAreCompiz; }
-    QList< BorderSize > borderSizes() const
-    {
-        return QList< BorderSize >() << BorderTiny << BorderNormal <<
-        BorderLarge << BorderVeryLarge << BorderHuge << BorderVeryHuge <<
-        BorderOversized;
-    }
 //    virtual void checkRequirements( KDecorationProvides* provides );
     inline static int titleSize(bool minimal = false) {return ourTitleSize[minimal];}
     inline static const Config *config() { return &ourConfig; }
@@ -110,7 +105,7 @@ private:
     static QHash<qint64, BgSet*> ourBgSets;
     static QList<Preset*> ourPresets;
     static bool weAreInitialized, weAreComposited, weAreCompiz;
-    static int ourButtonSize[2], ourBorderSize, ourTitleSize[2], ourBgMode;
+    static int ourButtonSize[2], ourTitleSize[2], ourBgMode, ourBorderSize[2];
     static QVector<Button::Type> ourMultiButton;
     static Config ourConfig;
     static QMenu *ourDesktopMenu, *ourWindowList;

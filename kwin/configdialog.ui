@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>665</width>
-    <height>288</height>
+    <width>564</width>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Bespin KWin Client Config</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,10">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="tabPosition">
@@ -721,6 +721,33 @@
        <string>Layout</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="roundCorners">
+         <property name="text">
+          <string>Round window corners</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QCheckBox" name="verticalTitlebar">
+         <property name="text">
+          <string>Netbook compatible titlebar orientation ;-)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="0" column="0" colspan="2">
         <layout class="QFormLayout" name="formLayout">
          <property name="fieldGrowthPolicy">
@@ -735,14 +762,20 @@
          <property name="verticalSpacing">
           <number>10</number>
          </property>
-         <item row="3" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label_10">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
            <property name="text">
             <string>Title alignment</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="2" column="1">
           <widget class="QWidget" name="widget" native="true">
            <property name="minimumSize">
             <size>
@@ -830,12 +863,12 @@
            </layout>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_5">
            <property name="font">
             <font>
-             <weight>50</weight>
-             <bold>false</bold>
+             <weight>75</weight>
+             <bold>true</bold>
             </font>
            </property>
            <property name="text">
@@ -846,7 +879,7 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="3" column="1">
           <widget class="QSpinBox" name="titlePadding">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -862,8 +895,90 @@
            </property>
           </widget>
          </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_20">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Border widths</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <layout class="QGridLayout" name="gridLayout_6">
+           <item row="0" column="2" colspan="2">
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>Edges</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QSpinBox" name="baseSize">
+             <property name="suffix">
+              <string>px</string>
+             </property>
+             <property name="maximum">
+              <number>32</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>16</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="1" column="2" colspan="2">
+            <widget class="QSpinBox" name="edgeSize">
+             <property name="suffix">
+              <string>px</string>
+             </property>
+             <property name="maximum">
+              <number>32</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>Base</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_12">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
            <property name="text">
             <string>Force small titlebar for</string>
            </property>
@@ -873,33 +988,6 @@
           <widget class="QLineEdit" name="smallTitleClasses"/>
          </item>
         </layout>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QCheckBox" name="verticalTitlebar">
-         <property name="text">
-          <string>Netbook compatible titlebar orientation ;-)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <spacer name="verticalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="roundCorners">
-         <property name="text">
-          <string>Round window corners</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>

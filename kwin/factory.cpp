@@ -65,7 +65,7 @@ Config Factory::ourConfig =
       Gradients::None, QStringList() };
 Qt::KeyboardModifier Factory::ourCommandKey = Qt::AltModifier;
 int Factory::ourButtonSize[2] = {-1, -1};
-int Factory::ourBorderSize = 4;
+int Factory::ourBorderSize[2] = {4,4};
 int Factory::ourTitleSize[2] = {18,16};
 int Factory::ourBgMode = 1;
 QVector<Button::Type> Factory::ourMultiButton(0);
@@ -358,23 +358,17 @@ bool Factory::readConfig()
         multiVector(newmultiorder, ourMultiButton);
     }
 
-    int oldbordersize = ourBorderSize;
-    switch (options()->preferredBorderSize(this))
+    const char *borderStrings[2] = { "BaseSize", "EdgeSize" };
+    for (int i = 0; i < 2; ++i)
     {
-        case BorderTiny: ourBorderSize = 0; break;
-        default:
-        case BorderNormal: ourBorderSize = 4; break;
-        case BorderLarge: ourBorderSize = 7; break;
-        case BorderVeryLarge: ourBorderSize = 10; break;
-        case BorderHuge: ourBorderSize = 16; break;
-        case BorderVeryHuge: ourBorderSize = 21; break;
-        case BorderOversized: ourBorderSize = 30; break;
+        oldInt = ourBorderSize[i];
+        ourBorderSize[i] = settings.value(borderStrings[i], 4).toInt();
+        if (oldInt != ourBorderSize[i]) ret = true;
     }
-    if (oldbordersize != ourBorderSize) ret = true;
 
     int fntHgt = QFontMetrics(options()->font()).height();
     int oldtitlesize = ourTitleSize[0];
-    ourTitleSize[0] = qMax(fntHgt + 4 + settings.value("TitlePadding", 0).toInt(), ourBorderSize);
+    ourTitleSize[0] = fntHgt + 4 + settings.value("TitlePadding", 0).toInt();
     if (oldtitlesize != ourTitleSize[0]) ret = true;
     ourButtonSize[0] = fntHgt-2 + ourTitleSize[0]%2;
 

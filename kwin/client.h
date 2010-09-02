@@ -109,7 +109,7 @@ private:
 private:
     QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
     Button *buttons[4];
-    int borderSize, myTitleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
+    int myBaseSize, myEdgeSize, myTitleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
     int myButtonOpacity;
     int myActiveChangeTimer;
     Picture topTile, btmTile, cnrTile, lCorner, rCorner;
