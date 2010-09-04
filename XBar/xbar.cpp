@@ -303,11 +303,16 @@ XBar::cleanBodies()
     MenuBar *mBar = 0;
     while (i != d.menus.end())
     {
-        if (ggmMenus.contains(i.key()) ||  services.contains(i.value()->service()))
+        if (ggmMenus.contains(i.key()) || services.contains(i.value()->service()))
             ++i;
         else
         {
             mBar = i.value();
+            if ( mBar == d.currentBar )
+            {
+                hide(mBar);
+                show(myMainMenu);
+            }
             i = d.menus.erase(i);
             delete mBar;
         }
