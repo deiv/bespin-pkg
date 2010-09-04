@@ -89,7 +89,7 @@ typedef struct Config
         QPalette::ColorRole std_role[2], active_role[2];
         Gradients::Type itemGradient;
         bool showIcons, shadow, barSunken, boldText, itemSunken, activeItemSunken, glassy, round, roundSelect;
-        int opacity;
+        int opacity, delay;
     } menu;
 
     int mnemonic;

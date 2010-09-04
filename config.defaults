@@ -90,6 +90,7 @@
 #define KWIN_INACTIVE_TEXT_ROLE "KWin.InactiveText", QPalette::WindowText
 #define KWIN_ACTIVE_TEXT_ROLE "KWin.ActiveText", QPalette::WindowText
 
+#define MENU_DELAY "Menu.Delay", 96
 #define MENU_GLASSY "Menu.Glassy", true
 #define MENU_OPACITY "Menu.OpacityARGB", 255
 #define MENU_ROUND "Menu.Round", true

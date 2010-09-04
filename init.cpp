@@ -151,6 +151,8 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.fixKMailFolderList = appType == KMail && readBool(HACK_KMAIL_FOLDERS);
         // PW Echo Char ===========================
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
+
+        config.menu.delay = readInt(MENU_DELAY);
 #if BESPIN_ARGB_WINDOWS
         config.menu.opacity = clamp(readInt(MENU_OPACITY), 0, 0xff);
 #else
