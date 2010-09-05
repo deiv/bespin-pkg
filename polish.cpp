@@ -787,7 +787,7 @@ Style::polish( QWidget * widget )
     {
         if (QDockWidget *dock = qobject_cast<QDockWidget*>(widget))
         {
-            if (appType == Dolphin)
+            if (appType == Dolphin && Hacks::config.opaqueDolphinViews)
                 FILTER_EVENTS(dock);
             if (config.bg.docks.invert && (dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable)))
             {

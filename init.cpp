@@ -263,8 +263,8 @@ Style::readSettings(const QSettings* settings, QString appName)
     if ((config.bg.glassy = readBool(ARGB_GLASSY)))
         config.bg.mode = Plain;
 
-    config.bg.docks.invert = readBool(BG_DOCKS_INVERT);
-    config.bg.docks.shape = config.bg.docks.invert ? readBool(BG_DOCKS_SHAPE) : false;
+    config.bg.docks.invert = (appType == Dolphin && !Hacks::config.opaqueDolphinViews) || readBool(BG_DOCKS_INVERT);
+    config.bg.docks.shape = config.bg.docks.invert && readBool(BG_DOCKS_SHAPE);
 
     config.bg.modal.glassy = readBool(BG_MODAL_GLASSY);
     config.bg.modal.opacity = readInt(BG_MODAL_OPACITY);

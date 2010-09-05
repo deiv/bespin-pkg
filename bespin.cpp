@@ -1364,7 +1364,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
 
-        if (appType == Dolphin)
+        if (appType == Dolphin && Hacks::config.opaqueDolphinViews)
         if (QDockWidget *dock = qobject_cast<QDockWidget*>(object))
         if (re->oldSize().height() != re->size().height())
         {
