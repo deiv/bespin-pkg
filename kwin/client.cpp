@@ -728,7 +728,7 @@ Client::repaint(QPainter &p, bool paintTitle)
         default:
         case 1: // scanlines, fallback
         {
-            const Gradients::Type gradient = Factory::config()->gradient[0][isActive()];
+            const Gradients::Type gradient = (bgMode == 0xff) ? gType[isActive()] : Factory::config()->gradient[0][isActive()];
             Qt::Orientation o = Qt::Vertical;
             QRect ttBar = top;
             QLine borderline;
@@ -755,6 +755,9 @@ Client::repaint(QPainter &p, bool paintTitle)
 //                 p.setPen(Colors::mid(bg, Qt::white,6,1));
 //                 p.drawLine(0,myTitleSize-1,width(),myTitleSize-1);
             }
+
+            if ( bgMode == 0xff )  // no deco gradient in this mode
+                break;
 
             const Gradients::Type titleGradient = gType[isActive()];
             if (paintTitle && titleGradient && label.width())
@@ -874,7 +877,7 @@ Client::repaint(QPainter &p, bool paintTitle)
     }
 
     // bar =========================
-    if (!(unoHeight || bgMode == 1))
+    if (!(unoHeight || bgMode == 1 || bgMode == 0xff))
     {
         const QColor bg2 = color(ColorTitleBlend, isActive());
 

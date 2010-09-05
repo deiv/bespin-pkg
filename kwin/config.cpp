@@ -45,11 +45,12 @@ enum ConfigRole { ActiveGradient = Qt::UserRole, ActiveGradient2,
                   ActiveText, ActiveButtons, InactiveText, InactiveButtons,
                   Classes, Types };
 
+static const int Gradients_TypeAmount = 9;
+
 Config::Config(QWidget* parent) : BConfig(parent)
 {
     ui.setupUi(this);
     // designer can't do this atm.
-    const int Gradients_TypeAmount = 9;
     ui.actGrad->setItemData( Gradients_TypeAmount, -1);
     ui.actGrad->setItemData( Gradients_TypeAmount+1, -3);
     ui.actGrad->setItemData( Gradients_TypeAmount+2, -4);
@@ -323,6 +324,21 @@ void Config::presetChanged(QListWidgetItem *item, QListWidgetItem *prev)
     bool enabled = false;
     if (item)
     {
+        if (ui.presets->row(item)) // not for the default preset
+        {
+            enabled = true;
+            ui.wmClasses->setText(item->data(Classes).toString());
+            ui.wmTypes->setText(item->data(Types).toString());
+            ui.actGrad->addItem( "Ignore", -0xff );
+            ui.inactGrad->addItem( "Ignore", -0xff );
+        }
+        else
+        {
+            ui.wmClasses->setText(QString());
+            ui.wmTypes->setText(QString());
+            ui.actGrad->removeItem( Gradients_TypeAmount+3 );
+            ui.inactGrad->removeItem( Gradients_TypeAmount+3 );
+        }
         setVariant(ui.actGrad, item->data(ActiveGradient));
         setVariant(ui.actGrad2, item->data(ActiveGradient2));
         setVariant(ui.inactGrad, item->data(InactiveGradient));
@@ -335,17 +351,6 @@ void Config::presetChanged(QListWidgetItem *item, QListWidgetItem *prev)
         ui.inactColor2->setColor(item->data(InactiveColor2).toUInt());
         ui.inactText->setColor(item->data(InactiveText).toUInt());
         ui.inactButtons->setColor(item->data(InactiveButtons).toUInt());
-        if (ui.presets->row(item)) // not for the default preset
-        {
-            enabled = true;
-            ui.wmClasses->setText(item->data(Classes).toString());
-            ui.wmTypes->setText(item->data(Types).toString());
-        }
-        else
-        {
-            ui.wmClasses->setText(QString());
-            ui.wmTypes->setText(QString());
-        }
     }
     ui.deletePreset->setEnabled(enabled);
     ui.wmClasses->setEnabled(enabled);
@@ -494,13 +499,24 @@ void Config::savePresets()
 
 void Config::watchBgMode()
 {
-    QWidget *other = 0;
+    if (ui.presets->currentRow() < 0)
+        return;
+    
+    QWidget *sibling = 0;
     if (sender() == ui.actGrad)
-        other = ui.inactGrad;
+        sibling = ui.inactGrad;
     else if (sender() == ui.inactGrad)
-        other = ui.actGrad;
-    if (other)
-        other->setEnabled(variant(sender()).toInt() >= 0);
+        sibling = ui.actGrad;
+
+    if (!sibling)
+        return;
+
+    int idx = variant(sender()).toInt();
+    sibling->setEnabled(idx >= 0);
+
+    const bool isDefault = (ui.presets->currentRow() == 0);
+    ui.actGrad2->setEnabled(isDefault || idx < 0);
+    ui.inactGrad2->setEnabled(isDefault || idx < 0);
 }
 
 void Config::watchButtonGradient()
@@ -514,11 +530,18 @@ void Config::watchDecoGradient()
 {
     if (ui.presets->currentRow() < 0)
         return;
-    QWidget *other = 0;
+    
+    QWidget *sibling = 0, *parent = 0;
     if (sender() == ui.actGrad2)
-        other = ui.actColor2;
+        { sibling = ui.actColor2; parent = ui.actGrad; }
     else if (sender() == ui.inactGrad2)
-        other = ui.inactColor2;
-    if (other)
-        other->setEnabled(variant(sender()).toInt() != 0);
+        { sibling = ui.inactColor2; parent = ui.inactGrad; }
+
+    if (!sibling)
+        return;
+
+    int idx = variant(sender()).toInt();
+    sibling->setEnabled(idx > 0);
+
+    parent->setEnabled(ui.presets->currentRow() == 0 || idx == 0);
 }

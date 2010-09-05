@@ -196,13 +196,13 @@ setupWindowData(Preset *preset, const QSettings &settings)
     int mode = settings.value("ActiveGradient", 0).toInt();
     if (mode < 0)
     {
-        mode = -(mode+1);
+        mode = (mode == 0xff) ? 1 : -(mode+1);
         preset->data.style =  ( ((mode & 0xff) << 16) |
                                 ((settings.value("InactiveGradient2", 0).toInt() & 0xff) << 8) |
                                 (settings.value("ActiveGradient2", 0).toInt() & 0xff) );
     }
     else
-        preset->data.style =  ( ((1 & 0xff) << 16) |
+        preset->data.style =  ( ((0xff & 0xff) << 16) |
                                 ((settings.value("InactiveGradient", 0).toInt() & 0xff) << 8) |
                                 (mode & 0xff) );
 }
