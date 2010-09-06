@@ -1102,6 +1102,16 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
 #endif
+        if ( appType == Dolphin && object->inherits("DolphinViewContainer") )
+        {
+            QWidget *w = static_cast<QWidget*>(object);
+            QPainter p(w);
+            shadows.sunken[false][w->isEnabled()].render( w->rect(), &p );
+            if (w->hasFocus())
+                lights.glow[false].render( w->rect(), &p, w->palette().color(QPalette::Highlight) );
+            p.end();
+            return false;
+        } else
 #if  QT_VERSION < 0x040500 // 4.5 has a CE_ for this =)
         if (QFrame *frame = qobject_cast<QFrame*>(object))
         {
@@ -1288,53 +1298,50 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (!widget)
             return false;
 
-        if ( widget->isWindow() )
-        {
-            if ((config.menu.round && qobject_cast<QMenu*>(object))
+        if ( ( widget->isWindow() && config.menu.round && qobject_cast<QMenu*>(object) ) || ( appType == Dolphin && object->inherits("DolphinViewContainer") )
 #if 0
-                || (config.bg.docks.shape && (widget = dock = qobject_cast<QDockWidget*>(object))))
+            || (config.bg.docks.shape && (widget = dock = qobject_cast<QDockWidget*>(object))))
+        {
+            if (dock && dock->isWindow()) // kwin yet cannot. compiz can't even menus...
             {
-                if (dock && dock->isWindow()) // kwin yet cannot. compiz can't even menus...
-                {
-                    dock->clearMask();
-                    return false;
-                }
+                dock->clearMask();
+                return false;
+            }
 #else
-                    )
-            {
+                )
+        {
 #endif
 #if 0 // xPerimental code for ribbon like looking menus - not atm.
-                QAction *head = menu->actions().at(0);
-                QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
-                Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
-                head->iconText());
-                r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
-                QResizeEvent *rev = (QResizeEvent*)ev;
-                QRegion mask(menu->rect());
-                mask -= QRect(0,0,menu->width(),r.bottom());
-                mask += r;
-                mask -= masks.corner[0]; // tl
-                QRect br = masks.corner[1].boundingRect();
-                mask -= masks.corner[1].translated(r.right()-br.width(), 0); // tr
-                br = masks.corner[2].boundingRect();
-                mask -= masks.corner[2].translated(0, menu->height()-br.height()); // bl
-                br = masks.corner[3].boundingRect();
-                mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
+            QAction *head = menu->actions().at(0);
+            QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
+            Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
+            head->iconText());
+            r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
+            QResizeEvent *rev = (QResizeEvent*)ev;
+            QRegion mask(menu->rect());
+            mask -= QRect(0,0,menu->width(),r.bottom());
+            mask += r;
+            mask -= masks.corner[0]; // tl
+            QRect br = masks.corner[1].boundingRect();
+            mask -= masks.corner[1].translated(r.right()-br.width(), 0); // tr
+            br = masks.corner[2].boundingRect();
+            mask -= masks.corner[2].translated(0, menu->height()-br.height()); // bl
+            br = masks.corner[3].boundingRect();
+            mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
 #endif
-                const int w = widget->width();
-                const int h = widget->height();
-                QRegion mask(4, 0, w-8, h);
-                mask += QRegion(0, 4, w, h-8);
-                mask += QRegion(2, 1, w-4, h-2);
-                mask += QRegion(1, 2, w-2, h-4);
-                // only top rounded - but looks nasty
-                //          QRegion mask(0, 0, w, h-4);
-                //          mask += QRect(1, h-4, w-2, 2);
-                //          mask += QRect(2, h-2, w-4, 1);
-                //          mask += QRect(4, h-1, w-8, 1);
-                        
-                widget->setMask(mask);
-            }
+            const int w = widget->width();
+            const int h = widget->height();
+            QRegion mask(4, 0, w-8, h);
+            mask += QRegion(0, 4, w, h-8);
+            mask += QRegion(2, 1, w-4, h-2);
+            mask += QRegion(1, 2, w-2, h-4);
+            // only top rounded - but looks nasty
+            //          QRegion mask(0, 0, w, h-4);
+            //          mask += QRect(1, h-4, w-2, 2);
+            //          mask += QRect(2, h-2, w-4, 1);
+            //          mask += QRect(4, h-1, w-8, 1);
+                    
+            widget->setMask(mask);
         }
         
         if ( config.bg.blur && 
@@ -1363,25 +1370,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
             return false;
         }
-
-        if (appType == Dolphin && Hacks::config.opaqueDolphinViews)
-        if (QDockWidget *dock = qobject_cast<QDockWidget*>(object))
-        if (re->oldSize().height() != re->size().height())
-        {
-            if (dock->allowedAreas() & Qt::BottomDockWidgetArea)
-                return false;
-            int l,t,r,b;
-            dock->getContentsMargins(&l, &t, &r, &b);
-            if ( dock->isFloating() )
-                b = 6;
-            else if (dock->geometry().bottom() == dock->window()->rect().bottom())
-                b = 22;
-            else
-                b = 0;
-            dock->setContentsMargins(l, t, r, b);
-            return false;
-        }
-        
         return false;
     }
 //    case QEvent::MouseButtonRelease:

@@ -519,6 +519,25 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
+                if (appType == Dolphin && itemView->parentWidget() && itemView->inherits("DolphinIconsView") )
+                {
+                    if (QWidget *grampa = itemView->parentWidget()->parentWidget())
+                    {
+                        itemView->setFrameStyle(QFrame::NoFrame);
+                        grampa->setBackgroundRole(QPalette::Base);
+                        grampa->setForegroundRole(QPalette::Text);
+                        QWidgetList kids = grampa->findChildren<QWidget*>();
+                        foreach (QWidget *kid, kids)
+                        {
+                            kid->setBackgroundRole(QPalette::Base);
+                            kid->setForegroundRole(QPalette::Text);
+                        }
+                        grampa->setAutoFillBackground(true);
+                        grampa->setContentsMargins(F(4),F(1),F(4),F(1));
+                        FILTER_EVENTS(grampa);
+                    }
+                    
+                }
                 if (QWidget *vp = itemView->viewport())
                 {
                     if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
@@ -783,12 +802,10 @@ Style::polish( QWidget * widget )
 //                 btn->setIconSize(QSize(10,10));
         }
     }
-    else if (config.bg.docks.invert || appType == Dolphin)
+    else if ( config.bg.docks.invert )
     {
         if (QDockWidget *dock = qobject_cast<QDockWidget*>(widget))
         {
-            if (appType == Dolphin && Hacks::config.opaqueDolphinViews)
-                FILTER_EVENTS(dock);
             if (config.bg.docks.invert && (dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable)))
             {
                 QPalette pal = dock->palette();
