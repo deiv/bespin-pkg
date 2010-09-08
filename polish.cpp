@@ -92,6 +92,8 @@ void Style::polish ( QApplication * app, bool initVFrame )
     originalPalette = 0; // so our eventfilter won't react on this... ;-P
     app->setPalette(pal);
     originalPalette = opal;
+    disconnect ( app, SIGNAL( focusChanged(QWidget*, QWidget*) ), this, SLOT( focusWidgetChanged(QWidget*, QWidget*)) );
+    connect ( app, SIGNAL( focusChanged(QWidget*, QWidget*) ), this, SLOT( focusWidgetChanged(QWidget*, QWidget*)) );
 }
 
 #define _SHIFTCOLOR_(clr) clr = QColor(CLAMP(clr.red()-10,0,255),CLAMP(clr.green()-10,0,255),CLAMP(clr.blue()-10,0,255))
@@ -535,6 +537,10 @@ Style::polish( QWidget * widget )
                         grampa->setAutoFillBackground(true);
                         grampa->setContentsMargins(F(4),F(1),F(4),F(1));
                         FILTER_EVENTS(grampa);
+                        int l,t,r,b;
+                        grampa = grampa->window();
+                        grampa->getContentsMargins(&l,&t,&r,&b);
+                        grampa->setContentsMargins(l,t,r,qMax(b,F(3)));
                     }
                     
                 }
@@ -953,6 +959,7 @@ Style::unpolish( QApplication *app )
     app->setPalette(QPalette());
     Hacks::releaseApp();
     Gradients::wipe();
+    disconnect ( app, SIGNAL( focusChanged(QWidget*, QWidget*) ), this, SLOT( focusWidgetChanged(QWidget*, QWidget*)) );
 }
 
 void

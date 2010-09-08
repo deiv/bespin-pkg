@@ -1106,9 +1106,13 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             QWidget *w = static_cast<QWidget*>(object);
             QPainter p(w);
-            shadows.sunken[false][w->isEnabled()].render( w->rect(), &p );
-            if (w->hasFocus())
-                lights.glow[false].render( w->rect(), &p, w->palette().color(QPalette::Highlight) );
+            QRect r = w->rect(); r.setBottom(r.bottom()+F(2));
+            shadows.sunken[false][w->isEnabled()].render( r, &p );
+
+            QVariant h = w->property("hasFocus");
+            if ( h.isValid() && h.toBool() )
+                lights.glow[false].render( r, &p, w->palette().color(QPalette::Highlight) );
+            
             p.end();
             return false;
         } else
@@ -1231,11 +1235,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             QWidget *w = static_cast<QWidget*>(object);
             QPainter p(w);
-            Tile::PosFlags pf = Tile::Full & (w->layoutDirection() == Qt::LeftToRight ? ~Tile::Right : ~Tile::Left);
+            Tile::PosFlags pf = Tile::Full & ~Tile::Top;
             Tile::setShape(pf);
-            QRect r = w->rect().adjusted(0,0,0,-F(1));
-            masks.rect[true].render(r, &p, GRAD(tab), Qt::Vertical, w->palette().color(QPalette::Window), r.height());
-            shadows.sunken[true][true].render(w->rect(), &p);
+            masks.rect[true].render(w->rect(), &p, w->palette().color(QPalette::Window));
             Tile::reset();
             p.end();
             return true; // sic! we paint
@@ -1291,6 +1293,11 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
         return false;
     }
+//     case QEvent::FocusIn:
+//     case QEvent::FocusOut:
+//         if ( appType == Dolphin && object->inherits("DolphinViewContainer") )
+//             static_cast<QWidget*>(object)->update();
+//         return false;
     case QEvent::Resize:
     {
         QResizeEvent *re = static_cast<QResizeEvent*>(ev);
@@ -1726,6 +1733,26 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
     
     if (silent)
         itemView->removeEventFilter(&eventKiller);
+}
+
+void
+Style::focusWidgetChanged( QWidget *old, QWidget *focusWidget )
+{
+    if ( appType == Dolphin )
+    {
+        QWidget *grampa = 0;
+        if ( focusWidget && (grampa = focusWidget->parentWidget()) && (grampa = grampa->parentWidget()) && focusWidget->inherits("DolphinIconsView") )
+        {
+            grampa->setProperty("hasFocus", true); 
+            grampa->update();
+            
+        }
+        if ( old && (grampa = old->parentWidget()) && (grampa = grampa->parentWidget()) && old->inherits("DolphinIconsView") )
+        {
+            grampa->setProperty("hasFocus", false); 
+            grampa->update();
+        }
+    }
 }
 
 QPalette

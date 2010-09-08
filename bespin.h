@@ -163,7 +163,9 @@ protected:
     void drawGroupBoxFrame(const QStyleOption*, QPainter*, const QWidget*) const;
     // input.cpp
     void drawLineEditFrame(const QStyleOption*, QPainter*, const QWidget*) const;
-    void drawLineEdit(const QStyleOption*, QPainter*, const QWidget*) const;
+    inline void drawLineEdit(const QStyleOption *opt, QPainter *p, const QWidget *w) const
+    { drawLineEdit(opt, p, w, false); }
+    void drawLineEdit(const QStyleOption*, QPainter*, const QWidget*, bool round) const;
     void drawSpinBox(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
     void drawComboBox(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
     void drawComboBoxLabel(const QStyleOption*, QPainter*, const QWidget*) const;
@@ -329,6 +331,7 @@ public:
     static Config config;
 private slots:
     void clearScrollbarCache();
+    void focusWidgetChanged(QWidget*, QWidget*);
     void removeAppEventFilter();
     void resetRingPix();
     void updateUno();
