@@ -51,9 +51,9 @@ static QPixmap *bgBuffer(const QPalette &pal, const QRect &r)
     p.end();
     return buffer;
 }
-
+#include <QtDebug>
 void
-Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget *widget, bool round) const
 {
     // spinboxes and combos allready have a lineedit as global frame
     // TODO: exclude Q3Combo??
@@ -70,42 +70,29 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
 
     OPT_ENABLED OPT_FOCUS
 
+//     round = true;
     isEnabled = isEnabled && !(option->state & State_ReadOnly);
     QRect r = RECT;
     if (isEnabled)
     {
-        const Tile::Set &mask = masks.rect[false];
+        const Tile::Set &mask = masks.rect[round && appType != GTK];
         r.setBottom(r.bottom() - F(2));
-        if (hasFocus)
-        {
-            QColor c;
-            if (PAL.brush(QPalette::Base).style() > 1 ) // pixmap, gradient, whatever
-            {
-                QPixmap *buffer = bgBuffer(PAL, r); mask.render(r, painter, *buffer); delete buffer;
-            }
-            else
-            {
-                c = FCOLOR(Base);
-                if (Colors::value(c) < 100)
-                    c = c.light(112);
-                mask.render(r, painter, c);
-            }
-            lights.glow[false].render(RECT, painter, FCOLOR(Highlight));
-        }
+        if (PAL.brush(QPalette::Base).style() > 1 ) // pixmap, gradient, whatever
+            { QPixmap *buffer = bgBuffer(PAL, r); mask.render(r, painter, *buffer); delete buffer; }
         else if (r.height() > 2*option->fontMetrics.height()) // no lineEdit... like some input frames in QWebKit
-            mask.render(r, painter, FCOLOR(Base));
-        else
         {
-            if (PAL.brush(QPalette::Base).style() > 1 ) // pixmap, gradient, whatever
-                { QPixmap *buffer = bgBuffer(PAL, r); mask.render(r, painter, *buffer); delete buffer; }
-            else
-                mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
+            const QColor &c = FCOLOR(Base);
+            mask.render(r, painter, (hasFocus && Colors::value(c) < 100) ? c.lighter(112) : c);
         }
+        else
+            mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
+        if (hasFocus)
+            lights.glow[round].render(RECT, painter, FCOLOR(Highlight));
     }
     if (appType == GTK)
         shadows.fallback.render(RECT,painter);
     else
-        shadows.sunken[false][isEnabled].render(RECT, painter);
+        shadows.sunken[round][isEnabled].render(RECT, painter);
 }
 
 static void
@@ -226,7 +213,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
     if ((cmb->subControls & SC_ComboBoxFrame) && cmb->frame)
     {
         if (cmb->editable)
-            drawLineEdit(option, painter, widget);
+            drawLineEdit(option, painter, widget, false);
         else
         {
             if (!ar.isNull())
