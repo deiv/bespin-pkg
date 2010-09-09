@@ -135,7 +135,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         // item single vs. double click, wizard appereance
         config.macStyle = readBool(MACSTYLE);
         config.dialogBtnLayout = readInt(DIALOG_BTN_LAYOUT);
-        config.drawSplitters = readInt(DRAW_SPLITTERS);
+        config.drawSplitters = readBool(DRAW_SPLITTERS);
         config.fadeInactive = readBool(FADE_INACTIVE);
         // Hacks ==================================
         Hacks::config.messages = readBool(HACK_MESSAGES);
