@@ -234,9 +234,17 @@ Style::registerRoutines()
     registerCC(drawToolButton, CC_ToolButton);
     registerPE(drawToolButtonShape, PE_PanelButtonTool);
     registerPE(skip, PE_IndicatorToolBarSeparator);
-    registerPE(drawToolBar, PE_PanelToolBar);
+    if (config.bg.opacity == 0xff)
+    {
+        registerPE(drawToolBar, PE_PanelToolBar);
+        registerCE(drawToolBar, CE_ToolBar);
+    }
+    else
+    {
+        registerPE(skip, PE_PanelToolBar);
+        registerCE(skip, CE_ToolBar);
+    }
     registerCE(drawToolButtonLabel, CE_ToolButtonLabel);
-    registerCE(drawToolBar, CE_ToolBar);
     registerPE(skip, PE_FrameButtonTool);
 #ifdef QT3_SUPPORT
     registerPE(skip, PE_Q3Separator);

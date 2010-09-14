@@ -29,7 +29,7 @@ static struct {
 void
 Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-    if (config.bg.mode == Scanlines  && config.bg.structure < 5)
+    if (config.bg.mode == Scanlines && config.bg.structure < 5 && config.bg.opacity == 0xff)
     {
         painter->save();
         painter->setPen(Qt::NoPen);
@@ -39,7 +39,7 @@ Style::drawDockBg(const QStyleOption *option, QPainter *painter, const QWidget *
         painter->drawRect(RECT);
     }
     if (widget && widget->isWindow())
-            drawWindowFrame(option, painter, widget);
+        drawWindowFrame(option, painter, widget);
 }
 
 void
@@ -51,7 +51,7 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
     bg.setAlpha(config.bg.opacity);
     const bool floating = widget && widget->isWindow();
 
-    if (dock->floatable || dock->movable)
+    if ((dock->floatable || dock->movable) && config.bg.opacity == 0xff)
     {
         if (!floating)
         {
@@ -130,8 +130,10 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
         painter->setPen(COLOR(fg));
     else
         painter->setPen(Colors::mid(bg, COLOR(fg), 2, 1+isEnabled));
-    drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dock->title);
+    drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dock->title/*, QPalette::NoRole, &rect*/);
     painter->setPen(pen);
+//     const int d = 3*rect.width()/16; rect.adjust(d,0,-d,0);
+//     shadows.line[0][Sunken].render(rect, painter, Tile::Full, true);
 }
 
 void
