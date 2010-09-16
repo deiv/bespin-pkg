@@ -37,6 +37,14 @@ BLIB_EXPORT Atom XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG
 BLIB_EXPORT Atom XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
 BLIB_EXPORT Atom XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
 BLIB_EXPORT Atom XProperty::blurRegion = XInternAtom(QX11Info::display(), "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
+BLIB_EXPORT Atom XProperty::forceShadows = XInternAtom( QX11Info::display(), "_KDE_SHADOW_FORCE", False );
+
+void
+XProperty::setAtom(WId window, Atom atom)
+{
+    const char *data = "1";
+    XChangeProperty(QX11Info::display(), window, atom, XA_ATOM, 32, PropModeReplace, (uchar*)data, 1 );
+}
 
 void
 XProperty::handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n)

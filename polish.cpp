@@ -29,8 +29,6 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
-#include <QPainter>
-#include <QPen>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QTimer>
@@ -386,6 +384,7 @@ Style::polish( QWidget * widget )
 #if QT_VERSION >= 0x040500
         if ( appType == Dolphin )
         if ( QMainWindow *mw = qobject_cast<QMainWindow*>(widget) )
+//             mw->setDockOptions(mw->dockOptions()|QMainWindow::VerticalTabs);
             mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );       
 #endif
         //BEGIN Popup menu handling                                                                -
@@ -437,10 +436,6 @@ Style::polish( QWidget * widget )
         /// WORKAROUND Qt color bug, uses daddies palette and FGrole, but TooltipBase as background
         else if (widget->inherits("QWhatsThat"))
             widget->setPalette(QToolTip::palette()); // so this is Qt bug WORKAROUND
-#if 0 // until kwin provides better shadows
-        else if (widget->inherits("QDockWidget"))
-            widget->installEventFilter(this); // shape corners... repeated below!
-#endif
         else
         {
             // talk to kwin about colors, gradients, etc.
@@ -808,21 +803,19 @@ Style::polish( QWidget * widget )
 //                 btn->setIconSize(QSize(10,10));
         }
     }
-    else if ( config.bg.docks.invert )
+    else if ( QDockWidget *dock = qobject_cast<QDockWidget*>(widget) )
     {
-        if (QDockWidget *dock = qobject_cast<QDockWidget*>(widget))
+        widget->setAttribute(Qt::WA_Hover);
+        if ( config.menu.round )
+            FILTER_EVENTS(widget); // shape 
+        if ( config.bg.docks.invert && dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable) )
         {
-            if (config.bg.docks.invert && (dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable)))
-            {
-                QPalette pal = dock->palette();
-                QColor c = pal.color(QPalette::Window);
-                pal.setColor(QPalette::Window, pal.color(QPalette::WindowText));
-                pal.setColor(QPalette::WindowText, c);
-                dock->setPalette(pal);
-                dock->setAutoFillBackground(true);
-            }
-//             connect (widget, SIGNAL(featuresChanged(QDockWidget::DockWidgetFeatures)),
-//                     this, SLOT(dockFeaturesChanged(QDockWidget::DockWidgetFeatures)));
+            QPalette pal = dock->palette();
+            QColor c = pal.color(QPalette::Window);
+            pal.setColor(QPalette::Window, pal.color(QPalette::WindowText));
+            pal.setColor(QPalette::WindowText, c);
+            dock->setPalette(pal);
+            dock->setAutoFillBackground(true);    
         }
     }
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
@@ -851,7 +844,7 @@ Style::polish( QWidget * widget )
     /// hover some leftover widgets
     else if (widget->inherits("QAbstractSpinBox") || widget->inherits("QSplitterHandle") ||
         widget->inherits("QWebView") || // to update the scrollbars
-        qobject_cast<QDockWidget*>(widget) || widget->inherits("QWorkspaceTitleBar") ||
+        widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("Q3DockWindowResizeHandle"))
     {
         widget->setAttribute(Qt::WA_Hover);

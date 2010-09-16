@@ -1073,6 +1073,48 @@ Style::updateBlurRegions() const
     pendingBlurUpdates.clear();
 }
 
+static void shapeCorners( QWidget *widget, bool forceShadows )
+{
+
+#if 0 // xPerimental code for ribbon like looking menus - not atm.
+    QAction *head = menu->actions().at(0);
+    QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
+    Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
+    head->iconText());
+    r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
+    QResizeEvent *rev = (QResizeEvent*)ev;
+    QRegion mask(menu->rect());
+    mask -= QRect(0,0,menu->width(),r.bottom());
+    mask += r;
+    mask -= masks.corner[0]; // tl
+    QRect br = masks.corner[1].boundingRect();
+    mask -= masks.corner[1].translated(r.right()-br.width(), 0); // tr
+    br = masks.corner[2].boundingRect();
+    mask -= masks.corner[2].translated(0, menu->height()-br.height()); // bl
+    br = masks.corner[3].boundingRect();
+    mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
+#endif
+    
+#ifdef Q_WS_X11
+    if ( forceShadows ) // kwin/beshadowed needs a little hint to shadow this one nevertheless
+        XProperty::setAtom( widget->winId(), XProperty::forceShadows );
+#endif
+
+    const int w = widget->width();
+    const int h = widget->height();
+    QRegion mask(4, 0, w-8, h);
+    mask += QRegion(0, 4, w, h-8);
+    mask += QRegion(2, 1, w-4, h-2);
+    mask += QRegion(1, 2, w-2, h-4);
+    // only top rounded - but looks nasty
+    //          QRegion mask(0, 0, w, h-4);
+    //          mask += QRect(1, h-4, w-2, 2);
+    //          mask += QRect(2, h-2, w-4, 1);
+    //          mask += QRect(4, h-1, w-8, 1);
+            
+    widget->setMask(mask);
+}
+
 bool
 Style::eventFilter( QObject *object, QEvent *ev )
 {
@@ -1309,55 +1351,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::Resize:
     {
         QResizeEvent *re = static_cast<QResizeEvent*>(ev);
-        QWidget *widget = qobject_cast<QWidget*>(object); // dock = 0;
+        QWidget *widget = qobject_cast<QWidget*>(object);
         if (!widget)
             return false;
 
-        if ( ( widget->isWindow() && config.menu.round && qobject_cast<QMenu*>(object) ) || ( appType == Dolphin && object->inherits("DolphinViewContainer") )
-#if 0
-            || (config.bg.docks.shape && (widget = dock = qobject_cast<QDockWidget*>(object))))
-        {
-            if (dock && dock->isWindow()) // kwin yet cannot. compiz can't even menus...
-            {
-                dock->clearMask();
-                return false;
-            }
-#else
-                )
-        {
-#endif
-#if 0 // xPerimental code for ribbon like looking menus - not atm.
-            QAction *head = menu->actions().at(0);
-            QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
-            Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
-            head->iconText());
-            r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
-            QResizeEvent *rev = (QResizeEvent*)ev;
-            QRegion mask(menu->rect());
-            mask -= QRect(0,0,menu->width(),r.bottom());
-            mask += r;
-            mask -= masks.corner[0]; // tl
-            QRect br = masks.corner[1].boundingRect();
-            mask -= masks.corner[1].translated(r.right()-br.width(), 0); // tr
-            br = masks.corner[2].boundingRect();
-            mask -= masks.corner[2].translated(0, menu->height()-br.height()); // bl
-            br = masks.corner[3].boundingRect();
-            mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
-#endif
-            const int w = widget->width();
-            const int h = widget->height();
-            QRegion mask(4, 0, w-8, h);
-            mask += QRegion(0, 4, w, h-8);
-            mask += QRegion(2, 1, w-4, h-2);
-            mask += QRegion(1, 2, w-2, h-4);
-            // only top rounded - but looks nasty
-            //          QRegion mask(0, 0, w, h-4);
-            //          mask += QRect(1, h-4, w-2, 2);
-            //          mask += QRect(2, h-2, w-4, 1);
-            //          mask += QRect(4, h-1, w-8, 1);
-                    
-            widget->setMask(mask);
-        }
+        bool isDock = false;
+        if ( ( widget->isWindow() && config.menu.round && (qobject_cast<QMenu*>(widget) || (isDock = qobject_cast<QDockWidget*>(widget)) ) ) || 
+             ( appType == Dolphin && widget->inherits("DolphinViewContainer") ) )
+            shapeCorners( widget, isDock );
         
         if ( config.bg.blur && 
             (widget->isWindow() || widget->autoFillBackground() ||
@@ -1477,7 +1478,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 #endif
             return false;
         }
-        if (QMenu * menu = qobject_cast<QMenu*>(widget))
+        else if (QMenu * menu = qobject_cast<QMenu*>(widget))
         {
             // seems to be necessary, somehow KToolBar context menus manages to take QPalette::Window...?!
             // through title setting?!
@@ -1490,9 +1491,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 pt = menu->parentWidget()->mapToGlobal(pt);
                 menu->move(pt);
             }
-            QMenuBar *bar = bar4popup(menu);
-            if (bar)
+
 #if 0
+            if ( QMenuBar *bar = bar4popup(menu) )
             {
                 QPoint pos(dpi.f1, 0);
                 pos += bar->actionGeometry(menu->menuAction()).topLeft();
@@ -1500,10 +1501,12 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 menu->setActiveAction(menu->actions().at(0));
             }
 #else
-            menu->move(menu->pos()-QPoint(0,F(2)));
+                menu->move(menu->pos()-QPoint(0,F(2)));
 #endif
             return false;
         }
+        else if ( widget->isWindow() && config.menu.round && qobject_cast<QDockWidget*>(widget) )
+            shapeCorners(widget, true);
         
         if ( config.bg.blur && !widget->isWindow() && 
             (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
