@@ -385,7 +385,7 @@ Style::polish( QWidget * widget )
         if ( appType == Dolphin )
         if ( QMainWindow *mw = qobject_cast<QMainWindow*>(widget) )
 //             mw->setDockOptions(mw->dockOptions()|QMainWindow::VerticalTabs);
-            mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );       
+            mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );
 #endif
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
@@ -516,7 +516,8 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                if (appType == Dolphin && itemView->parentWidget() && itemView->inherits("DolphinIconsView") )
+                if ( Hacks::config.extendDolphinViews  && itemView->parentWidget() &&
+                     QString(itemView->metaObject()->className()).startsWith("Dolphin") )
                 {
                     if (QWidget *grampa = itemView->parentWidget()->parentWidget())
                     {

@@ -149,6 +149,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.lockToolBars = readBool(HACK_TOOLBAR_LOCKING);
         Hacks::config.invertDolphinUrlBar = appType == Dolphin && readBool(HACK_DOLPHIN_URLBAR);
         Hacks::config.fixKMailFolderList = appType == KMail && readBool(HACK_KMAIL_FOLDERS);
+        Hacks::config.extendDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_ICONVIEWS);
         // PW Echo Char ===========================
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
 
@@ -431,10 +432,22 @@ Style::readSettings(const QSettings* settings, QString appName)
 //     GRAD(toolbox) = readGrad(TAB_ACTIVEGRADIENT);
 
     // Views ===========================
-    readRole(view.header, VIEW_HEADERROLE);
-    readRole(view.sortingHeader, VIEW_SORTINGHEADERROLE);
-    config.view.headerGradient = readGrad(VIEW_HEADERGRADIENT);
-    config.view.sortingHeaderGradient = readGrad(VIEW_SORTINGHEADERGRADIENT);
+    if ( Hacks::config.extendDolphinViews )
+    {
+        config.view.header_role[Bg] = QPalette::Base;
+        config.view.header_role[Fg] = QPalette::Text;
+        config.view.sortingHeader_role[Bg] = QPalette::AlternateBase;
+        config.view.sortingHeader_role[Fg] = QPalette::Text;
+        config.view.headerGradient = Gradients::None;
+        config.view.sortingHeaderGradient = Gradients::None;
+    }
+    else
+    {
+        readRole(view.header, VIEW_HEADERROLE);
+        readRole(view.sortingHeader, VIEW_SORTINGHEADERROLE);
+        config.view.headerGradient = readGrad(VIEW_HEADERGRADIENT);
+        config.view.sortingHeaderGradient = readGrad(VIEW_SORTINGHEADERGRADIENT);
+    }
     config.view.shadeLevel = readInt(VIEW_SHADE_LEVEL);
     config.view.shadeRole = (QPalette::ColorRole) iSettings->value(VIEW_SHADE_ROLE).toInt();
 

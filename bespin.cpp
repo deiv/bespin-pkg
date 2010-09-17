@@ -1152,7 +1152,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
 #endif
-        if ( appType == Dolphin && object->inherits("DolphinViewContainer") )
+        if ( Hacks::config.extendDolphinViews && object->inherits("DolphinViewContainer") )
         {
             QWidget *w = static_cast<QWidget*>(object);
             QPainter p(w);
@@ -1357,7 +1357,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 
         bool isDock = false;
         if ( ( widget->isWindow() && config.menu.round && (qobject_cast<QMenu*>(widget) || (isDock = qobject_cast<QDockWidget*>(widget)) ) ) || 
-             ( appType == Dolphin && widget->inherits("DolphinViewContainer") ) )
+             ( Hacks::config.extendDolphinViews && widget->inherits("DolphinViewContainer") ) )
             shapeCorners( widget, isDock );
         
         if ( config.bg.blur && 
@@ -1749,16 +1749,16 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
 void
 Style::focusWidgetChanged( QWidget *old, QWidget *focusWidget )
 {
-    if ( appType == Dolphin )
+    if ( Hacks::config.extendDolphinViews )
     {
         QWidget *grampa = 0;
-        if ( focusWidget && (grampa = focusWidget->parentWidget()) && (grampa = grampa->parentWidget()) && focusWidget->inherits("DolphinIconsView") )
+        if ( qobject_cast<QAbstractItemView*>(focusWidget) && (grampa = focusWidget->parentWidget()) && (grampa = grampa->parentWidget()) && QString(focusWidget->metaObject()->className()).startsWith("Dolphin") )
         {
             grampa->setProperty("hasFocus", true); 
             grampa->update();
             
         }
-        if ( old && (grampa = old->parentWidget()) && (grampa = grampa->parentWidget()) && old->inherits("DolphinIconsView") )
+        if ( qobject_cast<QAbstractItemView*>(old) && (grampa = old->parentWidget()) && (grampa = grampa->parentWidget()) && QString(old->metaObject()->className()).startsWith("Dolphin") )
         {
             grampa->setProperty("hasFocus", false); 
             grampa->update();
