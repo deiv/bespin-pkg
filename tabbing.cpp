@@ -120,6 +120,19 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
             return; // usually we alter the paintevent by eventfiltering
         win = widget->window();
     }
+    else
+    {
+        if (painter->device()->devType() == QInternal::Widget)
+            widget = static_cast<QWidget*>(painter->device());
+        else
+        {
+            QPaintDevice *dev = QPainter::redirected(painter->device());
+            if (dev && dev->devType() == QInternal::Widget)
+                widget = static_cast<QWidget*>(dev);
+        }
+        if ( widget )
+            win = widget->window();
+    }
 
     QRect rect = RECT.adjusted(0, 0, 0, -F(2));
     int size = RECT.height(); Qt::Orientation o = Qt::Vertical;
@@ -130,8 +143,8 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
         winRect = win->rect();
         winRect.moveTopLeft(widget->mapFrom(win, winRect.topLeft()));
     }
-    else
-        winRect = tbb->tabBarRect; // we set this from the eventfilter QEvent::Paint
+//     else
+//         winRect = tbb->tabBarRect; // we set this from the eventfilter QEvent::Paint
 
     Tile::PosFlags pf = Tile::Full;
     if (verticalTabs(tbb->shape))
