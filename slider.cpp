@@ -204,7 +204,7 @@ Style::drawDial(const QStyleOptionComplex *option, QPainter *painter, const QWid
     int d = qMin(2*rect.width()/5, Dpi::target.SliderThickness);
     int r;
     // angle calculation from qcommonstyle.cpp (c) Trolltech 1992-2007, ASA.
-    qreal a;
+    float a;
     if (dial->maximum == dial->minimum)
         a = M_PI / 2;
     else if (dial->dialWrapping)

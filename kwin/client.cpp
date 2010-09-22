@@ -563,7 +563,7 @@ else\
 #define drawRoundedRect(_R_, _RX_, _RY_) drawRoundRect(_R_, ( 99*_RX_)/qMax(_RX_, _R_.width()), (99*_RY_)/qMax(_RY_, _R_.height()))
 #endif
 
-inline static void shrink(QFont &fnt, qreal factor)
+inline static void shrink(QFont &fnt, float factor)
 {
     if (fnt.pointSize() > -1)
         fnt.setPointSize(qRound(fnt.pointSize()*factor));
@@ -815,14 +815,14 @@ Client::repaint(QPainter &p, bool paintTitle)
         QFont fnt = options()->font();
         if (iAmSmall)
             shrink(fnt, Factory::smallFactor());
-        qreal tw = 1.07*QFontMetrics(fnt).size(tf, myCaption).width();
+        float tw = 1.07*QFontMetrics(fnt).size(tf, myCaption).width();
         if (tw > sz)
         {
-            qreal f = sz/tw;
+            float f = sz/tw;
             if (f > 0.9)
                 fnt.setStretch(qRound(fnt.stretch()*f));
             else
-                shrink(fnt, qMax(f,0.75));
+                shrink(fnt, qMax(f,0.75f));
         }
         p.setFont(fnt);
         // ===============
