@@ -366,7 +366,7 @@ Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPale
 {
     if (text.isEmpty())
         return;
-    flags |= config.mnemonic;
+//     flags |= config.mnemonic;
     QPen savedPen;
     bool penDirty = false;
     if (textRole != QPalette::NoRole)
