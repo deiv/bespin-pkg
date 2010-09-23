@@ -125,6 +125,8 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
     // text
     const int itemtextopts = Qt::AlignCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
     QPalette::ColorRole fg = widget ? widget->foregroundRole() : QPalette::WindowText;
+    QFont fnt = painter->font();
+    setBold(painter, dock->title);
     QPen pen = painter->pen();
     if (floating && widget->isActiveWindow())
         painter->setPen(COLOR(fg));
@@ -132,6 +134,7 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
         painter->setPen(Colors::mid(bg, COLOR(fg), 2, 1+isEnabled));
     drawItemText(painter, rect, itemtextopts, PAL, isEnabled, dock->title/*, QPalette::NoRole, &rect*/);
     painter->setPen(pen);
+    painter->setFont(fnt);
 //     const int d = 3*rect.width()/16; rect.adjust(d,0,-d,0);
 //     shadows.line[0][Sunken].render(rect, painter, Tile::Full, true);
 }
