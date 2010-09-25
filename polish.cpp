@@ -384,8 +384,8 @@ Style::polish( QWidget * widget )
 #if QT_VERSION >= 0x040500
         if ( appType == Dolphin )
         if ( QMainWindow *mw = qobject_cast<QMainWindow*>(widget) )
-//             mw->setDockOptions(mw->dockOptions()|QMainWindow::VerticalTabs);
-            mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );
+            mw->setDockOptions(mw->dockOptions()|QMainWindow::VerticalTabs);
+//             mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );       
 #endif
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
@@ -455,52 +455,56 @@ Style::polish( QWidget * widget )
     //END Window handling                                                                          -
 
     //BEGIN Frames                                                                                 -
-    else if (QFrame *frame = qobject_cast<QFrame *>(widget)) // sic! for "else" - no window frames!
+    if ( QFrame *frame = qobject_cast<QFrame *>(widget) )
     {
+        if ( !frame->isWindow() )
+        {
+#if 0 // i want them centered, but titlewidget fights back, and it's not worth the eventfilter monitor
+            if (QLabel *label = qobject_cast<QLabel*>(frame))
+            {   // i want them center aligned
+                if (label->parentWidget() && label->parentWidget()->parentWidget() &&
+                    label->parentWidget()->parentWidget()->inherits("KTitleWidget"))
+                    label->setAlignment(Qt::AlignCenter);
+            } else
+#endif
+            // sunken looks soo much nicer ;)
+            if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
+            {
+                if (config.bg.mode == Scanlines)
+                    frame->setFrameShadow(QFrame::Sunken);
+                else
+                {
+                    frame->setAutoFillBackground(false);
+                    frame->setBackgroundRole(QPalette::Window);
+                    frame->setForegroundRole(QPalette::WindowText);
+                }
+            }
+            else if (frame->frameShape() != QFrame::NoFrame )
+            {
+#if  QT_VERSION < 0x040500 // 4.5 has a CE_ for this =)
+                // Kill ugly line look (we paint our styled v and h lines instead ;)
+                if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
+                    FILTER_EVENTS(widget);
+                else if (frame->frameShape() != QFrame::StyledPanel)
+                {   // Kill ugly winblows frames... (qShadeBlablabla stuff)
+                    if ( frame->frameShape() == QFrame::Box )
+                        frame->setFrameShadow( QFrame::Plain );
+                    frame->setFrameShape(QFrame::StyledPanel);
+                }
+#endif
+//             if ( appType == KMail && frame->frameStyle() == (QFrame::StyledPanel|QFrame::Sunken) && frame->inherits("KHBox") )
+//                 frame->setFrameShadow(QFrame::Raised);
+            }
+        }
         // just saw they're niftier in skulpture -> had to do sth. ;-P
-        if (QLCDNumber *lcd = qobject_cast<QLCDNumber*>(frame))
+        if ( QLCDNumber *lcd = qobject_cast<QLCDNumber*>(frame) )
         {
             if (lcd->frameShape() != QFrame::NoFrame)
                 lcd->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
             lcd->setSegmentStyle(QLCDNumber::Flat);
             lcd->setAutoFillBackground(true);
         }
-#if 0 // i want them centered, but titlewidget fights back, and it's not worth the eventfilter monitor
-        else if (QLabel *label = qobject_cast<QLabel*>(frame))
-        {   // i want them center aligned
-            if (label->parentWidget() && label->parentWidget()->parentWidget() &&
-                label->parentWidget()->parentWidget()->inherits("KTitleWidget"))
-                label->setAlignment(Qt::AlignCenter);
-        }
-#endif
-        // sunken looks soo much nicer ;)
-        else if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
-        {
-            if (config.bg.mode == Scanlines)
-                frame->setFrameShadow(QFrame::Sunken);
-            else
-            {
-                frame->setAutoFillBackground(false);
-                frame->setBackgroundRole(QPalette::Window);
-                frame->setForegroundRole(QPalette::WindowText);
-            }
-        }
-        else if (frame->frameShape() != QFrame::NoFrame )
-        {
-#if  QT_VERSION < 0x040500 // 4.5 has a CE_ for this =)
-            // Kill ugly line look (we paint our styled v and h lines instead ;)
-            if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
-                FILTER_EVENTS(widget);
-            else if (frame->frameShape() != QFrame::StyledPanel)
-            {   // Kill ugly winblows frames... (qShadeBlablabla stuff)
-                if ( frame->frameShape() == QFrame::Box )
-                    frame->setFrameShadow( QFrame::Plain );
-                frame->setFrameShape(QFrame::StyledPanel);
-            }
-#endif
-//             if ( appType == KMail && frame->frameStyle() == (QFrame::StyledPanel|QFrame::Sunken) && frame->inherits("KHBox") )
-//                 frame->setFrameShadow(QFrame::Raised);
-        }
+
 
         // scrollarea hovering
         QAbstractScrollArea *area = 0;
@@ -516,7 +520,7 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                if ( Hacks::config.extendDolphinViews  && itemView->parentWidget() &&
+                if ( Hacks::config.extendDolphinViews && itemView->parentWidget() &&
                      QString(itemView->metaObject()->className()).startsWith("Dolphin") )
                 {
                     if (QWidget *grampa = itemView->parentWidget()->parentWidget())
@@ -538,7 +542,6 @@ Style::polish( QWidget * widget )
                         grampa->getContentsMargins(&l,&t,&r,&b);
                         grampa->setContentsMargins(l,t,r,qMax(b,F(3)));
                     }
-                    
                 }
                 if (QWidget *vp = itemView->viewport())
                 {
@@ -595,9 +598,8 @@ Style::polish( QWidget * widget )
             Animator::Tab::manage(widget);
         else if (widget->inherits("KColorPatch"))
             widget->setAttribute(Qt::WA_NoMousePropagation);
-
         /// QToolBox handling - a shame they look that crap by default!
-        if (widget->inherits("QToolBox"))
+        else if (widget->inherits("QToolBox"))
         {   // get rid of QPalette::Button
             widget->setBackgroundRole(QPalette::Window);
             widget->setForegroundRole(QPalette::WindowText);
@@ -607,15 +609,18 @@ Style::polish( QWidget * widget )
                 widget->layout()->setSpacing ( 0 );
             }
         }
-
-        /// "Frame above Content" look, but ...
-        else if (isSpecialFrame(widget))
-        {   // ...QTextEdit etc. can be handled more efficiently
-            if (frame->lineWidth() == 1)
-                frame->setLineWidth(F(4)); // but must have enough indention
+        
+        if ( !frame->isWindow() )
+        {
+            /// "Frame above Content" look, but ...
+            if (isSpecialFrame(widget))
+            {   // ...QTextEdit etc. can be handled more efficiently
+                if (frame->lineWidth() == 1)
+                    frame->setLineWidth(F(4)); // but must have enough indention
+            }
+            else if (!widget->inherits("KPIM::OverlayWidget"))
+                VisualFrame::manage(frame);
         }
-        else if (!widget->inherits("KPIM::OverlayWidget"))
-            VisualFrame::manage(frame);
     }
     //END FRAMES                                                                                   -
 

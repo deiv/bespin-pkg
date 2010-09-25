@@ -1693,12 +1693,9 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
         itemView->setBackgroundRole(alternate ? QPalette::AlternateBase : QPalette::Base);
         itemView->setForegroundRole(QPalette::Text);
     }
-    else if ( vp )
-    {   /// NOTE: WORKAROUND for (no more) dolphin but amarok and probably others:
-        // if the viewport ist not autofilled, it's roles need to be adjusted (like QPalette::Window/Text)
-        // force this here, hoping it won't cause to many problems - and make a bug report
+    else if ( vp ) // just fix text colors
+    {   
         QPalette pal = itemView->palette();
-
         pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
         pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
         pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
