@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>765</width>
-    <height>391</height>
+    <height>402</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -562,8 +562,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>318</width>
-               <height>110</height>
+               <width>322</width>
+               <height>114</height>
               </rect>
              </property>
              <attribute name="label">
@@ -778,8 +778,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>167</width>
-               <height>61</height>
+               <width>169</width>
+               <height>62</height>
               </rect>
              </property>
              <attribute name="label">
@@ -874,8 +874,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>243</width>
-               <height>172</height>
+               <width>245</width>
+               <height>180</height>
               </rect>
              </property>
              <attribute name="label">
@@ -992,7 +992,7 @@
                <x>0</x>
                <y>0</y>
                <width>110</width>
-               <height>86</height>
+               <height>88</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1089,8 +1089,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>314</width>
-               <height>80</height>
+               <width>316</width>
+               <height>81</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1258,8 +1258,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>262</width>
-               <height>175</height>
+               <width>266</width>
+               <height>180</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1457,8 +1457,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>258</width>
-               <height>154</height>
+               <width>260</width>
+               <height>161</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1932,7 +1932,7 @@
                <x>0</x>
                <y>0</y>
                <width>316</width>
-               <height>242</height>
+               <height>249</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2094,8 +2094,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>193</width>
-               <height>86</height>
+               <width>197</width>
+               <height>90</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3130,7 +3130,17 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="hackDolphinIconViews">
+            <property name="text">
+             <string>Dolphin: unite iconview, url navigator &amp; statusbar</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="hackDolphinUrl">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Dolphin: Invert the Url Navigator</string>
             </property>
@@ -3479,12 +3489,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>513</x>
-     <y>158</y>
+     <x>384</x>
+     <y>127</y>
     </hint>
     <hint type="destinationlabel">
-     <x>523</x>
-     <y>158</y>
+     <x>394</x>
+     <y>127</y>
     </hint>
    </hints>
   </connection>
@@ -3495,12 +3505,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>239</x>
-     <y>86</y>
+     <x>221</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel">
-     <x>261</x>
-     <y>86</y>
+     <x>243</x>
+     <y>79</y>
     </hint>
    </hints>
   </connection>
@@ -3511,12 +3521,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>385</x>
-     <y>165</y>
+     <x>204</x>
+     <y>89</y>
     </hint>
     <hint type="destinationlabel">
-     <x>522</x>
-     <y>165</y>
+     <x>204</x>
+     <y>89</y>
     </hint>
    </hints>
   </connection>
@@ -3527,12 +3537,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>473</x>
-     <y>288</y>
+     <x>197</x>
+     <y>82</y>
     </hint>
     <hint type="destinationlabel">
-     <x>532</x>
-     <y>289</y>
+     <x>197</x>
+     <y>82</y>
     </hint>
    </hints>
   </connection>
@@ -3559,12 +3569,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>396</x>
-     <y>109</y>
+     <x>378</x>
+     <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>418</x>
-     <y>109</y>
+     <x>400</x>
+     <y>101</y>
     </hint>
    </hints>
   </connection>
@@ -3575,12 +3585,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>351</x>
-     <y>85</y>
+     <x>333</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel">
-     <x>351</x>
-     <y>224</y>
+     <x>333</x>
+     <y>217</y>
     </hint>
    </hints>
   </connection>
@@ -3591,12 +3601,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>537</x>
-     <y>108</y>
+     <x>408</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel">
-     <x>169</x>
-     <y>114</y>
+     <x>151</x>
+     <y>103</y>
     </hint>
    </hints>
   </connection>
@@ -3607,12 +3617,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>537</x>
-     <y>108</y>
+     <x>408</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel">
-     <x>301</x>
-     <y>134</y>
+     <x>281</x>
+     <y>103</y>
     </hint>
    </hints>
   </connection>
@@ -3623,12 +3633,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>537</x>
-     <y>108</y>
+     <x>408</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel">
-     <x>398</x>
-     <y>134</y>
+     <x>380</x>
+     <y>103</y>
     </hint>
    </hints>
   </connection>
@@ -3639,12 +3649,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>185</x>
-     <y>196</y>
+     <x>197</x>
+     <y>77</y>
     </hint>
     <hint type="destinationlabel">
-     <x>188</x>
-     <y>176</y>
+     <x>197</x>
+     <y>72</y>
     </hint>
    </hints>
   </connection>
@@ -3655,12 +3665,28 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>200</y>
+     <x>197</x>
+     <y>77</y>
     </hint>
     <hint type="destinationlabel">
-     <x>189</x>
-     <y>212</y>
+     <x>197</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>hackDolphinIconViews</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>hackDolphinUrl</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>292</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>230</x>
+     <y>304</y>
     </hint>
    </hints>
   </connection>

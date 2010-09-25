@@ -468,6 +468,11 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     setContextHelp(ui.hackDolphinUrl, "<b>Dolphin's URL Navigator</b><hr>\
     Invert colors, paint a TabBar-a-like frame and remove the location icon...");
     
+    handleSettings(ui.hackDolphinIconViews, HACK_DOLPHIN_ICONVIEWS);
+    setContextHelp(ui.hackDolphinIconViews, "<b>Dolphin Iconviews</b><hr>\
+    The three items for a unity when eg. splitting the view, but this is not reflected visually what\
+    leads to \"disalignment\"");
+    
     handleSettings(ui.dolphinViews, HACK_DOLPHIN_VIEWS);
     setContextHelp(ui.dolphinViews, "<b>Dolphin sidebar</b><hr>\
     Dolphin sets some views in the sidebars to look like the window - check this to force a\
