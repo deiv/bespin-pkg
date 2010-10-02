@@ -63,36 +63,39 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group)
     return list;
 }
 
-#if 0
-static int fontOffset()
+#if 1
+static int fontOffset(bool bold = false)
 {
     QString string = "qtipdfghjklöäyxbQWRTZIPÜSDFGHJKLÖÄYXVBN!()?ß\"";
-    QFont font; QFontMetrics metrics(font);
+    QFont font;
+    font.setBold(bold);
+    QFontMetrics metrics(font);
     QImage img(metrics.size(0, string), QImage::Format_ARGB32);
     img.fill(0xffffffff);
     QPainter p(&img); p.setPen(Qt::black); p.drawText(img.rect(), Qt::AlignCenter, string); p.end();
-    int result = 0;
+    int y1 = 0, y2 = 0;
     for (int y = 0; y < img.height(); ++y)
     {
         QRgb *scanLine = (QRgb*)img.scanLine(y);
         for (int x = 0; x < img.width(); ++x)
         {
             if (qRed(*scanLine++) < 128)
-                { result = y << 16; goto descent; }
+                { y1 = y; goto descent; }
         }
-        if ( result ) break;
     }
 descent:
-    for (int y = img.height(); y > 0; --y)
+    for (int y = img.height()-1; y > -1; --y)
     {
-        QRgb *scanLine = (QRgb*)img.scanLine(y-1);
+        QRgb *scanLine = (QRgb*)img.scanLine(y);
         for (int x = 0; x < img.width(); ++x)
         {
             if (qRed(*scanLine++) < 128)
-                return ( result | ( (metrics.height() - (y + 1) ) & 0xffff) );
+                { y2 = img.height()-y-1; goto offset; }
         }
     }
-    return result;
+offset:
+//     qDebug() << y1 << y2 << img.height() << (y2-y1)/2;
+    return (y2-y1)/2;
 }
 #endif
 
@@ -153,7 +156,8 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.invertDolphinUrlBar = Hacks::config.extendDolphinViews && readBool(HACK_DOLPHIN_URLBAR);
         
         // Font fixing offsets
-        config.fontOffset[0] = config.fontOffset[1] = 0;
+        config.fontOffset[0] = fontOffset();
+        config.fontOffset[1] = fontOffset(true);
         QStringList lst = iSettings->value( "FontOffset", QStringList() ).toStringList();
         if ( lst.count() > 0 )
         {
