@@ -151,6 +151,19 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.fixKMailFolderList = appType == KMail && readBool(HACK_KMAIL_FOLDERS);
         Hacks::config.extendDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_ICONVIEWS);
         Hacks::config.invertDolphinUrlBar = Hacks::config.extendDolphinViews && readBool(HACK_DOLPHIN_URLBAR);
+        
+        // Font fixing offsets
+        config.fontOffset[0] = config.fontOffset[1] = 0;
+        QStringList lst = iSettings->value( "FontOffset", QStringList() ).toStringList();
+        if ( lst.count() > 0 )
+        {
+            config.fontOffset[0] = lst.at(0).toInt();
+            if ( lst.count() > 1 )
+                config.fontOffset[1] = lst.at(1).toInt();
+            else
+                config.fontOffset[1] = config.fontOffset[0];
+        }
+
         // PW Echo Char ===========================
         config.input.pwEchoChar = ushort(iSettings->value(INPUT_PWECHOCHAR).toUInt());
 

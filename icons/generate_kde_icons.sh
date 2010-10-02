@@ -109,7 +109,9 @@ while read line; do
                     mogrify -fill $color -colorize 100% "$png"
                 fi
             fi
-            composite -blend ${alpha}x0 "$png" -size ${sz}x${sz} xc:transparent -matte "$png"
+	    if ((alpha < 100)); then
+                composite -blend ${alpha}x0 "$png" -size ${sz}x${sz} xc:transparent -matte "$png"
+            fi
         fi
 
         # print progress

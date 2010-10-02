@@ -147,7 +147,7 @@ Style::drawHeaderLabel(const QStyleOption * option, QPainter * painter, const QW
         fg = &CCOLOR(view.header, Fg);
     }
     if (bold)
-        setBold(painter);
+        setBold(painter, header->text, rect.width());
 
     if (isEnabled)
     {   // dark background, let's paint an emboss

@@ -383,7 +383,7 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     painter->save();
     if (!sunken && btn->features & QStyleOptionButton::DefaultButton)
-        setBold(painter, btn->text);
+        setBold(painter, btn->text, ir.width());
 
     if (isEnabled)
     {

@@ -126,7 +126,7 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
     const int itemtextopts = Qt::AlignCenter | Qt::TextSingleLine | Qt::TextHideMnemonic;
     QPalette::ColorRole fg = widget ? widget->foregroundRole() : QPalette::WindowText;
     QFont fnt = painter->font();
-    setBold(painter, dock->title);
+    setBold(painter, dock->title, rect.width());
     QPen pen = painter->pen();
     if (floating && widget->isActiveWindow())
         painter->setPen(COLOR(fg));

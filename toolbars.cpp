@@ -378,7 +378,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
             text = Colors::mid(text, FCOLOR(Link), 6-step, step);
         painter->setPen(text);
         if (sunken)
-            setBold(painter, toolbutton->text);
+            setBold(painter, toolbutton->text, RECT.width());
         drawItemText(painter, RECT, Qt::AlignCenter | BESPIN_MNEMONIC, PAL, isEnabled, toolbutton->text);
         return;
     }

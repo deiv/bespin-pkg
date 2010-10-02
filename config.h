@@ -68,7 +68,8 @@ typedef struct Config
     int  dialogBtnLayout;
     bool drawSplitters;
     bool fadeInactive;
-    int  groupBoxMode;
+    int fontOffset[2];
+    int groupBoxMode;
    
     struct input
     {

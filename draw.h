@@ -46,7 +46,7 @@ Dpi Style::dpi;
 #define BESPIN_MNEMONIC config.mnemonic
 
 static inline void
-setBold(QPainter *p, const QString &text = QString())
+setBold(QPainter *p, const QString &text = QString(), int w = -1)
 {
     if (p->font().pointSize() < 1)  // ignore pixelsize fonts for reports of bad visual quality (#2787384)
         return;
@@ -56,17 +56,17 @@ setBold(QPainter *p, const QString &text = QString())
     if (!text.isEmpty())
     {
         int wb = QFontMetrics(fnt).size(Qt::TextShowMnemonic, text).width();
-        if (wb)
+        if (wb > w)
         {
-            int w = QFontMetrics(p->font()).size(Qt::TextShowMnemonic, text).width();
-            fnt.setStretch(lround(w*100.0/wb));
+            int wd = qMax(w-F(4), QFontMetrics(p->font()).size(Qt::TextShowMnemonic, text).width());
+            fnt.setStretch(lround(wd*100.0/wb));
         }
     }
     p->setFont(fnt);
 }
 
 static inline void
-setTitleFont(QPainter *p, const QString &text = QString())
+setTitleFont(QPainter *p, const QString &text = QString(), int w = -1 )
 {
     if (p->font().pointSize() < 1) // ignore pixelsize fonts for reports of bad visual quality (#2787384)
         return;
@@ -85,10 +85,10 @@ setTitleFont(QPainter *p, const QString &text = QString())
     else
     {
         int wb = QFontMetrics(fnt).size(Qt::TextShowMnemonic, text).width();
-        if (wb)
+        if (wb > w)
         {
-            int w = QFontMetrics(p->font()).size(Qt::TextShowMnemonic, text).width();
-            fnt.setStretch(lround(w*100.0/wb));
+            int wd = qMax(w-F(4), QFontMetrics(p->font()).size(Qt::TextShowMnemonic, text).width());
+            fnt.setStretch(lround(wd*100.0/wb));
         }
     }
 

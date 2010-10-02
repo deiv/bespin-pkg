@@ -375,7 +375,7 @@ Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPale
         savedPen = painter->pen();
         painter->setPen(QPen(pal.brush(textRole), savedPen.widthF()));
     }
-    QRect r = rect;
+    QRect r = rect.translated( 0, config.fontOffset[painter->font().bold()] );
     if (!enabled)
     {   // let's see if we can get some blurrage here =)
         if (!penDirty)
@@ -394,7 +394,7 @@ Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPale
         painter->drawText(r, flags, text);
     }
     else
-        painter->drawText(rect, flags, text, boundingRect);
+        painter->drawText(r, flags, text, boundingRect);
     if (penDirty)
         painter->setPen(savedPen);
 }

@@ -641,7 +641,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
 //     case SE_ItemViewItemText:
 //     case SE_TreeViewDisclosureItem: //Area for the actual disclosure item in a tree branch.
     case SE_ToolBoxTabContents: // Area for a toolbox tab's icon and label
-        return RECT;
+        return RECT.adjusted( F(3), F(3), -F(3), -F(3) );
 //    case SE_TabBarTearIndicator: // Area for the tear indicator on a tab bar with scroll arrows.
     default:
         return QCommonStyle::subElementRect ( element, option, widget);

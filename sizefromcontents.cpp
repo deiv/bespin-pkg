@@ -169,10 +169,11 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         return contentsSize - QSize(0, F(2));
 //    case CT_Splitter: // A splitter, like QSplitter
     case CT_TabBarTab: // A tab on a tab bar, like QTabBar
+        
         if HAVE_OPTION(tab, Tab)
         {
-            int add = F(9);
-            int other = 0;
+            const int add = F(9);
+            int other = F(2);
 #if QT_VERSION >= 0x040500
             if ( appType == Dolphin && widget )
             if ( const QTabBar *bar = qobject_cast<const QTabBar*>(widget) )

@@ -230,7 +230,7 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
         painter->restore();
         if (!menuItem->text.isEmpty())
         {
-            setBold(painter, menuItem->text);
+            setBold(painter, menuItem->text, RECT.width());
             drawItemText(painter, RECT, Qt::AlignCenter, PAL, isEnabled, menuItem->text, ROLE[Fg]);
             painter->setFont(menuItem->font);
         }
@@ -314,7 +314,7 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
             s = s.left(t);
         }
         if (menuitem->menuItemType == QStyleOptionMenuItem::DefaultItem)
-            setBold(painter, s);
+            setBold(painter, s, vTextRect.width());
         drawItemText(painter, vTextRect, text_flags | Qt::AlignLeft, PAL, isEnabled, s);
 //       painter->drawText(vTextRect, text_flags | Qt::AlignLeft, s.left(t));
     }

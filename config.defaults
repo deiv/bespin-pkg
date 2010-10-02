@@ -24,6 +24,7 @@
 #define LEFTHANDED "LeftHanded", false
 #define MACSTYLE "MacStyle", true
 #define FADE_INACTIVE "FadeInactive", false
+#define FONT_OFFSET "FontOffset", 0
 #define GROUP_BOX_MODE "GroupBoxMode", 1
 
 #define ARGB_BLACKLIST "ARGB.Blacklist", "smplayer,amarok,dragonplayer,vlc,vlc-wrapper,kscreenlocker"
