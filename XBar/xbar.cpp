@@ -183,6 +183,7 @@ XBar::init()
     updatePalette();
     
     show(myMainMenu);
+    QTimer::singleShot(500, this, SLOT(showMainMenu())); // force repositioning cause plasma sucks.
 
     ggmLastId = 0;
     ggmContext = XInternAtom( QX11Info::display(), "_NET_GLOBALMENU_MENU_CONTEXT", false );
