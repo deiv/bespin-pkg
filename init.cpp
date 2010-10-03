@@ -72,7 +72,7 @@ static int fontOffset(bool bold = false)
     QFontMetrics metrics(font);
     QImage img(metrics.size(0, string), QImage::Format_ARGB32);
     img.fill(0xffffffff);
-    QPainter p(&img); p.setPen(Qt::black); p.drawText(img.rect(), Qt::AlignCenter, string); p.end();
+    QPainter p(&img); p.setPen(Qt::black); p.setFont(font); p.drawText(img.rect(), Qt::AlignCenter, string); p.end();
     int y1 = 0, y2 = 0;
     for (int y = 0; y < img.height(); ++y)
     {
