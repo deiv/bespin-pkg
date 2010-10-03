@@ -64,13 +64,13 @@ static QStringList colors(const QPalette &pal, QPalette::ColorGroup group)
 }
 
 #if 1
-static int fontOffset(bool bold = false)
+static int fontOffset(bool bold = false, int *extend = 0)
 {
     QString string = "qtipdfghjklöäyxbQWRTZIPÜSDFGHJKLÖÄYXVBN!()?ß\"";
     QFont font;
     font.setBold(bold);
     QFontMetrics metrics(font);
-    QImage img(metrics.size(0, string), QImage::Format_ARGB32);
+    QImage img(metrics.size(0, string) + QSize(4,4), QImage::Format_ARGB32);
     img.fill(0xffffffff);
     QPainter p(&img); p.setPen(Qt::black); p.setFont(font); p.drawText(img.rect(), Qt::AlignCenter, string); p.end();
     int y1 = 0, y2 = 0;
@@ -94,8 +94,25 @@ descent:
         }
     }
 offset:
-//     qDebug() << y1 << y2 << img.height() << (y2-y1)/2;
-    return (y2-y1)/2;
+    if ( extend )
+    {
+        *extend = y1 + y2 - 4;
+        *extend -= qAbs(*extend)%2;
+//         qDebug() << y1 << y2 << *extend;
+    }
+//     qDebug() << y1 << y2;
+    if ( y1 == y2) // font is centered ... hopefully ...
+        return 0;
+    int off = (y2-y1)/2;
+    if ( !off )
+    {
+        off += (y1 < 2); // the font has a negtive extent to the top
+        off -= (y2 < 2); // the font has a negtive extent to the bottom
+    }
+//     qDebug() << "->" << off;
+    return off;
+//     return y2 - y1/2;
+//     return (y2-y1)/2;
 }
 #endif
 
@@ -156,7 +173,8 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.invertDolphinUrlBar = Hacks::config.extendDolphinViews && readBool(HACK_DOLPHIN_URLBAR);
         
         // Font fixing offsets
-        config.fontOffset[0] = fontOffset();
+        config.fontOffset[0] = fontOffset(false, &config.fontExtent);
+        config.fontExtent = iSettings->value( "FontExtent", config.fontExtent ).toInt();
         config.fontOffset[1] = fontOffset(true);
         QStringList lst = iSettings->value( "FontOffset", QStringList() ).toStringList();
         if ( lst.count() > 0 )

@@ -50,13 +50,13 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         if HAVE_OPTION(cb, ComboBox)
         {
             if (cb->editable)
-                return contentsSize + QSize(F(9) + (cb->fontMetrics.ascent() + F(2))*1.1, F(2));
+                return contentsSize + QSize(F(9) + (cb->fontMetrics.ascent() + F(2))*1.1, qMax(F(4) - config.fontExtent,0));
             
             int hgt = contentsSize.height();
             int d = F(2);
             if ( cb->frame )
             {
-                hgt += (config.btn.fullHover) ? F(2) : F(4);
+                hgt += ((config.btn.fullHover) ? F(4) : F(6)) - config.fontExtent;
                 d = F(10);
             }
 //             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
@@ -73,15 +73,15 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
             int margin = F(2);
             int iconSize = hdr->icon.isNull() ? 0 : pixelMetric(QStyle::PM_SmallIconSize, hdr, widget);
             QSize txt = hdr->fontMetrics.size(0, hdr->text);
-            sz.setHeight(qMax(iconSize, txt.height()) + F(3));
+            sz.setHeight(qMax(iconSize, txt.height()) + F(5) - config.fontExtent);
             sz.setWidth((iconSize?margin+iconSize:0) + (hdr->text.isNull()?0:margin+txt.width()) + margin);
             return sz;
         }
     case CT_LineEdit: // A line edit, like QLineEdit
-        return contentsSize + QSize(F(4), F(2));
+        return contentsSize + QSize(F(4), qMax(F(4) - config.fontExtent,0));
     case CT_MenuBarItem:
     {   // A menu bar item, like the buttons in a QMenuBar
-        const int h = contentsSize.height()+F(4);
+        const int h = contentsSize.height() + F(8) - config.fontExtent;
         return QSize(qMax(contentsSize.width()+F(12), h*8/5), h);
     }
    case CT_MenuItem: // A menu item, like QMenuItem
@@ -93,10 +93,10 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
             bool checkable = menuItem->menuHasCheckableItems;
             int maxpmw = config.menu.showIcons*menuItem->maxIconWidth;
             int w = contentsSize.width();
-            int h = qMax(contentsSize.height(), menuItem->fontMetrics.lineSpacing()) + F(2);
+            int h = qMax(contentsSize.height(), menuItem->fontMetrics.lineSpacing()) + F(4) - config.fontExtent;
 
             if (config.menu.showIcons && !menuItem->icon.isNull())
-                h = qMax(h, menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), QIcon::Normal).height() + F(2));
+                h = qMax(h, menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), QIcon::Normal).height() + F(4) - config.fontExtent);
             if (menuItem->text.contains('\t'))
                 w += F(12);
             if (maxpmw > 0)
@@ -139,7 +139,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
                     if (abn->isCheckable())
                         w += contentsSize.height()+F(16);
 
-                int h = config.btn.layer ? F(2) : F(3);
+                int h = (config.btn.layer ? F(4) : F(5)) - config.fontExtent;
                 if (!config.btn.fullHover)
                     h *= 2;
                 h += contentsSize.height();
@@ -173,7 +173,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         if HAVE_OPTION(tab, Tab)
         {
             const int add = F(9);
-            int other = F(2);
+            int other = F(2) - config.fontExtent;
 #if QT_VERSION >= 0x040500
             if ( appType == Dolphin && widget )
             if ( const QTabBar *bar = qobject_cast<const QTabBar*>(widget) )
