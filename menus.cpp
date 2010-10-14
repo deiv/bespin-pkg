@@ -243,9 +243,11 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
     QColor bg = PAL.color(QPalette::Active, ROLE[Bg]);
     QColor fg = isEnabled ? COLOR(ROLE[Fg]) : Colors::mid(bg, PAL.color(QPalette::Active, ROLE[Fg]), 2,1);
 
-    painter->save();
-    bool checkable = (menuItem->checkType != QStyleOptionMenuItem::NotCheckable);
-    bool checked = checkable && menuItem->checked;
+    SAVE_PEN;
+    SAVE_BRUSH;
+    const bool checkable = (menuItem->checkType != QStyleOptionMenuItem::NotCheckable);
+    const bool checked = checkable && menuItem->checked;
+    const bool subMenu = (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu);
 
     // selected bg
     if (selected)
@@ -284,56 +286,16 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
         painter->drawPixmap(pmr.topLeft(), pixmap);
     }
        
-    painter->setPen ( fg );
-    painter->setBrush ( Qt::NoBrush );
-
     int x, y, w, h;
     r.getRect(&x, &y, &w, &h);
     const int tab = menuitem->tabWidth;
     const int cDim = (2*(r.height()+2)/3);
     const int xm = windowsItemFrame + iconCol + windowsItemHMargin;
     int xpos = r.x() + xm;
-    QRect textRect(xpos, y + windowsItemVMargin,
-                    w - xm - menuItem->menuHasCheckableItems*(cDim+F(7)) - windowsRightBorder - tab + 1,
-                    h - 2 * windowsItemVMargin);
-    QRect vTextRect = visualRect(option->direction, r, textRect);
-    QString s = menuitem->text;
 
-    if (!s.isEmpty())
-    {   // draw text
-        int t = s.indexOf('\t');
-        const int text_flags = Qt::AlignVCenter | BESPIN_MNEMONIC | Qt::TextDontClip | Qt::TextSingleLine;
-        if (t >= 0)
-        {
-            QRect vShortcutRect = visualRect(option->direction, r, QRect(textRect.topRight(),
-                                             QPoint(textRect.right()+tab, textRect.bottom())));
-            painter->setPen(Colors::mid(bg, fg));
-            drawItemText(painter, vShortcutRect, text_flags | Qt::AlignRight, PAL, isEnabled, s.mid(t + 1));
-//          painter->drawText(vShortcutRect, text_flags | Qt::AlignRight, s.mid(t + 1));
-            painter->setPen(fg);
-            s = s.left(t);
-        }
-        if (menuitem->menuItemType == QStyleOptionMenuItem::DefaultItem)
-            setBold(painter, s, vTextRect.width());
-        drawItemText(painter, vTextRect, text_flags | Qt::AlignLeft, PAL, isEnabled, s);
-//       painter->drawText(vTextRect, text_flags | Qt::AlignLeft, s.left(t));
-    }
-         
-    if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu)
-    {   // draw sub menu arrow ================================
-
-        Navi::Direction dir = (option->direction == Qt::RightToLeft) ? Navi::W : Navi::E;
-        int dim = 5*r.height()/12;
-        xpos = r.right() - F(4) - dim;
-        QStyleOptionMenuItem tmpOpt = *menuItem;
-        tmpOpt.rect = visualRect(option->direction, r, QRect(xpos, r.y() + (r.height() - dim)/2, dim, dim));
-        painter->setBrush(Colors::mid(bg, fg, 1, 2));
-        painter->setPen(QPen(painter->brush(), painter->pen().widthF()));
-        drawArrow(dir, tmpOpt.rect, painter);
-    }
-    else if (checkable)
+    if (checkable)
     {   // Checkmark =============================
-        xpos = r.right() - F(4) - cDim;
+//         xpos = r.x() + F(4); //r.right() - F(4) - cDim;
         QStyleOptionMenuItem tmpOpt = *menuItem;
         tmpOpt.rect = QRect(xpos, r.y() + (r.height() - cDim)/2, cDim, cDim);
         tmpOpt.rect = visualRect(menuItem->direction, menuItem->rect, tmpOpt.rect);
@@ -358,8 +320,52 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
         }
         else // Check box
             drawMenuCheck(&tmpOpt, painter, widget);
+        xpos += cDim + F(4);
     }
-    painter->restore();
+    
+    painter->setPen ( fg );
+    painter->setBrush ( Qt::NoBrush );
+    
+    QRect textRect(xpos, y + windowsItemVMargin,
+                   w - (xm + checkable*(cDim+F(4)) + subMenu*windowsRightBorder + tab + windowsItemFrame + windowsItemHMargin),
+                   h - 2 * windowsItemVMargin);
+    QRect vTextRect = visualRect(option->direction, r, textRect);
+    
+    QString s = menuitem->text;
+    if (!s.isEmpty())
+    {   // draw text
+        int t = s.indexOf('\t');
+        const int text_flags = Qt::AlignVCenter | BESPIN_MNEMONIC | Qt::TextDontClip | Qt::TextSingleLine;
+        if (t >= 0)
+        {
+            QRect vShortcutRect = visualRect(option->direction, r, QRect(textRect.topRight(),
+                                             QPoint(textRect.right()+tab, textRect.bottom())));
+            painter->setPen(Colors::mid(bg, fg));
+            drawItemText(painter, vShortcutRect, text_flags | Qt::AlignRight, PAL, isEnabled, s.mid(t + 1));
+//          painter->drawText(vShortcutRect, text_flags | Qt::AlignRight, s.mid(t + 1));
+            painter->setPen(fg);
+            s = s.left(t);
+        }
+        if (menuitem->menuItemType == QStyleOptionMenuItem::DefaultItem)
+            setBold(painter, s, vTextRect.width());
+        drawItemText(painter, vTextRect, text_flags | Qt::AlignLeft, PAL, isEnabled, s);
+//       painter->drawText(vTextRect, text_flags | Qt::AlignLeft, s.left(t));
+    }
+         
+    if (subMenu)
+    {   // draw sub menu arrow ================================
+
+        Navi::Direction dir = (option->direction == Qt::RightToLeft) ? Navi::W : Navi::E;
+        int dim = 5*r.height()/12;
+        xpos = r.right() - F(4) - dim;
+        QStyleOptionMenuItem tmpOpt = *menuItem;
+        tmpOpt.rect = visualRect(option->direction, r, QRect(xpos, r.y() + (r.height() - dim)/2, dim, dim));
+        painter->setBrush(Colors::mid(bg, fg, 1, 2));
+        painter->setPen(QPen(painter->brush(), painter->pen().widthF()));
+        drawArrow(dir, tmpOpt.rect, painter);
+    }
+    RESTORE_PEN;
+    RESTORE_BRUSH;
 }
 
 void
