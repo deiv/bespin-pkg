@@ -1560,13 +1560,17 @@ Client::trimm(const QString &string)
     away additional info like compile time, version numbers etc. ------------ */
     else
     {   // TODO maybe check with regexp and word bounds?
-        int i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
+        
+        QRegExp rgxp( "\\b" + appName + "\\b" );
+        rgxp.setCaseSensitivity(Qt::CaseInsensitive);
+        int i = ret.indexOf( rgxp );
         if (i > -1)
             ret = ret.mid(i, appName.length());
         else
         {
             appName = info.windowClassClass();
-            i = ret.indexOf(appName, 0, Qt::CaseInsensitive);
+            rgxp.setPattern( "\\b" + appName + "\\b" );
+            i = ret.indexOf( rgxp );
             if (i > -1)
                 ret = ret.mid(i, appName.length());
         }
