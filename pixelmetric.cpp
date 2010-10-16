@@ -61,6 +61,8 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     //    case PM_MDIMinimizedWidth: // Width of a minimized MDI window
     case PM_MaximumDragDistance: // Some feels require the scroll bar or other sliders to jump back to the original position when the mouse pointer is too far away while dragging; a value of -1 disables this behavior
         return -1;
+    case PM_ScrollView_ScrollBarSpacing:
+        return F(1);
     case PM_ScrollBarExtent: // Width of a vertical scroll bar and the height of a horizontal scroll bar
 //         if (const QSlider *slider = qobject_cast<const QSlider*>(widget))
 //         if (slider->orientation() == Qt::Horizontal)
