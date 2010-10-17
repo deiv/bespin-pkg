@@ -139,9 +139,9 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
                     if (abn->isCheckable())
                         w += contentsSize.height()+F(16);
 
-                int h = (config.btn.layer ? F(4) : F(5)) - config.fontExtent;
+                int h = (config.btn.layer ? F(6) : F(7)) - config.fontExtent;
                 if (!config.btn.fullHover)
-                    h *= 2;
+                    h += F(4);
                 h += contentsSize.height();
 
                 if (!btn->icon.isNull())
