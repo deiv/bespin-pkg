@@ -898,6 +898,22 @@ Style::polish( QWidget * widget )
 #endif
 
     bool isTopContainer = qobject_cast<QToolBar *>(widget);
+    
+    // Arora needs a separator between the buttons and the lineedit - looks megadull w/ shaped buttons otherwise :-(
+    if ( appType == Arora && isTopContainer && widget->objectName() == "NavigationToolBar")
+    {
+        QAction *before = 0;
+        QToolBar *bar = static_cast<QToolBar *>(widget);
+        foreach ( QObject *o, bar->children() )
+        {
+            before = 0;
+            if ( o->inherits("QWidgetAction") && bar->widgetForAction( (before = static_cast<QAction*>(o)) )->inherits("QSplitter") )
+                break;
+        }
+        if ( before )
+            bar->insertSeparator( before );
+    }
+        
     if ( isTopContainer && config.UNO.toolbar )
     {   // catches show/resize events and manipulates fg/bg role
         updateUno(static_cast<QToolBar *>(widget));

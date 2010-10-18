@@ -635,8 +635,8 @@ Style::init(const QSettings* settings)
             appType = VLC;
         else if (appName == "kmail")
             appType = KMail;
-//             if (appName == "arora")
-//                 appType = Arora;
+        else if (appName == "arora")
+                appType = Arora;
     }
     // ==========================
 
