@@ -175,6 +175,7 @@ grabWidget(QWidget * root, QPixmap &pix)
             // scrollarea workaround
             if ((scrollarea = qobject_cast<QAbstractScrollArea*>(w)))
                 hasScrollAreas = true;
+
             if ( hasScrollAreas && w != scrollarea && !qobject_cast<QScrollBar*>(w) && ( scrollarea = scrollAncestor(w, root) ) )
             {
                 // lately causes segfaults on QWidget::render() if painted through eventfilter
@@ -186,7 +187,6 @@ grabWidget(QWidget * root, QPixmap &pix)
                     continue;
 //                if ( w->metaObject()->className() == "KOrg::MonthGraphicsView" )
 //                    continue;
-                
                 QRect rect = scrollarea->frameRect();
                 if (rect.isValid())
                 {

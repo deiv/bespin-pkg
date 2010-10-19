@@ -26,7 +26,6 @@
 #include "bespin.h"
 #include "draw.h"
 
-
 using namespace Bespin;
 
 inline static bool

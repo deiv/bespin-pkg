@@ -26,7 +26,7 @@
       <attribute name="title">
        <string>Demo</string>
       </attribute>
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" columnstretch="8,3">
        <item row="0" column="0" colspan="2">
         <widget class="QMenuBar" name="menuBar">
          <widget class="QMenu" name="menuUiDemo">
@@ -1113,7 +1113,7 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>24</width>
+                <width>41</width>
                 <height>16</height>
                </rect>
               </property>
@@ -1229,7 +1229,7 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>24</width>
+                <width>41</width>
                 <height>16</height>
                </rect>
               </property>
@@ -1505,7 +1505,6 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
      </layout>
-     <zorder>checkBox</zorder>
      <zorder>checkBox</zorder>
      <zorder>rtl</zorder>
      <zorder></zorder>
