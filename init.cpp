@@ -636,7 +636,9 @@ Style::init(const QSettings* settings)
         else if (appName == "kmail")
             appType = KMail;
         else if (appName == "arora")
-                appType = Arora;
+            appType = Arora;
+        else if ( appName == "konqueror")
+            appType = Konqueror;
     }
     // ==========================
 

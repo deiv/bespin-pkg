@@ -16,7 +16,6 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <QtDebug>
 #include <QEvent>
 #include <QFrame>
 #include <QMenuBar>
@@ -54,7 +53,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return true; // UIs are no ego shooters...
     case SH_TabBar_Alignment:
 #if  0 // QT_VERSION >= 0x040500 DON'T TRY AGAIN, other thomas - it looks crap :-(
-        qDebug() << option << widget;
+//         qDebug() << option << widget;
         if (const QStyleOptionTabV3 *tab = qstyleoption_cast<const QStyleOptionTabV3*>(option))
             return (tab->documentMode ? Qt::AlignLeft : Qt::AlignCenter);
         if (const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget))
@@ -111,8 +110,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return true; //config.fadeInactive; // Gray out selected items when losing focus.
 ///    case SH_Widget_ShareActivation: // Turn on sharing activation with floating modeless dialogs.
     case SH_TabBar_SelectMouseType:
-        return QEvent::MouseButtonPress; // NOTICE WORKAROUND! MouseButtonRelease causes trouble with konqueror's doubleclicking
-        return QEvent::MouseButtonRelease; // QEvent::MouseButtonPress?
+        // NOTICE WORKAROUND! MouseButtonRelease causes trouble with konqueror's doubleclicking
+        return appType == Konqueror ? QEvent::MouseButtonPress : QEvent::MouseButtonRelease; // =)
     case SH_Q3ListViewExpand_SelectMouseType:
         return QEvent::MouseButtonPress;
     case SH_TabBar_PreferNoArrows:
@@ -130,8 +129,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_ScrollBar_StopMouseOverSlider:
         return false; // Stops auto-repeat when the slider reaches the mouse position. (hähh?)
     case SH_BlinkCursorWhenTextSelected:
-        //false; // that's annoying
-        return true; // ...but Qt4.6 or KDE is buggy - why am i surrounded by all idiots?!
+//         false; // that's annoying but ...
+        return true; // ... great, this is now completely ignored anyway winblows ftw :-(
     case SH_RichText_FullWidthSelection:
         return true;
     case SH_GroupBox_TextLabelVerticalAlignment:
@@ -219,7 +218,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
             return 0;
         int id = elementId(widget->objectName());
         if (!id)
-            qDebug() << "Unsupported KCustomStyleElement requested:" << widget->objectName();
+            qWarning("Unsupported KCustomStyleElement requested: %s", widget->objectName().toLatin1().data());
         return id;
     }
     default:
