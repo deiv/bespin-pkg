@@ -191,7 +191,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         }
         return contentsSize + QSize(F(9), F(9));
     case CT_TabWidget: // A tab widget, like QTabWidget
-        return contentsSize + QSize(F(8),F(6));
+        return contentsSize; // + QSize(F(8),F(6)); WARNING! this can causes recursive updates! (Qt 4.7 bug?)
     case CT_ToolButton:
     {   // A tool button, like QToolButton
         const QStyleOptionToolButton *toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option);
