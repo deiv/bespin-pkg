@@ -246,8 +246,8 @@ Style::drawSolidArrow(Navi::Direction dir, const QRect &rect, QPainter *painter,
             dir = (dir == Navi::W) ? Navi::SW : Navi::SE;
         if (w)
         {
-            painter->setBrush(w->palette().color(QPalette::WindowText));
-            painter->setPen(w->palette().color(QPalette::WindowText));
+            painter->setBrush(w->palette().color(w->foregroundRole()));
+            painter->setPen(w->palette().color(w->foregroundRole()));
         }
     }
     bool hadNoBrush = painter->brush() == Qt::NoBrush;

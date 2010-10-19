@@ -533,6 +533,12 @@ Style::polish( QWidget * widget )
                         {
                             kid->setBackgroundRole(QPalette::Base);
                             kid->setForegroundRole(QPalette::Text);
+                            if ( kid->inherits("StatusBarMessageLabel") )
+                            {   // hardcoded paint colors... bwuahahahaaaa :-(
+                                QPalette pal = kid->palette();
+                                pal.setColor( QPalette::WindowText, pal.color(QPalette::Text) );
+                                kid->setPalette(pal);
+                            }
                         }
                         grampa->setAutoFillBackground(true);
                         grampa->setContentsMargins(F(4),F(1),F(4),F(1));
