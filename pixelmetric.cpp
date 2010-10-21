@@ -25,8 +25,6 @@
 #include "hacks.h"
 #include "makros.h"
 
-#include <QtDebug>
-
 using namespace Bespin;
 
 int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidget *widget ) const
@@ -200,8 +198,10 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
 //    case PM_CheckListControllerSize: // Area (width/height) of the controller in a Q3CheckListItem
 //       if (option) return option->rect.height()-F(4);
 //       return F(16);
-//    case PM_DialogButtonsSeparator: // Distance between buttons in a dialog buttons widget
-//    case PM_DialogButtonsButtonWidth: // Minimum width of a button in a dialog buttons widget
+   case PM_DialogButtonsSeparator:
+       return 0;
+   case PM_DialogButtonsButtonWidth:
+       return F(80);
 //    case PM_DialogButtonsButtonHeight: // Minimum height of a button in a dialog buttons widget
 //    case PM_HeaderMarkSize: //
 //    case PM_HeaderGripMargin: //
@@ -209,12 +209,18 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
         return F(2);
     case PM_SpinBoxSliderHeight: // The height of the optional spin box slider
         return F(4);
+    case PM_LayoutBottomMargin:
+    case PM_LayoutHorizontalSpacing:
+    case PM_DefaultLayoutSpacing:
+    case PM_DefaultChildMargin:
+        return F(10);
+    case PM_LayoutTopMargin:
+    case PM_LayoutVerticalSpacing:
+        return F(6);
+    case PM_LayoutLeftMargin:
+    case PM_LayoutRightMargin:
     case PM_DefaultTopLevelMargin: //
         return F(8);
-    case PM_DefaultChildMargin: //
-        return F(7);
-    case PM_DefaultLayoutSpacing: //
-        return F(4);
     case PM_ToolBarIconSize: // Default tool bar icon size, defaults to PM_SmallIconSize
         return config.btn.tool.connected ? 16 : 22;
     case PM_SmallIconSize: // Default small icon size
