@@ -2,6 +2,20 @@
 BESPIN EXTRAS 
 =================
 
+kde_infopage.css
+=================
+Controls the "about:" look in konqueror, kmail and some other apps
+
+INSTALLATION:
+-------------
+copy the file to ~/.kde/share/apps/kdeui/about, in doubt link the about folder to
+~/.kde/share/apps/libkdepim
+
+restart konqueror*, kmail or ... to see changes
+
+* really restart: by default kfmclient will just open another tab or window!
+
+####################################################################################################
 
 bespin-compl:
 =============
