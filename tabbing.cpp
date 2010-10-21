@@ -100,6 +100,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
     ASSURE_OPTION(tbb, TabBarBase);
 
     QWidget *win = 0;
+
     // this has completely changed with recent KDE, KTabWidget doesn't call the style at all?!
     if (widget)
     {
@@ -339,9 +340,9 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         sunken = sunken || (option->state & State_Selected);
 
     // maybe we're done here?!
-    if (!(animStep || sunken))
+    if (!(animStep > 0 || sunken))
         return;
-
+    
     int size = rect.height() + F(3);
     Qt::Orientation o = Qt::Vertical;
     const bool vertical = verticalTabs(tab->shape);
@@ -351,9 +352,9 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         o = Qt::Horizontal;
         size = RECT.width();
     }
-    else
-        rect.adjust(F(1), F(3), -F(1), -F(4));
-
+    else    // Konsole now thinks it has to write it's own broken tab painting :-(
+        rect.adjust( F(1), F(3), -F(1), -( F(4) + (animStep < 0)*F(2) ) );
+    
     QColor c;
     bool noBase = false;
     const bool sameRoles = config.tab.active_role[Bg] == config.tab.std_role[Bg];
@@ -383,7 +384,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
     // gradient
     if (sameRoles)
     {
-        rect = RECT.adjusted(F(1),F(2),-F(1),0);
+        rect = RECT.adjusted( F(1), F(2), -F(1), -(animStep < 0)*F(2));
         Tile::setShape( (o == Qt::Vertical) ? (Tile::Left|Tile::Right) : (Tile::Top|Tile::Bottom) );
         Gradients::Type gt = GRAD(tab);
         if (sunken) // active tab has same color as inactive one, we must do sth. on the gradient...
