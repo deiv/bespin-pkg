@@ -231,6 +231,7 @@ protected:
     void drawSlider(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
     void drawDial(const QStyleOptionComplex*, QPainter*, const QWidget*) const;
     // tabbing.cpp
+    void calcAnimStep(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawTabWidget(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawTabBar(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawTab(const QStyleOption*, QPainter*, const QWidget*) const;

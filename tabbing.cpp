@@ -175,6 +175,57 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
 static int animStep = -1;
 static bool customColor = false;
 
+void 
+Style::calcAnimStep(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{   // animation stuff
+    OPT_ENABLED OPT_HOVER OPT_SUNKEN
+    sunken = sunken || (option->state & State_Selected);
+    animStep = 0;
+    if ( isEnabled && !sunken )
+    {
+        Animator::IndexInfo *info = 0;
+        int index = -1, hoveredIndex = -1;
+        if (widget)
+        if (const QTabBar* tbar = qobject_cast<const QTabBar*>(widget))
+        {
+            // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
+            index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
+
+            // sometimes... MANY times devs just set the tabTextColor to QPalette::WindowText,
+            // because it's defined that it has to be this. Qt provides all these color roles just
+            // to waste space and time... ...
+            const QColor &fgColor = tbar->tabTextColor(index - 1);
+            const QColor &stdFgColor = tbar->palette().color(config.tab.std_role[Fg]);
+            if (fgColor.isValid() && fgColor != stdFgColor)
+            {
+                if (fgColor == tbar->palette().color(QPalette::WindowText))
+                    const_cast<QTabBar*>(tbar)->setTabTextColor(index - 1, stdFgColor); // fixed
+                else // nope, this is really a custom color that will likley contrast just enough with QPalette::Window...
+                {
+                    customColor = true;
+                    if (Colors::haveContrast(tbar->palette().color(config.tab.std_role[Bg]), fgColor))
+                        painter->setPen(fgColor);
+                }
+            }
+#if QT_VERSION >= 0x040500
+            if (!tbar->documentMode() || tbar->drawBase())
+#endif
+            {
+                if (hover)
+                    hoveredIndex = index;
+                else if (widget->underMouse())
+                    hoveredIndex = tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
+                info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, hoveredIndex));
+            }
+            
+        }
+        if (info)
+            animStep = info->step(index);
+        if (hover && !animStep)
+            animStep = 6;
+    }
+}
+
 void
 Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -241,53 +292,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
 
     if (tab->position != QStyleOptionTab::OnlyOneTab || appType == GTK)
     {
-        OPT_SUNKEN OPT_ENABLED OPT_HOVER
-        sunken = sunken || (option->state & State_Selected);
-        animStep = 0;
-        // animation stuff
-        if (isEnabled && !sunken)
-        {
-            Animator::IndexInfo *info = 0;
-            int index = -1, hoveredIndex = -1;
-            if (widget)
-            if (const QTabBar* tbar = qobject_cast<const QTabBar*>(widget))
-            {
-                // NOTICE: the index increment is IMPORTANT to make sure it's not "0"
-                index = tbar->tabAt(RECT.topLeft()) + 1; // is the action for this item!
-
-                // sometimes... MANY times devs just set the tabTextColor to QPalette::WindowText,
-                // because it's defined that it has to be this. Qt provides all these color roles just
-                // to waste space and time... ...
-                const QColor &fgColor = tbar->tabTextColor(index - 1);
-                const QColor &stdFgColor = tbar->palette().color(config.tab.std_role[Fg]);
-                if (fgColor.isValid() && fgColor != stdFgColor)
-                {
-                    if (fgColor == tbar->palette().color(QPalette::WindowText))
-                        const_cast<QTabBar*>(tbar)->setTabTextColor(index - 1, stdFgColor); // fixed
-                    else // nope, this is really a custom color that will likley contrast just enough with QPalette::Window...
-                    {
-                        customColor = true;
-                        if (Colors::haveContrast(tbar->palette().color(config.tab.std_role[Bg]), fgColor))
-                            painter->setPen(fgColor);
-                    }
-                }
-#if QT_VERSION >= 0x040500
-                if (!tbar->documentMode() || tbar->drawBase())
-#endif
-                {
-                    if (hover)
-                        hoveredIndex = index;
-                    else if (widget->underMouse())
-                        hoveredIndex = tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
-                    info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, hoveredIndex));
-                }
-                
-            }
-            if (info)
-                animStep = info->step(index);
-            if (hover && !animStep)
-                animStep = 6;
-        }
+        calcAnimStep( option, painter, widget );
         drawTabShape(&copy, painter, widget);
     }
 #if QT_VERSION >= 0x040500
@@ -338,9 +343,15 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         sunken = false;
     else
         sunken = sunken || (option->state & State_Selected);
+    
+    // konsole now paints itself and of course it would be wrong to 
+    // just ask the style to paint a tabbar *grrrrrr...*
+    bool isOnlyShape = false;
+    if ( isOnlyShape = (animStep < 0) )
+        calcAnimStep( option, painter, widget );
 
     // maybe we're done here?!
-    if (!(animStep > 0 || sunken))
+    if ( !(animStep || sunken) )
         return;
     
     int size = rect.height() + F(3);
@@ -353,7 +364,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         size = RECT.width();
     }
     else    // Konsole now thinks it has to write it's own broken tab painting :-(
-        rect.adjust( F(1), F(3), -F(1), -( F(4) + (animStep < 0)*F(2) ) );
+        rect.adjust( F(1), F(3), -F(1), -( F(4) + isOnlyShape*F(2) ) );
     
     QColor c;
     bool noBase = false;
@@ -384,7 +395,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
     // gradient
     if (sameRoles)
     {
-        rect = RECT.adjusted( F(1), F(2), -F(1), -(animStep < 0)*F(2));
+        rect = RECT.adjusted( F(1), F(2), -F(1), isOnlyShape*-F(2));
         Tile::setShape( (o == Qt::Vertical) ? (Tile::Left|Tile::Right) : (Tile::Top|Tile::Bottom) );
         Gradients::Type gt = GRAD(tab);
         if (sunken) // active tab has same color as inactive one, we must do sth. on the gradient...
