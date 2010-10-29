@@ -19,6 +19,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+class QDialog;
+
 #include "bconfig.h"
 #include "ui_config.h"
 
@@ -49,6 +51,7 @@ private:
     Q_DISABLE_COPY(Config)
     /** This is the UI created with Qt Designer and included by ui_config.h */
     Ui::Config ui;
+    QDialog *myDemo;
 
     /** Just some functions to fill the comboboxes, not really of interest */
     void generateColorModes(QComboBox *box, QList<int> *roles = 0);
@@ -56,15 +59,16 @@ private:
 
     QPalette *loadedPal;
     bool infoIsManage;
-    void store3(const QString &, bool);
+    void applyPalette( QPalette *pal );
+    void store3(const QString &, bool, const QPalette &pal = QApplication::palette() );
     void setColorsFromPalette( const QPalette &pal );
 private slots:
-    void applyPalette();
     void setHeader(const QString&);
     void storedSettigSelected(QTreeWidgetItem *);
     void store2a();
     void store2b(QTreeWidgetItem *);
     void remove();
+    void showDemo();
     void handleBgMode(int);
     void handleGrooveMode(int);
     void learnPwChar();

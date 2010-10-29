@@ -23,6 +23,7 @@ Boston, MA 02110-1301, USA.
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QSettings>
+#include <QStyleFactory>
 #include <QTimer>
 // #include <QDialogButtonBox>
 // #include <QInputDialog>
@@ -34,7 +35,6 @@ Boston, MA 02110-1301, USA.
 #include "kdeini.h"
 #include "../config.defaults"
 #include "config.h"
-#include "ui_uiDemo.h"
 
 typedef QMap<QString,QString> StringMap;
 
@@ -168,7 +168,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     QSettings settings("Bespin", "Store");
     QString preset;
     foreach (preset, settings.childGroups())
-        presetMap.insert(preset, "");
+        if ( !preset.startsWith("__") )
+            presetMap.insert(preset, "");
     QSettings settings2("Bespin", "Style");
     settings2.beginGroup("PresetApps");
     StringMap::iterator entry;
@@ -218,7 +219,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     cd->hide();
     connect ( ui.colorButton, SIGNAL(clicked()), cd, SLOT(show()) );
     connect ( ui.colorButton, SIGNAL(clicked()), cd, SLOT(raise()) );
-    connect ( ui.colorApply, SIGNAL(clicked()), this, SLOT(applyPalette()) );
     ui.role_window->installEventFilter(this);
     ui.role_windowText->installEventFilter(this);
     ui.role_button->installEventFilter(this);
@@ -577,32 +577,16 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 
     strList <<
         "<b>Jump</b><hr>No transition at all - fastest but looks stupid" <<
-
-        "<b>ScanlineBlend</b><hr>Similar to CrossFade, but won't require \
-        Hardware acceleration." <<
-
+        "<b>ScanlineBlend</b><hr>Similar to CrossFade, but won't require Hardware acceleration." <<
         "<b>SlideIn</b><hr>The new tab falls down from top" <<
-
         "<b>SlideOut</b><hr>The new tab rises from bottom" <<
-
         "<b>RollIn</b><hr>The new tab appears from Top/Bottom to center" <<
-
         "<b>RollOut</b><hr>The new tab appears from Center to Top/Bottom" <<
-
-        "<b>OpenVertically</b><hr>The <b>old</b> Tab slides <b>out</b> \
-        to Top and Bottom" <<
-
-        "<b>CloseVertically</b><hr>The <b>new</b> Tab slides <b>in</b> \
-        from Top and Bottom" <<
-
-        "<b>OpenHorizontally</b><hr>The <b>old</b> Tab slides <b>out</b> \
-        to Left and Right" <<
-
-        "<b>CloseHorizontally</b><hr>The <b>new</b> Tab slides <b>in</b> \
-        from Left and Right" <<
-
-        "<b>CrossFade</b><hr>What you would expect - one fades out while the \
-        other fades in.<br>\
+        "<b>OpenVertically</b><hr>The <b>old</b> Tab slides <b>out</b> to Top and Bottom" <<
+        "<b>CloseVertically</b><hr>The <b>new</b> Tab slides <b>in</b> from Top and Bottom" <<
+        "<b>OpenHorizontally</b><hr>The <b>old</b> Tab slides <b>out</b> to Left and Right" <<
+        "<b>CloseHorizontally</b><hr>The <b>new</b> Tab slides <b>in</b> from Left and Right" <<
+        "<b>CrossFade</b><hr>What you would expect - one fades out while the other fades in.<br>\
         This is CPU hungry - better have GPU Hardware acceleration.";
 
     setContextHelp(ui.tabTransition, strList);
@@ -714,6 +698,8 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     /** you can call loadSettings() whenever you want, but (obviously)
     only items that have been propagated with handleSettings(.) are handled !!*/
     loadSettings();
+    
+    ui.sections->setCurrentIndex(0);
 
     /** ===========================================
     You're pretty much done here - simple eh? ;)
@@ -723,13 +709,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     if you want a standalone app you may want to check the main() funtion
     at the end of this file as well - but there's nothing special about it...
         =========================================== */
-
-    QDialog *demoW = new QDialog;
-    Ui::Demo ui2;
-    ui2.setupUi( demoW );
-    ui2.bottomBar->hide();
-    ui.sections->addWidget( demoW );
-    ui.sections->setCurrentIndex(0);
 }
 
 void
@@ -1045,7 +1024,7 @@ Config::restore(QTreeWidgetItem *item, int col)
     updatePalette(*loadedPal, QPalette::Disabled, list);
 
     setColorsFromPalette( *loadedPal );
-    applyPalette();
+    applyPalette( loadedPal );
 
     settings.endGroup();
     if ( QApplication::style()->objectName() == "bespin" || QApplication::setStyle("Bespin") )
@@ -1119,23 +1098,30 @@ Config::setColorsFromPalette( const QPalette &pal )
 }
 
 void
-Config::applyPalette()
+Config::applyPalette( QPalette *pal )
 {
-    if (!loadedPal)
-        loadedPal = new QPalette;
-    loadedPal->setColor( QPalette::Window, ui.role_window->palette().color( ui.role_window->backgroundRole() ) );
-    loadedPal->setColor( QPalette::WindowText, ui.role_window->palette().color( ui.role_windowText->foregroundRole() ) );
-    loadedPal->setColor( QPalette::Button, ui.role_button->palette().color( ui.role_button->backgroundRole() ) );
-    loadedPal->setColor( QPalette::ButtonText, ui.role_buttonText->palette().color( ui.role_buttonText->foregroundRole() ) );
-    loadedPal->setColor( QPalette::Base, ui.role_base->palette().color( ui.role_base->backgroundRole() ) );
-    loadedPal->setColor( QPalette::Text, ui.role_text->palette().color( ui.role_text->foregroundRole() ) );
-    loadedPal->setColor( QPalette::Highlight, ui.role_highlight->palette().color( ui.role_highlight->backgroundRole() ) );
-    loadedPal->setColor( QPalette::HighlightedText, ui.role_highlightedText->palette().color( ui.role_highlightedText->foregroundRole() ) );
-    QApplication::setPalette( *loadedPal );
-    emit changed(true);
-    emit changed();
-//     haveIcons = false; // force
+    if ( !pal )
+    {
+        if (!loadedPal)
+            loadedPal = new QPalette;
+        pal = loadedPal;
+    }
+    pal->setColor( QPalette::Window, ui.role_window->palette().color( ui.role_window->backgroundRole() ) );
+    pal->setColor( QPalette::WindowText, ui.role_window->palette().color( ui.role_windowText->foregroundRole() ) );
+    pal->setColor( QPalette::Button, ui.role_button->palette().color( ui.role_button->backgroundRole() ) );
+    pal->setColor( QPalette::ButtonText, ui.role_buttonText->palette().color( ui.role_buttonText->foregroundRole() ) );
+    pal->setColor( QPalette::Base, ui.role_base->palette().color( ui.role_base->backgroundRole() ) );
+    pal->setColor( QPalette::Text, ui.role_text->palette().color( ui.role_text->foregroundRole() ) );
+    pal->setColor( QPalette::Highlight, ui.role_highlight->palette().color( ui.role_highlight->backgroundRole() ) );
+    pal->setColor( QPalette::HighlightedText, ui.role_highlightedText->palette().color( ui.role_highlightedText->foregroundRole() ) );
+    if ( pal == loadedPal )
+    {
+        QApplication::setPalette( *loadedPal );
+        emit changed(true);
+        emit changed();
+        //     haveIcons = false; // force
 //     ensureIcons();
+    }
 }
 
 void
@@ -1242,6 +1228,20 @@ Config::savePalette(const QPalette &pal)
 
 }
 
+void
+Config::showDemo()
+{
+    QPalette pal;
+    applyPalette( &pal );
+    store3( "__config-tmp", false, pal );
+    QProcess *process = new QProcess( this );
+    QStringList env = QProcess::systemEnvironment();
+    env << "BESPIN_PRESET=__config-tmp";
+    process->setEnvironment(env);
+    connect ( process, SIGNAL(finished(int, QProcess::ExitStatus)), process, SLOT(deleteLater()) );
+    process->start( QCoreApplication::arguments().at(0), QStringList() << "demo" );
+}
+
 /** see above, we'll present a name input dialog here */
 void
 Config::store()
@@ -1293,7 +1293,7 @@ Config::store2b(QTreeWidgetItem* item)
 
 /** real action */
 void
-Config::store3( const QString &string, bool addItem )
+Config::store3( const QString &string, bool addItem, const QPalette &pal )
 {
     if (addItem)
     {
@@ -1303,7 +1303,7 @@ Config::store3( const QString &string, bool addItem )
         ui.store->sortItems(0, Qt::AscendingOrder);
     }
     setQSetting("Bespin", "Store", string);
-    save();
+    BConfig::save();
     setQSetting("Bespin", "Style", "Style");
 
     QSettings settings("Bespin", "Store");
@@ -1318,7 +1318,6 @@ Config::store3( const QString &string, bool addItem )
     /** Now let's save colors as well */
     settings.beginGroup("QPalette");
 
-    const QPalette &pal = QApplication::palette();
     settings.setValue ( "active", colors(pal, QPalette::Active) );
     settings.setValue ( "inactive", colors(pal, QPalette::Inactive) );
     settings.setValue ( "disabled", colors(pal, QPalette::Disabled) );

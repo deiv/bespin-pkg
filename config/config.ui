@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>765</width>
-    <height>402</height>
+    <width>772</width>
+    <height>477</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string>Bespin Configuration</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_14" columnstretch="2,0,0">
+  <layout class="QGridLayout" name="gridLayout_14" columnstretch="5,1,5">
    <item row="0" column="0" rowspan="2">
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <property name="spacing">
@@ -163,11 +163,6 @@
          <string>Colors</string>
         </property>
        </item>
-       <item>
-        <property name="text">
-         <string>Demo</string>
-        </property>
-       </item>
       </widget>
      </item>
     </layout>
@@ -246,7 +241,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>9</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -562,8 +557,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>322</width>
-               <height>114</height>
+               <width>479</width>
+               <height>170</height>
               </rect>
              </property>
              <attribute name="label">
@@ -778,8 +773,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>169</width>
-               <height>62</height>
+               <width>186</width>
+               <height>67</height>
               </rect>
              </property>
              <attribute name="label">
@@ -874,8 +869,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>245</width>
-               <height>180</height>
+               <width>244</width>
+               <height>188</height>
               </rect>
              </property>
              <attribute name="label">
@@ -991,8 +986,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>110</width>
-               <height>88</height>
+               <width>130</width>
+               <height>94</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1089,8 +1084,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>316</width>
-               <height>81</height>
+               <width>321</width>
+               <height>86</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1258,8 +1253,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>266</width>
-               <height>180</height>
+               <width>479</width>
+               <height>223</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1457,8 +1452,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>260</width>
-               <height>161</height>
+               <width>272</width>
+               <height>164</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1931,8 +1926,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>316</width>
-               <height>249</height>
+               <width>466</width>
+               <height>262</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2094,8 +2089,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>197</width>
-               <height>90</height>
+               <width>219</width>
+               <height>94</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3441,35 +3436,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
             </property>
            </spacer>
           </item>
-          <item row="9" column="1">
+          <item row="7" column="1">
            <widget class="QPushButton" name="colorButton">
             <property name="text">
              <string>Color dialog</string>
             </property>
            </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QPushButton" name="colorApply">
-            <property name="text">
-             <string>Apply palette</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <spacer name="verticalSpacer_22">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>12</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>

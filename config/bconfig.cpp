@@ -38,6 +38,11 @@ QDialog(parent, Qt::Window), _config(config) {
       connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
    }
    
+   if (btns & Demo) {
+      btn = (QWidget*)buttonBox->addButton ( tr("Demo"), QDialogButtonBox::ApplyRole );
+      connect(btn, SIGNAL(clicked(bool)), config, SLOT(showDemo()));
+   }
+   
    if (btns & Export) {
       btn = (QWidget*)buttonBox->addButton ( tr("Export..."), QDialogButtonBox::ApplyRole );
       connect(btn, SIGNAL(clicked(bool)), config, SLOT(saveAs()));

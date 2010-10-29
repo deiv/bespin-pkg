@@ -121,7 +121,7 @@ class BConfigDialog : public QDialog {
 public:
     enum ButtonType {
         Ok = 1, Cancel = 2, Save = 4, Reset = 8,
-            Defaults = 16, Import = 32, Export = 64, All = 127
+            Defaults = 16, Import = 32, Export = 64, Demo = 128, All = 255
     };
     BConfigDialog(BConfig *config, uint btns = All, QWidget *parent = 0L);
 public slots:
