@@ -1055,8 +1055,10 @@ Config::save()
     }
     settings.endGroup();
     /** save the palette loaded from store to qt configuration */
-    if (loadedPal)
-        savePalette(*loadedPal);
+    if (!loadedPal)
+        loadedPal = new QPalette;
+    applyPalette( loadedPal );
+    savePalette(*loadedPal);
     return true;
 }
 
