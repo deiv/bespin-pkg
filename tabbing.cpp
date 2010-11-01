@@ -517,7 +517,7 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
 //     sunken = sunken && config.tab.activeTabSunken;
 //     if (!sunken || Colors::value(CCOLOR(tab.active, Bg)) < 164)
         tr.translate(0,-F(1));
-    if (isEnabled && Colors::value(cB) < 148) // this is not the same...
+    if (isEnabled && Colors::value(cB) < Colors::value(cF)) // this is not the same...
     {   // dark background, let's paint an emboss
         painter->setPen(cB.dark(120));
         tr.moveTop(tr.top()-1);
@@ -657,7 +657,7 @@ Style::drawToolboxTabLabel(const QStyleOption *option, QPainter *painter, const 
 
     // on dark background, let's paint an emboss
     const uint tf = Qt::AlignHCenter | (selected ? Qt::AlignBottom : Qt::AlignVCenter) | BESPIN_MNEMONIC;
-    if (isEnabled && Colors::value(cB) < 100)
+    if (isEnabled && Colors::value(cB) < Colors::value(cF))
     {
         QRect tr = RECT;
         painter->setPen(cB.dark(120));

@@ -379,7 +379,8 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
         { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
 
     const QColor fg = btnFg(PAL, isEnabled, hasFocus, anim.step, isFlat);
-    const QColor &bg = isFlat ? FCOLOR(Window) : (hover ? CCOLOR(btn.active, Bg) : CCOLOR(btn.std, Bg));
+    const QColor &bg = isFlat ? FCOLOR(Window) : (hover ? CCOLOR(btn.active, Bg) : 
+                                                 (hasFocus && config.btn.layer == 2 && !config.btn.backLightHover ? FCOLOR(Highlight) : CCOLOR(btn.std, Bg)));
 
     painter->save();
     if (!sunken && btn->features & QStyleOptionButton::DefaultButton)
