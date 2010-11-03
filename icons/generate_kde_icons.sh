@@ -15,6 +15,9 @@ SHELL=$_
 ## CONFIG ##########################################################################################
 
 basename="nmfnms"
+alpha=100
+color="black"
+halo="white"
 
 # The color can be empty color="", color= or entirely dropped (commented)
 # If given, it MUST be a VALID SYMBOL (black, white, blue, green, red, etc.) or
