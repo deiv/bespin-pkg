@@ -93,15 +93,20 @@ while read line; do
         continue
     fi
     for sz in $sizes; do
+        if ((sz < 48)); then
+            os=2;
+        else
+            os=3;
+        fi
         png="$setname/${sz}x${sz}/.pool/$src.png"
         # convert and colorize
         if [ ! -e $png ] || [ $svg -nt $png ]; then
             if [ -n "$halo" ]; then
-                inkscape -w $((sz-4)) -e ".tmp.png" "$svg" > /dev/null
+                inkscape -w $((sz-2*os)) -e ".tmp.png" "$svg" > /dev/null
                 if [ -n "$color" ]; then
                     mogrify -fill $color -colorize 100% ".tmp.png"
                 fi
-                mogrify -bordercolor transparent -border 2x2 ".tmp.png"
+                mogrify -bordercolor transparent -border ${os}x${os} ".tmp.png"
                 convert -channel RGBA -blur 0x3 ".tmp.png" ".halo.png"
                 mogrify -fill $halo -colorize 100% ".halo.png"
                 convert ".halo.png" ".tmp.png" -gravity Center -composite "$png"
