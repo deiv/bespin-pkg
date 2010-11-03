@@ -16,7 +16,6 @@ SHELL=$_
 
 basename="nmfnms"
 alpha=100
-color="black"
 halo="white"
 
 # The color can be empty color="", color= or entirely dropped (commented)
