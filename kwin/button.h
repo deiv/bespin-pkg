@@ -64,7 +64,7 @@ protected:
 private:
     Q_DISABLE_COPY(Button)
     QColor color( bool background = false ) const;
-    bool hoverOut, left;
+    bool hoverOut, left, iAmScrollable;
     Client *client;
     Type myType;
     int state, multiIdx, hoverTimer, hoverLevel;

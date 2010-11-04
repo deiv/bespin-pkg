@@ -152,7 +152,10 @@ Config::Config(QWidget* parent) : BConfig(parent)
     <b>B</b>: Toggle 'Keep Below'<br>\
     <b>L</b>: Toggle Shade (The window is shrinked into the titlebar)<br>\
     <b>!</b>: Window Info<br>\
-    <b>E</b>: Window List");
+    <b>E</b>: Window List<br>\
+    <b>X</b>: Close<br>\
+    <b>I</b>: Minimize<br>\
+    <b>A</b>: Maximize<br>");
 
     handleSettings(ui.iconVariant, "IconVariant", 1);
     

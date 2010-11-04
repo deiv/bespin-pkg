@@ -52,21 +52,21 @@ client(parent), state(0), multiIdx(0), hoverTimer(0), hoverLevel(0)
     setCursor(Qt::ArrowCursor);
     this->left = left;
 
-    if (type == Multi)
+    myType = type;
+    
+    if ( iAmScrollable = ( myType == Multi ) )
     {
         myType = Factory::multiButtons().at(0);
         connect(client, SIGNAL(keepAboveChanged(bool)), SLOT(clientStateChanged(bool)));
         connect(client, SIGNAL(keepBelowChanged(bool)), SLOT(clientStateChanged(bool)));
         connect(client, SIGNAL(stickyChanged(bool)), SLOT(clientStateChanged(bool)));
         connect(client, SIGNAL(shadeChanged(bool)), SLOT(clientStateChanged(bool)));
+        if ( Factory::multiButtons().contains( Button::Max ) )
+            connect(client, SIGNAL(maximizeChanged(bool)), SLOT(maximizeChanged(bool)) );
         clientStateChanged(false);
     }
-    else
-    {
-        myType = type;
-        if (type == Max)
-            connect(client, SIGNAL(maximizeChanged(bool)), SLOT(maximizeChanged(bool)) );
-    }
+    else if ( myType == Max )
+        connect(client, SIGNAL(maximizeChanged(bool)), SLOT(maximizeChanged(bool)) );
 
 // 	setToolTip(tip);
 }
@@ -447,32 +447,30 @@ else if (multiIdx < 0 )\
 void
 Button::wheelEvent(QWheelEvent *e)
 {
-    if ((myType == Max || myType == Restore) && isEnabled())
+    if ( iAmScrollable )
     {
-        client->tileWindow(e->delta() < 0, e->modifiers() & Qt::ControlModifier, !left);
-        return;
-    }
-
-    if (myType < Multi) return;
-
-    const QVector<Type> &mb = Factory::multiButtons();
-    int d = (e->delta() < 0) ? 1 : -1;
-
-    CYCLE_ON;
-    if (mb.at(multiIdx) == Help && !client->providesContextHelp())
-//       || (mb.at(multiIdx) == Shade && !client->isShadeable()))
-    {
+        const QVector<Type> &mb = Factory::multiButtons();
+        int d = (e->delta() < 0) ? 1 : -1;
+        
         CYCLE_ON;
+        if (mb.at(multiIdx) == Help && !client->providesContextHelp())
+            //       || (mb.at(multiIdx) == Shade && !client->isShadeable()))
+        {
+            CYCLE_ON;
+        }
+        
+        myType = mb.at(multiIdx);
+        if ( (myType == Above && client->keepAbove()) || (myType == Below && client->keepBelow()) )
+            myType = UnAboveBelow;
+        else if (myType == Stick && client->isOnAllDesktops())
+            myType = Unstick;
+        else if (myType == Shade && client->isSetShade())
+            myType = Unshade;
+        
+        //TODO: roll max/vert/hori?!
+        repaint();
     }
-
-   myType = mb.at(multiIdx);
-   if ( (myType == Above && client->keepAbove()) || (myType == Below && client->keepBelow()) )
-      myType = UnAboveBelow;
-   else if (myType == Stick && client->isOnAllDesktops())
-      myType = Unstick;
-   else if (myType == Shade && client->isSetShade())
-      myType = Unshade;
-
-   //TODO: roll max/vert/hori?!
-   repaint();
+    
+    else if ( ( myType == Max || myType == Restore ) && isEnabled() )
+        client->tileWindow(e->delta() < 0, e->modifiers() & Qt::ControlModifier, !left);
 }

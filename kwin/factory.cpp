@@ -153,6 +153,9 @@ multiVector(const QString & string, QVector<Button::Type> &vector)
         case 'L': type = Button::Shade; break;
         case 'E': type = Button::Exposee; break;
         case '!': type = Button::Info; break;
+        case 'I': type = Button::Min; break;
+        case 'A': type = Button::Max; break;
+        case 'X': type = Button::Close; break;
         default: continue;
         }
         vector.append(type);
@@ -175,6 +178,9 @@ multiString(const QVector<Button::Type> &vector)
         case Button::Shade: c = 'L'; break;
         case Button::Exposee: c = 'E'; break;
         case Button::Info: c = '!'; break;
+        case Button::Min: c = 'I'; break;
+        case Button::Max: c = 'A'; break;
+        case Button::Close: c = 'X'; break;
         default: continue;
         }
         string.append(c);
