@@ -18,8 +18,10 @@ Boston, MA 02110-1301, USA.
 
 #include <QAbstractScrollArea>
 #include <QApplication>
+#include <QDropEvent>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QStackedWidget>
@@ -235,21 +237,53 @@ class Animator::Curtain : public QWidget
 public:
     Curtain(TabInfo *info, QWidget *parent) : QWidget(parent), _info(info)
     {
-        setAutoFillBackground(false);
+        setAutoFillBackground( false );
+        setAcceptDrops( true );
 //         setAttribute(Qt::WA_NoSystemBackground);
-        setAttribute(Qt::WA_OpaquePaintEvent);
+        setAttribute( Qt::WA_OpaquePaintEvent );
         raise();
     }
 protected:
-   void paintEvent( QPaintEvent *  )
-   {
-      if (_info->clock.isNull()) return; // should not happen
-      QPainter p(this);
-      p.drawPixmap(0,0, _info->tabPix[2]);
-      p.end();
-   }
+    void dragEnterEvent( QDragEnterEvent *dee ) { propagate( (QDropEvent*)dee ); }
+    void dragLeaveEvent ( QDragLeaveEvent *dle ) { if ( isVisible() ) propagate( (QDropEvent*)dle ); }
+    void dragMoveEvent ( QDragMoveEvent *dme ) { propagate( (QDropEvent*)dme ); }
+    void dropEvent ( QDropEvent *de )  { propagate( de ); }
+    
+    void paintEvent( QPaintEvent *  )
+    {
+        if ( _info->clock.isNull() )
+            return; // should not happen
+        QPainter p( this );
+        p.drawPixmap( 0, 0, _info->tabPix[2] );
+        p.end();
+    }
 private:
-   TabInfo *_info;
+    void propagate( QDropEvent *de )
+    {
+        QWidget *receiver = 0;
+        QWidget *container = parentWidget();
+        const QPoint pos = mapToParent( de->pos() );
+        while ( container )
+        {
+            const QObjectList &kids = container->children();
+            container = 0;
+            for ( int i = kids.count()-1; i>-1; --i )
+            {
+                if ( kids.at(i) != this && kids.at(i)->isWidgetType() )
+                {
+                    QWidget *w = static_cast<QWidget*>(kids.at(i));
+                    if ( w->isVisibleTo( parentWidget() ) && w->rect().contains( w->mapFromParent( pos ) ) )
+                    {
+                        receiver = container = w;
+                        break;
+                    }
+                }
+            }
+        }
+        if ( receiver )
+            QCoreApplication::sendEvent( receiver, de );
+    }
+    TabInfo *_info;
 };
 
 class StdChildAdd : public QObject
