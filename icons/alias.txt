@@ -190,3 +190,5 @@ desktop-preferences:apps/preferences-desktop-display
 notify:apps/preferences-desktop-notification
 disc:mimetypes/application-x-cd-image,devices/media-optical
 disc-sound:devices/media-optical-audio
+view-choose:actions/view-choose
+
