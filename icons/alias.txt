@@ -192,4 +192,5 @@ disc:mimetypes/application-x-cd-image,devices/media-optical
 disc-sound:devices/media-optical-audio
 view-choose:actions/view-choose
 preferences-desktop-mouse:apps/preferences-desktop-mouse,devices/input-mouse,categories/preferences-desktop-peripherals
+document-properties:actions/document-properties
 
