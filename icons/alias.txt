@@ -4,7 +4,7 @@ add-folder-to-archive:actions/archive-insert-directory:folder-new
 address-book-new:actions/address-book-new
 akonadi:apps/akonadi
 amarok:apps/amarok
-appearance:apps/preferences-desktop-theme
+appearance:apps/preferences-desktop-theme,categories/preferences-desktop
 applications-development:categories/applications-development
 applications-games:categories/applications-games
 applications-graphics:categories/applications-graphics
@@ -25,7 +25,7 @@ centrejust:actions/align-horizontal-center
 color-line:apps/preferences-desktop-color
 compressed-pack:apps/ark:utilities-file-archiver,mimetypes/application-zip:application-x-tarz:application-x-rar:application-x-bzip-compressed-tar:application-x-compressed-tar:application-x-lzma-compressed-tar
 computer:devices/computer
-configure:actions/configure-shortcuts:configure-toolbars:configure:run-build-configure
+configure:actions/configure-shortcuts:configure-toolbars:configure:run-build-configure,categories/preferences-other:preferences-system-network
 desktop:apps/preferences-desktop-display:preferences-desktop-wallpaper,mimetypes/application-x-desktop,places/user-desktop
 dialog-cancel:actions/dialog-cancel
 dialog-close:actions/application-exit:dialog-close:irc-close-channel:project-development-close-all:project-development-close:view-close:window-close:view-right-close:view-left-close:actions:system-log-out
@@ -42,7 +42,7 @@ edit-clear-locationbar:actions/edit-clear-locationbar-rtl:edit-clear-locationbar
 edit-cut:actions/edit-cut
 edit-copy:actions/edit-copy
 edit-delete:actions/edit-delete
-edit-find:actions/edit-find:document-preview-archive:document-preview:edit-fint-user:page-zoom
+edit-find:actions/edit-find:document-preview-archive:document-preview:edit-find-user:page-zoom:edit-fint-project:edit-find-mail
 edit-paste:actions/edit-paste
 edit-undo.alt2:actions/edit-undo
 edit-redo.alt2:actions/edit-redo
@@ -191,5 +191,5 @@ notify:apps/preferences-desktop-notification
 disc:mimetypes/application-x-cd-image,devices/media-optical
 disc-sound:devices/media-optical-audio
 view-choose:actions/view-choose
-preferences-desktop-mouse:apps/preferences-desktop-mouse,devices/input-mouse
+preferences-desktop-mouse:apps/preferences-desktop-mouse,devices/input-mouse,categories/preferences-desktop-peripherals
 
