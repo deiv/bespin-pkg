@@ -194,5 +194,5 @@ view-choose:actions/view-choose
 preferences-desktop-mouse:apps/preferences-desktop-mouse,devices/input-mouse,categories/preferences-desktop-peripherals
 document-properties:actions/document-properties
 edit-rename:actions/edit-rename
-tools-bug-report:actions/tools-bug-report
+tools-bug-report:actions/tools-report-bug
 
