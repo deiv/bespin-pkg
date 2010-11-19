@@ -671,7 +671,7 @@ const QPixmap
         break;
     case 10: // planks
     {
-        i = 100 + (_bgIntensity - 100)/2;
+        i = 100 + (_bgIntensity - 100)/3;
         QLinearGradient lg(pix->rect().topLeft(), pix->rect().topRight());
         QColor shadow = c.dark(i);
         QColor light = c.light(i);
