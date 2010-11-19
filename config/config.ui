@@ -241,7 +241,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -668,6 +668,26 @@
                 <item>
                  <property name="text">
                   <string>Sand</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Planks</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Thin Diagonals</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Bamboo</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Weave</string>
                  </property>
                 </item>
                </widget>
@@ -1253,8 +1273,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>479</width>
-               <height>223</height>
+               <width>269</width>
+               <height>183</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1452,7 +1472,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>272</width>
+               <width>271</width>
                <height>164</height>
               </rect>
              </property>
@@ -1926,7 +1946,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>466</width>
+               <width>332</width>
                <height>262</height>
               </rect>
              </property>
