@@ -687,6 +687,44 @@ const QPixmap
         p.drawRect(pix->rect());
         break;
     }
+    case 11: // thin diagonals
+    {
+        p.setPen(Qt::NoPen);
+        i = 100 + (_bgIntensity - 100)/4;
+        p.setBrush(c.light(i));
+        p.drawRect(pix->rect());
+        p.setPen(QPen(c.dark(i)));
+        p.setBrush(Qt::NoBrush);
+        p.setRenderHint(QPainter::Antialiasing);
+        for (i = -12; i < 66; i+=3)
+            p.drawLine(0, i+12, 64, i);
+        break;
+    }
+    case 12: // bamboo
+    case 13: // weave
+    {
+        i = 100 + (_bgIntensity - 100)/2;
+        QLinearGradient lg(QPoint(0,0), QPoint(0,8));
+        QColor dark = c.dark(i);
+        QColor light = c.light(i);
+        lg.setColorAt(0.0, light);
+        lg.setColorAt(1.0, dark);
+        lg.setSpread( QGradient::RepeatSpread );
+        p.setBrush(lg);
+        p.setPen(Qt::NoPen);
+        p.drawRect(pix->rect());
+        if ( _struct == 12 )
+            break;
+        lg = QLinearGradient(QPoint(0,0), QPoint(8,0));
+        lg.setColorAt(0.0, light);
+        lg.setColorAt(1.0, dark);
+        lg.setSpread( QGradient::RepeatSpread );
+        p.setBrush(lg);
+        for (int j = 0; j < 8; ++j)
+        for (int i = 8*(j%2); i < 64; i+=16)
+            p.drawRect(i,j*8,8,8);
+        break;
+    }
     }
     p.end();
 
