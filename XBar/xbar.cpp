@@ -933,6 +933,113 @@ XBar::wheelEvent(QGraphicsSceneWheelEvent *ev)
 
 // ================= GGM support implementation ===============
 
+
+static QHash<QString,QString> ggmMapIcons()
+{
+    QHash<QString,QString> hash;
+    hash.insert( "gtk-about", "start-here-kde" );
+    hash.insert( "gtk-add", "list-add.png" );
+    hash.insert( "gtk-apply", "dialog-ok-apply.png" );
+    hash.insert( "gtk-bold", "format-text-bold.png" );
+    hash.insert( "gtk-cancel", "dialog-cancel.png" );
+    hash.insert( "gtk-cdrom", "media-optical.png" );
+    hash.insert( "gtk-clear", "edit-clear.png" );
+    hash.insert( "gtk-close", "window-close.png" );
+    hash.insert( "gtk-color-picker", "color-picker.png" );
+    hash.insert( "gtk-connect", "network-connect.png" );
+    hash.insert( "gtk-convert", "document-export.png" );
+    hash.insert( "gtk-copy", "edit-copy.png" );
+    hash.insert( "gtk-cut", "edit-cut.png" );
+    hash.insert( "gtk-delete", "edit-delete.png" );
+    hash.insert( "gtk-dialog-authentication", "status/dialog-password.png" );
+    hash.insert( "gtk-dialog-error", "status/dialog-error.png" );
+    hash.insert( "gtk-dialog-info", "status/dialog-information.png" );
+    hash.insert( "gtk-dialog-question", "status/dialog-information.png" );
+    hash.insert( "gtk-dialog-warning", "status/dialog-warning.png" );
+    hash.insert( "gtk-directory", "folder.png" );
+    hash.insert( "gtk-disconnect", "network-disconnect.png" );
+    hash.insert( "gtk-dnd", "application-x-zerosize.png" );
+    hash.insert( "gtk-dnd-multiple", "document-multiple.png" );
+    hash.insert( "gtk-edit", "document-properties.png" );
+    hash.insert( "gtk-execute", "fork.png" );
+    hash.insert( "gtk-file", "application-x-zerosize.png" );
+    hash.insert( "gtk-find", "edit-find.png" );
+    hash.insert( "gtk-find-and-replace", "edit-find-replace.png" );
+    hash.insert( "gtk-floppy", "media-floppy.png" );
+    hash.insert( "gtk-fullscreen", "view-fullscreen.png" );
+    hash.insert( "gtk-goto-bottom", "go-bottom.png" );
+    hash.insert( "gtk-goto-first", "go-first.png" );
+    hash.insert( "gtk-goto-last", "go-last.png" );
+    hash.insert( "gtk-goto-top", "go-top.png" );
+    hash.insert( "gtk-go-back", "go-previous.png" );
+    hash.insert( "gtk-go-back-ltr", "go-previous.png" );
+    hash.insert( "gtk-go-back-rtl", "go-next.png" );
+    hash.insert( "gtk-go-down", "go-down.png" );
+    hash.insert( "gtk-go-forward", "go-next.png" );
+    hash.insert( "gtk-go-forward-ltr", "go-next.png" );
+    hash.insert( "gtk-go-forward-rtl", "go-previous.png" );
+    hash.insert( "gtk-go-up", "go-up.png" );
+    hash.insert( "gtk-harddisk", "drive-harddisk.png" );
+    hash.insert( "gtk-help", "help-contents.png" );
+    hash.insert( "gtk-home", "go-home.png" );
+    hash.insert( "gtk-indent", "format-indent-more.png" );
+    hash.insert( "gtk-index", "help-contents.png" );
+    hash.insert( "gtk-info", "help-about.png" );
+    hash.insert( "gtk-italic", "format-text-italic.png" );
+    hash.insert( "gtk-jump-to", "go-jump.png" );
+    hash.insert( "gtk-justify-center", "format-justify-center.png" );
+    hash.insert( "gtk-justify-fill", "format-justify-fill.png" );
+    hash.insert( "gtk-justify-left", "format-justify-left.png" );
+    hash.insert( "gtk-justify-right", "format-justify-right.png" );
+    hash.insert( "gtk-leave-fullscreen", "view-restore.png" );
+    hash.insert( "gtk-media-forward", "media-seek-forward.png" );
+    hash.insert( "gtk-media-next", "media-skip-forward.png" );
+    hash.insert( "gtk-media-pause", "media-playback-pause.png" );
+    hash.insert( "gtk-media-play", "media-playback-start.png" );
+    hash.insert( "gtk-media-previous", "media-skip-backward.png" );
+    hash.insert( "gtk-media-record", "media-record.png" );
+    hash.insert( "gtk-media-rewind", "media-seek-backward.png" );
+    hash.insert( "gtk-media-stop", "media-playback-stop.png" );
+    hash.insert( "gtk-missing-image", "unknown.png" );
+    hash.insert( "gtk-network", "network-server.png" );
+    hash.insert( "gtk-new", "document-new.png" );
+    hash.insert( "gtk-no", "edit-delete.png" );
+    hash.insert( "gtk-ok", "dialog-ok.png" );
+    hash.insert( "gtk-open", "document-open.png" );
+    hash.insert( "gtk-paste", "edit-paste.png" );
+    hash.insert( "gtk-preferences", "configure.png" );
+    hash.insert( "gtk-print", "document-print.png" );
+    hash.insert( "gtk-print-preview", "document-print-preview.png" );
+    hash.insert( "gtk-properties", "document-properties.png" );
+    hash.insert( "gtk-quit", "application-exit.png" );
+    hash.insert( "gtk-redo", "edit-redo.png" );
+    hash.insert( "gtk-refresh", "view-refresh.png" );
+    hash.insert( "gtk-remove", "edit-delete.png" );
+    hash.insert( "gtk-revert-to-saved", "document-revert.png" );
+    hash.insert( "gtk-save", "document-save.png" );
+    hash.insert( "gtk-save-as", "document-save-as.png" );
+    hash.insert( "gtk-select-all", "edit-select-all.png" );
+    hash.insert( "gtk-select-color", "color-picker.png" );
+    hash.insert( "gtk-select-font", "preferences-desktop-font.png" );
+    hash.insert( "gtk-sort-ascending", "view-sort-ascending.png" );
+    hash.insert( "gtk-sort-descending", "view-sort-descending.png" );
+    hash.insert( "gtk-spell-check", "tools-check-spelling.png" );
+    hash.insert( "gtk-stop", "process-stop.png" );
+    hash.insert( "gtk-strikethrough", "format-text-strikethrough.png" );
+    hash.insert( "gtk-undelete", "edit-undo.png" );
+    hash.insert( "gtk-underline", "format-text-underline.png" );
+    hash.insert( "gtk-undo", "edit-undo.png" );
+    hash.insert( "gtk-unindent", "format-indent-less.png" );
+    hash.insert( "gtk-yes", "dialog-ok.png" );
+    hash.insert( "gtk-zoom-100", "zoom-original.png" );
+    hash.insert( "gtk-zoom-fit", "zoom-fit-best.png" );
+    hash.insert( "gtk-zoom-in", "zoom-in.png" );
+    hash.insert( "gtk-zoom-out", "zoom-out.png" );
+    return hash;
+}
+
+static QHash<QString,QString> ggmIconMap = ggmMapIcons();
+
 bool
 XBar::globalX11EventFilter( void *msg )
 {
@@ -982,25 +1089,30 @@ ggmRecursive(const QDomElement &node, QObject *widget, const QString &prefix )
                 QDomElement menuNode = e.firstChildElement("menu");
                 if ( !menuNode.isNull() )
                 {   // submenu
-                QMenu *newMenu = MENU_FUNC( addMenu( accelMappedLabel(e) ) );
-                ggmRecursive(menuNode, newMenu, prefix + "/" + e.attribute("id") );
+                    QMenu *newMenu = MENU_FUNC( addMenu( accelMappedLabel(e) ) );
+                    ggmRecursive(menuNode, newMenu, prefix + "/" + e.attribute("id") );
                 }
                 else if ( !e.attribute("label").isEmpty() )
                 {   // real action item
-                QAction *action = new QAction(widget);
-                action->setText( accelMappedLabel(e) );
-                action->setData( prefix + "/" + e.attribute("id") );
-                action->setEnabled( e.attribute("sensible") != "0" );
-                QString state = e.attribute("state");
-                int iState = 0;
-                if ( state == "0" )
-                    iState = 1;
-                else if ( state == "1" )
-                    iState = 2;
-                action->setCheckable( iState > 0 );
-                action->setChecked( (iState == 2) );
-                QObject::connect ( action, SIGNAL(triggered()), instance, SLOT(runGgmAction()) );
-                MENU_FUNC( addAction(action) );
+                    QAction *action = new QAction(widget);
+                    action->setText( accelMappedLabel(e) );
+                    action->setData( prefix + "/" + e.attribute("id") );
+                    action->setEnabled( e.attribute("sensible") != "0" );
+                    QString icon = e.attribute("icon");
+                    if ( !icon.isEmpty() ) 
+                        icon = ggmIconMap.value( icon, QString() );
+                    if ( !icon.isEmpty() ) 
+                        action->setIcon( KIcon( icon ) );
+                    QString state = e.attribute("state");
+                    int iState = 0;
+                    if ( state == "0" )
+                        iState = 1;
+                    else if ( state == "1" )
+                        iState = 2;
+                    action->setCheckable( iState > 0 );
+                    action->setChecked( (iState == 2) );
+                    QObject::connect ( action, SIGNAL(triggered()), instance, SLOT(runGgmAction()) );
+                    MENU_FUNC( addAction(action) );
                 }
             }
         }
