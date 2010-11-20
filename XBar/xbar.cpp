@@ -94,8 +94,10 @@ static void ggmSetLocalMenus(bool on)
 {
     Atom ggmSettings = XInternAtom( QX11Info::display(), "_NET_GLOBALMENU_SETTINGS", false );
     XTextProperty text;
-    QString string = QString("[GlobalMenu:Client]\nshow-local-menu=%1\nshow-menu-icons=%1\nchanged-notify-timeout=500\n#").arg(on?"true":"false");
-    char *data = string.toLatin1().append("\0").data();
+    QString string = QString("\n[GlobalMenu:Client]\nshow-local-menu=%1\nshow-menu-icons=true\nchanged-notify-timeout=500\n#").arg(on?"true":"false");
+    QByteArray ba = string.toLatin1();
+    ba.append("\0");
+    char *data = ba.data();
     XStringListToTextProperty( &data, 1, &text );
     XSetTextProperty( QX11Info::display(), QX11Info::appRootWindow(), &text, ggmSettings );
 }
