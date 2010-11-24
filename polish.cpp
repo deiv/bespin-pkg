@@ -508,15 +508,12 @@ Style::polish( QWidget * widget )
 
         // scrollarea hovering
         QAbstractScrollArea *area = 0;
-        if ((area = qobject_cast<QAbstractScrollArea*>(frame))
+        if ( (area = qobject_cast<QAbstractScrollArea*>(frame))
 #ifdef QT3_SUPPORT
             || frame->inherits("Q3ScrollView")
 #endif
             )
         {
-            // just <strike>broadsword</strike> gladius here - the stupid viewport should use the mouse...
-            if (area && area->viewport())
-                area->viewport()->setAttribute(Qt::WA_NoMousePropagation);
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
@@ -592,6 +589,9 @@ Style::polish( QWidget * widget )
                         widget->setAttribute(Qt::WA_Hover);
                 }
             }
+            // just <strike>broadsword</strike> gladius here - the stupid viewport should use the mouse...
+            else  if (area && area->viewport())
+                area->viewport()->setAttribute(Qt::WA_NoMousePropagation);
 #if 0 // does not work
             else if (appType == Amarok && widget->inherits("Context::ContextView"))
                 FILTER_EVENTS(widget);
