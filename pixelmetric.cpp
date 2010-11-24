@@ -199,7 +199,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
 //       if (option) return option->rect.height()-F(4);
 //       return F(16);
    case PM_DialogButtonsSeparator:
-       return 0;
+       return F(4);
    case PM_DialogButtonsButtonWidth:
        return F(80);
 //    case PM_DialogButtonsButtonHeight: // Minimum height of a button in a dialog buttons widget
