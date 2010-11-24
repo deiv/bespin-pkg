@@ -1126,14 +1126,15 @@ Style::eventFilter( QObject *object, QEvent *ev )
         return false; // just for performance - they can occur really often
     case QEvent::Paint:
 #if BESPIN_ARGB_WINDOWS
-        if (object->isWidgetType())
+//         if (object->isWidgetType())
         if (QWidget *window = static_cast<QWidget*>(object))
         if (window->testAttribute(Qt::WA_TranslucentBackground))
         if (window->isWindow())
         {
-            const bool isARGB = FX::compositingActive();
             const bool isPopup =  window->windowFlags() & (Qt::Popup & ~Qt::Window);
-            const int opacity = isARGB ? (isPopup ? config.menu.opacity : config.bg.opacity) : 0xff;
+            int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
+            if ( opacity < 0xff && !FX::compositingActive() )
+                opacity = 0xff;
 
             QPainter p(window);
             p.setPen(Qt::NoPen);

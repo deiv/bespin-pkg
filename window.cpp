@@ -167,7 +167,9 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         return;
 
     const bool isPopup = widget->windowFlags() & (Qt::Popup & ~Qt::Window);
-    const int opacity = FX::compositingActive()  ? (isPopup ? config.menu.opacity : config.bg.opacity) : 0xff;
+    int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
+    if ( opacity < 0xff && !FX::compositingActive() )
+        opacity = 0xff;
 
 #if BESPIN_ARGB_WINDOWS
     if (opacity < c.alpha())
