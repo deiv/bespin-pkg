@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,13 +13,8 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.46+devel"
-   sodipodi:docname="media-playback-stop.svg"
-   inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/media-skip-backward.png"
-   inkscape:export-xdpi="33.75"
-   inkscape:export-ydpi="33.75"
-   sodipodi:version="0.32"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="media-playback-pause.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -28,6 +24,18 @@
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective10" />
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="72"
+       height="112.00002"
+       patternTransform="translate(64,916.36218)"
+       id="pattern3607">
+      <path
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:16;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="M 8,56 48,8 64,8 24,56 l 40,48.00002 -16,0 L 8,56 z"
+         id="path3602"
+         sodipodi:nodetypes="ccccccc" />
+    </pattern>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -36,21 +44,21 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.875"
-     inkscape:cx="46.582076"
-     inkscape:cy="64"
+     inkscape:zoom="3.959798"
+     inkscape:cx="75.124019"
+     inkscape:cy="64.843138"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1162"
-     inkscape:window-height="1084"
-     inkscape:window-x="412"
-     inkscape:window-y="26"
+     inkscape:window-width="1351"
+     inkscape:window-height="987"
+     inkscape:window-x="54"
+     inkscape:window-y="63"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid2816"
-       empspacing="4"
+       empspacing="8"
        visible="true"
        enabled="true"
        snapvisiblegridlinesonly="true" />
@@ -63,7 +71,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -72,19 +80,13 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-924.36218)">
-    <path
-       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 64,924.36218 c -32.446021,0 -59.219381,24.164502 -63.4,55.466667 l 17.266667,0 c 4.0155637,-21.842992 23.129248,-38.4 46.133333,-38.4 23.004085,0 42.117771,16.557008 46.133333,38.4 l 17.266667,0 C 123.21938,948.52668 96.44602,924.36218 64,924.36218 z M 0.6,996.89551 c 4.1806188,31.302165 30.953979,55.466667 63.4,55.466667 32.446021,0 59.219381,-24.164501 63.4,-55.466667 l -17.266667,0 c -4.0155627,21.842992 -23.129248,38.4 -46.133333,38.4 -23.004085,0 -42.11777,-16.557008 -46.133333,-38.4 z"
-       id="path3038" />
-    <path
-       sodipodi:type="arc"
-       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       id="path3043"
-       sodipodi:cx="64"
-       sodipodi:cy="64"
-       sodipodi:rx="28"
-       sodipodi:ry="28"
-       d="M 92,64 A 28,28 0 1 1 36,64 28,28 0 1 1 92,64 z"
-       transform="matrix(1.0666667,0,0,1.0666667,-4.2666688,920.09551)" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:16;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4656"
+       width="96"
+       height="96"
+       x="16"
+       y="16"
+       transform="translate(0,924.36218)" />
   </g>
 </svg>
