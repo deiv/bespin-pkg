@@ -65,8 +65,8 @@ forward:actions/mail-forward:mail-forwarded
 go-bottom:actions/go-bottom:arrow-down-double
 go-down:actions/go-down:arrow-down
 go-jump-locationbar:actions/go-jump-locationbar
-go-next:actions/go-next:arrow-right:media-skip-forward
-go-previous:actions/go-previous:arrow-left:media-skip-backward
+go-next:actions/go-next:arrow-right
+go-previous:actions/go-previous:arrow-left
 go-top:actions/go-top:arrow-up-double
 go-up:actions/go-up:arrow-up
 horus:apps/gwenview
@@ -195,4 +195,8 @@ preferences-desktop-mouse:apps/preferences-desktop-mouse,devices/input-mouse,cat
 document-properties:actions/document-properties
 edit-rename:actions/edit-rename
 tools-bug-report:actions/tools-report-bug
+media-skip-backward:actions/media-skip-backward
+media-skip-forward:actions/media-skip-forward
+media-seek-backward:actions/media-seek-backward
+media-seek-forward:actions/media-seek-forward
 
