@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="media-seek-forward.svg">
+   sodipodi:docname="media-skip-forward.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -52,7 +52,7 @@
      showgrid="true"
      inkscape:window-width="1351"
      inkscape:window-height="987"
-     inkscape:window-x="54"
+     inkscape:window-x="250"
      inkscape:window-y="63"
      inkscape:window-maximized="0">
     <inkscape:grid
@@ -81,14 +81,15 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:16;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
-       d="m 56,948.36218 0,80.00002 -40,-40.00002 40,-40 z"
-       id="rect4720"
-       sodipodi:nodetypes="cccc" />
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="M 16,63.999998 C 16.000001,53.192001 54.64,18.596001 64,24 c 9.36,5.403999 9.36,74.596 0,80 -9.36,5.404 -48.000001,-29.192005 -48,-40.000002 z"
+       id="path4861"
+       sodipodi:nodetypes="cssc"
+       transform="translate(-8,924.36218)" />
     <path
-       sodipodi:nodetypes="cccc"
-       id="path4728"
-       d="m 105.33321,961.69575 0,53.33285 -26.666424,-26.66642 26.666424,-26.66643 z"
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10.66657162;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1" />
+       sodipodi:nodetypes="cssc"
+       id="path4866"
+       d="m 71.510009,988.36218 c 10e-7,-7.8575 28.09159,-33.00907 34.896381,-29.08032 6.8048,3.92875 6.8048,54.23194 0,58.16064 -6.804791,3.9288 -34.896381,-21.22281 -34.896381,-29.08032 z"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
   </g>
 </svg>

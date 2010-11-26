@@ -52,7 +52,7 @@
      showgrid="true"
      inkscape:window-width="1351"
      inkscape:window-height="987"
-     inkscape:window-x="54"
+     inkscape:window-x="250"
      inkscape:window-y="63"
      inkscape:window-maximized="0">
     <inkscape:grid
@@ -81,14 +81,14 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:16;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
-       d="m 72,948.36218 0,80.00002 40,-40.00002 -40,-40 z"
-       id="rect4720"
-       sodipodi:nodetypes="cccc" />
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="m 120,988.36218 c 0,-10.808 -38.64,-45.404 -48,-40 -9.36,5.404 -9.36,74.59602 0,80.00002 9.36,5.404 48,-29.19202 48,-40.00002 z"
+       id="path4861"
+       sodipodi:nodetypes="cssc" />
     <path
-       sodipodi:nodetypes="cccc"
-       id="path4728"
-       d="m 16,948.36218 0,80.00002 40,-40.00002 -40,-40 z"
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:16;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1" />
+       sodipodi:nodetypes="cssc"
+       id="path4866"
+       d="m 64,988.36218 c -10e-7,-10.808 -38.64,-45.404 -48,-40 -9.36,5.404 -9.36,74.59602 0,80.00002 9.36,5.404 48.000001,-29.19202 48,-40.00002 z"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
   </g>
 </svg>

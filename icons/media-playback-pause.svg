@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="media-playback-start.svg">
+   sodipodi:docname="media-playback-stop.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -52,8 +52,8 @@
      showgrid="true"
      inkscape:window-width="1351"
      inkscape:window-height="987"
-     inkscape:window-x="234"
-     inkscape:window-y="91"
+     inkscape:window-x="250"
+     inkscape:window-y="63"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -80,21 +80,16 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-924.36218)">
-    <rect
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:16;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4589"
-       width="32"
-       height="96"
-       x="16"
-       y="16"
-       transform="translate(0,924.36218)" />
-    <rect
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:16;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4591"
-       width="32"
-       height="96"
-       x="80"
-       y="16"
-       transform="translate(0,924.36218)" />
+    <path
+       transform="translate(0,924.36218)"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="m 16,16 c 2.941564,-2.941564 37.058435,-2.941564 40,0 2.941564,2.941564 2.941564,93.05844 0,96 -2.941564,2.94156 -37.058435,2.94156 -40,0 -2.941564,-2.94156 -2.941564,-93.058435 0,-96 z"
+       id="path5133"
+       sodipodi:nodetypes="csssc" />
+    <path
+       sodipodi:nodetypes="csssc"
+       id="path5138"
+       d="m 72,940.36218 c 2.941564,-2.94156 37.05844,-2.94156 40,0 2.94156,2.94156 2.94156,93.05842 0,96.00002 -2.94156,2.9415 -37.058435,2.9415 -40,0 -2.941564,-2.9416 -2.941564,-93.05845 0,-96.00002 z"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
   </g>
 </svg>
