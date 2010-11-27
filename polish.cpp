@@ -590,7 +590,7 @@ Style::polish( QWidget * widget )
                 }
             }
             // just <strike>broadsword</strike> gladius here - the stupid viewport should use the mouse...
-            else  if (area && area->viewport())
+            else  if (appType != Dolphin && area && area->viewport())
                 area->viewport()->setAttribute(Qt::WA_NoMousePropagation);
 #if 0 // does not work
             else if (appType == Amarok && widget->inherits("Context::ContextView"))
