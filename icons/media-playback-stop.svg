@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="media-playback-start.svg">
+   sodipodi:docname="media-playback-stop.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -45,8 +45,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
-     inkscape:cx="75.124019"
-     inkscape:cy="64.843138"
+     inkscape:cx="35.349263"
+     inkscape:cy="61.496459"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -71,7 +71,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -81,20 +81,15 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       sodipodi:type="star"
+       transform="translate(0,924.36218)"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       id="path5110"
-       sodipodi:sides="4"
-       sodipodi:cx="64"
-       sodipodi:cy="64"
-       sodipodi:r1="67.882251"
-       sodipodi:r2="48"
-       sodipodi:arg1="-2.3561945"
-       sodipodi:arg2="-1.5707963"
-       inkscape:flatsided="true"
-       inkscape:rounded="0.13"
-       inkscape:randomized="0"
-       d="M 16.000002,16.000003 C 24.824694,7.1753103 103.17531,7.1753096 112,16.000002 c 8.82469,8.824692 8.82469,87.175308 0,95.999998 -8.82469,8.82469 -87.175305,8.82469 -95.999997,0 -8.8246927,-8.82469 -8.8246934,-87.175305 -1e-6,-95.999997 z"
-       transform="translate(0,924.36218)" />
+       d="m 56,8 c 1.470782,-1.470782 14.529218,-1.470782 16,0 1.470782,1.470782 1.470782,38.529218 0,40 -1.470782,1.470782 -14.529218,1.470782 -16,0 C 54.529218,46.529218 54.529218,9.470782 56,8 z"
+       id="path3622"
+       sodipodi:nodetypes="csssc" />
+    <path
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="M 48 18.75 C 29.361928 25.342087 16 43.10408 16 64 C 16 90.509668 37.490332 112 64 112 C 90.509668 112 112 90.509668 112 64 C 112 43.10408 98.638072 25.342087 80 18.75 L 80 36.28125 C 89.564362 41.814319 96 52.155827 96 64 C 96 81.673112 81.673112 96 64 96 C 46.326888 96 32 81.673112 32 64 C 32 52.155827 38.435638 41.814319 48 36.28125 L 48 18.75 z "
+       transform="translate(0,924.36218)"
+       id="path3625" />
   </g>
 </svg>
