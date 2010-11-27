@@ -17,7 +17,7 @@
    inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/go-up.png"
    inkscape:export-xdpi="67.5"
    inkscape:export-ydpi="67.5"
-   sodipodi:docname="view-icons.svg"
+   sodipodi:docname="view-list-details.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
@@ -38,15 +38,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="9.3470678"
-     inkscape:cx="7.8439397"
-     inkscape:cy="30.171483"
+     inkscape:cx="31.258542"
+     inkscape:cy="28.513209"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1546"
-     inkscape:window-height="932"
-     inkscape:window-x="73"
-     inkscape:window-y="57"
+     inkscape:window-width="1647"
+     inkscape:window-height="951"
+     inkscape:window-x="184"
+     inkscape:window-y="228"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -75,23 +75,23 @@
      transform="translate(0,-988.36218)">
     <path
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 12,1000.3622 c 1.470782,-1.47082 38.529218,-1.47082 40,0 1.470782,1.4708 1.470782,2.5292 0,4 -1.470782,1.4708 -38.529218,1.4708 -40,0 -1.470782,-1.4708 -1.470782,-2.5292 0,-4 z"
-       id="path3020"
+       d="m 8,1000.3622 c 0.735391,-0.73541 47.264609,-0.73541 48,0 0.735391,0.7354 0.735391,3.2646 0,4 -0.735391,0.7354 -47.264609,0.7354 -48,0 -0.735391,-0.7354 -0.735391,-3.2646 0,-4 z"
+       id="path2840"
        sodipodi:nodetypes="csssc" />
     <path
        sodipodi:nodetypes="csssc"
-       id="path3106"
-       d="m 12,1012.3622 c 1.470782,-1.4708 38.529218,-1.4708 40,0 1.470782,1.4708 1.470782,2.5292 0,4 -1.470782,1.4708 -38.529218,1.4708 -40,0 -1.470782,-1.4708 -1.470782,-2.5292 0,-4 z"
+       id="path2843"
+       d="m 8,1012.3622 c 0.735391,-0.7354 47.264609,-0.7354 48,0 0.735391,0.7354 0.735391,3.2646 0,4 -0.735391,0.7354 -47.264609,0.7354 -48,0 -0.735391,-0.7354 -0.735391,-3.2646 0,-4 z"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
     <path
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 12,1024.3622 c 1.470782,-1.4708 38.529218,-1.4708 40,0 1.470782,1.4708 1.470782,2.5292 0,4 -1.470782,1.4708 -38.529218,1.4708 -40,0 -1.470782,-1.4708 -1.470782,-2.5292 0,-4 z"
-       id="path3108"
+       d="m 8,1024.3622 c 0.735391,-0.7354 47.264609,-0.7354 48,0 0.735391,0.7354 0.735391,3.2646 0,4 -0.735391,0.7354 -47.264609,0.7354 -48,0 -0.735391,-0.7354 -0.735391,-3.2646 0,-4 z"
+       id="path2845"
        sodipodi:nodetypes="csssc" />
     <path
        sodipodi:nodetypes="csssc"
-       id="path3110"
-       d="m 12,1036.3622 c 1.470782,-1.4708 38.529218,-1.4708 40,0 1.470782,1.4708 1.470782,2.5292 0,4 -1.470782,1.4708 -38.529218,1.4708 -40,0 -1.470782,-1.4708 -1.470782,-2.5292 0,-4 z"
+       id="path2847"
+       d="m 8,1036.3622 c 0.735391,-0.7354 47.264609,-0.7354 48,0 0.735391,0.7354 0.735391,3.2646 0,4 -0.735391,0.7354 -47.264609,0.7354 -48,0 -0.735391,-0.7354 -0.735391,-3.2646 0,-4 z"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
   </g>
 </svg>
