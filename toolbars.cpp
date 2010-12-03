@@ -78,12 +78,13 @@ Style::drawToolBar(const QStyleOption *option, QPainter *painter, const QWidget 
     // lighter scanline variant
     if (config.bg.mode == Scanlines  && config.bg.structure < 5)
     {
-        painter->save();
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(Gradients::structure(FCOLOR(Window), true));
-        painter->translate(RECT.topLeft());
-        painter->drawRect(RECT);
-        painter->restore();
+        painter->drawTiledPixmap( RECT, Gradients::structure(FCOLOR(Window), true), RECT.topLeft() );
+//         painter->save();
+//         painter->setPen(Qt::NoPen);
+//         painter->setBrush(Gradients::structure(FCOLOR(Window), true));
+//         painter->translate(RECT.topLeft());
+//         painter->drawRect(RECT);
+//         painter->restore();
     }
     // window
     else if (widget && widget->isWindow())
