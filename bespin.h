@@ -332,9 +332,11 @@ public:
     static Config config;
 private slots:
     void clearScrollbarCache();
+    void dockLocationChanged( Qt::DockWidgetArea );
     void focusWidgetChanged(QWidget*, QWidget*);
     void removeAppEventFilter();
     void resetRingPix();
+    void unlockDocks(bool);
     void updateUno();
     void updateBlurRegions() const;
 };

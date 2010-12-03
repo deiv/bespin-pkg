@@ -69,6 +69,7 @@
 #define DRAW_SPLITTERS "DrawSplitters", true
 
 #define HACK_AMAROK_VIEWS "Hack.AmarokViews", false
+#define HACK_DOCK_LOCKING "Hack.DockLocking", false
 #define HACK_DOLPHIN_URLBAR "Hack.DolphinUrlBar", false
 #define HACK_DOLPHIN_VIEWS "Hack.DolphinViews", false
 #define HACK_DOLPHIN_ICONVIEWS "Hack.DolphinIconViews", false

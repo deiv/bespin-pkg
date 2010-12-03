@@ -40,7 +40,7 @@ public:
     {
         bool messages, KHTMLView, treeViews, windowMovement, killThrobber, 
              opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews, 
-             lockToolBars, invertDolphinUrlBar, fixKMailFolderList, extendDolphinViews;
+             lockToolBars, invertDolphinUrlBar, fixKMailFolderList, extendDolphinViews, lockDocks;
     } config;
 private slots:
     void toggleToolBarLock();

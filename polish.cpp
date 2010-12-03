@@ -19,6 +19,7 @@
 #include <QAbstractItemView>
 // #include <QAbstractScrollArea>
 #include <QAbstractSlider>
+#include <QAction>
 #include <QApplication>
 #include <QComboBox>
 #include <QDockWidget>
@@ -296,6 +297,8 @@ polishGTK(QWidget * widget, const Config &config)
     }
 }
 
+static QAction *dockLocker = 0;
+
 void
 Style::polish( QWidget * widget )
 {
@@ -381,12 +384,28 @@ Style::polish( QWidget * widget )
                 FILTER_EVENTS(widget);
             widget->setAttribute(Qt::WA_StyledBackground);
         }
-#if QT_VERSION >= 0x040500
-        if ( appType == Dolphin )
         if ( QMainWindow *mw = qobject_cast<QMainWindow*>(widget) )
-            mw->setDockOptions(mw->dockOptions()|QMainWindow::VerticalTabs);
+        {
+#if QT_VERSION >= 0x040500
+            if ( appType == Dolphin )
+                mw->setDockOptions(mw->dockOptions()|QMainWindow::VerticalTabs);
 //             mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );       
 #endif
+            if ( Hacks::config.lockDocks )
+            {
+                if ( !dockLocker )
+                {
+                    dockLocker = new QAction( "Locked Dock Positions", qApp );
+                    dockLocker->setShortcutContext( Qt::ApplicationShortcut );
+                    dockLocker->setShortcuts( QList<QKeySequence>() << QKeySequence("Ctrl+Alt+D") );
+                    dockLocker->setEnabled( true );
+                    dockLocker->setCheckable( true );
+                    dockLocker->setChecked( true );
+                    connect ( dockLocker, SIGNAL(toggled(bool)), SLOT(unlockDocks(bool)) );   
+                }
+                widget->addAction( dockLocker );
+            }
+        }
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
         {
@@ -817,6 +836,11 @@ Style::polish( QWidget * widget )
     }
     else if ( QDockWidget *dock = qobject_cast<QDockWidget*>(widget) )
     {
+        if ( Hacks::config.lockDocks )
+        {
+            disconnect( dock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(dockLocationChanged(Qt::DockWidgetArea)) );
+            connect( dock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(dockLocationChanged(Qt::DockWidgetArea)) );
+        }
         widget->setAttribute(Qt::WA_Hover);
         if ( config.menu.round )
             FILTER_EVENTS(widget); // shape 

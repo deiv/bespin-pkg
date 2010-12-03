@@ -16,9 +16,46 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QApplication>
 #include <QDockWidget>
 #include <QStyleOptionDockWidget>
 #include "draw.h"
+#include "hacks.h"
+
+#include <QtDebug>
+
+static QDockWidget *carriedDock = 0;
+
+void
+Style::dockLocationChanged( Qt::DockWidgetArea /*area*/ )
+{
+    QDockWidget *dock = carriedDock ? carriedDock : qobject_cast<QDockWidget*>( sender() );
+    if ( !dock )
+        return;
+    if ( dock->isFloating() || !Hacks::config.lockDocks )
+    {
+        if ( QWidget *title = dock->titleBarWidget() )
+        {
+            if ( title->objectName() ==  "bespin_docktitle_dummy" )
+            {
+                dock->setTitleBarWidget(0);
+                title->deleteLater();
+            }
+            else
+                title->show();
+        }
+    }
+    else
+    {
+        if ( !dock->titleBarWidget() )
+        {
+            QWidget *title = new QWidget;
+            title->setObjectName( "bespin_docktitle_dummy" );
+            dock->setTitleBarWidget( title );
+        }
+        dock->titleBarWidget()->hide();
+    }
+}
 
 static struct {
     QPainterPath path;
@@ -231,4 +268,19 @@ if (option->subControls & SC_Mdi##_btn_##Button)\
     PAINT_MDI_BUTTON(Min);
 
 #undef PAINT_MDI_BUTTON
+}
+
+void
+Style::unlockDocks(bool b)
+{
+    const bool lock = Hacks::config.lockDocks;
+    Hacks::config.lockDocks = b;
+    foreach ( QWidget *w, qApp->allWidgets() )
+    {
+        if ( (carriedDock = qobject_cast<QDockWidget*>(w)) )
+        if ( !carriedDock->isFloating() )
+            dockLocationChanged( Qt::AllDockWidgetAreas );
+    }
+    carriedDock = 0;
+    Hacks::config.lockDocks = lock;
 }

@@ -16,12 +16,12 @@
    Boston, MA 02110-1301, USA.
  */
 
-#include <QSettings>
-#include <QFile>
+#include <QApplication>
 #include <QDir>
+#include <QFile>
 #include <QPainter>
 #include <QProcess>
-#include <QApplication>
+#include <QSettings>
 #include <QTimer>
 
 #include <cmath>
@@ -167,6 +167,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.opaqueAmarokViews = appType == Amarok && readBool(HACK_AMAROK_VIEWS);
         Hacks::config.opaquePlacesViews = readBool(HACK_PLACES_VIEWS);
         Hacks::config.lockToolBars = readBool(HACK_TOOLBAR_LOCKING);
+        Hacks::config.lockDocks = readBool(HACK_DOCK_LOCKING);
         Hacks::config.invertDolphinUrlBar = appType == Dolphin && readBool(HACK_DOLPHIN_URLBAR);
         Hacks::config.fixKMailFolderList = appType == KMail && readBool(HACK_KMAIL_FOLDERS);
         Hacks::config.extendDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_ICONVIEWS);

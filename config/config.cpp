@@ -539,6 +539,14 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     (like in eg. arora) don't.<br>\
     This locks all Qt Toolbars and adds a config item, accessible by pressing CTRL\
     and rightclicking the Toolbar.");
+    
+    handleSettings(ui.lockDocks, HACK_DOCK_LOCKING);
+    setContextHelp(ui.lockDocks, "<b>Lock Dockwidgets</b><hr>\
+    Qt mainwindows provide a (quite ;-) powerfull way to arrange parts of the application\
+    (like the sidebars in Dolphin or K3b) but while you can lock them in eg. Amarok or K3b,\
+    they'll remain always movable in most other applications.<br>\
+    Checking this will initially lock those docks and allow you to toggle them unlocked\
+    by pressing CRTL+ALT+D.");
 
     /** setContextHelp(.) attaches a context help string to a widget on your form */
     setContextHelp(ui.btnRole, "<b>Button Colors</b><hr>\
