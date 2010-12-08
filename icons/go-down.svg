@@ -9,17 +9,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64"
-   height="64"
+   width="128"
+   height="128"
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/go-up.png"
-   inkscape:export-xdpi="67.5"
-   inkscape:export-ydpi="67.5"
-   sodipodi:docname="go-up.svg"
-   sodipodi:version="0.32"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   sodipodi:docname="go-next.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -37,24 +32,28 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="9.3470678"
-     inkscape:cx="7.8439397"
-     inkscape:cy="30.171483"
+     inkscape:zoom="6.703125"
+     inkscape:cx="75.089355"
+     inkscape:cy="64"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1546"
-     inkscape:window-height="932"
-     inkscape:window-x="73"
-     inkscape:window-y="57"
+     inkscape:window-width="1574"
+     inkscape:window-height="1069"
+     inkscape:window-x="42"
+     inkscape:window-y="20"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid2816"
-       empspacing="4"
+       empspacing="8"
        visible="true"
        enabled="true"
-       snapvisiblegridlinesonly="true" />
+       snapvisiblegridlinesonly="true"
+       originx="2.7755576e-17px"
+       originy="0px"
+       spacingx="1.3333px"
+       spacingy="1.3333px" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -72,22 +71,22 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-988.36218)">
+     transform="translate(0,-924.36218)">
     <path
        sodipodi:type="star"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       id="path2816"
+       id="path3590"
        sodipodi:sides="3"
-       sodipodi:cx="32"
-       sodipodi:cy="32"
-       sodipodi:r1="28"
-       sodipodi:r2="8.1479998"
+       sodipodi:cx="63.998402"
+       sodipodi:cy="64.001602"
+       sodipodi:r1="53.332001"
+       sodipodi:r2="26.666"
        sodipodi:arg1="3.1415927"
-       sodipodi:arg2="4.1887902"
+       sodipodi:arg2="4.1887903"
        inkscape:flatsided="true"
-       inkscape:rounded="0.13"
+       inkscape:rounded="0.16"
        inkscape:randomized="0"
-       d="m 4,31.999999 c 3e-7,-6.304665 36.540001,-27.4010424 42.000001,-24.2487097 5.46,3.1523327 5.459998,45.3450907 -2e-6,48.4974227 C 40.539999,59.401044 3.9999997,38.304664 4,31.999999 z"
-       transform="matrix(0,-1,-1,0,63.999999,1048.3622)" />
+       d="m 10.666401,64.0016 c 10e-7,-14.779798 67.198323,-53.576763 79.998003,-46.186864 12.799676,7.389899 12.799676,84.983834 -4e-6,92.373734 -12.799681,7.3899 -79.998,-31.407073 -79.997999,-46.18687 z"
+       transform="matrix(0,-1,-1,0,128,1045.6957)" />
   </g>
 </svg>

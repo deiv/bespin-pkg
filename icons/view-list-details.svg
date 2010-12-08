@@ -9,17 +9,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64"
-   height="64"
+   width="128"
+   height="128"
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/go-up.png"
-   inkscape:export-xdpi="67.5"
-   inkscape:export-ydpi="67.5"
-   sodipodi:docname="view-icons.svg"
-   sodipodi:version="0.32"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   sodipodi:docname="view-file-columns.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -37,24 +32,28 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="9.3470678"
-     inkscape:cx="31.258542"
-     inkscape:cy="32.792626"
+     inkscape:zoom="6.703125"
+     inkscape:cx="75.089355"
+     inkscape:cy="64"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1628"
-     inkscape:window-height="875"
-     inkscape:window-x="186"
-     inkscape:window-y="154"
+     inkscape:window-width="1574"
+     inkscape:window-height="1069"
+     inkscape:window-x="42"
+     inkscape:window-y="20"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid2816"
-       empspacing="4"
+       empspacing="8"
        visible="true"
        enabled="true"
-       snapvisiblegridlinesonly="true" />
+       snapvisiblegridlinesonly="true"
+       originx="2.7755576e-17px"
+       originy="0px"
+       spacingx="1.3333px"
+       spacingy="1.3333px" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -72,26 +71,27 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-988.36218)">
+     transform="translate(0,-924.36218)">
     <path
+       transform="translate(-37.332401,919.02898)"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 4,992.36218 c 0.735391,-0.73539 55.264609,-0.73539 56,0 0.735391,0.73539 0.735391,3.26461 0,4.00002 -0.735391,0.7354 -55.264609,0.7354 -56,0 -0.735391,-0.73541 -0.735391,-3.26463 0,-4.00002 z"
-       id="path3197"
+       d="m 58.665201,26.669199 c 1.206766,-1.206765 84.124429,-1.206765 85.331199,0 1.20677,1.206766 1.20677,9.459635 0,10.666401 -1.20677,1.206765 -84.124433,1.206765 -85.331198,0 -1.206766,-1.206766 -1.206766,-9.459635 -10e-7,-10.666401 z"
+       id="path3960"
        sodipodi:nodetypes="csssc" />
     <path
        sodipodi:nodetypes="csssc"
-       id="path3200"
-       d="m 4,1008.3622 c 0.735391,-0.7354 55.264609,-0.7354 56,0 0.735391,0.7354 0.735391,3.2646 0,4 -0.735391,0.7354 -55.264609,0.7354 -56,0 -0.735391,-0.7354 -0.735391,-3.2646 0,-4 z"
+       id="path3963"
+       d="m 21.3328,967.03098 c 1.206766,-1.20676 84.12443,-1.20676 85.3312,0 1.20677,1.20677 1.20677,9.45964 0,10.6664 -1.20677,1.20677 -84.124434,1.20677 -85.331199,0 -1.206766,-1.20676 -1.206766,-9.45963 -1e-6,-10.6664 z"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
     <path
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 4,1024.3622 c 0.735391,-0.7354 55.264609,-0.7354 56,0 0.735391,0.7354 0.735391,3.2646 0,4 -0.735391,0.7354 -55.264609,0.7354 -56,0 -0.735391,-0.7354 -0.735391,-3.2646 0,-4 z"
-       id="path3208"
+       d="m 21.3328,988.36378 c 1.206766,-1.20676 84.12443,-1.20676 85.3312,0 1.20677,1.20677 1.20677,9.45964 0,10.6664 -1.20677,1.20682 -84.124434,1.20682 -85.331199,0 -1.206766,-1.20676 -1.206766,-9.45963 -1e-6,-10.6664 z"
+       id="path3965"
        sodipodi:nodetypes="csssc" />
     <path
        sodipodi:nodetypes="csssc"
-       id="path3210"
-       d="m 4,1040.3622 c 0.735391,-0.7354 55.264609,-0.7354 56,0 0.735391,0.7354 0.735391,3.2646 0,4 -0.735391,0.7354 -55.264609,0.7354 -56,0 -0.735391,-0.7354 -0.735391,-3.2646 0,-4 z"
+       id="path3967"
+       d="m 21.3328,1011.0299 c 1.206766,-1.2068 84.12443,-1.2068 85.3312,0 1.20677,1.2068 1.20677,9.4596 0,10.6664 -1.20677,1.2068 -84.124434,1.2068 -85.331199,0 -1.206766,-1.2068 -1.206766,-9.4596 -1e-6,-10.6664 z"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
   </g>
 </svg>
