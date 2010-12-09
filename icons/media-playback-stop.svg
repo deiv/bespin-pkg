@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="media-playback-stop.svg">
+   sodipodi:docname="view-icons.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -24,18 +24,6 @@
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective10" />
-    <pattern
-       patternUnits="userSpaceOnUse"
-       width="72"
-       height="112.00002"
-       patternTransform="translate(64,916.36218)"
-       id="pattern3607">
-      <path
-         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:16;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         d="M 8,56 48,8 64,8 24,56 l 40,48.00002 -16,0 L 8,56 z"
-         id="path3602"
-         sodipodi:nodetypes="ccccccc" />
-    </pattern>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -44,16 +32,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.959798"
-     inkscape:cx="-4.1729551"
-     inkscape:cy="57.960925"
+     inkscape:zoom="6.703125"
+     inkscape:cx="75.089355"
+     inkscape:cy="64"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1351"
-     inkscape:window-height="987"
-     inkscape:window-x="250"
-     inkscape:window-y="63"
+     inkscape:window-width="1574"
+     inkscape:window-height="1069"
+     inkscape:window-x="239"
+     inkscape:window-y="25"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -61,7 +49,11 @@
        empspacing="8"
        visible="true"
        enabled="true"
-       snapvisiblegridlinesonly="true" />
+       snapvisiblegridlinesonly="true"
+       originx="2.7755576e-17px"
+       originy="0px"
+       spacingx="1.3333px"
+       spacingy="1.3333px" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -71,7 +63,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -81,15 +73,9 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       transform="translate(0,924.36218)"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="m 56,8 c 1.470782,-1.470782 14.529218,-1.470782 16,0 1.470782,1.470782 1.470782,46.529218 0,48 -1.470782,1.470782 -14.529218,1.470782 -16,0 C 54.529218,54.529218 54.529218,9.470782 56,8 z"
-       id="path3622"
-       sodipodi:nodetypes="csssc" />
-    <path
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="M 48 18.75 C 29.361928 25.342087 16 43.10408 16 64 C 16 90.509668 37.490332 112 64 112 C 90.509668 112 112 90.509668 112 64 C 112 43.10408 98.638072 25.342087 80 18.75 L 80 46 C 85.071924 50.469792 88.28125 57.045313 88.28125 64.375 C 88.28125 77.828872 77.490992 88.71875 64.15625 88.71875 C 50.821508 88.71875 40 77.828872 40 64.375 C 40 57.180186 43.081059 50.713249 48 46.25 L 48 18.75 z "
+       d="M 64 10.65625 C 34.545549 10.65625 10.65625 34.545549 10.65625 64 C 10.65625 93.454451 34.545549 117.34375 64 117.34375 C 93.454451 117.34375 117.34375 93.454451 117.34375 64 C 117.34375 34.545549 93.454451 10.65625 64 10.65625 z M 64 42.65625 C 75.781781 42.65625 85.34375 52.218219 85.34375 64 C 85.34375 75.781781 75.781781 85.34375 64 85.34375 C 52.218219 85.34375 42.65625 75.781781 42.65625 64 C 42.65625 52.218219 52.218219 42.65625 64 42.65625 z "
        transform="translate(0,924.36218)"
-       id="path2817" />
+       id="path4148" />
   </g>
 </svg>
