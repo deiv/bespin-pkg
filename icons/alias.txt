@@ -199,4 +199,4 @@ media-skip-backward:actions/media-skip-backward
 media-skip-forward:actions/media-skip-forward
 media-seek-backward:actions/media-seek-backward
 media-seek-forward:actions/media-seek-forward
-
+media-playback-record:actions/media-record
