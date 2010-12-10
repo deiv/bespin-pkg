@@ -9,17 +9,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64"
-   height="64"
+   width="128"
+   height="128"
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   inkscape:export-filename="/home/rob/.kde4/share/icons/nmfnms/48x48/actions/go-up.png"
-   inkscape:export-xdpi="67.5"
-   inkscape:export-ydpi="67.5"
-   sodipodi:docname="view-file-columns.svg"
-   sodipodi:version="0.32"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   sodipodi:docname="configure.svg">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -37,24 +32,26 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="9.3470678"
-     inkscape:cx="31.258542"
-     inkscape:cy="32.792626"
+     inkscape:zoom="5.6"
+     inkscape:cx="53.46828"
+     inkscape:cy="61.302102"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1628"
-     inkscape:window-height="875"
-     inkscape:window-x="186"
-     inkscape:window-y="154"
+     inkscape:window-width="1653"
+     inkscape:window-height="1022"
+     inkscape:window-x="161"
+     inkscape:window-y="50"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid2816"
-       empspacing="4"
+       empspacing="8"
        visible="true"
        enabled="true"
-       snapvisiblegridlinesonly="true" />
+       snapvisiblegridlinesonly="true"
+       spacingx="1.3333px"
+       spacingy="1.3333px" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -72,17 +69,17 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-988.36218)">
+     transform="translate(0,-924.36218)">
     <path
-       transform="translate(-5.845293e-8,972.36218)"
+       transform="translate(-3.7549543e-7,892.36298)"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="M 4.0000001,20 C 5.4707821,18.529218 18.529218,18.529218 20,20 c 1.470782,1.470782 1.470782,54.529218 0,56 -1.470782,1.470782 -14.5292178,1.470782 -15.9999999,0 -1.4707821,-1.470782 -1.4707821,-54.529218 0,-56 z"
-       id="path3364"
+       d="m 21.3328,53.335202 c 3.016914,-3.016914 18.315887,-3.016914 21.332801,0 3.016914,3.016913 3.016913,82.314288 -1e-6,85.331198 -3.016913,3.01691 -18.315887,3.01691 -21.3328,0 -3.016914,-3.01691 -3.016913,-82.314284 0,-85.331198 z"
+       id="path3034"
        sodipodi:nodetypes="csssc" />
     <path
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="M 44 2.90625 C 36.367695 2.90625 28.735391 3.26461 28 4 C 26.529218 5.47078 26.529218 58.5292 28 60 C 29.470782 61.4708 58.529218 61.4708 60 60 C 61.470782 58.5292 61.470782 5.47078 60 4 C 59.264609 3.26461 51.632305 2.90625 44 2.90625 z M 44 20 C 48.918753 20 44.928167 24.115666 48.40625 27.59375 C 51.884333 31.071834 56 27.081247 56 32 C 56 36.918753 51.884334 32.928167 48.40625 36.40625 C 44.928166 39.884333 48.918753 44 44 44 C 39.081247 44 43.071833 39.884334 39.59375 36.40625 C 36.115667 32.928166 32 36.918753 32 32 C 32 27.081247 36.115666 31.071833 39.59375 27.59375 C 43.071834 24.115667 39.081247 20 44 20 z "
-       transform="translate(0,988.36218)"
-       id="path3367" />
+       d="M 80 19.0625 C 67.421228 19.062505 54.852207 19.835295 53.34375 21.34375 C 50.326837 24.36066 50.326836 103.63935 53.34375 106.65625 C 56.360663 109.67315 103.63934 109.67315 106.65625 106.65625 C 109.67316 103.63935 109.67316 24.36066 106.65625 21.34375 C 105.1478 19.835295 92.578772 19.062495 80 19.0625 z M 74.65625 32 L 85.34375 32 L 85.34375 53.34375 L 106.65625 53.34375 L 106.65625 64 L 85.34375 64 L 85.34375 85.34375 L 74.65625 85.34375 L 74.65625 64 L 53.34375 64 L 53.34375 53.34375 L 74.65625 53.34375 L 74.65625 32 z "
+       transform="translate(0,924.36218)"
+       id="path3037" />
   </g>
 </svg>
