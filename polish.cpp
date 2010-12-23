@@ -66,6 +66,7 @@
 #define FILTER_EVENTS(_WIDGET_) { _WIDGET_->removeEventFilter(this); _WIDGET_->installEventFilter(this); } // skip semicolon
 
 #define BESPIN_MOUSE_DEBUG 0
+#define I_AM_THE_ROB 0
 
 using namespace Bespin;
 
@@ -567,7 +568,7 @@ Style::polish( QWidget * widget )
                 }
                 if (QWidget *vp = itemView->viewport())
                 {
-                    if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 180)
+                    if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 128)
                     {
                         const bool solid = Hacks::config.opaqueAmarokViews || Hacks::config.opaqueDolphinViews || 
                                            (Hacks::config.opaquePlacesViews && itemView->inherits("KFilePlacesView"));
@@ -944,10 +945,17 @@ Style::polish( QWidget * widget )
             bar->insertSeparator( before );
     }
         
-    if ( isTopContainer && config.UNO.toolbar )
+    if ( isTopContainer )
     {   // catches show/resize events and manipulates fg/bg role
-        updateUno(static_cast<QToolBar *>(widget));
-        FILTER_EVENTS(widget);
+        if ( config.UNO.toolbar )
+        {
+            updateUno(static_cast<QToolBar *>(widget));
+            FILTER_EVENTS(widget);
+        }
+#if I_AM_THE_ROB
+        else if ( config.btn.tool.connected )
+            FILTER_EVENTS(widget);
+#endif
     }
 
 #ifdef QT3_SUPPORT
