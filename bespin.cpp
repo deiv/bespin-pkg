@@ -59,6 +59,7 @@
 
 #define BESPIN_MOUSE_DEBUG 0
 #define BESPIN_STANDARD_PALETTE_HACK 0
+#define I_AM_THE_ROB 0
 
 /**=========================================================*/
 
@@ -1433,6 +1434,29 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
         return false;
     }
+#if I_AM_THE_ROB
+    case QEvent::ChildAdded:
+    case QEvent::ChildRemoved:
+    {
+        if ( config.btn.tool.connected )
+        if ( QToolBar *bar = qobject_cast<QToolBar *>(object) )
+        {
+            qWarning("stage 1");
+            object->removeEventFilter( this );
+            QSize sz = bar->iconSize();
+            bar->blockSignals( true );
+            bar->setIconSize( QSize() );
+            qWarning("stage 2");
+            bar->setIconSize( sz );
+            qWarning("stage 3");
+            QCoreApplication::sendEvent( object, ev );
+            bar->blockSignals( false );
+            object->installEventFilter( this );
+            return true;
+        }
+        return false;
+    }
+#endif
 #if BESPIN_MOUSE_DEBUG
     case QEvent::MouseButtonPress:
     {
@@ -1532,7 +1556,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 {
                     if (!unoUpdateTimer)
                     {
-                        unoUpdateTimer = new QTimer(this);
+                        unoUpdateTimer = new QTimer;
                         unoUpdateTimer->setSingleShot(true);
                         connect (unoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateUno()));
                     }
