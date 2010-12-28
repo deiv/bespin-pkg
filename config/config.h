@@ -63,6 +63,7 @@ private:
     void store3(const QString &, bool, const QPalette &pal = QApplication::palette() );
     void setColorsFromPalette( const QPalette &pal );
 private slots:
+    void initColors();
     void setHeader(const QString&);
     void storedSettigSelected(QTreeWidgetItem *);
     void store2a();

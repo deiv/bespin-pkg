@@ -227,7 +227,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     ui.role_text->installEventFilter(this);
     ui.role_highlight->installEventFilter(this);
     ui.role_highlightedText->installEventFilter(this);
-    setColorsFromPalette( QApplication::palette() );
+    QTimer::singleShot( 50, this, SLOT(initColors()) );
 
     /** fill some comboboxes, not of interest */
     generateColorModes(ui.tooltipRole);
@@ -720,6 +720,12 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 }
 
 void
+Config::initColors()
+{
+    setColorsFromPalette( QApplication::palette() );
+}
+
+void
 Config::changeEvent(QEvent *event)
 {
     if (event->type() != QEvent::PaletteChange)
@@ -1079,6 +1085,8 @@ static QColor mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
                     (w1*c1.alpha() + w2*c2.alpha())/sum);
 }
 
+#include <QtDebug>
+
 void
 Config::setColorsFromPalette( const QPalette &pal )
 {
@@ -1117,7 +1125,7 @@ Config::applyPalette( QPalette *pal )
         pal = loadedPal;
     }
     pal->setColor( QPalette::Window, ui.role_window->palette().color( ui.role_window->backgroundRole() ) );
-    pal->setColor( QPalette::WindowText, ui.role_window->palette().color( ui.role_windowText->foregroundRole() ) );
+    pal->setColor( QPalette::WindowText, ui.role_windowText->palette().color( ui.role_windowText->foregroundRole() ) );
     pal->setColor( QPalette::Button, ui.role_button->palette().color( ui.role_button->backgroundRole() ) );
     pal->setColor( QPalette::ButtonText, ui.role_buttonText->palette().color( ui.role_buttonText->foregroundRole() ) );
     pal->setColor( QPalette::Base, ui.role_base->palette().color( ui.role_base->backgroundRole() ) );
