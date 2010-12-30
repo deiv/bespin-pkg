@@ -347,7 +347,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
     // konsole now paints itself and of course it would be wrong to 
     // just ask the style to paint a tabbar *grrrrrr...*
     bool isOnlyShape = false;
-    if ( isOnlyShape = (animStep < 0) )
+    if ( (isOnlyShape = (animStep < 0)) )
         calcAnimStep( option, painter, widget );
 
     // maybe we're done here?!
@@ -364,7 +364,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         size = RECT.width();
     }
     else    // Konsole now thinks it has to write it's own broken tab painting :-(
-        rect.adjust( F(1), F(3), -F(1), -( F(4) + isOnlyShape*F(2) ) );
+        rect.adjust( F(1), F(2), -F(1), -( F(3) + isOnlyShape*F(2) ) );
     
     QColor c;
     bool noBase = false;
@@ -381,33 +381,33 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         c = sameRoles ? Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 60, 6) : CCOLOR(tab.active, Bg);
         if (option->state & State_HasFocus)
             c = Colors::mid(c, FCOLOR(Highlight), 2, 1);
-
+/*
         else if (config.tab.activeTabSunken && Colors::value(CCOLOR(tab.std, Bg)) < 164)
             vertical ?  rect.adjust(0, F(1), 0, -F(2)) : rect.adjust(F(2), -F(1), -F(2), 0);
         else
-            vertical ? rect.adjust(-F(1), F(2), F(1), -F(2)) : rect.adjust(F(2), -F(1), -F(2), F(1));
+            vertical ? rect.adjust(-F(1), F(2), F(1), -F(2)) : rect.adjust(F(2), -F(1), -F(2), F(1));*/
     }
     else if (sameRoles)
         c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 66-animStep, animStep);
     else
         c = Colors::mid(CCOLOR(tab.std, Bg), CCOLOR(tab.active, Bg), 10-animStep, animStep);
 
-    // gradient
+    Gradients::Type gt = (config.tab.activeTabSunken && sunken) ? Gradients::Sunken : GRAD(tab);
     if (sameRoles)
     {
         rect = RECT.adjusted( F(1), F(2), -F(1), isOnlyShape*-F(2));
         Tile::setShape( (o == Qt::Vertical) ? (Tile::Left|Tile::Right) : (Tile::Top|Tile::Bottom) );
-        Gradients::Type gt = GRAD(tab);
-        if (sunken) // active tab has same color as inactive one, we must do sth. on the gradient...
+        if (sunken) 
         {
+            if ( GRAD(tab) == Gradients::Sunken )
+                gt = Gradients::Simple;
             rect.adjust(0,-F(2),0,0);
-            gt = (gt == Gradients::Sunken ? Gradients::Simple : Gradients::Sunken);
         }
         painter->drawTiledPixmap(rect, Gradients::pix(c, size, o, gt));
         rect.adjust(0,0,0,-F(2));
     }
     else
-        masks.rect[true].render(rect, painter, GRAD(tab), o, c, size, rect.topLeft());
+        masks.rect[true].render(rect, painter, gt, o, c, size, rect.topLeft());
 
     // shadow
     if ((config.tab.activeTabSunken || noBase) && sunken)
