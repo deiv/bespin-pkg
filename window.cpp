@@ -132,8 +132,6 @@ Style::drawTitleShadow( QPainter *painter, const QWidget *widget ) const
         if ( config.UNO.toolbar )
         {
             y = widget->property("UnoHeight").toInt();
-// NOTICE @gravy: the following line :)
-//            qDebug() << "BESPIN UNO" << y << (y & 0xffffff) << ((y>>24) & 0xff);
             y = (y & 0xffffff) - ((y>>24) & 0xff);
             if ( y > 0 )
                 ++y;
@@ -149,6 +147,8 @@ Style::drawTitleShadow( QPainter *painter, const QWidget *widget ) const
 void
 Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widget) const
 {
+
+    // Invalid attempts --------------------------------------------------------
     if (!(widget && widget->isWindow()))
         return; // can't do anything here
         // err... no. splashscreens want their own bg? but this applies to popups as well ???
@@ -166,6 +166,8 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     if (c == Qt::transparent) // plasma uses this
         return;
 
+    // Figure alpha stuff --------------------------------------------------------
+
     const bool isPopup = widget->windowFlags() & (Qt::Popup & ~Qt::Window);
     int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
     if ( opacity < 0xff && !FX::compositingActive() )
@@ -175,20 +177,18 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     if (opacity < c.alpha())
         c.setAlpha(opacity);
 #endif
-#if QT_VERSION >= 0x040500
-    const bool isARGB = widget->testAttribute(Qt::WA_TranslucentBackground);
-#else
-    const bool isARGB = false;
-#endif
 
+    const bool isARGB = widget->testAttribute(Qt::WA_TranslucentBackground);
     bool translucent = false;
     if (c.alpha() < 0xff)
     {
-    if (isARGB)
+        if (isARGB)
             translucent = true;
         else
             c.setAlpha(0xff);
     }
+
+    // Ensure ring texture --------------------------------------------------------
 
     bool drawRings = false;
     if (config.bg.ringOverlay)
@@ -203,6 +203,27 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         }
         ringResetTimer.start(5000);
     }
+
+    // "Simple" backgrounds ------------------------------------------------------
+    if (config.bg.mode == Scanlines)
+    {
+        const bool light = (widget->windowFlags() & ((Qt::Tool | Qt::Popup) & ~Qt::Window));
+        painter->save();
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(Gradients::structure(c, light));
+        painter->drawRect(widget->rect());
+        if ( !isPopup )
+            drawTitleShadow(painter, widget);
+        else if ( isARGB )
+            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
+        painter->restore();
+        return;
+    }
+
+#if BESPIN_ARGB_WINDOWS
+    if (isARGB)
+        painter->fillRect( widget->rect(), c );
+#endif
 
     // glassy Modal dialog/Popup menu ==========
     // we just kinda abuse this mac only attribute... ;P
@@ -239,45 +260,26 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     }
 
     // cause of scrollbars - kinda optimization
-    if (config.bg.mode == Plain && !isPopup)
+    if ( config.bg.mode == Plain )
     {
         if ( !isPopup )
         {
             if (drawRings)
                 painter->drawPixmap(widget->width()-450, 0, *rings);
-            drawTitleShadow(painter, widget);   
+            drawTitleShadow(painter, widget);
         }
         else if ( isARGB )
             shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
         return;
     }
 
-    if (config.bg.mode == Scanlines)
-    {
-        const bool light = (widget->windowFlags() & ((Qt::Tool | Qt::Popup) & ~Qt::Window));
-        painter->save();
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(Gradients::structure(c, light));
-        painter->drawRect(widget->rect());
-        if ( !isPopup )
-            drawTitleShadow(painter, widget);
-        else if ( isARGB )
-            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
-            
-        painter->restore();
-        return;
-    }
+    // Complex part ===================
 
 #if BESPIN_ARGB_WINDOWS
-    if (isARGB)
-    {
-        painter->fillRect(widget->rect(), c);
-        if (translucent)
-            c = Qt::transparent;
-    }
+    if (isARGB && translucent)
+        c = Qt::transparent;
 #endif
 
-    // Complex part ===================
     const BgSet &set = Gradients::bgSet(c);
     QRect rect = widget->rect();
 #ifndef QT_NO_XRENDER

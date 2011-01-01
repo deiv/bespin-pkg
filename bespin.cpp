@@ -30,6 +30,7 @@
 #include <QMenuBar>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPaintEvent>
 #include <QPushButton>
 #include <QStyleOptionTabWidgetFrame>
 #include <QStylePlugin>
@@ -548,16 +549,11 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
 
         if (config.bg.opacity == 0xff || tmpOpt.palette.brush(QPalette::Window).style() > 1)
             painter->fillRect(tmpOpt.rect, tmpOpt.palette.brush(QPalette::Window));
-        else if (config.bg.mode == Plain)
-        {
-            QColor c = tmpOpt.palette.color(QPalette::Window);
-            c.setAlpha(config.bg.opacity);
-            painter->fillRect(tmpOpt.rect, c);
-        }
-        
+
         painter->translate(tl);
         drawWindowBg(&tmpOpt, painter, grampa);
     }
+
     if (!grampa->isWindow())
     {
         painter->setBrush(grampa->palette().brush(grampa->backgroundRole()));
@@ -1132,24 +1128,9 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (window->testAttribute(Qt::WA_TranslucentBackground))
         if (window->isWindow())
         {
-            const bool isPopup =  window->windowFlags() & (Qt::Popup & ~Qt::Window);
-            int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
-            if ( opacity < 0xff && !FX::compositingActive() )
-                opacity = 0xff;
-
             QPainter p(window);
-            p.setPen(Qt::NoPen);
-            const bool glassy = window->testAttribute(Qt::WA_MacBrushedMetal);
-            const bool isPlain = config.bg.mode == Plain;// || (isPopup && opacity < 0xff && !glassy);
-            if (isPlain || glassy)
-            {
-                QColor c = window->palette().color(window->backgroundRole());
-                c.setAlpha(opacity);
-                p.setBrush(c);
-                p.drawRect(window->rect());
-            }
-            if (!isPlain || glassy || config.bg.ringOverlay)
-                drawWindowBg(0, &p, window);
+            p.setClipRegion( static_cast<QPaintEvent*>(ev)->region() );
+            drawWindowBg(0, &p, window);
             p.end();
             return false;
         }
