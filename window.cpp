@@ -241,9 +241,14 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     // cause of scrollbars - kinda optimization
     if (config.bg.mode == Plain && !isPopup)
     {
-        if (drawRings)
-            painter->drawPixmap(widget->width()-450, 0, *rings);
-        drawTitleShadow(painter, widget);
+        if ( !isPopup )
+        {
+            if (drawRings)
+                painter->drawPixmap(widget->width()-450, 0, *rings);
+            drawTitleShadow(painter, widget);   
+        }
+        else if ( isARGB )
+            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
         return;
     }
 
@@ -254,13 +259,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         painter->setPen(Qt::NoPen);
         painter->setBrush(Gradients::structure(c, light));
         painter->drawRect(widget->rect());
-        if (isPopup)
-        {
-            if (isARGB)
-                shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
-        }
-        else
+        if ( !isPopup )
             drawTitleShadow(painter, widget);
+        else if ( isARGB )
+            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
+            
         painter->restore();
         return;
     }
@@ -358,13 +361,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     }
     if (drawRings)
         painter->drawPixmap(widget->width()-450, 0, *rings);
-    if (isPopup)
-    {
-        if (isARGB)
-            shapeCorners( painter, rect, masks.rect[rounderAlphaCorners] );
-    }
-    else
+    
+    if ( !isPopup )
         drawTitleShadow(painter, widget);
+    else if (isARGB)
+        shapeCorners( painter, rect, masks.rect[rounderAlphaCorners] );
     
 }
 

@@ -1140,7 +1140,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             QPainter p(window);
             p.setPen(Qt::NoPen);
             const bool glassy = window->testAttribute(Qt::WA_MacBrushedMetal);
-            const bool isPlain = config.bg.mode == Plain || (isPopup && !glassy);
+            const bool isPlain = config.bg.mode == Plain;// || (isPopup && opacity < 0xff && !glassy);
             if (isPlain || glassy)
             {
                 QColor c = window->palette().color(window->backgroundRole());
