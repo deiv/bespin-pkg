@@ -321,7 +321,7 @@ Style::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QW
             masks.rect[false].render( RECT.adjusted(0,0,0,-F(2)), painter, QColor(0,0,0,48) );
         else
 #endif
-            if (config.bg.mode == Scanlines)
+            if (config.bg.mode == Scanlines && !(widget && widget->window() && widget->window()->testAttribute(Qt::WA_MacBrushedMetal)))
             masks.rect[false].render( RECT.adjusted(0,0,0,-F(2)), painter,
                                       Gradients::structure(FCOLOR(Window).darker(108)),
                                       widget ? widget->mapTo(widget->window(), RECT.topLeft()) : QPoint() );

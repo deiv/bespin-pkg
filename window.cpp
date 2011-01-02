@@ -204,27 +204,6 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         ringResetTimer.start(5000);
     }
 
-    // "Simple" backgrounds ------------------------------------------------------
-    if (config.bg.mode == Scanlines)
-    {
-        const bool light = (widget->windowFlags() & ((Qt::Tool | Qt::Popup) & ~Qt::Window));
-        painter->save();
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(Gradients::structure(c, light));
-        painter->drawRect(widget->rect());
-        if ( !isPopup )
-            drawTitleShadow(painter, widget);
-        else if ( isARGB )
-            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
-        painter->restore();
-        return;
-    }
-
-#if BESPIN_ARGB_WINDOWS
-    if (isARGB)
-        painter->fillRect( widget->rect(), c );
-#endif
-
     // glassy Modal dialog/Popup menu ==========
     // we just kinda abuse this mac only attribute... ;P
     if (widget->testAttribute(Qt::WA_MacBrushedMetal))
@@ -240,6 +219,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         }
         painter->save();
         painter->setPen(Qt::NoPen);
+        if (isARGB)
+        {
+            painter->setBrush( c );
+            painter->drawRect( widget->rect() );
+        }
         const int v = Colors::value(c);
         if (c.alpha() < 0xff)
         {
@@ -258,6 +242,27 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         painter->restore();
         return;
     }
+    
+        // "Simple" backgrounds ------------------------------------------------------
+    if (config.bg.mode == Scanlines)
+    {
+        const bool light = (widget->windowFlags() & ((Qt::Tool | Qt::Popup) & ~Qt::Window));
+        painter->save();
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(Gradients::structure(c, light));
+        painter->drawRect(widget->rect());
+        if ( !isPopup )
+            drawTitleShadow(painter, widget);
+        else if ( isARGB )
+            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
+        painter->restore();
+        return;
+    }
+    
+#if BESPIN_ARGB_WINDOWS
+    if (isARGB)
+        painter->fillRect( widget->rect(), c );
+#endif
 
     // cause of scrollbars - kinda optimization
     if ( config.bg.mode == Plain )
