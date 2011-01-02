@@ -237,7 +237,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         if (drawRings)
             painter->drawPixmap(widget->width()-450, 0, *rings);
 
-        if (isARGB && isPopup)
+        if ( isARGB && isPopup && config.menu.round )
             shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
         painter->restore();
         return;
@@ -253,7 +253,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         painter->drawRect(widget->rect());
         if ( !isPopup )
             drawTitleShadow(painter, widget);
-        else if ( isARGB )
+        else if ( isARGB && config.menu.round )
             shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
         painter->restore();
         return;
@@ -273,7 +273,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
                 painter->drawPixmap(widget->width()-450, 0, *rings);
             drawTitleShadow(painter, widget);
         }
-        else if ( isARGB )
+        else if ( isARGB && config.menu.round )
             shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
         return;
     }
@@ -371,7 +371,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     
     if ( !isPopup )
         drawTitleShadow(painter, widget);
-    else if (isARGB)
+    else if ( isARGB && config.menu.round )
         shapeCorners( painter, rect, masks.rect[rounderAlphaCorners] );
     
 }
