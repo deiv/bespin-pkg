@@ -77,15 +77,7 @@ Style::drawToolBar(const QStyleOption *option, QPainter *painter, const QWidget 
     
     // lighter scanline variant
     if (config.bg.mode == Scanlines  && config.bg.structure < 5)
-    {
         painter->drawTiledPixmap( RECT, Gradients::structure(FCOLOR(Window), true), RECT.topLeft() );
-//         painter->save();
-//         painter->setPen(Qt::NoPen);
-//         painter->setBrush(Gradients::structure(FCOLOR(Window), true));
-//         painter->translate(RECT.topLeft());
-//         painter->drawRect(RECT);
-//         painter->restore();
-    }
     // window
     else if (widget && widget->isWindow())
     {
@@ -205,6 +197,8 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         QToolBar *tb = static_cast<QToolBar*>(widget->parentWidget()); // guaranteed by "connected", see above
         OPT_SUNKEN
         const bool round = (config.btn.tool.frame == 1);
+        const bool sameRoles = config.btn.tool.std_role[Bg] == config.btn.tool.active_role[Bg];
+        Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(btn.tool);
 
         QPalette pal = PAL;
 #undef PAL
@@ -215,14 +209,15 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
             pal.setCurrentColorGroup(QPalette::Active);
 
         QColor c  = config.btn.tool.std_role[Bg] == QPalette::Window ? Colors::bg(pal, widget) : CCOLOR(btn.tool.std, Bg);
-        QColor c2 = /*config.btn.tool.active_role[Bg] == QPalette::Window ? Colors::bg(pal, widget) : */CCOLOR(btn.tool.active, Bg);
+        QColor c2 = sameRoles ? Colors::mid(c, Qt::black, 3,1) : CCOLOR(btn.tool.active, Bg);
 #undef PAL
 #define PAL option->palette
+        
+        
         if (option->state & State_On)
         {
-            QColor h = c;
-            c = c2;
-            c2 = h;
+            QColor h = c; c = c2; c2 = h; // swap colors
+            if ( sameRoles ) gt = Gradients::Sunken; // sunken dark active - mac-a-like
         }
 
         if (Colors::value(c) < 50)
@@ -251,9 +246,20 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         }
 
         // paint
-        Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(btn.tool);
         o = (o == Qt::Horizontal) ? Qt::Vertical : Qt::Horizontal;
         Tile::setShape(pf);
+#if 0
+        if ( true )
+        {
+            const int d = F(3);
+            masks.rect[round].render( rect, painter, Gradients::Sunken, o,
+                                      Colors::mid(tb->palette().color(tb->backgroundRole()), Qt::black, 4, 1) );
+            rect.adjust(bool(pf & Tile::Left) * d, bool(pf & Tile::Top) * d,
+                        bool(pf & Tile::Right) * -d, bool(pf & Tile::Bottom) * -d);
+            masks.rect[round].render(rect, painter, gt, o, c);
+        }
+        else 
+#endif
         if (config.btn.tool.frame)
         {
             if (pf & Tile::Bottom)
@@ -261,13 +267,9 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
             bool relief = false;
             if (config.btn.tool.frame == 2)
                 relief = !(sunken || option->state & State_On);
-//             if (step || !relief)
-                masks.rect[round].render(rect, painter, gt, o, c);
+            masks.rect[round].render(rect, painter, gt, o, c);
             if (relief)
-            {
-//                 OPT_HOVER
                 shadows.relief[round][true].render(RECT, painter);
-            }
             else
                 shadows.sunken[round][true].render(RECT, painter);
         }
