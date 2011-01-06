@@ -191,29 +191,40 @@ Style::generatePixmaps()
         tmp = QImage(w,h,QImage::Format_ARGB32);
         for (int j = 0; j < 3; ++j)
         {   // direction
-            c1 = (j > 0) ? 255 : 111; c2 = (j > 0) ? 111 : 255;
+            c1 = 255*(j > 0);
+            c2 = 255-c1;
             tmp.fill(Qt::transparent); p.begin(&tmp);
 
             stops   << QGradientStop( 0, QColor(c1,c1,c1,0) )
-                    << QGradientStop( 0.5, QColor(c1,c1,c1,71) )
+                    << QGradientStop( 0.5, QColor(c1,c1,c1,16) )
                     << QGradientStop( 1, QColor(c1,c1,c1,0) );
             lg.setStops(stops);
+            QRect r;
             if (i)
-                { p.fillRect(0,0,F(1),f49,lg); }
+            { 
+                r.setRect(0,0,F(1),f49);
+                p.setClipRect(r);
+                p.fillRect(r,lg);
+                r.setRect(F(1),0,F(2)-F(1),f49);
+            }
             else
-                { p.fillRect(0,0,f49,F(1),lg); }
+            { 
+                r.setRect(0,0,f49,F(1));
+                p.setClipRect(r);
+                p.fillRect(r,lg);
+                r.setRect(0,F(1),f49,F(2)-F(1));
+            }
+            
             stops.clear();
-
             stops   << QGradientStop( 0, QColor(c2,c2,c2,0) )
-                    << QGradientStop( 0.5, QColor(c2,c2,c2,74) )
+                    << QGradientStop( 0.5, QColor(c2,c2,c2,16) )
                     << QGradientStop( 1, QColor(c2,c2,c2,0) );
             lg.setStops(stops);
-            if (i)
-                { p.fillRect(F(1),0,F(2)-F(1),f49,lg); }
-            else
-                { p.fillRect(0,F(1),f49,F(2)-F(1),lg); }
+            
+            p.setClipRect( r );
+            p.fillRect(r,lg);
+            
             stops.clear();
-
             p.end();
             shadows.line[i][j] = Tile::Line(QPixmap::fromImage(tmp), i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);
         }
