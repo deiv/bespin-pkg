@@ -26,7 +26,7 @@
 #include "makros.h"
 
 using namespace Bespin;
-
+#include <QtDebug>
 int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidget *widget ) const
 {
     switch ( pm )
@@ -62,14 +62,9 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_ScrollView_ScrollBarSpacing:
         return F(1);
     case PM_ScrollBarExtent: // Width of a vertical scroll bar and the height of a horizontal scroll bar
-//         if (const QSlider *slider = qobject_cast<const QSlider*>(widget))
-//         if (slider->orientation() == Qt::Horizontal)
-//             return Dpi::target.ScrollBarExtent + F(20);
-//         else
-            return Dpi::target.ScrollBarExtent;
-//         return (widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-//                 widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")) ?
-//                 F(16) : Dpi::target.ScrollBarExtent;
+        if ( /*config.scroll.groove < Groove::Sunken && */option && (option->state & QStyle::State_Horizontal) )
+            return Dpi::target.ScrollBarExtent + F(2);
+        return Dpi::target.ScrollBarExtent;
     case PM_ScrollBarSliderMin: // The minimum height of a vertical scroll bar's slider and the minimum width of a horizontal scroll bar's slider
         return Dpi::target.ScrollBarSliderMin;
     case PM_SliderThickness: // Total slider thickness

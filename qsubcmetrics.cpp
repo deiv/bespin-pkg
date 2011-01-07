@@ -192,7 +192,7 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
                 {
                     if (config.scroll.groove == Groove::Groove)
                         { off = F(2); d = RECT.height() / 3; }
-                    ret.adjust(off, d, -(buttonSpace + off), -(d+off));
+                    ret.adjust(off, d, -(buttonSpace + off), -d);
                 }
                 else
                 {
