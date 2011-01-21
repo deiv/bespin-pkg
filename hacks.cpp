@@ -265,7 +265,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
 //         !w->rect().contains(w->mapFromGlobal(QCursor::pos()))) // KColorChooser etc., catched by mouseGrabber ?!
     // avoid if we click a menu action ========================================
     if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
-    if (bar->activeAction())
+    if (bar->activeAction() || bar->inherits("QDesignerMenuBar")) // ....
         return false;
 
     // avoid if we try to (un)check a groupbx ==============================

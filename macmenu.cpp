@@ -94,6 +94,13 @@ MacMenu::manage(QMenuBar *menu)
     instance->items.append(menu);
 }
 
+
+bool 
+MacMenu::manages(const QMenuBar *menu)
+{
+    return instance && instance->usingMacMenu && instance->items.contains(const_cast<QMenuBar*>(menu));
+}
+
 void
 MacMenu::release(QMenuBar *menu)
 {

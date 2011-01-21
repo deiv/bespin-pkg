@@ -78,7 +78,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_MainWindow_SpaceBelowMenuBar:
         if (MacMenu::isActive())
         if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
-        if (menubar->height() == 0)
+        if (MacMenu::manages(menubar))
+//         if (menubar->height() == 0)
         if (!menubar->actions().isEmpty())
         {   // we trick menubars if we use macmenus - hehehe...
             // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
