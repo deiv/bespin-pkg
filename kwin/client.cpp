@@ -1116,15 +1116,18 @@ Client::reset(unsigned long changed)
                     colors[i][ColorTitleBlend] = colors[i][ColorTitleBar];
                     colors[i][ColorButtonBg] = colors[i][ColorFont];
                 }
+#if 0 
+                // NOTICE this makes no more sense at all since we provide our own coloring... =\
                 // usually the window is titlebar colored and the titleblend gradient painted upon - in case
                 // but the fallback shall be fully titleblend with a titlebar color section behind the title
                 // to not have to handle this during the painting, we just swap the colors here
-                else
+                else if ( bgMode == 1 )
                 {
                     QColor h = colors[i][ColorTitleBlend];
                     colors[i][ColorTitleBlend] = colors[i][ColorTitleBar];
                     colors[i][ColorTitleBar] = h;
                 }
+#endif
             }
         }
         else if (bgMode == 1)
