@@ -202,7 +202,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
             if (needsPaint)
             {
                 QPoint offset(0,0);
-                if (isWebKit && option->state & QStyle::State_Horizontal)
+                if (isWebKit && (option->state & QStyle::State_Horizontal))
                     offset.setY(RECT.height() - widget->height());
                 erase(option, cPainter, widget, &offset);
             }
@@ -343,11 +343,11 @@ Style::drawScrollBarButton(const QStyleOption *option, QPainter *painter, const 
 }
 
 void
-Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawScrollBarGroove(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     OPT_ENABLED;
     const bool horizontal = option->state & QStyle::State_Horizontal ||
-                            RECT.width() > RECT.height(); // at least opera doesn't propagate this
+                            RECT.width() > RECT.height(); // at least opera didn't propagate this
 
     if (isComboDropDownSlider)
     {   // get's a special solid groove
@@ -368,9 +368,24 @@ Style::drawScrollBarGroove(const QStyleOption * option, QPainter * painter, cons
 
     const Groove::Mode gType = config.scroll.groove;
     const bool round = config.scroll.sliderWidth + (gType > Groove::Groove) > 13;
-    // opera paints groove and slider directly, but messes up with bg, does not pass a widget and ignores the opaquePaintevent hint...
-    if (appType == Opera)
-        painter->fillRect(RECT, FCOLOR(Window));
+    
+    if ( appType == Opera && painter->device() )
+    {   // opera fakes raised webpages - we help a little ;-)
+        QRect r( 0, 0, painter->device()->width(), painter->device()->height() );
+        if ( horizontal )
+        {
+            const QPixmap &shadow = shadows.raised[false][true][false].tile(Tile::BtmMid);
+            r.setHeight( shadow.height() );
+            painter->drawTiledPixmap( r, shadow );
+        }
+        else
+        {
+            const QPixmap &shadow = shadows.raised[false][true][false].tile(Tile::MidRight);
+            r.setWidth( shadow.width() );
+            painter->drawTiledPixmap( r, shadow );
+        }
+        return; // no real "groove"...
+    }
 
     QColor bg = config.scroll.invertBg ?
                 Colors::mid(FCOLOR(WindowText), FCOLOR(Window), 2 + gType*gType*gType, 1):
@@ -436,8 +451,6 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
             drawScrollBarGroove(option, painter, widget);
         return;
     }
-    if (appType == Opera)
-        painter->fillRect(RECT, FCOLOR(Window));
 
     // --> we need to paint a slider
 

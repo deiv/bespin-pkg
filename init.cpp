@@ -599,9 +599,7 @@ Style::init(const QSettings* settings)
     // various workarounds... ==========================
     appType = Unknown;
     QString appName;
-    if (getenv("OPERA_LD_PRELOAD"))
-        appType = Opera;
-    else if (!qApp->inherits("KApplication") && getenv("GTK_QT_ENGINE_ACTIVE"))
+    if (!qApp->inherits("KApplication") && getenv("GTK_QT_ENGINE_ACTIVE"))
         { appType = GTK; /*qWarning("BESPIN: Detected GKT+ application");*/ }
     else if (qApp->inherits("GreeterApp"))
         appType = KDM;
@@ -640,7 +638,13 @@ Style::init(const QSettings* settings)
             appType = Arora;
         else if ( appName == "konqueror")
             appType = Konqueror;
+        else if ( appName == "Kde4ToolkitLibrary" )
+        {
+            appName = "opera";
+            appType = Opera;
+        }
     }
+    
     // ==========================
 
     readSettings(settings, appName);
