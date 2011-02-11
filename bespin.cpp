@@ -1395,6 +1395,22 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 Animator::Hover::Play(slider);
             return false;
         }
+        if ( appType == Gwenview && object->objectName() == "qt_scrollarea_viewport" )
+        {
+            if (QListView *list = qobject_cast<QListView*>(object->parent()))
+            {
+                QScrollBar *bar = list->verticalScrollBar();
+                if ( !bar )
+                    return false;
+                int step = bar->singleStep();
+                bar->setSingleStep(step/3);
+//                 list->setVerticalScrollMode( QAbstractItemView::ScrollPerPixel );
+                QCoreApplication::sendEvent(bar, ev); // tell the scrollbar to do this ;-P
+                bar->setSingleStep(step);
+                return true; // eat it
+            }
+            return false;
+        }
 
 //         if (object->objectName() == "qt_scrollarea_viewport")
 //         {
@@ -1420,16 +1436,15 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::ChildRemoved:
     {
         if ( config.btn.tool.connected )
-        if ( QToolBar *bar = qobject_cast<QToolBar *>(object) )
+        if ( QToolBar *bar = qobject_cast<QToolBar*>(object) )
+        if ( !qobject_cast<QAbstractAnimation*>(static_cast<QChildEvent*>(ev)->child()) )
         {
-            qWarning("stage 1");
+            qDebug() << static_cast<QChildEvent*>(ev)->child();
             object->removeEventFilter( this );
             QSize sz = bar->iconSize();
             bar->blockSignals( true );
             bar->setIconSize( QSize() );
-            qWarning("stage 2");
             bar->setIconSize( sz );
-            qWarning("stage 3");
             QCoreApplication::sendEvent( object, ev );
             bar->blockSignals( false );
             object->installEventFilter( this );

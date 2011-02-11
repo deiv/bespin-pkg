@@ -628,6 +628,8 @@ Style::init(const QSettings* settings)
             appType = KWin;
         else if (appName == "amarok")
             appType = Amarok;
+        else if ( appName == "gwenview" )
+            appType = Gwenview;
         else if (appName == "OpenOffice.org" || appName == "soffice.bin")
             appType = OpenOffice;
         else if (appName == "vlc")
