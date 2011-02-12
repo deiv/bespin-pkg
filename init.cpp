@@ -163,6 +163,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.treeViews = readBool(HACK_TREEVIEWS);
         Hacks::config.windowMovement = readBool(HACK_WINDOWMOVE);
         Hacks::config.killThrobber = readBool(HACK_THROBBER);
+        Hacks::config.fixGwenview = readBool(HACK_FIX_GWENVIEW);
         Hacks::config.opaqueDolphinViews = (appType == Dolphin || appType == KMail) && readBool(HACK_DOLPHIN_VIEWS);
         Hacks::config.opaqueAmarokViews = appType == Amarok && readBool(HACK_AMAROK_VIEWS);
         Hacks::config.opaquePlacesViews = readBool(HACK_PLACES_VIEWS);

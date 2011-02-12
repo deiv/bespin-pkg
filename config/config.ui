@@ -557,8 +557,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>482</width>
-               <height>167</height>
+               <width>362</width>
+               <height>118</height>
               </rect>
              </property>
              <attribute name="label">
@@ -794,7 +794,7 @@
                <x>0</x>
                <y>0</y>
                <width>186</width>
-               <height>68</height>
+               <height>67</height>
               </rect>
              </property>
              <attribute name="label">
@@ -889,8 +889,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>247</width>
-               <height>192</height>
+               <width>245</width>
+               <height>184</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1007,7 +1007,7 @@
                <x>0</x>
                <y>0</y>
                <width>130</width>
-               <height>96</height>
+               <height>94</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1104,8 +1104,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>324</width>
-               <height>87</height>
+               <width>322</width>
+               <height>86</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1273,8 +1273,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>482</width>
-               <height>226</height>
+               <width>270</width>
+               <height>181</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1473,7 +1473,7 @@
                <x>0</x>
                <y>0</y>
                <width>271</width>
-               <height>165</height>
+               <height>158</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1946,8 +1946,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>469</width>
-               <height>267</height>
+               <width>332</width>
+               <height>260</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2110,7 +2110,7 @@
                <x>0</x>
                <y>0</y>
                <width>219</width>
-               <height>96</height>
+               <height>92</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3172,6 +3172,16 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
             </property>
             <property name="text">
              <string>Dolphin: Invert the Url Navigator</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="hackFixGwenview">
+            <property name="text">
+             <string>Gwenview: Fix thumbview</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

@@ -463,6 +463,14 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     This setting allows to \"normalize\" the views (including a sunken frame) ...<br>\
     PS: there <u>is</u> a pending merge request to at least fix the bad implementation and\
     i've actually noted this for the first time in 2007 or 2008... ;-P");
+
+    handleSettings(ui.hackFixGwenview, HACK_FIX_GWENVIEW);
+    setContextHelp(ui.hackFixGwenview, "<b>Gwenview's Thumbview</b><hr>\
+    There are two major issues with the thumbnail browsing in Gwenview.\
+    <ol><li>It scrolls 3 lines on one wheel event and you waste time on redetecting context</li>\
+    <li>It moves to another (upper) position when you leave the image view</li></ol>\
+    If those were bugs, one could easily fix them, but they exists ever since...<br>\
+    So you can fix them here >-)");
     
     handleSettings(ui.hackDolphinUrl, HACK_DOLPHIN_URLBAR);
     setContextHelp(ui.hackDolphinUrl, "<b>Dolphin's URL Navigator</b><hr>\

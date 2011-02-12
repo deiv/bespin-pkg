@@ -73,6 +73,8 @@
 #define HACK_DOLPHIN_URLBAR "Hack.DolphinUrlBar", false
 #define HACK_DOLPHIN_VIEWS "Hack.DolphinViews", false
 #define HACK_DOLPHIN_ICONVIEWS "Hack.DolphinIconViews", false
+// yes - "true" by default. This Gwenview attitude sucks incredibly!
+#define HACK_FIX_GWENVIEW "Hack.FixGwenview", true
 #define HACK_KMAIL_FOLDERS "Hack.KMailFolderList", false
 #define HACK_PLACES_VIEWS "Hack.PlacesViews", false
 #define HACK_MESSAGES "Hack.Messages", false

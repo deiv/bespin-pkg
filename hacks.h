@@ -22,6 +22,7 @@
 #include <QObject>
 
 class QWidget;
+class QScrollBar;
 
 namespace Bespin
 {
@@ -31,19 +32,20 @@ class Hacks : public QObject
     Q_OBJECT
 public:
     Hacks() {}
-    enum HackAppType { Unknown = 0, SMPlayer, Dragon, KDM };
+    enum HackAppType { Unknown = 0, SMPlayer, Dragon, KDM, Gwenview };
     bool eventFilter( QObject *, QEvent *);
     static bool add(QWidget *w);
     static void releaseApp();
     static void remove(QWidget *w);
     static struct Config
     {
-        bool messages, KHTMLView, treeViews, windowMovement, killThrobber, 
+        bool messages, KHTMLView, treeViews, windowMovement, killThrobber, fixGwenview,
              opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews, 
              lockToolBars, invertDolphinUrlBar, fixKMailFolderList, extendDolphinViews, lockDocks;
     } config;
 private slots:
     void toggleToolBarLock();
+    void fixGwenviewPosition();
 private:
     Q_DISABLE_COPY(Hacks)
 };

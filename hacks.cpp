@@ -16,6 +16,7 @@
    Boston, MA 02110-1301, USA.
  */
 
+#include <QAbstractScrollArea>
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDesktopWidget>
@@ -29,6 +30,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include "bepointer.h"
+#include <QScrollBar>
 #include <QStatusBar>
 #include <QStyle>
 #include <QStyleOption>
@@ -302,6 +304,11 @@ hackMoveWindow(QWidget* w, QEvent *e)
     return true;
 }
 
+
+// obviously gwenview is completely incapable to keep the view position when watching an image
+// -> we need a beter image browser :(
+static int gwenview_position = 0;
+
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
@@ -378,6 +385,41 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         return wmDrag;
     }
 
+    if ( *appType == Gwenview &&
+         ( e->type() == QEvent::Wheel || e->type() == QEvent::Show || e->type() == QEvent::Hide ) &&
+         o->objectName() == "qt_scrollarea_viewport" )
+    {
+        if ( QAbstractScrollArea *list = qobject_cast<QAbstractScrollArea*>(o->parent()) )
+        {
+            QScrollBar *bar = list->verticalScrollBar();
+            if ( !bar )
+                return false;
+            // Gwenview scrolls three rows at once, what drives me crazy because you loose track on images
+            // and waste time to find yourself back into context.
+            if ( e->type() == QEvent::Wheel )
+            {
+                int step = bar->singleStep();
+                bar->setSingleStep(step/3);
+//                 list->setVerticalScrollMode( QAbstractItemView::ScrollPerPixel );
+                QCoreApplication::sendEvent(bar, e); // tell the scrollbar to do this ;-P
+                bar->setSingleStep(step);
+                return true; // eat it
+            }
+            // another funny crap is that it scrolls around whenever you start looking a an image
+            // so we save the position and re-set it when the thumbview comes back
+            // i'd  make a bugreport but it's been like this since KDE4 times, this cannot be a bug but
+            // must be stubborness :-(
+            if ( e->type() == QEvent::Hide )
+                gwenview_position = bar->value();
+            else if ( gwenview_position )
+            {
+                bar->setValue( gwenview_position );
+                connect( bar, SIGNAL(valueChanged(int)), this, SLOT(fixGwenviewPosition()) );
+            }
+        }
+        return false;
+    }
+
     if (e->type() == QEvent::Show)
     {
         FILTER_EVENTS(o);
@@ -385,6 +427,16 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     }  // >-)
 
     return false;
+}
+
+void
+Hacks::fixGwenviewPosition()
+{
+    QScrollBar *bar = qobject_cast<QScrollBar*>(sender());
+    if ( !bar )
+        return;
+    disconnect( bar, SIGNAL(valueChanged(int)), this, SLOT(fixGwenviewPosition()) );
+    bar->setValue( gwenview_position );
 }
 
 void
@@ -403,6 +455,8 @@ Hacks::add(QWidget *w)
         appType = new HackAppType((HackAppType)Unknown);
         if (qApp->inherits("GreeterApp")) // KDM segfaults on QCoreApplication::arguments()...
             *appType = KDM;
+        else if (QCoreApplication::applicationName() == "gwenview")
+            *appType = Gwenview;
 //         else if (QCoreApplication::applicationName() == "dragonplayer")
 //             *appType = Dragon;
 //         else if (!QCoreApplication::arguments().isEmpty() &&
@@ -431,6 +485,16 @@ Hacks::add(QWidget *w)
         static_cast<QToolBar*>(w)->setMovable(false);
         FILTER_EVENTS(w);
     }
+
+    if ( *appType == Gwenview && config.fixGwenview )
+    if ( QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(w) )
+    if ( area->inherits("Gwenview::ThumbnailView") )
+    {
+        ENSURE_INSTANCE;
+        FILTER_EVENTS(area->viewport());
+    }
+
+    if ( w->objectName() == "qt_scrollarea_viewport" )
     
     if (config.KHTMLView)
     if (QFrame *frame = qobject_cast<QFrame*>(w))

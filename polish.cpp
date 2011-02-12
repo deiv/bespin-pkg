@@ -537,8 +537,6 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
-                if ( appType == Gwenview && itemView->inherits("Gwenview::ThumbnailView"))
-                    FILTER_EVENTS(area->viewport());
                 if ( Hacks::config.extendDolphinViews && itemView->parentWidget() &&
                      QString(itemView->metaObject()->className()).startsWith("Dolphin") )
                 {

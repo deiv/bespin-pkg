@@ -1395,22 +1395,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 Animator::Hover::Play(slider);
             return false;
         }
-        if ( appType == Gwenview && object->objectName() == "qt_scrollarea_viewport" )
-        {
-            if (QListView *list = qobject_cast<QListView*>(object->parent()))
-            {
-                QScrollBar *bar = list->verticalScrollBar();
-                if ( !bar )
-                    return false;
-                int step = bar->singleStep();
-                bar->setSingleStep(step/3);
-//                 list->setVerticalScrollMode( QAbstractItemView::ScrollPerPixel );
-                QCoreApplication::sendEvent(bar, ev); // tell the scrollbar to do this ;-P
-                bar->setSingleStep(step);
-                return true; // eat it
-            }
-            return false;
-        }
 
 //         if (object->objectName() == "qt_scrollarea_viewport")
 //         {
@@ -1572,7 +1556,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         QWidget * widget = qobject_cast<QWidget*>(object);
         if (config.bg.modal.invert && widget && widget->isModal())
             swapPalette(widget, this);
-        
+
         if ( config.bg.blur && !widget->isWindow() && 
             (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
             appType != Plasma  )
