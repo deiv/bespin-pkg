@@ -252,10 +252,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
                 { c2 = CCOLOR(btn.active, Bg); c2.setAlpha(c2.alpha()*anim.step/8); }
 
             if (c2 != Qt::transparent)
-            {
-                QRect r = RECT; if (config.btn.layer == 1) r.setBottom(r.bottom()-F(1));
-                lights.glow[round].render(r, painter, c2);
-            }
+                lights.glow[round].render(RECT, painter, c2);
             // ---- alpha notice ----------
         }
         if (sunken)
