@@ -33,7 +33,9 @@ dialog-ok:actions/dialog-ok
 dialog-apply:actions/dialog-ok-apply
 document-new:actions/document-new
 document-open:actions/document-open:document-open-recent
-document-save:actions/document-save:document-save-as:document-save-all
+document-save:actions/document-save
+document-save-as:actions/document-save-as
+document-save-all:actions/document-save-all
 download-mail:actions/mail-receive
 drive-harddrive:devices/drive-harddisk,apps/partitionmanager
 drive-removable-media-usb:devices/drive-removable-media-usb-pendrive:drive-removable-media:drive-removable-media-usb,apps/device-notifier
@@ -102,6 +104,7 @@ nepomuk:apps/nepomuk
 new-mail:
 node:mimetypes/inode-directory,apps/dolphin:system-file-manager,places/folder:folder-documents:folder-downloads:folder-favorites:folder-image:folder-red:folder-sound
 notes:apps/knotes
+opera:apps/opera:opera-browser
 plasma:mimetypes/application-x-plasma,apps/plasma
 playlist-layouts:actions/view-media-playlist
 print:apps/preferences-desktop-printer,devices/printer,status/printer-printing,actions/document-print-direct:document-print-preview:document-print
