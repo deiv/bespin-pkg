@@ -52,6 +52,7 @@ private:
     /** This is the UI created with Qt Designer and included by ui_config.h */
     Ui::Config ui;
     QDialog *myDemo;
+    bool myColorsHaveChanged;
 
     /** Just some functions to fill the comboboxes, not really of interest */
     void generateColorModes(QComboBox *box, QList<int> *roles = 0);
@@ -63,18 +64,19 @@ private:
     void store3(const QString &, bool, const QPalette &pal = QApplication::palette() );
     void setColorsFromPalette( const QPalette &pal );
 private slots:
+    void filterPresets(const QString & text);
+    void handleBgMode(int);
+    void handleGrooveMode(int);
     void initColors();
+    void learnPwChar();
+    void presetAppsChanged(QTreeWidgetItem *, int);
+    void remove();
+    void reloadColorRoles();
     void setHeader(const QString&);
     void storedSettigSelected(QTreeWidgetItem *);
     void store2a();
     void store2b(QTreeWidgetItem *);
-    void remove();
     void showDemo();
-    void handleBgMode(int);
-    void handleGrooveMode(int);
-    void learnPwChar();
-    void filterPresets(const QString & text);
-    void presetAppsChanged(QTreeWidgetItem *, int);
 };
 
 #endif

@@ -162,6 +162,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                 ui.sections, SLOT(setCurrentIndex(int)));
     connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
                 this, SLOT(setHeader(const QString &)));
+    connect (ui.sections, SIGNAL(currentChanged(int)), this, SLOT(reloadColorRoles()));
 
     /** Prepare the settings store, not of interest */
     StringMap presetMap;
@@ -230,29 +231,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     QTimer::singleShot( 50, this, SLOT(initColors()) );
 
     /** fill some comboboxes, not of interest */
-    generateColorModes(ui.tooltipRole);
-    generateColorModes(ui.uno_role);
-    generateColorModes(ui.crProgressBg);
-    generateColorModes(ui.crProgressFg);
-    generateColorModes(ui.crTabBar);
-    generateColorModes(ui.crTabBarActive);
-    generateColorModes(ui.crPopup);
-    generateColorModes(ui.crMenuActive);
-    generateColorModes(ui.btnRole);
-    generateColorModes(ui.btnActiveRole);
-    generateColorModes(ui.toolbuttonRole);
-    generateColorModes(ui.toolbuttonActiveRole);
-    generateColorModes(ui.scrollRole);
-    generateColorModes(ui.scrollActiveRole);
-    generateColorModes(ui.headerRole);
-    generateColorModes(ui.headerSortingRole);
-    QList<int> roles; roles << 3 << 4 << 6;
-    generateColorModes(ui.viewShadingRole, &roles);
-    
-    generateColorModes(ui.kwinInactiveRole);
-    generateColorModes(ui.kwinActiveRole);
-    generateColorModes(ui.kwinInactiveText);
-    generateColorModes(ui.kwinActiveText);
 
     generateGradientTypes(ui.uno_gradient);
     generateGradientTypes(ui.gradButton);
@@ -738,7 +716,10 @@ Config::changeEvent(QEvent *event)
 {
     if (event->type() != QEvent::PaletteChange)
         return;
-    
+
+    myColorsHaveChanged = true;
+    reloadColorRoles();
+
     const int s = 32;
     QPixmap logo(s*4,s*4);
     QPainterPath path;
@@ -797,6 +778,9 @@ Config::eventFilter( QObject *o, QEvent *e )
             pal.setColor( fg ? w->foregroundRole() : w->backgroundRole(), c );
             w->setPalette(pal);
             counter->setPalette(pal);
+            // TODO this doesn't work (the app palette didn't change) - need to figure whether i want it to...
+            // requires a palette in sync with the color dialog
+//             myColorsHaveChanged = true;
         }
         return false;
     }
@@ -1145,8 +1129,6 @@ Config::applyPalette( QPalette *pal )
         QApplication::setPalette( *loadedPal );
         emit changed(true);
         emit changed();
-        //     haveIcons = false; // force
-//     ensureIcons();
     }
 }
 
@@ -1442,7 +1424,6 @@ static void ensureIcons()
     QPixmap pix(16,16);
     pix.fill(Qt::transparent);
     QPainter p;
-    QPalette *pal = /*loadedPal ? loadedPal : */&qApp->palette();
     for (int i = 0; i < 8; ++i)
     {
         pix.fill(Qt::transparent);
@@ -1450,7 +1431,7 @@ static void ensureIcons()
         p.setRenderHint(QPainter::Antialiasing);
         p.setPen(Qt::white);
         p.drawEllipse(pix.rect().adjusted(2,2,-2,-2));
-        p.setBrush(pal->color(roles[i]));
+        p.setBrush(qApp->palette().color(roles[i]));
         p.setPen(Qt::black);
         p.drawEllipse(pix.rect().adjusted(3,3,-3,-3));
         p.end();
@@ -1476,6 +1457,38 @@ Config::generateColorModes(QComboBox *box, QList<int> *wantedRoles)
         for (int i = 0; i < 8; ++i)
             box->addItem(icons[i], roleStrings[i], roles[i]);
     }
+}
+
+void
+Config::reloadColorRoles()
+{
+    if ( !myColorsHaveChanged )
+        return;
+    myColorsHaveChanged = haveIcons = false;
+    ensureIcons();
+    generateColorModes(ui.tooltipRole);
+    generateColorModes(ui.uno_role);
+    generateColorModes(ui.crProgressBg);
+    generateColorModes(ui.crProgressFg);
+    generateColorModes(ui.crTabBar);
+    generateColorModes(ui.crTabBarActive);
+    generateColorModes(ui.crPopup);
+    generateColorModes(ui.crMenuActive);
+    generateColorModes(ui.btnRole);
+    generateColorModes(ui.btnActiveRole);
+    generateColorModes(ui.toolbuttonRole);
+    generateColorModes(ui.toolbuttonActiveRole);
+    generateColorModes(ui.scrollRole);
+    generateColorModes(ui.scrollActiveRole);
+    generateColorModes(ui.headerRole);
+    generateColorModes(ui.headerSortingRole);
+    QList<int> roles; roles << 3 << 4 << 6;
+    generateColorModes(ui.viewShadingRole, &roles);
+    
+    generateColorModes(ui.kwinInactiveRole);
+    generateColorModes(ui.kwinActiveRole);
+    generateColorModes(ui.kwinInactiveText);
+    generateColorModes(ui.kwinActiveText);
 }
 
 void
