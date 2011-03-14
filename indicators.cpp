@@ -123,7 +123,7 @@ Style::drawCheck(const QStyleOption *option, QPainter *painter, const QWidget*, 
         if (!(option->state & State_Off))
             copy.state |= State_On;
         if (option->state & State_Selected)
-        { fg = QPalette::HighlightedText; bg = QPalette::Highlight; }
+            { fg = QPalette::HighlightedText; bg = QPalette::Highlight; }
         painter->setPen(Colors::mid(COLOR(bg), COLOR(fg)));
     }
 

@@ -765,6 +765,7 @@ Client::repaint(QPainter &p, bool paintTitle)
                 p.setRenderHint( QPainter::Antialiasing );
                 bg = color(ColorTitleBlend, isActive());
                 const QPixmap &fill = Gradients::pix(bg, myTitleSize, o, titleGradient);
+//                 p.setPen(Qt::NoPen); p.setBrush(Gradients::structure(bg, true));
                 const QColor shadow = Colors::mid(bg, Qt::black,6,1);
                 p.setPen(QPen(shadow, 2)); p.setBrush(fill);
                 p.drawRoundRect(label.adjusted(0,4,0,-4),myTitleSize*99/label.width(),99);
