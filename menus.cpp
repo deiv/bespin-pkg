@@ -311,7 +311,9 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
             tmpOpt.state &= ~State_On;
         }
         painter->setPen(Colors::mid(bg, fg));
-        painter->setBrush(fg);
+        // i don't know why, but opera sends has inverted or button colors for non selected items...
+        // the roles are however correct.
+        painter->setBrush(appType == Opera ? painter->pen().color() : fg);
         if (menuItem->checkType & QStyleOptionMenuItem::Exclusive)
         {
             const int d = cDim/7;
