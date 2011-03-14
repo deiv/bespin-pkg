@@ -297,9 +297,12 @@ Style::drawGroupBoxFrame(const QStyleOption *option, QPainter *painter, const QW
 
     if (groupBox && groupBox->features == QStyleOptionFrameV2::Flat)
     {
-        Tile::setShape(Tile::Bottom);
-        shadows.relief[true][false].render(RECT, painter);
-        Tile::reset();
+        const QRect r = (option->direction == Qt::LeftToRight) ?
+                        RECT.adjusted(RECT.width()/2,0,0,0) : RECT.adjusted(0,0,-RECT.width()/2,0);
+        shadows.line[0][Sunken].render(r, painter, Tile::Full, true);
+//         Tile::setShape(Tile::Bottom);
+//         shadows.relief[true][false].render(RECT, painter);
+//         Tile::reset();
         return;
     }
     if (config.groupBoxMode)
