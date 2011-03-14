@@ -13,7 +13,7 @@
    height="128"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.1 r9760"
    sodipodi:docname="view-right-new.svg">
   <defs
      id="defs4">
@@ -32,17 +32,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6"
-     inkscape:cx="53.46828"
+     inkscape:zoom="1.4"
+     inkscape:cx="0.25399431"
      inkscape:cy="61.302102"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1653"
+     inkscape:window-width="1600"
      inkscape:window-height="1022"
-     inkscape:window-x="161"
-     inkscape:window-y="50"
-     inkscape:window-maximized="0">
+     inkscape:window-x="176"
+     inkscape:window-y="73"
+     inkscape:window-maximized="0"
+     gridtolerance="10">
     <inkscape:grid
        type="xygrid"
        id="grid2816"
@@ -71,15 +72,17 @@
      id="layer1"
      transform="translate(0,-924.36218)">
     <path
-       transform="translate(-3.7549543e-7,892.36298)"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="m 21.3328,53.335202 c 3.016914,-3.016914 18.315887,-3.016914 21.332801,0 3.016914,3.016913 3.016913,82.314288 -1e-6,85.331198 -3.016913,3.01691 -18.315887,3.01691 -21.3328,0 -3.016914,-3.01691 -3.016913,-82.314284 0,-85.331198 z"
        id="path3034"
-       sodipodi:nodetypes="csssc" />
+       sodipodi:nodetypes="csssc"
+       transform="translate(-3.7549543e-7,892.36298)" />
     <path
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       d="M 80 19.0625 C 67.421228 19.062505 54.852207 19.835295 53.34375 21.34375 C 50.326837 24.36066 50.326836 103.63935 53.34375 106.65625 C 56.360663 109.67315 103.63934 109.67315 106.65625 106.65625 C 109.67316 103.63935 109.67316 24.36066 106.65625 21.34375 C 105.1478 19.835295 92.578772 19.062495 80 19.0625 z M 53.34375 53.34375 L 106.65625 53.34375 L 106.65625 64 L 53.34375 64 L 53.34375 53.34375 z "
-       transform="translate(0,924.36218)"
-       id="path3037" />
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;opacity:0.33"
+       d="m 80,19.0625 c -12.578772,5e-6 -25.147793,0.772795 -26.65625,2.28125 -3.016913,3.01691 -3.016914,82.2956 0,85.3125 3.016913,3.0169 50.29559,3.0169 53.3125,0 3.01691,-3.0169 3.01691,-82.29559 0,-85.3125 C 105.1478,19.835295 92.578772,19.062495 80,19.0625 z"
+       id="path3037"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ssssss"
+       transform="translate(0,924.36218)" />
   </g>
 </svg>
