@@ -1339,10 +1339,11 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
 
         bool isDock = false;
-        if ( ( widget->isWindow() && config.menu.round && (qobject_cast<QMenu*>(widget) || (isDock = qobject_cast<QDockWidget*>(widget)) ) ) || 
+        if ( ( widget->isWindow() && config.menu.round &&
+             (widget->windowType() == Qt::ToolTip || qobject_cast<QMenu*>(widget) || (isDock = qobject_cast<QDockWidget*>(widget)) ) ) ||
              ( Hacks::config.extendDolphinViews && widget->inherits("DolphinViewContainer") ) )
             shapeCorners( widget, isDock );
-        
+
         if ( config.bg.blur && 
             (widget->isWindow() || widget->autoFillBackground() ||
             (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
@@ -1510,7 +1511,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 #endif
             return false;
         }
-        else if ( widget->isWindow() && config.menu.round && qobject_cast<QDockWidget*>(widget) )
+        else if ( widget->isWindow() && config.menu.round && (qobject_cast<QDockWidget*>(widget) || widget->windowType() == Qt::ToolTip) )
             shapeCorners(widget, true);
         
         if ( config.bg.blur && !widget->isWindow() && 

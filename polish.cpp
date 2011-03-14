@@ -148,6 +148,30 @@ void Style::polish( QPalette &pal, bool onInit )
 
     if (onInit)
     {
+#if 1 // while working as expected, it will "break" the colors in the mail client, where opera apparently paints
+      // WindowText on Base - auauauauaaa!
+        if ( appType == Opera )
+        {   // WORKAROUND for opera which uses QPalette::Text to paint the UI foreground
+            // (i.e. WindowText, ButtonText & -sometimes- "even" Text...)
+            // there isn't much we can do about since opera paints text by itself, so we merge colors
+            // and just hope for the best :-(
+            QColor c = pal.color(QPalette::Active, QPalette::Text);
+            if ( Colors::haveContrast(c, pal.color(QPalette::Active, QPalette::Base)) )
+            {
+                if ( !Colors::haveContrast(c, pal.color(QPalette::Active, QPalette::Window)) )
+                    c = Colors::mid(c, pal.color(QPalette::Active, QPalette::WindowText) );
+                if ( !Colors::haveContrast(c, pal.color(QPalette::Active, QPalette::Button)) )
+                    c = Colors::mid(c, pal.color(QPalette::Active, QPalette::ButtonText) );
+                if ( c != pal.color(QPalette::Active, QPalette::Text) )
+                {
+                    
+                    qWarning("Bespin warning:\nOpera uses the wrong color to paint UI text and there's no contrast to the background\n"
+                             "Merging foreground colors - sorry :-(");
+                    pal.setColor( QPalette::Text, c );
+                }
+            }
+        }
+#endif
         // dark, light & etc are tinted... no good:
         pal.setColor(QPalette::Dark, QColor(70,70,70));
         pal.setColor(QPalette::Mid, QColor(100,100,100));
@@ -314,8 +338,6 @@ Style::polish( QWidget * widget )
     if (!widget)
         return;
 
-//     qDebug() << widget << widget->parent();
-
 //     if (widget->inherits("QGraphicsView"))
 //         qDebug() << "BESPIN" << widget;
 #if BESPIN_MOUSE_DEBUG
@@ -333,14 +355,17 @@ Style::polish( QWidget * widget )
     if ( widget->isWindow() &&
 //          widget->testAttribute(Qt::WA_WState_Created) &&
 //          widget->internalWinId() &&
-            !(widget->inherits("QTipLabel") || widget->inherits("QSplashScreen") || 
+            !(/*widget->inherits("QTipLabel") || */widget->inherits("QSplashScreen") || 
             widget->inherits("KScreenSaver") /*|| widget->inherits("QGLWidget")*/ || widget->objectName() == "decoration widget") )
     {
 //         QPalette pal = widget->palette();
         /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
         /// also doesn't work bgs get transparent and applying this to everythign causes funny sideeffects...
+        if ( widget->windowType() == Qt::ToolTip )
+            FILTER_EVENTS(widget)
+
 #if BESPIN_ARGB_WINDOWS
-        if (!(  config.bg.opacity == 0xff || // opaque
+        else if (!(  config.bg.opacity == 0xff || // opaque
                 widget->windowType() == Qt::Desktop || // makes no sense + QDesktopWidget is often misused
                 widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) || // makes no sense
                 widget->testAttribute(Qt::WA_TranslucentBackground) ||
