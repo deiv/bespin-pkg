@@ -781,6 +781,8 @@ Config::eventFilter( QObject *o, QEvent *e )
             // TODO this doesn't work (the app palette didn't change) - need to figure whether i want it to...
             // requires a palette in sync with the color dialog
 //             myColorsHaveChanged = true;
+            emit changed(true);
+            emit changed();
         }
         return false;
     }
@@ -1077,7 +1079,6 @@ static QColor mid(const QColor &c1, const QColor &c2, int w1 = 1, int w2 = 1)
                     (w1*c1.alpha() + w2*c2.alpha())/sum);
 }
 
-#include <QtDebug>
 
 void
 Config::setColorsFromPalette( const QPalette &pal )
@@ -1443,6 +1444,7 @@ static void ensureIcons()
 void
 Config::generateColorModes(QComboBox *box, QList<int> *wantedRoles)
 {
+    int oldIndex = box->currentIndex();
     ensureIcons();
     box->clear();
     box->setIconSize ( QSize(16,16) );
@@ -1457,6 +1459,7 @@ Config::generateColorModes(QComboBox *box, QList<int> *wantedRoles)
         for (int i = 0; i < 8; ++i)
             box->addItem(icons[i], roleStrings[i], roles[i]);
     }
+    box->setCurrentIndex(oldIndex);
 }
 
 void
