@@ -568,22 +568,30 @@ Style::readSettings(const QSettings* settings, QString appName)
 
 void Style::initMetrics()
 {
-   Dpi::target.f1 = SCALE(1); Dpi::target.f2 = SCALE(2);
-   Dpi::target.f3 = SCALE(3); Dpi::target.f4 = SCALE(4);
-   Dpi::target.f5 = SCALE(5); Dpi::target.f6 = SCALE(6);
-   Dpi::target.f7 = SCALE(7); Dpi::target.f8 = SCALE(8);
-   Dpi::target.f9 = SCALE(9); Dpi::target.f10 =SCALE(10);
-   
-   Dpi::target.f12 = SCALE(12); Dpi::target.f13 = SCALE(13);
-   Dpi::target.f16 = SCALE(16); Dpi::target.f18 = SCALE(18);
-   Dpi::target.f20 = SCALE(20); Dpi::target.f32 = SCALE(32);
-   Dpi::target.f80 = SCALE(80);
+    Dpi::target.f1 = SCALE(1); Dpi::target.f2 = SCALE(2);
+    Dpi::target.f3 = SCALE(3); Dpi::target.f4 = SCALE(4);
+    Dpi::target.f5 = SCALE(5); Dpi::target.f6 = SCALE(6);
+    Dpi::target.f7 = SCALE(7); Dpi::target.f8 = SCALE(8);
+    Dpi::target.f9 = SCALE(9); Dpi::target.f10 =SCALE(10);
 
-   Dpi::target.ScrollBarExtent = SCALE(config.scroll.sliderWidth);
-   Dpi::target.ScrollBarSliderMin = SCALE(40);
-   Dpi::target.SliderThickness = SCALE(20);
-   Dpi::target.SliderControl = SCALE(20);
-   Dpi::target.Indicator = SCALE(20 - 2*config.btn.layer);
+    Dpi::target.f12 = SCALE(12); Dpi::target.f13 = SCALE(13);
+    Dpi::target.f16 = SCALE(16); Dpi::target.f18 = SCALE(18);
+    Dpi::target.f20 = SCALE(20); Dpi::target.f32 = SCALE(32);
+    Dpi::target.f80 = SCALE(80);
+
+    Dpi::target.ScrollBarExtent = SCALE(config.scroll.sliderWidth);
+    Dpi::target.ScrollBarSliderMin = SCALE(40);
+    if (config.scroll.sliderWidth < 13)
+    {
+        Dpi::target.SliderThickness = SCALE(14);
+        Dpi::target.SliderControl = SCALE(14);
+    }
+    else
+    {
+        Dpi::target.SliderThickness = SCALE(20);
+        Dpi::target.SliderControl = SCALE(20);
+    }
+    Dpi::target.Indicator = SCALE(20 - 2*config.btn.layer);
 #if 0
    Dpi::target.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
 #else

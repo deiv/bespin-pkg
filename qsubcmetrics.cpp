@@ -280,42 +280,42 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
         }
         break;
       
-   case CC_Slider:
-      if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
-      {
-         int tickOffset = pixelMetric(PM_SliderTickmarkOffset, slider, widget);
-         int thickness = pixelMetric(PM_SliderControlThickness, slider, widget);
-         
-         switch (subControl)
-         {
-         case SC_SliderHandle:
-         {
-            int sliderPos = 0;
-            int len = pixelMetric(PM_SliderLength, slider, widget);
-            bool horizontal = slider->orientation == Qt::Horizontal;
-            sliderPos = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition,
-                                                (horizontal ? RECT.width() : RECT.height()) - len, slider->upsideDown);
-            if (horizontal)
-               ret.setRect(RECT.x() + sliderPos, RECT.y() + tickOffset, len, thickness);
-            else
-                ret.setRect(RECT.x() + tickOffset, RECT.y() + sliderPos, thickness, len);
-            break;
-         }
-         case SC_SliderGroove:
-         {
-            const int d = (thickness-F(2))/3;
-            if (slider->orientation == Qt::Horizontal)
-               ret.setRect(RECT.x(), RECT.y() + tickOffset + d, RECT.width(), thickness-(2*d+F(2)));
-            else
-               ret.setRect(RECT.x() + tickOffset + d + F(1), RECT.y(), thickness-(2*d+F(1)), RECT.height());
-            break;
-         }
-         default:
-            break;
-         ret = visualRect(slider->direction, RECT, ret);
-         }
-      }
-      break;
+    case CC_Slider:
+        if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
+        {
+            int tickOffset = pixelMetric(PM_SliderTickmarkOffset, slider, widget);
+            int thickness = pixelMetric(PM_SliderControlThickness, slider, widget);
+
+            switch (subControl)
+            {
+            case SC_SliderHandle:
+            {
+                int sliderPos = 0;
+                int len = pixelMetric(PM_SliderLength, slider, widget);
+                bool horizontal = slider->orientation == Qt::Horizontal;
+                sliderPos = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition,
+                                                    (horizontal ? RECT.width() : RECT.height()) - len, slider->upsideDown);
+                if (horizontal)
+                    ret.setRect(RECT.x() + sliderPos, RECT.y() + tickOffset, len, thickness);
+                else
+                    ret.setRect(RECT.x() + tickOffset, RECT.y() + sliderPos, thickness, len);
+                break;
+            }
+            case SC_SliderGroove:
+            {
+                const int d = (thickness-F(2))/(config.scroll.sliderWidth < 13 ? 4 : 3);
+                if (slider->orientation == Qt::Horizontal)
+                    ret.setRect(RECT.x(), RECT.y() + tickOffset + d, RECT.width(), thickness-(2*d+F(2)));
+                else
+                    ret.setRect(RECT.x() + tickOffset + d + F(1), RECT.y(), thickness-(2*d+F(1)), RECT.height());
+                break;
+            }
+            default:
+                break;
+            ret = visualRect(slider->direction, RECT, ret);
+            }
+        }
+        break;
       
     case CC_ToolButton: // A tool button, like QToolButton
         if HAVE_OPTION(tb, ToolButton)

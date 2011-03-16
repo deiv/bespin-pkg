@@ -21,8 +21,7 @@
 #include "draw.h"
 
 void
-Style::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainter *painter,
-                              int step) const
+Style::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainter *painter, int step) const
 {
     OPT_SUNKEN OPT_ENABLED OPT_FOCUS
     bool fullHover = config.scroll.fullHover && !config.btn.backLightHover;
@@ -47,7 +46,8 @@ Style::drawSliderHandle(const QRect &handle, const QStyleOption *option, QPainte
     if (!fullHover && isEnabled)
     {
         const QColor fc = Colors::mid(bc, hasFocus ? FCOLOR(HighlightedText) : CCOLOR(scroll._, Fg), 6-step, step+3);
-        xy += QPoint(F(5), F(5));
+        const QSize d = (masks.slider.size() - masks.notch.size())/2;
+        xy += QPoint(d.width(), d.height());
         fillWithMask(painter, xy, fc, masks.notch);
     }
 }
