@@ -439,7 +439,8 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         painter->setRenderHint(QPainter::Antialiasing);
         if (sunken || (hover && !complexStep))
             complexStep = 6;
-        painter->setBrush(Colors::mid(FCOLOR(Base), FCOLOR(Text), 6-complexStep, complexStep+1));
+        if (isComboDropDownSlider)
+            painter->setBrush(Colors::mid(FCOLOR(Base), FCOLOR(Text), 6-complexStep, complexStep+1));
         painter->drawRoundedRect(r, F(4), F(4));
         painter->restore();
         return;
@@ -455,15 +456,16 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     // --> we need to paint a slider
 
     // COLOR: the hover indicator (inside area)
+    const bool backLightHover = config.btn.backLightHover && config.scroll.sliderWidth > 9;
 #define SCROLL_COLOR(_X_) \
-(widgetStep ? Colors::mid(  bgC, fgC, (config.btn.backLightHover ? (Gradients::isReflective(GRAD(scroll)) ? 48 : 72) : 6) - _X_, _X_) : bgC)
+(widgetStep ? Colors::mid(  bgC, fgC, (backLightHover ? (Gradients::isReflective(GRAD(scroll)) ? 48 : 72) : 6) - _X_, _X_) : bgC)
 
     if (scrollAreaHovered_ && !widgetStep)
         widgetStep = 6;
 
     QColor c, bgC = CCOLOR(scroll._, Bg), fgC = CCOLOR(scroll._, Fg);
-    if ( !config.btn.backLightHover && widget && widget->isActiveWindow() )
-    { 
+    if ( !backLightHover && widget && widget->isActiveWindow() )
+    {
         if ( complexStep )
             { if (hover || !scrollAreaHovered_) complexStep = 6; }
         else if (!hover)
@@ -511,7 +513,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     }
     else
     {
-        if (!sunken && config.btn.backLightHover && complexStep)
+        if (!sunken && backLightHover && complexStep)
         {
             QColor blh = Colors::mid(c, CCOLOR(scroll._, Fg), 6-complexStep, complexStep);
             lights.rect[round].render(r, painter, blh); // backlight
@@ -538,7 +540,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     else
         offset.setY(-r.top()/2);
 
-    bool fullHover = config.scroll.fullHover || config.scroll.sliderWidth < 10;
+    const bool fullHover = config.scroll.fullHover || config.scroll.sliderWidth < 10;
     QColor bc = fullHover ? c : CCOLOR(scroll._, Bg);
     bc.setAlpha(255); // CCOLOR(scroll._, Bg) pot. reintroduces translucency...
     masks.rect[round].render(r, painter, GRAD(scroll), o, bc, size, offset);
