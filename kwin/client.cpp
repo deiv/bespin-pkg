@@ -124,6 +124,7 @@ Client::updateStylePixmaps()
             lCorner = set->lCorner.x11PictureHandle();
             rCorner = set->rCorner.x11PictureHandle();
         }
+        XFree(pics);
     }
     if (topTile)
         widget()->update();
@@ -147,6 +148,7 @@ Client::updateUnoHeight()
     {
         unoHeight = ((data->style >> 24) & 0xff);
         widget()->update();
+        XFree(data);
     }
 #endif
 }
@@ -1058,13 +1060,16 @@ Client::reset(unsigned long changed)
         else if (!Factory::config()->forceUserColors)
         {
             WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
+            bool needFree = true;
             if (!data)
             {   // check for data from dbus
+                needFree = false;
                 long int *pid = XProperty::get<long int>(windowId(), XProperty::pid, XProperty::LONG);
                 if (pid)
                 {
                     if ((data = Factory::decoInfo(*pid)))
                         XProperty::set<uint>(windowId(), XProperty::winData, (uint*)data, XProperty::WORD, 9);
+                    XFree(pid);
                 }
                 if (!data) // check for data from preset
                 {
@@ -1098,6 +1103,8 @@ Client::reset(unsigned long changed)
                 gType[0] = (Gradients::Type)((data->style >> 8) & 0xff);
                 gType[1] = (Gradients::Type)(data->style & 0xff);
             }
+            if (needFree)
+                XFree(data);
         }
         if (def)
         {   // the fallback solution

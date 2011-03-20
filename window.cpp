@@ -309,6 +309,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         }
         XProperty::set<Picture>(widget->winId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
         rect.adjust(-((decoDim >> 24) & 0xff), -((decoDim >> 16) & 0xff), (decoDim >> 8) & 0xff, decoDim & 0xff);
+        XFree(decoDimP);
     }
 #endif
 
