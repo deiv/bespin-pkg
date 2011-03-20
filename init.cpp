@@ -595,7 +595,7 @@ void Style::initMetrics()
 #if 0
    Dpi::target.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
 #else
-	Dpi::target.ExclusiveIndicator = SCALE(17);
+    Dpi::target.ExclusiveIndicator = SCALE(17);
 #endif
 }
 

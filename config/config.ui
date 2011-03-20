@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>772</width>
-    <height>477</height>
+    <height>478</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -241,7 +241,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>9</number>
+         <number>6</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -557,8 +557,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>362</width>
-               <height>118</height>
+               <width>480</width>
+               <height>170</height>
               </rect>
              </property>
              <attribute name="label">
@@ -793,8 +793,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>186</width>
-               <height>67</height>
+               <width>180</width>
+               <height>62</height>
               </rect>
              </property>
              <attribute name="label">
@@ -890,7 +890,7 @@
                <x>0</x>
                <y>0</y>
                <width>245</width>
-               <height>184</height>
+               <height>188</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1006,8 +1006,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>130</width>
-               <height>94</height>
+               <width>124</width>
+               <height>89</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1105,7 +1105,7 @@
                <x>0</x>
                <y>0</y>
                <width>322</width>
-               <height>86</height>
+               <height>81</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1273,8 +1273,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>270</width>
-               <height>181</height>
+               <width>480</width>
+               <height>223</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1284,7 +1284,7 @@
               <item row="2" column="0">
                <widget class="QTabWidget" name="tabWidget">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="tab">
                  <attribute name="title">
@@ -1473,7 +1473,7 @@
                <x>0</x>
                <y>0</y>
                <width>271</width>
-               <height>158</height>
+               <height>164</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1946,8 +1946,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>332</width>
-               <height>260</height>
+               <width>474</width>
+               <height>257</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2110,7 +2110,7 @@
                <x>0</x>
                <y>0</y>
                <width>219</width>
-               <height>92</height>
+               <height>94</height>
               </rect>
              </property>
              <attribute name="label">
