@@ -2,10 +2,11 @@ project (kwin3-bespin)
 
 set (KWIN_HEADER_FOUND true )
 
-if (EXISTS ${CMAKE_INSTALL_PREFIX}/include/kdecoration.h)
+find_file(KDECORATION_H kdecoration.h ${KDE4_INCLUDES})
+if (KDECORATION_H)
     MESSAGE( STATUS "KWin headers found" )
 else()
-MESSAGE( "WARNING: KWin headers NOT found, compiling the decoration might fail.\n\n  -> Ensure you've installed the kdebase[-workspace]-dev package" )
+    MESSAGE( "WARNING: KWin headers NOT found, compiling the decoration might fail.\n\n  -> Ensure you've installed the kdebase[-workspace]-dev package" )
 endif()
 
 set (kwin3_bespin_SOURCES button.cpp client.cpp resizecorner.cpp factory.cpp )
