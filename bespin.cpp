@@ -1512,8 +1512,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
 #endif
             return false;
         }
-        else if ( widget->isWindow() && config.menu.round && (qobject_cast<QDockWidget*>(widget) || widget->windowType() == Qt::ToolTip) )
-            shapeCorners(widget, true);
+        else {
+            if ( widget->isWindow() ) {
+            if ( config.menu.round && (qobject_cast<QDockWidget*>(widget) || widget->windowType() == Qt::ToolTip) )
+                shapeCorners(widget, true);
+            }
+            else if (config.menu.round && qobject_cast<QDockWidget*>(widget))
+                widget->clearMask();
+        }
         
         if ( config.bg.blur && !widget->isWindow() && 
             (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
