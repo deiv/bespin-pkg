@@ -152,6 +152,10 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
     {
         if (RECT.bottom() >= winRect.bottom())
             pf &= ~Tile::Bottom; // we do NEVER shape away the top - assuming deco here...!
+        if (RECT.left() <= winRect.left())
+            pf &= ~Tile::Left;
+        if (RECT.right() >= winRect.right())
+            pf &= ~Tile::Right;
         o = Qt::Horizontal; size = RECT.width();
     }
     else

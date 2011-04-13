@@ -1194,6 +1194,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             QPainter p(tabBar);
             QStyleOptionTabBarBase opt;
             opt.initFrom(tabBar);
+            opt.shape = tabBar->shape();
 //             if (QWidget *window = tabBar->window())
 //             {
 //                 opt.tabBarRect = window->rect();
