@@ -205,12 +205,13 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
     case PM_SpinBoxSliderHeight: // The height of the optional spin box slider
         return F(4);
     case PM_LayoutBottomMargin:
-    case PM_LayoutHorizontalSpacing:
-    case PM_DefaultLayoutSpacing:
     case PM_DefaultChildMargin:
-        return F(10);
+//     case PM_LayoutHorizontalSpacing: //NOTICE collides with PM_DefaultLayoutSpacing
+        return F(9);
+    case PM_DefaultLayoutSpacing: //NOTICE required since vertical/horizontal variants are underused
+        return F(7);
     case PM_LayoutTopMargin:
-    case PM_LayoutVerticalSpacing:
+//     case PM_LayoutVerticalSpacing: //NOTICE collides with PM_DefaultLayoutSpacing
         return F(6);
     case PM_LayoutLeftMargin:
     case PM_LayoutRightMargin:
