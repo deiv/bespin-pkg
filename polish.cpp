@@ -30,12 +30,14 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
+#include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QTimer>
 #include <QToolBar>
 #include <QToolTip>
 #include <QTreeView>
+#include <QWizard>
 
 #include <QtDebug>
 
@@ -432,6 +434,26 @@ Style::polish( QWidget * widget )
                 widget->addAction( dockLocker );
             }
         }
+        else if ( QWizard *wiz = qobject_cast<QWizard*>(widget) )
+        {
+            if (config.macStyle && wiz->pixmap(QWizard::BackgroundPixmap).isNull())
+            {
+                QPixmap pix(468,128);
+                pix.fill(Qt::transparent);
+                QRect r(0,0,128,128);
+                QPainter p(&pix);
+                QColor c = wiz->palette().color(wiz->foregroundRole());
+                c.setAlpha(24);
+                p.setBrush(c);
+                p.setPen(Qt::NoPen);
+                Navi::Direction dir = wiz->layoutDirection() == Qt::LeftToRight ? Navi::E : Navi::W;
+                Style::drawArrow(dir, r, &p);
+                r.translate(170,0); Style::drawArrow(dir, r, &p);
+                r.translate(170,0); Style::drawArrow(dir, r, &p);
+                p.end();
+                wiz->setPixmap( QWizard::BackgroundPixmap, pix );
+            }
+        }
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
         {
@@ -549,7 +571,6 @@ Style::polish( QWidget * widget )
             lcd->setSegmentStyle(QLCDNumber::Flat);
             lcd->setAutoFillBackground(true);
         }
-
 
         // scrollarea hovering
         QAbstractScrollArea *area = 0;
