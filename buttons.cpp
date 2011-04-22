@@ -564,7 +564,9 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
    }
 #else
 
-    QRect r = RECT.adjusted(f1,f1,-f1,-f1);
+    QRect r(0,0,Dpi::target.ExclusiveIndicator,Dpi::target.ExclusiveIndicator);
+    r.moveCenter(RECT.center());
+    r.adjust(f1,f1,-f1,-f1);
     QColor bg = isEnabled ? CCOLOR(btn.std, Bg) : FCOLOR(Window);
     if (hasFocus)
     {

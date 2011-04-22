@@ -429,7 +429,7 @@ Style::polish( QWidget * widget )
                     dockLocker->setEnabled( true );
                     dockLocker->setCheckable( true );
                     dockLocker->setChecked( true );
-                    connect ( dockLocker, SIGNAL(toggled(bool)), SLOT(unlockDocks(bool)) );   
+                    connect ( dockLocker, SIGNAL(toggled(bool)), SLOT(unlockDocks(bool)) );
                 }
                 widget->addAction( dockLocker );
             }
@@ -438,20 +438,25 @@ Style::polish( QWidget * widget )
         {
             if (config.macStyle && wiz->pixmap(QWizard::BackgroundPixmap).isNull())
             {
-                QPixmap pix(468,128);
-                pix.fill(Qt::transparent);
-                QRect r(0,0,128,128);
-                QPainter p(&pix);
-                QColor c = wiz->palette().color(wiz->foregroundRole());
-                c.setAlpha(24);
-                p.setBrush(c);
-                p.setPen(Qt::NoPen);
-                Navi::Direction dir = wiz->layoutDirection() == Qt::LeftToRight ? Navi::E : Navi::W;
-                Style::drawArrow(dir, r, &p);
-                r.translate(170,0); Style::drawArrow(dir, r, &p);
-                r.translate(170,0); Style::drawArrow(dir, r, &p);
-                p.end();
-                wiz->setPixmap( QWizard::BackgroundPixmap, pix );
+                if (!wiz->pixmap(QWizard::WatermarkPixmap).isNull())
+                    wiz->setPixmap( QWizard::BackgroundPixmap, wiz->pixmap(QWizard::WatermarkPixmap) );
+                else
+                {
+                    QPixmap pix(468,128);
+                    pix.fill(Qt::transparent);
+                    QRect r(0,0,128,128);
+                    QPainter p(&pix);
+                    QColor c = wiz->palette().color(wiz->foregroundRole());
+                    c.setAlpha(24);
+                    p.setBrush(c);
+                    p.setPen(Qt::NoPen);
+                    Navi::Direction dir = wiz->layoutDirection() == Qt::LeftToRight ? Navi::E : Navi::W;
+                    Style::drawArrow(dir, r, &p);
+                    r.translate(170,0); Style::drawArrow(dir, r, &p);
+                    r.translate(170,0); Style::drawArrow(dir, r, &p);
+                    p.end();
+                    wiz->setPixmap( QWizard::BackgroundPixmap, pix );
+                }
             }
         }
         //BEGIN Popup menu handling                                                                -
@@ -621,6 +626,8 @@ Style::polish( QWidget * widget )
                         const bool alternate = !(appType == Amarok && itemView->inherits("Playlist::PrettyListView"));
                         fixViewPalette(itemView, solid, alternate);
                     }
+                    else if (vp->backgroundRole() == QPalette::Window || vp->palette().color(vp->backgroundRole()) == itemView->palette().color(itemView->backgroundRole()))
+                        fixViewPalette(itemView, 2, false);
                 }
                 if (appType == Amarok) // fix the palette anyway. amarok tries to reset it's slooww transparent one... gnagnagna
                     FILTER_EVENTS(itemView);
