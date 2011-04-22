@@ -439,8 +439,8 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         painter->setRenderHint(QPainter::Antialiasing);
         if (sunken || (hover && !complexStep))
             complexStep = 6;
-        if (isComboDropDownSlider)
-            painter->setBrush(Colors::mid(FCOLOR(Base), FCOLOR(Text), 6-complexStep, complexStep+1));
+
+        painter->setBrush(Colors::mid(FCOLOR(Base), FCOLOR(Text), 6-complexStep, complexStep+1));
         painter->drawRoundedRect(r, F(4), F(4));
         painter->restore();
         return;
