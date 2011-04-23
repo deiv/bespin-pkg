@@ -787,7 +787,7 @@ Client::repaint(QPainter &p, bool paintTitle)
 
     if (paintTitle && isShade())
     {   // splitter
-        QColor bg2 = color(ColorTitleBlend, isActive());
+//         QColor bg2 = color(ColorTitleBlend, isActive());
         p.setPen(Colors::mid(bg, Qt::black, 3, 1));
         int xy = myTitleSize-2;
         if (Factory::verticalTitle())
@@ -1022,9 +1022,11 @@ Client::reset(unsigned long changed)
     if (changed & SettingButtons)
     {
         myButtonOpacity = (isActive() || !Factory::config()->hideInactiveButtons) ? 100 : 0;
+        QLayoutItem *item;
+        while ((item = myTitleBar->takeAt(0)))
+            if (item != myTitleSpacer) delete item;
         for (int i = 0; i < 4; ++i)
-            { delete buttons[i]; buttons[i] = 0; }
-        myTitleBar->removeItem(myTitleSpacer);
+            buttons[i] = 0;
         addButtons(options()->titleButtonsLeft(), buttonSpaceLeft, true);
         myTitleBar->addItem(myTitleSpacer);
         addButtons(options()->titleButtonsRight(), buttonSpaceRight, false);
@@ -1125,7 +1127,7 @@ Client::reset(unsigned long changed)
                     colors[i][ColorButtonBg] = colors[i][ColorFont];
                 }
 #if 0 
-                // NOTICE this makes no more sense at all since we provide our own coloring... =\
+                // NOTICE this makes no more sense at all since we provide our own coloring... =S
                 // usually the window is titlebar colored and the titleblend gradient painted upon - in case
                 // but the fallback shall be fully titleblend with a titlebar color section behind the title
                 // to not have to handle this during the painting, we just swap the colors here
