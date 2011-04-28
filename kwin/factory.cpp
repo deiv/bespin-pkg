@@ -659,12 +659,14 @@ Factory::supports( Ability ability ) const
     case AbilityColorTitleFore: ///< decoration supports titlebar foreground color
     case AbilityColorTitleBlend: ///< decoration supports second titlebar background color
     case AbilityColorButtonBack: ///< decoration supports button background color
+#if KDE_IS_VERSION(4,6,0)
+    case AbilityUsesBlurBehind:
+#endif
         return true;
         
     // composite
 #if KDE_IS_VERSION(4,3,0)
     case AbilityUsesAlphaChannel: /// don't clip - it's expensive with composition
-
     case AbilityProvidesShadow: /// rather not
 #if KDE_IS_VERSION(4,4,0)
     case AbilityExtendIntoClientArea: /// i don't even know what this is :-)
