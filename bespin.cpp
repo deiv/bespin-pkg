@@ -1452,7 +1452,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 //             w = w->parentWidget();
 //         }
 //         qDebug() << debug;
-        qDebug() << "BESPIN:" << object << ->geometry() << static_cast<QWidget*>(object)->parentWidget();
+        qDebug() << "BESPIN:" << object << w->geometry() << w->parentWidget();
         //       DEBUG (object);
         return false;
     }
@@ -1590,17 +1590,17 @@ Style::eventFilter( QObject *object, QEvent *ev )
         QWidget * widget = qobject_cast<QWidget*>(object);
         if (!widget)
             return false;
-
 #ifdef Q_WS_X11
         // talk to kwin about colors, gradients, etc.
-        if (widget->isWindow() && !(widget->windowFlags() & ignoreForDecoHints))
+        if (widget->testAttribute(Qt::WA_WState_Created) && widget->internalWinId() &&
+            widget->isWindow() && !(widget->windowFlags() & ignoreForDecoHints))
         {
             setupDecoFor(widget, widget->palette(), config.bg.mode, GRAD(kwin));
             XProperty::remove(widget->winId(), XProperty::bgPics);
             return false;
         }
 #endif
-        
+
         if (appType == Amarok)
         {
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
@@ -1610,7 +1610,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
             return false;
         }
-        
+
         // i think, i hope i got it....
         // 1. khtml sets buttontext, windowtext and text to the fg color - what leads to trouble if e.g. button doesn't contrast window
         // 2. combolists need a special kick (but their palette seems ok, though it isn't...)
