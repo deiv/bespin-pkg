@@ -1118,6 +1118,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 {
     switch (ev->type())
     {
+    case QEvent::HoverMove:
     case QEvent::MouseMove:
     case QEvent::Timer:
     case QEvent::Move:
@@ -1325,6 +1326,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 w->setFont(fnt);
                 return false;
             }
+            return false;
         }
         return false;
     }
