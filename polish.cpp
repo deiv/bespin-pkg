@@ -52,6 +52,7 @@
 #include "blib/xproperty.h"
 #endif
 
+#include "splitterproxy.h"
 #include "visualframe.h"
 #include "hacks.h"
 #include "bespin.h"
@@ -126,8 +127,9 @@ void Style::polish( QPalette &pal, bool onInit )
     int h,s,v;
     // highlight colors
     h = qGray(pal.color(QPalette::Active, QPalette::Highlight).rgb());
+//     pal.setColor(QPalette::Inactive, QPalette::Highlight, Colors::mid(QColor(h,h,h), pal.color(QPalette::Active, QPalette::Highlight), 3, 1));
     pal.setColor(QPalette::Inactive, QPalette::Highlight, QColor(h,h,h));
-    pal.setColor(QPalette::Disabled, QPalette::Highlight, Colors::mid(QColor(h,h,h), pal.color(QPalette::Active, QPalette::HighlightedText), 3, 1));
+    pal.setColor(QPalette::Disabled, QPalette::Highlight, Colors::mid(pal.color(QPalette::Inactive, QPalette::Highlight), pal.color(QPalette::Active, QPalette::HighlightedText), 3, 1));
 
     // Link colors can not be set through qtconfig - and the colors suck
     QColor link = pal.color(QPalette::Active, QPalette::Highlight);
@@ -433,6 +435,8 @@ Style::polish( QWidget * widget )
                 }
                 widget->addAction( dockLocker );
             }
+            if (!config.drawSplitters)
+                SplitterProxy::manage(widget);
         }
         else if ( QWizard *wiz = qobject_cast<QWizard*>(widget) )
         {
@@ -895,6 +899,7 @@ Style::polish( QWidget * widget )
             disconnect( dock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(dockLocationChanged(Qt::DockWidgetArea)) );
             connect( dock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(dockLocationChanged(Qt::DockWidgetArea)) );
         }
+        dock->setContentsMargins(F(4),F(4),F(4),F(4));
         widget->setAttribute(Qt::WA_Hover);
         if ( config.menu.round )
             FILTER_EVENTS(widget); // shape 
@@ -937,6 +942,8 @@ Style::polish( QWidget * widget )
         widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("Q3DockWindowResizeHandle"))
     {
+        if (!config.drawSplitters)
+            SplitterProxy::manage(widget);
         widget->setAttribute(Qt::WA_Hover);
         if (widget->inherits("QWebView"))
             FILTER_EVENTS(widget);
