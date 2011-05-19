@@ -93,7 +93,7 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
             return qMax(F(5), (26 - QFontMetrics(widget->font()).height())/2);
         return F(4);
     case PM_DockWidgetSeparatorExtent: // Width of a separator in a horizontal dock window and the height of a separator in a vertical dock window
-        return config.drawSplitters ? F(10) : F(2);
+        return config.drawSplitters ? F(10) : F(1);
     case PM_DockWidgetHandleExtent: // Width of the handle in a horizontal dock window and the height of the handle in a vertical dock window
         return F(6);
     case PM_DockWidgetFrameWidth: // Frame width of a dock window
