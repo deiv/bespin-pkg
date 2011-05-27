@@ -910,13 +910,26 @@ Client::repaint(QPainter &p, bool paintTitle)
             p.drawPath(buttonCorner);
         }
         
-        if ((bg2 != bg) && (myBaseSize || myEdgeSize || gType[isActive()]))
+        if ((bg2 != bg) && (myBaseSize > 2 || myEdgeSize > 2 || gType[isActive()]))
         {   // outline
             p.setBrush(Qt::NoBrush);
             p.setRenderHint( QPainter::Antialiasing );
             p.setPen(QPen(bg2,3));
-            if ( myBaseSize || myEdgeSize )
-                p.drawRect(1,1,width()-2,height()-2);
+            if ( myBaseSize > 2 )
+            {
+                if ( myEdgeSize > 2 )
+                    p.drawRect(1,1,width()-2,height()-2);
+                else if (Factory::verticalTitle())
+                {
+                    p.drawLine(1,0,1,height());
+                    p.drawLine(width()-2,0,width()-2,height());
+                }
+                else
+                {
+                    p.drawLine(0,1,width(),1);
+                    p.drawLine(0,height()-2,width(),height()-2);
+                }
+            }
             else if (Factory::verticalTitle())
                 p.drawLine(1,0,1,height());
             else
