@@ -26,8 +26,21 @@
 #include <QSplitterHandle>
 #include <QWidget>
 
+static const int PADDING = 24;
+
 class SplitterProxy;
 static SplitterProxy *splitterProxy = 0;
+
+class StdChildAdd : public QObject
+{
+public:
+    bool eventFilter( QObject *, QEvent *ev)
+    {
+        return (ev->type() == QEvent::ChildAdded || ev->type() == QEvent::ChildInserted);
+    }
+};
+
+static StdChildAdd stdChildAdd;
 
 class SplitterProxy : public QWidget
 {
@@ -54,7 +67,12 @@ protected:
         switch (e->type())
         {
         case QEvent::Paint:
+        {
+//             QPainter p(this);
+//             p.fillRect(rect(), Qt::red);
+//             p.end();
             return true;
+        }
         case QEvent::MouseMove:
         case QEvent::MouseButtonPress:
         case QEvent::MouseButtonRelease:
@@ -64,7 +82,9 @@ protected:
             if (e->type() == QEvent::MouseButtonPress)
                 grabMouse();
 
+            parentWidget()->setUpdatesEnabled(false);
             resize(1,1);
+            parentWidget()->setUpdatesEnabled(true);
 
             QMouseEvent *me = static_cast<QMouseEvent*>(e);
             const QPoint pos = (e->type() == QEvent::MouseMove) ? mySplitter->mapFromGlobal(QCursor::pos()) : myHook;
@@ -72,7 +92,9 @@ protected:
             QCoreApplication::sendEvent(mySplitter, &me2);
 
             if (e->type() == QEvent::MouseButtonRelease)
-                setSplitter(0);
+            if (mouseGrabber() == this)
+                releaseMouse();
+//                 setSplitter(0);
             return true;
         }
         case QEvent::Leave:
@@ -93,9 +115,17 @@ protected:
 
         switch (e->type())
         {
-        case QEvent::HoverMove:
         case QEvent::HoverEnter:
+            if (!isVisible())
+            if (QSplitterHandle *handle = qobject_cast<QSplitterHandle*>(o))
+            {
+                setSplitter(handle);
+                return false;
+            }
+        case QEvent::HoverMove:
         case QEvent::HoverLeave:
+            if (isVisible() && o == mySplitter)
+                return true;
         case QEvent::MouseMove:
         case QEvent::Timer:
         case QEvent::Move:
@@ -108,13 +138,6 @@ protected:
                 setSplitter(window);
             return false;
         }
-        case QEvent::Enter:
-            if (QSplitterHandle *handle = qobject_cast<QSplitterHandle*>(o))
-            {
-                setSplitter(handle);
-                return true;
-            }
-            return false;
         case QEvent::MouseButtonRelease:
             if (qobject_cast<QSplitterHandle*>(o) || qobject_cast<QMainWindow*>(o))
                 setSplitter(0);
@@ -126,28 +149,43 @@ protected:
 private:
     void setSplitter(QWidget *splt)
     {
-        mySplitter = splt;
-
-        if (!mySplitter)
+        if (!splt)
         {
             if (mouseGrabber() == this)
                 releaseMouse();
-            setParent(0);
+            if (QWidget *dad = parentWidget())
+            {
+                dad->setUpdatesEnabled(false);
+                setParent(0);
+                dad->setUpdatesEnabled(true);
+            }
+            if (mySplitter)
+            {
+                QHoverEvent he(qobject_cast<QSplitterHandle*>(mySplitter) ? QEvent::HoverLeave : QEvent::HoverMove,
+                               mySplitter->mapFromGlobal(QCursor::pos()), myHook);
+                QCoreApplication::sendEvent(mySplitter, &he);
+            }
+            mySplitter = splt;
             return;
         }
 
+        mySplitter = splt;
         myHook = mySplitter->mapFromGlobal(QCursor::pos());
 
         QWidget *w = mySplitter->window();
-        QRect r(0,0,48,48);
+        QRect r(0,0,2*PADDING,2*PADDING);
         r.moveCenter(w->mapFromGlobal(QCursor::pos()));
 
+        w->setUpdatesEnabled(false);
+        w->installEventFilter(&stdChildAdd);
         setParent(w);
+        w->removeEventFilter(&stdChildAdd);
         setGeometry(r);
         setCursor( mySplitter->cursor().shape() );
 
         raise();
         show();
+        w->setUpdatesEnabled(true);
     }
 private:
     QWidget *mySplitter;
