@@ -435,7 +435,7 @@ Style::polish( QWidget * widget )
                 }
                 widget->addAction( dockLocker );
             }
-            if (!config.drawSplitters)
+//             if (!config.drawSplitters)
                 SplitterProxy::manage(widget);
         }
         else if ( QWizard *wiz = qobject_cast<QWizard*>(widget) )
@@ -942,7 +942,7 @@ Style::polish( QWidget * widget )
         widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("Q3DockWindowResizeHandle"))
     {
-        if (!config.drawSplitters)
+//         if (!config.drawSplitters)
             SplitterProxy::manage(widget);
         widget->setAttribute(Qt::WA_Hover);
         if (widget->inherits("QWebView"))
