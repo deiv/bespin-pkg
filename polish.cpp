@@ -137,15 +137,15 @@ void Style::polish( QPalette &pal, bool onInit )
     const int vt = Colors::value(pal.color(QPalette::Active, QPalette::Base));
     link.getHsv(&h,&s,&v);
     s = sqrt(s/255.0)*255.0;
-    
+
     if (vwt > 128 && vt > 128)
         v = 3*v/4;
     else if (vwt < 128 && vt < 128)
         v = qMin(255, 7*v/6);
     link.setHsv(h, s, v);
-    
+
     pal.setColor(QPalette::Link, link);
-    
+
     link = Colors::mid(link, Colors::mid(pal.color(QPalette::Active, QPalette::Text),
                                          pal.color(QPalette::Active, QPalette::WindowText)), 4, 1);
                                          pal.setColor(QPalette::LinkVisited, link);
@@ -168,7 +168,7 @@ void Style::polish( QPalette &pal, bool onInit )
                     c = Colors::mid(c, pal.color(QPalette::Active, QPalette::ButtonText) );
                 if ( c != pal.color(QPalette::Active, QPalette::Text) )
                 {
-                    
+
                     qWarning("Bespin warning:\nOpera uses the wrong color to paint UI text and there's no contrast to the background\n"
                              "Merging foreground colors - sorry :-(");
                     pal.setColor( QPalette::Text, c );
@@ -266,10 +266,10 @@ polishGTK(QWidget * widget, const Config &config)
         c2 = CCOLOR(btn.active, Bg);
         c3 = CCOLOR(btn.std, Fg);
         c4 = CCOLOR(btn.active, Fg);
-        
+
         pal.setColor(QPalette::Disabled, QPalette::Button, Colors::mid(Qt::black, FCOLOR(Window),5,100));
         pal.setColor(QPalette::Disabled, QPalette::ButtonText, Colors::mid(FCOLOR(Window), FCOLOR(WindowText),3,1));
-        
+
         pal.setColor(QPalette::Inactive, QPalette::Button, c1);
         pal.setColor(QPalette::Active, QPalette::Button, c2);
         pal.setColor(QPalette::Inactive, QPalette::ButtonText, c3);
@@ -302,7 +302,7 @@ polishGTK(QWidget * widget, const Config &config)
         c2 = CCOLOR(menu.active, Bg);
         c3 = CCOLOR(UNO._, Fg);
         c4 = CCOLOR(menu.active, Fg);
-        
+
         pal.setColor(QPalette::Inactive, QPalette::Window, c1);
         pal.setColor(QPalette::Active, QPalette::Window, c2);
         pal.setColor(QPalette::Inactive, QPalette::WindowText, c3);
@@ -317,7 +317,7 @@ polishGTK(QWidget * widget, const Config &config)
         c2 = CCOLOR(menu.active, Bg);
         c3 = CCOLOR(menu.std, Fg);
         c4 = CCOLOR(menu.active, Fg);
-        
+
         pal.setColor(QPalette::Inactive, QPalette::Window, c1);
         pal.setColor(QPalette::Active, QPalette::Window, c2);
         pal.setColor(QPalette::Inactive, QPalette::WindowText, c3);
@@ -359,7 +359,7 @@ Style::polish( QWidget * widget )
     if ( widget->isWindow() &&
 //          widget->testAttribute(Qt::WA_WState_Created) &&
 //          widget->internalWinId() &&
-            !(/*widget->inherits("QTipLabel") || */widget->inherits("QSplashScreen") || 
+            !(/*widget->inherits("QTipLabel") || */widget->inherits("QSplashScreen") ||
             widget->inherits("KScreenSaver") /*|| widget->inherits("QGLWidget")*/ || widget->objectName() == "decoration widget") )
     {
 //         QPalette pal = widget->palette();
@@ -373,7 +373,7 @@ Style::polish( QWidget * widget )
                 widget->windowType() == Qt::Desktop || // makes no sense + QDesktopWidget is often misused
                 widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) || // makes no sense
                 widget->testAttribute(Qt::WA_TranslucentBackground) ||
-                widget->testAttribute(Qt::WA_NoSystemBackground) || 
+                widget->testAttribute(Qt::WA_NoSystemBackground) ||
                 widget->testAttribute(Qt::WA_OpaquePaintEvent) ) )
         {
 #if 0
@@ -390,7 +390,7 @@ Style::polish( QWidget * widget )
                     break;
                 }
                 ++kid;
-            }    
+            }
             if (!skip)
 #endif
             {
@@ -419,7 +419,7 @@ Style::polish( QWidget * widget )
 #if QT_VERSION >= 0x040500
             if ( appType == Dolphin )
                 mw->setDockOptions(mw->dockOptions()|QMainWindow::VerticalTabs);
-//             mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );       
+//             mw->setTabPosition ( Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea, QTabWidget::North );
 #endif
             if ( Hacks::config.lockDocks )
             {
@@ -493,7 +493,7 @@ Style::polish( QWidget * widget )
 
             if (appType == Plasma) // GNARF!
                 menu->setWindowFlags( menu->windowFlags()|Qt::Popup);
-            
+
             // eventfiltering to reposition MDI windows, shaping, paint ARGB bg and correct distance to menubars
             FILTER_EVENTS(menu);
 #if 0
@@ -625,7 +625,7 @@ Style::polish( QWidget * widget )
                 {
                     if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 128)
                     {
-                        const bool solid = Hacks::config.opaqueAmarokViews || Hacks::config.opaqueDolphinViews || 
+                        const bool solid = Hacks::config.opaqueAmarokViews || Hacks::config.opaqueDolphinViews ||
                                            (Hacks::config.opaquePlacesViews && itemView->inherits("KFilePlacesView"));
                         const bool alternate = !(appType == Amarok && itemView->inherits("Playlist::PrettyListView"));
                         fixViewPalette(itemView, solid, alternate);
@@ -648,7 +648,7 @@ Style::polish( QWidget * widget )
                         tv->viewport()->autoFillBackground() &&
                         tv->viewport()->palette().color(tv->viewport()->backgroundRole()).alpha() > 200) // 255 would be perfect, though
                     tv->setAnimated(true);
-//                     KMail::MainFolderView(0xa16fd68, name = ) 
+//                     KMail::MainFolderView(0xa16fd68, name = )
                     if ( Hacks::config.fixKMailFolderList && tv->objectName() == "folderTree" )
                     {
                         fixViewPalette( tv, Hacks::config.opaqueDolphinViews ? 1 : 2, true );
@@ -692,7 +692,7 @@ Style::polish( QWidget * widget )
                 widget->layout()->setSpacing ( 0 );
             }
         }
-        
+
         if ( !frame->isWindow() )
         {
             /// "Frame above Content" look, but ...
@@ -771,7 +771,7 @@ Style::polish( QWidget * widget )
             widget->setPalette(pal);
         }
     }
-    
+
     //BEGIN COMBOBOXES - hovering/animation                                                        -
     else if (QComboBox *cb = qobject_cast<QComboBox*>(widget))
     {
@@ -790,7 +790,7 @@ Style::polish( QWidget * widget )
     else if (qobject_cast<QAbstractSlider*>(widget))
     {
         FILTER_EVENTS(widget); // finish animation
-        
+
         widget->setAttribute(Qt::WA_Hover);
         // NOTICE
         // QAbstractSlider::setAttribute(Qt::WA_OpaquePaintEvent) saves surprisinlgy little CPU
@@ -902,7 +902,7 @@ Style::polish( QWidget * widget )
         dock->setContentsMargins(F(4),F(4),F(4),F(4));
         widget->setAttribute(Qt::WA_Hover);
         if ( config.menu.round )
-            FILTER_EVENTS(widget); // shape 
+            FILTER_EVENTS(widget); // shape
         if ( config.bg.docks.invert && dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable) )
         {
             QPalette pal = dock->palette();
@@ -910,11 +910,11 @@ Style::polish( QWidget * widget )
             pal.setColor(QPalette::Window, pal.color(QPalette::WindowText));
             pal.setColor(QPalette::WindowText, c);
             dock->setPalette(pal);
-            dock->setAutoFillBackground(true);    
+            dock->setAutoFillBackground(true);
         }
     }
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
-    if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
+    else if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
     {
         mbar->setBackgroundRole(config.UNO.__role[Bg]);
         mbar->setForegroundRole(config.UNO.__role[Fg]);
@@ -948,6 +948,8 @@ Style::polish( QWidget * widget )
         if (widget->inherits("QWebView"))
             FILTER_EVENTS(widget);
     }
+    else if (Hacks::config.konsoleScanlines &&widget->inherits("Konsole::TerminalDisplay"))
+        FILTER_EVENTS(widget)
     // this is a WORKAROUND for amarok filebrowser, see above on itemviews...
     else if (widget->inherits("KDirOperator"))
     {
@@ -964,7 +966,7 @@ Style::polish( QWidget * widget )
 // #ifdef Q_WS_X11
     if ( config.bg.opacity != 0xff && /*widget->window() &&*/
         (widget->inherits("MplayerWindow") ||
-         widget->inherits("KSWidget") || 
+         widget->inherits("KSWidget") ||
          widget->inherits("QX11EmbedContainer") ||
          widget->inherits("QX11EmbedWidget") ||
          widget->inherits("Phonon::VideoWidget")) )
@@ -989,7 +991,7 @@ Style::polish( QWidget * widget )
 #endif
 
     bool isTopContainer = qobject_cast<QToolBar *>(widget);
-    
+
     // Arora needs a separator between the buttons and the lineedit - looks megadull w/ shaped buttons otherwise :-(
     if ( appType == Arora && isTopContainer && widget->objectName() == "NavigationToolBar")
     {
@@ -1004,7 +1006,7 @@ Style::polish( QWidget * widget )
         if ( before )
             bar->insertSeparator( before );
     }
-        
+
     if ( isTopContainer )
     {   // catches show/resize events and manipulates fg/bg role
         if ( config.UNO.toolbar )
@@ -1040,7 +1042,7 @@ Style::polish( QWidget * widget )
         widget->parentWidget()->setAutoFillBackground(false);
         widget->setAutoFillBackground(false);
     }
-    
+
     if (config.bg.blur && (widget->autoFillBackground() || widget->testAttribute(Qt::WA_OpaquePaintEvent)))
         FILTER_EVENTS(widget);
 
@@ -1052,7 +1054,7 @@ Style::polish( QWidget * widget )
         QEvent ev(QEvent::PaletteChange);
         eventFilter(widget, &ev);
     }
-    
+
     if ( appType == KMail )
     {   // This no only has not been fixed in 4 years now, but there's even a new widget with this flag set: head -> desk!
         if (widget->inherits("KMail::MessageListView::Widget"))
@@ -1060,7 +1062,7 @@ Style::polish( QWidget * widget )
         else if ( widget->parentWidget() && widget->inherits("RecipientLine") )
             widget->parentWidget()->setAutoFillBackground(false);
     }
-        
+
 }
 #undef PAL
 

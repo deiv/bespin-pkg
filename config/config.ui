@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>772</width>
-    <height>478</height>
+    <height>498</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -241,7 +241,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>6</number>
+         <number>9</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -557,8 +557,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
-               <height>170</height>
+               <width>483</width>
+               <height>185</height>
               </rect>
              </property>
              <attribute name="label">
@@ -793,8 +793,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>180</width>
-               <height>62</height>
+               <width>174</width>
+               <height>64</height>
               </rect>
              </property>
              <attribute name="label">
@@ -889,8 +889,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>245</width>
-               <height>188</height>
+               <width>247</width>
+               <height>196</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1006,8 +1006,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>124</width>
-               <height>89</height>
+               <width>115</width>
+               <height>93</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1104,8 +1104,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>322</width>
-               <height>81</height>
+               <width>321</width>
+               <height>83</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1273,8 +1273,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
-               <height>223</height>
+               <width>268</width>
+               <height>189</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1472,8 +1472,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>271</width>
-               <height>164</height>
+               <width>267</width>
+               <height>166</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1946,8 +1946,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>474</width>
-               <height>257</height>
+               <width>326</width>
+               <height>268</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2109,8 +2109,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>219</width>
-               <height>94</height>
+               <width>211</width>
+               <height>98</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3182,6 +3182,13 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="konsoleScanlines">
+            <property name="text">
+             <string>Konsole: &quot;A terminal without scanlines is no real terminal at all!&quot; ;-)</string>
             </property>
            </widget>
           </item>

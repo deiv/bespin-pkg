@@ -62,7 +62,7 @@
 #define BTN_ROUND "Btn.Round", false
 #define BTN_SUNKEN_TOOLS "Btn.ToolSunken", false
 #define BTN_MIN_HEIGHT "Btn.MinHeight", 0
-   
+
 #define CHOOSER_GRADIENT "Chooser.Gradient", Gradients::Sunken
 
 #define DIALOG_BTN_LAYOUT "DialogButtonLayout", 2
@@ -79,6 +79,8 @@
 #define HACK_PLACES_VIEWS "Hack.PlacesViews", false
 #define HACK_MESSAGES "Hack.Messages", false
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false
+// yes - "true" by default since a terminal w/o scanlines is no terminal at all ;-)
+#define HACK_KONSOLE_SCANLINES "Hack.KonsoleScanlines", true
 #define HACK_KRUNNER "Hack.KRunner", false
 #define HACK_TREEVIEWS "Hack.TreeViews", false
 #define HACK_THROBBER "Hack.KillThrobber", false

@@ -333,7 +333,7 @@ Style::btnBg( const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool
         else
             c = Colors::mid(FCOLOR(Highlight), c, 1, 10 + Colors::contrast(FCOLOR(Highlight), c));
     }
-    
+
     if (fullHover && step)
         c = Colors::mid(c, CCOLOR(btn.active, Bg), (config.btn.backLightHover ? (translucent ? 48 : 72) : 6) - step, step);
 
@@ -425,7 +425,7 @@ Style::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
 {
     Q_ASSERT(option);
     Q_ASSERT(painter);
-    
+
 //    if (pe == PE_IndicatorItemViewItemDrop)
 // An indicator that is drawn to show where an item in an item view is about to
 // be dropped during a drag-and-drop operation in an item view.
@@ -641,7 +641,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
 
     if (glassy && !uno)
         bg = bg.light(115-Colors::value(bg)/20);
-    
+
 #if BESPIN_ARGB_WINDOWS
     if (ARGB_deco)
         bg.setAlpha(config.bg.opacity);
@@ -673,7 +673,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     data.inactiveButton = Colors::mid( pal.color(QPalette::Inactive, inactive[Bg]),
                                        pal.color(QPalette::Inactive, inactive[Fg]),3,2).rgba();
     data.activeButton   = pal.color(QPalette::Active, active[Fg]).rgba();
-    
+
     if (widget)
     {
         WId id = widget->winId();
@@ -718,7 +718,7 @@ swapPalette(QWidget *widget, Style *style)
     // reason nr. 2: some idiot must have spread the idea that pal.setColor(backgroundRole(), Qt::transparent)
     // is a great idea instead of just using setAutoFillBackground(false), preserving all colors and just not
     // using them. hey, why not call Qt to paint some nothing.... *grrrr*
-    
+
     QMap<QWidget*, QString> shits;
     QList<QWidget*> kids = widget->findChildren<QWidget*>();
     kids.prepend(widget);
@@ -737,7 +737,7 @@ swapPalette(QWidget *widget, Style *style)
             kid->setStyleSheet(QString());
             hasShit = true;
         }
-        
+
         // now swap the palette ----------------
         if (hasShit || kid->testAttribute(Qt::WA_SetPalette) || kid == widget)
         {
@@ -752,7 +752,7 @@ swapPalette(QWidget *widget, Style *style)
                 kid->setPalette(pal);
                 continue;
             }
-            
+
             // NOTE: WORKAROUND for amarok and probably others: see polish.cpp
             if (QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(kid) )
             if (QWidget *vp = area->viewport())
@@ -775,7 +775,7 @@ swapPalette(QWidget *widget, Style *style)
             for (int i = 0; i < 3; ++i)
             {
                 group = groups[i];
-                
+
                 if (solidBase && !fixViewport)
                 {
                     pal.setColor(group, QPalette::WindowText, solidBase->palette().color(group, solidBase->foregroundRole()));
@@ -828,7 +828,7 @@ swapPalette(QWidget *widget, Style *style)
         // ... and reset the apps palette
         QApplication::setPalette(appPal);
     }
-    
+
 //     originalPalette = savedPal;
 }
 
@@ -880,15 +880,15 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool
     int oldH = 0, newH = 0;
     if (var.isValid())
         oldH = var.toInt();
-    
+
     QList<QWidget*> dirty;
-    
+
     if (mwin->menuBar())
     {
         newH = mwin->menuBar()->height();
         dirty << mwin->menuBar();
     }
-    
+
     if (includeToolbars)
     {
         QToolBar *b;
@@ -923,7 +923,7 @@ updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool
             newH = ((newH + decoDim) & 0xffffff) | (decoDim << 24);
             XFree(decoDimP);
         }
-        else if (gotTitle) 
+        else if (gotTitle)
             *gotTitle = false;
     }
 #endif
@@ -987,7 +987,7 @@ Style::updateUno(QToolBar *bar, bool *gotTitle)
         pendingUnoWindows.removeAll(mwin);
         if (updateUnoHeight(mwin, config.UNO.toolbar, config.UNO.title, gotTitle) && config.UNO.title)
             setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
-        
+
         QPalette::ColorRole bg = QPalette::Window, fg = QPalette::WindowText;
         bool autoFill = false;
         if ( mwin->toolBarArea(bar) == Qt::TopToolBarArea )
@@ -1024,7 +1024,7 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
         if ( !o->isWidgetType() )
             continue;
         QWidget *w = static_cast<QWidget*>(o);
-        if ( w->isVisible() && 
+        if ( w->isVisible() &&
             (w->autoFillBackground() || (w->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(w))) )
         {
             QPoint offset = w->mapTo(window, QPoint(0,0));
@@ -1041,7 +1041,7 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
 
 static QList<BePointer<QWidget> > pendingBlurUpdates;
 
-void 
+void
 Style::updateBlurRegions() const
 {
 #ifdef Q_WS_X11 // hint blur region for the kwin plugin
@@ -1051,7 +1051,7 @@ Style::updateBlurRegions() const
             continue;
         if (!FX::usesXRender() && widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
             continue; // protect against pseudo widgets, see setupDecoFor()
-            
+
         QRegion blur = widget->mask().isEmpty() ? widget->rect() : widget->mask();
         detectBlurRegion(widget, widget, blur);
         if (blur.isEmpty())
@@ -1092,7 +1092,7 @@ static void shapeCorners( QWidget *widget, bool forceShadows )
     br = masks.corner[3].boundingRect();
     mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
 #endif
-    
+
 #ifdef Q_WS_X11
     if ( forceShadows ) // kwin/beshadowed needs a little hint to shadow this one nevertheless
         XProperty::setAtom( widget->winId(), XProperty::forceShadows );
@@ -1109,7 +1109,7 @@ static void shapeCorners( QWidget *widget, bool forceShadows )
     //          mask += QRect(1, h-4, w-2, 2);
     //          mask += QRect(2, h-2, w-4, 1);
     //          mask += QRect(4, h-1, w-8, 1);
-            
+
     widget->setMask(mask);
 }
 
@@ -1124,6 +1124,32 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::Move:
         return false; // just for performance - they can occur really often
     case QEvent::Paint:
+        if (Hacks::config.konsoleScanlines &&
+            !qstrcmp(object->metaObject()->className(), "Konsole::TerminalDisplay"))
+        {
+            QWidget *w = static_cast<QWidget*>(object);
+
+            w->removeEventFilter(this);
+            QCoreApplication::sendEvent(w, ev);
+            w->installEventFilter(this);
+
+            QPainter p(w);
+            QColor c = w->palette().color(w->foregroundRole());
+            c.setAlpha(24);
+            p.setBrush(QBrush(c, Qt::HorPattern));
+            p.setPen(Qt::NoPen);
+            const QRegion &reg = static_cast<QPaintEvent*>(ev)->region();
+            if (reg.isEmpty())
+                p.drawRect(w->rect());
+            else
+            {
+                foreach (QRect r, reg.rects())
+                    p.drawRect(r);
+            }
+            p.end();
+
+            return true;
+        }
 #if BESPIN_ARGB_WINDOWS
 //         if (object->isWidgetType())
         if (QWidget *window = static_cast<QWidget*>(object))
@@ -1147,7 +1173,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             QVariant h = w->property("hasFocus");
             if ( h.isValid() && h.toBool() )
                 lights.glow[false].render( r, &p, w->palette().color(QPalette::Highlight) );
-            
+
             p.end();
             return false;
         } else
@@ -1260,7 +1286,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                     w->setForegroundRole(QPalette::Link);
 
                 QCoreApplication::sendEvent(object, ev);
-              
+
                 object->installEventFilter(this);
                 isUrlNaviButtonArrow = false;
                 return true;
@@ -1278,7 +1304,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             p.end();
             return true; // sic! we paint
         }
-#if 0 // TODO this _should_ work, but does not - <strike>i HATE plasma!</strike> actuall amaroks palettehandler fault, sorry :-)
+#if 0 // TODO this _should_ work, but does not - <strike>i HATE plasma!</strike> actually amaroks palettehandler fault, sorry :-)
         else if (appType == Amarok && object->inherits("Context::ContextView"))
         {
             QPalette pal = qApp->palette();
@@ -1348,7 +1374,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
              ( Hacks::config.extendDolphinViews && widget->inherits("DolphinViewContainer") ) )
             shapeCorners( widget, isDock );
 
-        if ( config.bg.blur && 
+        if ( config.bg.blur &&
             (widget->isWindow() || widget->autoFillBackground() ||
             (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
             appType != Plasma  )
@@ -1367,7 +1393,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 
         if ( config.UNO.used && re->size().height() != re->oldSize().height() )
         if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(object->parent()) )
-        if ( (config.UNO.toolbar && qobject_cast<QToolBar*>(object) && mwin->toolBarArea(static_cast<QToolBar*>(object)) == Qt::TopToolBarArea) 
+        if ( (config.UNO.toolbar && qobject_cast<QToolBar*>(object) && mwin->toolBarArea(static_cast<QToolBar*>(object)) == Qt::TopToolBarArea)
                                                                                                                 || qobject_cast<QMenuBar*>(object) )
         {
             if (updateUnoHeight(mwin,config.UNO.toolbar,config.UNO.title) && config.UNO.title)
@@ -1523,8 +1549,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
             else if (config.menu.round && qobject_cast<QDockWidget*>(widget))
                 widget->clearMask();
         }
-        
-        if ( config.bg.blur && !widget->isWindow() && 
+
+        if ( config.bg.blur && !widget->isWindow() &&
             (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
             appType != Plasma  )
         {
@@ -1568,7 +1594,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (config.bg.modal.invert && widget && widget->isModal())
             swapPalette(widget, this);
 
-        if ( config.bg.blur && !widget->isWindow() && 
+        if ( config.bg.blur && !widget->isWindow() &&
             (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
             appType != Plasma  )
         {
@@ -1642,7 +1668,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                     pal.setColor(group, QPalette::Text, HARD_CONTRAST(QPalette::Base));
                 }
             }
-            
+
             if (paletteChanged)
             {
                 widget->removeEventFilter(this);
@@ -1686,14 +1712,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
     }
 }
 
-void 
+void
 Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bool silent)
 {
     QWidget *vp = itemView->viewport();
-    
+
     if (silent)
         itemView->installEventFilter(&eventKiller);
-    
+
     if (style == 1)
     {
         itemView->setAlternatingRowColors(false);
@@ -1710,14 +1736,14 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
         itemView->setForegroundRole(QPalette::Text);
     }
     else if ( vp ) // just fix text colors
-    {   
+    {
         QPalette pal = itemView->palette();
         pal.setColor(QPalette::Active, QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText));
         pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Inactive, QPalette::WindowText));
         pal.setColor(QPalette::Disabled, QPalette::Text, pal.color(QPalette::Disabled, QPalette::WindowText));
         itemView->setPalette(pal);
     }
-    
+
     if ( vp && (style == 2 || (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 25)) )
     {
         if (silent)
@@ -1732,8 +1758,8 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
                 itemView->setFrameStyle(QFrame::NoFrame);
             }
             QPalette pal = itemView->palette();
-            QColor bgc[3] = { pal.color(QPalette::Active, QPalette::Window), 
-                              pal.color(QPalette::Inactive, QPalette::Window), 
+            QColor bgc[3] = { pal.color(QPalette::Active, QPalette::Window),
+                              pal.color(QPalette::Inactive, QPalette::Window),
                               pal.color(QPalette::Disabled, QPalette::Window) };
 //                         Colors::mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::Base),6,1)
 #define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
@@ -1754,7 +1780,7 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
         if (silent)
             vp->removeEventFilter(&eventKiller);
     }
-    
+
     if (silent)
         itemView->removeEventFilter(&eventKiller);
 }
@@ -1767,13 +1793,13 @@ Style::focusWidgetChanged( QWidget *old, QWidget *focusWidget )
         QWidget *grampa = 0;
         if ( qobject_cast<QAbstractItemView*>(focusWidget) && (grampa = focusWidget->parentWidget()) && (grampa = grampa->parentWidget()) && QString(focusWidget->metaObject()->className()).startsWith("Dolphin") )
         {
-            grampa->setProperty("hasFocus", true); 
+            grampa->setProperty("hasFocus", true);
             grampa->update();
-            
+
         }
         if ( qobject_cast<QAbstractItemView*>(old) && (grampa = old->parentWidget()) && (grampa = grampa->parentWidget()) && QString(old->metaObject()->className()).startsWith("Dolphin") )
         {
-            grampa->setProperty("hasFocus", false); 
+            grampa->setProperty("hasFocus", false);
             grampa->update();
         }
     }

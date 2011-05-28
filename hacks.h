@@ -32,7 +32,7 @@ class Hacks : public QObject
     Q_OBJECT
 public:
     Hacks() {}
-    enum HackAppType { Unknown = 0, SMPlayer, Dragon, KDM, Gwenview };
+    enum HackAppType { Unknown = 0, SMPlayer, Dragon, KDM, Gwenview, VLC };
     bool eventFilter( QObject *, QEvent *);
     static bool add(QWidget *w);
     static void releaseApp();
@@ -40,8 +40,9 @@ public:
     static struct Config
     {
         bool messages, KHTMLView, treeViews, windowMovement, killThrobber, fixGwenview,
-             opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews, 
-             lockToolBars, invertDolphinUrlBar, fixKMailFolderList, extendDolphinViews, lockDocks;
+             opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews,
+             lockToolBars, invertDolphinUrlBar, fixKMailFolderList, extendDolphinViews, lockDocks,
+             konsoleScanlines;
     } config;
 private slots:
     void toggleToolBarLock();

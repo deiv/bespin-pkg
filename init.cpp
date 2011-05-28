@@ -141,7 +141,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     {
         delSettings = true;
         QString qPreset;
-        
+
         iSettings = new QSettings("Bespin", "Style");
         iSettings->beginGroup("Style");
         //BEGIN read some user personal settings (i.e. not preset related)
@@ -173,7 +173,8 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.fixKMailFolderList = appType == KMail && readBool(HACK_KMAIL_FOLDERS);
         Hacks::config.extendDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_ICONVIEWS);
         Hacks::config.invertDolphinUrlBar = Hacks::config.extendDolphinViews && readBool(HACK_DOLPHIN_URLBAR);
-        
+        Hacks::config.konsoleScanlines = readBool(HACK_KONSOLE_SCANLINES);
+
         // Font fixing offsets
         config.fontOffset[0] = fontOffset(false, &config.fontExtent);
         config.fontExtent = iSettings->value( "FontExtent", config.fontExtent ).toInt();
@@ -202,12 +203,12 @@ Style::readSettings(const QSettings* settings, QString appName)
         config.menu.shadow = readBool(MENU_SHADOW);
 
         config.winBtnStyle = 2; // this is a kwin deco setting, TODO: read from there?
-        
+
         Animator::Tab::setTransition((Animator::Transition) readInt(TAB_TRANSITION));
         Animator::Tab::setDuration(clamp(iSettings->value(TAB_DURATION).toUInt(), 150, 4000));
         //END personal settings
         //NOTICE we do not end group here, but below. this way it's open if we don't make use of presets
-        
+
         // check for environment override
         const char *preset = getenv("BESPIN_PRESET");
         if (preset)
@@ -256,7 +257,7 @@ Style::readSettings(const QSettings* settings, QString appName)
             }
             else
                 { delete iSettings; iSettings = 0L; }
-            
+
             // KDE replaces the palette after styling with an unpolished own version, breaking presets...
             // used to work by if (qApp->inherits("KApplication")), but now it
             // must be for all apps - KDE does some freaky stuff between the qApp and KApp constructor...
@@ -275,7 +276,7 @@ Style::readSettings(const QSettings* settings, QString appName)
 
     // Background ===========================
     config.bg.minValue = readInt(BG_MINVALUE);
-    
+
     config.bg.mode = (BGMode) readInt(BG_MODE);
     if (appType == Opera && config.bg.mode > Scanlines)
         config.bg.mode = Plain; // it doesn't work - at least atm - and breaks kwin appereance...
@@ -368,7 +369,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         config.btn.tool.std_role[Bg] = config.btn.tool.active_role[Bg] = QPalette::Window;
         config.btn.tool.std_role[Fg] = config.btn.tool.active_role[Fg] = QPalette::WindowText;
     }
-   
+
     // Choosers ===========================
     GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
 
@@ -388,7 +389,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.menu.roundSelect = iSettings->value("Menu.RoundSelect",
                                               !(config.menu.itemGradient == Gradients::Glass ||
                                               config.menu.itemGradient == Gradients::Gloss)).toBool();
-    
+
     if (appType == GTK || appType == OpenOffice)
     {
         config.menu.glassy = false;
@@ -409,7 +410,7 @@ Style::readSettings(const QSettings* settings, QString appName)
 
     if (appType == Plasma || appType == BEshell)
         config.UNO.used = false; // that's probably XBar, ...
-    
+
     if (config.UNO.used)
     {
         config.UNO.sunken = readBool(UNO_SUNKEN);
@@ -515,7 +516,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         }
     }
 #if 0
-    
+
 #endif
     config.groupBoxMode = readInt(GROUP_BOX_MODE);
 
@@ -556,7 +557,7 @@ Style::readSettings(const QSettings* settings, QString appName)
 //         config.view.header_role[Bg] = QPalette::Window;
 //         config.view.sortingHeader_role[Bg] = QPalette::Window;
     }
-   
+
     if (delSettings)
         delete iSettings;
 }
@@ -655,7 +656,7 @@ Style::init(const QSettings* settings)
             appType = Opera;
         }
     }
-    
+
     // ==========================
 
     readSettings(settings, appName);
