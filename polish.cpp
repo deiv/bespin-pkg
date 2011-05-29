@@ -367,7 +367,11 @@ Style::polish( QWidget * widget )
         /// also doesn't work bgs get transparent and applying this to everythign causes funny sideeffects...
         if ( widget->windowType() == Qt::ToolTip )
             FILTER_EVENTS(widget)
-
+        else if (widget->testAttribute(Qt::WA_X11NetWmWindowTypeDND) && FX::compositingActive())
+        {
+            widget->setAttribute(Qt::WA_TranslucentBackground);
+            widget->clearMask();
+        }
 #if BESPIN_ARGB_WINDOWS
         else if (!(  config.bg.opacity == 0xff || // opaque
                 widget->windowType() == Qt::Desktop || // makes no sense + QDesktopWidget is often misused
