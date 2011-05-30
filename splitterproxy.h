@@ -59,7 +59,7 @@ public:
         return false;
     }
 
-    SplitterProxy() : QWidget() { hide(); }
+    SplitterProxy() : QWidget(), mySplitter(0) { hide(); }
 
 protected:
     bool event(QEvent *e)
