@@ -60,6 +60,7 @@ public:
     }
 
     SplitterProxy() : QWidget(), mySplitter(0) { hide(); }
+    ~SplitterProxy() { if (this == splitterProxy) splitterProxy = 0; }
 
 protected:
     bool event(QEvent *e)
@@ -97,9 +98,10 @@ protected:
 //                 setSplitter(0);
             return true;
         }
+        case QEvent::HoverLeave:
         case QEvent::Leave:
         {
-            QWidget::leaveEvent(e);
+//             QWidget::leaveEvent(e);
             if (!rect().contains(mapFromGlobal(QCursor::pos())))
                 setSplitter(0);
             return true;
