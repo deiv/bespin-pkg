@@ -349,8 +349,14 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
             s = s.left(t);
         }
         if (menuitem->menuItemType == QStyleOptionMenuItem::DefaultItem)
+        {
+            QFont fnt = painter->font();
             setBold(painter, s, vTextRect.width());
-        drawItemText(painter, vTextRect, text_flags | Qt::AlignLeft, PAL, isEnabled, s);
+            drawItemText(painter, vTextRect, text_flags | Qt::AlignLeft, PAL, isEnabled, s);
+            painter->setFont(fnt);
+        }
+        else
+            drawItemText(painter, vTextRect, text_flags | Qt::AlignLeft, PAL, isEnabled, s);
 //       painter->drawText(vTextRect, text_flags | Qt::AlignLeft, s.left(t));
     }
          
