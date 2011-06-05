@@ -24,9 +24,10 @@
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <QSplitterHandle>
+#include <QTimerEvent>
 #include <QWidget>
 
-static const int PADDING = 24;
+static const int PADDING = 16;
 
 class SplitterProxy;
 static SplitterProxy *splitterProxy = 0;
@@ -59,7 +60,7 @@ public:
         return false;
     }
 
-    SplitterProxy() : QWidget(), mySplitter(0) { hide(); }
+    SplitterProxy() : QWidget(), mySplitter(0), myHoverChecker(0) { hide(); }
     ~SplitterProxy() { if (this == splitterProxy) splitterProxy = 0; }
 
 protected:
@@ -98,14 +99,16 @@ protected:
 //                 setSplitter(0);
             return true;
         }
+        case QEvent::Timer:
+            if (static_cast<QTimerEvent*>(e)->timerId() != myHoverChecker)
+                return QWidget::event(e);
+            //  ===> FALL THROUGH IS INTENDED! We somehow lost a QEvent::Leave and gonna fix that from here!
         case QEvent::HoverLeave:
         case QEvent::Leave:
-        {
 //             QWidget::leaveEvent(e);
             if (!rect().contains(mapFromGlobal(QCursor::pos())))
                 setSplitter(0);
             return true;
-        }
         default:
             return QWidget::event(e);
         }
@@ -166,6 +169,8 @@ private:
                 QHoverEvent he(qobject_cast<QSplitterHandle*>(mySplitter) ? QEvent::HoverLeave : QEvent::HoverMove,
                                mySplitter->mapFromGlobal(QCursor::pos()), myHook);
                 QCoreApplication::sendEvent(mySplitter, &he);
+                killTimer(myHoverChecker);
+                myHoverChecker = 0;
             }
             mySplitter = splt;
             return;
@@ -188,10 +193,12 @@ private:
         raise();
         show();
         w->setUpdatesEnabled(true);
+        myHoverChecker = startTimer(150); // sometimes Qt looses a leave event? Dolphin's fault? Mine?
     }
 private:
     QWidget *mySplitter;
     QPoint myHook;
+    int myHoverChecker;
 };
 
 #endif // SPLITTERPROXY_H
