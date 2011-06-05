@@ -102,6 +102,8 @@ protected:
         case QEvent::Timer:
             if (static_cast<QTimerEvent*>(e)->timerId() != myHoverChecker)
                 return QWidget::event(e);
+            if (mouseGrabber() == this)
+                return true;
             //  ===> FALL THROUGH IS INTENDED! We somehow lost a QEvent::Leave and gonna fix that from here!
         case QEvent::HoverLeave:
         case QEvent::Leave:
