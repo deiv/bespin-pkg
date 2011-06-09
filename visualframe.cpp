@@ -246,7 +246,17 @@ VisualFrame::correctPosition()
 
     VFrame::Type t = type(myFrame->frameShadow());
     QRect rect = myFrameRect = correctedRect(myFrame);
-
+#if 1
+    int x,y,r,b;
+    rect.getRect(&x, &y, &r, &b);
+    ++y; --b; // I have NO idea why this is required
+    QRegion mask(x+4, y, r-8, b);
+    mask += QRegion(x, y+4, r, b-8);
+    mask += QRegion(x+2, y+1, r-4, b-2);
+    mask += QRegion(x+1, y+2, r-2, b-4);
+    myFrame->setMask(mask);
+    r += x; b += y;
+#else
     // mask
     int x,y,r,b;
     rect.getRect(&x, &y, &r, &b); r += x; b += y;
@@ -259,7 +269,7 @@ VisualFrame::correctPosition()
     br = corner[East].boundingRect();
     mask -= corner[East].translated(r-br.width(), b-br.height()); // br
     myFrame->setMask(mask);
-
+#endif
     // position
     rect.translate(myFrame->mapTo(myWindow, QPoint(0,0)));
     rect.getRect(&x, &y, &r, &b);
