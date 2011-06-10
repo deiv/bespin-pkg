@@ -246,7 +246,7 @@ VisualFrame::correctPosition()
 
     VFrame::Type t = type(myFrame->frameShadow());
     QRect rect = myFrameRect = correctedRect(myFrame);
-#if 1
+#if 0
     int x,y,r,b;
     rect.getRect(&x, &y, &r, &b);
     ++y; --b; // I have NO idea why this is required
