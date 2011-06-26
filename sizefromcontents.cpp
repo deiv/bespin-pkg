@@ -96,14 +96,14 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         if HAVE_OPTION(cb, ComboBox)
         {
             if (cb->editable)
-                return contentsSize + QSize(F(9) + (cb->fontMetrics.ascent() + F(2))*1.1, qMax(F(4) - config.fontExtent,0));
+                return contentsSize + QSize(F(12) + (cb->fontMetrics.ascent() + F(2))*1.1, qMax(F(4) - config.fontExtent,0));
             
             int hgt = contentsSize.height();
-            int d = F(2);
+            int d = F(8);
             if ( cb->frame )
             {
                 hgt += ((config.btn.fullHover) ? F(4) : F(6)) - config.fontExtent;
-                d = F(10);
+                d = F(16);
             }
 //             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
 //                 hgt += F(2);
