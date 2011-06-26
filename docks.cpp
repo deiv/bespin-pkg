@@ -181,26 +181,28 @@ Style::drawDockHandle(const QStyleOption *option, QPainter *painter, const QWidg
 {
     OPT_HOVER
 #if 0
-    const QColor fg = Colors::mid(FCOLOR(Window), hover ? FCOLOR(Highlight) : FCOLOR(WindowText), 6, 1 + 2*hover );
-    QRect rect;
-    if (RECT.width() > RECT.height())
-        rect.setRect(0,0,F(32),F(2));
+    const bool vert = RECT.height() > RECT.width();
+    QRect rect = RECT;
+    if (vert)
+    {
+        const int d = RECT.height() / 3;
+        rect.adjust(0,d,0,-d);
+    }
     else
-        rect.setRect(0,0,F(2),F(32));
-    rect.moveCenter( RECT.center() );
-    painter->drawPixmap( rect.left(), rect.top(),
-                         Gradients::pix(fg, rect.height(), Qt::Vertical, Gradients::Sunken),
-                         0, 0, rect.width(), rect.height() );
-
+    {
+        const int d = RECT.width() / 3;
+        rect.adjust(d,0,-d,0);
+    }
+    shadows.line[vert][Sunken].render(rect, painter, Tile::Full, false);
 #else
     QPoint *points; int num;
     const int f12 = F(12), f6 = F(6);
     if (RECT.width() > RECT.height())
     {
-        int x = RECT.left()+2*RECT.width()/5;
+        int x = RECT.left()+4*RECT.width()/9;
         int y = RECT.top()+(RECT.height()-f6)/2;
-        num = RECT.width()/(5*f12);
-        if ((2*RECT.width()/5) % f12)
+        num = RECT.width()/(9*f12);
+        if ((4*RECT.width()/9) % f12)
             ++num;
         points = new QPoint[num];
         for (int i = 0; i < num; ++i)
@@ -209,9 +211,9 @@ Style::drawDockHandle(const QStyleOption *option, QPainter *painter, const QWidg
     else
     {
         int x = RECT.left()+(RECT.width()-f6)/2;
-        int y = RECT.top()+2*RECT.height()/5;
-        num = RECT.height()/(5*f12);
-        if ((2*RECT.height()/5) % f12)
+        int y = RECT.top()+4*RECT.height()/9;
+        num = RECT.height()/(9*f12);
+        if ((4*RECT.height()/9) % f12)
             ++num;
         points = new QPoint[num];
         for (int i = 0; i < num; ++i)
