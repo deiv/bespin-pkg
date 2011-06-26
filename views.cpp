@@ -219,29 +219,22 @@ Style::drawBranch(const QStyleOption *option, QPainter *painter, const QWidget *
         QRect rect = QRect(bef_h+2, bef_v+2, decoration_size, decoration_size);
         if (firstCol)
             rect.moveRight(RECT.right()-F(1));
+        Navi::Direction dir;
+        QColor c;
         if (option->state & State_Open)
         {
-            if (option->state & State_Selected)
-                painter->setBrush(FCOLOR(HighlightedText));
-            else
-                painter->setBrush(Colors::mid( COLOR(bg), COLOR(fg)));
+            c = (option->state & State_Selected) ? FCOLOR(HighlightedText) : Colors::mid( COLOR(bg), COLOR(fg));
             rect.translate(0,-decoration_size/6);
-            if (option->direction == Qt::RightToLeft)
-                drawSolidArrow(Navi::SW, rect, painter);
-            else
-                drawSolidArrow(Navi::SE, rect, painter);
+            dir = (option->direction == Qt::RightToLeft) ? Navi::SW : Navi::SE;
         }
         else
         {
-            if (option->state & State_Selected)
-                painter->setBrush(FCOLOR(HighlightedText));
-            else
-                painter->setBrush(Colors::mid( COLOR(bg), COLOR(fg), 6, 1));
-            if (option->direction == Qt::RightToLeft)
-                drawArrow(Navi::W, rect, painter);
-            else
-                drawArrow(Navi::E, rect, painter);
+            c = (option->state & State_Selected) ? FCOLOR(HighlightedText) : Colors::mid( COLOR(bg), COLOR(fg), 6, 1);
+            dir = (option->direction == Qt::RightToLeft) ? Navi::W : Navi::E;
         }
+        c.setAlpha(255);
+        painter->setBrush(c);
+        drawSolidArrow(dir, rect, painter);
         RESTORE_BRUSH
     }
 
@@ -285,7 +278,7 @@ Style::drawTree(const QStyleOptionComplex *option, QPainter *painter, const QWid
     QStyleOptionQ3ListViewItem item = lv->items.at(0);
     int y = lv->rect.y();
     int c;
-    int dotoffset = 0;
+//     int dotoffset = 0;
     QPolygon dotlines;
 
     QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
@@ -306,7 +299,7 @@ Style::drawTree(const QStyleOptionComplex *option, QPainter *painter, const QWid
     {
         int linetop = 0, linebot = 0;
         // each branch needs at most two lines, ie. four end points
-        dotoffset = (item.itemY + item.height - y) % 2;
+//         dotoffset = (item.itemY + item.height - y) % 2;
         dotlines.resize(item.childCount * 4);
         c = 0;
 
@@ -541,12 +534,10 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
 //    if (cg == QPalette::Normal && !(item->state & QStyle::State_Active))
 //       cg = QPalette::Inactive;
 
-    bool dolphinhack = false;
     if (!isItem && (hover || selected))
     {   // dolphin constrains selection to the text and really REALLY hates a non winblows look :-(
         // TODO: write a better finder clone...
-        dolphinhack = view && !qstrcmp(view->className(), "DolphinDetailsView");
-        if ( dolphinhack )
+        if (view && !qstrcmp(view->className(), "DolphinDetailsView"))
             hover = selected = false;
     }
     if (hover || selected)
