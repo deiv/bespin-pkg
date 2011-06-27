@@ -44,6 +44,13 @@ add_definitions ( -DBLIB_EXPORT=Q_DECL_IMPORT )
 
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
 
+# set (bespin_SOURCES animator/basic.cpp animator/aprogress.cpp animator/hover.cpp
+# animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp
+# bespin.cpp buttons.cpp docks.cpp frames.cpp genpixmaps.cpp hacks.cpp init.cpp
+# input_ng.cpp macmenu.cpp menus.cpp pixelmetric_ng.cpp polish.cpp progress_ng.cpp qsubcmetrics_ng.cpp
+# scrollareas_ng.cpp indicators.cpp sizefromcontents.cpp slider_ng.cpp stdpix.cpp stylehint.cpp
+# tabbing_ng.cpp toolbars.cpp views.cpp visualframe.cpp window.cpp )
+
 set (bespin_SOURCES animator/basic.cpp animator/aprogress.cpp animator/hover.cpp
 animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp
 bespin.cpp buttons.cpp docks.cpp frames.cpp genpixmaps.cpp hacks.cpp init.cpp
