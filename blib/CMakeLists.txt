@@ -17,7 +17,7 @@ add_definitions ( -DBLIB_EXPORT=Q_DECL_EXPORT )
 
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
 
-set (QtBespin_SOURCES colors.cpp dpi.cpp elements.cpp FX.cpp gradients.cpp shapes.cpp tileset.cpp)
+set (QtBespin_SOURCES colors.cpp dpi.cpp elements.cpp FX.cpp gradients.cpp shapes.cpp tileset.cpp shadows.cpp)
 
 if ( X11_FOUND )
     set (QtBespin_SOURCES ${QtBespin_SOURCES} xproperty.cpp)

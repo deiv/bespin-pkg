@@ -38,6 +38,11 @@ BLIB_EXPORT Atom XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_D
 BLIB_EXPORT Atom XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
 BLIB_EXPORT Atom XProperty::blurRegion = XInternAtom(QX11Info::display(), "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
 BLIB_EXPORT Atom XProperty::forceShadows = XInternAtom( QX11Info::display(), "_KDE_SHADOW_FORCE", False );
+BLIB_EXPORT Atom XProperty::kwinShadow = XInternAtom( QX11Info::display(), "_KDE_NET_WM_SHADOW", False );
+//     const char* const ShadowHelper::netWMForceShadowPropertyName( "_KDE_NET_WM_FORCE_SHADOW" );
+//     const char* const ShadowHelper::netWMSkipShadowPropertyName( "_KDE_NET_WM_SKIP_SHADOW" );
+BLIB_EXPORT Atom XProperty::bespinShadow[2] = { XInternAtom( QX11Info::display(), "BESPIN_SHADOW_SMALL", False ),
+                                                XInternAtom( QX11Info::display(), "BESPIN_SHADOW_LARGE", False ) };
 
 void
 XProperty::setAtom(WId window, Atom atom)
