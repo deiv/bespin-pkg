@@ -49,6 +49,7 @@
 #include "../blib/colors.h"
 #include "../blib/gradients.h"
 #include "../blib/xproperty.h"
+#include "../blib/shadows.h"
 #include "../blib/shapes.h"
 #include "button.h"
 #include "resizecorner.h"
@@ -161,6 +162,8 @@ Client::activeChange()
     fadeButtons();
     if (bgMode > 1)
         updateStylePixmaps();
+    // broken in kwin
+///     Bespin::Shadows::set(windowId(), isActive() ? Bespin::Shadows::Large : Bespin::Shadows::Small, true);
 //     if (unoHeight)
 //         updateUnoHeight();
     if (corner)
@@ -429,6 +432,8 @@ void
 Client::init()
 {
     createMainWidget();
+    // broken in kwin
+///     Bespin::Shadows::set(windowId(), Bespin::Shadows::Large, true);
     dirty[0] = dirty[1] = true;
 
     KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass);
@@ -1037,7 +1042,14 @@ Client::reset(unsigned long changed)
         myButtonOpacity = (isActive() || !Factory::config()->hideInactiveButtons) ? 100 : 0;
         QLayoutItem *item;
         while ((item = myTitleBar->takeAt(0)))
-            if (item != myTitleSpacer) delete item;
+            if (item != myTitleSpacer) {
+                if (item->widget())
+                    delete item->widget();
+                else if (item->spacerItem())
+                    delete item->spacerItem();
+                else
+                    delete item;
+            }
         for (int i = 0; i < 4; ++i)
             buttons[i] = 0;
         addButtons(options()->titleButtonsLeft(), buttonSpaceLeft, true);

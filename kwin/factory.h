@@ -28,6 +28,7 @@
 #define BESPIN_H
 
 #include <QHash>
+#include <QObject>
 #include <QPixmap>
 #include <QVector>
 #include <kdecorationfactory.h>
@@ -62,6 +63,7 @@ class Factory : public QObject, public KDecorationFactory
 {
     friend class BespinDecoAdaptor;
     friend class Client;
+    Q_OBJECT
 public:
     Factory();
     ~Factory();
@@ -99,6 +101,8 @@ protected:
     void updateDeco(WId id);
 private:
     bool readConfig();
+private slots:
+    void cleanUp();
 private:
     static Qt::KeyboardModifier ourCommandKey;
     static QHash<qint64, WindowData*> ourDecoInfos;

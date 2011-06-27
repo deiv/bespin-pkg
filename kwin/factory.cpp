@@ -37,6 +37,7 @@
 #include <QStyleOptionHeader>
 #include <QTextBrowser>
 #include <QVBoxLayout>
+#include <QX11Info>
 #include <KGlobal>
 #include <KSharedConfig>
 #include <KConfigGroup>
@@ -79,7 +80,7 @@ QPixmap Factory::mask;
 
 typedef QHash<QString, QHash<NET::WindowType, WindowData*> > DoubleHash;
 
-Factory::Factory() : QObject()
+Factory::Factory() : QObject(), KDecorationFactory()
 {
     weAreCompiz = QCoreApplication::applicationName() != "kwin";
     readConfig();
@@ -93,13 +94,21 @@ Factory::Factory() : QObject()
     p.drawEllipse(mask.rect());
     p.end();
 
+    connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
     weAreInitialized = true;
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
     QDBusConnection::sessionBus().registerObject("/BespinDeco", this);
 }
 
-Factory::~Factory() { weAreInitialized = false; Gradients::wipe(); }
+void Factory::cleanUp() {
+    weAreInitialized = false;
+    Gradients::wipe();
+    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[0]);
+    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[1]);    
+}
+
+Factory::~Factory() { cleanUp(); }
 
 KDecoration* Factory::createDecoration(KDecorationBridge* b)
 {
@@ -685,7 +694,7 @@ Factory::supports( Ability ability ) const
 BgSet *
 Factory::bgSet(const QColor &c, bool vertical, int intensity, qint64 *hashPtr)
 {
-    qint64 hash = (qint64(c.rgba()) << 32) | (int(vertical) << 31) | (intensity & 0xfffffff);
+    qint64 hash = (qint64(c.rgba()) << 32) | (qint64(vertical) << 31) | qint64(intensity & 0xfffffff);
     if (hashPtr)
         *hashPtr = hash;
     
@@ -782,3 +791,4 @@ Factory::decoInfo(QString wmClass, NET::WindowType type)
 }
 
 #include "dbus.moc"
+#include "factory.moc"
