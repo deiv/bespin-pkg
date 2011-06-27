@@ -49,6 +49,7 @@
 
 #ifdef Q_WS_X11
 #include "macmenu.h"
+#include "blib/shadows.h"
 #include "blib/xproperty.h"
 #endif
 
@@ -411,6 +412,8 @@ Style::polish( QWidget * widget )
         if (config.bg.glassy)
             widget->setAttribute(Qt::WA_MacBrushedMetal);
 
+//         Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Large);
+
         if ( config.bg.mode > Plain || (config.UNO.toolbar && !config.UNO.sunken) ||
              config.bg.opacity != 0xff || config.bg.ringOverlay || widget->testAttribute(Qt::WA_MacBrushedMetal) )
         {
@@ -470,6 +473,7 @@ Style::polish( QWidget * widget )
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
         {
+//             Bespin::Shadows::set(menu->winId(), Bespin::Shadows::Large);
             if (config.menu.glassy)
             {   // glass mode popups
                 menu->setAttribute(Qt::WA_MacBrushedMetal);
@@ -1074,6 +1078,7 @@ void
 Style::unpolish( QApplication *app )
 {
     app->removeEventFilter(this);
+    SplitterProxy::cleanUp();
     VisualFrame::setStyle(0L);
     app->setPalette(QPalette());
     Hacks::releaseApp();

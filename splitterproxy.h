@@ -59,6 +59,7 @@ public:
         }
         return false;
     }
+    static void cleanUp() { splitterProxy->deleteLater(); }
 
     SplitterProxy() : QWidget(), mySplitter(0), myHoverChecker(0) { hide(); }
     ~SplitterProxy() { if (this == splitterProxy) splitterProxy = 0; }
