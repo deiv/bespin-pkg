@@ -57,6 +57,7 @@ XProperty::handleProperty(WId window, Atom atom, uchar **data, Type type, unsign
     if (*data) // this is ok, internally used only
     {
         XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, type, PropModeReplace, *data, n );
+        XSync(QX11Info::display(), False);
         return;
     }
     int result, de; //dead end
