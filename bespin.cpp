@@ -51,6 +51,7 @@
 #endif
 #include "blib/FX.h"
 #include "blib/colors.h"
+#include "blib/shadows.h"
 #include "animator/hover.h"
 
 #include "hacks.h"
@@ -1369,7 +1370,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
 
         bool isDock = false;
-        if ( ( widget->isWindow() && config.menu.round &&
+        if ( ( widget->isWindow() && config.beshadowed && config.menu.round &&
              (widget->windowType() == Qt::ToolTip || qobject_cast<QMenu*>(widget) || (isDock = qobject_cast<QDockWidget*>(widget)) ) ) ||
              ( Hacks::config.extendDolphinViews && widget->inherits("DolphinViewContainer") ) )
             shapeCorners( widget, isDock );
@@ -1518,6 +1519,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             // seems to be necessary, somehow KToolBar context menus manages to take QPalette::Window...?!
             // through title setting?!
+            Bespin::Shadows::set(menu->winId(), Bespin::Shadows::Small);
             menu->setBackgroundRole ( config.menu.std_role[Bg] );
             menu->setForegroundRole ( config.menu.std_role[Fg] );
             if (menu->parentWidget() && menu->parentWidget()->inherits("QMdiSubWindow"))
@@ -1543,8 +1545,12 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
         else {
             if ( widget->isWindow() ) {
-            if ( config.menu.round && (qobject_cast<QDockWidget*>(widget) || widget->windowType() == Qt::ToolTip) )
-                shapeCorners(widget, true);
+            if ( qobject_cast<QDockWidget*>(widget) || widget->windowType() == Qt::ToolTip )
+            {
+                if (config.beshadowed && config.menu.round)
+                    shapeCorners(widget, true);
+                Bespin::Shadows::set(widget->winId(), widget->isActiveWindow() ? Bespin::Shadows::Large : Bespin::Shadows::Small );
+            }
             }
             else if (config.menu.round && qobject_cast<QDockWidget*>(widget))
                 widget->clearMask();

@@ -56,7 +56,7 @@ Style : public QCommonStyle
 {
     Q_OBJECT
     Q_CLASSINFO ("X-KDE-CustomElements", "true")
-    
+
 public:
     enum ColorRole { Bg = 0, Fg = 1 };
 
@@ -69,8 +69,8 @@ public:
 
     void drawControl ( ControlElement element, const QStyleOption * option, QPainter * painter,
                         const QWidget * widget = 0 ) const;
-   
-//    virtual void drawItemPixmap ( QPainter * painter, const QRect & rect, int alignment, const QPixmap & pixmap ) const; 
+
+//    virtual void drawItemPixmap ( QPainter * painter, const QRect & rect, int alignment, const QPixmap & pixmap ) const;
 
     void drawItemText(QPainter*, const QRect&, int alignment, const QPalette&, bool enabled,
                       const QString &text, QPalette::ColorRole textRole, QRect *boundingRect) const;
@@ -82,9 +82,9 @@ public:
 
     QPixmap standardPixmap(StandardPixmap stdPix, const QStyleOption *opt = 0, const QWidget *w = 0 ) const;
 //     QPixmap generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *opt) const;
-   
+
 //    what do they do? ========================================
-   
+
 //    SubControl hitTestComplexControl ( ComplexControl control,
 //                                       const QStyleOptionComplex * option,
 //                                       const QPoint & pos,
@@ -98,7 +98,7 @@ public:
 //                         bool enabled,
 //                         const QString & text ) const;
 //=============================================================
-   
+
     int pixelMetric ( PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0 ) const;
 
     void polish( QWidget *w );
@@ -292,10 +292,10 @@ private:
 private:
     typedef struct
     {
-        Tile::Set rect[2]; // round
+        Tile::Set rect[2], windowShape; // round
         QPixmap radio, radioIndicator, notch, slider;
         QPixmap winClose, winMin, winMax;
-        QRegion corner[4];
+//         QRegion corner[4];
     } Masks;
     typedef struct
     {
@@ -308,7 +308,7 @@ private:
 //         QPixmap slider[4][2][2]; // for triangles, currently not...
         QPixmap slider[2][2];
     } Shadows;
-   
+
     typedef struct
     {
 //         Tile::Line top;
@@ -317,7 +317,7 @@ private:
         Tile::Set rect[2];
         Tile::Set glow[2];
     } Lights;
-   
+
     // gtk-qt and other workarounds
     static AppType appType;
     // KDE palette fix..

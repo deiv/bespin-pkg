@@ -107,8 +107,6 @@ Style::resetRingPix()
     delete rings; rings = 0L;
 }
 
-static const bool rounderAlphaCorners = true;
-
 static void shapeCorners( QPainter *p, const QRect &r, const Tile::Set &mask )
 {
     p->setCompositionMode(QPainter::CompositionMode_DestinationIn);
@@ -238,11 +236,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
             painter->drawPixmap(widget->width()-450, 0, *rings);
 
         if ( isARGB && isPopup && config.menu.round )
-            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
+            shapeCorners( painter, widget->rect(), masks.windowShape );
         painter->restore();
         return;
     }
-    
+
         // "Simple" backgrounds ------------------------------------------------------
     if (config.bg.mode == Scanlines)
     {
@@ -254,11 +252,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         if ( !isPopup )
             drawTitleShadow(painter, widget);
         else if ( isARGB && config.menu.round )
-            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
+            shapeCorners( painter, widget->rect(), masks.windowShape );
         painter->restore();
         return;
     }
-    
+
 #if BESPIN_ARGB_WINDOWS
     if (isARGB)
         painter->fillRect( widget->rect(), c );
@@ -274,7 +272,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
             drawTitleShadow(painter, widget);
         }
         else if ( isARGB && config.menu.round )
-            shapeCorners( painter, widget->rect(), masks.rect[rounderAlphaCorners] );
+            shapeCorners( painter, widget->rect(), masks.windowShape );
         return;
     }
 
@@ -369,12 +367,12 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     }
     if (drawRings)
         painter->drawPixmap(widget->width()-450, 0, *rings);
-    
+
     if ( !isPopup )
         drawTitleShadow(painter, widget);
     else if ( isARGB && config.menu.round )
-        shapeCorners( painter, rect, masks.rect[rounderAlphaCorners] );
-    
+        shapeCorners( painter, rect, masks.windowShape );
+
 }
 
 void
@@ -422,7 +420,7 @@ Style::drawTitleBar(const QStyleOptionComplex * option,
       ir.adjust(F(2), 0, -F(2), 0);
       painter->drawText(ir, Qt::AlignCenter | Qt::TextSingleLine, tb->text);
    }
-   
+
    QStyleOptionTitleBar tmpOpt = *tb;
    if (tb->subControls & SC_TitleBarCloseButton)
       PAINT_WINDOW_BUTTON(Close)
@@ -434,7 +432,7 @@ Style::drawTitleBar(const QStyleOptionComplex * option,
       else
          PAINT_WINDOW_BUTTON(Max)
    }
-       
+
    if (tb->subControls & SC_TitleBarMinButton &&
        tb->titleBarFlags & Qt::WindowMinimizeButtonHint) {
       if (tb->titleBarState & Qt::WindowMinimized)
@@ -442,7 +440,7 @@ Style::drawTitleBar(const QStyleOptionComplex * option,
       else
          PAINT_WINDOW_BUTTON(Min)
    }
-       
+
    if (tb->subControls & SC_TitleBarNormalButton &&
        tb->titleBarFlags & Qt::WindowMinMaxButtonsHint)
       PAINT_WINDOW_BUTTON(Normal)

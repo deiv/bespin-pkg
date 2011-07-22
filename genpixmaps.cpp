@@ -28,7 +28,7 @@ Style::generatePixmaps()
     scale = config.scale;
 
     Elements::setShadowIntensity( config.shadowIntensity );
-    
+
     const int f9 = F(9); const int f11 = SCALE(11);
     const int f13 = SCALE(13); const int f17 = SCALE(17);
     const int f49 = SCALE(49);
@@ -44,6 +44,7 @@ Style::generatePixmaps()
         masks.rect[i] = Tile::Set(Elements::roundedMask(s, r),s/2,s/2,1,1, r);
         masks.rect[i].sharpenEdges();
     }
+    masks.windowShape = Tile::Set(Elements::roundedMask(9, 99),4,4,1,1, 99);
 
     // SHADOWS ===============================
     // sunken
@@ -81,7 +82,7 @@ Style::generatePixmaps()
             }
     }
 
-    
+
     // fallback ( sunken ) // TODO: raised
     QImage tmp(f9, f9, QImage::Format_ARGB32);
     QPainter p;
@@ -128,9 +129,9 @@ Style::generatePixmaps()
 
    // toplight -- UNUSED!
 //    renderLightLine(lights.top);
-   
+
     // ================================================================
-   
+
     // SLIDER =====================================
     // shadow
     for (int i = 0; i < 2; ++i)
@@ -201,36 +202,36 @@ Style::generatePixmaps()
             lg.setStops(stops);
             QRect r;
             if (i)
-            { 
+            {
                 r.setRect(0,0,F(1),f49);
                 p.setClipRect(r);
                 p.fillRect(r,lg);
                 r.setRect(F(1),0,F(2)-F(1),f49);
             }
             else
-            { 
+            {
                 r.setRect(0,0,f49,F(1));
                 p.setClipRect(r);
                 p.fillRect(r,lg);
                 r.setRect(0,F(1),f49,F(2)-F(1));
             }
-            
+
             stops.clear();
             stops   << QGradientStop( 0, QColor(c2,c2,c2,0) )
                     << QGradientStop( 0.5, QColor(c2,c2,c2,16) )
                     << QGradientStop( 1, QColor(c2,c2,c2,0) );
             lg.setStops(stops);
-            
+
             p.setClipRect( r );
             p.fillRect(r,lg);
-            
+
             stops.clear();
             p.end();
             shadows.line[i][j] = Tile::Line(QPixmap::fromImage(tmp), i ? Qt::Vertical : Qt::Horizontal, f49_2, -f49_2);
         }
     }
     // ================================================================
-    
+
     // ================================================================
     // Popup corners - not really pxmaps, though ;) ===================
     // they at least break beryl's popup shadows...
@@ -243,6 +244,7 @@ Style::generatePixmaps()
     p.setBrush(Qt::white);
     p.drawEllipse(0,0,2*f5,2*f5);
     p.end();
+#if 0
     QRegion circle(bm);
     masks.corner[0] = circle & QRegion(0,0,f5,f5); // tl
     masks.corner[1] = circle & QRegion(f5,0,f5,f5); // tr
@@ -251,6 +253,7 @@ Style::generatePixmaps()
     masks.corner[2].translate(0, -masks.corner[2].boundingRect().top());
     masks.corner[3] = circle & QRegion(f5,f5,f5,f5); // br
     masks.corner[3].translate(-masks.corner[3].boundingRect().topLeft());
+#endif
     // ================================================================
 }
 #undef fillRect

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>772</width>
-    <height>498</height>
+    <height>525</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -241,7 +241,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>9</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -557,8 +557,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>483</width>
-               <height>185</height>
+               <width>363</width>
+               <height>120</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1273,7 +1273,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>268</width>
+               <width>274</width>
                <height>189</height>
               </rect>
              </property>
@@ -1472,7 +1472,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>267</width>
+               <width>273</width>
                <height>166</height>
               </rect>
              </property>
@@ -1946,111 +1946,15 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>326</width>
-               <height>268</height>
+               <width>495</width>
+               <height>276</height>
               </rect>
              </property>
              <attribute name="label">
               <string>Popup Menu</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_8">
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_49">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Color:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QComboBox" name="crPopup">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <spacer name="horizontalSpacer_13">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Expanding</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>67</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="2" column="0" colspan="4">
-               <widget class="QCheckBox" name="menuRound">
-                <property name="text">
-                 <string>Round corners</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0" colspan="5">
-               <widget class="QCheckBox" name="menuGlas">
-                <property name="text">
-                 <string>Glassy</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0" colspan="5">
-               <widget class="QCheckBox" name="menuShadow">
-                <property name="text">
-                 <string>Outline</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0" colspan="5">
-               <widget class="QCheckBox" name="menuBoldText">
-                <property name="text">
-                 <string>Bold text</string>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="0" colspan="5">
-               <widget class="QCheckBox" name="showMenuIcons">
-                <property name="text">
-                 <string>Show icons</string>
-                </property>
-               </widget>
-              </item>
-              <item row="7" column="0" colspan="5">
-               <spacer name="verticalSpacer_17">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="0" colspan="3">
+              <item row="0" column="0" colspan="7">
                <widget class="QWidget" name="popup_ARGB" native="true">
                 <layout class="QGridLayout" name="gridLayout_7">
                  <item row="1" column="2">
@@ -2102,6 +2006,109 @@
                 </layout>
                </widget>
               </item>
+              <item row="1" column="2">
+               <widget class="QComboBox" name="crPopup">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="5">
+               <widget class="QCheckBox" name="menuRound">
+                <property name="text">
+                 <string>Round corners</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0" colspan="7">
+               <widget class="QCheckBox" name="menuGlas">
+                <property name="text">
+                 <string>Glassy</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0" colspan="7">
+               <widget class="QCheckBox" name="menuShadow">
+                <property name="text">
+                 <string>Outline</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0" colspan="7">
+               <widget class="QCheckBox" name="menuBoldText">
+                <property name="text">
+                 <string>Bold text</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="0" colspan="7">
+               <widget class="QCheckBox" name="showMenuIcons">
+                <property name="text">
+                 <string>Show icons</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0" colspan="7">
+               <spacer name="verticalSpacer_17">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="2" column="5">
+               <widget class="QCheckBox" name="beshadowed">
+                <property name="text">
+                 <string>Use XShape (required for KDE &lt; 4.7. Do NOT use with 4.7)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3" colspan="3">
+               <spacer name="horizontalSpacer_13">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Expanding</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>67</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QLabel" name="label_49">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Color:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
             <widget class="QWidget" name="page_9">
@@ -2109,8 +2116,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>211</width>
-               <height>98</height>
+               <width>495</width>
+               <height>138</height>
               </rect>
              </property>
              <attribute name="label">

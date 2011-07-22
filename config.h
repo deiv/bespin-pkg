@@ -28,6 +28,9 @@ namespace Bespin
 typedef struct Config
 {
     QString appDataPath;
+
+    bool beshadowed;
+
     struct bg
     {
         BGMode mode;
@@ -44,7 +47,7 @@ typedef struct Config
         } modal;
         QPalette::ColorRole tooltip_role[2];
     } bg;
-   
+
     struct btn
     {
         int layer, minHeight;
@@ -59,7 +62,7 @@ typedef struct Config
             QPalette::ColorRole std_role[2], active_role[2];
         } tool;
     } btn;
-   
+
     struct chooser
     {
         Gradients::Type gradient;
@@ -71,7 +74,7 @@ typedef struct Config
     int fontExtent;
     int fontOffset[2];
     int groupBoxMode;
-   
+
     struct input
     {
         ushort pwEchoChar;
@@ -95,7 +98,7 @@ typedef struct Config
     } menu;
 
     int mnemonic;
-    
+
     struct progress
     {
         Gradients::Type gradient;
@@ -105,7 +108,7 @@ typedef struct Config
     int winBtnStyle;
 
     float scale;
-   
+
     struct scroll
     {
         Gradients::Type gradient;
@@ -118,7 +121,7 @@ typedef struct Config
     float shadowIntensity;
     bool  shadowTitlebar;
     bool  showOff;
-    
+
     struct tab
     {
         QPalette::ColorRole std_role[2], active_role[2];
