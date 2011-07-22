@@ -34,6 +34,7 @@
 #include <QX11Info>
 #include <QtDebug>
 
+#include <kdeversion.h>
 #include <klocale.h>
 #include <kwindowinfo.h>
 #include <kwindowsystem.h>
@@ -162,8 +163,8 @@ Client::activeChange()
     fadeButtons();
     if (bgMode > 1)
         updateStylePixmaps();
-    // broken in kwin
-///     Bespin::Shadows::set(windowId(), isActive() ? Bespin::Shadows::Large : Bespin::Shadows::Small, true);
+    /// broken in kwin
+    Bespin::Shadows::set(windowId(), isActive() ? Bespin::Shadows::Large : Bespin::Shadows::Small, true);
 //     if (unoHeight)
 //         updateUnoHeight();
     if (corner)
@@ -252,7 +253,7 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
 
     if (maximizeMode() == MaximizeFull)
     {
-        *title = Factory::buttonSize(iAmSmall)+4;
+        *title = Factory::buttonSize(iAmSmall) + 5;
         if ( options()->moveResizeMaximizedWindows() )
         {
             *border = right = qMin(4, Factory::edgeSize());
@@ -432,8 +433,8 @@ void
 Client::init()
 {
     createMainWidget();
-    // broken in kwin
-///     Bespin::Shadows::set(windowId(), Bespin::Shadows::Large, true);
+    /// broken in kwin
+//     Bespin::Shadows::set(windowId(), Bespin::Shadows::Large, true);
     dirty[0] = dirty[1] = true;
 
     KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass);
@@ -817,12 +818,16 @@ Client::repaint(QPainter &p, bool paintTitle)
     if (paintTitle && sz > 0)
     {
         const QColor titleColor = color((isShade() && bgMode == 1) ? ColorButtonBg : ColorFont, isActive());
-        const int tf = Factory::config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
+        int tf = Factory::config()->titleAlign | Qt::AlignVCenter | Qt::TextSingleLine;
 
         // FONT ==========================================
         QFont fnt = options()->font();
-        if (iAmSmall)
+        if (iAmSmall) {
             shrink(fnt, Factory::smallFactor());
+            tf |= Qt::AlignBottom;
+        }
+        else
+            tf |= Qt::AlignVCenter;
         float tw = 1.07*QFontMetrics(fnt).size(tf, myCaption).width();
         if (tw > sz)
         {
@@ -842,7 +847,7 @@ Client::repaint(QPainter &p, bool paintTitle)
             const int d = (label.height() - label.width()) / 2;
             label.setRect( label.x() - d, label.y() + d, label.height(), label.width() );
         }
-        
+
         if (isActive())
         {
             // emboss?!
@@ -871,7 +876,7 @@ Client::repaint(QPainter &p, bool paintTitle)
                 }
             }
         }
-        
+
         p.setPen(titleColor);
         p.drawText ( label, tf, myCaption );
         if ( Factory::verticalTitle() )
@@ -994,7 +999,7 @@ Client::reset(unsigned long changed)
                 if (corner)
                     corner->hide();
             }
-            myTitleSize = Factory::buttonSize(iAmSmall)+4;
+            myTitleSize = Factory::buttonSize(iAmSmall) + 5;
         }
         else
         {
@@ -1301,8 +1306,11 @@ Client::resize( const QSize& s )
     bottom.moveBottom( h-1 );
     right.setHeight( h - (top.height() + bottom.height()) );
     right.moveRight( w-1 );
-
-    if ( Factory::roundCorners() /*&& !Factory::compositingActive()*/ )
+#if KDE_IS_VERSION(4,7,0)
+    if ( Factory::roundCorners() && !Factory::compositingActive() )
+#else
+    if ( Factory::roundCorners() )
+#endif
     {
         if (maximizeMode() == MaximizeFull)
             { clearMask(); widget()->update(); return; }

@@ -385,13 +385,13 @@ bool Factory::readConfig()
     int oldtitlesize = ourTitleSize[0];
     ourTitleSize[0] = fntHgt + 4 + settings.value("TitlePadding", 0).toInt();
     if (oldtitlesize != ourTitleSize[0]) ret = true;
-    ourButtonSize[0] = fntHgt-2 + ourTitleSize[0]%2;
+    ourButtonSize[0] = fntHgt - 2 + ourTitleSize[0]%2;
 
     fntHgt *= smallFactor();
     oldtitlesize = ourTitleSize[1];
     ourTitleSize[1] = fntHgt + 2;
     if (oldtitlesize != ourTitleSize[1]) ret = true;
-    ourButtonSize[1] = fntHgt-2 + ourTitleSize[1]%2;
+    ourButtonSize[1] = fntHgt - 2 + ourTitleSize[1]%2;
 
     // delete old presets
     qDeleteAll(ourPresets.begin(), ourPresets.end());
