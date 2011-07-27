@@ -163,8 +163,9 @@ Client::activeChange()
     fadeButtons();
     if (bgMode > 1)
         updateStylePixmaps();
-    /// broken in kwin
+#if KDE_IS_VERSION(4,7,0)
     Bespin::Shadows::set(windowId(), isActive() ? Bespin::Shadows::Large : Bespin::Shadows::Small, true);
+#endif
 //     if (unoHeight)
 //         updateUnoHeight();
     if (corner)
@@ -433,8 +434,9 @@ void
 Client::init()
 {
     createMainWidget();
-    /// broken in kwin
-//     Bespin::Shadows::set(windowId(), Bespin::Shadows::Large, true);
+#if KDE_IS_VERSION(4,7,0)
+    Bespin::Shadows::set(windowId(), Bespin::Shadows::Large, true);
+#endif
     dirty[0] = dirty[1] = true;
 
     KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass);
@@ -565,11 +567,6 @@ else\
     _PREF_##Buffer.fill(bg);\
     XRenderComposite(QX11Info::display(), PictOpSrc, _PICT_, 0, _PREF_##Buffer.x11PictureHandle(),\
     0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);\
-
-#if QT_VERSION < 0x040400
-// NOTICE: this is no really working substitute, as r.width() >> rx and roundness has only 100 deg...
-#define drawRoundedRect(_R_, _RX_, _RY_) drawRoundRect(_R_, ( 99*_RX_)/qMax(_RX_, _R_.width()), (99*_RY_)/qMax(_RY_, _R_.height()))
-#endif
 
 inline static void shrink(QFont &fnt, float factor)
 {
