@@ -1545,7 +1545,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
         else {
             if ( widget->isWindow() ) {
-            if ( qobject_cast<QDockWidget*>(widget) || widget->windowType() == Qt::ToolTip )
+            if ( qobject_cast<QDockWidget*>(widget) || widget->inherits("QTipLabel") /*widget->windowType() == Qt::ToolTip -- too aggressive, hit plasma tips as well*/ )
             {
                 if (config.beshadowed && config.menu.round)
                     shapeCorners(widget, true);
