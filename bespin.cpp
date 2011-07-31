@@ -571,14 +571,14 @@ static QTime _lastCheckTime(-1,-1);
 bool
 Style::serverSupportsShadows()
 {
-	 if (appType == KDM)
-		 return false;
+    if (appType == KDM)
+        return false;
 #ifdef Q_WS_X11
     if (!_lastCheckTime.isValid() || _lastCheckTime.elapsed() > 1000*60*5)
     {
         unsigned long n = 0;
         Atom *supported = XProperty::get<Atom>(QX11Info::appRootWindow(), XProperty::netSupported, XProperty::ATOM, &n);
-        for (int i = 0; i < 66; ++i)
+        for (int i = 0; i < n; ++i)
             if (supported[i] == XProperty::kwinShadow)
             {
                 _serverSupportsShadows = true;
