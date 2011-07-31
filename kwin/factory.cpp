@@ -43,6 +43,7 @@
 #include <KConfigGroup>
 #include <kwindowsystem.h>
 #include <kdeversion.h>
+#include "../blib/shadows.h"
 // #include "button.h"
 #include "client.h"
 #include "factory.h"
@@ -105,7 +106,8 @@ void Factory::cleanUp() {
     weAreInitialized = false;
     Gradients::wipe();
     XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[0]);
-    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[1]);    
+    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[1]);
+    Shadows::cleanUp();
 }
 
 Factory::~Factory() { cleanUp(); }

@@ -304,6 +304,7 @@ Style::Style() : QCommonStyle()
 Style::~Style()
 {
     Gradients::wipe();
+    Bespin::Shadows::cleanUp();
 #if BESPIN_STANDARD_PALETTE_HACK
     if ( usingStandardPalette )
     if ( QStyle *newStyle = QApplication::style() )
@@ -578,7 +579,7 @@ Style::serverSupportsShadows()
     {
         unsigned long n = 0;
         Atom *supported = XProperty::get<Atom>(QX11Info::appRootWindow(), XProperty::netSupported, XProperty::ATOM, &n);
-        for (int i = 0; i < n; ++i)
+        for (uint i = 0; i < n; ++i)
             if (supported[i] == XProperty::kwinShadow)
             {
                 _serverSupportsShadows = true;

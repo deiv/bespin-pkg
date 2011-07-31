@@ -6,19 +6,40 @@
 
 #include <QtDebug>
 
-#include "xproperty.h"
+#include "FX.h"
 #include "shadows.h"
 #include "tileset.h"
+#include "xproperty.h"
 
 using namespace Bespin;
 
 
-static QPixmap (*pixmaps[2])[8];
+static QPixmap (*pixmaps[2])[8] = {0,0};
 static unsigned long globalShadowData[2][12];
+
+static QPixmap nativePixmap(const QPixmap &qtPix)
+{
+#ifdef Q_WS_X11
+    if (FX::usesXRender() || qtPix.isNull())
+        return qtPix;
+
+    Pixmap xPix = XCreatePixmap(QX11Info::display(), QX11Info::appRootWindow(), qtPix.width(), qtPix.height(), 32);
+    QPixmap qtXPix(QPixmap::fromX11Pixmap( xPix, QPixmap::ExplicitlyShared ));
+    QPainter p(&qtXPix);
+    p.setCompositionMode(QPainter::CompositionMode_Source);
+    p.drawPixmap(0, 0, qtPix);
+    p.end();
+    return qtXPix;
+#else
+    return qtPix; // just for GCC - makes no sense at all anyway
+#endif
+}
+
 
 static unsigned long*
 shadowData(Shadows::Type t, bool storeToRoot)
 {
+#ifdef Q_WS_X11
     unsigned long _12 = 12;
     unsigned long *data = XProperty::get<unsigned long>(QX11Info::appRootWindow(), XProperty::bespinShadow[t-1], XProperty::LONG, &_12);
     if (!data)
@@ -68,14 +89,15 @@ shadowData(Shadows::Type t, bool storeToRoot)
             p.end();
 
             Tile::Set shadowSet(shadow,sz,sz,1,1);
-            store[0] = shadowSet.tile(Tile::TopMid);
-            store[1] = shadowSet.tile(Tile::TopRight);
-            store[2] = shadowSet.tile(Tile::MidRight);
-            store[3] = shadowSet.tile(Tile::BtmRight);
-            store[4] = shadowSet.tile(Tile::BtmMid);
-            store[5] = shadowSet.tile(Tile::BtmLeft);
-            store[6] = shadowSet.tile(Tile::MidLeft);
-            store[7] = shadowSet.tile(Tile::TopLeft);
+            
+            store[0] = nativePixmap(shadowSet.tile(Tile::TopMid));
+            store[1] = nativePixmap(shadowSet.tile(Tile::TopRight));
+            store[2] = nativePixmap(shadowSet.tile(Tile::MidRight));
+            store[3] = nativePixmap(shadowSet.tile(Tile::BtmRight));
+            store[4] = nativePixmap(shadowSet.tile(Tile::BtmMid));
+            store[5] = nativePixmap(shadowSet.tile(Tile::BtmLeft));
+            store[6] = nativePixmap(shadowSet.tile(Tile::MidLeft));
+            store[7] = nativePixmap(shadowSet.tile(Tile::TopLeft));
         }
         for (int i = 0; i < 8; ++i)
             globalShadowData[t-1][i] = (*pixmaps[t-1])[i].handle();
@@ -85,11 +107,35 @@ shadowData(Shadows::Type t, bool storeToRoot)
             XProperty::set(QX11Info::appRootWindow(), XProperty::bespinShadow[t-1], data, XProperty::LONG, 12);
     }
     return data;
+#else
+    return 0;  // just for GCC - makes no sense at all anyway
+#endif
+}
+
+BLIB_EXPORT void
+Shadows::cleanUp()
+{
+#ifdef Q_WS_X11
+    for (int i = 0; i < 2; ++i)
+    {
+        if (pixmaps[i])
+        {
+            if (!FX::usesXRender())
+            {
+                for (int j = 0; j < 8; ++j)
+                    XFreePixmap(QX11Info::display(), (*pixmaps[i])[j].handle());
+            }
+            delete pixmaps[i];
+            pixmaps[i] = 0L;
+        }
+    }
+#endif
 }
 
 BLIB_EXPORT void
 Shadows::set(WId id, Shadows::Type t, bool storeToRoot)
 {
+#ifdef Q_WS_X11
     if (id == QX11Info::appRootWindow()) {
         qWarning("BESPIN WARNING! Setting shadow to ROOT window is NOT supported");
         return;
@@ -105,5 +151,6 @@ Shadows::set(WId id, Shadows::Type t, bool storeToRoot)
     default:
         break;
     }
+#endif
 }
 
