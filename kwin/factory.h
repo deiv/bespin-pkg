@@ -53,7 +53,7 @@ typedef struct _Preset
 
 typedef struct
 {
-    bool forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons, verticalTitle;
+    bool forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons, verticalTitle, variableShadowSizes;
     int slickButtons, titleAlign;
     Gradients::Type gradient[2][2], buttonGradient;
     QStringList smallTitleClasses;
@@ -91,6 +91,7 @@ public:
     static void showDesktopMenu(const QPoint &p, Client *client);
     static void showInfo(const QPoint &p, WId id);
     static void showWindowList(const QPoint &p, Client *client);
+    inline static bool variableShadowSizes() { return ourConfig.variableShadowSizes; }
     inline static bool verticalTitle() { return ourConfig.verticalTitle; }
 protected:
     static BgSet *bgSet(const QColor &c, bool vertical, int intensity, qint64 *hash = 0);

@@ -62,7 +62,7 @@ bool Factory::weAreInitialized = false;
 bool Factory::weAreComposited = true; // just guessing, kwin isn't up yet ... :(
 bool Factory::weAreCompiz = false; // just guessing, isn't up yet ... :(
 Config Factory::ourConfig =
-    { false, false, false, true, true, false, Qt::AlignHCenter, 0,
+    { false, false, false, true, true, false, true, 0, Qt::AlignHCenter,
       { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
       Gradients::None, QStringList() };
 Qt::KeyboardModifier Factory::ourCommandKey = Qt::AltModifier;
@@ -323,6 +323,10 @@ bool Factory::readConfig()
     oldInt = ourConfig.titleAlign;
     ourConfig.titleAlign = settings.value("TitleAlign", Qt::AlignHCenter).toInt();
     if (oldInt != ourConfig.titleAlign) ret = true;
+
+    oldBool = ourConfig.variableShadowSizes;
+    ourConfig.variableShadowSizes = settings.value("VariableShadows", true).toBool();
+    if (oldBool != ourConfig.variableShadowSizes) ret = true;
 
     oldBool = ourConfig.verticalTitle;
     ourConfig.verticalTitle = settings.value("VerticalTitlebar", false).toBool();

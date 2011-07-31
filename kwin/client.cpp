@@ -165,7 +165,8 @@ Client::activeChange()
     if (bgMode > 1)
         updateStylePixmaps();
 #if KDE_IS_VERSION(4,7,0)
-    Bespin::Shadows::set(windowId(), isActive() ? Bespin::Shadows::Large : Bespin::Shadows::Small, true);
+    if (Factory::variableShadowSizes())
+        Bespin::Shadows::set(windowId(), isActive() ? Bespin::Shadows::Large : Bespin::Shadows::Small, true);
 #endif
 //     if (unoHeight)
 //         updateUnoHeight();
