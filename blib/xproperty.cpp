@@ -43,6 +43,7 @@ BLIB_EXPORT Atom XProperty::kwinShadow = XInternAtom( QX11Info::display(), "_KDE
 //     const char* const ShadowHelper::netWMSkipShadowPropertyName( "_KDE_NET_WM_SKIP_SHADOW" );
 BLIB_EXPORT Atom XProperty::bespinShadow[2] = { XInternAtom( QX11Info::display(), "BESPIN_SHADOW_SMALL", False ),
                                                 XInternAtom( QX11Info::display(), "BESPIN_SHADOW_LARGE", False ) };
+BLIB_EXPORT Atom XProperty::netSupported = XInternAtom( QX11Info::display(), "_NET_SUPPORTED", False );
 
 void
 XProperty::setAtom(WId window, Atom atom)
@@ -51,20 +52,24 @@ XProperty::setAtom(WId window, Atom atom)
     XChangeProperty(QX11Info::display(), window, atom, XA_ATOM, 32, PropModeReplace, (uchar*)data, 1 );
 }
 
-void
+unsigned long
 XProperty::handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n)
 {
+    int format = (type == LONG ? 32 : type);
+    Atom xtype = (type == ATOM ? XA_ATOM : XA_CARDINAL);
     if (*data) // this is ok, internally used only
     {
-        XChangeProperty(QX11Info::display(), window, atom, XA_CARDINAL, type, PropModeReplace, *data, n );
+        XChangeProperty(QX11Info::display(), window, atom, xtype, format, PropModeReplace, *data, n );
         XSync(QX11Info::display(), False);
-        return;
+        return 0;
     }
     int result, de; //dead end
     unsigned long nn, de2;
-    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, n, False, XA_CARDINAL, &de2, &de, &nn, &de2, data);
-    if (result != Success || *data == X::None || n != nn)
+    int nmax = n ? n : 0xffffffff;
+    result = XGetWindowProperty(QX11Info::display(), window, atom, 0L, nmax, False, xtype, &de2, &de, &nn, &de2, data);
+    if (result != Success || *data == X::None || (n > 0 && n != nn))
         *data = NULL; // superflous?!?
+    return nn;
 }
 
 void

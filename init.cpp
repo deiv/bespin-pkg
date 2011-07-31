@@ -274,8 +274,6 @@ Style::readSettings(const QSettings* settings, QString appName)
     else
         qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
 
-    config.beshadowed = readBool(BESHADOWED);
-
     // Background ===========================
     config.bg.minValue = readInt(BG_MINVALUE);
 

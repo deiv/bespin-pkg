@@ -8,8 +8,10 @@
 
 #include "xproperty.h"
 #include "shadows.h"
+#include "tileset.h"
 
 using namespace Bespin;
+
 
 static QPixmap (*pixmaps[2])[8];
 static unsigned long globalShadowData[2][12];
@@ -17,7 +19,8 @@ static unsigned long globalShadowData[2][12];
 static unsigned long*
 shadowData(Shadows::Type t, bool storeToRoot)
 {
-    unsigned long *data = XProperty::get<unsigned long>(QX11Info::appRootWindow(), XProperty::bespinShadow[t-1], XProperty::LONG, 12);
+    unsigned long _12 = 12;
+    unsigned long *data = XProperty::get<unsigned long>(QX11Info::appRootWindow(), XProperty::bespinShadow[t-1], XProperty::LONG, &_12);
     if (!data)
     {
         const int sz = t == Shadows::Large ? 32 : 20;
@@ -64,16 +67,15 @@ shadowData(Shadows::Type t, bool storeToRoot)
                                                      -globalShadowData[t-1][11], -globalShadowData[t-1][10]), 4,4);
             p.end();
 
-            QPixmap shadowPix = QPixmap::fromImage(shadow);
-
-            store[0] = shadowPix.copy(sz, 0, 1, sz); // topcenter -> clockwise
-            store[1] = shadowPix.copy(sz+1, 0, sz, sz);
-            store[2] = shadowPix.copy(sz+1, sz, sz, 1);
-            store[3] = shadowPix.copy(sz+1, sz+1, sz, sz);
-            store[4] = shadowPix.copy(sz, sz+1, 1, sz);
-            store[5] = shadowPix.copy(0, sz+1, sz, sz);
-            store[6] = shadowPix.copy(0, sz, sz, 1);
-            store[7] = shadowPix.copy(0, 0, sz, sz); // topleft
+            Tile::Set shadowSet(shadow,sz,sz,1,1);
+            store[0] = shadowSet.tile(Tile::TopMid);
+            store[1] = shadowSet.tile(Tile::TopRight);
+            store[2] = shadowSet.tile(Tile::MidRight);
+            store[3] = shadowSet.tile(Tile::BtmRight);
+            store[4] = shadowSet.tile(Tile::BtmMid);
+            store[5] = shadowSet.tile(Tile::BtmLeft);
+            store[6] = shadowSet.tile(Tile::MidLeft);
+            store[7] = shadowSet.tile(Tile::TopLeft);
         }
         for (int i = 0; i < 8; ++i)
             globalShadowData[t-1][i] = (*pixmaps[t-1])[i].handle();
@@ -84,7 +86,6 @@ shadowData(Shadows::Type t, bool storeToRoot)
     }
     return data;
 }
-
 
 BLIB_EXPORT void
 Shadows::set(WId id, Shadows::Type t, bool storeToRoot)

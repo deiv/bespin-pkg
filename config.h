@@ -29,8 +29,6 @@ typedef struct Config
 {
     QString appDataPath;
 
-    bool beshadowed;
-
     struct bg
     {
         BGMode mode;

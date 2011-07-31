@@ -92,10 +92,10 @@ createRingPix(int alpha, int value)
     rings = new QPixmap(450,360);
     rings->fill(Qt::transparent);
     QPainter p(rings);
-    QColor white(value,value,value,(alpha+16)*112/255);
-    p.setPen(white);
-    white.setAlpha(24*(alpha+16)/255);
-    p.setBrush(white);
+    QColor color(value,value,value,(alpha+16)*112/255);
+    p.setPen(color);
+    color.setAlpha(24*(alpha+16)/255);
+    p.setBrush(color);
     p.setRenderHint(QPainter::Antialiasing);
     p.drawPath(ringPath);
     p.end();
@@ -166,8 +166,10 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
 
     // Figure alpha stuff --------------------------------------------------------
 
-    const bool isPopup = widget->windowFlags() & (Qt::Popup & ~Qt::Window);
-    int opacity = isPopup ? config.menu.opacity : config.bg.opacity;
+    const QVariant wdv = widget->property("BespinWindowHints");
+    const int windowDecoration = wdv.isValid() ? wdv.toInt() : 0;
+    const bool hasTitleBar = !(widget->windowFlags() & ((Qt::Popup | Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint | Qt::FramelessWindowHint) & ~Qt::Window));
+    int opacity = widget->windowFlags() & (Qt::Popup & ~Qt::Window) ? config.menu.opacity : config.bg.opacity;
     if ( opacity < 0xff && !FX::compositingActive() )
         opacity = 0xff;
 
@@ -191,10 +193,11 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     bool drawRings = false;
     if (config.bg.ringOverlay)
     {
-        drawRings = !isPopup;
+        drawRings = hasTitleBar;
         if (drawRings && !rings)
         {
-            const int ringValue = qMin(3*Colors::value(pal.color(widget->backgroundRole()))/2, 255);
+            int ringValue = (Colors::value(pal.color(widget->backgroundRole())) + 128) / 2; //[64,191]
+            ringValue += (64 - qAbs(ringValue - 128))/2; //[64,191]
             createRingPix(opacity, ringValue);
             disconnect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
             connect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
@@ -231,14 +234,8 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         else
             painter->setBrush(c.light(115-v/20));
         painter->drawPath(glasPath);
-
-        if (drawRings)
-            painter->drawPixmap(widget->width()-450, 0, *rings);
-
-        if ( isARGB && isPopup && config.menu.round )
-            shapeCorners( painter, widget->rect(), masks.windowShape );
         painter->restore();
-        return;
+        goto CommonOperations;
     }
 
         // "Simple" backgrounds ------------------------------------------------------
@@ -249,12 +246,8 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         painter->setPen(Qt::NoPen);
         painter->setBrush(Gradients::structure(c, light));
         painter->drawRect(widget->rect());
-        if ( !isPopup )
-            drawTitleShadow(painter, widget);
-        else if ( isARGB && config.menu.round )
-            shapeCorners( painter, widget->rect(), masks.windowShape );
         painter->restore();
-        return;
+        goto CommonOperations;
     }
 
 #if BESPIN_ARGB_WINDOWS
@@ -264,19 +257,9 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
 
     // cause of scrollbars - kinda optimization
     if ( config.bg.mode == Plain )
-    {
-        if ( !isPopup )
-        {
-            if (drawRings)
-                painter->drawPixmap(widget->width()-450, 0, *rings);
-            drawTitleShadow(painter, widget);
-        }
-        else if ( isARGB && config.menu.round )
-            shapeCorners( painter, widget->rect(), masks.windowShape );
-        return;
-    }
+        goto CommonOperations;
 
-    // Complex part ===================
+    { //BEGIN Complex part ===================
 
 #if BESPIN_ARGB_WINDOWS
     if (isARGB && translucent)
@@ -365,28 +348,28 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     default:
         break;
     }
+    } //END Complex part ===================
+
+CommonOperations:
     if (drawRings)
         painter->drawPixmap(widget->width()-450, 0, *rings);
-
-    if ( !isPopup )
+    if ( hasTitleBar )
         drawTitleShadow(painter, widget);
-    else if ( isARGB && config.menu.round )
-        shapeCorners( painter, rect, masks.windowShape );
-
+    if ( isARGB && (windowDecoration & Rounded) )
+        shapeCorners( painter, widget->rect(), masks.windowShape );
 }
 
 void
-Style::drawToolTip(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawToolTip(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, false);
 //    painter->setBrush(Gradients::pix(FCOLOR(ToolTipBase), RECT.height(), Qt::Vertical, Gradients::Button));
-//    painter->setBrush(FCOLOR(ToolTipBase));
     painter->setBrush(FCOLOR(ToolTipBase));
     painter->setPen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),4,1));
     painter->drawRect(RECT.adjusted(0,0,-1,-1));
-//     painter->drawRoundedRect(RECT.adjusted(0,0,-1,-1),4,4);
-
+    if (config.menu.round && widget && widget->testAttribute(Qt::WA_TranslucentBackground) && FX::compositingActive())
+        shapeCorners( painter, RECT, masks.windowShape );
     painter->restore();
 }
 

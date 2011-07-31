@@ -30,8 +30,6 @@
 #define ARGB_GLASSY "ARGB.Glassy", false
 #define ARGB_BLUR "Bg.Blur", false
 
-#define BESHADOWED "BeShadowed", false
-
 #define BG_INTENSITY "Bg.Intensity", 10
 #define BG_MINVALUE "Bg.MinValue", 70
 #define BG_DOCKS_INVERT "Bg.Docks.Invert", false

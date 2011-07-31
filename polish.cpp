@@ -46,10 +46,10 @@
 
 #include "blib/colors.h"
 #include "blib/FX.h"
+#include "blib/shadows.h"
 
 #ifdef Q_WS_X11
 #include "macmenu.h"
-#include "blib/shadows.h"
 #include "blib/xproperty.h"
 #endif
 
@@ -360,14 +360,29 @@ Style::polish( QWidget * widget )
     if ( widget->isWindow() &&
 //          widget->testAttribute(Qt::WA_WState_Created) &&
 //          widget->internalWinId() &&
-            !(/*widget->inherits("QTipLabel") || */widget->inherits("QSplashScreen") ||
-            widget->inherits("KScreenSaver") /*|| widget->inherits("QGLWidget")*/ || widget->objectName() == "decoration widget") )
+            !(widget->inherits("QSplashScreen") || widget->inherits("KScreenSaver")
+            || widget->objectName() == "decoration widget" /*|| widget->inherits("QGLWidget")*/ ) )
     {
 //         QPalette pal = widget->palette();
         /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
         /// also doesn't work bgs get transparent and applying this to everythign causes funny sideeffects...
-        if ( widget->windowType() == Qt::ToolTip )
-            FILTER_EVENTS(widget)
+        if ( widget->windowType() == Qt::ToolTip)
+        {
+            if (widget->inherits("QTipLabel"))
+            {
+                if (config.menu.round && !serverSupportsShadows())
+                    FILTER_EVENTS(widget)
+                if ( !widget->testAttribute(Qt::WA_TranslucentBackground) && config.menu.round && FX::compositingActive() )
+                    widget->setAttribute(Qt::WA_TranslucentBackground);
+                widget->setProperty("BespinWindowHints", Shadowed|(config.menu.round?Rounded:0));
+                Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small);
+            }
+        }
+        else if ( widget->windowType() == Qt::Popup)
+        {
+            if ( widget->inherits("QComboBoxPrivateContainer") )
+                Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small);
+        }
         else if (widget->testAttribute(Qt::WA_X11NetWmWindowTypeDND) && FX::compositingActive())
         {
             widget->setAttribute(Qt::WA_TranslucentBackground);
@@ -412,7 +427,6 @@ Style::polish( QWidget * widget )
         if (config.bg.glassy)
             widget->setAttribute(Qt::WA_MacBrushedMetal);
 
-//         Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Large);
 
         if ( config.bg.mode > Plain || (config.UNO.toolbar && !config.UNO.sunken) ||
              config.bg.opacity != 0xff || config.bg.ringOverlay || widget->testAttribute(Qt::WA_MacBrushedMetal) )
@@ -473,7 +487,6 @@ Style::polish( QWidget * widget )
         //BEGIN Popup menu handling                                                                -
         if (QMenu *menu = qobject_cast<QMenu *>(widget))
         {
-//             Bespin::Shadows::set(menu->winId(), Bespin::Shadows::Large);
             if (config.menu.glassy)
             {   // glass mode popups
                 menu->setAttribute(Qt::WA_MacBrushedMetal);
@@ -502,7 +515,10 @@ Style::polish( QWidget * widget )
             if (appType == Plasma) // GNARF!
                 menu->setWindowFlags( menu->windowFlags()|Qt::Popup);
 
-            // eventfiltering to reposition MDI windows, shaping, paint ARGB bg and correct distance to menubars
+            menu->setProperty("BespinWindowHints", Shadowed|(config.menu.round?Rounded:0));
+            Bespin::Shadows::set(menu->winId(), Bespin::Shadows::Small);
+
+            // eventfiltering to reposition MDI windows, shaping, shadows, paint ARGB bg and correct distance to menubars
             FILTER_EVENTS(menu);
 #if 0
             /// NOTE this was intended to be for some menu mock from nuno where the menu
@@ -519,7 +535,12 @@ Style::polish( QWidget * widget )
         //END Popup menu handling                                                                  -
         /// WORKAROUND Qt color bug, uses daddies palette and FGrole, but TooltipBase as background
         else if (widget->inherits("QWhatsThat"))
+        {
+            FILTER_EVENTS(widget); // IT - LOOKS - SHIT - !
             widget->setPalette(QToolTip::palette()); // so this is Qt bug WORKAROUND
+            widget->setProperty("BespinWindowHints", Shadowed);
+            Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small);
+        }
         else
         {
             // talk to kwin about colors, gradients, etc.

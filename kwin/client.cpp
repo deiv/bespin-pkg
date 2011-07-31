@@ -84,7 +84,8 @@ void
 Client::updateStylePixmaps()
 {
     topTile = btmTile = cnrTile = lCorner = rCorner = 0;
-    if (WindowPics *pics = (WindowPics*)XProperty::get<Picture>(windowId(), XProperty::bgPics, XProperty::LONG, 5))
+    unsigned long _5 = 5;
+    if (WindowPics *pics = (WindowPics*)XProperty::get<Picture>(windowId(), XProperty::bgPics, XProperty::LONG, &_5))
     {
         if ((topTile = pics->topTile))
         {
@@ -357,7 +358,7 @@ Client::eventFilter(QObject *o, QEvent *e)
             QPixmap *buffer = 0;
             QPixmap dBuffer;
             QPoint off(0,0);
-            
+
             if (color(ColorTitleBar, isActive()).alpha() == 0xff)
             {
                 // try to copy from redirection
@@ -386,7 +387,7 @@ Client::eventFilter(QObject *o, QEvent *e)
                     // enforce repaint, button thinks it's independend
                     buttons[i]->repaint();
                 }
-            
+
             if (corner)
                 corner->repaint();
         }
@@ -472,7 +473,7 @@ Client::init()
         myTitleSpacer = new QSpacerItem( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
     myTitleBar->setSpacing(2);
-    
+
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
     layout->addLayout(myTitleBar);
@@ -505,7 +506,7 @@ Client::mousePosition( const QPoint& p ) const
 {
     if (isShade() || !isResizable())
         return PositionCenter;
-   
+
     if (p.y() < 4)
     {   // top
         if (p.x() < 4) return PositionTopLeft; // corner
@@ -602,21 +603,21 @@ Client::repaint(QPainter &p, bool paintTitle)
         r.adjust(0,0,0,-1);
         p.drawRoundedRect(r, 6, 6);
         r.adjust(0,0,0,-1);
-        
+
         // the window
         p.setBrush(Gradients::pix(bg, r.height(), Qt::Vertical, Gradients::Button));
         QColor c = color(Client::ColorFont, isActive());
         c.setAlpha(80);
         p.setPen(c);
         p.drawRoundedRect(r, 6, 6);
-        
+
         // logo
         if (isActive())
         {
             const int s = qMin(r.width(), r.height())/2;
             QRect logo(0,0,s,s);
             logo.moveCenter(r.center());
-            
+
             c.setAlpha(180); p.setBrush(c); p.setPen(Qt::NoPen);
             p.drawPath(Shapes::logo(logo));
         }
@@ -916,7 +917,7 @@ Client::repaint(QPainter &p, bool paintTitle)
             p.setRenderHint( QPainter::Antialiasing );
             p.drawPath(buttonCorner);
         }
-        
+
         if ((bg2 != bg) && (myBaseSize > 2 || myEdgeSize > 2 || gType[isActive()]))
         {   // outline
             p.setBrush(Qt::NoBrush);
@@ -955,13 +956,13 @@ Client::repaint(QPainter &p, bool paintTitle)
             path.arcTo(x+w-cornerSize, y+h-cornerSize, cornerSize, cornerSize, 3*90, 90);
             path.arcTo(x+w-cornerSize, y, cornerSize, cornerSize, 0, 90);
             path.closeSubpath();
-            
+
             p.setRenderHint( QPainter::Antialiasing, true );
             p.setBrush(Qt::NoBrush);
             int v = Colors::value(bg);
             p.setPen(QPen(Colors::mid(bg,Qt::white,300-v,v),3));
             p.drawPath(path);
-            
+
             p.setPen(Colors::mid(bg, color(ColorFont, true),5,2));
             p.drawPath(path);
         }
@@ -973,7 +974,7 @@ Client::reset(unsigned long changed)
 {
     if (changed & SettingFont)
         myTitleSize = Factory::titleSize(iAmSmall);
-    
+
     if (changed & SettingDecoration)
     {
         gType[0] = Factory::config()->gradient[1][0];
@@ -1079,7 +1080,7 @@ Client::reset(unsigned long changed)
             colors[0][ColorTitleBlend] = colors[1][ColorTitleBlend] =
             colors[0][ColorTitleBar] = colors[1][ColorTitleBar] =
             widget()->palette().color(QPalette::Active, QPalette::Window);
-            
+
             colors[1][ColorButtonBg] = colors[1][ColorFont] =
             widget()->palette().color(QPalette::Active, QPalette::WindowText);
 
@@ -1088,7 +1089,8 @@ Client::reset(unsigned long changed)
         }
         else if (!Factory::config()->forceUserColors)
         {
-            WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, 9);
+            unsigned long _9 = 9;
+            WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, &_9);
             bool needFree = true;
             if (!data)
             {   // check for data from dbus
@@ -1153,7 +1155,7 @@ Client::reset(unsigned long changed)
                     colors[i][ColorTitleBlend] = colors[i][ColorTitleBar];
                     colors[i][ColorButtonBg] = colors[i][ColorFont];
                 }
-#if 0 
+#if 0
                 // NOTICE this makes no more sense at all since we provide our own coloring... =S
                 // usually the window is titlebar colored and the titleblend gradient painted upon - in case
                 // but the fallback shall be fully titleblend with a titlebar color section behind the title
@@ -1169,7 +1171,7 @@ Client::reset(unsigned long changed)
         }
         else if (bgMode == 1)
         {
-            // iff the user set a colormode from the style, but no gradient, we use the color on 
+            // iff the user set a colormode from the style, but no gradient, we use the color on
             // the default gradient and NOT the nonexisting accessoire
             for (int i = 0; i <  2; ++i)
             {
@@ -1209,7 +1211,7 @@ Client::reset(unsigned long changed)
     dirty[0] = dirty[1] = color(ColorTitleBar, isActive()).alpha() == 0xff;
     if (changed)
         activeChange(); // handles bg pixmaps in case and triggers update
-   
+
 }
 
 void
@@ -1603,7 +1605,7 @@ Client::trimm(const QString &string)
     away additional info like compile time, version numbers etc. ------------ */
     else
     {   // TODO maybe check with regexp and word bounds?
-        
+
         QRegExp rgxp( "\\b" + appName + "\\b" );
         rgxp.setCaseSensitivity(Qt::CaseInsensitive);
         int i = ret.indexOf( rgxp );
@@ -1618,15 +1620,15 @@ Client::trimm(const QString &string)
                 ret = ret.mid(i, appName.length());
         }
     }
-    
+
     // in general, remove leading and ending blanks...
     ret = ret.trimmed();
-    
+
     if (ret.isEmpty())
         ret = string; // ...
-    
+
     return ret;
-   
+
 //    KWindowInfo info(windowId(), NET::WMVisibleName | NET::WMName, NET::WM2WindowClass);
 //    qDebug() << "BESPIN:" << info.windowClassClass() <<  << info.name() << info.visibleName();
 //    QByteArray windowClassClass() const;

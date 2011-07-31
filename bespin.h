@@ -59,6 +59,7 @@ Style : public QCommonStyle
 
 public:
     enum ColorRole { Bg = 0, Fg = 1 };
+    enum WindowDecoration { Shadowed = 1, Rounded = 2 };
 
     Style();
     ~Style();
@@ -288,6 +289,7 @@ private:
     void readSettings(const QSettings *settings = 0L, QString appName = QString());
     void registerRoutines();
     void setupDecoFor(QWidget *w, const QPalette &pal, int mode, const Gradients::Type (&gt)[2]);
+    static bool serverSupportsShadows();
     void updateUno(QToolBar *, bool *gotTitle = 0);
 private:
     typedef struct

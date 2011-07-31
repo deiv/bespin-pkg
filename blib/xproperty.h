@@ -52,14 +52,17 @@ typedef struct _WindowPics
 class BLIB_EXPORT XProperty
 {
 public:
-    enum Type { BYTE = 8, WORD = 16, LONG = 32 };
-    static Atom winData, bgPics, decoDim, pid, blurRegion, forceShadows, kwinShadow, bespinShadow[2];
+    enum Type { LONG = 1, BYTE = 8, WORD = 16, ATOM = 32 };
+    static Atom winData, bgPics, decoDim, pid, blurRegion, forceShadows, kwinShadow, bespinShadow[2], netSupported;
 
-    template <typename T> inline static T *get(WId window, Atom atom, Type type, unsigned long n = 1)
+    template <typename T> inline static T *get(WId window, Atom atom, Type type, unsigned long *n = 0)
     {
+        unsigned long nn = n ? *n : 1;
         T *data = 0;
         T **data_p = &data;
-        handleProperty(window, atom, (uchar**)data_p, type, _n<T>(type, n));
+        nn = handleProperty(window, atom, (uchar**)data_p, type, _n<T>(type, nn));
+        if (n)
+            *n = nn;
         return data;
     }
 
@@ -73,9 +76,11 @@ public:
     static void remove(WId window, Atom atom);
     static void setAtom(WId window, Atom atom);
 private:
-    static void handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n);
+    static unsigned long handleProperty(WId window, Atom atom, uchar **data, Type type, unsigned long n);
     template <typename T> inline static long _n(Type type, unsigned long n)
     {
+        if (n < 1)
+            return 0;
         unsigned long _n = n*sizeof(T)*8;
         _n /= (type == XProperty::LONG) ? 8*sizeof(long int) : (uint)type;
         return _n ? _n : 1L;

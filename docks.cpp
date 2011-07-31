@@ -21,6 +21,7 @@
 #include <QStyleOptionDockWidget>
 #include "draw.h"
 #include "hacks.h"
+#include "blib/shadows.h"
 
 #include <QtDebug>
 
@@ -32,6 +33,7 @@ Style::dockLocationChanged( Qt::DockWidgetArea /*area*/ )
     QDockWidget *dock = carriedDock ? carriedDock : qobject_cast<QDockWidget*>( sender() );
     if ( !dock )
         return;
+
     if ( dock->isFloating() || !Hacks::config.lockDocks )
     {
         if ( QWidget *title = dock->titleBarWidget() )

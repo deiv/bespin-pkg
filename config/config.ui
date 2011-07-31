@@ -241,7 +241,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>7</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -2006,7 +2006,7 @@
                 </layout>
                </widget>
               </item>
-              <item row="1" column="2">
+              <item row="1" column="1" colspan="2">
                <widget class="QComboBox" name="crPopup">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -2022,7 +2022,7 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0" colspan="5">
+              <item row="2" column="0" colspan="7">
                <widget class="QCheckBox" name="menuRound">
                 <property name="text">
                  <string>Round corners</string>
@@ -2070,14 +2070,7 @@
                 </property>
                </spacer>
               </item>
-              <item row="2" column="5">
-               <widget class="QCheckBox" name="beshadowed">
-                <property name="text">
-                 <string>Use XShape (required for KDE &lt; 4.7. Do NOT use with 4.7)</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3" colspan="3">
+              <item row="1" column="3" colspan="4">
                <spacer name="horizontalSpacer_13">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -2093,7 +2086,7 @@
                 </property>
                </spacer>
               </item>
-              <item row="1" column="0" colspan="2">
+              <item row="1" column="0">
                <widget class="QLabel" name="label_49">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">

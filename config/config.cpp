@@ -383,7 +383,6 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     
     handleSettings(ui.crMenuActive, MENU_ACTIVEROLE);
     handleSettings(ui.menuRound, MENU_ROUND);
-    handleSettings(ui.beshadowed, BESHADOWED);
     handleSettings(ui.menuRoundSelect, "Menu.RoundSelect", true);
     handleSettings(ui.menuGlas, MENU_GLASSY);
     handleSettings(ui.gradMenuItem, MENU_ITEMGRADIENT);
@@ -851,7 +850,6 @@ blackListed(QString &key)
         key.startsWith("Hack.") || // don't im/export hacks
 //         key.startsWith("ARGB.") || // don't im/export ARGB stuff
         key.startsWith("App.") || // don't im/export app specific stuff
-        key == "BeShadowed" || // the current KDE version
         key == "Bg.Opacity" || // or dimmed inactive wins
         key == "DialogButtonLayout" || // or OS conventions
         key == "ShowOff" || // or whether we're a pretender ;-)

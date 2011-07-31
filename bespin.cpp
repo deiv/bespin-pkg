@@ -35,6 +35,7 @@
 #include <QStyleOptionTabWidgetFrame>
 #include <QStylePlugin>
 #include <QScrollBar>
+#include <QTime>
 #include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
@@ -565,6 +566,30 @@ Style::erase(const QStyleOption *option, QPainter *painter, const QWidget *widge
     painter->restore();
 }
 
+static bool _serverSupportsShadows = false;
+static QTime _lastCheckTime(-1,-1);
+bool
+Style::serverSupportsShadows()
+{
+	 if (appType == KDM)
+		 return false;
+#ifdef Q_WS_X11
+    if (!_lastCheckTime.isValid() || _lastCheckTime.elapsed() > 1000*60*5)
+    {
+        unsigned long n = 0;
+        Atom *supported = XProperty::get<Atom>(QX11Info::appRootWindow(), XProperty::netSupported, XProperty::ATOM, &n);
+        for (int i = 0; i < 66; ++i)
+            if (supported[i] == XProperty::kwinShadow)
+            {
+                _serverSupportsShadows = true;
+                break;
+            }
+        _lastCheckTime.start();
+    }
+#endif
+    return _serverSupportsShadows;
+}
+
 // X11 properties for the deco ---------------
 
 #define MSG(_FNC_) QDBusMessage::createMethodCall( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco", _FNC_ )
@@ -679,7 +704,7 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     {
         WId id = widget->winId();
         XProperty::set<uint>(id, XProperty::winData, (uint*)&data, XProperty::WORD, 9);
-        XSync(QX11Info::display(), False);
+//         XSync(QX11Info::display(), False);
         KWIN_SEND( MSG("updateDeco") << (uint)id );
     }
     else
@@ -1074,12 +1099,11 @@ Style::updateBlurRegions() const
 
 static void shapeCorners( QWidget *widget, bool forceShadows )
 {
-
 #if 0 // xPerimental code for ribbon like looking menus - not atm.
     QAction *head = menu->actions().at(0);
     QRect r = menu->fontMetrics().boundingRect(menu->actionGeometry(head),
-    Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
-    head->iconText());
+                                               Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine | Qt::TextExpandTabs | BESPIN_MNEMONIC,
+                                               head->iconText());
     r.adjust(-dpi.f12, -dpi.f3, dpi.f16, dpi.f3);
     QResizeEvent *rev = (QResizeEvent*)ev;
     QRegion mask(menu->rect());
@@ -1093,12 +1117,10 @@ static void shapeCorners( QWidget *widget, bool forceShadows )
     br = masks.corner[3].boundingRect();
     mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
 #endif
-
 #ifdef Q_WS_X11
     if ( forceShadows ) // kwin/beshadowed needs a little hint to shadow this one nevertheless
         XProperty::setAtom( widget->winId(), XProperty::forceShadows );
 #endif
-
     const int w = widget->width();
     const int h = widget->height();
     QRegion mask(4, 0, w-8, h);
@@ -1110,7 +1132,6 @@ static void shapeCorners( QWidget *widget, bool forceShadows )
     //          mask += QRect(1, h-4, w-2, 2);
     //          mask += QRect(2, h-2, w-4, 1);
     //          mask += QRect(4, h-1, w-8, 1);
-
     widget->setMask(mask);
 }
 
@@ -1177,25 +1198,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
 
             p.end();
             return false;
-        } else
-#if  QT_VERSION < 0x040500 // 4.5 has a CE_ for this =)
-        if (QFrame *frame = qobject_cast<QFrame*>(object))
-        {
-            if ((frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine) &&
-                 frame->isVisible())
-            {
-                QPainter p(frame);
-                Orientation3D o3D = (frame->frameShadow() == QFrame::Sunken) ? Sunken :
-                                    (frame->frameShadow() == QFrame::Raised) ? Raised : Relief;
-                const bool v = frame->frameShape() == QFrame::VLine;
-                shadows.line[v][o3D].render(frame->rect(), &p);
-                p.end();
-                return true;
-            }
-            return false;
-        } else
-#endif
-        if (QTabBar *tabBar = qobject_cast<QTabBar*>(object))
+        }
+        else if (QTabBar *tabBar = qobject_cast<QTabBar*>(object))
         {
             if (tabBar->testAttribute(Qt::WA_NoSystemBackground))
                 return false; // shall be translucent
@@ -1305,31 +1309,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
             p.end();
             return true; // sic! we paint
         }
-#if 0 // TODO this _should_ work, but does not - <strike>i HATE plasma!</strike> actually amaroks palettehandler fault, sorry :-)
-        else if (appType == Amarok && object->inherits("Context::ContextView"))
-        {
-            QPalette pal = qApp->palette();
-            QPalette pal2 = pal;
-            pal2.setColor( QPalette::Highlight, pal.color(QPalette::Active, QPalette::Window) );
-            pal2.setColor( QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::WindowText) );
-            pal2.setColor( QPalette::Base, pal.color(QPalette::Active, QPalette::Window) );
-            pal2.setColor( QPalette::Text, pal.color(QPalette::Active, QPalette::WindowText) );
-
-            qApp->installEventFilter(&eventKiller);
-            qApp->setPalette(pal2);
-            qApp->removeEventFilter(&eventKiller);
-
-            object->removeEventFilter(this);
-            QCoreApplication::sendEvent(object, ev);
-            object->installEventFilter(this);
-
-            qApp->installEventFilter(&eventKiller);
-            qApp->setPalette(pal);
-            qApp->removeEventFilter(&eventKiller);
-
-            return true;
-        }
-#endif
         return false;
 
     case QEvent::Enter:
@@ -1369,12 +1348,15 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (!widget)
             return false;
 
+        //BEGIN SHAPE CORNERS ======================================
         bool isDock = false;
-        if ( ( widget->isWindow() && config.beshadowed && config.menu.round &&
-             (widget->windowType() == Qt::ToolTip || qobject_cast<QMenu*>(widget) || (isDock = qobject_cast<QDockWidget*>(widget)) ) ) ||
+        if ( ( widget->isWindow() && !serverSupportsShadows() && config.menu.round &&
+             ((widget->windowType() == Qt::ToolTip && widget->inherits("QTipLabel")) || qobject_cast<QMenu*>(widget) ||
+             (isDock = qobject_cast<QDockWidget*>(widget)) ) ) ||
              ( Hacks::config.extendDolphinViews && widget->inherits("DolphinViewContainer") ) )
             shapeCorners( widget, isDock );
 
+        //BEGIN BLURRING REGIONS ======================================
         if ( config.bg.blur &&
             (widget->isWindow() || widget->autoFillBackground() ||
             (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
@@ -1392,6 +1374,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 return false;
         }
 
+        //BEGIN UNO TOOLBAR RESIZE ======================================
         if ( config.UNO.used && re->size().height() != re->oldSize().height() )
         if ( QMainWindow *mwin = qobject_cast<QMainWindow*>(object->parent()) )
         if ( (config.UNO.toolbar && qobject_cast<QToolBar*>(object) && mwin->toolBarArea(static_cast<QToolBar*>(object)) == Qt::TopToolBarArea)
@@ -1519,7 +1502,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             // seems to be necessary, somehow KToolBar context menus manages to take QPalette::Window...?!
             // through title setting?!
-            Bespin::Shadows::set(menu->winId(), Bespin::Shadows::Small);
             menu->setBackgroundRole ( config.menu.std_role[Bg] );
             menu->setForegroundRole ( config.menu.std_role[Fg] );
             if (menu->parentWidget() && menu->parentWidget()->inherits("QMdiSubWindow"))
@@ -1529,7 +1511,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 pt = menu->parentWidget()->mapToGlobal(pt);
                 menu->move(pt);
             }
-
 #if 0
             if ( QMenuBar *bar = bar4popup(menu) )
             {
@@ -1539,20 +1520,19 @@ Style::eventFilter( QObject *object, QEvent *ev )
                 menu->setActiveAction(menu->actions().at(0));
             }
 #else
-                menu->move(menu->pos()-QPoint(0,F(2)));
+            menu->move(menu->pos()-QPoint(0,F(2)));
 #endif
             return false;
         }
-        else {
-            if ( widget->isWindow() ) {
-            if ( qobject_cast<QDockWidget*>(widget) || widget->inherits("QTipLabel") /*widget->windowType() == Qt::ToolTip -- too aggressive, hit plasma tips as well*/ )
+        else if ( qobject_cast<QDockWidget*>(widget) )
+        {
+            if ( widget->isWindow() )
             {
-                if (config.beshadowed && config.menu.round)
+                if (config.menu.round && !serverSupportsShadows())
                     shapeCorners(widget, true);
-                Bespin::Shadows::set(widget->winId(), widget->isActiveWindow() ? Bespin::Shadows::Large : Bespin::Shadows::Small );
+                Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small );
             }
-            }
-            else if (config.menu.round && qobject_cast<QDockWidget*>(widget))
+            else if (config.menu.round && !serverSupportsShadows())
                 widget->clearMask();
         }
 
