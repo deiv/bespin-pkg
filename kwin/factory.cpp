@@ -85,6 +85,11 @@ Factory::Factory() : QObject(), KDecorationFactory()
 {
     weAreCompiz = QCoreApplication::applicationName() != "kwin";
     readConfig();
+    // get rid of old stuff - kwin sometimes crashes on --replace
+    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[0]);
+    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[1]);
+    Shadows::cleanUp();
+    //-------------
     Gradients::init();
 
     mask = QPixmap(13,13);
