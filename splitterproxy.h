@@ -85,9 +85,11 @@ protected:
             if (e->type() == QEvent::MouseButtonPress)
                 grabMouse();
 
-            parentWidget()->setUpdatesEnabled(false);
+            if (parentWidget())
+                parentWidget()->setUpdatesEnabled(false);
             resize(1,1);
-            parentWidget()->setUpdatesEnabled(true);
+            if (parentWidget())
+                parentWidget()->setUpdatesEnabled(true);
 
             QMouseEvent *me = static_cast<QMouseEvent*>(e);
             const QPoint pos = (e->type() == QEvent::MouseMove) ? mySplitter->mapFromGlobal(QCursor::pos()) : myHook;
