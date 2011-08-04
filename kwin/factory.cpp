@@ -92,7 +92,7 @@ Factory::Factory() : QObject(), KDecorationFactory()
     //-------------
     Gradients::init();
 
-    mask = QPixmap(13,13);
+    mask = QPixmap(17,17);
     mask.fill(Qt::transparent);
     QPainter p(&mask);
     p.setPen(Qt::NoPen); p.setBrush(Qt::black);
