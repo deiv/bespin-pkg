@@ -54,7 +54,7 @@ client(parent), state(0), multiIdx(0), hoverTimer(0), hoverLevel(0)
 
     myType = type;
     
-    if ( iAmScrollable = ( myType == Multi ) )
+    if ( (iAmScrollable = ( myType == Multi )) )
     {
         myType = Factory::multiButtons().at(0);
         connect(client, SIGNAL(keepAboveChanged(bool)), SLOT(clientStateChanged(bool)));
@@ -223,11 +223,10 @@ Button::mousePressEvent ( QMouseEvent * event )
 }
 
 void
-Button::mouseReleaseEvent ( QMouseEvent * event )
+Button::mouseReleaseEvent ( QMouseEvent *event )
 {
     state &= ~Sunken;
-    const bool under_mouse = Factory::isCompiz() ? underMouse() :
-                             QRect(mapToGlobal(QPoint(0,0)), size()).contains(QCursor::pos());
+    const bool under_mouse = Factory::isCompiz() ? underMouse() : rect().contains(event->pos());
     if (!(isEnabled() && under_mouse))
     {
         repaint();
