@@ -1118,10 +1118,18 @@ static void shapeCorners( QWidget *widget, bool forceShadows )
     br = masks.corner[3].boundingRect();
     mask -= masks.corner[3].translated(menu->width()-br.width(), menu->height()-br.height()); // br
 #endif
+
 #ifdef Q_WS_X11
     if ( forceShadows ) // kwin/beshadowed needs a little hint to shadow this one nevertheless
         XProperty::setAtom( widget->winId(), XProperty::forceShadows );
 #endif
+
+    if (FX::compositingActive() && Bespin::Style::serverSupportsShadows())
+    {
+        widget->clearMask();
+        return;
+    }
+
     const int w = widget->width();
     const int h = widget->height();
     QRegion mask(4, 0, w-8, h);
@@ -1351,7 +1359,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 
         //BEGIN SHAPE CORNERS ======================================
         bool isDock = false;
-        if ( ( widget->isWindow() && !serverSupportsShadows() && config.menu.round &&
+        if ( ( widget->isWindow() && config.menu.round &&
              ((widget->windowType() == Qt::ToolTip && widget->inherits("QTipLabel")) || qobject_cast<QMenu*>(widget) ||
              (isDock = qobject_cast<QDockWidget*>(widget)) ) ) ||
              ( Hacks::config.extendDolphinViews && widget->inherits("DolphinViewContainer") ) )
@@ -1522,6 +1530,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
 #else
             menu->move(menu->pos()-QPoint(0,F(2)));
+            shapeCorners( widget, false );
 #endif
             return false;
         }
@@ -1529,8 +1538,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
         {
             if ( widget->isWindow() )
             {
-                if (config.menu.round && !serverSupportsShadows())
-                    shapeCorners(widget, true);
+                if (config.menu.round)
+                    shapeCorners( widget, true );
                 Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small );
             }
             else if (config.menu.round && !serverSupportsShadows())

@@ -133,6 +133,8 @@ public:
     static void drawArrow(Navi::Direction, const QRect&, QPainter*, const QWidget *w = 0);
     static void drawSolidArrow(Navi::Direction, const QRect&, QPainter*, const QWidget *w = 0);
 
+    static bool serverSupportsShadows();
+
 protected:
     virtual void init(const QSettings *settings = 0L);
 
@@ -289,7 +291,6 @@ private:
     void readSettings(const QSettings *settings = 0L, QString appName = QString());
     void registerRoutines();
     void setupDecoFor(QWidget *w, const QPalette &pal, int mode, const Gradients::Type (&gt)[2]);
-    static bool serverSupportsShadows();
     void updateUno(QToolBar *, bool *gotTitle = 0);
 private:
     typedef struct
