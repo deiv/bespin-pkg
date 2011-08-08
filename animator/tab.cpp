@@ -117,6 +117,8 @@ dumpBackground(QWidget *target, const QRect &r, const QStyle *style, bool _32bit
 }
 
 
+#define WORKAROUND_SCROLLAREAS 0
+
 // QPixmap::grabWidget(.) currently fails on the background offset,
 // so we use our own implementation
 static void
@@ -148,8 +150,10 @@ grabWidget(QWidget * root, QPixmap &pix)
     QCoreApplication::sendEvent(root, &e);
     QPainter::restoreRedirected(root);
 
+#if WORKAROUND_SCROLLAREAS
     bool hasScrollAreas = false;
     QAbstractScrollArea *scrollarea = 0;
+#endif
     QPainter p; QRegion rgn;
     QPixmap *saPix = 0L;
 
@@ -175,6 +179,7 @@ grabWidget(QWidget * root, QPixmap &pix)
             }
 
             // scrollarea workaround
+#if WORKAROUND_SCROLLAREAS
             if ((scrollarea = qobject_cast<QAbstractScrollArea*>(w)))
                 hasScrollAreas = true;
 
@@ -217,11 +222,9 @@ grabWidget(QWidget * root, QPixmap &pix)
                     p.end();
                 }
             }
-            // default painting redirection
             else
-            {
-//                 if (w->objectName().contains("viewport"))
-//                     qDebug() << "BESPIN" << w << w->rect();
+#endif //WORKAROUND_SCROLLAREAS
+            {   // default painting redirection
                 w->render(&pix, w->mapTo(root, zero), w->rect(), 0);
             }
         }
@@ -364,6 +367,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
         clock.start();
         tabPix[0] = tabPix[1];
         grabWidget(ow, tabPix[0]);
+//         tabPix[0] = QPixmap::grabWidget(ow);
         tabPix[2] = tabPix[0];
         AVOID(TOO_SLOW);
     }
@@ -374,6 +378,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
     }
 
     grabWidget(cw, tabPix[1]);
+//     tabPix[1] = QPixmap::grabWidget(cw);
     AVOID(TOO_SLOW);
 
     duration = _duration - clock.elapsed() + _timeStep;
