@@ -92,7 +92,7 @@ protected:
                 parentWidget()->setUpdatesEnabled(true);
 
             QMouseEvent *me = static_cast<QMouseEvent*>(e);
-            const QPoint pos = (e->type() == QEvent::MouseMove) ? mySplitter->mapFromGlobal(QCursor::pos()) : myHook;
+            const QPoint pos = (e->type() == QEvent::MouseButtonPress) ? myHook : mySplitter->mapFromGlobal(QCursor::pos());
             QMouseEvent me2(me->type(), pos, mySplitter->mapToGlobal(pos), me->button(), me->buttons(), me->modifiers());
             QCoreApplication::sendEvent(mySplitter, &me2);
 
