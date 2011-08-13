@@ -44,6 +44,7 @@ BLIB_EXPORT Atom XProperty::kwinShadow = XInternAtom( QX11Info::display(), "_KDE
 BLIB_EXPORT Atom XProperty::bespinShadow[2] = { XInternAtom( QX11Info::display(), "BESPIN_SHADOW_SMALL", False ),
                                                 XInternAtom( QX11Info::display(), "BESPIN_SHADOW_LARGE", False ) };
 BLIB_EXPORT Atom XProperty::netSupported = XInternAtom( QX11Info::display(), "_NET_SUPPORTED", False );
+BLIB_EXPORT Atom XProperty::blockCompositing = XInternAtom( QX11Info::display(), "_KDE_NET_WM_BLOCK_COMPOSITING", False );
 
 void
 XProperty::setAtom(WId window, Atom atom)

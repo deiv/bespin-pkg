@@ -53,7 +53,9 @@ class BLIB_EXPORT XProperty
 {
 public:
     enum Type { LONG = 1, BYTE = 8, WORD = 16, ATOM = 32 };
-    static Atom winData, bgPics, decoDim, pid, blurRegion, forceShadows, kwinShadow, bespinShadow[2], netSupported;
+    static Atom winData, bgPics, decoDim, pid, blurRegion,
+                forceShadows, kwinShadow, bespinShadow[2],
+                netSupported, blockCompositing;
 
     template <typename T> inline static T *get(WId window, Atom atom, Type type, unsigned long *n = 0)
     {

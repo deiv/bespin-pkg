@@ -31,6 +31,7 @@
 #include <QPainter>
 #include "bepointer.h"
 #include <QScrollBar>
+#include <QWindowStateChangeEvent>
 #include <QStatusBar>
 #include <QStyle>
 #include <QStyleOption>
@@ -58,6 +59,7 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 #include <QtDebug>
 #include "blib/colors.h"
 #include "blib/gradients.h"
+#include "blib/xproperty.h"
 #include "hacks.h"
 
 using namespace Bespin;
@@ -70,6 +72,7 @@ static Hacks *bespinHacks = 0L;
 static Hacks::HackAppType *appType = 0L;
 // const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
 // const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
+const char *VLCVideoWidget = "BackgroundWidget"; // "VideoWidget"; //
 static BePointer<QWidget> dragCandidate = 0L;
 static BePointer<QWidget> dragWidget = 0L;
 static bool dragWidgetHadTrack = false;
@@ -241,6 +244,8 @@ isWindowDragWidget(QObject *o, const QPoint *pt = 0L)
         // now catched by QMainWindow
 //          ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
 //          ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
+        // whatever the videowidget is, VLC does not work since it apparently does not get polished...
+//         ((*appType == Hacks::VLC) && o->inherits(VLCVideoWidget)) ||
 
             (o->inherits("QMainWindow") ) )
         return true;
@@ -420,6 +425,20 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         return false;
     }
 
+    if (e->type() == QEvent::WindowStateChange)
+    {
+        if (config.suspendFullscreenPlayers)
+        if (*appType == SMPlayer || *appType == VLC || *appType == Dragon)
+        if (QWidget *w = qobject_cast<QWidget*>(o))
+        if (w->isWindow())
+        {
+            if (w->windowState() & Qt::WindowFullScreen)
+                XProperty::setAtom( w->winId(), XProperty::blockCompositing );
+            else if (static_cast<QWindowStateChangeEvent*>(e)->oldState() & Qt::WindowFullScreen)
+                XProperty::remove(w->winId(), XProperty::blockCompositing);
+        }
+    }
+
     if (e->type() == QEvent::Show)
     {
         FILTER_EVENTS(o);
@@ -457,13 +476,25 @@ Hacks::add(QWidget *w)
             *appType = KDM;
         else if (QCoreApplication::applicationName() == "gwenview")
             *appType = Gwenview;
-//         else if (QCoreApplication::applicationName() == "dragonplayer")
-//             *appType = Dragon;
-//         else if (!QCoreApplication::arguments().isEmpty() &&
-//                  QCoreApplication::arguments().at(0).endsWith("smplayer"))
-//             *appType = SMPlayer;
+        else if (QCoreApplication::applicationName() == "dragonplayer")
+            *appType = Dragon;
+        else if (!QCoreApplication::arguments().isEmpty() &&
+                 QCoreApplication::arguments().at(0).endsWith("smplayer"))
+            *appType = SMPlayer;
+        else if (!QCoreApplication::arguments().isEmpty() &&
+            QCoreApplication::arguments().at(0).endsWith("vlc"))
+            *appType = VLC;
     }
-    
+
+    if (config.suspendFullscreenPlayers)
+    if (*appType == SMPlayer || *appType == VLC || *appType == Dragon)
+    if (w->isWindow())
+    {
+        ENSURE_INSTANCE;
+        w->removeEventFilter(bespinHacks); // just to be sure
+        w->installEventFilter(bespinHacks);
+    }
+
     if (config.messages && qobject_cast<QMessageBox*>(w))
     {
         ENSURE_INSTANCE;
