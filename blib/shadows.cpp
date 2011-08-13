@@ -1,4 +1,22 @@
+/* Bespin widget style for Qt4
+   Copyright (C) 2011 Thomas Luebking <thomas.luebking@web.de>
 
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License version 2 as published by the Free Software Foundation.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this library; see the file COPYING.LIB.  If not, write to
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.
+ */
+
+#include <QEvent>
 #include <QImage>
 #include <QPainter>
 #include <QPixmap>
@@ -13,9 +31,27 @@
 
 using namespace Bespin;
 
+#ifdef Q_WS_X11
+class ShadowManager : public QObject {
+public:
+    ShadowManager() : QObject() {}
+protected:
+    bool eventFilter(QObject *o, QEvent *e)
+    {
+        if (e->type() == QEvent::Show)
+        if (QWidget *w = qobject_cast<QWidget*>(o))
+        if (w->isWindow() && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId())
+            Shadows::set(w->winId(), Shadows::Small);
+        return false;
+    }
+};
+
+static ShadowManager *shadowManager = 0;
+
 
 static QPixmap (*pixmaps[2])[8] = {0,0};
 static unsigned long globalShadowData[2][12];
+#endif
 
 static QPixmap nativePixmap(const QPixmap &qtPix)
 {
@@ -120,10 +156,11 @@ shadowData(Shadows::Type t, bool storeToRoot)
 #endif
 }
 
-BLIB_EXPORT void
+void
 Shadows::cleanUp()
 {
 #ifdef Q_WS_X11
+    delete shadowManager; shadowManager = 0;
     for (int i = 0; i < 2; ++i)
     {
         if (pixmaps[i])
@@ -140,7 +177,18 @@ Shadows::cleanUp()
 #endif
 }
 
-BLIB_EXPORT void
+void
+Shadows::manage(QWidget *w)
+{
+#ifdef Q_WS_X11
+    if (!shadowManager)
+        shadowManager = new ShadowManager;
+    w->removeEventFilter(shadowManager);
+    w->installEventFilter(shadowManager);
+#endif
+}
+
+void
 Shadows::set(WId id, Shadows::Type t, bool storeToRoot)
 {
 #ifdef Q_WS_X11

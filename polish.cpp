@@ -365,7 +365,7 @@ Style::polish( QWidget * widget )
     {
 //         QPalette pal = widget->palette();
         /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
-        /// also doesn't work bgs get transparent and applying this to everythign causes funny sideeffects...
+        /// also doesn't work bgs get transparent and applying this to everything causes funny sideeffects...
         if ( widget->windowType() == Qt::ToolTip)
         {
             if (widget->inherits("QTipLabel"))
@@ -375,15 +375,15 @@ Style::polish( QWidget * widget )
                 if ( !widget->testAttribute(Qt::WA_TranslucentBackground) && config.menu.round && FX::compositingActive() )
                     widget->setAttribute(Qt::WA_TranslucentBackground);
                 widget->setProperty("BespinWindowHints", Shadowed|(config.menu.round?Rounded:0));
-                Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small);
+                Bespin::Shadows::manage(widget);
             }
         }
         else if ( widget->windowType() == Qt::Popup)
         {
             if ( widget->inherits("QComboBoxPrivateContainer") )
-                Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small);
+                Bespin::Shadows::manage(widget);
         }
-        else if (widget->testAttribute(Qt::WA_X11NetWmWindowTypeDND) && FX::compositingActive())
+        else if ( widget->testAttribute(Qt::WA_X11NetWmWindowTypeDND) && FX::compositingActive() )
         {
             widget->setAttribute(Qt::WA_TranslucentBackground);
             widget->clearMask();
@@ -493,10 +493,10 @@ Style::polish( QWidget * widget )
                 menu->setAttribute(Qt::WA_StyledBackground);
             }
             else
-                widget->setAttribute(Qt::WA_MacBrushedMetal, false);
+                menu->setAttribute(Qt::WA_MacBrushedMetal, false);
             // opacity
 #if BESPIN_ARGB_WINDOWS
-            if ( !widget->testAttribute(Qt::WA_TranslucentBackground) &&
+            if ( !menu->testAttribute(Qt::WA_TranslucentBackground) &&
                 (config.menu.opacity != 0xff || (config.menu.round && FX::compositingActive())) )
             {
                 menu->setAttribute(Qt::WA_TranslucentBackground);
@@ -516,7 +516,7 @@ Style::polish( QWidget * widget )
                 menu->setWindowFlags( menu->windowFlags()|Qt::Popup);
 
             menu->setProperty("BespinWindowHints", Shadowed|(config.menu.round?Rounded:0));
-            Bespin::Shadows::set(menu->winId(), Bespin::Shadows::Small);
+            Bespin::Shadows::manage(menu);
 
             // eventfiltering to reposition MDI windows, shaping, shadows, paint ARGB bg and correct distance to menubars
             FILTER_EVENTS(menu);
@@ -536,10 +536,10 @@ Style::polish( QWidget * widget )
         /// WORKAROUND Qt color bug, uses daddies palette and FGrole, but TooltipBase as background
         else if (widget->inherits("QWhatsThat"))
         {
-            FILTER_EVENTS(widget); // IT - LOOKS - SHIT - !
+//             FILTER_EVENTS(widget); // IT - LOOKS - SHIT - !
             widget->setPalette(QToolTip::palette()); // so this is Qt bug WORKAROUND
-            widget->setProperty("BespinWindowHints", Shadowed);
-            Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small);
+//             widget->setProperty("BespinWindowHints", Shadowed);
+//             Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small);
         }
         else
         {
@@ -931,7 +931,8 @@ Style::polish( QWidget * widget )
         dock->setContentsMargins(F(4),F(4),F(4),F(4));
         widget->setAttribute(Qt::WA_Hover);
         if ( config.menu.round )
-            FILTER_EVENTS(widget); // shape
+            FILTER_EVENTS(dock); // shape
+        Bespin::Shadows::manage(dock);
         if ( config.bg.docks.invert && dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable) )
         {
             QPalette pal = dock->palette();
@@ -1113,7 +1114,7 @@ Style::unpolish( QWidget *widget )
     if (!widget)
         return;
 
-    if (widget->isWindow())
+    if (widget->isWindow() && widget->testAttribute(Qt::WA_WState_Created) && widget->internalWinId())
     {
 //         if (config.bg.opacity != 0xff)
 //         {

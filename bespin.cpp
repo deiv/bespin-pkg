@@ -1540,7 +1540,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
             {
                 if (config.menu.round)
                     shapeCorners( widget, true );
-                Bespin::Shadows::set(widget->winId(), Bespin::Shadows::Small );
             }
             else if (config.menu.round && !serverSupportsShadows())
                 widget->clearMask();

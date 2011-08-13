@@ -269,7 +269,7 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     const BgSet &set = Gradients::bgSet(c);
     QRect rect = widget->rect();
 #ifndef QT_NO_XRENDER
-    uint *decoDimP = XProperty::get<uint>(widget->winId(), XProperty::decoDim, XProperty::LONG);
+    uint *decoDimP = (widget->testAttribute(Qt::WA_WState_Created) && widget->internalWinId()) ? XProperty::get<uint>(widget->winId(), XProperty::decoDim, XProperty::LONG) : 0;
     if (decoDimP)
     {
         uint decoDim = *decoDimP;
