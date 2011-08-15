@@ -368,7 +368,7 @@ Style::polish( QWidget * widget )
         /// also doesn't work bgs get transparent and applying this to everything causes funny sideeffects...
         if ( widget->windowType() == Qt::ToolTip)
         {
-            if (widget->inherits("QTipLabel"))
+            if (widget->inherits("QTipLabel") || widget->inherits("KToolTipWindow"))
             {
                 if (config.menu.round && !serverSupportsShadows())
                     FILTER_EVENTS(widget)
