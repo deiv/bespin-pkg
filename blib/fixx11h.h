@@ -28,6 +28,9 @@
 
 */
 
+#ifndef BESPIN_FIX_X_H
+#define BESPIN_FIX_X_H
+
 namespace X
 {
 
@@ -231,3 +234,5 @@ char* rindex( const char* s, int c )
 }
 
 using namespace X;
+
+#endif // BESPIN_FIX_X_H
