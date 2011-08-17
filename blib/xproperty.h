@@ -27,12 +27,15 @@
 #ifndef XPROPERTY_H
 #define XPROPERTY_H
 
-#include <QWidget>
-#include <QtDebug>
+//#include <QWidget>
+//#include <QtDebug>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrender.h>
 #include "fixx11h.h"
+
+#include <QWidget>
+#include <QtDebug>
 
 namespace Bespin {
 

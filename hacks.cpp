@@ -46,12 +46,11 @@
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>
 
-#include "blib/xproperty.h"
-
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <QX11Info>
-#include "blib/fixx11h.h"
+//#include "blib/fixx11h.h"
+#include "blib/xproperty.h"
 
 
 #include <cmath>
@@ -62,6 +61,7 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 #include <QtDebug>
 #include "blib/colors.h"
 #include "blib/gradients.h"
+//#include "blib/xproperty.h"
 #include "hacks.h"
 
 using namespace Bespin;
