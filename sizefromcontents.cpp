@@ -105,6 +105,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
                 hgt += ((config.btn.fullHover) ? F(4) : F(6)) - config.fontExtent;
                 d = F(16);
             }
+            hgt += hgt%2;
 //             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
 //                 hgt += F(2);
             return QSize(contentsSize.width() + d + ( int)(hgt/1.1), qMax(config.btn.minHeight, hgt));
@@ -189,10 +190,12 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
                 if (!config.btn.fullHover)
                     h += F(4);
                 h += contentsSize.height();
+                if (!(h%2))
+                    ++h;
 
                 if (!btn->icon.isNull())
                     { w += F(10); h += F(2); }
-                    
+
                 if (config.btn.round)
                     { w += F(8); /*h -= F(2);*/ }
 
