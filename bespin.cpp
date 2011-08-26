@@ -1052,7 +1052,7 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
             continue;
         QWidget *w = static_cast<QWidget*>(o);
         if ( w->isVisible() &&
-            (w->autoFillBackground() || (w->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(w))) )
+            ((w->autoFillBackground() && w->palette().color(w->backgroundRole()).alpha() > 160) || (w->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(w))) )
         {
             QPoint offset = w->mapTo(window, QPoint(0,0));
             if (w->mask().isEmpty())

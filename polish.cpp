@@ -702,6 +702,10 @@ Style::polish( QWidget * widget )
             else if (appType == Amarok && widget->inherits("Context::ContextView"))
                 FILTER_EVENTS(widget);
 #endif
+            // Dolphin Information panel still (again?) does this
+            // *sigh* - this cannot be true. this CANNOT be true. this CAN NOT BE TRUE!
+            if (area->viewport() && area->viewport()->autoFillBackground() && !area->viewport()->palette().color(area->viewport()->backgroundRole()).alpha() )
+                area->viewport()->setAutoFillBackground(false);
         }
 
         /// Tab Transition animation,
