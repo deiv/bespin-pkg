@@ -621,6 +621,8 @@ Style::polish( QWidget * widget )
             Animator::Hover::manage(frame);
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
+                if (widget->inherits("KCompletionBox"))
+                    Bespin::Shadows::manage(widget);
                 if ( Hacks::config.extendDolphinViews && itemView->parentWidget() &&
                      QString(itemView->metaObject()->className()).startsWith("Dolphin") )
                 {
