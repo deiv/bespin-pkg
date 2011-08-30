@@ -652,6 +652,7 @@ Style::polish( QWidget * widget )
                         grampa->setContentsMargins(l,t,r,qMax(b,F(3)));
                     }
                 }
+
                 if (QWidget *vp = itemView->viewport())
                 {
                     if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 128)
@@ -663,6 +664,7 @@ Style::polish( QWidget * widget )
                     }
                     else if (vp->backgroundRole() == QPalette::Window || vp->palette().color(vp->backgroundRole()) == itemView->palette().color(itemView->backgroundRole()))
                         fixViewPalette(itemView, 2, false);
+                    vp->setAttribute(Qt::WA_Hover);
                 }
                 if (appType == Amarok) // fix the palette anyway. amarok tries to reset it's slooww transparent one... gnagnagna
                     FILTER_EVENTS(itemView);
@@ -670,15 +672,12 @@ Style::polish( QWidget * widget )
                 if (itemView->inherits("KCategorizedView")) // fix scrolldistance...
                     FILTER_EVENTS(itemView);
 
-#if QT_VERSION >= 0x040500
-                itemView->viewport()->setAttribute(Qt::WA_Hover);
-#endif
                 if ( QTreeView* tv = qobject_cast<QTreeView*>(itemView) )
                 {   // allow all treeviews to be animated! NOTICE: animation causes visual errors on non autofilling views...
-                    if (Hacks::config.treeViews &&
+                    if (Hacks::config.treeViews && tv->viewport() &&
                         tv->viewport()->autoFillBackground() &&
                         tv->viewport()->palette().color(tv->viewport()->backgroundRole()).alpha() > 200) // 255 would be perfect, though
-                    tv->setAnimated(true);
+                        tv->setAnimated(true);
 //                     KMail::MainFolderView(0xa16fd68, name = )
                     if ( Hacks::config.fixKMailFolderList && tv->objectName() == "folderTree" )
                     {
@@ -687,15 +686,12 @@ Style::polish( QWidget * widget )
                         tv->setRootIsDecorated ( false );
                         tv->sortByColumn ( 0, Qt::AscendingOrder );
                         tv->setIconSize( QSize(22,22) );
-                        tv->header()->setResizeMode( QHeaderView::Stretch );
+                        if (tv->header())
+                            tv->header()->setResizeMode( QHeaderView::Stretch );
                     }
                 }
-                else
-                {   // Enable hover effects in listview, treeview hovering sucks, as the "tree" doesn't get an update
-                    itemView->viewport()->setAttribute(Qt::WA_Hover);
-                    if (widget->inherits("QHeaderView"))
-                        widget->setAttribute(Qt::WA_Hover);
-                }
+                else if (widget->inherits("QHeaderView"))
+                    widget->setAttribute(Qt::WA_Hover);
             }
             // just <strike>broadsword</strike> gladius here - the stupid viewport should use the mouse...
             else  if (appType != Dolphin && area && area->viewport())
@@ -706,10 +702,9 @@ Style::polish( QWidget * widget )
 #endif
             // Dolphin Information panel still (again?) does this
             // *sigh* - this cannot be true. this CANNOT be true. this CAN NOT BE TRUE!
-            if (area->viewport() && area->viewport()->autoFillBackground() && !area->viewport()->palette().color(area->viewport()->backgroundRole()).alpha() )
+            if (area && area->viewport() && area->viewport()->autoFillBackground() && !area->viewport()->palette().color(area->viewport()->backgroundRole()).alpha() )
                 area->viewport()->setAutoFillBackground(false);
         }
-
         /// Tab Transition animation,
         if (widget->inherits("QStackedWidget"))
             // NOTICE do NOT(!) apply this on tabs explicitly, as they contain a stack!
