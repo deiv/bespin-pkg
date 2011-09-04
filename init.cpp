@@ -445,9 +445,6 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.progress.__role[Fg] = (QPalette::ColorRole) readInt(PROGRESS_ROLE_FG);
 
     // ScrollStuff ===========================
-    GRAD(scroll) = readGrad(SCROLL_GRADIENT);
-    config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
-    config.scroll.fullHover = config.btn.backLightHover || readBool(SCROLL_FULLHOVER);
     config.scroll.groove = (Groove::Mode) readInt(SCROLL_GROOVE);
     config.scroll.sliderWidth = readInt(SCROLL_SLIDER_WIDTH);
     if (config.scroll.sliderWidth > 33)
@@ -455,9 +452,22 @@ Style::readSettings(const QSettings* settings, QString appName)
     else if ( config.scroll.sliderWidth < 6 + 2*(config.scroll.groove < Groove::Sunken) )
         config.scroll.sliderWidth = 6 + 2*(config.scroll.groove < Groove::Sunken);
     config.scroll.invertBg = readBool(SCROLL_INVERT_BG);
-    // this MUST happen after reading the button role, which it will default to!
-    config.scroll.__role[Bg] = (QPalette::ColorRole) readInt(SCROLL_ROLE);
-    config.scroll.__role[Fg] = (QPalette::ColorRole) readInt(SCROLL_ACTIVEROLE);
+    if (config.scroll.groove == Groove::None)
+    {
+        GRAD(scroll) = Gradients::None;
+        config.scroll.showButtons = false;
+        config.scroll.fullHover = true;
+        config.scroll.__role[Bg] = QPalette::Window;
+        config.scroll.__role[Fg] = QPalette::WindowText;
+    }
+    else
+    {   // this MUST happen after reading the button role, which it will default to!
+        GRAD(scroll) = readGrad(SCROLL_GRADIENT);
+        config.scroll.showButtons = readBool(SCROLL_SHOWBUTTONS);
+        config.scroll.fullHover = config.btn.backLightHover || readBool(SCROLL_FULLHOVER);
+        config.scroll.__role[Bg] = (QPalette::ColorRole) readInt(SCROLL_ROLE);
+        config.scroll.__role[Fg] = (QPalette::ColorRole) readInt(SCROLL_ACTIVEROLE);
+    }
 //     config.scroll.std_role[Bg] = config.btn.std_role[Bg];
 //     config.scroll.std_role[Fg] = config.btn.std_role[Fg];
 //     config.scroll.active_role[Bg] = config.btn.active_role[Bg];

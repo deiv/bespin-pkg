@@ -1366,15 +1366,21 @@ Config::handleBgMode(int idx)
     ui.structure->setEnabled(idx == 1);
 }
 
-static const char *grooveModes[4] = {"Line", "Groove", "Inlay", "Sunken"};
+static const char *grooveModes[5] = {"Line", "Groove", "Inlay", "Sunken", "None"};
 
 void
 Config::handleGrooveMode(int v)
 {
-    if (v > 3 || v < 0)
+    if (v > 4 || v < 0)
         ui.grooveLabel->setText("INVALID");
     else
         ui.grooveLabel->setText(grooveModes[v]);
+    
+    ui.showScrollButtons->setDisabled(v == 4);
+    ui.fullScrollHover->setDisabled(v == 4);
+    ui.invertGroove->setDisabled(v == 4);
+    ui.scrollRole->setDisabled(v == 4);
+    ui.scrollActiveRole->setDisabled(v == 4);
 }
 
 void

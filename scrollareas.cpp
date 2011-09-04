@@ -266,7 +266,9 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
         optCopy.rect = scrollbar->rect;
         optCopy.state = saveFlags;
         optCopy.rect = subControlRect(CC_ScrollBar, &optCopy, SC_ScrollBarSlider, widget);
-        if (grooveIsSunken)
+        if (config.scroll.groove == Groove::None)
+            optCopy.rect.adjust(F(2),F(2),-F(2),-F(2));
+        else if (grooveIsSunken)
             optCopy.rect.adjust(-F(1),-F(1),F(1),0);
 
         if (optCopy.rect.isValid())
@@ -365,6 +367,9 @@ Style::drawScrollBarGroove(const QStyleOption *option, QPainter *painter, const 
         painter->fillRect(r, Colors::mid(FCOLOR(Base), FCOLOR(Text), 10, 1));
         return;
     }
+    
+    if (config.scroll.groove == Groove::None)
+        return;
 
     const Groove::Mode gType = config.scroll.groove;
     const bool round = config.scroll.sliderWidth + (gType > Groove::Groove) > 13;
@@ -456,7 +461,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     // --> we need to paint a slider
 
     // COLOR: the hover indicator (inside area)
-    const bool backLightHover = config.btn.backLightHover && config.scroll.sliderWidth > 9;
+    const bool backLightHover = config.btn.backLightHover && config.scroll.groove != Groove::None && config.scroll.sliderWidth > 9;
 #define SCROLL_COLOR(_X_) \
 (widgetStep ? Colors::mid(  bgC, fgC, (backLightHover ? (Gradients::isReflective(GRAD(scroll)) ? 48 : 72) : 6) - _X_, _X_) : bgC)
 
@@ -493,40 +498,43 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     const bool round = config.scroll.sliderWidth + (config.scroll.groove > Groove::Groove) > 13;
     const bool grooveIsSunken = config.scroll.groove >= Groove::Sunken;
 
-    // draw shadow
-    // clip away innper part of shadow - hey why paint invisible alpha stuff =D   --------
-    bool hadClip = painter->hasClipping();
-    QRegion oldClip;
-    if (hadClip)
-        oldClip = painter->clipRegion();
-    painter->setClipping(true);
-    if (horizontal)
-        painter->setClipRegion(QRegion(RECT) - r.adjusted(F(9), F(3), -F(9), -F(3)));
-    else
-        painter->setClipRegion(QRegion(RECT) - r.adjusted(F(3), F(9), -F(3), -F(9)));
-    // --------------
-    if (sunken && !grooveIsSunken)
+    if (config.scroll.groove != Groove::None)
     {
-        r.adjust(f1, f1, -f1, -f1);
-        shadows.raised[round][true][true].render(r, painter);
-        r.adjust(f1, f1, -f1, -f2 );
-    }
-    else
-    {
-        if (!sunken && backLightHover && complexStep)
+        // draw shadow
+        // clip away innper part of shadow - hey why paint invisible alpha stuff =D   --------
+        bool hadClip = painter->hasClipping();
+        QRegion oldClip;
+        if (hadClip)
+            oldClip = painter->clipRegion();
+        painter->setClipping(true);
+        if (horizontal)
+            painter->setClipRegion(QRegion(RECT) - r.adjusted(F(9), F(3), -F(9), -F(3)));
+        else
+            painter->setClipRegion(QRegion(RECT) - r.adjusted(F(3), F(9), -F(3), -F(9)));
+    
+        // --------------
+        if (sunken && !grooveIsSunken)
         {
-            QColor blh = Colors::mid(c, CCOLOR(scroll._, Fg), 6-complexStep, complexStep);
-            lights.rect[round].render(r, painter, blh); // backlight
+            r.adjust(f1, f1, -f1, -f1);
+            shadows.raised[round][true][true].render(r, painter);
+            r.adjust(f1, f1, -f1, -f2 );
         }
-        shadows.raised[round][true][true].render(r, painter);
-        r.adjust(f2, f2, -f2, horizontal && grooveIsSunken ? -f2 : -F(3) );
+        else
+        {
+            if (!sunken && backLightHover && complexStep)
+            {
+                QColor blh = Colors::mid(c, CCOLOR(scroll._, Fg), 6-complexStep, complexStep);
+                lights.rect[round].render(r, painter, blh); // backlight
+            }
+            shadows.raised[round][true][true].render(r, painter);
+            r.adjust(f2, f2, -f2, horizontal && grooveIsSunken ? -f2 : -F(3) );
+        }
+        // restore clip---------------
+        if (hadClip)
+            // sic! clippping e.g. in webkit seems to be broken? at least querky with size and pos twisted...
+            painter->setClipRegion(RECT);
+        painter->setClipping(hadClip);
     }
-    // restore clip---------------
-    if (hadClip)
-        // sic! clippping e.g. in webkit seems to be broken? at least querky with size and pos twisted...
-        painter->setClipRegion(RECT);
-    painter->setClipping(hadClip);
-
     // the always shown base
     Qt::Orientation o = Qt::Horizontal;
     QPoint offset;
@@ -544,6 +552,9 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     QColor bc = fullHover ? c : CCOLOR(scroll._, Bg);
     bc.setAlpha(255); // CCOLOR(scroll._, Bg) pot. reintroduces translucency...
     masks.rect[round].render(r, painter, GRAD(scroll), o, bc, size, offset);
+
+    if (config.scroll.groove == Groove::None)
+        return;
 
     // reflexive outline
     if ( GRAD(scroll) == Gradients::Shiny || (!sunken && Gradients::isReflective(GRAD(btn))) )

@@ -26,7 +26,7 @@ enum AppType
 };
 
 namespace Groove {
-enum Mode { Line = 0, Groove, Sunken, SunkenGroove };
+enum Mode { Line = 0, Groove, Sunken, SunkenGroove, None };
 }
 }
 
