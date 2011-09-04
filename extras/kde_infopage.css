@@ -15,10 +15,10 @@ body {
     padding: 8pt;
     padding-top: 0px;
     padding-bottom: 0px;
-    background-color: #F0F0F0;
-    border-left: 20pt solid #4E5052;
-    border-right: 20pt solid #4E5052;
-    border-radius: 80px:
+    background-color: #2D2F30; /*#F0F0F0;*/
+/*     border-left: 20pt solid #2D2F30; */
+/*     border-right: 20pt solid #2D2F30; */
+    border-radius: 0px;
     color: #333333; 
     min-height: 100%;
     left: 0px;
@@ -30,33 +30,31 @@ body {
  */
 
 #box {
+    position:absolute;
     background-color: #FCFDFE;
-    width: 90%;
-    margin-left: 5%;
-    margin-right: 5%;
+    width: 66%;
+    margin-left: 17%;
+    margin-right: 17%;
     margin-top: 10px;
     margin-bottom: 30pt;
-    border: 2px solid #AAAEB2;
+    border: none;
     border-radius: 8px;
+    -khtml-box-shadow: 1px 2px 0px #666;
 }
 
 a, a:visited {
-    color: #222222; 
+    color: #222222;
     text-decoration: none; 
     font-weight: bold;
 }
-a:hover {
+a:hover, a.selected, a:active {
     color: #000000;
     text-shadow: #AAAEB2 0px 0px 6px;
     text-decoration: none;
 }
 
-a.selected, a:active {
-    color: #000000;
-    font-size: 1.2em;
-    text-decoration: none;
-    text-shadow: none;
-}
+#bar a, #bar a:active, #bar a:hover { color: #E3E5E6; }
+#bar a.selected { color: #f0f2f4; font-size: 1.4em; text-shadow: none; }
 
 #subtext {
     font-size: 10pt;
@@ -77,10 +75,10 @@ a.selected, a:active {
 #header, #footer {
     margin-top: 0px;
     position: fixed;
-    background-color: #4E5052;
+    background-color: #2D2F30;
     font: window;
-    color: #EEF0F2;
-    border-top: 4px solid #3B3C3E;
+    color: #f0f2f4;
+/*     border-top: 4px solid #000000; */
     z-index: 100;
 }
 
@@ -125,21 +123,24 @@ a.selected, a:active {
     text-align: left;
     font-size: 64px;
     font-weight: bold;
-/*     color: #f0f2f4; */
-    color: #444648;
-    text-shadow: #FFFFFF 0px 0px 16px;
+    color: #f0f2f4;
+    font-family: sans-serif;
+/*     color: #444648; */
+    text-shadow: #E3E5E6 0px 0px 16px;
     z-index: 105;
 }
 
 #tagline {
     position: absolute;
-    top: 86px;
+    font-family: sans-serif;
+    top: 0px;
     left: 0px;
+/*     width:30%; */
     margin-left: 30pt;
-    text-align: right;
+/*     text-align: right; */
     font-size: 20px;
     font-weight: bold;
-    color: #9EA0A2;
+    color: #5A5E60;
     z-index: 105;
 }
 
