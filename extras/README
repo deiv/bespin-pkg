@@ -2,6 +2,14 @@
 BESPIN EXTRAS 
 =================
 
+k3b
+====
+Well, a k3b theme - mostly dark, not really comple so far.
+
+INSTALLATION:
+-------------
+copy the folder to ~/.kde/share/apps/k3b/pics/bespin (ie. rename "k3b" to "bespin" - k3b is a little generic for that purpose ;-)
+
 kde_infopage.css
 =================
 Controls the "about:" look in konqueror, kmail and some other apps
