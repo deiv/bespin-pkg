@@ -392,36 +392,79 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         return wmDrag;
     }
 
-    if ( *appType == Gwenview &&
-         ( e->type() == QEvent::Wheel || e->type() == QEvent::Show || e->type() == QEvent::Hide ) &&
-         o->objectName() == "qt_scrollarea_viewport" )
+    if ( *appType == Gwenview && config.fixGwenview )
     {
-        if ( QAbstractScrollArea *list = qobject_cast<QAbstractScrollArea*>(o->parent()) )
+        if ( ( e->type() == QEvent::Wheel || e->type() == QEvent::Show || e->type() == QEvent::Hide ) && o->objectName() == "qt_scrollarea_viewport" )
         {
-            QScrollBar *bar = list->verticalScrollBar();
-            if ( !bar )
-                return false;
-            // Gwenview scrolls three rows at once, what drives me crazy because you loose track on images
-            // and waste time to find yourself back into context.
-            if ( e->type() == QEvent::Wheel )
+            if ( QAbstractScrollArea *list = qobject_cast<QAbstractScrollArea*>(o->parent()) )
             {
-                int step = bar->singleStep();
-                bar->setSingleStep(step/3);
-//                 list->setVerticalScrollMode( QAbstractItemView::ScrollPerPixel );
-                QCoreApplication::sendEvent(bar, e); // tell the scrollbar to do this ;-P
-                bar->setSingleStep(step);
-                return true; // eat it
+                QScrollBar *bar = list->verticalScrollBar();
+                if ( !bar )
+                    return false;
+                // Gwenview scrolls three rows at once, what drives me crazy because you loose track on images
+                // and waste time to find yourself back into context.
+                if ( e->type() == QEvent::Wheel )
+                {
+                    int step = bar->singleStep();
+                    bar->setSingleStep(step/3);
+    //                 list->setVerticalScrollMode( QAbstractItemView::ScrollPerPixel );
+                    QCoreApplication::sendEvent(bar, e); // tell the scrollbar to do this ;-P
+                    bar->setSingleStep(step);
+                    return true; // eat it
+                }
+                // another funny crap is that it scrolls around whenever you start looking a an image
+                // so we save the position and re-set it when the thumbview comes back
+                // i'd  make a bugreport but it's been like this since KDE4 times, this cannot be a bug but
+                // must be stubborness :-(
+                if ( e->type() == QEvent::Hide )
+                    gwenview_position = bar->value();
+                else if ( gwenview_position )
+                {
+                    bar->setValue( gwenview_position );
+                    connect( bar, SIGNAL(valueChanged(int)), this, SLOT(fixGwenviewPosition()) );
+                }
             }
-            // another funny crap is that it scrolls around whenever you start looking a an image
-            // so we save the position and re-set it when the thumbview comes back
-            // i'd  make a bugreport but it's been like this since KDE4 times, this cannot be a bug but
-            // must be stubborness :-(
-            if ( e->type() == QEvent::Hide )
-                gwenview_position = bar->value();
-            else if ( gwenview_position )
+            return false;
+        }
+        // a) abusing stylesheets because we're not able to just set the proper QWidget properties, are we? cpp is sooooo hard
+        // b) if you don''t understand css or basic layering concepts: JUST STAY AWAY, FOOLS
+        // c) yes i know - there's the bottom border. but you've got a frame in a widget in another widget being a frame .... *sigh*
+        if (e->type() == QEvent::StyleChange && o->objectName() == "saveBarWidget" )
+        {
+            QWidget *w = static_cast<QWidget*>(o);
+            if (w->styleSheet().isEmpty())
+                return false;
+
+            w->removeEventFilter(this);
+            w->setStyleSheet(QString());
+            w->installEventFilter(this);
+
+            QPalette pal = QApplication::palette();
+
+            QWidget *window = w->window();
+            if ( window && window->isFullScreen() )
             {
-                bar->setValue( gwenview_position );
-                connect( bar, SIGNAL(valueChanged(int)), this, SLOT(fixGwenviewPosition()) );
+                pal.setColor(QPalette::Window, QColor(48,48,48));
+                pal.setColor(QPalette::WindowText, QColor(224,224,224));
+            }
+            else
+            {
+                pal.setColor(QPalette::Window, pal.color(QPalette::ToolTipBase));
+                pal.setColor(QPalette::WindowText, pal.color(QPalette::ToolTipText));
+            }
+
+            w->setAutoFillBackground(true);
+            w->setBackgroundRole(QPalette::Window);
+            w->setForegroundRole(QPalette::WindowText);
+            w->setPalette(pal);
+
+            QList<QWidget*> kids = w->findChildren<QWidget*>();
+            foreach (QWidget *w2, kids)
+            {
+                w2->setBackgroundRole(QPalette::Window);
+                w2->setForegroundRole(QPalette::WindowText);
+                w2->setAutoFillBackground(false);
+                w2->setPalette(pal); // w2->setPalette(QPalette()); should be sufficient but fails. possibly related to qss abuse...
             }
         }
         return false;
@@ -520,15 +563,22 @@ Hacks::add(QWidget *w)
     }
 
     if ( *appType == Gwenview && config.fixGwenview )
-    if ( QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(w) )
-    if ( area->inherits("Gwenview::ThumbnailView") )
     {
-        ENSURE_INSTANCE;
-        FILTER_EVENTS(area->viewport());
+        if ( QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(w) )
+        if ( area->inherits("Gwenview::ThumbnailView") )
+        {
+            ENSURE_INSTANCE;
+            FILTER_EVENTS(area->viewport());
+        }
+        if (w->objectName() == "saveBarWidget") // they broke it again or never really fixed it. now we fix it. i hope canonical dies soon.
+        {
+            ENSURE_INSTANCE;
+            FILTER_EVENTS(w);
+        }
     }
 
-    if ( w->objectName() == "qt_scrollarea_viewport" )
-    
+//     if ( w->objectName() == "qt_scrollarea_viewport" )
+
     if (config.KHTMLView)
     if (QFrame *frame = qobject_cast<QFrame*>(w))
     if (frame->inherits("KHTMLView"))
