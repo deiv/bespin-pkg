@@ -85,8 +85,11 @@ Style::generatePixmaps()
 
     // fallback ( sunken ) // TODO: raised
     QImage tmp(f9, f9, QImage::Format_ARGB32);
+    tmp.fill(Qt::transparent);
+
     QPainter p;
     p.begin(&tmp);
+
     p.fillRect(F(1),0,f9-F(2),F(1), BLACK(10));
     p.fillRect(F(2),F(1),f9-F(4),F(1), BLACK(20));
     p.fillRect(F(2),F(2),f9-F(4),F(1), BLACK(40));
