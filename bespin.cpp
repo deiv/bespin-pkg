@@ -585,6 +585,8 @@ Style::serverSupportsShadows()
                 _serverSupportsShadows = true;
                 break;
             }
+        if (supported)
+            XFree(supported);
         _lastCheckTime.start();
     }
 #endif
