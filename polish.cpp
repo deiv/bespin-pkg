@@ -366,6 +366,7 @@ Style::polish( QWidget * widget )
 //         QPalette pal = widget->palette();
         /// this is dangerous! e.g. applying to QDesktopWidget leads to infinite recursion...
         /// also doesn't work bgs get transparent and applying this to everything causes funny sideeffects...
+//         qDebug() << widget << widget->windowType();
         if ( widget->windowType() == Qt::ToolTip)
         {
             if (widget->inherits("QTipLabel") || widget->inherits("KToolTipWindow"))
@@ -636,7 +637,7 @@ Style::polish( QWidget * widget )
                         {
                             kid->setBackgroundRole(QPalette::Base);
                             kid->setForegroundRole(QPalette::Text);
-                            if ( kid->inherits("StatusBarMessageLabel") )
+                            if ( kid->inherits("KonqStatusBarMessageLabel") || kid->inherits("StatusBarMessageLabel")) // hey, why not some pointless renames...
                             {   // hardcoded paint colors... bwuahahahaaaa :-(
                                 QPalette pal = kid->palette();
                                 pal.setColor( QPalette::WindowText, pal.color(QPalette::Text) );
@@ -662,7 +663,8 @@ Style::polish( QWidget * widget )
                         const bool alternate = !(appType == Amarok && itemView->inherits("Playlist::PrettyListView"));
                         fixViewPalette(itemView, solid, alternate);
                     }
-                    else if (vp->backgroundRole() == QPalette::Window || vp->palette().color(vp->backgroundRole()) == itemView->palette().color(itemView->backgroundRole()))
+                    else if (itemView->backgroundRole() != QPalette::Base && (vp->backgroundRole() == QPalette::Window ||
+                             vp->palette().color(vp->backgroundRole()) == itemView->palette().color(itemView->backgroundRole())))
                         fixViewPalette(itemView, 2, false);
                     vp->setAttribute(Qt::WA_Hover);
                 }
