@@ -44,6 +44,7 @@
 #include <kwindowsystem.h>
 #include <kdeversion.h>
 #include "../blib/shadows.h"
+#include "../config.defaults"
 // #include "button.h"
 #include "client.h"
 #include "factory.h"
@@ -85,10 +86,6 @@ Factory::Factory() : QObject(), KDecorationFactory()
 {
     weAreCompiz = QCoreApplication::applicationName() != "kwin";
     readConfig();
-    // get rid of old stuff - kwin sometimes crashes on --replace
-    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[0]);
-    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[1]);
-    Shadows::cleanUp();
     //-------------
     Gradients::init();
 
@@ -296,6 +293,12 @@ bool Factory::readConfig()
     
     QSettings settings("Bespin", "Style");
     settings.beginGroup("Deco");
+
+    Shadows::setSize( settings.value(SHADOW_SIZE_INACTIVE).toInt(), settings.value(SHADOW_SIZE_ACTIVE).toInt() );
+    Shadows::cleanUp();
+    // get rid of old stuff (even w/o config: kwin sometimes crashes on --replace)
+    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[0]);
+    XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[1]);
 
     oldString = ourConfig.smallTitleClasses.join(",");
     QString smallTitleClasses = settings.value("SmallTitleClasses", "").toString().replace(QRegExp("\\s*,\\s*"), ",");

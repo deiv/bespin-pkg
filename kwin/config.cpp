@@ -28,6 +28,7 @@
 #include <QSettings>
 #include <QtDebug>
 
+#include "../config.defaults"
 #include "../config/kdeini.h"
 
 class KConfig;
@@ -57,13 +58,16 @@ Config::Config(QWidget* parent) : BConfig(parent)
     ui.inactGrad->setItemData( Gradients_TypeAmount, -1);
     ui.inactGrad->setItemData( Gradients_TypeAmount+1, -3);
     ui.inactGrad->setItemData( Gradients_TypeAmount+2, -4);
-    connect (ui.actGrad, SIGNAL(currentIndexChanged(int)), this, SLOT(watchBgMode()));
-    connect (ui.inactGrad, SIGNAL(currentIndexChanged(int)), this, SLOT(watchBgMode()));
+    connect (ui.actGrad, SIGNAL(currentIndexChanged(int)), SLOT(watchBgMode()));
+    connect (ui.inactGrad, SIGNAL(currentIndexChanged(int)), SLOT(watchBgMode()));
 
-    connect (ui.actGrad2, SIGNAL(currentIndexChanged(int)), this, SLOT(watchDecoGradient()));
-    connect (ui.inactGrad2, SIGNAL(currentIndexChanged(int)), this, SLOT(watchDecoGradient()));
+    connect (ui.actGrad2, SIGNAL(currentIndexChanged(int)), SLOT(watchDecoGradient()));
+    connect (ui.inactGrad2, SIGNAL(currentIndexChanged(int)), SLOT(watchDecoGradient()));
     
-    connect (ui.buttonGradient, SIGNAL(currentIndexChanged(int)), this, SLOT(watchButtonGradient()));
+    connect (ui.buttonGradient, SIGNAL(currentIndexChanged(int)), SLOT(watchButtonGradient()));
+
+    connect (ui.activeShadowSize, SIGNAL(valueChanged(int)), SLOT(watchShadowSize(int)));
+    connect (ui.inactiveShadowSize, SIGNAL(valueChanged(int)), SLOT(watchShadowSize(int)));
     
     ui.onlinehelp->setOpenExternalLinks( true ); /** i've an internet link here */
     ui.onlinehelp->viewport()->setAutoFillBackground(false);
@@ -198,6 +202,9 @@ Config::Config(QWidget* parent) : BConfig(parent)
     window types.<br>\
     The window class is usually near the application name and can determined by adding the Info button\
     (\"!\") to the multibutton order and pressing it.");
+
+    handleSettings(ui.inactiveShadowSize, SHADOW_SIZE_INACTIVE);
+    handleSettings(ui.activeShadowSize, SHADOW_SIZE_ACTIVE);
 
     /** if you call setContextHelp(.) with a combobox and pass a stringlist,
     the strings are attached to the combo entries and shown on select/hover */
@@ -547,4 +554,12 @@ void Config::watchDecoGradient()
     sibling->setEnabled(idx > 0);
 
     parent->setEnabled(ui.presets->currentRow() == 0 || idx == 0);
+}
+
+void Config::watchShadowSize(int v)
+{
+    if (sender() == ui.activeShadowSize && ui.inactiveShadowSize->value() > v)
+        ui.inactiveShadowSize->setValue(v);
+    else if (sender() == ui.inactiveShadowSize && ui.activeShadowSize->value() < v)
+        ui.activeShadowSize->setValue(v);
 }

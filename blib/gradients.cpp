@@ -509,24 +509,6 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
     return nullPix;
 }
 
-static QPixmap _dither;
-
-static inline void
-createDither()
-{
-    QImage img(32,32, QImage::Format_ARGB32);
-    QRgb *pixel = (QRgb*)img.bits();
-    int a, v;
-    for (int i = 0; i < 1024; ++i) // 32*32...
-    {
-        a = (rand() % 6)/2;
-        v = (a%2)*255;
-        *pixel = qRgba(v,v,v,a);
-        ++pixel;
-    }
-    _dither = QPixmap::fromImage(img);
-}
-
 const QPixmap
 &Gradients::structure(const QColor &c, bool light)
 {
@@ -923,14 +905,14 @@ Gradients::bgSet(const QColor &c, BgMode mode, int bgIntensity)
         p.begin(&set->topTile);
         stops << QGradientStop(0, c1) << QGradientStop(1, c);
         lg.setStops(stops); p.fillRect(set->topTile.rect(), lg); stops.clear();
-        p.drawTiledPixmap(set->topTile.rect(), _dither);
+        p.drawTiledPixmap(set->topTile.rect(), FX::dither());
         p.end();
 
         // Bottom Tile
         p.begin(&set->btmTile);
         stops << QGradientStop(0, c) << QGradientStop(1, c3);
         lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg); stops.clear();
-        p.drawTiledPixmap(set->btmTile.rect(), _dither);
+        p.drawTiledPixmap(set->btmTile.rect(), FX::dither());
         p.end();
 
         if (Colors::value(c) > 244)
@@ -950,7 +932,7 @@ Gradients::bgSet(const QColor &c, BgMode mode, int bgIntensity)
         lg.setStops(stops);
         p.fillRect(set->cornerTile.rect(), lg);
         stops.clear();
-        p.drawTiledPixmap(set->cornerTile.rect(), _dither);
+        p.drawTiledPixmap(set->cornerTile.rect(), FX::dither());
         p.end();
         
         // Left Corner, right corner
@@ -972,7 +954,7 @@ Gradients::bgSet(const QColor &c, BgMode mode, int bgIntensity)
 
             p.begin(pix);
             p.drawPixmap(0,0, fill);
-            p.drawTiledPixmap(pix->rect(), _dither);
+            p.drawTiledPixmap(pix->rect(), FX::dither());
             p.end();
             delete mask;
         }
@@ -1013,14 +995,14 @@ Gradients::bgSet(const QColor &c, BgMode mode, int bgIntensity)
         p.begin(&set->topTile);
         stops << QGradientStop(0, c1) << QGradientStop(1, c);
         lg.setStops(stops); p.fillRect(set->topTile.rect(), lg); stops.clear();
-        p.drawTiledPixmap(set->topTile.rect(), _dither);
+        p.drawTiledPixmap(set->topTile.rect(), FX::dither());
         p.end();
 
         // right
         p.begin(&set->btmTile);
         stops << QGradientStop(0, c) << QGradientStop(1, c1);
         lg.setStops(stops); p.fillRect(set->btmTile.rect(), lg); stops.clear();
-        p.drawTiledPixmap(set->btmTile.rect(), _dither);
+        p.drawTiledPixmap(set->btmTile.rect(), FX::dither());
         p.end();
 
         // left corner right corner
@@ -1048,7 +1030,7 @@ Gradients::bgSet(const QColor &c, BgMode mode, int bgIntensity)
 
             p.begin(pix);
             p.drawPixmap(0,0, fill);
-            p.drawTiledPixmap(pix->rect(), _dither);
+            p.drawTiledPixmap(pix->rect(), FX::dither());
             p.end();
         }
         delete mask;
@@ -1056,7 +1038,7 @@ Gradients::bgSet(const QColor &c, BgMode mode, int bgIntensity)
         lg.setColorAt(0, c3); lg.setColorAt(1, c);
         p.begin(&set->cornerTile);
         p.fillRect(set->cornerTile.rect(), lg);
-        p.drawTiledPixmap(set->cornerTile.rect(), _dither);
+        p.drawTiledPixmap(set->cornerTile.rect(), FX::dither());
         p.end();
         break;
     }
@@ -1095,7 +1077,6 @@ Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bo
         stops.clear();
         p.begin(&_bevel[i]); p.fillRect(_bevel[i].rect(), lg); p.end();
     }
-    createDither();
 
     for (int i = 0; i < 4; ++i)
         _borderline[i].setMaxCost( ((32*32)<<3)<<4 ); // enough for 16 different colors

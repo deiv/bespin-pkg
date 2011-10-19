@@ -393,6 +393,32 @@ FX::desaturate(QImage &img, const QColor &c)
     }
 }
 #endif
+
+
+static QPixmap _dither;
+QImage
+FX::newDitherImage(uint intensity)
+{
+    QImage img(32,32, QImage::Format_ARGB32);
+    QRgb *pixel = (QRgb*)img.bits();
+    int a, v;
+    for (int i = 0; i < 1024; ++i) // 32*32...
+    {
+        a = (rand() % intensity)/2;
+        v = (a%2)*255;
+        *pixel = qRgba(v,v,v,a);
+        ++pixel;
+    }
+    return img;
+}
+const QPixmap &
+FX::dither()
+{
+    if (_dither.isNull())
+        _dither = QPixmap::fromImage(newDitherImage());
+    return _dither;
+}
+
 QPixmap
 FX::tint(const QPixmap &mask, const QColor &color)
 {

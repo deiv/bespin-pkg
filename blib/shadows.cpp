@@ -47,6 +47,7 @@ protected:
 };
 
 static ShadowManager *shadowManager = 0;
+static uint size[2] = { 12, 64 };
 
 
 static QPixmap (*pixmaps[2])[8] = {0,0};
@@ -56,6 +57,7 @@ static unsigned long globalShadowData[2][12];
 static QPixmap nativePixmap(const QPixmap &qtPix)
 {
 #ifdef Q_WS_X11
+    QPainter pd(const_cast<QPixmap*>(&qtPix)); pd.drawTiledPixmap(qtPix.rect(), FX::dither()); pd.end();
     if (FX::usesXRender() || qtPix.isNull())
         return qtPix;
 
@@ -81,7 +83,7 @@ shadowData(Shadows::Type t, bool storeToRoot)
     if (!data)
     {
 //         const int sz = (t == Shadows::Large) ? 32 : 20;
-        int sz = 32;
+        int sz = size[1];
         globalShadowData[t-1][8] = (sz-4)/2;
         globalShadowData[t-1][9] = 2*(sz-4)/3;
         globalShadowData[t-1][10] = sz-4;
@@ -98,12 +100,18 @@ shadowData(Shadows::Type t, bool storeToRoot)
 
 //             QRadialGradient rg(QPoint(sz+1,sz+1),sz);
             QRect shadowRect(shadow.rect());
+            QRadialGradient rg;
             if (t == Shadows::Small)
             {
-                sz = 22;
-                shadowRect.adjust(8, 5, -8, -11);
+//                 shadowRect.adjust(8, 5, -8, -11);
+                const int d = (size[1] - (size[0]+2))/2;
+                shadowRect.adjust(d+3, d, -(d+3), -(d+6));
+                sz = qMin(shadowRect.width(), shadowRect.height()) / 2;
+                rg = QRadialGradient(shadowRect.center(), sz);
+                sz = size[0];
             }
-            QRadialGradient rg(shadowRect.center(), sz);
+            else
+                rg = QRadialGradient(shadowRect.center(), sz);
 
             QPainter p(&shadow);
             p.setPen(Qt::NoPen);
@@ -129,10 +137,11 @@ shadowData(Shadows::Type t, bool storeToRoot)
             p.setBrush(Qt::transparent);
             p.drawRoundedRect(shadow.rect().adjusted(globalShadowData[t-1][9], globalShadowData[t-1][8],
                                                      -globalShadowData[t-1][11], -globalShadowData[t-1][10]), 8,8);
+
             p.end();
 
 //             Tile::Set shadowSet(shadow,sz,sz,1,1);
-            Tile::Set shadowSet(shadow,32,32,1,1);
+            Tile::Set shadowSet(shadow,size[1],size[1],1,1);
 
             store[0] = nativePixmap(shadowSet.tile(Tile::TopMid));
             store[1] = nativePixmap(shadowSet.tile(Tile::TopRight));
@@ -208,5 +217,12 @@ Shadows::set(WId id, Shadows::Type t, bool storeToRoot)
         break;
     }
 #endif
+}
+
+void
+Shadows::setSize(int small, int big)
+{
+    size[0] = qMin(72, qMax(8, small));
+    size[1] = qMin(72, qMax(8, big));
 }
 

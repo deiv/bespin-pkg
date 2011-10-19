@@ -51,6 +51,7 @@ private slots:
     void watchBgMode();
     void watchButtonGradient();
     void watchDecoGradient();
+    void watchShadowSize(int);
 private:
    Ui::Config ui;
 };
