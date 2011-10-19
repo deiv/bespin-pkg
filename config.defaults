@@ -113,6 +113,8 @@
 #define MENU_ITEM_SUNKEN "Menu.ItemSunken", false
 #define MENU_ACTIVEITEMSUNKEN "Menu.ActiveItemSunken", false
 
+#define SHADOW_SIZE_INACTIVE "InactiveShadowSize", 12
+#define SHADOW_SIZE_ACTIVE "ActiveShadowSize", 48
 #define SHADOW_TITLEBAR "ShadowTitlebar", false
 #define SHOW_MNEMONIC "ShowMnemonic", false
 #define SHOW_OFF "ShowOff", false
