@@ -1091,11 +1091,31 @@ Client::reset(unsigned long changed)
         else if (!Factory::config()->forceUserColors)
         {
             unsigned long _9 = 9;
-            WindowData *data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, &_9);
-            bool needFree = true;
+            WindowData *data = 0;
+            bool needFree = false;
+
+             // check for data from preset ====================================================
+            KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass);
+            data = Factory::decoInfo(info.windowClassClass(), info.windowType(supported_types));
+            if (data && (((data->style >> 16) & 0xff) > 1))
+            {
+                WindowPics pics;
+                pics.topTile = pics.cnrTile = pics.lCorner = pics.rCorner = 0;
+                /// NOTICE encoding the bg gradient intensity in the btmTile Pic!!
+                pics.btmTile = 150;
+                XProperty::set<Picture>(windowId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
+            }
+
+            // check for data from style ====================================================
+            if (!data) {
+                data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, &_9);
+                if (data)
+                    needFree = true;  // X provides a deep copy
+            }
+
+            // check for data from dbus =========================================================
             if (!data)
-            {   // check for data from dbus
-                needFree = false;
+            {
                 long int *pid = XProperty::get<long int>(windowId(), XProperty::pid, XProperty::LONG);
                 if (pid)
                 {
@@ -1103,21 +1123,9 @@ Client::reset(unsigned long changed)
                         XProperty::set<uint>(windowId(), XProperty::winData, (uint*)data, XProperty::WORD, 9);
                     XFree(pid);
                 }
-                if (!data) // check for data from preset
-                {
-                    KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass);
-                    data = Factory::decoInfo(info.windowClassClass(), info.windowType(supported_types));
-                    if (data && (((data->style >> 16) & 0xff) > 1))
-                    {
-                        WindowPics pics;
-                        pics.topTile = pics.cnrTile = pics.lCorner = pics.rCorner = 0;
-                        /// NOTICE encoding the bg gradient intensity in the btmTile Pic!!
-                        pics.btmTile = 150;
-                        XProperty::set<Picture>(windowId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
-                    }
-                }
             }
 
+            // read data ========================================================================
             if (data)
             {
                 def = false;
@@ -1135,9 +1143,12 @@ Client::reset(unsigned long changed)
                 gType[0] = (Gradients::Type)((data->style >> 8) & 0xff);
                 gType[1] = (Gradients::Type)(data->style & 0xff);
             }
+
+            // free X11 data ======================================================================
             if (needFree)
                 XFree(data);
         }
+
         if (def)
         {   // the fallback solution
             unoHeight = 0;
