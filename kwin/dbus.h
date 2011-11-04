@@ -45,6 +45,7 @@ public:
 public slots:
     Q_NOREPLY void styleByPid(qint64 pid, QByteArray data) { fac->learn(pid, data); }
     Q_NOREPLY void forget(qint64 pid) { fac->forget(pid); }
+    Q_NOREPLY void setNetbookMode(bool b) { fac->setNetbookMode(b); }
     Q_NOREPLY void updateDeco(uint wid) { fac->updateDeco((WId)wid); }
 };
 } //namespace

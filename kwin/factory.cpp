@@ -80,6 +80,8 @@ QHash<qint64, BgSet*> Factory::ourBgSets;
 QList<Preset*> Factory::ourPresets;
 QPixmap Factory::mask;
 
+static short int _verticalTitle = 0;
+
 typedef QHash<QString, QHash<NET::WindowType, WindowData*> > DoubleHash;
 
 Factory::Factory() : QObject(), KDecorationFactory()
@@ -337,7 +339,7 @@ bool Factory::readConfig()
     if (oldBool != ourConfig.variableShadowSizes) ret = true;
 
     oldBool = ourConfig.verticalTitle;
-    ourConfig.verticalTitle = settings.value("VerticalTitlebar", false).toBool();
+    ourConfig.verticalTitle =  _verticalTitle ? bool(_verticalTitle-1) : settings.value("VerticalTitlebar", false).toBool();
     if (oldBool != ourConfig.verticalTitle) ret = true;
 
     oldBool = ourConfig.resizeCorner;
@@ -445,6 +447,16 @@ bool Factory::readConfig()
                   settings.value("IAmMyLittleSister", false).toBool(), icnVar);
 
     return ret;
+}
+
+void
+Factory::setNetbookMode(bool on)
+{
+    _verticalTitle = on + 1;
+//     reset(63);
+//     ourConfig.verticalTitle = on;
+    QDBusConnection::sessionBus().send( QDBusMessage::createMethodCall( "org.kde.kwin", "/KWin", "org.kde.KWin", "reconfigure" ) );
+//     resetDecorations(63);
 }
 
 class Header : public QLabel

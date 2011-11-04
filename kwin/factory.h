@@ -100,6 +100,7 @@ protected:
     static void learn(qint64 pid, QByteArray data);
     static QPixmap mask;
     void updateDeco(WId id);
+    void setNetbookMode(bool on);
 private:
     bool readConfig();
 private slots:
