@@ -238,7 +238,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>6</number>
+         <number>10</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -554,8 +554,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>508</width>
-               <height>223</height>
+               <width>364</width>
+               <height>113</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1270,8 +1270,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>508</width>
-               <height>223</height>
+               <width>278</width>
+               <height>183</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1943,8 +1943,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>508</width>
-               <height>272</height>
+               <width>314</width>
+               <height>252</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3246,6 +3246,13 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="suspendFsVideoCompositing">
+            <property name="text">
+             <string>Suspend KWin compositing for SMplayer, VLC &amp; DragonPlayer in fullscreen mode</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

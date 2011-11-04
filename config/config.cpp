@@ -511,6 +511,16 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     - Statusbars<br>\
     - SMPlayer/DragonPlayer Video areas<br>");
 
+    handleSettings(ui.suspendFsVideoCompositing, HACK_SUSPEND_FULLSCREEN_PLAYERS);
+    setContextHelp(ui.suspendFsVideoCompositing, "<b>Suspend Fullscreen Video Compositing</b><hr>\
+    Compositing, esp. the OpenGL variant, can have a significant conversion overhead, depending\
+    on the window size and the update frequency - unfortunately that especially holds for fullscreen\
+    video playback, when often the CPU is worried with decoding an 1080p x264 video as well.<br>\
+    This will catch some video clients when entering the fullscreen mode and disable compositing until\
+    fullscreen mode exits.<br>\
+    Will likely cause some temporarily flicker when entering/leaving the fullscreen mode but can safe a lot\
+    of cpu when it really matters.");
+
     handleSettings(ui.killThrobber, HACK_THROBBER);
     setContextHelp(ui.killThrobber, "<b>Kill JarJar, err... Throbber</b><hr>\
     You see the nasty rotating thing in the top right of konqueror, now even oversizing the menubar?\
