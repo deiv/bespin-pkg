@@ -269,7 +269,7 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     {
         *title = Factory::titleSize(iAmSmall);
         *border = right = Factory::edgeSize();
-        *counter = isShade() ? 8 : Factory::baseSize();
+        *counter = isShade() ? 12 : Factory::baseSize();
     }
 }
 
