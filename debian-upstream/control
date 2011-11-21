@@ -3,7 +3,7 @@ Section: kde
 Priority: extra
 Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
 XSBC-Original-Maintainer: Sune Vuorela <debian@pusling.com>
-Build-Depends: debhelper (>= 5), libqt4-dev (>= 4.4)
+Build-Depends: debhelper (>= 5), libqt4-dev (>= 4.4), kdelibs-bin, cmake, kdelibs5-dev, kdebase-workspace-dev, libx11-dev, libxrender-dev, libxext-dev
 Standards-Version: 3.7.3
 Homepage: http://cloudcity.sourceforge.net
 Bugs: http://sourceforge.net/tracker/?atid=976907&group_id=201276&func=browse
