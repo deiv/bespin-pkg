@@ -31,6 +31,8 @@
 
 using namespace Bespin;
 
+#define VARYING_SHADOWS 0
+
 #ifdef Q_WS_X11
 class ShadowManager : public QObject {
 public:
@@ -73,7 +75,6 @@ static QPixmap nativePixmap(const QPixmap &qtPix)
 #endif
 }
 
-
 static unsigned long*
 shadowData(Shadows::Type t, bool storeToRoot)
 {
@@ -82,8 +83,11 @@ shadowData(Shadows::Type t, bool storeToRoot)
     unsigned long *data = XProperty::get<unsigned long>(QX11Info::appRootWindow(), XProperty::bespinShadow[t-1], XProperty::LONG, &_12);
     if (!data)
     {
-//         const int sz = (t == Shadows::Large) ? 32 : 20;
+#if VARYING_SHADOWS
+        const int sz = size[t == Shadows::Large];
+#else
         int sz = size[1];
+#endif
         globalShadowData[t-1][8] = (sz-4)/2;
         globalShadowData[t-1][9] = 2*(sz-4)/3;
         globalShadowData[t-1][10] = sz-4;
@@ -97,13 +101,14 @@ shadowData(Shadows::Type t, bool storeToRoot)
             // radial gradient requires the raster engine anyway and we need *working* ... -> QImage
             QImage shadow(2*sz+1, 2*sz+1, QImage::Format_ARGB32);
             shadow.fill(Qt::transparent);
-
-//             QRadialGradient rg(QPoint(sz+1,sz+1),sz);
+#if VARYING_SHADOWS
+            QRadialGradient rg(QPoint(sz+1,sz+1),sz);
+            const QRect shadowRect(shadow.rect());
+#else
             QRect shadowRect(shadow.rect());
             QRadialGradient rg;
             if (t == Shadows::Small)
             {
-//                 shadowRect.adjust(8, 5, -8, -11);
                 const int d = (size[1] - (size[0]+2))/2;
                 shadowRect.adjust(d+3, d, -(d+3), -(d+6));
                 sz = qMin(shadowRect.width(), shadowRect.height()) / 2;
@@ -112,7 +117,7 @@ shadowData(Shadows::Type t, bool storeToRoot)
             }
             else
                 rg = QRadialGradient(shadowRect.center(), sz);
-
+#endif
             QPainter p(&shadow);
             p.setPen(Qt::NoPen);
 
@@ -139,9 +144,11 @@ shadowData(Shadows::Type t, bool storeToRoot)
                                                      -globalShadowData[t-1][11], -globalShadowData[t-1][10]), 8,8);
 
             p.end();
-
-//             Tile::Set shadowSet(shadow,sz,sz,1,1);
+#if VARYING_SHADOWS
+            Tile::Set shadowSet(shadow,sz,sz,1,1);
+#else
             Tile::Set shadowSet(shadow,size[1],size[1],1,1);
+#endif
 
             store[0] = nativePixmap(shadowSet.tile(Tile::TopMid));
             store[1] = nativePixmap(shadowSet.tile(Tile::TopRight));
