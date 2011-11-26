@@ -16,7 +16,7 @@ override_dh_auto_configure:
 override_dh_auto_build:
 	test -d build || exit 1
 	cd build; $(MAKE)
-	cd ksplash; ./generate.sh 1024 768; ./generate.sh 1280 1024; ./generate.sh 1366 768; ./generate.sh 600 1200; ./generate.sh 1920 1080;
+	cd ksplash; ./generate.sh 1024 768; ./generate.sh 1280 1024; ./generate.sh 1366 768; ./generate.sh 1600 1200; ./generate.sh 1920 1080;
 
 override_dh_auto_install:
 	test -d build || exit 1
