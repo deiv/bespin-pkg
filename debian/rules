@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export DH_VERBOSE=1
+export DH_OPTIONS
+export install_dir="debian/kde-style-bespin"
+
+%:
+	dh $@ --parallel
+
+
+override_dh_auto_configure:
+	test -d build || mkdir build
+	cd build && ln -sf ../debian && cmake -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix` -DCMAKE_BUILD_TYPE=Release ..
+
+override_dh_auto_build:
+	test -d build || exit 1
+	cd build; $(MAKE)
+
+override_dh_auto_install:
+	test -d build || exit 1
+	cd build; $(MAKE) DESTDIR=$(install_dir) install
