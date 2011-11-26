@@ -1,3 +1,12 @@
+kde-style-bespin (0.r1421-1) UNRELEASED; urgency=low
+
+  * Sync with SVN@1421
+  * Also ship kdm theme and ksplash theme. 2 new packages:
+    - kdm-theme-bespin
+    - ksplash-theme-bespin 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 26 Nov 2011 23:54:34 +0530
+
 kde-style-bespin (0.r1419-1) UNRELEASED; urgency=low
 
   * Initial release. (Closes: #XXXXXX)
