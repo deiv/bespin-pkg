@@ -27,6 +27,7 @@
 // #include <QLabel>
 #include <QLayout>
 #include <QLCDNumber>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
@@ -375,7 +376,7 @@ Style::polish( QWidget * widget )
                     FILTER_EVENTS(widget)
                 if ( !widget->testAttribute(Qt::WA_TranslucentBackground) && config.menu.round && FX::compositingActive() )
                     widget->setAttribute(Qt::WA_TranslucentBackground);
-                widget->setProperty("BespinWindowHints", Shadowed|(config.menu.round?Rounded:0));
+                widget->setProperty("BespinWindowHints", config.menu.round?Rounded:0);
                 Bespin::Shadows::manage(widget);
             }
         }
@@ -516,7 +517,7 @@ Style::polish( QWidget * widget )
             if (appType == Plasma) // GNARF!
                 menu->setWindowFlags( menu->windowFlags()|Qt::Popup);
 
-            menu->setProperty("BespinWindowHints", Shadowed|(config.menu.round?Rounded:0));
+            menu->setProperty("BespinWindowHints", config.menu.round?Rounded:0);
             Bespin::Shadows::manage(menu);
 
             // eventfiltering to reposition MDI windows, shaping, shadows, paint ARGB bg and correct distance to menubars
@@ -557,6 +558,8 @@ Style::polish( QWidget * widget )
                 FILTER_EVENTS(widget); // catch show event and palette changes for deco
             }
         }
+        if (widget->property("BespinWindowHints").toInt() & Shadowed)
+            Bespin::Shadows::manage(widget);
     }
     //END Window handling                                                                          -
 
@@ -1094,6 +1097,12 @@ Style::polish( QWidget * widget )
             widget->setAutoFillBackground(false);
         else if ( widget->parentWidget() && widget->inherits("RecipientLine") )
             widget->parentWidget()->setAutoFillBackground(false);
+    }
+
+    if ( appType == KDM )
+    {
+        if (QLineEdit *le = qobject_cast<QLineEdit*>(widget))
+            le->setAlignment(Qt::AlignCenter);
     }
 
 }
