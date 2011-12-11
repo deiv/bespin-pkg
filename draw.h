@@ -70,16 +70,13 @@ setTitleFont(QPainter *p, const QString &text = QString(), int w = -1 )
 {
     if (p->font().pointSize() < 1) // ignore pixelsize fonts for reports of bad visual quality (#2787384)
         return;
-    
+
     QFont fnt = p->font();
     fnt.setWeight(QFont::Black);
 //         fnt.setUnderline(true);
 //         fnt.setStretch(QFont::SemiExpanded);
-#if QT_VERSION >= 0x040400
-    fnt.setCapitalization(QFont::AllUppercase/*SmallCaps*/);
-#else
-    title = title.toUpper();
-#endif
+//     fnt.setCapitalization(QFont::AllUppercase/*SmallCaps*/);
+//     fnt.setCapitalization(QFont::SmallCaps);
     if (text.isEmpty())
         fnt.setPointSize(9*fnt.pointSize()/10);
     else

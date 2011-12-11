@@ -60,7 +60,7 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
     QWidget *daddy = widget ? widget->parentWidget() : 0L;
     if (qstyleoption_cast<const QStyleOptionFrame*>(option) && static_cast<const QStyleOptionFrame *>(option)->lineWidth < 1)
     {
-        if (daddy && ( qobject_cast<QComboBox*>(daddy) || daddy->inherits("QAbstractSpinBox")))
+        if (appType == KDM || (daddy && ( qobject_cast<QComboBox*>(daddy) || daddy->inherits("QAbstractSpinBox"))))
             return;
         painter->fillRect(RECT, FCOLOR(Base));
         return;

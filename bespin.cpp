@@ -1397,20 +1397,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
         return false;
     }
-//    case QEvent::MouseButtonRelease:
-//    case QEvent::MouseButtonPress:
-//       qWarning("pressed/released");
-//       if (object->inherits("QScrollBar")) {
-//          qWarning("QScrollBar pressed/released");
-//          QWidget *w = static_cast<QWidget*>(object)->parentWidget();
-//          if (w && isSpecialFrame(w)) {
-//             qWarning("set frame updates to %s",
-//                      ev->type() == QEvent::MouseButtonRelease ? "active" : "INactive");
-//             w->setUpdatesEnabled(ev->type() == QEvent::MouseButtonRelease);
-//          }
-//          return false;
-//       }
-//       return false;
+
     case QEvent::Wheel:
     {
         if (QAbstractSlider* slider = qobject_cast<QAbstractSlider*>(object))
@@ -1422,16 +1409,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
 
-//         if (object->objectName() == "qt_scrollarea_viewport")
-//         {
-//             if (QListView *list = qobject_cast<QListView*>(object->parent()))
-//             if (list->verticalScrollBar() && list->inherits("KateFileList"))
-//             { // suck it, jerks!
-//                 QCoreApplication::sendEvent(list->verticalScrollBar(), ev); // tell the scrollbar to do this ;-P
-//                 return true; // eat it
-//             }
-//             return false;
-//         }
         if (QListView *list = qobject_cast<QListView*>(object))
         {
 //             if (list->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) // this should be, but semms to be not
@@ -1591,6 +1568,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (config.bg.modal.invert && widget && widget->isModal())
             swapPalette(widget, this);
 
+        /* TODO: why to blur on hide?
         if ( config.bg.blur && !widget->isWindow() &&
             (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
             appType != Plasma  )
@@ -1604,6 +1582,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
                     pendingBlurUpdates << window;
             }
         }
+        */
         return false;
     }
 #if 1
