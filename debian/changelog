@@ -1,3 +1,9 @@
+kde-style-bespin (0.r1425-1) UNRELEASED; urgency=low
+
+  * Sync with SVN@1425
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 11 Dec 2011 14:49:37 +0530
+
 kde-style-bespin (0.r1421-1) UNRELEASED; urgency=low
 
   * Sync with SVN@1421
