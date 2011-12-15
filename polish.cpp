@@ -588,30 +588,38 @@ Style::polish( QWidget * widget )
             // sunken looks soo much nicer ;)
             else if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
             {
-                frame->setFrameShadow(QFrame::Sunken);
-                if (config.bg.mode != Scanlines) {
-#if 1
+                if (config.bg.mode == Scanlines) {
+                    frame->setFrameShadow(QFrame::Sunken);
+                    frame->setAutoFillBackground(true);
+                } else {
                     frame->setFrameShadow(QFrame::Raised);
                     frame->setAutoFillBackground(false);
-#else
+                }
+
+#if 0
+                    frame->setFrameShadow(QFrame::Sunken);
+                    frame->setAutoFillBackground(false);
+// #else
                     frame->setAutoFillBackground(true);
                     frame->setBackgroundRole(QPalette::WindowText);
                     frame->setForegroundRole(QPalette::Window);
 //                     QPalette pal = frame->palette(), dadsPal = frame->parentWidget()->palette();
-//                     pal.setColor(QPalette::Window, dadsPal.color(QPalette::WindowText));
+//                     pal.setColor(QPalette::Window, dadsPal.color(QPalette::Highlight));
 //                     pal.setColor(QPalette::WindowText, dadsPal.color(QPalette::Window));
 //                     pal.setColor(QPalette::Base, dadsPal.color(QPalette::WindowText));
-//                     pal.setColor(QPalette::Text, dadsPal.color(QPalette::Window));
+//                     pal.setColor(QPalette::Text, Qt::red);
 //                     frame->setPalette(pal);
-                    foreach (QWidget *kid, frame->findChildren<QLabel*>()) {
-                        QPalette pal = kid->palette(); pal.setColor(QPalette::Text, frame->palette().color(QPalette::Window));
-                        kid->setPalette(pal);
+//                     foreach (QWidget *kid, frame->findChildren<QLabel*>()) {
+//                         kid->setAutoFillBackground(true);
+//                         kid->setStyleSheet(QString("*{background-color:red; color:white;}"));
+//                         QPalette pal = kid->palette(); pal.setColor(QPalette::Text, frame->palette().color(QPalette::Window));
+//                         kid->setPalette(pal);
 //                         kid->setBackgroundRole(QPalette::WindowText);
 //                         kid->setForegroundRole(QPalette::Window);
 //                         kid->unsetPalette();
-                    }
+//                     }
 #endif
-                }
+//                 }
             }
         }
         // just saw they're niftier in skulpture -> had to do sth. ;-P
