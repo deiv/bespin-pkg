@@ -86,7 +86,7 @@ dumpBackground(QWidget *target, const QRect &r, const QStyle *style, bool _32bit
     }
     if (!w)
         w = target;
-    
+
     QPainter p(&pix);
     const QBrush bg = w->palette().brush(w->backgroundRole());
     if (bg.style() == Qt::TexturePattern)
@@ -128,7 +128,7 @@ grabWidget(QWidget * root, QPixmap &pix)
         return;
 
     QPoint zero(0,0);
-    QSize sz = root->window()->size();
+//     QSize sz = root->window()->size();
 
    // resizing (in case) -- NOTICE may be dropped for performance...?!
 //    if (root->testAttribute(Qt::WA_PendingResizeEvent) ||
@@ -143,7 +143,7 @@ grabWidget(QWidget * root, QPixmap &pix)
 //          QApplication::sendEvent(w, &e);
 //       }
 //    }
-   
+
     // painting ------------
     QPainter::setRedirected( root, &pix );
     QPaintEvent e(QRect(zero, root->size()));
@@ -251,7 +251,7 @@ protected:
     void dragLeaveEvent ( QDragLeaveEvent *dle ) { if ( isVisible() ) propagate( (QDropEvent*)dle ); }
     void dragMoveEvent ( QDragMoveEvent *dme ) { propagate( (QDropEvent*)dme ); }
     void dropEvent ( QDropEvent *de )  { propagate( de ); }
-    
+
     void paintEvent( QPaintEvent *  )
     {
         if ( _info->clock.isNull() )
@@ -306,14 +306,14 @@ TabInfo::proceed()
 {
    if (clock.isNull()) // this tab is currently not animated
       return false;
-   
+
    // check if our desired duration has exceeded and stop this in case
    uint ms = clock.elapsed();
    if (ms > duration - _timeStep) {
       rewind();
       return false;
    }
-   
+
    // normal action
    updatePixmaps(_transition, ms);
    if (curtain) curtain->repaint();
@@ -332,7 +332,7 @@ TabInfo::rewind()
         currentWidget->setUpdatesEnabled(true);
         currentWidget->repaint();
     }
-    tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space    
+    tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space
 }
 
 #define TOO_SLOW clock.elapsed() > maxRenderTime
@@ -350,7 +350,7 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 
     if (!(sw->isVisible() && ow && cw))
         return;
-    
+
     int maxRenderTime = qMin(200, (int)(_duration - _timeStep));
 
 #define AVOID(_COND_) if (_COND_) { rewind(); return; } //
@@ -521,9 +521,12 @@ Tab::_manage (QWidget* w)
    // the tabs need to be kept in a list, as currentChanged() does not allow us
    // to identify the former tab... unfortunately.
    QStackedWidget *sw = qobject_cast<QStackedWidget*>(w);
-   if (!sw) return false;
-   connect(sw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
-   connect(sw, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
+   if (!sw)
+       return false;
+
+   connect(sw, SIGNAL(destroyed(QObject*)), SLOT(release_s(QObject*)));
+   connect(sw, SIGNAL(widgetRemoved(int)), SLOT(widgetRemoved(int)));
+   connect(sw, SIGNAL(currentChanged(int)), SLOT(changed(int)));
    items.insert(sw, new TabInfo(this, sw->currentWidget(), sw->currentIndex()));
    return true;
 }
@@ -532,18 +535,22 @@ void
 Tab::_release(QWidget *w)
 {
    QStackedWidget *sw = qobject_cast<QStackedWidget*>(w);
-   if (!sw) return;
+   if (!sw)
+       return;
 
    disconnect(sw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
+   disconnect(sw, SIGNAL(widgetRemoved(int)), this, SLOT(widgetRemoved(int)));
    items.remove(sw);
-   if (items.isEmpty()) timer.stop();
+
+   if (items.isEmpty())
+       timer.stop();
 }
 
 void
 Tab::changed(int index)
 {
-   if (_transition == Jump)
-      return; // ugly nothing ;)
+    if (_transition == Jump || QCoreApplication::closingDown())
+        return; // ugly nothing ;)
 
    // ensure this is a qtabwidget - we'd segfault otherwise
    QStackedWidget *sw = qobject_cast<QStackedWidget*>(sender());
@@ -555,10 +562,28 @@ Tab::changed(int index)
       return; // not handled... why ever (i.e. should not happen by default)
    // init transition
    i.value()->switchTab(sw, index);
-   
+
    // _activeTabs is counted in the timerEvent(), so if this is the first
    // changing tab in a row, it's currently '0'
    if (!_activeTabs) timer.start(timeStep, this);
+}
+
+void
+Tab::widgetRemoved(int index)
+{
+    if (_transition == Jump)
+        return; // ugly nothing ;)
+
+    // ensure this is a qtabwidget - we'd segfault otherwise
+    QStackedWidget *sw = qobject_cast<QStackedWidget*>(sender());
+    if (!(sw && sw->isVisible())) return;
+
+    // find matching tabinfo
+    Items::iterator i = items.find(sw);
+    if (i == items.end())
+        return;
+    if (i.value()->index == index)
+        i.value()->index = -1;
 }
 
 

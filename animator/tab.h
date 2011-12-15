@@ -31,6 +31,7 @@ CloseHorizontally, CrossFade
 };
 
 class Curtain;
+class Tab;
 
 class TabInfo : public QObject
 {
@@ -42,6 +43,7 @@ protected:
     BePointer<Curtain> curtain;
     float progress;
     BePointer<QWidget> currentWidget;
+    friend class Tab;
     int index;
     uint duration;
     QTime clock;
@@ -72,6 +74,7 @@ protected:
     int _activeTabs;
 protected slots:
     void changed(int);
+    void widgetRemoved(int);
 private:
     Q_DISABLE_COPY(Tab)
 };
