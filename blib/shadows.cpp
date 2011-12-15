@@ -31,8 +31,6 @@
 
 using namespace Bespin;
 
-#define VARYING_SHADOWS 0
-
 #ifdef Q_WS_X11
 class ShadowManager : public QObject {
 public:
@@ -84,6 +82,7 @@ shadowData(Shadows::Type t, bool storeToRoot)
     if (!data)
     {
 #if VARYING_SHADOWS
+#warning *** COMPILING WITH VARYING SHADOW PIXMAPS ***
         const int sz = size[t == Shadows::Large];
 #else
         int sz = size[1];
