@@ -24,7 +24,7 @@
 #include <QComboBox>
 #include <QDockWidget>
 #include <QHeaderView>
-// #include <QLabel>
+#include <QLabel>
 #include <QLayout>
 #include <QLCDNumber>
 #include <QLineEdit>
@@ -568,41 +568,58 @@ Style::polish( QWidget * widget )
     {
         if ( !frame->isWindow() )
         {
-#if 0 // i want them centered, but titlewidget fights back, and it's not worth the eventfilter monitor
-            if (QLabel *label = qobject_cast<QLabel*>(frame))
-            {   // i want them center aligned
-                if (label->parentWidget() && label->parentWidget()->parentWidget() &&
-                    label->parentWidget()->parentWidget()->inherits("KTitleWidget"))
-                    label->setAlignment(Qt::AlignCenter);
-            } else
+            if (QLabel *label = qobject_cast<QLabel*>(frame)) {
+                if (QWidget *dad = label->parentWidget()) {
+                    bool isTitle = false;
+                    if (dad->inherits("KFontRequester") || (isTitle = (dad->parentWidget() && dad->parentWidget()->inherits("KTitleWidget"))))
+                        label->setAlignment(Qt::AlignCenter); // fix alignment
+#if 1
+                        if (isTitle) { // KTitleWidget uses a RichText label (html) - naaahhhhh.
+                            label->setTextFormat(Qt::PlainText); // fix mode
+                            // fix font
+                            QFont fnt; fnt.setBold(true); fnt.setCapitalization(QFont::SmallCaps);
+                            if (fnt.pointSize() > -1)
+                                fnt.setPointSize(qRound(fnt.pointSize()*1.3));
+                            label->setFont(fnt);
+                        }
 #endif
-            // sunken looks soo much nicer ;)
-            if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
-            {
-                if (config.bg.mode == Scanlines)
-                    frame->setFrameShadow(QFrame::Sunken);
-                else
-                {
-                    frame->setAutoFillBackground(false);
-                    frame->setBackgroundRole(QPalette::Window);
-                    frame->setForegroundRole(QPalette::WindowText);
                 }
             }
-            else if (frame->frameShape() != QFrame::NoFrame )
+            // sunken looks soo much nicer ;)
+            else if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
             {
-#if  QT_VERSION < 0x040500 // 4.5 has a CE_ for this =)
-                // Kill ugly line look (we paint our styled v and h lines instead ;)
-                if (frame->frameShape() == QFrame::HLine || frame->frameShape() == QFrame::VLine)
-                    FILTER_EVENTS(widget);
-                else if (frame->frameShape() != QFrame::StyledPanel)
-                {   // Kill ugly winblows frames... (qShadeBlablabla stuff)
-                    if ( frame->frameShape() == QFrame::Box )
-                        frame->setFrameShadow( QFrame::Plain );
-                    frame->setFrameShape(QFrame::StyledPanel);
+                if (config.bg.mode == Scanlines) {
+                    frame->setFrameShadow(QFrame::Sunken);
+                    frame->setAutoFillBackground(true);
+                } else {
+                    frame->setFrameShadow(QFrame::Raised);
+                    frame->setAutoFillBackground(false);
                 }
+
+#if 0
+                    frame->setFrameShadow(QFrame::Sunken);
+                    frame->setAutoFillBackground(false);
+// #else
+                    frame->setAutoFillBackground(true);
+                    frame->setBackgroundRole(QPalette::WindowText);
+                    frame->setForegroundRole(QPalette::Window);
+//                     QPalette pal = frame->palette(), dadsPal = frame->parentWidget()->palette();
+//                     pal.setColor(QPalette::Window, dadsPal.color(QPalette::Highlight));
+//                     pal.setColor(QPalette::WindowText, dadsPal.color(QPalette::Window));
+//                     pal.setColor(QPalette::Base, dadsPal.color(QPalette::WindowText));
+//                     pal.setColor(QPalette::Text, Qt::red);
+//                     frame->setPalette(pal);
+//                     foreach (QWidget *kid, frame->findChildren<QLabel*>()) {
+//                         kid->setAutoFillBackground(true);
+//                         kid->setStyleSheet(QString("*{background-color:red; color:white;}"));
+//                         QPalette pal = kid->palette(); pal.setColor(QPalette::Text, frame->palette().color(QPalette::Window));
+//                         kid->setPalette(pal);
+//                         kid->setBackgroundRole(QPalette::WindowText);
+//                         kid->setForegroundRole(QPalette::Window);
+//                         kid->unsetPalette();
+//                     }
 #endif
-//             if ( appType == KMail && frame->frameStyle() == (QFrame::StyledPanel|QFrame::Sunken) && frame->inherits("KHBox") )
-//                 frame->setFrameShadow(QFrame::Raised);
+//                 }
             }
         }
         // just saw they're niftier in skulpture -> had to do sth. ;-P
@@ -699,7 +716,7 @@ Style::polish( QWidget * widget )
                     widget->setAttribute(Qt::WA_Hover);
             }
             // just <strike>broadsword</strike> gladius here - the stupid viewport should use the mouse...
-            else  if (appType != Dolphin && area && area->viewport())
+            else  if (appType != Dolphin && appType != Plasma && area && area->viewport())
                 area->viewport()->setAttribute(Qt::WA_NoMousePropagation);
 #if 0 // does not work
             else if (appType == Amarok && widget->inherits("Context::ContextView"))
@@ -731,7 +748,7 @@ Style::polish( QWidget * widget )
         if ( !frame->isWindow() )
         {
             /// "Frame above Content" look, but ...
-            if (isSpecialFrame(widget))
+            if (frame->frameShape() != QFrame::NoFrame && isSpecialFrame(widget))
             {   // ...QTextEdit etc. can be handled more efficiently
                 if (frame->lineWidth() == 1)
                     frame->setLineWidth(F(4)); // but must have enough indention

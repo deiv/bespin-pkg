@@ -9,6 +9,7 @@ option(ENABLE_ARGB "Enable translucent windows" ON)
 option(ENABLE_KDE "Enable Bespin support for KDE4" ON)
 option(ENABLE_KWIN "Build Bespin KWin decoration" ON)
 option(ENABLE_XBAR "Enable the XBar plasmoid (Mac-Alike-Menubar)" ON)
+option(ENABLE_474_SHADOWS "Enable shadows with variable pixmap size (requires KWin >= 4.7.4)" ON)
 
 if (ENABLE_KDE)
     find_package(KDE4)
@@ -20,6 +21,13 @@ if (ENABLE_ARGB)
 else (ENABLE_ARGB)
     add_definitions ( -DBESPIN_ARGB_WINDOWS=0 )
 endif (ENABLE_ARGB)
+
+if (ENABLE_474_SHADOWS)
+    message (STATUS "WARNING: *** Variable shadow pixmap sizes will cause glitches on KWin < 4.7.4 and OpenGL ***")
+    add_definitions ( -DVARYING_SHADOWS=1 )
+else (ENABLE_474_SHADOWS)
+    add_definitions ( -DVARYING_SHADOWS=0 )
+endif (ENABLE_474_SHADOWS)
 
 find_package(X11)
 

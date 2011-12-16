@@ -47,6 +47,8 @@ Style::isSpecialFrame(const QWidget *widget)
         return (last_isSpecialFrame = true);
     if IS_HTML_WIDGET
         return (last_isSpecialFrame = true);
+    if (widget->minimumSize() == widget->maximumSize()) // koffice uses this... and miscalculates margins.
+        return false;
     if (const QListView *view = qobject_cast<const QListView*>(widget))
     {
         last_isSpecialFrame = (view->viewMode() == QListView::IconMode || view->inherits("KCategorizedView"));
@@ -263,7 +265,7 @@ Style::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, const 
                 pf |= Tile::Left;
             }
             shadows.line[0][Sunken].render(textRect, painter, pf, true);
-        
+
 //             const int x = textRect.right();
 //             textRect.setRight(RECT.right()); textRect.setLeft(x);
 //             shadows.line[0][Sunken].render(textRect, painter, Tile::Center | Tile::Right, true);
@@ -275,7 +277,7 @@ Style::drawGroupBox(const QStyleOptionComplex *option, QPainter *painter, const 
             shadows.line[0][Sunken].render(textRect, painter, Tile::Full, true);
         }
     }
-       
+
     // Checkbox
     // TODO: doesn't hover - yet.
     if (groupBox->subControls & SC_GroupBoxCheckBox)

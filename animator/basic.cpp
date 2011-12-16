@@ -149,7 +149,7 @@ Basic::eventFilter( QObject* object, QEvent *e )
    QWidget* widget = qobject_cast<QWidget*>(object);
    if (!(widget && widget->isVisible()))
       return false;
-   
+
    switch (e->type())
    {
     case QEvent::MouseMove:

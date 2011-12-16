@@ -33,7 +33,6 @@ Style::dockLocationChanged( Qt::DockWidgetArea /*area*/ )
     QDockWidget *dock = carriedDock ? carriedDock : qobject_cast<QDockWidget*>( sender() );
     if ( !dock )
         return;
-
     if ( dock->isFloating() || !Hacks::config.lockDocks )
     {
         if ( QWidget *title = dock->titleBarWidget() )
@@ -49,13 +48,15 @@ Style::dockLocationChanged( Qt::DockWidgetArea /*area*/ )
     }
     else
     {
-        if ( !dock->titleBarWidget() )
+        QWidget *title = dock->titleBarWidget();
+        if ( !title )
         {
-            QWidget *title = new QWidget;
+            title = new QWidget;
             title->setObjectName( "bespin_docktitle_dummy" );
             dock->setTitleBarWidget( title );
         }
-        dock->titleBarWidget()->hide();
+        if ( title->objectName() ==  "bespin_docktitle_dummy" )
+            dock->titleBarWidget()->hide();
     }
 }
 
@@ -99,7 +100,7 @@ Style::drawDockTitle(const QStyleOption *option, QPainter *painter, const QWidge
                 if (config.bg.docks.shape && widget->parentWidget())
                 {
                     QPixmap *buffer = new QPixmap(RECT.size());
-                    QRect r = buffer->rect();
+//                     QRect r = buffer->rect();
                     const int rnd = F(8);
                     QPainter bp(buffer);
                     bp.setPen(Qt::NoPen);
