@@ -102,6 +102,7 @@ Factory::Factory() : QObject(), KDecorationFactory()
     connect (qApp, SIGNAL(aboutToQuit()), SLOT(cleanUp()));
     connect (KWindowSystem::self(), SIGNAL(compositingChanged(bool)), SLOT(updateCompositingState(bool)));
     weAreInitialized = true;
+    weAreComposited = KWindowSystem::compositingActive();
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
     QDBusConnection::sessionBus().registerObject("/BespinDeco", this);
