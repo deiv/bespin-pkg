@@ -105,6 +105,7 @@ private:
     bool readConfig();
 private slots:
     void cleanUp();
+    void updateCompositingState(bool);
 private:
     static Qt::KeyboardModifier ourCommandKey;
     static QHash<qint64, WindowData*> ourDecoInfos;

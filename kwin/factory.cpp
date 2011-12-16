@@ -99,7 +99,8 @@ Factory::Factory() : QObject(), KDecorationFactory()
     p.drawEllipse(mask.rect());
     p.end();
 
-    connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
+    connect (qApp, SIGNAL(aboutToQuit()), SLOT(cleanUp()));
+    connect (KWindowSystem::self(), SIGNAL(compositingChanged(bool)), SLOT(updateCompositingState(bool)));
     weAreInitialized = true;
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
@@ -783,6 +784,13 @@ Factory::updateDeco(WId id)
             deco->reset(SettingColors);
             return;
         }
+}
+
+void
+Factory::updateCompositingState(bool active)
+{
+    weAreComposited = !active;
+    reset(0);
 }
 
 WindowData*
