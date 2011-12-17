@@ -175,6 +175,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.invertDolphinUrlBar = Hacks::config.extendDolphinViews && readBool(HACK_DOLPHIN_URLBAR);
         Hacks::config.konsoleScanlines = readBool(HACK_KONSOLE_SCANLINES);
         Hacks::config.suspendFullscreenPlayers = readBool(HACK_SUSPEND_FULLSCREEN_PLAYERS);
+        Hacks::config.titleWidgets = readBool(HACK_TITLE_WIDGET);
 
         // Font fixing offsets
         config.fontOffset[0] = fontOffset(false, &config.fontExtent);

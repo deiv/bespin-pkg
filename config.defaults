@@ -83,9 +83,11 @@
 #define HACK_KONSOLE_SCANLINES "Hack.KonsoleScanlines", true
 #define HACK_KRUNNER "Hack.KRunner", false
 #define HACK_SUSPEND_FULLSCREEN_PLAYERS "Hack.SuspendFSPlayers", false
-#define HACK_TREEVIEWS "Hack.TreeViews", false
 #define HACK_THROBBER "Hack.KillThrobber", false
+// yes - "true" by default since they're dead ugly
+#define HACK_TITLE_WIDGET"Hack.TitleWidget", true
 #define HACK_TOOLBAR_LOCKING "Hack.ToolBarLocking", false
+#define HACK_TREEVIEWS "Hack.TreeViews", false
 #define HACK_WINDOWMOVE "Hack.WindowMovement", false
 
 #define INPUT_PWECHOCHAR "Input.PwEchoChar", 0x26AB
