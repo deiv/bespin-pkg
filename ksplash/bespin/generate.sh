@@ -12,11 +12,11 @@ DIR="${1}x${2}"
 mkdir "$DIR" 2>/dev/null
 
 if [ ! -e "$DIR/background.png" ]; then
-    convert -scale $DIR! -filter lanczos ../kdm/background.jpg "$DIR/background.png"
+    convert -scale $DIR! -filter lanczos ../../kdm/background.jpg "$DIR/background.png"
 fi
 
 if [ ! -e Preview.png ]; then
-    convert -scale 740x420! -filter lanczos ../kdm/background.jpg ".tmp.png"
+    convert -scale 740x420! -filter lanczos ../../kdm/background.jpg ".tmp.png"
     convert -crop 740x420+6660+0 pulse.png ".tmp2.png"
     convert ".tmp.png" ".tmp2.png" -gravity Center -composite Preview.png
     mogrify -scale 400x300 -filter lanczos Preview.png
