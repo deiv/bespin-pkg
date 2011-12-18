@@ -27,7 +27,7 @@ override_dh_auto_build:
 	./generate.sh 1440 900; ./generate.sh 1600 1200; ./generate.sh 1920 1080;
 
 	# Build icons
-	cd icons; cp config.example config; ./generate_kde_icons.sh
+	cd icons; test -f config || cp config.example config; ./generate_kde_icons.sh
 
 override_dh_auto_install:
 	test -d build || exit 1
