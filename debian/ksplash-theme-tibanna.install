@@ -1,0 +1,3 @@
+ksplash/tibanna/[1-9]*	usr/share/kde4/apps/ksplash/Themes/Tibanna/
+ksplash/tibanna/*.png	usr/share/kde4/apps/ksplash/Themes/Tibanna/
+ksplash/tibanna/Theme.rc	usr/share/kde4/apps/ksplash/Themes/Tibanna/

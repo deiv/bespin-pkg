@@ -16,8 +16,15 @@ override_dh_auto_configure:
 override_dh_auto_build:
 	test -d build || exit 1
 	cd build; $(MAKE)
-	cd ksplash; ./generate.sh 1024 768; ./generate.sh 1280 1024; ./generate.sh 1366 768; ./generate.sh 1440 900;  \
-		./generate.sh 1600 1200; ./generate.sh 1920 1080;
+	cd ksplash; 
+	for x in *; do
+		if [ -d $x ]; then
+			cd $x;
+			./generate.sh 1024 768; ./generate.sh 1280 1024; ./generate.sh 1366 768; \
+			./generate.sh 1440 900; ./generate.sh 1600 1200; ./generate.sh 1920 1080;
+			cd ..;
+		fi
+	done
 
 	# Build icons
 	cd icons; cp config.example config; ./generate_kde_icons.sh

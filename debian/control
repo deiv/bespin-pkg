@@ -38,6 +38,26 @@ Description: A very glossy Qt4/KDE4 window decoration
  .
  This package includes the ksplash theme for Bespin
 
+Package: ksplash-theme-tibanna
+Architecture: all
+Suggests: kde-style-bespin
+Description: A very glossy Qt4/KDE4 window decoration
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+ .
+ This package includes the ksplash theme for Bespin - Tibanna variant
+
+Package: ksplash-theme-aperture
+Architecture: all
+Suggests: kde-style-bespin
+Description: A very glossy Qt4/KDE4 window decoration
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+ .
+ This package includes the ksplash theme for Bespin - Aperture variant
+
 Package: bespin-icon-theme
 Architecture: all
 Suggests: kde-style-bespin
