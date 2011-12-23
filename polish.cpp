@@ -573,20 +573,28 @@ Style::polish( QWidget * widget )
                     label->setAlignment(Qt::AlignCenter); // fix alignment
             }
             // sunken looks soo much nicer ;)
-            else if (Hacks::config.titleWidgets && frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
+            else if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
             {
-                if (config.bg.mode == Scanlines) {
-                    frame->setBackgroundRole(QPalette::Base);
-                    frame->setForegroundRole(QPalette::Text);
-                } else {
-                    frame->setBackgroundRole(QPalette::WindowText);
-                    frame->setForegroundRole(QPalette::Window);
-                }
-                QList<QLabel*> labels = frame->findChildren<QLabel*>();
-                foreach (QLabel *label, labels)
+                if (Hacks::config.titleWidgets)
                 {
-                    label->setBackgroundRole(frame->backgroundRole());
-                    label->setForegroundRole(frame->foregroundRole());
+                    if (config.bg.mode == Scanlines) {
+                        frame->setBackgroundRole(QPalette::Base);
+                        frame->setForegroundRole(QPalette::Text);
+                    } else {
+                        frame->setBackgroundRole(QPalette::WindowText);
+                        frame->setForegroundRole(QPalette::Window);
+                    }
+                    QList<QLabel*> labels = frame->findChildren<QLabel*>();
+                    foreach (QLabel *label, labels)
+                    {
+                        label->setBackgroundRole(frame->backgroundRole());
+                        label->setForegroundRole(frame->foregroundRole());
+                    }
+                }
+                else
+                {
+                    frame->setFrameShape(QFrame::NoFrame);
+                    frame->setAutoFillBackground(false);
                 }
             }
         }
