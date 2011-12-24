@@ -343,6 +343,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 
     if ( e->type() == QEvent::Paint )
     {
+        if (config.titleWidgets)
         if (QLabel *label = qobject_cast<QLabel*>(o))
         if (label->parentWidget() && label->parentWidget()->parentWidget() &&
             label->parentWidget()->parentWidget()->inherits("KTitleWidget"))
