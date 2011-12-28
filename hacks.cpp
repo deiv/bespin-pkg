@@ -73,9 +73,6 @@ using namespace Bespin;
 
 static Hacks *bespinHacks = 0L;
 static Hacks::HackAppType *appType = 0L;
-// const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
-// const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
-const char *VLCVideoWidget = "BackgroundWidget"; // "VideoWidget"; //
 static BePointer<QWidget> dragCandidate = 0L;
 static BePointer<QWidget> dragWidget = 0L;
 static bool dragWidgetHadTrack = false;
@@ -242,15 +239,7 @@ isWindowDragWidget(QObject *o, const QPoint *pt = 0L)
          (qobject_cast<QToolButton*>(o) && !static_cast<QWidget*>(o)->isEnabled()) ||
          qobject_cast<QToolBar*>(o) || qobject_cast<QDockWidget*>(o) ||
 
-         qobject_cast<QStatusBar*>(o) ||
-
-        // now catched by QMainWindow
-//          ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
-//          ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
-        // whatever the videowidget is, VLC does not work since it apparently does not get polished...
-//         ((*appType == Hacks::VLC) && o->inherits(VLCVideoWidget)) ||
-
-            (o->inherits("QMainWindow") ) )
+         qobject_cast<QStatusBar*>(o) || (o->inherits("QMainWindow") ) )
         return true;
 
     if ( QLabel *label = qobject_cast<QLabel*>(o) )
@@ -520,7 +509,6 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     if (e->type() == QEvent::WindowStateChange)
     {
         if (config.suspendFullscreenPlayers)
-        if (*appType == SMPlayer || *appType == VLC || *appType == Dragon)
         if (QWidget *w = qobject_cast<QWidget*>(o))
         if (w->isWindow())
         {
@@ -568,18 +556,9 @@ Hacks::add(QWidget *w)
             *appType = KDM;
         else if (QCoreApplication::applicationName() == "gwenview")
             *appType = Gwenview;
-        else if (QCoreApplication::applicationName() == "dragonplayer")
-            *appType = Dragon;
-        else if (!QCoreApplication::arguments().isEmpty() &&
-                 QCoreApplication::arguments().at(0).endsWith("smplayer"))
-            *appType = SMPlayer;
-        else if (!QCoreApplication::arguments().isEmpty() &&
-            QCoreApplication::arguments().at(0).endsWith("vlc"))
-            *appType = VLC;
     }
 
     if (config.suspendFullscreenPlayers)
-    if (*appType == SMPlayer || *appType == VLC || *appType == Dragon)
     if (w->isWindow())
     {
         ENSURE_INSTANCE;
