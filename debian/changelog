@@ -1,3 +1,10 @@
+bespin (0.r1446-1) experimental; urgency=low
+
+  * Sync with SVN@1446 
+  * Initial release. (Closes: #651091)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 31 Dec 2011 13:39:27 +0530
+
 bespin (0.r1436-1) UNRELEASED; urgency=low
 
   * Sync with SVN@1436
@@ -5,24 +12,3 @@ bespin (0.r1436-1) UNRELEASED; urgency=low
     - Added 2 new Ksplash themes: Aperture and Tibanna
 
  -- Ritesh Raj Sarraf <rrs@debian.org>  Mon, 19 Dec 2011 01:04:31 +0530
-
-kde-style-bespin (0.r1425-1) UNRELEASED; urgency=low
-
-  * Sync with SVN@1425
-
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 11 Dec 2011 14:49:37 +0530
-
-kde-style-bespin (0.r1421-1) UNRELEASED; urgency=low
-
-  * Sync with SVN@1421
-  * Also ship kdm theme and ksplash theme. 2 new packages:
-    - kdm-theme-bespin
-    - ksplash-theme-bespin 
-
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 26 Nov 2011 23:54:34 +0530
-
-kde-style-bespin (0.r1419-1) UNRELEASED; urgency=low
-
-  * Initial release. (Closes: #XXXXXX)
-
- -- Ritesh Raj Sarraf <rrs@debian.org>  Mon, 21 Nov 2011 21:21:14 +0530
