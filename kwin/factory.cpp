@@ -43,6 +43,7 @@
 #include <KConfigGroup>
 #include <kwindowsystem.h>
 #include <kdeversion.h>
+#include "../blib/FX.h"
 #include "../blib/shadows.h"
 #include "../config.defaults"
 // #include "button.h"
@@ -99,8 +100,11 @@ Factory::Factory() : QObject(), KDecorationFactory()
     p.drawEllipse(mask.rect());
     p.end();
 
-    connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
+    connect (qApp, SIGNAL(aboutToQuit()), SLOT(cleanUp()));
+    connect (KWindowSystem::self(), SIGNAL(compositingChanged(bool)), SLOT(updateCompositingState(bool)));
     weAreInitialized = true;
+    weAreComposited = FX::compositingActive();
+    qDebug() << weAreComposited << KWindowSystem::compositingActive();
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
     QDBusConnection::sessionBus().registerObject("/BespinDeco", this);
@@ -134,7 +138,7 @@ bool Factory::reset(unsigned long changed)
     bool ret = configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder));
     
     bool wasComposited = weAreComposited;
-    weAreComposited = KWindowSystem::compositingActive();
+    weAreComposited = FX::compositingActive();
     if (wasComposited != weAreComposited)
         ret = false;
 
@@ -783,6 +787,13 @@ Factory::updateDeco(WId id)
             deco->reset(SettingColors);
             return;
         }
+}
+
+void
+Factory::updateCompositingState(bool active)
+{
+    weAreComposited = !active;
+    reset(0);
 }
 
 WindowData*
