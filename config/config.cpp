@@ -157,7 +157,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
         pal.setColor(groups[i], QPalette::Text, pal.color(groups[i], QPalette::WindowText));
     }
     ui.sectionSelect->setPalette(pal);
-    
+
     connect (ui.sectionSelect, SIGNAL(currentRowChanged(int)),
                 ui.sections, SLOT(setCurrentIndex(int)));
     connect (ui.sectionSelect, SIGNAL(currentTextChanged(const QString &)),
@@ -244,7 +244,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     generateGradientTypes(ui.headerSortingGradient);
     generateGradientTypes(ui.kwinInactiveGrad);
     generateGradientTypes(ui.kwinActiveGrad);
-   
+
     QSettings csettings("Bespin", "Config");
     QStringList strList = csettings.value ( "UserPwChars", QStringList() ).toStringList();
     ushort n;
@@ -285,13 +285,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     /** connection between the bgmode and the structure combo - not of interest*/
     connect(ui.bgMode, SIGNAL(currentIndexChanged(int)), this, SLOT(handleBgMode(int)));
     connect(ui.sliderGroove, SIGNAL(valueChanged(int)), this, SLOT(handleGrooveMode(int)));
-   
+
     /** 1. name the info browser, you'll need it to show up context help
     Can be any QTextBrowser on your UI form */
     setInfoBrowser(ui.info);
     /** 2. Define a context info that is displayed when no other context help is demanded */
     setDefaultContextInfo(defInfo1);
-    
+
     /** handleSettings(.) tells BConfig to take care (save/load) of a widget
     In this case "ui.bgMode" is the widget on the form,
     "BackgroundMode" specifies the entry in the ini style config file and
@@ -362,7 +362,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Now that KDE actually allows me again to choose an effect, you can select to leave the icon FX\
     untouched (what will result in different disabled looks for Qt and KDE applications), force the\
     Qt desaturation or the former Bespin (forced - sorry everyone) blurring.");
-   
+
     handleSettings(ui.gradChoose, CHOOSER_GRADIENT);
 
     handleSettings(ui.pwEchoChar, INPUT_PWECHOCHAR);
@@ -374,13 +374,13 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     setContextHelp(ui.dialogBtnLayout, "<b>Dialog button layout</b><hr>\
     This controls the order of the Yes/No/Cancel buttons, use with care, you might accidently\
     misclick if you revert it from e.g. KDE to OS X");
-    
+
     handleSettings(ui.drawSplitters, DRAW_SPLITTERS);
     setContextHelp(ui.drawSplitters, "<b>Draw Splitters</b><hr>\
     The things that allow you to adjust the layout in some windows (dolphin, amarok, many ... :)<br>\
     Warning: Unchecking this will result in VERY thin splitters (2px) - while they look slick, they're also\
     harder to hit. Test yoursef...");
-    
+
     handleSettings(ui.crMenuActive, MENU_ACTIVEROLE);
     handleSettings(ui.menuRound, MENU_ROUND);
     handleSettings(ui.menuRoundSelect, "Menu.RoundSelect", true);
@@ -411,7 +411,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.scrollActiveRole, "Scroll.ActiveRole", QPalette::Highlight);
 
     handleSettings(ui.shadowIntensity, SHADOW_INTENSITY);
-   
+
     handleSettings(ui.crTabBarActive, TAB_ACTIVEROLE);
     handleSettings(ui.tabAnimDuration, TAB_DURATION);
     handleSettings(ui.gradTab, TAB_GRADIENT);
@@ -449,27 +449,27 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     <li>It moves to another (upper) position when you leave the image view</li></ol>\
     If those were bugs, one could easily fix them, but they exists ever since...<br>\
     So you can fix them here >-)");
-    
+
     handleSettings(ui.hackDolphinUrl, HACK_DOLPHIN_URLBAR);
     setContextHelp(ui.hackDolphinUrl, "<b>Dolphin's URL Navigator</b><hr>\
     Invert colors, paint a TabBar-a-like frame and remove the location icon...");
-    
+
     handleSettings(ui.hackDolphinIconViews, HACK_DOLPHIN_ICONVIEWS);
     setContextHelp(ui.hackDolphinIconViews, "<b>Dolphin Iconviews</b><hr>\
     The three items for a unity when eg. splitting the view, but this is not reflected visually what\
     leads to \"disalignment\"");
-    
+
     handleSettings(ui.dolphinViews, HACK_DOLPHIN_VIEWS);
     setContextHelp(ui.dolphinViews, "<b>Dolphin sidebar</b><hr>\
     Dolphin sets some views in the sidebars to look like the window - check this to force a\
     \"traditional\" appearance.<br>(Sunken frame, Base colored background)");
-    
+
     handleSettings(ui.placesViews, HACK_PLACES_VIEWS);
     setContextHelp(ui.placesViews, "<b>Places selectors</b><hr>\
     The PlacesView also used in Dolphin appears in virtually all filedialogs and probably\
     some other places...<br>\
     Check this to hit them all");
-    
+
     handleSettings(ui.kmailFolderList, HACK_KMAIL_FOLDERS);
     setContextHelp(ui.kmailFolderList, "<b>KMail's Folder list</b><hr>\
     A bit more like Apple mail - the reasons:<br>\
@@ -483,7 +483,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
 
     handleSettings(ui.konsoleScanlines, HACK_KONSOLE_SCANLINES);
     setContextHelp(ui.konsoleScanlines, "<b>Konsole scanlines</b><hr>THE BELOVED SCANLINES!!!");
-    
+
+    handleSettings(ui.kTitleWidgets, HACK_TITLE_WIDGET);
+    setContextHelp(ui.kTitleWidgets, "<b>KTitleWidget</b><hr>I'd' like my headers inverted and center aligned...");
+
     handleSettings(ui.hackMessages, HACK_MESSAGES);
     setContextHelp(ui.hackMessages, "<b>Messageboxes</b><hr>\
     Overwrites the painting routines of QMessageBoxes for a custom appereance.<br>\
@@ -525,20 +528,20 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     setContextHelp(ui.killThrobber, "<b>Kill JarJar, err... Throbber</b><hr>\
     You see the nasty rotating thing in the top right of konqueror, now even oversizing the menubar?\
     Click here and you won't anymore >-P" );
-    
+
     handleSettings(ui.hackTreeViews, HACK_TREEVIEWS);
     setContextHelp(ui.hackTreeViews, "<b>Animate TreeViwes</b><hr>\
     This is a plain vanilla Qt feature, but must be activated by developers for each\
     treeview in order to be used - can be cute, can be annoying: choose by yourself<br>\
     This way it's activated globally." );
-    
+
     handleSettings(ui.lockToolbars, HACK_TOOLBAR_LOCKING);
     setContextHelp(ui.lockToolbars, "<b>Lock Toolbars</b><hr>\
     KDE toolbars allow you (among other) to lock their position, plain Qt Toolbars\
     (like in eg. arora) don't.<br>\
     This locks all Qt Toolbars and adds a config item, accessible by pressing CTRL\
     and rightclicking the Toolbar.");
-    
+
     handleSettings(ui.lockDocks, HACK_DOCK_LOCKING);
     setContextHelp(ui.lockDocks, "<b>Lock Dockwidgets</b><hr>\
     Qt mainwindows provide a (quite ;-) powerfull way to arrange parts of the application\
@@ -576,7 +579,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
         "<b>Horizontal Center Gradient</b><hr>The window horizontally brightens \
         to the center (similar to Apples Brushed Metal, less cheap, \
         fallback suggestion 2)";
-   
+
     /** if you call setContextHelp(.) with a combobox and pass a stringlist,
     the strings are attached to the combo entries and shown on select/hover */
     setContextHelp(ui.bgMode, strList);
@@ -624,7 +627,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                     (this works - of course - with every Qt4 application,\
                     not only the bespin executable)\
                     </p>");
-   
+
     setContextHelp(ui.pwEchoChar, "<b>Pasword Echo Character</b><hr>\
                     The character that is displayed instead of the real text when\
                     you enter e.g. a password.<br>\
@@ -697,7 +700,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
                     the M$ DOUBLEclick thing ;)<br>\
                     (Not exported from presets)");
 
-   
+
     /** setQSetting(.) tells BConfig to store values at
     "Company, Application, Group" - these strings are passed to QSettings */
     setQSetting("Bespin", "Style", "Style");
@@ -705,7 +708,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     /** you can call loadSettings() whenever you want, but (obviously)
     only items that have been propagated with handleSettings(.) are handled !!*/
     loadSettings();
-    
+
     ui.sections->setCurrentIndex(0);
 
     /** ===========================================
@@ -1050,7 +1053,7 @@ Config::restore(QTreeWidgetItem *item, int col)
     settings.endGroup();
     if ( QApplication::style()->objectName() == "bespin" || QApplication::setStyle("Bespin") )
         static_cast<BStyle*>(QApplication::style())->init(&settings);
-    
+
     settings.endGroup();
 }
 
@@ -1385,7 +1388,7 @@ Config::handleGrooveMode(int v)
         ui.grooveLabel->setText("INVALID");
     else
         ui.grooveLabel->setText(grooveModes[v]);
-    
+
     ui.showScrollButtons->setDisabled(v == 4);
     ui.fullScrollHover->setDisabled(v == 4);
     ui.invertGroove->setDisabled(v == 4);
@@ -1506,7 +1509,7 @@ Config::reloadColorRoles()
     generateColorModes(ui.headerSortingRole);
     QList<int> roles; roles << 3 << 4 << 6;
     generateColorModes(ui.viewShadingRole, &roles);
-    
+
     generateColorModes(ui.kwinInactiveRole);
     generateColorModes(ui.kwinActiveRole);
     generateColorModes(ui.kwinInactiveText);

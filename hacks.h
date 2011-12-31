@@ -42,7 +42,7 @@ public:
         bool messages, KHTMLView, treeViews, windowMovement, killThrobber, fixGwenview,
              opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews,
              lockToolBars, invertDolphinUrlBar, fixKMailFolderList, extendDolphinViews, lockDocks,
-             konsoleScanlines, suspendFullscreenPlayers;
+             konsoleScanlines, suspendFullscreenPlayers, titleWidgets;
     } config;
 private slots:
     void toggleToolBarLock();

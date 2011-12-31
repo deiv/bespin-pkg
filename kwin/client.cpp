@@ -48,6 +48,7 @@
 #include "../fixx11h.h"
 
 #include "../blib/colors.h"
+#include "../blib/FX.h"
 #include "../blib/gradients.h"
 #include "../blib/xproperty.h"
 #include "../blib/shadows.h"
@@ -60,7 +61,7 @@ using namespace Bespin;
 
 Client::Client(KDecorationBridge *b, Factory *f) :
 KDecoration(b, f), retry(0), myButtonOpacity(0), myActiveChangeTimer(0),
-topTile(0), btmTile(0), cnrTile(0), lCorner(0), rCorner(0),
+topTile(0), btmTile(0), cornerTile(0), lCorner(0), rCorner(0),
 bgMode(Factory::defaultBgMode()), corner(0), bg(0)
 {
     setParent( f );
@@ -83,11 +84,11 @@ Client::~Client()
 void
 Client::updateStylePixmaps()
 {
-    topTile = btmTile = cnrTile = lCorner = rCorner = 0;
+    topTile = btmTile = cornerTile = lCorner = rCorner = 0;
     unsigned long _5 = 5;
     if (WindowPics *pics = (WindowPics*)XProperty::get<Picture>(windowId(), XProperty::bgPics, XProperty::LONG, &_5))
     {
-        if ((topTile = pics->topTile))
+        if (FX::usesXRender() && (topTile = pics->topTile))
         {
             if (bg)
             {
@@ -97,7 +98,7 @@ Client::updateStylePixmaps()
                 bg = 0;
             }
             btmTile = pics->btmTile;
-            cnrTile = pics->cnrTile;
+            cornerTile = pics->cnrTile;
             lCorner = pics->lCorner;
             rCorner = pics->rCorner;
         }
@@ -121,11 +122,16 @@ Client::updateStylePixmaps()
                 bg->set = set;
                 bg->hash = hash;
             }
-            topTile = set->topTile.x11PictureHandle();
-            btmTile = set->btmTile.x11PictureHandle();
-            cnrTile = set->cornerTile.x11PictureHandle();
-            lCorner = set->lCorner.x11PictureHandle();
-            rCorner = set->rCorner.x11PictureHandle();
+            if (FX::usesXRender())
+            {
+                topTile = set->topTile.x11PictureHandle();
+                btmTile = set->btmTile.x11PictureHandle();
+                cornerTile = set->cornerTile.x11PictureHandle();
+                lCorner = set->lCorner.x11PictureHandle();
+                rCorner = set->rCorner.x11PictureHandle();
+            }
+            else
+                topTile = btmTile = cornerTile = lCorner = rCorner = -1;
         }
         XFree(pics);
     }
@@ -363,6 +369,7 @@ Client::eventFilter(QObject *o, QEvent *e)
             if (color(ColorTitleBar, isActive()).alpha() == 0xff)
             {
                 // try to copy from redirection
+                if (FX::usesXRender())
                 if ( QPaintDevice *device = QPainter::redirected(widget(), &off) )
                 {
                     if (device->devType() == QInternal::Pixmap)
@@ -559,16 +566,21 @@ Client::minimumSize() const
 }
 
 #define DUMP_PICTURE(_PREF_, _PICT_)\
+if (FX::usesXRender()) { \
 if (bg.alpha() != 0xff){\
     _PREF_##Buffer.detach();\
     _PREF_##Buffer.fill(Qt::transparent);\
     XRenderComposite(QX11Info::display(), PictOpOver, _PICT_, 0, _PREF_##Buffer.x11PictureHandle(),\
     0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);\
 }\
-else\
+else {\
     _PREF_##Buffer.fill(bg);\
     XRenderComposite(QX11Info::display(), PictOpSrc, _PICT_, 0, _PREF_##Buffer.x11PictureHandle(),\
     0, 0, 0, 0, 0, 0, _PREF_##Width, _PREF_##Height);\
+}}\
+else if (this->bg && this->bg->set) { \
+    _PREF_##Buffer = this->bg->set->_PICT_; \
+}
 
 inline static void shrink(QFont &fnt, float factor)
 {
@@ -675,7 +687,7 @@ Client::repaint(QPainter &p, bool paintTitle)
                 {
                     s2 = 128-s1;
                     QPixmap ctBuffer(ctWidth, ctHeight);
-                    DUMP_PICTURE(ct, cnrTile);
+                    DUMP_PICTURE(ct, cornerTile);
                     p.drawTiledPixmap( 0, 0, w, s2, ctBuffer, 0, s1 );
                     p.drawTiledPixmap( width()-w, 0, w, s2, ctBuffer, 0, s1 );
                 }
@@ -723,7 +735,7 @@ Client::repaint(QPainter &p, bool paintTitle)
             p.drawTiledPixmap( width() - s2, h, s2, height()-h, tbBuffer );
             DUMP_PICTURE(lrc, rCorner); // right bottom shine
             p.drawPixmap(width() - s2, h-32, lrcBuffer);
-            DUMP_PICTURE(ct, cnrTile); // misleading, TOP TILE
+            DUMP_PICTURE(ct, cornerTile); // misleading, TOP TILE
             p.drawTiledPixmap( 0, h-(128+32), width(), 128, ctBuffer );
             break;
         }

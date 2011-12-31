@@ -37,6 +37,7 @@
 #include <QStyleOption>
 #include <QStyleOptionGroupBox>
 #include <QTabBar>
+#include <QTextDocument>
 #include <QToolBar>
 #include <QToolButton>
 
@@ -72,9 +73,6 @@ using namespace Bespin;
 
 static Hacks *bespinHacks = 0L;
 static Hacks::HackAppType *appType = 0L;
-// const char *SMPlayerVideoWidget = "MplayerLayer" ;// MplayerWindow
-// const char *DragonVideoWidget = "Phonon::VideoWidget"; // Codeine::VideoWindow, Phonon::Xine::VideoWidget
-const char *VLCVideoWidget = "BackgroundWidget"; // "VideoWidget"; //
 static BePointer<QWidget> dragCandidate = 0L;
 static BePointer<QWidget> dragWidget = 0L;
 static bool dragWidgetHadTrack = false;
@@ -237,19 +235,11 @@ isWindowDragWidget(QObject *o, const QPoint *pt = 0L)
     if ( qobject_cast<QDialog*>(o) ||
          (qobject_cast<QMenuBar*>(o) && !static_cast<QMenuBar*>(o)->activeAction()) ||
          qobject_cast<QGroupBox*>(o) ||
-        
+
          (qobject_cast<QToolButton*>(o) && !static_cast<QWidget*>(o)->isEnabled()) ||
          qobject_cast<QToolBar*>(o) || qobject_cast<QDockWidget*>(o) ||
 
-         qobject_cast<QStatusBar*>(o) ||
-
-        // now catched by QMainWindow
-//          ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget)) ||
-//          ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget)) ||
-        // whatever the videowidget is, VLC does not work since it apparently does not get polished...
-//         ((*appType == Hacks::VLC) && o->inherits(VLCVideoWidget)) ||
-
-            (o->inherits("QMainWindow") ) )
+         qobject_cast<QStatusBar*>(o) || (o->inherits("QMainWindow") ) )
         return true;
 
     if ( QLabel *label = qobject_cast<QLabel*>(o) )
@@ -287,7 +277,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
         if (gb->isFlat())
             opt.features |= QStyleOptionFrameV2::Flat;
         opt.lineWidth = 1; opt.midLineWidth = 0;
-        
+
         opt.text = gb->title();
         opt.textAlignment = gb->alignment();
 
@@ -296,7 +286,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
             opt.subControls |= QStyle::SC_GroupBoxLabel;
 
         opt.state |= (gb->isChecked() ? QStyle::State_On : QStyle::State_Off);
-        
+
         if (gb->style()->subControlRect(QStyle::CC_GroupBox, &opt, QStyle::SC_GroupBoxCheckBox, gb).contains(mev->pos()))
             return false;
     }
@@ -315,7 +305,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
 // obviously gwenview is completely incapable to keep the view position when watching an image
 // -> we need a beter image browser :(
 static int gwenview_position = 0;
-
+static QTextDocument html2text;
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
@@ -341,7 +331,53 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         return hackMessageBox(box, e);
 
     if ( e->type() == QEvent::Paint )
+    {
+        if (config.titleWidgets)
+        if (QLabel *label = qobject_cast<QLabel*>(o))
+        if (label->parentWidget() && label->parentWidget()->parentWidget() &&
+            label->parentWidget()->parentWidget()->inherits("KTitleWidget"))
+        {
+            QWidget *container = label->parentWidget();
+            QList<QLabel*> kids = container->findChildren<QLabel*>();
+            foreach (QLabel *kid, kids)
+                FILTER_EVENTS(kid); // the stupid KTitleWidget removes filters...
+
+            QString string = label->text();
+            if (string.contains('<'))
+                { html2text.setHtml(string); string = html2text.toPlainText(); }
+
+            QStringList strings = string.split('\n', QString::SkipEmptyParts);
+            if (strings.isEmpty())
+                return false;
+
+//             qDebug() << strings;
+
+            QRect r = label->contentsRect();
+            const int fh = r.height()/(strings.count()+1);
+            QPainter p(label);
+            p.setPen(container->palette().color(container->foregroundRole()));
+            QFont fnt(container->font());
+            fnt.setPixelSize(2*fh);
+            r.setBottom(r.top()+2*fh);
+            p.setFont(fnt);
+            p.drawText( r, Qt::AlignCenter|Qt::TextSingleLine, strings.at(0) );
+
+            if (strings.count() < 2)
+                return true;
+
+            fnt.setPixelSize(fh-2);
+            p.setFont(fnt);
+            r.setTop(r.top()+fh);
+
+            for (int i = 1; i < strings.count(); ++i)
+            {
+                r.translate(0, fh);
+                p.drawText( r, Qt::AlignCenter|Qt::TextSingleLine, strings.at(i) );
+            }
+            return true;
+        }
         return false;
+    }
 
     if (e->type() == QEvent::MouseButtonPress)
     {
@@ -473,7 +509,6 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     if (e->type() == QEvent::WindowStateChange)
     {
         if (config.suspendFullscreenPlayers)
-        if (*appType == SMPlayer || *appType == VLC || *appType == Dragon)
         if (QWidget *w = qobject_cast<QWidget*>(o))
         if (w->isWindow())
         {
@@ -521,18 +556,9 @@ Hacks::add(QWidget *w)
             *appType = KDM;
         else if (QCoreApplication::applicationName() == "gwenview")
             *appType = Gwenview;
-        else if (QCoreApplication::applicationName() == "dragonplayer")
-            *appType = Dragon;
-        else if (!QCoreApplication::arguments().isEmpty() &&
-                 QCoreApplication::arguments().at(0).endsWith("smplayer"))
-            *appType = SMPlayer;
-        else if (!QCoreApplication::arguments().isEmpty() &&
-            QCoreApplication::arguments().at(0).endsWith("vlc"))
-            *appType = VLC;
     }
 
     if (config.suspendFullscreenPlayers)
-    if (*appType == SMPlayer || *appType == VLC || *appType == Dragon)
     if (w->isWindow())
     {
         ENSURE_INSTANCE;
@@ -548,7 +574,7 @@ Hacks::add(QWidget *w)
         w->installEventFilter(bespinHacks);
         return true;
     }
-    
+
     if (config.lockToolBars && qobject_cast<QToolBar*>(w) && !w->inherits("KToolBar"))
     {
         ENSURE_INSTANCE;
@@ -603,6 +629,18 @@ Hacks::add(QWidget *w)
         FILTER_EVENTS(w);
         return true;
     }
+
+    if (config.titleWidgets)
+    if (QFrame *frame = qobject_cast<QFrame*>(w))
+    if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
+    {
+        ENSURE_INSTANCE;
+        frame->setFrameShadow(QFrame::Sunken);
+        frame->setAutoFillBackground(true);
+        QList<QLabel*> labels = frame->findChildren<QLabel*>();
+        foreach (QLabel *label, labels)
+            FILTER_EVENTS(label);
+    }
 #if 0
     ENSURE_INSTANCE;
     FILTER_EVENTS(w);
@@ -627,7 +665,7 @@ Hacks::remove(QWidget *w)
 
 void
 Hacks::releaseApp()
-{ 
+{
     bespinHacks->deleteLater(); bespinHacks = 0L;
     lockToggleMenu->deleteLater(); lockToggleMenu = 0L;
 }

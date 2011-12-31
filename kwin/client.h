@@ -112,7 +112,7 @@ private:
     int myBaseSize, myEdgeSize, myTitleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
     int myButtonOpacity;
     int myActiveChangeTimer;
-    Picture topTile, btmTile, cnrTile, lCorner, rCorner;
+    Picture topTile, btmTile, cornerTile, lCorner, rCorner;
     uint bgMode, unoHeight;
     Gradients::Type gType[2];
     bool iAmSmall;

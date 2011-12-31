@@ -569,57 +569,33 @@ Style::polish( QWidget * widget )
         if ( !frame->isWindow() )
         {
             if (QLabel *label = qobject_cast<QLabel*>(frame)) {
-                if (QWidget *dad = label->parentWidget()) {
-                    bool isTitle = false;
-                    if (dad->inherits("KFontRequester") || (isTitle = (dad->parentWidget() && dad->parentWidget()->inherits("KTitleWidget"))))
-                        label->setAlignment(Qt::AlignCenter); // fix alignment
-#if 1
-                        if (isTitle) { // KTitleWidget uses a RichText label (html) - naaahhhhh.
-                            label->setTextFormat(Qt::PlainText); // fix mode
-                            // fix font
-                            QFont fnt; fnt.setBold(true); fnt.setCapitalization(QFont::SmallCaps);
-                            if (fnt.pointSize() > -1)
-                                fnt.setPointSize(qRound(fnt.pointSize()*1.3));
-                            label->setFont(fnt);
-                        }
-#endif
-                }
+                if (label->parentWidget() && label->parentWidget()->inherits("KFontRequester"))
+                    label->setAlignment(Qt::AlignCenter); // fix alignment
             }
             // sunken looks soo much nicer ;)
             else if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
             {
-                if (config.bg.mode == Scanlines) {
-                    frame->setFrameShadow(QFrame::Sunken);
-                    frame->setAutoFillBackground(true);
-                } else {
-                    frame->setFrameShadow(QFrame::Raised);
+                if (Hacks::config.titleWidgets)
+                {
+                    if (config.bg.mode == Scanlines) {
+                        frame->setBackgroundRole(QPalette::Base);
+                        frame->setForegroundRole(QPalette::Text);
+                    } else {
+                        frame->setBackgroundRole(QPalette::WindowText);
+                        frame->setForegroundRole(QPalette::Window);
+                    }
+                    QList<QLabel*> labels = frame->findChildren<QLabel*>();
+                    foreach (QLabel *label, labels)
+                    {
+                        label->setBackgroundRole(frame->backgroundRole());
+                        label->setForegroundRole(frame->foregroundRole());
+                    }
+                }
+                else
+                {
+                    frame->setFrameShape(QFrame::NoFrame);
                     frame->setAutoFillBackground(false);
                 }
-
-#if 0
-                    frame->setFrameShadow(QFrame::Sunken);
-                    frame->setAutoFillBackground(false);
-// #else
-                    frame->setAutoFillBackground(true);
-                    frame->setBackgroundRole(QPalette::WindowText);
-                    frame->setForegroundRole(QPalette::Window);
-//                     QPalette pal = frame->palette(), dadsPal = frame->parentWidget()->palette();
-//                     pal.setColor(QPalette::Window, dadsPal.color(QPalette::Highlight));
-//                     pal.setColor(QPalette::WindowText, dadsPal.color(QPalette::Window));
-//                     pal.setColor(QPalette::Base, dadsPal.color(QPalette::WindowText));
-//                     pal.setColor(QPalette::Text, Qt::red);
-//                     frame->setPalette(pal);
-//                     foreach (QWidget *kid, frame->findChildren<QLabel*>()) {
-//                         kid->setAutoFillBackground(true);
-//                         kid->setStyleSheet(QString("*{background-color:red; color:white;}"));
-//                         QPalette pal = kid->palette(); pal.setColor(QPalette::Text, frame->palette().color(QPalette::Window));
-//                         kid->setPalette(pal);
-//                         kid->setBackgroundRole(QPalette::WindowText);
-//                         kid->setForegroundRole(QPalette::Window);
-//                         kid->unsetPalette();
-//                     }
-#endif
-//                 }
             }
         }
         // just saw they're niftier in skulpture -> had to do sth. ;-P
