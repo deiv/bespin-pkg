@@ -880,7 +880,6 @@ blackListed(QString &key)
         key.startsWith("App.") || // don't im/export app specific stuff
         key == "Bg.Opacity" || // or dimmed inactive wins
         key == "DialogButtonLayout" || // or OS conventions
-        key == "ShowOff" || // or whether we're a pretender ;-)
         key == "FadeInactive" || // or dimmed inactive wins
         key == "Tab.Duration" || key == "Tab.Transition" || // or tab trans settings
         key == "MacStyle" || // or macfeeling
