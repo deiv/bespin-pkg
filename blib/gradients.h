@@ -79,7 +79,7 @@ BLIB_EXPORT inline bool isTranslucent(Type type = Simple)
 BLIB_EXPORT QColor endColor(const QColor &c, Position p, Type type = Simple, bool checkValue = false);
 
 /** a diagonal NW -> SE light */
-BLIB_EXPORT const QPixmap &shadow(int height, bool bottom = false);
+// BLIB_EXPORT const QPixmap &shadow(int height, bool bottom = false);
 
 /** a diagonal 16:9 SE -> NW light */
 BLIB_EXPORT const QPixmap &ambient(int height);

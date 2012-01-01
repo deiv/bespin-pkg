@@ -102,8 +102,12 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
             int d = F(8);
             if ( cb->frame )
             {
-                hgt += ((config.btn.fullHover) ? F(4) : F(6)) - config.fontExtent;
-                d = F(16);
+                hgt -= config.fontExtent;
+                if (config.chooser.layer == Inlay || !config.btn.fullHover)
+                    hgt += F(4);
+                if (config.chooser.layer == Raised || config.chooser.layer == Inlay)
+                    hgt += F(4);
+                d = F(16) + F(2)*(config.btn.layer != Sunken);
             }
             hgt += hgt%2;
 //             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
@@ -184,12 +188,13 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
                     if (widget)
                     if (const QAbstractButton* abn = qobject_cast<const QAbstractButton*>(widget))
                     if (abn->isCheckable())
-                        w += contentsSize.height()+F(16);
+                        w += contentsSize.height() + F(16);
 
-                int h = (config.btn.layer ? F(6) : F(7)) - config.fontExtent;
-                if (!config.btn.fullHover)
+                int h = contentsSize.height() - config.fontExtent;
+                if (config.btn.layer == Inlay || !config.btn.fullHover)
                     h += F(4);
-                h += contentsSize.height();
+                if (config.btn.layer == Raised || config.btn.layer == Inlay)
+                    h += F(4);
                 if (!(h%2))
                     ++h;
 

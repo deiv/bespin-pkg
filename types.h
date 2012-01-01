@@ -17,7 +17,7 @@ enum Direction {
 
 enum BGMode { Plain = 0, Scanlines, BevelV, BevelH };
 
-enum Orientation3D {Sunken = 0, Relief, Raised};
+enum Orientation3D {Raised = 0, Relief, Sunken, Inlay};
 
 enum AppType
 {

@@ -64,6 +64,7 @@
 #define BTN_MIN_HEIGHT "Btn.MinHeight", 0
 
 #define CHOOSER_GRADIENT "Chooser.Gradient", Gradients::Sunken
+#define CHOOSER_LAYER "Chooser.Layer", 2
 
 #define DIALOG_BTN_LAYOUT "DialogButtonLayout", 2
 #define DRAW_SPLITTERS "DrawSplitters", true

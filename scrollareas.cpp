@@ -163,7 +163,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
     // triggered (for no sense)
     if (!widget) // fallback ===========
         painter->fillRect(RECT, FCOLOR(Window));
-    
+
     else if (isWebKit || widget->testAttribute(Qt::WA_OpaquePaintEvent))
     {   /// fake a transparent bg (real transparency leads to frame22 painting overhead)
         // i.e. we erase the bg with the window background or any autofilled element between
@@ -211,7 +211,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
     // =================
 
     //BEGIN real scrollbar painting                                                                -
-   
+
     // Make a copy here and reset it for each primitive.
     QStyleOptionSlider optCopy = *scrollbar;
     if (isWebKit)
@@ -219,7 +219,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
     State saveFlags = optCopy.state;
     if (scrollbar->minimum == scrollbar->maximum)
         saveFlags &= ~State_Enabled; // there'd be nothing to scroll anyway...
-        
+
     /// hover animation =================
     if (scrollbar->activeSubControls & SC_ScrollBarSlider)
         { widgetStep = 0; scrollAreaHovered_ = true; }
@@ -228,7 +228,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
         widgetStep = Animator::Hover::step(widget);
         scrollAreaHovered_ = !isWebKit && scrollAreaHovered(widget);
     }
-    
+
     SubControls hoverControls = scrollbar->activeSubControls &
                                 (SC_ScrollBarSubLine | SC_ScrollBarAddLine | SC_ScrollBarSlider);
     const Animator::ComplexInfo *info = isWebKit ? 0L : Animator::HoverComplex::info(widget, hoverControls);
@@ -246,7 +246,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
 
     if (cPainter != painter) // unwrap cache painter
         { cPainter->end(); delete cPainter; cPainter = painter; }
-   
+
     /// Background and groove have been painted
     if (useCache) //flush the cache
     {   cacheCleaner.start(1000);
@@ -288,7 +288,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
             drawScrollBarSlider(&optCopy, cPainter, widget);
         }
     }
-   
+
 //     if (!isComboDropDownSlider && grooveIsSunken)
 //         shadows.sunken[round_][isEnabled].render(groove, painter);
 
@@ -328,7 +328,7 @@ Style::drawScrollBarButton(const QStyleOption *option, QPainter *painter, const 
                 ((up && opt->sliderValue > opt->minimum) || (!up && opt->sliderValue < opt->maximum));
     hover = hover && alive;
     const int step = (hover && !complexStep) ? 6 : complexStep;
-    
+
     const QColor c = alive ? Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.active, Bg), 6-step, step) : FCOLOR(Window);
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
@@ -367,13 +367,13 @@ Style::drawScrollBarGroove(const QStyleOption *option, QPainter *painter, const 
         painter->fillRect(r, Colors::mid(FCOLOR(Base), FCOLOR(Text), 10, 1));
         return;
     }
-    
+
     if (config.scroll.groove == Groove::None)
         return;
 
     const Groove::Mode gType = config.scroll.groove;
     const bool round = config.scroll.sliderWidth + (gType > Groove::Groove) > 13;
-    
+
     if ( appType == Opera && painter->device() )
     {   // opera fakes raised webpages - we help a little ;-)
         QRect r( 0, 0, painter->device()->width(), painter->device()->height() );
@@ -395,7 +395,7 @@ Style::drawScrollBarGroove(const QStyleOption *option, QPainter *painter, const 
     QColor bg = config.scroll.invertBg ?
                 Colors::mid(FCOLOR(WindowText), FCOLOR(Window), 2 + gType*gType*gType, 1):
                 Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 2 + gType*gType*gType, 1);
-    
+
     if (gType == Groove::Line)
     {
         SAVE_PEN;
@@ -492,7 +492,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         c = bgC;
     c.setAlpha(255); // bg could be transparent, i don't want scrollers translucent, though.
 #undef SCROLL_COLOR
-   
+
     QRect r = RECT;
     const int f1 = F(1), f2 = F(2);
     const bool round = config.scroll.sliderWidth + (config.scroll.groove > Groove::Groove) > 13;
@@ -511,7 +511,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
             painter->setClipRegion(QRegion(RECT) - r.adjusted(F(9), F(3), -F(9), -F(3)));
         else
             painter->setClipRegion(QRegion(RECT) - r.adjusted(F(3), F(9), -F(3), -F(9)));
-    
+
         // --------------
         if (sunken && !grooveIsSunken)
         {
