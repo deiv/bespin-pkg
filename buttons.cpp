@@ -274,7 +274,8 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         if (config.btn.layer == Inlay) {
             const QColor sc = widget ? windowColor(widget) : FCOLOR(Window);
             masks.rect[1].render(r, painter, Gradients::Sunken, Qt::Vertical, sc);
-            r.adjust(3,3,-3,-3);
+            const int f3 = F(3);
+            r.adjust(f3,f3,-f3,-f3);
         }
         if (isEnabled)
         {

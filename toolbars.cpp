@@ -74,7 +74,7 @@ Style::drawToolBar(const QStyleOption *option, QPainter *painter, const QWidget 
         }
         return;
     }
-    
+
     // lighter scanline variant
     if (config.bg.mode == Scanlines  && config.bg.structure < 5)
         painter->drawTiledPixmap( RECT, Gradients::structure(FCOLOR(Window), true), RECT.topLeft() );
@@ -142,8 +142,6 @@ Style::drawToolButton(const QStyleOptionComplex *option, QPainter *painter, cons
     if ((bflags & State_AutoRaise) && !hover)
         bflags &= ~State_Raised;
 
-    State mflags = bflags;
-
     if (toolbutton->activeSubControls & SC_ToolButton)
         bflags |= State_Sunken;
 
@@ -196,7 +194,7 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
     {
         QToolBar *tb = static_cast<QToolBar*>(widget->parentWidget()); // guaranteed by "connected", see above
         OPT_SUNKEN
-        const bool round = (config.btn.tool.frame == 1);
+        const bool round = RECT.height() > 30 || config.btn.tool.frame > Relief;
         const bool sameRoles = config.btn.tool.std_role[Bg] == config.btn.tool.active_role[Bg];
         Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(btn.tool);
 
@@ -212,8 +210,7 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         QColor c2 = sameRoles ? Colors::mid(c, Qt::black, 3,1) : CCOLOR(btn.tool.active, Bg);
 #undef PAL
 #define PAL option->palette
-        
-        
+
         if (option->state & State_On)
         {
             QColor h = c; c = c2; c2 = h; // swap colors
@@ -248,42 +245,45 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         // paint
         o = (o == Qt::Horizontal) ? Qt::Vertical : Qt::Horizontal;
         Tile::setShape(pf);
-#if 0
-        if ( true )
-        {
-            const int d = F(3);
-            masks.rect[round].render( rect, painter, Gradients::Sunken, o,
-                                      Colors::mid(tb->palette().color(tb->backgroundRole()), Qt::black, 4, 1) );
-            rect.adjust(bool(pf & Tile::Left) * d, bool(pf & Tile::Top) * d,
-                        bool(pf & Tile::Right) * -d, bool(pf & Tile::Bottom) * -d);
-            masks.rect[round].render(rect, painter, gt, o, c);
-        }
-        else 
-#endif
+
+#define adjustConditionally(X1, Y1, X2, Y2) adjust((pf & Tile::Left) ? X1 : 0, (pf & Tile::Top) ? Y1 : 0, \
+                                                   (pf & Tile::Right) ? X2 : 0, (pf & Tile::Bottom) ? Y2 : 0);
         if (config.btn.tool.frame)
         {
-            if (pf & Tile::Bottom)
+            if (config.btn.tool.frame == Inlay) {
+                const QColor sc = config.UNO.toolbar ? tb->palette().color(tb->backgroundRole()) : windowColor(widget);
+                masks.rect[1].render(rect, painter, Gradients::Sunken, Qt::Vertical, sc);
+                const int f3 = F(3);
+                rect.adjustConditionally(f3, f3, -f3, -f3);
+            }
+            else if (pf & Tile::Bottom)
                 rect.setBottom(rect.bottom()-F(2));
-            bool relief = false;
-            if (config.btn.tool.frame == 2)
-                relief = !(sunken || option->state & State_On);
             masks.rect[round].render(rect, painter, gt, o, c);
+
+            bool relief;
+            if (config.btn.tool.frame == Inlay) {
+                const int f1 = F(1);
+                rect.adjustConditionally(-f1, -f1, f1, f1);
+                relief = true;
+            }
+            else {
+                relief = (config.btn.tool.frame == Relief) && !(sunken || option->state & State_On);
+                rect = RECT;
+            }
             if (relief)
-                shadows.relief[round][true].render(RECT, painter);
+                shadows.relief[round][true].render(rect, painter);
             else
-                shadows.sunken[round][true].render(RECT, painter);
+                shadows.sunken[round][true].render(rect, painter);
         }
         else
         {
             // shadow
             if (pf & Tile::Top)
-                rect.adjust(0, F(1), 0, 0);
+                rect.setTop(rect.top() + F(1));
             shadows.raised[round][true][false].render(rect, painter);
-            
+
             // plate
-            rect.adjust((pf & Tile::Left) ? F(2) : 0, (pf & Tile::Top) ? F(1) : 0,
-                        (pf & Tile::Right) ? -F(1) : 0, (pf & Tile::Bottom) ? -F(3) : 0);
-                        
+            rect.adjustConditionally(F(2), F(1), -F(1), -F(3));
             masks.rect[round].render(rect, painter, gt, o, c);
 
             // outline
@@ -291,14 +291,15 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
                 lights.glow[round].render(rect, painter, c.lighter(120));
 
         }
+#undef adjustConditionally
         if (config.btn.tool.separator)
         {
             QPen pen = painter->pen();
             painter->setPen(Colors::mid(c,QColor(0,0,0),8,1));
             if (!(pf & Tile::Bottom))
-                painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+                painter->drawLine(rect.bottomLeft() + QPoint(F(2),0), rect.bottomRight() - QPoint(F(2),0));
             else if (!(pf & Tile::Right))
-                painter->drawLine(rect.topRight(), rect.bottomRight());
+                painter->drawLine(rect.topRight() + QPoint(0,F(1)), rect.bottomRight() - QPoint(0,F(2)));
             painter->setPen(pen);
         }
         Tile::reset();
@@ -363,7 +364,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
         const QWidget *w = dad ? dad : widget;
         bgRole = w->backgroundRole();
         role = w->foregroundRole();
-        
+
         if (role == QPalette::ButtonText && dad && dad->inherits("QMenu"))
         {
             role = config.menu.std_role[Fg]; // this is a f**** KMenu Header
@@ -431,7 +432,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
         if (!connected && pm.isNull())
             text = Colors::mid(text, FCOLOR(Link), 6-step, step);
         painter->setPen(text);
-            
+
 //         QFont fnt = toolbutton->font;
 //         fnt.setStretch(QFont::SemiCondensed);
         painter->setFont(toolbutton->font);

@@ -227,58 +227,9 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
                 drawButtonFrame(option, painter, widget, animStep);
                 config.btn.round = !config.btn.round;
                 config.btn.layer = btn_layer;
-
-#if 0
-                // ground
-
-                const bool translucent = Gradients::isTranslucent(GRAD(chooser));
-                c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover, translucent);
-                if (hasFocus)
-                {
-                    lights.glow[round_].render(RECT, painter, FCOLOR(Highlight));
-                    if ( !config.btn.backLightHover )
-                    {
-                        const int contrast =  (config.btn.fullHover && animStep) ?
-                        Colors::contrast(btnBg(PAL, isEnabled, hasFocus, 0, true, translucent), FCOLOR(Highlight)):
-                        Colors::contrast(c, FCOLOR(Highlight));
-                        if (contrast > 10)
-                            c = Colors::mid(c, FCOLOR(Highlight), contrast/4, 1);
-                    }
-                }
-
-                if (config.btn.layer == Inlay) {
-                    masks.rect[true].render(RECT, painter, Gradients::Sunken, Qt::Vertical, widget ? windowColor(widget) : FCOLOR(Window));
-                    r = RECT.adjusted(f3,f3,-f3,-f3);
-                }
-                mask.render(r, painter, GRAD(chooser), ori[1], c);
-                if (config.btn.layer == Inlay) {
-                    r.adjust(-f1, -f1, f1, f1);
-                    shadows.relief[round_][isEnabled].render(r, painter);
-                }
-
-                if (animStep)
-                {
-                    if (!config.btn.fullHover)
-                    {   // maybe hover indicator?
-                        r.adjust(f3, f3, -f3, -f3);
-                        c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-                        mask.render(r, painter, GRAD(chooser), ori[1], c, RECT.height()-f2, QPoint(0,f3));
-                        r = RECT.adjusted(f1, f1, -f1, -f2); // RESET 'r' !!!
-                    }
-                    else if (config.btn.backLightHover)
-                    {
-                        QColor c2 = CCOLOR(btn.active, Bg);
-                        c2.setAlpha(c2.alpha()*animStep/8);
-                        lights.glow[round_].render(RECT, painter, c2);
-                    }
-                }
-#endif
             }
             else
                 shadows.sunken[!config.btn.round][isEnabled].render(RECT, painter);
-            //r.setBottom(RECT.bottom());
-            //if (config.btn.layer != Inlay)
-              //  shadows.sunken[round_][isEnabled].render(r, painter);
         }
     }
 
