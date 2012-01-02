@@ -787,7 +787,10 @@ Client::repaint(QPainter &p, bool paintTitle)
 //                 p.setPen(Qt::NoPen); p.setBrush(Gradients::structure(bg, true));
                 const QColor shadow = Colors::mid(bg, Qt::black,6,1);
                 p.setPen(QPen(shadow, 2)); p.setBrush(fill);
-                p.drawRoundRect(label.adjusted(0,4,0,-4),myTitleSize*99/label.width(),99);
+                if (Factory::verticalTitle())
+                    p.drawRoundRect(label.adjusted(4,0,-4,0),99,myTitleSize*99/label.height());
+                else
+                    p.drawRoundRect(label.adjusted(0,4,0,-4),myTitleSize*99/label.width(),99);
                 p.setRenderHint( QPainter::Antialiasing, false );
             }
             break;
@@ -859,6 +862,8 @@ Client::repaint(QPainter &p, bool paintTitle)
             label.setRect( label.x() - d, label.y() + d, label.height(), label.width() );
         }
 
+        if (bgMode == 1)
+            label.adjust(8,0,-8,0);
         if (isActive())
         {
             // emboss?!
@@ -890,6 +895,8 @@ Client::repaint(QPainter &p, bool paintTitle)
 
         p.setPen(titleColor);
         p.drawText ( label, tf, myCaption );
+        if (bgMode == 1)
+            label.adjust(-8,0,8,0);
         if ( Factory::verticalTitle() )
         {
             p.translate(label.center());
