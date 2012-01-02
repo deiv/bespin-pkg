@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// 
+//
 // -------------------
 // Bespin window decoration for KDE.
 // -------------------
@@ -103,11 +103,15 @@ Factory::Factory() : QObject(), KDecorationFactory()
     connect (qApp, SIGNAL(aboutToQuit()), SLOT(cleanUp()));
     connect (KWindowSystem::self(), SIGNAL(compositingChanged(bool)), SLOT(updateCompositingState(bool)));
     weAreInitialized = true;
-    weAreComposited = FX::compositingActive();
-    qDebug() << weAreComposited << KWindowSystem::compositingActive();
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
     QDBusConnection::sessionBus().registerObject("/BespinDeco", this);
+    connect (KWindowSystem::self(), SIGNAL(compositingChanged(bool)), SLOT(updateCompositingState(bool)));
+    QMetaObject::invokeMethod( this, "postInit", Qt::QueuedConnection);
+}
+
+void Factory::postInit() {
+    updateCompositingState(FX::compositingActive());
 }
 
 void Factory::cleanUp() {
@@ -134,9 +138,9 @@ bool Factory::reset(unsigned long changed)
     weAreInitialized = false;
     const bool configChanged = readConfig();
     weAreInitialized = true;
-    
+
     bool ret = configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder));
-    
+
     bool wasComposited = weAreComposited;
     weAreComposited = FX::compositingActive();
     if (wasComposited != weAreComposited)
@@ -151,8 +155,8 @@ bool Factory::reset(unsigned long changed)
         }
         else
             resetDecorations(changed);
-    }   
-    
+    }
+
     return ret;
 }
 
@@ -291,12 +295,12 @@ qDebug() << "BESPIN" << winecfg.childKeys();
 bool Factory::readConfig()
 {
     ourCommandKey = KConfigGroup( KGlobal::config(), "Windows" ).readEntry("CommandAllKey","Alt") == "Meta" ? Qt::MetaModifier : Qt::AltModifier;
-    
+
     bool ret = false;
     bool oldBool;
     QString oldString;
     Gradients::Type oldgradient;
-    
+
     QSettings settings("Bespin", "Style");
     settings.beginGroup("Deco");
 
@@ -376,7 +380,7 @@ bool Factory::readConfig()
     oldgradient = ourConfig.gradient[1][0];
     ourConfig.gradient[1][0] = (Gradients::Type)(settings.value("InactiveGradient2", 0).toInt());
     if (oldgradient != ourConfig.gradient[1][0]) ret = true;
-    
+
     oldgradient = ourConfig.gradient[1][1];
     ourConfig.gradient[1][1] = (Gradients::Type)(settings.value("ActiveGradient2", 0).toInt());
     if (oldgradient != ourConfig.gradient[1][1]) ret = true;
@@ -416,7 +420,7 @@ bool Factory::readConfig()
     // delete old presets
     qDeleteAll(ourPresets.begin(), ourPresets.end());
     ourPresets.clear();
-    
+
     // read presets
     QStringList presets = settings.childGroups();
     foreach (QString presetName, presets)
@@ -445,7 +449,7 @@ bool Factory::readConfig()
 
         settings.endGroup();
     }
-    
+
     const int icnVar = ourConfig.buttonGradient == Gradients::None ? settings.value("IconVariant", 1).toInt() : 1;
     Button::init( options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
                   settings.value("IAmMyLittleSister", false).toBool(), icnVar);
@@ -702,7 +706,7 @@ Factory::supports( Ability ability ) const
     case AbilityUsesBlurBehind:
 #endif
         return true;
-        
+
     // composite
 #if KDE_IS_VERSION(4,3,0)
     case AbilityUsesAlphaChannel: /// don't clip - it's expensive with composition
@@ -727,7 +731,7 @@ Factory::bgSet(const QColor &c, bool vertical, int intensity, qint64 *hashPtr)
     qint64 hash = (qint64(c.rgba()) << 32) | (qint64(vertical) << 31) | qint64(intensity & 0xfffffff);
     if (hashPtr)
         *hashPtr = hash;
-    
+
     BgSet *set = ourBgSets.value(hash, 0);
     if (!set)
         set = Gradients::bgSet(c, vertical?Gradients::BevelV:Gradients::BevelH , intensity);
