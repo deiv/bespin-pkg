@@ -247,14 +247,17 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         Tile::setShape(pf);
 
 #define adjustConditionally(X1, Y1, X2, Y2) adjust((pf & Tile::Left) ? X1 : 0, (pf & Tile::Top) ? Y1 : 0, \
-                                                   (pf & Tile::Right) ? X2 : 0, (pf & Tile::Bottom) ? Y2 : 0);
+                                                   (pf & Tile::Right) ? X2 : 0, (pf & Tile::Bottom) ? Y2 : 0)
         if (config.btn.tool.frame)
         {
             if (config.btn.tool.frame == Inlay) {
                 const QColor sc = config.UNO.toolbar ? tb->palette().color(tb->backgroundRole()) : windowColor(widget);
                 masks.rect[1].render(rect, painter, Gradients::Sunken, Qt::Vertical, sc);
                 const int f3 = F(3);
-                rect.adjustConditionally(f3, f3, -f3, -f3);
+                if (round)
+                    rect.adjustConditionally(F(4), f3, -F(4), -f3);
+                else
+                    rect.adjustConditionally(f3, f3, -f3, -f3);
             }
             else if (pf & Tile::Bottom)
                 rect.setBottom(rect.bottom()-F(2));
