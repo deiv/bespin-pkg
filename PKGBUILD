@@ -29,7 +29,9 @@ build()
     cd src
     rm -f src pgk
 
-    ./configure
+    if [ ! -d build ]; then
+        ./configure
+    fi
     cd build
     make || return 1
 
