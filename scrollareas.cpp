@@ -506,6 +506,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
 
     if (config.scroll.groove != Groove::None)
     {
+        if (config.scroll.groove > Groove::Groove)
         r.adjust(f2,f2,-f2,-F(3)); // extra padding
         // draw shadow
         // clip away innper part of shadow - hey why paint invisible alpha stuff =D   --------
