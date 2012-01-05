@@ -192,8 +192,8 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
         widget = 0;
     }
 
-    const int f1 = F(1), f2 = F(2), f3 = F(3);
-    QRect ar, r = RECT.adjusted(f1, f1, -f1, -f2);
+    const int f1 = F(1), f2 = F(2);
+    QRect ar;
     const QComboBox *combo = widget ? qobject_cast<const QComboBox*>(widget) : 0;
     QColor c = CONF_COLOR(btn.std, Bg);
 
@@ -223,10 +223,13 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
 
                 config.btn.round = !config.btn.round;
                 int btn_layer = config.btn.layer;
+                Gradients::Type gradient = config.btn.gradient;
+                config.btn.gradient = config.chooser.gradient;
                 config.btn.layer = config.chooser.layer;
                 drawButtonFrame(option, painter, widget, animStep);
                 config.btn.round = !config.btn.round;
                 config.btn.layer = btn_layer;
+                config.btn.gradient = gradient;
             }
             else
                 shadows.sunken[!config.btn.round][isEnabled].render(RECT, painter);
