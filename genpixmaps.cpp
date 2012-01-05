@@ -30,7 +30,8 @@ Style::generatePixmaps()
     Elements::setShadowIntensity( config.shadowIntensity );
 
     const int f9 = F(9); const int f11 = SCALE(11);
-    const int f17 = SCALE(17); const int f49 = SCALE(49);
+    const int f17 = SCALE(17); const int f19 = SCALE(19);
+    const int f49 = SCALE(49);
 
     // MASKS =======================================
     for (int i = 0; i < 2; ++i)
@@ -49,7 +50,7 @@ Style::generatePixmaps()
     // sunken
     for (int r = 0; r < 2; ++r)
     {
-        int s = r ? f17 : f9;
+        int s = r ? f19 : f11;
         for (int i = 0; i < 2; ++i)
         {
             shadows.sunken[r][i] = Tile::Set(Elements::sunkenShadow(s, i), s/2,s/2,1,1);
@@ -72,7 +73,7 @@ Style::generatePixmaps()
     for (int r = 0; r < 2; ++r)
     {
         int s;  float f = .8;
-        s =  r ? f17 : f9;
+        s =  r ? f19 : f11;
         for (int i = 0; i < 2; ++i) // opaque?
             for (int j = 0; j < 2; ++j)
             {   // sunken?
