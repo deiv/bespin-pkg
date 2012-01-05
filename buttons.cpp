@@ -260,12 +260,17 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
             r.adjust(f2, f1, -f2, -F(3));
         }
 
+        const bool outline = Gradients::isReflective(GRAD(btn));
+        if (outline) {
+            Tile::setShape(Tile::Ring);
+            masks.rect[round].render(r, painter, Gradients::None, ori[1], Colors::mid(c, Qt::white, 10,1));
+            Tile::reset();
+            r.adjust(f1,f1,-f1,-f1);
+        }
         // plate
         masks.rect[round].render(r, painter, bgt, ori[1], c);
-
-        // outline
-        if (Gradients::isReflective(GRAD(btn)))
-            lights.glow[round].render(r, painter, c.lighter(120));
+        if (outline)
+            r.adjust(-f1,-f1,f1,f1);
     }
     else
     {
@@ -273,9 +278,12 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         // r == RECT at this point
         if (config.btn.layer == Inlay) {
             const QColor sc = widget ? windowColor(widget) : FCOLOR(Window);
-            masks.rect[1].render(r, painter, Gradients::Sunken, Qt::Vertical, sc);
+            masks.rect[true].render(r, painter, Gradients::Sunken, Qt::Vertical, sc);
             const int f3 = F(3);
-            r.adjust(f3,f3,-f3,-f3);
+            if (round)
+                r.adjust(F(4),f3,-F(4),-f3);
+            else
+                r.adjust(f3,f3,-f3,-f3);
         }
         if (isEnabled)
         {
