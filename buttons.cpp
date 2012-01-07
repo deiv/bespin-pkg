@@ -79,9 +79,9 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
     {
         if (sunken && !config.btn.cushion)
         {
-            if (config.btn.layer == 1)
+            if (config.btn.layer == Relief)
                 _btn->rect.adjust(F(1), F(1), -F(1), 0);
-            else if (!config.btn.layer)
+            else if (config.btn.layer == Raised)
                 _btn->rect.adjust(0, F(1), 0, F(1));
         }
         drawPushButtonBevel(btn, painter, widget);
@@ -91,9 +91,9 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
     if (appType == GTK)
         return; // GTK paints the label itself
 
-    _btn->rect.adjust(F(6), F(1), -F(6), (isFlat || config.btn.layer == 1) ? -F(1) : -F(2));
+    _btn->rect.adjust(F(6), F(1), -F(6), (isFlat || config.btn.layer == Relief) ? -F(1) : -F(2));
     drawPushButtonLabel(btn, painter, widget);
-    
+
     _btn->rect = oldRect;
     anim.widget = 0; anim.step = 0;
 }
@@ -169,7 +169,7 @@ Style::drawPushButtonBevel(const QStyleOption *option, QPainter *painter, const 
 }
 
 void
-Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWidget *widget, int _animStep) const
 {
     const int f1 = F(1), f2 = F(2);
     B_STATES
@@ -178,17 +178,19 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
     bool resetAnim = false;
     if (widget && !btn && widget->inherits("QAbstractItemView"))
         { hover = false; anim.step = 0; }
+    else if (_animStep > -1)
+        { resetAnim = true; anim.widget = widget; anim.step = _animStep; }
     else if ( !widget || widget != anim.widget )
         { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
 
         // "Flash effect - is debatable"
 //     if (sunken)
 //         anim.step = hover = sunken = 0;
-        
+
 //    const bool toggled = !hover && (option->state & State_On);
     const bool round = !isCheckbox && (config.btn.round || (btn && btn->isCheckable()));
     const bool fullHover =  config.btn.fullHover ||
-                            (isCheckbox && (config.btn.layer || config.btn.checkType == Check::O));
+                            (isCheckbox && (config.btn.layer != Raised || config.btn.checkType == Check::O));
 
     int iOff[4] = {0,0,0,0};
     QRect r = RECT;
@@ -224,48 +226,12 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
     if (sunken)
         hasFocus = false; // no frame add on trigger - looks nasty
 
-    // sunken variant
-    if (config.btn.layer)
+    if (config.btn.layer == Raised)
     {
-        sunken = (sunken && !config.btn.cushion) || config.btn.layer == 2;
-        if (isEnabled)
-        {
-            if (sunken)
-                r.setBottom(r.bottom()-f2);
-            else
-                r.adjust(f1, f1, -f1, -f2);
-            masks.rect[round].render(r, painter, gt, ori[1], c);
-            if (drawInner)
-            {
-                iOff[0] = iOff[2] = F(3);
-                iOff[1] = iOff[3] = sunken ? F(3) : F(2);
-            }
-
-            // we MUST use alpha blending as this crosses between button and bg
-            QColor c2 = Qt::transparent;
-            if (hasFocus)
-            {
-                if ( config.btn.layer == 1 || config.btn.active_role[Bg] == QPalette::Highlight)
-                    { c2 = FCOLOR(Highlight); }
-            }
-            else if ( anim.step  && config.btn.backLightHover )
-                { c2 = CCOLOR(btn.active, Bg); c2.setAlpha(c2.alpha()*anim.step/8); }
-
-            if (c2 != Qt::transparent)
-                lights.glow[round].render(RECT, painter, c2);
-            // ---- alpha notice ----------
-        }
-        if (sunken)
-            shadows.sunken[round][isEnabled].render(RECT, painter);
-        else
-            shadows.relief[round][isEnabled].render(RECT, painter);
-    }
-    else
-    {   // normal buttons ---------------
         if (drawInner)
         {
-            iOff[0] = iOff[2] = isCheckbox ? F(2) : F(3);
-            iOff[1] = iOff[3] = F(2);
+            iOff[0] = iOff[2] = isCheckbox ? f2 : F(3);
+            iOff[1] = iOff[3] = f2;
         }
 
         if (hasFocus)
@@ -294,15 +260,67 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
             r.adjust(f2, f1, -f2, -F(3));
         }
 
+        const bool outline = Gradients::isReflective(GRAD(btn));
+        if (outline) {
+            Tile::setShape(Tile::Ring);
+            masks.rect[round].render(r, painter, Gradients::None, ori[1], Colors::mid(c, Qt::white, 10,1));
+            Tile::reset();
+            r.adjust(f1,f1,-f1,-f1);
+        }
         // plate
         masks.rect[round].render(r, painter, bgt, ori[1], c);
-
-        // outline
-        if (Gradients::isReflective(GRAD(btn)))
-            lights.glow[round].render(r, painter, c.lighter(120));
-
+        if (outline)
+            r.adjust(-f1,-f1,f1,f1);
     }
-    
+    else
+    {
+        sunken = (sunken && !config.btn.cushion) || config.btn.layer == Sunken;
+        // r == RECT at this point
+        if (config.btn.layer == Inlay) {
+            const QColor sc = widget ? windowColor(widget) : FCOLOR(Window);
+            masks.rect[true].render(r, painter, Gradients::Sunken, Qt::Vertical, sc);
+            const int f3 = F(3);
+            if (round)
+                r.adjust(F(4),f3,-F(4),-f3);
+            else
+                r.adjust(f3,f3,-f3,-f3);
+        }
+        if (isEnabled)
+        {
+            if (sunken)
+                r.setBottom(r.bottom()-f2);
+            else if (config.btn.layer == Relief)
+                r.adjust(f1, f1, -f1, -f2);
+            masks.rect[round].render(r, painter, gt, ori[1], c);
+            if (config.btn.layer == Inlay)
+                r.adjust(-f1, -f1, f1, f1);
+            if (drawInner)
+            {
+                iOff[0] = iOff[2] = F(3);
+                iOff[1] = sunken ? F(3) : f2;
+                iOff[3] = f2;
+            }
+
+            // we MUST use alpha blending as this crosses between button and bg
+            QColor c2 = Qt::transparent;
+            if (hasFocus)
+            {
+                if ( config.btn.layer != Sunken || config.btn.active_role[Bg] == QPalette::Highlight)
+                    c2 = FCOLOR(Highlight);
+            }
+            else if ( anim.step  && config.btn.backLightHover )
+                { c2 = CCOLOR(btn.active, Bg); c2.setAlpha(c2.alpha()*anim.step/8); }
+
+            if (c2 != Qt::transparent)
+                lights.glow[round].render(config.btn.layer == Relief ? RECT : r, painter, c2);
+            // ---- alpha notice ----------
+        }
+        if (sunken)
+            shadows.sunken[round][isEnabled].render(RECT, painter);
+        else
+            shadows.relief[round][isEnabled].render(config.btn.layer == Relief ? RECT : r, painter);
+    }
+
     if (isEnabled)
     {
         if (drawInner)
@@ -376,8 +394,8 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
         { resetAnim = true; anim.widget = widget; anim.step = HOVER_STEP; }
 
     const QColor fg = btnFg(PAL, isEnabled, hasFocus, anim.step, isFlat);
-    const QColor &bg = isFlat ? FCOLOR(Window) : (hover ? CCOLOR(btn.active, Bg) : 
-                                                 (hasFocus && config.btn.layer == 2 && !config.btn.backLightHover ? FCOLOR(Highlight) : CCOLOR(btn.std, Bg)));
+    const QColor &bg = isFlat ? FCOLOR(Window) : (hover ? CCOLOR(btn.active, Bg) :
+                                                 (hasFocus && config.btn.layer == Sunken && !config.btn.backLightHover ? FCOLOR(Highlight) : CCOLOR(btn.std, Bg)));
 
     painter->save();
     if (!sunken && btn->features & QStyleOptionButton::DefaultButton)
@@ -399,7 +417,7 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
 
     drawItemText(painter, ir, tf, PAL, isEnabled, btn->text);
     painter->restore();
-    
+
     if ( resetAnim )
         { anim.widget = 0; anim.step = 0; }
 }
@@ -410,9 +428,9 @@ Style::drawCheckBox(const QStyleOption *option, QPainter *painter, const QWidget
     B_STATES
     // the button -----------------
     QStyleOption copy = *option;
-    if (config.btn.layer == 0)
+    if (config.btn.layer == Raised)
         copy.rect.adjust(F(1),F(1),-F(1),0); // get rect appereance again
-        
+
     if ( widget && widget->inherits("QWebView") )
     {
         widget = 0;
@@ -445,7 +463,7 @@ Style::drawCheckBox(const QStyleOption *option, QPainter *painter, const QWidget
         else
             center += QPoint(0, -F(1));
         painter->setBrush(btnFg(PAL, isEnabled, hasFocus, anim.step));
-        const int d = F(5) - (bool(config.btn.checkType) + config.btn.layer) * F(1);
+        const int d = F(5) - (bool(config.btn.checkType) + config.btn.layer==Inlay?Raised:config.btn.layer) * F(1);
         copy.rect.adjust(d, d, -d, -d);
         if (copy.rect.width() > copy.rect.height())
             copy.rect.setWidth(copy.rect.height());
@@ -470,7 +488,7 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
     bool isOn = option->state & State_On;
     if (isOn)
         hover = false;
-   
+
 //       else if (hover && sunken) isOn = true;
 
 #if 0
@@ -480,7 +498,7 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
    QColor bc = btnBg(PAL, isEnabled, hasFocus, 0,
                      false, Gradients::isReflective(gt));
    QColor c = bc;
-	
+
    if (animStep)
       c = Colors::mid(c, CCOLOR(btn.active, Bg), 6-animStep, animStep);
 
@@ -493,7 +511,7 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
       xy += QPoint(f1, 0);
 
    } else if (config.btn.layer) { // embedded ==================
-      
+
       QRect r = RECT.adjusted(2,2,-2,-2);
       painter->save();
       painter->setRenderHint(QPainter::Antialiasing);
@@ -529,11 +547,11 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
          QRect r = RECT; if (sunken) r.setBottom(r.bottom()-f1);
          painter->drawEllipse(r);
       }
-      
+
       // shadow
       painter->drawPixmap(sunken ? xy + QPoint(f1,f1) : xy,
                           shadows.radio[isEnabled][sunken]);
-      
+
       // plate
       xy += QPoint(f2,f1); const int sz = dpi.ExclusiveIndicator - f4;
       if (config.btn.fullHover && !config.btn.backLightHover)
@@ -577,10 +595,13 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
             bg = Colors::mid(bg, FCOLOR(Highlight), contrast/5, 1);
         }
     }
-    masks.rect[true].render(r, painter, GRAD(chooser), ori[1], bg);
+    masks.rect[true].render(r, painter, config.btn.layer == Inlay ? Gradients::Sunken : GRAD(chooser), ori[1], bg);
 
     r.setBottom(RECT.bottom());
-    shadows.sunken[true][isEnabled].render(r, painter);
+    if (config.btn.layer == Inlay)
+        shadows.relief[true][isEnabled].render(r, painter);
+    else
+        shadows.sunken[true][isEnabled].render(r, painter);
 
     int animStep = isOn ? 12 : HOVER_STEP;
 
@@ -627,7 +648,7 @@ Style::drawCheckLabel(const QStyleOption *option, QPainter *painter, const QWidg
 
     uint alignment = visualAlignment(btn->direction, Qt::AlignLeft)  | Qt::AlignVCenter;
     QRect textRect = RECT;
-    
+
     if (!btn->icon.isNull())
     {
         const QPixmap pix = btn->icon.pixmap(btn->iconSize, isEnabled ? QIcon::Normal : QIcon::Disabled);

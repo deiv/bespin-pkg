@@ -145,7 +145,9 @@ protected:
     // element painting routines ===============
     void skip(const QStyleOption*, QPainter*, const QWidget*) const {}
     // buttons.cpp
-    void drawButtonFrame(const QStyleOption*, QPainter*, const QWidget*) const;
+    void drawButtonFrame(const QStyleOption *o, QPainter *p, const QWidget *w, int animStep) const;
+    inline void drawButtonFrame(const QStyleOption *o, QPainter *p, const QWidget *w) const
+    { drawButtonFrame(o, p, w, -1); }
     void drawPushButton(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawPushButtonBevel(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawPushButtonLabel(const QStyleOption*, QPainter*, const QWidget*) const;
@@ -279,6 +281,7 @@ protected:
 
 private:
     Q_DISABLE_COPY(Style)
+    QColor windowColor(const QWidget *w) const;
     void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
     int elementId(const QString &string) const;
     void erase(const QStyleOption*, QPainter*, const QWidget*, const QPoint *off = 0) const;

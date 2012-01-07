@@ -1452,7 +1452,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 //             w = w->parentWidget();
 //         }
 //         qDebug() << debug;
-        qDebug() << "BESPIN:" << object << w->geometry() << w->parentWidget();
+        qDebug() << "BESPIN:" << w << w->geometry() << w->parentWidget();
         //       DEBUG (object);
         return false;
     }

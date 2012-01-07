@@ -80,7 +80,15 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
         int x,y,wi,he;
         cb->rect.getRect(&x,&y,&wi,&he);
         const int fh = cb->fontMetrics.ascent() + F(2);
-        const int margin = cb->frame ? (cb->editable ? 1 : config.btn.fullHover ? F(2) : F(4)) : 0;
+        int margin = 0;
+        if (cb->frame) {
+            if (cb->editable)
+                margin = 1;
+            else if (!config.btn.fullHover || config.chooser.layer == Inlay || config.chooser.layer == Raised)
+                margin = F(4);
+            else
+                margin = F(2);
+        }
 
         switch (subControl)
         {

@@ -582,7 +582,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
             const int contrast = qMax(1, Colors::contrast(FCOLOR(Highlight), COLOR(fg)));
             const QColor high = selected ? FCOLOR(Highlight) : Colors::mid(COLOR(bg), FCOLOR(Highlight), 100/contrast, 4);
             if (round)
-                masks.rect[true].render(RECT, painter, high);
+                masks.rect[RECT.height() > F(20) && RECT.width() > F(20)].render(RECT, painter, high);
             else
                 painter->fillRect(RECT, high);
         }
@@ -591,10 +591,11 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
             const QPixmap &fill = Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical, gt);
             if (round)
             {
-                masks.rect[true].render(RECT, painter, fill);
+                const bool rounder = RECT.height() > F(20) && RECT.width() > F(20);
+                masks.rect[rounder].render(RECT, painter, fill);
 //                 painter->drawTiledPixmap(RECT, fill);
                 if (selected && strongSelect)
-                    shadows.sunken[true][true].render(RECT, painter);
+                    shadows.sunken[rounder][true].render(RECT, painter);
             }
             else
                 painter->drawTiledPixmap(RECT, fill);

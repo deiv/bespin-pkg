@@ -363,6 +363,12 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     untouched (what will result in different disabled looks for Qt and KDE applications), force the\
     Qt desaturation or the former Bespin (forced - sorry everyone) blurring.");
 
+    handleSettings(ui.chooserLayer, CHOOSER_LAYER);
+    setContextHelp(ui.chooserLayer, "<b>Combobox layers</b><hr>\
+    I guess it's been enough time. Whoever really <b>must</b> make comboboxes look like pushbuttons\
+    may now do so.<br>;-)<br>\
+    The main reason for this is that you likely want to use inlay combos with inlay buttons since\
+    the latter currently enforce a frameless hover animation.");
     handleSettings(ui.gradChoose, CHOOSER_GRADIENT);
 
     handleSettings(ui.pwEchoChar, INPUT_PWECHOCHAR);
@@ -403,6 +409,15 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     This used to be bound to the corresponding setting for Pushbuttons, but i figured that i wanted them framed\
     regardless of the pushbutton behaviour, just looks much better ...");
     handleSettings(ui.sliderGroove, SCROLL_GROOVE);
+    handleSettings(ui.showOff, SHOW_OFF);
+    setContextHelp(ui.showOff, "<b>Show Off</b><hr>\
+    This used to be a hidden setting i used for showing off only. It will allocate vertical gradients\
+    for vertical sliders.<br>\
+    Be warned that there can end up being many (since the slider lenths tend to vary). The cache is\
+    a limited FIFO and the gradients are handled sloppy (The bigger they become the bigger grows the\
+    cluster) but this is still no cheap setting. <br>\
+    However in times where 8GB RAM and 1GB VRAM become common - who cares ;-)<br>\
+    (It's by far not that much, every Web 2.0 page is worse by the order of *some* magnitutes)");
     handleSettings(ui.gradScroll, SCROLL_GRADIENT);
     handleSettings(ui.invertGroove, SCROLL_INVERT_BG);
     handleSettings(ui.sliderWidth, SCROLL_SLIDER_WIDTH);
@@ -865,7 +880,6 @@ blackListed(QString &key)
         key.startsWith("App.") || // don't im/export app specific stuff
         key == "Bg.Opacity" || // or dimmed inactive wins
         key == "DialogButtonLayout" || // or OS conventions
-        key == "ShowOff" || // or whether we're a pretender ;-)
         key == "FadeInactive" || // or dimmed inactive wins
         key == "Tab.Duration" || key == "Tab.Transition" || // or tab trans settings
         key == "MacStyle" || // or macfeeling

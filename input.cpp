@@ -119,7 +119,7 @@ drawSBArrow(QStyle::SubControl sc, QPainter *painter, QStyleOptionSpinBox *optio
         bool isEnabled = option->stepEnabled & sef;
         bool hover = isEnabled && (option->activeSubControls == (int)sc);
         bool sunken = hover && (option->state & QStyle::State_Sunken);
-        
+
 
         if (!sunken)
         {
@@ -175,7 +175,6 @@ Style::drawSpinBox(const QStyleOptionComplex * option, QPainter * painter,
 }
 
 static int animStep = -1;
-static bool round_ = true;
 
 void
 Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
@@ -193,8 +192,8 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
         widget = 0;
     }
 
-    const int f1 = F(1), f2 = F(2), f3 = F(3);
-    QRect ar, r = RECT.adjusted(f1, f1, -f1, -f2);
+    const int f1 = F(1), f2 = F(2);
+    QRect ar;
     const QComboBox *combo = widget ? qobject_cast<const QComboBox*>(widget) : 0;
     QColor c = CONF_COLOR(btn.std, Bg);
 
@@ -209,7 +208,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
     }
 
     // the frame
-    const Tile::Set &mask = masks.rect[round_];
+    const Tile::Set &mask = masks.rect[!config.btn.round];
     if ((cmb->subControls & SC_ComboBoxFrame) && cmb->frame)
     {
         if (cmb->editable)
@@ -218,47 +217,22 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
         {
             if (!ar.isNull())
             {
-                // ground
                 animStep = (appType == GTK || !widget) ? 6*hover : Animator::Hover::step(widget);
                 if (listShown)
                     animStep = 6;
 
-                const bool translucent = Gradients::isTranslucent(GRAD(chooser));
-                c = btnBg(PAL, isEnabled, hasFocus, animStep, config.btn.fullHover, translucent);
-                if (hasFocus)
-                {
-                    lights.glow[round_].render(RECT, painter, FCOLOR(Highlight));
-                    if ( !config.btn.backLightHover )
-                    {
-                        const int contrast =  (config.btn.fullHover && animStep) ?
-                        Colors::contrast(btnBg(PAL, isEnabled, hasFocus, 0, true, translucent), FCOLOR(Highlight)):
-                        Colors::contrast(c, FCOLOR(Highlight));
-                        if (contrast > 10)
-                            c = Colors::mid(c, FCOLOR(Highlight), contrast/4, 1);
-                    }
-                }
-
-                mask.render(r, painter, GRAD(chooser), ori[1], c);
-
-                if (animStep)
-                {
-                    if (!config.btn.fullHover)
-                    {   // maybe hover indicator?
-                        r.adjust(f3, f3, -f3, -f3);
-                        c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-                        mask.render(r, painter, GRAD(chooser), ori[1], c, RECT.height()-f2, QPoint(0,f3));
-                        r = RECT.adjusted(f1, f1, -f1, -f2); // RESET 'r' !!!
-                    }
-                    else if (config.btn.backLightHover)
-                    {
-                        QColor c2 = CCOLOR(btn.active, Bg);
-                        c2.setAlpha(c2.alpha()*animStep/8);
-                        lights.glow[round_].render(RECT, painter, c2);
-                    }
-                }
+                config.btn.round = !config.btn.round;
+                int btn_layer = config.btn.layer;
+                Gradients::Type gradient = config.btn.gradient;
+                config.btn.gradient = config.chooser.gradient;
+                config.btn.layer = config.chooser.layer;
+                drawButtonFrame(option, painter, widget, animStep);
+                config.btn.round = !config.btn.round;
+                config.btn.layer = btn_layer;
+                config.btn.gradient = gradient;
             }
-            r.setBottom(RECT.bottom());
-            shadows.sunken[round_][isEnabled].render(r, painter);
+            else
+                shadows.sunken[!config.btn.round][isEnabled].render(RECT, painter);
         }
     }
 
@@ -359,7 +333,7 @@ Style::drawComboBoxLabel(const QStyleOption *option, QPainter *painter, const QW
         else
             editRect.setRight(editRect.right() - (cb->iconSize.width() + 4));
     }
-    
+
     if (!cb->currentText.isEmpty() && !cb->editable)
     {   // text ==================================================
         if (cb->frame)
@@ -376,7 +350,7 @@ Style::drawComboBoxLabel(const QStyleOption *option, QPainter *painter, const QW
                 if (combo->view() && ((QWidget*)(combo->view()))->isVisible())
                     animStep = 6;
             }
-            editRect.adjust(F(3),0, -F(3), 0);
+            editRect.adjust(F(3),0, -F(3), -F(1)*(config.chooser.layer != Sunken));
             painter->setPen(btnFg(PAL, isEnabled, hasFocus, animStep));
         }
         int tf = Qt::AlignCenter;

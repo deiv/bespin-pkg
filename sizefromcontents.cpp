@@ -23,55 +23,9 @@
 #include "bespin.h"
 #include "makros.h"
 
-#define I_AM_THE_ROB 0
-
-#if I_AM_THE_ROB
-    #include <QMainWindow>
-    #include <QtDebug>
-    #include <QToolBar>
-    #include <QToolButton>
-#endif
-
 using namespace Bespin;
 
 static const int windowsArrowHMargin = 6; // arrow horizontal margin
-
-#if I_AM_THE_ROB
-static int shape( const QWidget *w )
-{
-    const QToolButton *bt = qobject_cast<const QToolButton*>(w);
-    if (!bt)
-        return 0;
-    
-    QToolBar *bar = 0;
-    if ( !( Style::config.btn.tool.connected && bt && (bar = qobject_cast<QToolBar*>(bt->parentWidget())) ) )
-        return 0;
-    QMainWindow *mwin = qobject_cast<QMainWindow*>(bar->parentWidget());
-    if (!mwin)
-        return 0;
-    
-    int pf = Tile::Full;
-    const int d = 1;
-    Qt::Orientation o = bar->orientation();
-    QRect geo = bt->geometry();
-    if (o == Qt::Horizontal)
-    {
-        if (qobject_cast<QToolButton*>(bar->childAt(geo.x()-d, geo.y())))
-            pf &= ~Tile::Left;
-        if (qobject_cast<QToolButton*>(bar->childAt(geo.right()+d, geo.y())))
-            pf &= ~Tile::Right;
-    }
-    else
-    {
-        if (qobject_cast<QToolButton*>(bar->childAt(geo.x(), geo.y()-d)))
-            pf &= ~Tile::Top;
-        if (qobject_cast<QToolButton*>(bar->childAt(geo.x(), geo.bottom()+d)))
-            pf &= ~Tile::Bottom;
-    }
-    
-    return pf;
-}
-#endif
 
 QSize
 Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
@@ -97,13 +51,17 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         {
             if (cb->editable)
                 return contentsSize + QSize(F(12) + (cb->fontMetrics.ascent() + F(2))*1.1, qMax(F(4) - config.fontExtent,0));
-            
+
             int hgt = contentsSize.height();
             int d = F(8);
             if ( cb->frame )
             {
-                hgt += ((config.btn.fullHover) ? F(4) : F(6)) - config.fontExtent;
-                d = F(16);
+                hgt -= config.fontExtent;
+                if (config.chooser.layer == Inlay || !config.btn.fullHover)
+                    hgt += F(4);
+                if (config.chooser.layer == Raised || config.chooser.layer == Inlay)
+                    hgt += F(4);
+                d = F(16) + F(2)*(config.btn.layer != Sunken);
             }
             hgt += hgt%2;
 //             if ( !cb->currentIcon.isNull()) // leads to inequal heights + pot. height changes on item change
@@ -112,7 +70,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         }
 //    case CT_DialogButtons: //
 //       return QSize((contentsSize.width()+16 < 80) ? 80 : contentsSize.width()+16, contentsSize.height()+10);
-//    case CT_Q3DockWindow: //  
+//    case CT_Q3DockWindow: //
     case CT_HeaderSection: // A header section, like QHeader
         if HAVE_OPTION(hdr, Header)
         {
@@ -136,7 +94,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         {
             if (menuItem->menuItemType == QStyleOptionMenuItem::Separator && menuItem->text.isEmpty())
                 return QSize(10, F(6));
-             
+
             bool checkable = menuItem->menuHasCheckableItems;
             int maxpmw = config.menu.showIcons*menuItem->maxIconWidth;
             int w = contentsSize.width();
@@ -184,12 +142,13 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
                     if (widget)
                     if (const QAbstractButton* abn = qobject_cast<const QAbstractButton*>(widget))
                     if (abn->isCheckable())
-                        w += contentsSize.height()+F(16);
+                        w += contentsSize.height() + F(16);
 
-                int h = (config.btn.layer ? F(6) : F(7)) - config.fontExtent;
-                if (!config.btn.fullHover)
+                int h = contentsSize.height() - config.fontExtent;
+                if (config.btn.layer == Inlay || !config.btn.fullHover)
                     h += F(4);
-                h += contentsSize.height();
+                if (config.btn.layer == Raised || config.btn.layer == Inlay)
+                    h += F(4);
                 if (!(h%2))
                     ++h;
 
@@ -218,7 +177,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         return contentsSize - QSize(0, F(2));
 //    case CT_Splitter: // A splitter, like QSplitter
     case CT_TabBarTab: // A tab on a tab bar, like QTabBar
-        
+
         if HAVE_OPTION(tab, Tab)
         {
             const int add = F(9);
@@ -249,16 +208,12 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
         if (toolbutton && toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon)
             h = contentsSize.height() + F(8);
         else
-            h = contentsSize.height() + F(6);
-        if (config.btn.tool.connected && !config.btn.tool.frame)
+            h = contentsSize.height() + F(4);
+        if (config.btn.tool.connected && config.btn.tool.frame == Raised || config.btn.tool.frame == Inlay )
             h += F(4);
-            
-#if I_AM_THE_ROB
-        w = qMax(contentsSize.width()+F(4), (shape(widget)==Tile::Full)*F(32)+h*4/3-F(4)); // 4/3 - 16/9
-#else
-        w = qMax(contentsSize.width()+F(4), h*4/3-F(4)); // 4/3 - 16/9
-#endif
-    //      w = contentsSize.width()+F(8);
+
+        w = qMax(contentsSize.width() + F(4), h*4/3); // 4/3 - 16/9
+
         if (toolbutton && hasMenuIndicator(toolbutton))
             w += pixelMetric(PM_MenuButtonIndicator, option, widget)/* + F(4)*/;
         return QSize(w, h);

@@ -71,6 +71,7 @@ static inline void
 createRingPix(int alpha, int value)
 {
     QPainterPath ringPath;
+//     ringPath.setFillRule(Qt::WindingFill); // Qt::OddEvenFill (default) 
     ringPath.addEllipse(0,0,200,200);
     ringPath.addEllipse(30,30,140,140);
 
@@ -93,7 +94,8 @@ createRingPix(int alpha, int value)
     rings->fill(Qt::transparent);
     QPainter p(rings);
     QColor color(value,value,value,(alpha+16)*112/255);
-    p.setPen(color);
+//     p.setPen(color);
+    p.setPen(Qt::NoPen);
     color.setAlpha(24*(alpha+16)/255);
     p.setBrush(color);
     p.setRenderHint(QPainter::Antialiasing);
@@ -493,4 +495,27 @@ Style::drawSizeGrip(const QStyleOption * option, QPainter * painter, const QWidg
    }
    painter->drawPie(rect, angle, 90<<4);
    painter->restore();
+}
+
+QColor
+Style::windowColor(const QWidget *w) const
+{
+    QWidget *window = w->window();
+    if (!window)
+        return w->palette().color(w->backgroundRole());
+    QColor c = window->palette().color(window->backgroundRole());
+    if (config.bg.mode == BevelV && config.bg.intensity != 100)
+    {
+        QPoint pos = w->mapTo(window, w->rect().center());
+        int y = pos.y()*100/window->height();
+        if (y < 20)
+            c = c.light(100+2*(config.bg.intensity-100)/3);
+        else if (y < 40)
+            c = c.light(100+(config.bg.intensity-100)/3);
+        else if (y > 80)
+            c = c.dark(100+2*(config.bg.intensity-100)/3);
+        else if (y > 60)
+            c = c.dark(100+(config.bg.intensity-100)/3);
+    }
+    return c;
 }

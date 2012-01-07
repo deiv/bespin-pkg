@@ -788,7 +788,7 @@ Gradients::bevel(bool ltr)
 {
    return _bevel[ltr];
 }
-
+#if 0
 const QPixmap &
 Gradients::shadow(int height, bool bottom)
 {
@@ -830,7 +830,7 @@ Gradients::shadow(int height, bool bottom)
         return *pix;
     return nullPix;
 }
-
+#endif
 static inline QPixmap *
 cornerMask(bool right = false)
 {

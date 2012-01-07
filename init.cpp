@@ -147,9 +147,10 @@ Style::readSettings(const QSettings* settings, QString appName)
         //BEGIN read some user personal settings (i.e. not preset related)
         // flanders
         config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
-        if ((config.showOff = readBool(SHOW_OFF)))
-            { ori[0] = Qt::Vertical; ori[1] = Qt::Horizontal; }
-        else
+        config.showOff = readBool(SHOW_OFF);
+//         if (config.showOff)
+//             { ori[0] = Qt::Vertical; ori[1] = Qt::Horizontal; }
+//         else
             { ori[0] = Qt::Horizontal; ori[1] = Qt::Vertical; }
         config.shadowTitlebar = readBool(SHADOW_TITLEBAR);
         // item single vs. double click, wizard appereance
@@ -339,15 +340,15 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.btn.checkType = (Check::Type) readInt(BTN_CHECKTYPE);
     config.btn.round = readBool(BTN_ROUND);
     config.btn.backLightHover = readBool(BTN_BACKLIGHTHOVER);
-    config.btn.layer = clamp(readInt(BTN_LAYER), 0, 2);
+    config.btn.layer = clamp(readInt(BTN_LAYER), 0, 3);
     GRAD(btn) = readGrad(BTN_GRADIENT);
-    if (config.btn.layer == 2 && GRAD(btn) == Gradients::Sunken) // NO!
+    if (config.btn.layer > Relief && GRAD(btn) == Gradients::Sunken) // NO!
         GRAD(btn) = Gradients::None;
 
-    config.btn.fullHover = config.btn.backLightHover || readBool(BTN_FULLHOVER);
+    config.btn.fullHover = config.btn.backLightHover || config.btn.layer == Inlay || readBool(BTN_FULLHOVER);
     config.btn.minHeight = readInt(BTN_MIN_HEIGHT);
 
-    if (config.btn.layer == 2) config.btn.cushion = true;
+    if (config.btn.layer > Relief) config.btn.cushion = true;
     else if (GRAD(btn) ==  Gradients::Sunken) config.btn.cushion = false;
     else config.btn.cushion = readBool(BTN_CUSHION);
 
@@ -377,6 +378,7 @@ Style::readSettings(const QSettings* settings, QString appName)
 
     // Choosers ===========================
     GRAD(chooser) = readGrad(CHOOSER_GRADIENT);
+    config.chooser.layer = clamp(readInt(CHOOSER_LAYER), 0, 3);
 
 
     // kwin - yes i let the style control the deco, iff the deco permits, though :)
@@ -591,7 +593,6 @@ void Style::initMetrics()
     Dpi::target.f5 = SCALE(5); Dpi::target.f6 = SCALE(6);
     Dpi::target.f7 = SCALE(7); Dpi::target.f8 = SCALE(8);
     Dpi::target.f9 = SCALE(9); Dpi::target.f10 =SCALE(10);
-
     Dpi::target.f12 = SCALE(12); Dpi::target.f13 = SCALE(13);
     Dpi::target.f16 = SCALE(16); Dpi::target.f18 = SCALE(18);
     Dpi::target.f20 = SCALE(20); Dpi::target.f32 = SCALE(32);
@@ -609,12 +610,16 @@ void Style::initMetrics()
         Dpi::target.SliderThickness = SCALE(20);
         Dpi::target.SliderControl = SCALE(20);
     }
-    Dpi::target.Indicator = SCALE(20 - 2*config.btn.layer);
-#if 0
-   Dpi::target.ExclusiveIndicator = config.btn.layer ? SCALE(16) : SCALE(19);
-#else
-    Dpi::target.ExclusiveIndicator = SCALE(17);
-#endif
+    if (config.btn.layer == Inlay)
+    {
+        Dpi::target.Indicator = SCALE(20);
+        Dpi::target.ExclusiveIndicator = SCALE(19);
+    }
+    else
+    {
+        Dpi::target.Indicator = SCALE(20 - 2*config.btn.layer);
+        Dpi::target.ExclusiveIndicator = SCALE(17); // forced sunken
+    }
 }
 
 #undef SCALE

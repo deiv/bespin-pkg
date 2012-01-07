@@ -64,6 +64,7 @@ typedef struct Config
     struct chooser
     {
         Gradients::Type gradient;
+        int layer;
     } chooser;
 
     int  dialogBtnLayout;
