@@ -331,7 +331,7 @@ Style::btnBg( const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool
     QColor c = CCOLOR(btn.std, Bg);
     if (hasFocus && config.btn.active_role[Bg] != QPalette::Highlight)
     {
-        if (config.btn.layer == 2)
+        if (config.btn.layer == Sunken)
             c = FCOLOR(Highlight);
         else
             c = Colors::mid(FCOLOR(Highlight), c, 1, 10 + Colors::contrast(FCOLOR(Highlight), c));
@@ -349,7 +349,7 @@ Style::btnFg(const QPalette &pal, bool isEnabled, bool hasFocus, int step, bool 
     if (!isEnabled)
         return FCOLOR(WindowText); //Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 1, 3);
 
-    if (config.btn.layer != 2 || config.btn.active_role[Bg] == QPalette::Highlight)
+    if (config.btn.layer != Sunken || config.btn.active_role[Bg] == QPalette::Highlight)
         hasFocus = false;
     QColor  fg1 = hasFocus ? FCOLOR(HighlightedText) : CCOLOR(btn.std, Fg),
             fg2 = CCOLOR(btn.active, Fg);

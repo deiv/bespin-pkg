@@ -18,6 +18,7 @@
 
 #include <QApplication>
 #include <QComboBox>
+#include <QToolBar>
 #include "draw.h"
 #include "hacks.h"
 #include "animator/hover.h"
@@ -208,7 +209,6 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
     }
 
     // the frame
-    const Tile::Set &mask = masks.rect[!config.btn.round];
     if ((cmb->subControls & SC_ComboBoxFrame) && cmb->frame)
     {
         if (cmb->editable)
@@ -221,15 +221,28 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
                 if (listShown)
                     animStep = 6;
 
-                config.btn.round = !config.btn.round;
                 int btn_layer = config.btn.layer;
-                Gradients::Type gradient = config.btn.gradient;
-                config.btn.gradient = config.chooser.gradient;
-                config.btn.layer = config.chooser.layer;
+                Gradients::Type btn_grd = config.btn.gradient;
+                config.btn.round = !config.btn.round;
+
+                const bool comboNotSmallerThanTool = config.chooser.layer == Raised || config.chooser.layer == Inlay ||
+                                                     config.btn.tool.frame == Sunken || config.btn.tool.frame == Relief;
+                if (comboNotSmallerThanTool && widget && qobject_cast<QToolBar*>(widget->parentWidget()))
+                {
+                    GRAD(btn) = GRAD(btn.tool);
+                    config.btn.layer = config.btn.tool.frame;
+                }
+                else
+                {
+                    GRAD(btn) = GRAD(chooser);
+                    config.btn.layer = config.chooser.layer;
+                }
+
                 drawButtonFrame(option, painter, widget, animStep);
+
                 config.btn.round = !config.btn.round;
                 config.btn.layer = btn_layer;
-                config.btn.gradient = gradient;
+                config.btn.gradient = btn_grd;
             }
             else
                 shadows.sunken[!config.btn.round][isEnabled].render(RECT, painter);
@@ -284,8 +297,7 @@ Style::drawComboBox(const QStyleOptionComplex *option, QPainter *painter, const 
         {
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg));
             c = Colors::mid(c, CONF_COLOR(btn.active, Bg), 6-animStep, animStep);
-//          ar.adjust(f2, f3, -f2, -f3);
-            mask.render(ar, painter, GRAD(chooser), ori[1], c, RECT.height()-f2, QPoint(0, ar.y() - RECT.y()) );
+            masks.rect[!config.btn.round].render(ar, painter, GRAD(chooser), ori[1], c, RECT.height()-f2, QPoint(0, ar.y() - RECT.y()) );
             painter->setBrush(Colors::mid(c, CONF_COLOR(btn.active, Fg), 1,2));
         }
         if (upDown)
@@ -351,7 +363,11 @@ Style::drawComboBoxLabel(const QStyleOption *option, QPainter *painter, const QW
                     animStep = 6;
             }
             editRect.adjust(F(3),0, -F(3), -F(1)*(config.chooser.layer != Sunken));
+            // trick btnFg
+            const int btn_layer = config.btn.layer;
+            config.btn.layer = config.chooser.layer;
             painter->setPen(btnFg(PAL, isEnabled, hasFocus, animStep));
+            config.btn.layer = btn_layer;
         }
         int tf = Qt::AlignCenter;
         if ( !((cb->subControls & SC_ComboBoxFrame) && cb->frame) )
