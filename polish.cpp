@@ -576,13 +576,15 @@ Style::polish( QWidget * widget )
             else if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
             {
                 if (Hacks::config.titleWidgets)
-                {
-                    if (config.bg.mode == Scanlines) {
-                        frame->setBackgroundRole(QPalette::Base);
-                        frame->setForegroundRole(QPalette::Text);
-                    } else {
-                        frame->setBackgroundRole(QPalette::WindowText);
-                        frame->setForegroundRole(QPalette::Window);
+                {   // to invert or to not invert, ...?
+                    if (config.UNO.used) {
+                        frame->setBackgroundRole(config.UNO.__role[Bg]);
+                        frame->setForegroundRole(config.UNO.__role[Fg]);
+                    }
+                    else
+                    {
+                        frame->setBackgroundRole(config.tab.std_role[Bg]);
+                        frame->setForegroundRole(config.tab.std_role[Fg]);
                     }
                     QList<QLabel*> labels = frame->findChildren<QLabel*>();
                     foreach (QLabel *label, labels)
