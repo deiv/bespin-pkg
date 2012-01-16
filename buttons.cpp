@@ -189,7 +189,7 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
 
 //    const bool toggled = !hover && (option->state & State_On);
     const bool round = !isCheckbox && (config.btn.round || (btn && btn->isCheckable()));
-    const bool fullHover =  config.btn.fullHover ||
+    const bool fullHover =  config.btn.fullHover || config.btn.layer == Inlay ||
                             (isCheckbox && (config.btn.layer != Raised || config.btn.checkType == Check::O));
 
     int iOff[4] = {0,0,0,0};
