@@ -116,6 +116,8 @@
 #define MENU_ITEM_SUNKEN "Menu.ItemSunken", false
 #define MENU_ACTIVEITEMSUNKEN "Menu.ActiveItemSunken", false
 
+#define SHADOW_COLOR "ShadowColor", QColor(0,0,0,255)
+#define SHADOW_IS_HALO "ShadowIsHalo", false
 #define SHADOW_SIZE_INACTIVE "InactiveShadowSize", 12
 #define SHADOW_SIZE_ACTIVE "ActiveShadowSize", 48
 #define SHADOW_TITLEBAR "ShadowTitlebar", false

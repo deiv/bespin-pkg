@@ -305,6 +305,9 @@ bool Factory::readConfig()
     settings.beginGroup("Deco");
 
     Shadows::setSize( settings.value(SHADOW_SIZE_INACTIVE).toInt(), settings.value(SHADOW_SIZE_ACTIVE).toInt() );
+    const bool halo = settings.value(SHADOW_IS_HALO).toBool();
+    Shadows::setColor( halo ? settings.value(SHADOW_COLOR).value<QColor>() : QColor(0,0,0,255) );
+    Shadows::setHalo( halo );
     Shadows::cleanUp();
     // get rid of old stuff (even w/o config: kwin sometimes crashes on --replace)
     XProperty::remove(QX11Info::appRootWindow(), XProperty::bespinShadow[0]);

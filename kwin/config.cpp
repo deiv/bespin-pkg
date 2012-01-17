@@ -205,6 +205,10 @@ Config::Config(QWidget* parent) : BConfig(parent)
 
     handleSettings(ui.inactiveShadowSize, SHADOW_SIZE_INACTIVE);
     handleSettings(ui.activeShadowSize, SHADOW_SIZE_ACTIVE);
+    handleSettings(ui.halo, SHADOW_IS_HALO);
+    setContextHelp(ui.halo, "<b>Use Halo instead of Shadow</b><hr>\
+    Allows to set a colored halo with even paddings around windows. Good for dark setups");
+    connect ( ui.shadowColor, SIGNAL( changed(const QColor&) ), SIGNAL( changed() ) );
 
     /** if you call setContextHelp(.) with a combobox and pass a stringlist,
     the strings are attached to the combo entries and shown on select/hover */
@@ -219,6 +223,10 @@ Config::Config(QWidget* parent) : BConfig(parent)
 
     /** ===========================================
     You're pretty much done here - simple eh? ;) **/
+
+    QSettings settings("Bespin", "Style");
+    settings.beginGroup("Deco");
+    ui.shadowColor->setColor(settings.value(SHADOW_COLOR).value<QColor>());
 
     /* setup the presets UI */
     QListWidgetItem *item = new QListWidgetItem("Default");
@@ -269,6 +277,9 @@ void Config::save(KConfigGroup&)
 {
     ui.presets->setCurrentRow(-1);
     BConfig::save();
+    QSettings settings("Bespin", "Style");
+    settings.beginGroup("Deco");
+    settings.setValue("ShadowColor", ui.shadowColor->color());
     savePresets();
 }
 
