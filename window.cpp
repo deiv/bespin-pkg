@@ -500,7 +500,11 @@ Style::drawSizeGrip(const QStyleOption * option, QPainter * painter, const QWidg
 QColor
 Style::windowColor(const QWidget *w) const
 {
-    QWidget *window = w->window();
+    QWidget *window = const_cast<QWidget*>(w);
+    while ((window = window->parentWidget())) {
+        if (window->autoFillBackground() || window->isWindow())
+            break;
+    }
     if (!window)
         return w->palette().color(w->backgroundRole());
     QColor c = window->palette().color(window->backgroundRole());
@@ -519,3 +523,4 @@ Style::windowColor(const QWidget *w) const
     }
     return c;
 }
+
