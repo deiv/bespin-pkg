@@ -645,13 +645,6 @@ Hacks::add(QWidget *w)
     ENSURE_INSTANCE;
     FILTER_EVENTS(w);
 #endif
-
-//    if (config.hack.konsole)
-//    if (w->inherits("Konsole::TerminalDisplay")) {
-//       w->setAttribute(Qt::WA_StyledBackground);
-//       w->setAttribute(Qt::WA_MacBrushedMetal);
-//       return true;
-//    }
     return false;
 }
 

@@ -238,7 +238,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>9</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -554,8 +554,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>390</width>
-               <height>121</height>
+               <width>524</width>
+               <height>236</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1209,8 +1209,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>524</width>
-               <height>233</height>
+               <width>287</width>
+               <height>193</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1946,8 +1946,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>524</width>
-               <height>290</height>
+               <width>323</width>
+               <height>266</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3254,6 +3254,9 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
           </item>
           <item>
            <widget class="QCheckBox" name="konsoleScanlines">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Konsole: &quot;A terminal without scanlines is no real terminal at all!&quot; ;-)</string>
             </property>

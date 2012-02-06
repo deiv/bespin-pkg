@@ -496,8 +496,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     still works by double clicking the item)<br>\
     * as a minor fix the column autoexpands (would stretch the header, now affects the section)");
 
-    handleSettings(ui.konsoleScanlines, HACK_KONSOLE_SCANLINES);
-    setContextHelp(ui.konsoleScanlines, "<b>Konsole scanlines</b><hr>THE BELOVED SCANLINES!!!");
+    setContextHelp(ui.konsoleScanlines, "<b>Konsole scanlines</b><hr>Since konsole support wallpapers again, use that. It's more flexible, efficient and nicer that plaing with the paint mode and drawing lines by line.");
 
     handleSettings(ui.kTitleWidgets, HACK_TITLE_WIDGET);
     setContextHelp(ui.kTitleWidgets, "<b>KTitleWidget</b><hr>I'd' like my headers inverted and center aligned...");
