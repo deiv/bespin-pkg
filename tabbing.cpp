@@ -405,6 +405,8 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         {
             if ( GRAD(tab) == Gradients::Sunken )
                 gt = Gradients::Simple;
+            else
+                c = Colors::mid(c,Qt::black,6,1);
             rect.adjust(0,-F(2),0,0);
         }
         painter->drawTiledPixmap(rect, Gradients::pix(c, size, o, gt));
