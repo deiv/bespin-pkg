@@ -241,11 +241,12 @@ void
 MacMenu::deactivate(QMenuBar *menu)
 {
     menu->removeEventFilter(this);
+    const bool wasShown = menu->isVisible();
     menu->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
     if (QWidget *dad = menu->parentWidget())
     if (dad->layout())
         dad->layout()->setMenuBar(menu);
-    menu->show();
+    menu->setVisible(wasShown);
     menu->adjustSize();
 //     menu->updateGeometry();
 }
