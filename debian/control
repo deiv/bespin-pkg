@@ -7,6 +7,8 @@ Build-Depends: debhelper (>= 7.0.50~), libqt4-dev (>= 4.4), kdelibs-bin, cmake, 
 Standards-Version: 3.9.3
 Homepage: http://cloudcity.sourceforge.net
 Bugs: http://sourceforge.net/tracker/?atid=976907&group_id=201276&func=browse
+Vcs-Git: git://git.debian.org/pkg-kde/kde-extras/bespin.git
+Vcs-Browser: http://git.debian.org/?p=pkg-kde/kde-extras/bespin.git
 
 Package: kde-style-bespin
 Architecture: any
