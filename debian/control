@@ -15,7 +15,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: kdm-theme-bespin, ksplash-theme-bespin
 Conflicts: kde4-style-bespin, kwin4-style-bespin, plasma-widget-xbar
-Description: A very glossy Qt4/KDE4 window decoration
+Description: very glossy Qt4/KDE4 window decoration
  Bespin is a window decoration for KDE4, the name is nothing about quantum
  mechanics, but just refers to cloud city (StarWars Episode V: The Empire
  Strikes Back)
@@ -24,7 +24,7 @@ Package: kdm-theme-bespin
 Architecture: all
 Suggests: kde-style-bespin
 Depends: ${misc:Depends}
-Description: A very glossy Qt4/KDE4 kdm theme
+Description: very glossy Qt4/KDE4 kdm theme
  Bespin is a window decoration for KDE4, the name is nothing about quantum
  mechanics, but just refers to cloud city (StarWars Episode V: The Empire
  Strikes Back)
@@ -35,7 +35,7 @@ Package: kdm-theme-aperture
 Architecture: all
 Suggests: kde-style-bespin
 Depends: ${misc:Depends}
-Description: A very glossy Qt4/KDE4 kdm theme - aperture variant
+Description: very glossy Qt4/KDE4 kdm theme - aperture variant
  Bespin is a window decoration for KDE4, the name is nothing about quantum
  mechanics, but just refers to cloud city (StarWars Episode V: The Empire
  Strikes Back)
@@ -46,7 +46,7 @@ Package: kdm-theme-tibanna
 Architecture: all
 Suggests: kde-style-bespin
 Depends: ${misc:Depends}
-Description: A very glossy Qt4/KDE4 kdm theme - tibanna variant
+Description: very glossy Qt4/KDE4 kdm theme - tibanna variant
  Bespin is a window decoration for KDE4, the name is nothing about quantum
  mechanics, but just refers to cloud city (StarWars Episode V: The Empire
  Strikes Back)
@@ -57,7 +57,7 @@ Package: ksplash-theme-bespin
 Architecture: all
 Suggests: kde-style-bespin
 Depends: ${misc:Depends}
-Description: A very glossy Qt4/KDE4 ksplash theme
+Description: very glossy Qt4/KDE4 ksplash theme
  Bespin is a window decoration for KDE4, the name is nothing about quantum
  mechanics, but just refers to cloud city (StarWars Episode V: The Empire
  Strikes Back)
@@ -68,7 +68,7 @@ Package: ksplash-theme-tibanna
 Architecture: all
 Suggests: kde-style-bespin
 Depends: ${misc:Depends}
-Description: A very glossy Qt4/KDE4 ksplash theme - tibanna variant
+Description: very glossy Qt4/KDE4 ksplash theme - tibanna variant
  Bespin is a window decoration for KDE4, the name is nothing about quantum
  mechanics, but just refers to cloud city (StarWars Episode V: The Empire
  Strikes Back)
@@ -79,7 +79,7 @@ Package: ksplash-theme-aperture
 Architecture: all
 Suggests: kde-style-bespin
 Depends: ${misc:Depends}
-Description: A very glossy Qt4/KDE4 ksplash theme - aperture variant
+Description: very glossy Qt4/KDE4 ksplash theme - aperture variant
  Bespin is a window decoration for KDE4, the name is nothing about quantum
  mechanics, but just refers to cloud city (StarWars Episode V: The Empire
  Strikes Back)
