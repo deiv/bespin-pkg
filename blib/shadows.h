@@ -27,6 +27,8 @@ namespace Shadows {
     BLIB_EXPORT void cleanUp();
     BLIB_EXPORT void manage(QWidget *w);
     BLIB_EXPORT void set(WId id, Shadows::Type t, bool storeToRoot = false);
+    BLIB_EXPORT void setColor(QColor c);
+    BLIB_EXPORT void setHalo(bool halo);
     BLIB_EXPORT void setSize(int small, int big);
 } }
 

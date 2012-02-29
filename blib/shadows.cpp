@@ -48,7 +48,8 @@ protected:
 
 static ShadowManager *shadowManager = 0;
 static uint size[2] = { 12, 64 };
-
+static QColor color(0,0,0,0);
+static bool halo(false);
 
 static QPixmap (*pixmaps[2])[8] = {0,0};
 static unsigned long globalShadowData[2][12];
@@ -87,10 +88,18 @@ shadowData(Shadows::Type t, bool storeToRoot)
 #else
         int sz = size[1];
 #endif
-        globalShadowData[t-1][8] = (sz-4)/2;
-        globalShadowData[t-1][9] = 2*(sz-4)/3;
-        globalShadowData[t-1][10] = sz-4;
-        globalShadowData[t-1][11] = 2*(sz-4)/3;
+        if (halo)
+        {
+            globalShadowData[t-1][8] = globalShadowData[t-1][9] = // yes, next line
+            globalShadowData[t-1][10] = globalShadowData[t-1][11] = 3*(sz-4)/4;
+        }
+        else
+        {
+            globalShadowData[t-1][8] = (sz-4)/2;
+            globalShadowData[t-1][9] = 2*(sz-4)/3;
+            globalShadowData[t-1][10] = sz-4;
+            globalShadowData[t-1][11] = 2*(sz-4)/3;
+        }
 
         if (!pixmaps[t-1])
         {
@@ -120,19 +129,30 @@ shadowData(Shadows::Type t, bool storeToRoot)
             QPainter p(&shadow);
             p.setPen(Qt::NoPen);
 
-            rg.setColorAt(0, QColor(0,0,0,112-sz)); rg.setColorAt(0.98, QColor(0,0,0,0));
+            if (halo)
+            {
+                rg.setColorAt(0, QColor(255,255,255,192)); rg.setColorAt(0.98, QColor(255,255,255,0));
+                p.setBrush(rg);
+                p.drawRect(shadowRect);
+            }
+
+            QColor transparent = color; transparent.setAlpha(0);
+            color.setAlpha(112-sz);
+            rg.setColorAt(0, color); rg.setColorAt(0.98, transparent);
             p.setBrush(rg);
             p.drawRect(shadowRect);
 
             rg.setStops(QGradientStops());
 
-            rg.setColorAt(0, QColor(0,0,0,96-sz)); rg.setColorAt(0.80, QColor(0,0,0,0));
+            color.setAlpha(96-sz);
+            rg.setColorAt(0, color); rg.setColorAt(0.80, transparent);
             p.setBrush(rg);
             p.drawRect(shadowRect);
 
             rg.setStops(QGradientStops());
 
-            rg.setColorAt(0, QColor(0,0,0,72-sz)); rg.setColorAt(0.66, QColor(0,0,0,0));
+            color.setAlpha(72-sz);
+            rg.setColorAt(0, color); rg.setColorAt(0.66, transparent);
             p.setBrush(rg);
             p.drawRect(shadowRect);
 
@@ -225,10 +245,19 @@ Shadows::set(WId id, Shadows::Type t, bool storeToRoot)
 #endif
 }
 
+void Shadows::setColor(QColor c)
+{
+    color = c;
+}
+
+void Shadows::setHalo(bool h)
+{
+    halo = h;
+}
+
 void
 Shadows::setSize(int small, int big)
 {
     size[0] = qMin(72, qMax(8, small));
     size[1] = qMin(72, qMax(8, big));
 }
-

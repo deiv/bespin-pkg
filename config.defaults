@@ -81,7 +81,6 @@
 #define HACK_MESSAGES "Hack.Messages", false
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false
 // yes - "true" by default since a terminal w/o scanlines is no terminal at all ;-)
-#define HACK_KONSOLE_SCANLINES "Hack.KonsoleScanlines", true
 #define HACK_KRUNNER "Hack.KRunner", false
 #define HACK_SUSPEND_FULLSCREEN_PLAYERS "Hack.SuspendFSPlayers", false
 #define HACK_THROBBER "Hack.KillThrobber", false
@@ -116,6 +115,8 @@
 #define MENU_ITEM_SUNKEN "Menu.ItemSunken", false
 #define MENU_ACTIVEITEMSUNKEN "Menu.ActiveItemSunken", false
 
+#define SHADOW_COLOR "ShadowColor", QColor(0,0,0,255)
+#define SHADOW_IS_HALO "ShadowIsHalo", false
 #define SHADOW_SIZE_INACTIVE "InactiveShadowSize", 12
 #define SHADOW_SIZE_ACTIVE "ActiveShadowSize", 48
 #define SHADOW_TITLEBAR "ShadowTitlebar", false

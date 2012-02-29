@@ -618,39 +618,39 @@ Style::polish( QWidget * widget )
             )
         {
             Animator::Hover::manage(frame);
+            if ( Hacks::config.extendDolphinViews && frame->parentWidget() &&
+                            QString(frame->metaObject()->className()).startsWith("Dolphin") )
+            {
+                if (QWidget *grampa = frame->parentWidget()->parentWidget())
+                {
+                    frame->setFrameStyle(QFrame::NoFrame);
+                    grampa->setBackgroundRole(QPalette::Base);
+                    grampa->setForegroundRole(QPalette::Text);
+                    QWidgetList kids = grampa->findChildren<QWidget*>();
+                    foreach (QWidget *kid, kids)
+                    {
+                        kid->setBackgroundRole(QPalette::Base);
+                        kid->setForegroundRole(QPalette::Text);
+                        if ( kid->inherits("KonqStatusBarMessageLabel") || kid->inherits("StatusBarMessageLabel")) // hey, why not some pointless renames...
+                        {   // hardcoded paint colors... bwuahahahaaaa :-(
+                            QPalette pal = kid->palette();
+                            pal.setColor( QPalette::WindowText, pal.color(QPalette::Text) );
+                            kid->setPalette(pal);
+                        }
+                    }
+                    grampa->setAutoFillBackground(true);
+                    grampa->setContentsMargins(F(4),F(1),F(4),F(1));
+                    FILTER_EVENTS(grampa);
+                    int l,t,r,b;
+                    grampa = grampa->window();
+                    grampa->getContentsMargins(&l,&t,&r,&b);
+                    grampa->setContentsMargins(l,t,r,qMax(b,F(3)));
+                }
+            }
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
             {
                 if (widget->inherits("KCompletionBox"))
                     Bespin::Shadows::manage(widget);
-                if ( Hacks::config.extendDolphinViews && itemView->parentWidget() &&
-                     QString(itemView->metaObject()->className()).startsWith("Dolphin") )
-                {
-                    if (QWidget *grampa = itemView->parentWidget()->parentWidget())
-                    {
-                        itemView->setFrameStyle(QFrame::NoFrame);
-                        grampa->setBackgroundRole(QPalette::Base);
-                        grampa->setForegroundRole(QPalette::Text);
-                        QWidgetList kids = grampa->findChildren<QWidget*>();
-                        foreach (QWidget *kid, kids)
-                        {
-                            kid->setBackgroundRole(QPalette::Base);
-                            kid->setForegroundRole(QPalette::Text);
-                            if ( kid->inherits("KonqStatusBarMessageLabel") || kid->inherits("StatusBarMessageLabel")) // hey, why not some pointless renames...
-                            {   // hardcoded paint colors... bwuahahahaaaa :-(
-                                QPalette pal = kid->palette();
-                                pal.setColor( QPalette::WindowText, pal.color(QPalette::Text) );
-                                kid->setPalette(pal);
-                            }
-                        }
-                        grampa->setAutoFillBackground(true);
-                        grampa->setContentsMargins(F(4),F(1),F(4),F(1));
-                        FILTER_EVENTS(grampa);
-                        int l,t,r,b;
-                        grampa = grampa->window();
-                        grampa->getContentsMargins(&l,&t,&r,&b);
-                        grampa->setContentsMargins(l,t,r,qMax(b,F(3)));
-                    }
-                }
 
                 if (QWidget *vp = itemView->viewport())
                 {
@@ -979,8 +979,6 @@ Style::polish( QWidget * widget )
         if (widget->inherits("QWebView"))
             FILTER_EVENTS(widget);
     }
-    else if (Hacks::config.konsoleScanlines &&widget->inherits("Konsole::TerminalDisplay"))
-        FILTER_EVENTS(widget)
     // this is a WORKAROUND for amarok filebrowser, see above on itemviews...
     else if (widget->inherits("KDirOperator"))
     {

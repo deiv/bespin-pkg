@@ -1157,32 +1157,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
     case QEvent::Move:
         return false; // just for performance - they can occur really often
     case QEvent::Paint:
-        if (Hacks::config.konsoleScanlines &&
-            !qstrcmp(object->metaObject()->className(), "Konsole::TerminalDisplay"))
-        {
-            QWidget *w = static_cast<QWidget*>(object);
-
-            w->removeEventFilter(this);
-            QCoreApplication::sendEvent(w, ev);
-            w->installEventFilter(this);
-
-            QPainter p(w);
-            QColor c = w->palette().color(w->foregroundRole());
-            c.setAlpha(24);
-            p.setBrush(QBrush(c, Qt::HorPattern));
-            p.setPen(Qt::NoPen);
-            const QRegion &reg = static_cast<QPaintEvent*>(ev)->region();
-            if (reg.isEmpty())
-                p.drawRect(w->rect());
-            else
-            {
-                foreach (QRect r, reg.rects())
-                    p.drawRect(r);
-            }
-            p.end();
-
-            return true;
-        }
 #if BESPIN_ARGB_WINDOWS
 //         if (object->isWidgetType())
         if (QWidget *window = static_cast<QWidget*>(object))
@@ -1761,19 +1735,26 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
         itemView->removeEventFilter(&eventKiller);
 }
 
+inline static bool isDolphinView(const QWidget *w, QWidget **grampa)
+{
+    return qobject_cast<const QAbstractScrollArea*>(w) && (*grampa = w->parentWidget()) &&
+                                                    (*grampa = (*grampa)->parentWidget()) &&
+                                                    QString(w->metaObject()->className()).startsWith("Dolphin");
+}
+
 void
 Style::focusWidgetChanged( QWidget *old, QWidget *focusWidget )
 {
     if ( Hacks::config.extendDolphinViews )
     {
         QWidget *grampa = 0;
-        if ( qobject_cast<QAbstractItemView*>(focusWidget) && (grampa = focusWidget->parentWidget()) && (grampa = grampa->parentWidget()) && QString(focusWidget->metaObject()->className()).startsWith("Dolphin") )
+        if ( isDolphinView(focusWidget, &grampa) )
         {
             grampa->setProperty("hasFocus", true);
             grampa->update();
 
         }
-        if ( qobject_cast<QAbstractItemView*>(old) && (grampa = old->parentWidget()) && (grampa = grampa->parentWidget()) && QString(old->metaObject()->className()).startsWith("Dolphin") )
+        if ( isDolphinView(old, &grampa) )
         {
             grampa->setProperty("hasFocus", false);
             grampa->update();

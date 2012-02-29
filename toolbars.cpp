@@ -23,6 +23,8 @@
 #include "animator/hover.h"
 #include "blib/FX.h"
 
+#include <QtDebug>
+
 static int step = 0;
 static bool connected = false;
 
@@ -252,7 +254,7 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
         {
             if (config.btn.tool.frame == Inlay) {
                 const QColor sc = config.UNO.toolbar ? tb->palette().color(tb->backgroundRole()) : windowColor(widget);
-                masks.rect[1].render(rect, painter, Gradients::Sunken, Qt::Vertical, sc);
+                masks.rect[true].render(rect, painter, Gradients::Sunken, Qt::Vertical, sc);
                 const int f3 = F(3);
                 if (round)
                     rect.adjustConditionally(F(4), f3, -F(4), -f3);
@@ -379,6 +381,13 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
     if (connected && (option->state & State_On))
         text = CCOLOR(btn.tool.active, Fg);
 
+    if (hasArrow)
+    {
+        painter->setPen(text);
+        const int f5 = F(5);
+        drawSolidArrow(Navi::Direction(toolbutton->arrowType), RECT.adjusted(f5,f5,-f5,-f5), painter);
+    }
+
     if (justText)
     {   // the most simple way
         if (!connected)
@@ -470,12 +479,7 @@ Style::drawToolButtonLabel(const QStyleOption *option, QPainter *painter, const 
         return;
     }
 
-    if (hasArrow)
-    {
-        const int f5 = F(5);
-        drawSolidArrow(Navi::Direction(toolbutton->arrowType), RECT.adjusted(f5,f5,-f5,-f5), painter);
-    }
-    else
+    if (!hasArrow)
         drawItemPixmap(painter, RECT, Qt::AlignCenter, pm);
 }
 
