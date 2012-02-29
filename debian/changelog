@@ -1,15 +1,9 @@
-bespin (0.r1462-1) experimental; urgency=low
+bespin (0.r1476-1) experimental; urgency=low
 
-  * Sync with SVN@1462 
-
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 07 Jan 2012 13:55:51 +0530
-
-bespin (0.r1446-1) experimental; urgency=low
-
-  * Sync with SVN@1446 
+  * Sync with SVN@1476 
   * Initial release. (Closes: #651091)
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 31 Dec 2011 13:39:27 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Wed, 29 Feb 2012 17:24:54 +0530
 
 bespin (0.r1436-1) UNRELEASED; urgency=low
 
