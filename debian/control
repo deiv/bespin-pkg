@@ -83,14 +83,3 @@ Description: A very glossy Qt4/KDE4 ksplash theme
  Strikes Back)
  .
  This package includes the ksplash theme for Bespin - Aperture variant
-
-Package: bespin-icon-theme
-Architecture: all
-Suggests: kde-style-bespin
-Depends: ${misc:Depends}
-Description: Icon sets for bespin
- Bespin is a window decoration for KDE4, the name is nothing about quantum
- mechanics, but just refers to cloud city (StarWars Episode V: The Empire
- Strikes Back)
- .
- This package includes the icon theme for Bespin
