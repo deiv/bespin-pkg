@@ -3,7 +3,7 @@ Section: kde
 Priority: extra
 Maintainer: Debian KDE Extras Team <pkg-kde-extras@lists.alioth.debian.org>
 Uploaders: Ritesh Raj Sarraf <rrs@debian.org>
-Build-Depends: debhelper (>= 7.0.50~), libqt4-dev (>= 4.4), kdelibs-bin, cmake, kdelibs5-dev, kdebase-workspace-dev, libx11-dev, libxrender-dev, libxext-dev, imagemagick, inkscape
+Build-Depends: debhelper (>= 7.0.50~), libqt4-dev (>= 4.4), kdelibs-bin, cmake, kdelibs5-dev, kdebase-workspace-dev, libx11-dev, libxrender-dev, libxext-dev, imagemagick, inkscape, git
 Standards-Version: 3.9.3
 Homepage: http://cloudcity.sourceforge.net
 Bugs: http://sourceforge.net/tracker/?atid=976907&group_id=201276&func=browse
