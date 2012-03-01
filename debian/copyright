@@ -1,6 +1,6 @@
 Format: http://dep.debian.net/deps/dep5
 Upstream-Name: bespin
-Upstream-Contact: Nicholas A. Bellinger (nab) <nab@linux-iscsi.org>
+Upstream-Contact: Thomas Lübking <baghira-style@gmx.net>
 Source: http://cloudcity.sourceforge.net
 
 Files: *
