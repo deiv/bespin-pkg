@@ -1,3 +1,9 @@
+bespin (0.r1476-3) experimental; urgency=low
+
+  * Switch source format to 3.0 (git)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Fri, 02 Mar 2012 01:24:39 +0530
+
 bespin (0.r1476-2) experimental; urgency=low
 
   * Fix debian/copyright details
