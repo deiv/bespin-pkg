@@ -1,0 +1,6 @@
+Bespin upstream does not do any tarball release. The upstream also does not
+do any tagging on the repository.
+
+The package source is acquired by checking out the upstream code from their
+revision control. The specific revision is specified in the debian/changelog
+file
