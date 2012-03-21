@@ -33,7 +33,6 @@ class Hacks : public QObject
 public:
     Hacks() {}
     enum HackAppType { Unknown = 0, SMPlayer, Dragon, KDM, Gwenview, VLC };
-    bool eventFilter( QObject *, QEvent *);
     static bool add(QWidget *w);
     static void releaseApp();
     static void remove(QWidget *w);
@@ -44,6 +43,9 @@ public:
              lockToolBars, invertDolphinUrlBar, fixKMailFolderList, extendDolphinViews, lockDocks,
              konsoleScanlines, suspendFullscreenPlayers, titleWidgets;
     } config;
+protected:
+    bool eventFilter( QObject *, QEvent *);
+    void timerEvent(QTimerEvent *te);
 private slots:
     void toggleToolBarLock();
     void fixGwenviewPosition();
