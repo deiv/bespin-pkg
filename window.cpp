@@ -94,8 +94,8 @@ createRingPix(int alpha, int value)
     rings->fill(Qt::transparent);
     QPainter p(rings);
     QColor color(value,value,value,(alpha+16)*112/255);
-//     p.setPen(color);
-    p.setPen(Qt::NoPen);
+    p.setPen(color);
+//     p.setPen(Qt::NoPen);
     color.setAlpha(24*(alpha+16)/255);
     p.setBrush(color);
     p.setRenderHint(QPainter::Antialiasing);
@@ -198,8 +198,17 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
         drawRings = hasTitleBar;
         if (drawRings && !rings)
         {
-            int ringValue = (Colors::value(pal.color(widget->backgroundRole())) + 128) / 2; //[64,191]
-            ringValue += (64 - qAbs(ringValue - 128))/2; //[64,191]
+//             int ringValue = (Colors::value(pal.color(widget->backgroundRole())) + 128) / 2; //[64,191]
+//             ringValue += (64 - qAbs(ringValue - 128))/2; //[64,191]
+            int ringValue = Colors::value(pal.color(widget->backgroundRole()));
+            if (ringValue < 48)
+                ringValue += qMax(48-ringValue,24);
+            else if (ringValue < 160)
+                ringValue -= 24;
+            else if (ringValue < 236)
+                ringValue = qMin(ringValue+24,255);
+            else
+                ringValue -= 24;
             createRingPix(opacity, ringValue);
             disconnect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
             connect(&ringResetTimer, SIGNAL(timeout()), this, SLOT(resetRingPix()));
