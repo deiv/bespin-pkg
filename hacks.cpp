@@ -32,6 +32,7 @@
 #include "bepointer.h"
 #include <QScrollBar>
 #include <QWindowStateChangeEvent>
+#include <QSlider>
 #include <QStatusBar>
 #include <QStyle>
 #include <QStyleOption>
@@ -79,6 +80,7 @@ static bool dragWidgetHadTrack = false;
 static QMenu *lockToggleMenu = 0L;
 static QToolBar *lockToggleBar = 0L;
 static QAction *lockToggleAction = 0L;
+static int autoSlideTimer = 0;
 
 static void
 triggerWMMove(const QWidget *w, const QPoint &p)
@@ -259,6 +261,8 @@ hackMoveWindow(QWidget* w, QEvent *e)
 {
     if (w->mouseGrabber())
         return false;
+    if (w->window()->isFullScreen())
+        return false;
     // general validity ================================
     QMouseEvent *mev = static_cast<QMouseEvent*>(e);
 //         !w->rect().contains(w->mapFromGlobal(QCursor::pos()))) // KColorChooser etc., catched by mouseGrabber ?!
@@ -306,6 +310,9 @@ hackMoveWindow(QWidget* w, QEvent *e)
 // -> we need a beter image browser :(
 static int gwenview_position = 0;
 static QTextDocument html2text;
+static QPointer<QSlider> s_videoTimerSlider = 0;
+static QPointer<QSlider> s_videoVolumeSlider = 0;
+static QPoint s_mousePressPos, s_lastMovePos;
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
@@ -397,6 +404,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         if (isWindowDragWidget(o, &mev->pos()))
         {
             dragCandidate = w;
+            s_mousePressPos = s_lastMovePos = mev->pos();
             qApp->installEventFilter(this);
         }
         return false;
@@ -405,6 +413,11 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     if (dragCandidate && e->type() == QEvent::MouseButtonRelease)
     {   // was just a click
         qApp->removeEventFilter(this);
+        if (*appType == SMPlayer && dragCandidate->window()->isFullScreen() && s_videoTimerSlider) {
+            s_videoTimerSlider->setSliderDown(false);
+        }
+        killTimer(autoSlideTimer);
+        autoSlideTimer = 0;
         dragCandidate = 0L;
         return false;
     }
@@ -424,7 +437,38 @@ Hacks::eventFilter(QObject *o, QEvent *e)
             dragWidgetHadTrack = dragWidget->hasMouseTracking();
             dragWidget->setMouseTracking(true);
         }
-        dragCandidate = 0L;
+        else if (*appType == SMPlayer && dragCandidate->window()->isFullScreen())
+        {
+            QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+            QPoint diff = mev->pos() - s_mousePressPos;
+            int dx = qAbs(diff.x()), dy = qAbs(diff.y());
+            const int w = 64, h = 64;
+            if (dx > w && dy < h) {
+                if (s_videoTimerSlider) {
+                    dx = ((mev->pos().x() - s_lastMovePos.x()) * (s_videoTimerSlider->maximum() - s_videoTimerSlider->minimum())) /
+                                                                                            (dragCandidate->window()->width());
+                    if (dx) {
+                        s_videoTimerSlider->setSliderDown(true);
+                        s_videoTimerSlider->setSliderPosition(s_videoTimerSlider->sliderPosition() + dx);
+                        s_lastMovePos = mev->pos();
+                        killTimer(autoSlideTimer);
+                        autoSlideTimer = startTimer(250);
+                    }
+                }
+            }
+            else if (dx < w && dy > h) {
+                if (s_videoVolumeSlider) {
+                    dy = ((mev->pos().y() - s_lastMovePos.y()) * (s_videoVolumeSlider->maximum() - s_videoVolumeSlider->minimum())) /
+                                                                                            (dragCandidate->window()->height());
+                    if (dy) {
+                        s_videoVolumeSlider->setValue(s_videoVolumeSlider->value() - dy);
+                        s_lastMovePos = mev->pos();
+                    }
+                }
+            }
+        }
+        else
+            dragCandidate = 0L;
         return wmDrag;
     }
 
@@ -556,6 +600,9 @@ Hacks::add(QWidget *w)
             *appType = KDM;
         else if (QCoreApplication::applicationName() == "gwenview")
             *appType = Gwenview;
+        else if (QCoreApplication::applicationName() == "smplayer" || QCoreApplication::arguments().at(0).endsWith("smplayer") ) {
+            *appType = SMPlayer;
+        }
     }
 
     if (config.suspendFullscreenPlayers)
@@ -601,6 +648,18 @@ Hacks::add(QWidget *w)
             ENSURE_INSTANCE;
             FILTER_EVENTS(w);
         }
+    }
+
+    if ( *appType == SMPlayer /*&& config.*/  )
+    if (QSlider *slider = qobject_cast<QSlider*>(w)) {
+        qDebug() << "BESPIN" << slider << slider->parentWidget();
+    if (slider->parentWidget() && slider->parentWidget()->objectName() == "controlwidget")
+    {
+        if (slider->inherits("TimeSlider"))
+            s_videoTimerSlider = slider;
+        else if (slider->inherits("MySlider"))
+            s_videoVolumeSlider = slider;
+    }
     }
 
 //     if ( w->objectName() == "qt_scrollarea_viewport" )
@@ -661,6 +720,19 @@ Hacks::releaseApp()
 {
     bespinHacks->deleteLater(); bespinHacks = 0L;
     lockToggleMenu->deleteLater(); lockToggleMenu = 0L;
+}
+
+void
+Hacks::timerEvent(QTimerEvent *te)
+{
+    if (te->timerId() == autoSlideTimer) {
+        if (*appType == SMPlayer && dragCandidate && dragCandidate->window()->isFullScreen() && s_videoTimerSlider) {
+            s_videoTimerSlider->setSliderDown(false);
+            s_videoTimerSlider->setSliderDown(true);
+        }
+        killTimer(autoSlideTimer);
+        autoSlideTimer = 0;
+    }
 }
 
 #undef FILTER_EVENTS
