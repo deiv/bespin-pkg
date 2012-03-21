@@ -209,7 +209,7 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
             h = contentsSize.height() + F(8);
         else
             h = contentsSize.height() + F(4);
-        if (config.btn.tool.connected && config.btn.tool.frame == Raised || config.btn.tool.frame == Inlay )
+        if (config.btn.tool.connected && (config.btn.tool.frame == Raised || config.btn.tool.frame == Inlay) )
             h += F(4);
 
         w = qMax(contentsSize.width() + F(4), h*4/3); // 4/3 - 16/9
