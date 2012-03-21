@@ -87,7 +87,7 @@ typedef QHash<QString, QHash<NET::WindowType, WindowData*> > DoubleHash;
 
 Factory::Factory() : QObject(), KDecorationFactory()
 {
-    weAreCompiz = QCoreApplication::applicationName() != "kwin";
+    weAreCompiz = !QCoreApplication::applicationName().startsWith("kwin");
     readConfig();
     //-------------
     Gradients::init();
@@ -705,20 +705,18 @@ Factory::supports( Ability ability ) const
     case AbilityColorTitleFore: ///< decoration supports titlebar foreground color
     case AbilityColorTitleBlend: ///< decoration supports second titlebar background color
     case AbilityColorButtonBack: ///< decoration supports button background color
-#if KDE_IS_VERSION(4,6,0)
     case AbilityUsesBlurBehind:
-#endif
         return true;
 
     // composite
-#if KDE_IS_VERSION(4,3,0)
-    case AbilityUsesAlphaChannel: /// don't clip - it's expensive with composition
+    case AbilityUsesAlphaChannel:
+#if KDE_IS_VERSION(4,8,2) // previous versions have a bug in the OpenGL shadow painting
+        return true;
+#endif
+//     case AbilityUsesAlphaChannel: /// don't clip - it's expensive with composition
     case AbilityProvidesShadow: /// rather not
-#if KDE_IS_VERSION(4,4,0)
     case AbilityExtendIntoClientArea: /// i don't even know what this is :-)
-    case AbilityClientGrouping: /// errr - NO
-#endif
-#endif
+//     case AbilityClientGrouping: /// errr - NO
     case AbilityColorButtonFore: ///< decoration supports button foreground color
     case AbilityColorFrame: ///< decoration supports frame color
     case AbilityButtonResize: ///< decoration supports a resize button

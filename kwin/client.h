@@ -55,7 +55,8 @@ class Client : public KDecoration
 public:
     Client(KDecorationBridge *b, Factory *f);
     ~Client();
-    void activeChange();
+    inline void activeChange() { activeChange(true); }
+    void activeChange(bool realActiveChange);
     void addButtons(const QString &, int &, bool);
     inline uint backgroundMode() {return bgMode;}
     void borders( int& left, int& right, int& top, int& bottom ) const;

@@ -75,6 +75,10 @@ Client::~Client()
             Factory::kickBgSet(bg->hash);
         delete bg;
     }
+#if 0 // KDE_IS_VERSION(4,7,0)
+    if (!Factory::initialized()) // factory being deconstructed
+        Bespin::Shadows::set(windowId(), Bespin::Shadows::None, false);
+#endif
 //    delete corner;
 //    delete [] buttons;
 //    delete myTitleBar;
@@ -163,17 +167,19 @@ Client::updateUnoHeight()
 }
 
 void
-Client::activeChange()
+Client::activeChange(bool realActiveChange)
 {
     if (gType[0] != gType[1])
         updateTitleLayout(widget()->size());
-    fadeButtons();
     if (bgMode > 1)
         updateStylePixmaps();
+    if (realActiveChange) {
+        fadeButtons();
 #if KDE_IS_VERSION(4,7,0)
-    if (Factory::variableShadowSizes())
-        Bespin::Shadows::set(windowId(), isActive() ? Bespin::Shadows::Large : Bespin::Shadows::Small, true);
+        if (Factory::variableShadowSizes())
+            Bespin::Shadows::set(windowId(), isActive() ? Bespin::Shadows::Large : Bespin::Shadows::Small, true);
 #endif
+    }
 //     if (unoHeight)
 //         updateUnoHeight();
     if (corner)
@@ -275,7 +281,7 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     {
         *title = Factory::titleSize(iAmSmall);
         *border = right = Factory::edgeSize();
-        *counter = isShade() ? 12 : Factory::baseSize();
+        *counter = isShade() ? 14 : Factory::baseSize();
     }
 }
 
@@ -1241,7 +1247,7 @@ Client::reset(unsigned long changed)
     // fail to paint IMAGE_RGB -> QPixmap -> device while device is redirected
     dirty[0] = dirty[1] = color(ColorTitleBar, isActive()).alpha() == 0xff;
     if (changed)
-        activeChange(); // handles bg pixmaps in case and triggers update
+        activeChange(false); // handles bg pixmaps in case and triggers update
 
 }
 
