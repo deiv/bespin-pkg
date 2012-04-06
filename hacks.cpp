@@ -600,7 +600,8 @@ Hacks::add(QWidget *w)
             *appType = KDM;
         else if (QCoreApplication::applicationName() == "gwenview")
             *appType = Gwenview;
-        else if (QCoreApplication::applicationName() == "smplayer" || QCoreApplication::arguments().at(0).endsWith("smplayer") ) {
+        else if (QCoreApplication::applicationName() == "smplayer" ||
+            (QCoreApplication::arguments().count() && QCoreApplication::arguments().at(0).endsWith("smplayer")) ) {
             *appType = SMPlayer;
         }
     }
