@@ -808,10 +808,11 @@ Factory::decoInfo(qint64 pid)
 }
 
 WindowData*
-Factory::decoInfo(QString wmClass, NET::WindowType type)
+Factory::decoInfo(QString wmClass, NET::WindowType type, bool strict)
 {
     WindowData *data = 0;
     bool matchesType = false;
+    bool matchesClass = false;
     foreach (Preset *preset, ourPresets)
     {
         matchesType = false;
@@ -823,13 +824,16 @@ Factory::decoInfo(QString wmClass, NET::WindowType type)
         }
         if (preset->classes.contains(wmClass)) // class matched
         {
+            matchesClass = true;
             if (matchesType) // we won't find a better one
                 return &preset->data;
             else
                 data = &preset->data;
         }
     }
-    return data; // we may have found a class OR type match
+    if (!strict || (matchesClass && matchesType))
+        return data; // we may have found a class OR type match
+    return 0;
 }
 
 #include "dbus.moc"

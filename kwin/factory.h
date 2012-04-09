@@ -82,7 +82,7 @@ public:
     inline static int titleSize(bool minimal = false) {return ourTitleSize[minimal];}
     inline static const Config *config() { return &ourConfig; }
     static WindowData *decoInfo(qint64 pid);
-    static WindowData *decoInfo(QString WMclass, NET::WindowType type);
+    static WindowData *decoInfo(QString WMclass, NET::WindowType type, bool strict);
     static int defaultBgMode() { return ourBgMode; }
     inline static const QVector<Button::Type> &multiButtons() { return ourMultiButton; }
     inline static bool roundCorners() { return ourConfig.roundCorners; }
