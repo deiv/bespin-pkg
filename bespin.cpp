@@ -1126,7 +1126,7 @@ static void shapeCorners( QWidget *widget, bool forceShadows )
         XProperty::setAtom( widget->winId(), XProperty::forceShadows );
 #endif
 
-    if (FX::compositingActive() && Bespin::Style::serverSupportsShadows())
+    if (widget->isWindow() && FX::compositingActive() && Bespin::Style::serverSupportsShadows())
     {
         widget->clearMask();
         return;
