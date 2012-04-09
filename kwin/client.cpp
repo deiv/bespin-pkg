@@ -1119,9 +1119,9 @@ Client::reset(unsigned long changed)
             WindowData *data = 0;
             bool needFree = false;
 
-             // check for data from preset ====================================================
+             // check for strict match data from preset ==========================================
             KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass);
-            data = Factory::decoInfo(info.windowClassClass(), info.windowType(supported_types));
+            data = Factory::decoInfo(info.windowClassClass(), info.windowType(supported_types), true);
             if (data && (((data->style >> 16) & 0xff) > 1))
             {
                 WindowPics pics;
@@ -1136,6 +1136,19 @@ Client::reset(unsigned long changed)
                 data = (WindowData*)XProperty::get<uint>(windowId(), XProperty::winData, XProperty::WORD, &_9);
                 if (data)
                     needFree = true;  // X provides a deep copy
+            }
+
+            // check for weak match data from preset ==========================================
+            if (!data) {
+                data = Factory::decoInfo(info.windowClassClass(), info.windowType(supported_types), false);
+                if (data && (((data->style >> 16) & 0xff) > 1))
+                {
+                    WindowPics pics;
+                    pics.topTile = pics.cnrTile = pics.lCorner = pics.rCorner = 0;
+                    /// NOTICE encoding the bg gradient intensity in the btmTile Pic!!
+                    pics.btmTile = 150;
+                    XProperty::set<Picture>(windowId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
+                }
             }
 
             // check for data from dbus =========================================================
