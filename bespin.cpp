@@ -1542,7 +1542,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if (config.bg.modal.invert && widget && widget->isModal())
             swapPalette(widget, this);
 
-        /* TODO: why to blur on hide?
+        /* why to blur on hide?
+         * NOTICE: because it may expose a blurrable region, you moron!*/
         if ( config.bg.blur && !widget->isWindow() &&
             (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
             appType != Plasma  )
@@ -1556,7 +1557,6 @@ Style::eventFilter( QObject *object, QEvent *ev )
                     pendingBlurUpdates << window;
             }
         }
-        */
         return false;
     }
 #if 1
