@@ -130,39 +130,37 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
     case CT_PushButton: // A push button, like QPushButton
         if HAVE_OPTION(btn, Button)
         {
-            if (btn->text.isEmpty())
-//             3px for shadow & outline + 1px padding -> 4px per side
-                return ( QSize( contentsSize.width() + F(8), contentsSize.height() + F(8) ) );
+            int w = contentsSize.width();
+            if (btn->features & QStyleOptionButton::HasMenu)
+                w += contentsSize.height()+F(16);
             else
-            {
-                int w = contentsSize.width() + F(20);
-                if (btn->features & QStyleOptionButton::HasMenu)
-                    w += contentsSize.height()+F(16);
-                else
-                    if (widget)
-                    if (const QAbstractButton* abn = qobject_cast<const QAbstractButton*>(widget))
-                    if (abn->isCheckable())
-                        w += contentsSize.height() + F(16);
+                if (widget)
+                if (const QAbstractButton* abn = qobject_cast<const QAbstractButton*>(widget))
+                if (abn->isCheckable())
+                    w += contentsSize.height() + F(4);
 
-                int h = contentsSize.height() - config.fontExtent;
-                if (config.btn.layer == Inlay || !config.btn.fullHover)
-                    h += F(4);
-                if (config.btn.layer == Raised || config.btn.layer == Inlay)
-                    h += F(4);
-                if (!(h%2))
-                    ++h;
+            int h = contentsSize.height() - config.fontExtent;
+            if (config.btn.layer == Inlay || !config.btn.fullHover)
+                h += F(4);
+            if (config.btn.layer == Raised || config.btn.layer == Inlay)
+                h += F(4);
+            if (!(h%2))
+                ++h;
 
+            if (config.btn.round)
+                { w += F(8); /*h -= F(2);*/ }
+
+            if (btn->text.isEmpty()) {
+                w += 8;
+            } else {
+                w += F(20);
                 if (!btn->icon.isNull())
                     { w += F(10); h += F(2); }
-
-                if (config.btn.round)
-                    { w += F(8); /*h -= F(2);*/ }
-
                 if (w < F(80))
                     w = F(80);
-
-                return QSize(w, qMax(config.btn.minHeight, h));
             }
+
+            return QSize(w, qMax(config.btn.minHeight, h));
         }
 //    case CT_SizeGrip: // A size grip, like QSizeGrip
 

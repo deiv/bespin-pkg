@@ -348,9 +348,19 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
 {
     ASSURE_OPTION(btn, Button);
     OPT_ENABLED OPT_FOCUS OPT_HOVER OPT_SUNKEN;
+    bool checkable = false;
+    if (const QAbstractButton* b = qobject_cast<const QAbstractButton*>(widget))
+        checkable = b->isCheckable();
 
-    QRect ir = btn->rect;
-    uint tf = Qt::AlignCenter | BESPIN_MNEMONIC;
+    QRect ir = RECT;
+    if (checkable)
+        ir.setLeft(ir.x() + ir.height()/3 + F(8));
+
+    uint tf = Qt::AlignVCenter | BESPIN_MNEMONIC;
+    if (checkable)
+        tf |= Qt::AlignLeft;
+    else
+        tf |= Qt::AlignHCenter;
 
     if (!btn->icon.isNull())
     {   // The ICON ================================================
@@ -364,9 +374,9 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
         int pixw = pixmap.width();
         int pixh = pixmap.height();
 
-        //Center the icon if there is no text
+        //Center the icon if there is no text (and it's no checkbutton)
         QPoint point;
-        if (btn->text.isEmpty())
+        if (btn->text.isEmpty() && !checkable)
             point = QPoint(ir.x() + ir.width() / 2 - pixw / 2, ir.y() + ir.height() / 2 - pixh / 2);
         else
             point = QPoint(ir.x() + 2, ir.y() + ir.height() / 2 - pixh / 2);
