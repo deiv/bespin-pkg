@@ -1345,7 +1345,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if ( config.bg.blur &&
             (widget->isWindow() || widget->autoFillBackground() ||
             (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
-            appType != Plasma  )
+            (appType != Plasma || qobject_cast<QMenu*>(widget))  )
         {
             QWidget *window = widget->window();
             if ( window->testAttribute(Qt::WA_TranslucentBackground) )
