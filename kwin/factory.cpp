@@ -822,7 +822,8 @@ Factory::decoInfo(QString wmClass, NET::WindowType type, bool strict)
             if (!data) // class not yet matched
                 data = &preset->data;
         }
-        if (preset->classes.contains(wmClass)) // class matched
+        if ((preset->classes.isEmpty() && wmClass.isEmpty()) ||
+            preset->classes.contains(wmClass)) // class matched
         {
             matchesClass = true;
             if (matchesType) // we won't find a better one
