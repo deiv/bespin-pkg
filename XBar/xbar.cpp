@@ -146,7 +146,8 @@ XBar::init()
         lLayout->setStretchFactor(this, 1000);
         lLayout->setAlignment( this, Qt::AlignLeft|Qt::AlignVCenter );
     }
-    
+
+    d.desktopMode = !view()->window()->testAttribute(Qt::WA_X11NetWmWindowTypeDock);
 //     if (!view()->inherits("PanelView"))
 //     {
 //         QMessageBox::warning ( 0, "XBar requires a Panel", "XBar shall be on panels dummy text");
@@ -406,6 +407,10 @@ XBar::registerMenu(const QString &service, qlonglong key, const QString &title, 
 void
 XBar::releaseFocus(qlonglong key)
 {
+    if (d.desktopMode && (view()->isActiveWindow() || d.currentBar->hoveredIndex() > -1)) {
+        view()->installEventFilter(this);
+        return;
+    }
     int n = 0;
     for (MenuMap::iterator i = d.menus.begin(); i != d.menus.end(); ++i)
     {
@@ -595,7 +600,7 @@ XBar::rBuildMenu(const QDomElement &node, QObject *widget)
 
 
 void
-XBar::buildMenu(const QString &name, QObject *widget, const QString &type)
+XBar::buildMenu(const QString &name, QObject *widget, const QString &/*type*/)
 {
     if (!instance)
         return;
@@ -874,6 +879,18 @@ XBar::updateWindowlist()
     d.windowList.addSeparator();
     d.windowList.addAction ( "Embed menu in window", this, SLOT(unregisterCurrentMenu()) );
 #endif
+}
+
+bool
+XBar::eventFilter(QObject *o, QEvent *e)
+{
+    if (o == view() && e->type() == QEvent::MouseButtonPress &&
+        static_cast<QMouseEvent*>(e)->button() == Qt::LeftButton)
+    {
+        view()->removeEventFilter(this);
+        showMainMenu();
+    }
+    return false;
 }
 
 void

@@ -76,6 +76,7 @@ protected:
     QSizeF sizeHint ( Qt::SizeHint which, const QSizeF & constraint ) const;
     void timerEvent(QTimerEvent *event);
 friend class XBar;
+    inline int hoveredIndex() const { return d.hoverIndex; }
     inline QList<QAction*> &actions() { return d.actions; }
     void popDown();
     void setOpenPopup(int popup);

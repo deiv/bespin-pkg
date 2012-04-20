@@ -47,6 +47,7 @@ public:
 public slots:
     void init();
 protected:
+    bool eventFilter(QObject *o, QEvent *e);
     void wheelEvent( QGraphicsSceneWheelEvent *ev );
     virtual QSizeF sizeHint ( Qt::SizeHint which, const QSizeF & constraint = QSizeF() ) const;
 private:
@@ -67,6 +68,7 @@ private:
         QMenu windowList;
         MenuBar *currentBar;
         bool extraTitle;
+        bool desktopMode;
     } d;
     KDirWatch *myMainMenuDefWatcher;
     MenuBar *myMainMenu;
