@@ -340,19 +340,15 @@ Hacks::eventFilter(QObject *o, QEvent *e)
     if ( e->type() == QEvent::Paint )
     {
         if (config.titleWidgets)
-        if (QLabel *label = qobject_cast<QLabel*>(o))
+        if (QLabel *label = qobject_cast<QLabel*>(o)) {
         if (label->parentWidget() && label->parentWidget()->parentWidget() &&
             label->parentWidget()->parentWidget()->inherits("KTitleWidget"))
         {
             QWidget *container = label->parentWidget();
-            QList<QLabel*> kids = container->findChildren<QLabel*>();
-            foreach (QLabel *kid, kids)
-                FILTER_EVENTS(kid); // the stupid KTitleWidget removes filters...
 
             QString string = label->text();
             if (string.contains('<'))
                 { html2text.setHtml(string); string = html2text.toPlainText(); }
-
             QStringList strings = string.split('\n', QString::SkipEmptyParts);
             if (strings.isEmpty())
                 return false;
@@ -382,6 +378,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
                 p.drawText( r, Qt::AlignCenter|Qt::TextSingleLine, strings.at(i) );
             }
             return true;
+        }
         }
         return false;
     }
@@ -691,15 +688,14 @@ Hacks::add(QWidget *w)
     }
 
     if (config.titleWidgets)
-    if (QFrame *frame = qobject_cast<QFrame*>(w))
+    if (QLabel *label = qobject_cast<QLabel*>(w))
+    if (QFrame *frame = qobject_cast<QFrame*>(label->parentWidget()))
     if (frame->parentWidget() && frame->parentWidget()->inherits("KTitleWidget"))
     {
         ENSURE_INSTANCE;
         frame->setFrameShadow(QFrame::Sunken);
         frame->setAutoFillBackground(true);
-        QList<QLabel*> labels = frame->findChildren<QLabel*>();
-        foreach (QLabel *label, labels)
-            FILTER_EVENTS(label);
+        FILTER_EVENTS(label);
     }
 #if 0
     ENSURE_INSTANCE;
