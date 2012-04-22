@@ -30,15 +30,15 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
     ASSURE_OPTION(cb, ProgressBar);
     if (cb->maximum == cb->minimum)
         return;
-        
+
     OPT_ENABLED
 
     const int f2 = F(2);
     QRect r = RECT;
     QPalette::ColorRole bg = widget ? widget->backgroundRole() : QPalette::Window;
     QPalette::ColorRole fg = bg;
-    
-    if (RECT.height() < F(16))
+
+    if (RECT.height() < F(13))
     {
         fg = widget ? widget->foregroundRole() : QPalette::WindowText;
         int w = r.width()*cb->progress/(cb->maximum - cb->minimum);
