@@ -58,11 +58,11 @@ fingerprint:mimetypes/application-pkcs7-signature:application-pgp-signature,acti
 firefox:apps/firefox
 firewire:
 fnt:apps/preferences-desktop-font,mimetypes/application-x-font-afm:application-x-font-bdf:application-x-font-otf:application-x-font-pcf:application-x-font-snf:application-x-font-ttf:application-x-font-type1
-format-indent-less:
-format-indent-more:
-format-justify-fill:
-format-justify-left:
-format-justify-right:
+format-indent-less:actions/format-indent-less
+format-indent-more:actions/format-indent-more
+format-justify-fill:actions/format-justify-fill
+format-justify-left:actions/format-justify-left
+format-justify-right:actions/format-justify-right
 forward:actions/mail-forward:mail-forwarded
 go-bottom:actions/go-bottom:arrow-down-double
 go-down:actions/go-down:arrow-down
