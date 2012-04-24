@@ -63,6 +63,7 @@ format-indent-more:actions/format-indent-more
 format-justify-fill:actions/format-justify-fill
 format-justify-left:actions/format-justify-left
 format-justify-right:actions/format-justify-right
+format-justify-center:actions/format-justify-center
 forward:actions/mail-forward:mail-forwarded
 go-bottom:actions/go-bottom:arrow-down-double
 go-down:actions/go-down:arrow-down
