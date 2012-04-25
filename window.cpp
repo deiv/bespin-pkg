@@ -31,34 +31,48 @@
 #endif
 
 void
-Style::drawWindowFrame(const QStyleOption * option, QPainter * painter, const QWidget *) const
+Style::drawWindowFrame(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     // windows, docks etc. - just a frame
     const QColor border = Colors::mid(FCOLOR(Window), FCOLOR(WindowText), 5,2);
+    const int x = RECT.left()+(32+4);
+    const int y = RECT.top()+(32+4);
     const int right = RECT.right()-(32+4);
     const int bottom = RECT.bottom()-(32+4);
     QPen pen = painter->pen();
     painter->setPen(border);
-    painter->drawLine(32+4, 0, right, 0);
-    painter->drawLine(32+4, RECT.bottom(), right, RECT.bottom());
-    painter->drawLine(0, 32+4, 0, bottom);
-    painter->drawLine(RECT.right(), 32+4, RECT.right(), bottom);
+    if (right > x) {
+        painter->drawLine(x, 0, right, 0);
+        painter->drawLine(x, RECT.bottom(), right, RECT.bottom());
+    }
+    if (bottom > y) {
+        painter->drawLine(0, y, 0, bottom);
+        painter->drawLine(RECT.right(), y, RECT.right(), bottom);
+    }
 
+    QRect clip;
     const QPixmap &top = Gradients::borderline(border, Gradients::Top);
-    painter->drawPixmap(0,4, top);
-    painter->drawPixmap(RECT.right(), 4, top);
+    clip = top.rect(); clip.setHeight(qMin(clip.height(), RECT.height()/2-4));
+    // TODO: the cliprect seems to be ignored or mishandled in this case, or i'm stupid ...
+    painter->drawPixmap(QPoint(0,4), top, clip);
+    painter->drawPixmap(QPoint(RECT.right(), 4), top, clip);
 
     const QPixmap &btm = Gradients::borderline(border, Gradients::Bottom);
-    painter->drawPixmap(0, bottom, btm);
-    painter->drawPixmap(RECT.right(), bottom, btm);
+    clip = btm.rect(); clip.setHeight(qMin(clip.height(), (RECT.height()+1)/2-4));
+    clip.moveBottom(btm.rect().bottom());
+    painter->drawPixmap(QPoint(0, bottom), btm, clip);
+    painter->drawPixmap(QPoint(RECT.right(), bottom), btm, QRect(0,16,1,8));
 
     const QPixmap &left = Gradients::borderline(border, Gradients::Left);
-    painter->drawPixmap(4, 0, left);
-    painter->drawPixmap(4, RECT.bottom(), left);
+    clip = left.rect(); clip.setWidth(qMin(clip.width(), RECT.width()/2-4));
+    painter->drawPixmap(QPoint(4, 0), left, clip);
+    painter->drawPixmap(QPoint(4, RECT.bottom()), left, clip);
 
     const QPixmap &rgt = Gradients::borderline(border, Gradients::Right);
-    painter->drawPixmap(right, 0, rgt);
-    painter->drawPixmap(right, RECT.bottom(), rgt);
+    clip = rgt.rect(); clip.setWidth(qMin(clip.width(), (RECT.width()+1)/2-4));
+    clip.moveRight(rgt.rect().right());
+    painter->drawPixmap(QPoint(right, 0), rgt, clip);
+    painter->drawPixmap(QPoint(right, RECT.bottom()), rgt, clip);
 }
 
 static QPainterPath glasPath;
