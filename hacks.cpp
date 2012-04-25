@@ -356,11 +356,12 @@ Hacks::eventFilter(QObject *o, QEvent *e)
 //             qDebug() << strings;
 
             QRect r = label->contentsRect();
-            const int fh = r.height()/(strings.count()+1);
+            const int fh = r.height()/(strings.count()+1)/* - 1*/;
             QPainter p(label);
             p.setPen(container->palette().color(container->foregroundRole()));
             QFont fnt(container->font());
-            fnt.setPixelSize(2*fh);
+            fnt.setPointSize/*F*/(float(2*fh*72)/label->logicalDpiY());
+//             fnt.setPixelSize(2*fh);
             r.setBottom(r.top()+2*fh);
             p.setFont(fnt);
             p.drawText( r, Qt::AlignCenter|Qt::TextSingleLine, strings.at(0) );
