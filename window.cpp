@@ -61,7 +61,7 @@ Style::drawWindowFrame(const QStyleOption *option, QPainter *painter, const QWid
     clip = btm.rect(); clip.setHeight(qMin(clip.height(), (RECT.height()+1)/2-4));
     clip.moveBottom(btm.rect().bottom());
     painter->drawPixmap(QPoint(0, bottom), btm, clip);
-    painter->drawPixmap(QPoint(RECT.right(), bottom), btm, QRect(0,16,1,8));
+    painter->drawPixmap(QPoint(RECT.right(), bottom), btm, clip);
 
     const QPixmap &left = Gradients::borderline(border, Gradients::Left);
     clip = left.rect(); clip.setWidth(qMin(clip.width(), RECT.width()/2-4));
