@@ -1,28 +1,20 @@
-//////////////////////////////////////////////////////////////////////////////
-//
-// -------------------
-// Bespin window decoration for KDE.
-// -------------------
-// Copyright (c) 2008/2009 Thomas Lübking <baghira-style@gmx.net>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
-//////////////////////////////////////////////////////////////////////////////
+/*
+ *   Bespin window decoration for KWin
+ *   Copyright 2008-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
 #include "config.h"
 #include <QSettings>
@@ -63,12 +55,12 @@ Config::Config(QWidget* parent) : BConfig(parent)
 
     connect (ui.actGrad2, SIGNAL(currentIndexChanged(int)), SLOT(watchDecoGradient()));
     connect (ui.inactGrad2, SIGNAL(currentIndexChanged(int)), SLOT(watchDecoGradient()));
-    
+
     connect (ui.buttonGradient, SIGNAL(currentIndexChanged(int)), SLOT(watchButtonGradient()));
 
     connect (ui.activeShadowSize, SIGNAL(valueChanged(int)), SLOT(watchShadowSize(int)));
     connect (ui.inactiveShadowSize, SIGNAL(valueChanged(int)), SLOT(watchShadowSize(int)));
-    
+
     ui.onlinehelp->setOpenExternalLinks( true ); /** i've an internet link here */
     ui.onlinehelp->viewport()->setAutoFillBackground(false);
     const QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
@@ -135,7 +127,7 @@ Config::Config(QWidget* parent) : BConfig(parent)
     handleSettings(ui.actGrad2, "ActiveGradient2", 0);
     setContextHelp(ui.actGrad2, "<b>Second active gradient</b><hr>\
     Accessoire gradient in the titlebar center of ACTIVE windows.");
-    
+
     handleSettings(ui.inactGrad2, "InactiveGradient2", 0);
     setContextHelp(ui.inactGrad2, "<b>Second inactive gradient</b><hr>\
     Accessoire gradient in the titlebar center of INACTIVE windows.");
@@ -162,11 +154,11 @@ Config::Config(QWidget* parent) : BConfig(parent)
     <b>A</b>: Maximize<br>");
 
     handleSettings(ui.iconVariant, "IconVariant", 1);
-    
+
     handleSettings(ui.slickButtons, "SlickButtons", 0);
     setContextHelp(ui.slickButtons, "The appereance of unhovered buttons. Morphs to icon on hover<br>\
     Dots and bricks look slick, but may be considered less usable, as unhovered buttons look all the same");
-    
+
     handleSettings(ui.buttonGradient, "ButtonGradient", 0);
     setContextHelp(ui.buttonGradient, "The button gradient. <br>\
     \"None\" is the default and behaves a bit different from all others.<br>\
@@ -179,7 +171,7 @@ Config::Config(QWidget* parent) : BConfig(parent)
     handleSettings(ui.baseSize, "BaseSize", 4);
     setContextHelp(ui.baseSize, "<b>Base Size</b><hr>\
     The width of the border facing the titlebar");
-    
+
     handleSettings(ui.edgeSize, "EdgeSize", 4);
     setContextHelp(ui.edgeSize, "<b>Edge Size</b><hr>\
     The width of the borders adjacent to the titlebar");
@@ -424,14 +416,14 @@ void Config::loadPresets()
         return;
     }
     kdeglobals->setGroup("WM");
-    
+
     QListWidgetItem *item = ui.presets->item(0);
 
     item->setData(ActiveColor, kdeglobals->value("activeBackground", Qt::black).rgba());
     item->setData(ActiveColor2, kdeglobals->value("activeBlend", Qt::black).rgba());
     item->setData(ActiveText, kdeglobals->value("activeForeground", Qt::black).rgba());
     item->setData(ActiveButtons, kdeglobals->value("activeTitleBtnBg", Qt::black).rgba());
-    
+
     item->setData(InactiveColor, kdeglobals->value("inactiveBackground", Qt::black).rgba());
     item->setData(InactiveColor2, kdeglobals->value("inactiveBlend", Qt::black).rgba());
     item->setData(InactiveText, kdeglobals->value("inactiveForeground", Qt::black).rgba());
@@ -489,9 +481,9 @@ void Config::savePresets()
         return;
     }
     kdeglobals->setGroup("WM");
-    
+
     QListWidgetItem *item = ui.presets->item(0);
-    
+
     int gradient = item->data(ActiveGradient2).toInt();
     QRgb color = item->data(ActiveColor).toUInt();
     kdeglobals->setValue("activeBackground", QColor(color));
@@ -522,7 +514,7 @@ void Config::watchBgMode()
 {
     if (ui.presets->currentRow() < 0)
         return;
-    
+
     QWidget *sibling = 0;
     if (sender() == ui.actGrad)
         sibling = ui.inactGrad;
@@ -551,7 +543,7 @@ void Config::watchDecoGradient()
 {
     if (ui.presets->currentRow() < 0)
         return;
-    
+
     QWidget *sibling = 0, *parent = 0;
     if (sender() == ui.actGrad2)
         { sibling = ui.actColor2; parent = ui.actGrad; }

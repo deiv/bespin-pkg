@@ -1,28 +1,20 @@
-//////////////////////////////////////////////////////////////////////////////
-// button.cpp
-// -------------------
-// Bespin window decoration for KDE
-// -------------------
-// Copyright (c) 2008/2009 Thomas Lübking <baghira-style@web.de>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
-//////////////////////////////////////////////////////////////////////////////
+/*
+ *   Bespin window decoration for KWin
+ *   Copyright 2008-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
 #include <QPainter>
 #include <QX11Info>
@@ -53,7 +45,7 @@ client(parent), state(0), multiIdx(0), hoverTimer(0), hoverLevel(0)
     this->left = left;
 
     myType = type;
-    
+
     if ( (iAmScrollable = ( myType == Multi )) )
     {
         myType = Factory::multiButtons().at(0);
@@ -129,7 +121,7 @@ Button::init(bool leftMenu, bool fColors, int variant)
         shape[t] = QPainterPath();
 
     Shapes::Style style = (Shapes::Style)qMin(qMax(0,variant),3);
-    
+
     QRectF bound(-sz/2.0, -sz/2.0, sz, sz);
     shape[Close] = Shapes::close(bound, style);
     shape[Min] = Shapes::min(bound, style);
@@ -316,7 +308,7 @@ Button::color( bool background ) const
     }
     if ( background )
         return client->color(bgt, client->isActive());
-    
+
     QColor c = client->color(fgt, client->isActive());
     if (fixedColors && myType < Multi)
         c = client->isActive() ? QColor(fcolors[myType]) :
@@ -342,7 +334,7 @@ Button::paintEvent(QPaintEvent *)
         const QColor bg = color(true);
         const float t = (height()-2)/2.0;
         const float fs = (height()-2)/99.0;
-        
+
         p.end();
         QPixmap mask(size());
         mask.fill(Qt::transparent);
@@ -354,17 +346,17 @@ Button::paintEvent(QPaintEvent *)
         p.scale ( fs, fs );
         p.drawPath(shape[myType]);
         p.end();
-        
+
         p.begin(this);
         const QColor c = color();
         QPixmap texture(size());
-        
+
         texture.fill(Colors::mid(c, Qt::black, 5,4));
         p.drawPixmap(0,0, FX::applyAlpha( texture, mask ) );
-        
+
         texture.fill(Colors::mid(bg, Qt::white ));
         p.drawPixmap(0,2, FX::applyAlpha( texture, mask ) );
-        
+
         QRectF br = shape[myType].boundingRect();
         br.setRect( 0, t + br.y()*fs, texture.width(), br.height() * fs );
         texture.fill(Qt::transparent);
@@ -382,7 +374,7 @@ Button::paintEvent(QPaintEvent *)
     p.setPen(Qt::NoPen);
     p.setBrush(color());
     const int slick = Factory::slickButtons();
-    
+
     float fx, fy;
     if (state & Sunken)
         fx = fy = .75;
@@ -442,7 +434,7 @@ if (multiIdx >= mb.size() )\
     multiIdx = 0;\
 else if (multiIdx < 0 )\
     multiIdx = mb.size()-1
-    
+
 void
 Button::wheelEvent(QWheelEvent *e)
 {
@@ -450,14 +442,14 @@ Button::wheelEvent(QWheelEvent *e)
     {
         const QVector<Type> &mb = Factory::multiButtons();
         int d = (e->delta() < 0) ? 1 : -1;
-        
+
         CYCLE_ON;
         if (mb.at(multiIdx) == Help && !client->providesContextHelp())
             //       || (mb.at(multiIdx) == Shade && !client->isShadeable()))
         {
             CYCLE_ON;
         }
-        
+
         myType = mb.at(multiIdx);
         if ( (myType == Above && client->keepAbove()) || (myType == Below && client->keepBelow()) )
             myType = UnAboveBelow;
@@ -465,11 +457,11 @@ Button::wheelEvent(QWheelEvent *e)
             myType = Unstick;
         else if (myType == Shade && client->isSetShade())
             myType = Unshade;
-        
+
         //TODO: roll max/vert/hori?!
         repaint();
     }
-    
+
     else if ( ( myType == Max || myType == Restore ) && isEnabled() )
         client->tileWindow(e->delta() < 0, e->modifiers() & Qt::ControlModifier, !left);
 }

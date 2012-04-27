@@ -1,3 +1,20 @@
+/*
+ *   Bespin library for Qt style, KWin decoration and everythng else
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Library General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
 #include <cmath>
 #include <QPainter>
@@ -131,7 +148,7 @@ Elements::sunkenShadow(int size, bool enabled)
     p.fillRect(w,size-F(1),size-2*w,F(1), WHITE(20+10*enabled));
 
     p.end();
-    
+
     return img;
 }
 
@@ -163,7 +180,7 @@ Elements::groupShadow(int size)
     DRAW_ROUND_ALPHA_RECT(9, F(1), F(1), size-F(2), 32);
     DRAW_ROUND_ALPHA_RECT(11, F(2), F(2), size-F(4), 20);
     DRAW_ROUND_ALPHA_RECT(13, F(3), F(3), size-F(6), 12);
-    
+
     p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
     p.setBrush(BLACK(0)); p.DRAW_ROUND_RECT(F(4), F(2), size-F(8), ss, 6, 11);
 

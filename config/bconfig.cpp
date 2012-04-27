@@ -1,3 +1,20 @@
+/*
+ *   Bespin managed confg dialog
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Library General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
 #include "bconfig.h"
 #include <QApplication>
@@ -20,57 +37,57 @@
 
 BConfigDialog::BConfigDialog(BConfig *config, uint btns, QWidget *parent) :
 QDialog(parent, Qt::Window), _config(config) {
-   
+
    QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
    QWidget *btn;
-   
+
    if (btns & Ok) {
       btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Ok );
       connect(btn, SIGNAL(clicked(bool)), this, SLOT(accept()));
       btn->setDisabled(true);
       connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
    }
-   
+
    if (btns & Save) {
       btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Save );
       connect(btn, SIGNAL(clicked(bool)), config, SLOT(save()));
       btn->setDisabled(true);
       connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
    }
-   
+
    if (btns & Demo) {
       btn = (QWidget*)buttonBox->addButton ( tr("Demo"), QDialogButtonBox::ApplyRole );
       connect(btn, SIGNAL(clicked(bool)), config, SLOT(showDemo()));
    }
-   
+
    if (btns & Export) {
       btn = (QWidget*)buttonBox->addButton ( tr("Export..."), QDialogButtonBox::ApplyRole );
       connect(btn, SIGNAL(clicked(bool)), config, SLOT(saveAs()));
    }
-   
+
    if (btns & Import) {
       btn = (QWidget*)buttonBox->addButton ( tr("Import..."), QDialogButtonBox::ActionRole );
       connect(btn, SIGNAL(clicked(bool)), config, SLOT(import()));
    }
-   
+
    if (btns & Reset) {
       btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Reset );
       connect(btn, SIGNAL(clicked(bool)), config, SLOT(reset()));
       btn->setDisabled(true);
       connect(config, SIGNAL(changed(bool)), btn, SLOT(setEnabled(bool)));
    }
-   
+
    if (btns & Defaults) {
       btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::RestoreDefaults );
       connect(btn, SIGNAL(clicked(bool)), config, SLOT(defaults()));
    }
-   
+
    if (btns & Cancel) {
       btn = (QWidget*)buttonBox->addButton ( QDialogButtonBox::Cancel );
       connect(btn, SIGNAL(clicked(bool)), this, SLOT(reject()));
    }
 
-   
+
    QVBoxLayout *vl = new QVBoxLayout;
    vl->addWidget(config);
    vl->addWidget(buttonBox);
@@ -171,7 +188,7 @@ void BConfig::checkDirty()
 //       {
             SettingInfo *info = &(i.value());
             dirty = dirty || variant(i.key()) != info->savedValue;
-         
+
             if (/*sender() ||*/ dirty)
                 break;
 //       }
@@ -235,9 +252,9 @@ void BConfig::loadSettings(QSettings *settings, bool updateInit, bool merge) {
       delSettings = true;
       settings = new QSettings(_qsetting[0], _qsetting[1]);
    }
-   
+
    settings->beginGroup(_qsetting[2]);
-   
+
    QMap<QObject*, SettingInfo>::iterator i;
    SettingInfo *info; QVariant value;
    for (i = _settings.begin(); i != _settings.end(); ++i)
@@ -249,7 +266,7 @@ void BConfig::loadSettings(QSettings *settings, bool updateInit, bool merge) {
          info->savedValue = info->initialValue = value;
       setVariant(i.key(), value);
    }
-   
+
    settings->endGroup();
    if (delSettings)
       delete settings;

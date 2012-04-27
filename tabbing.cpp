@@ -1,19 +1,19 @@
-/* Bespin widget style for Qt4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin style for Qt4
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #include <QToolButton>
@@ -37,7 +37,7 @@ Style::drawTabWidget(const QStyleOption *option, QPainter *painter, const QWidge
         shadows.sunken[true][true].render(RECT, painter);
         return;
     }
-   
+
     ASSURE_OPTION(twf, TabWidgetFrame);
     QLine line[2];
     QStyleOptionTabBarBase tbb;
@@ -52,7 +52,7 @@ baseHeight = twf->tabBarSize._o_(); \
 if (!baseHeight) return; /*  no base -> no tabbing -> no bottom border either. period.*/\
 if (baseHeight < 0) \
     baseHeight = pixelMetric( PM_TabBarBaseHeight, option, widget )
-         
+
     int baseHeight;
     switch (twf->shape)
     {
@@ -82,7 +82,7 @@ if (baseHeight < 0) \
         break;
     }
 #undef SET_BASE_HEIGHT
-   
+
     // the "frame"
     painter->save();
     painter->setPen(FCOLOR(Window).dark(120));
@@ -179,7 +179,7 @@ Style::drawTabBar(const QStyleOption *option, QPainter *painter, const QWidget *
 static int animStep = -1;
 static bool customColor = false;
 
-void 
+void
 Style::calcAnimStep(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {   // animation stuff
     OPT_ENABLED OPT_HOVER OPT_SUNKEN
@@ -221,7 +221,7 @@ Style::calcAnimStep(const QStyleOption *option, QPainter *painter, const QWidget
                     hoveredIndex = tbar->tabAt(tbar->mapFromGlobal(QCursor::pos())) + 1;
                 info = const_cast<Animator::IndexInfo*>(Animator::HoverIndex::info(widget, hoveredIndex));
             }
-            
+
         }
         if (info)
             animStep = info->step(index);
@@ -243,7 +243,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
         QRegion clipRgn = painter->clipRegion();
         if (clipRgn.isEmpty())
             clipRgn = RECT;
-            
+
         QList<QToolButton*> buttons = widget->findChildren<QToolButton*>();
         foreach (QToolButton* button, buttons)
         {
@@ -304,7 +304,7 @@ Style::drawTab(const QStyleOption *option, QPainter *painter, const QWidget *wid
         copy.rect = RECT;
     else if HAVE_OPTION(tabV3, TabV3)
     {
-#if QT_VERSION >= 0x040600	
+#if QT_VERSION >= 0x040600
         int d[4] = {0,1,0,0};
 #else
         int d[4] = {0,0,0,0};
@@ -347,8 +347,8 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         sunken = false;
     else
         sunken = sunken || (option->state & State_Selected);
-    
-    // konsole now paints itself and of course it would be wrong to 
+
+    // konsole now paints itself and of course it would be wrong to
     // just ask the style to paint a tabbar *grrrrrr...*
     bool isOnlyShape = false;
     if ( (isOnlyShape = (animStep < 0)) )
@@ -357,7 +357,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
     // maybe we're done here?!
     if ( !(animStep || sunken) )
         return;
-    
+
     int size = rect.height() + F(3);
     Qt::Orientation o = Qt::Vertical;
     const bool vertical = verticalTabs(tab->shape);
@@ -369,7 +369,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
     }
     else    // Konsole now thinks it has to write it's own broken tab painting :-(
         rect.adjust( F(1), F(2), -F(1), -( F(3) + isOnlyShape*F(2) ) );
-    
+
     QColor c;
     bool noBase = false;
     const bool sameRoles = config.tab.active_role[Bg] == config.tab.std_role[Bg];
@@ -401,7 +401,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
     {
         rect = RECT.adjusted( F(1), F(2), -F(1), isOnlyShape*-F(2));
         Tile::setShape( (o == Qt::Vertical) ? (Tile::Left|Tile::Right) : (Tile::Top|Tile::Bottom) );
-        if (sunken) 
+        if (sunken)
         {
             if ( GRAD(tab) == Gradients::Sunken )
                 gt = Gradients::Simple;
@@ -421,7 +421,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
         rect.setBottom(rect.bottom() + F(2));
         shadows.sunken[true][true].render(rect, painter);
     }
-    
+
     Tile::reset();
 }
 
@@ -543,7 +543,7 @@ Style::drawTabCloser(const QStyleOption *option, QPainter *painter, const QWidge
 {
     OPT_SUNKEN OPT_HOVER
     if (sunken) hover = false;
-    
+
     QRect rect = RECT;
     sunken ? rect.adjust(F(5),F(4),-F(4),-F(5)) :
     hover ?  rect.adjust(F(3),F(2),-F(2),-F(3)) :
@@ -628,7 +628,7 @@ Style::drawToolboxTabShape(const QStyleOption *option, QPainter *painter, const 
 
     QColor c = CCOLOR(tab.std, Bg);
     Gradients::Type gt = GRAD(tab);
-    
+
     if (gt == Gradients::Sunken) // looks freaky
         gt = Gradients::Button;
     if (sunken)

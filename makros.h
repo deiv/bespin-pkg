@@ -1,5 +1,23 @@
-#ifndef OXYGEN_DEFS_H
-#define OXYGEN_DEFS_H
+/*
+ *   Bespin style for Qt4
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+#ifndef BESPIN_MAKROS_H
+#define BESPIN_MAKROS_H
 
 #define CLAMP(x,l,u) (x) < (l) ? (l) :\
 (x) > (u) ? (u) :\
@@ -51,4 +69,4 @@ if (!_VAR_) return
 
 #define IS_HTML_WIDGET (widget->objectName() == "RenderFormElementWidget")
 
-#endif //OXYGEN_DEFS_H
+#endif //BESPIN_MAKROS_H

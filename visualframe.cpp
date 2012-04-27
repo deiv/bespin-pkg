@@ -1,19 +1,19 @@
-/* Bespin widget style for Qt4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin style for Qt4
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #include "visualframe.h"
@@ -162,7 +162,7 @@ myFrame(0), myWindow(0), top(0), bottom(0), left(0), right(0), hidden(true)
     }
     if (!parent)
         { deleteLater(); return; }
-   
+
    // create frame elements
    myFrame = parent;
    myFrame->installEventFilter(this);
@@ -182,7 +182,7 @@ void
 VisualFrame::updateShape()
 {
     myStyle = myFrame->frameShape();
-    
+
     if (myStyle != QFrame::StyledPanel)
     {
         if (top) { top->hide(); top->deleteLater(); top = 0L; }
@@ -200,7 +200,7 @@ VisualFrame::updateShape()
         hidden = true;
         return;
     }
-    
+
     // we start out with myWindow == myFrame, the actual parent widget is recalculated on each show()
     // to capture e.g. dock floats etc.
     myWindow = myFrame;
@@ -308,7 +308,7 @@ VisualFrame::show()
     }
     if (myStyle != QFrame::StyledPanel)
         return;
-    
+
     if (!top)
     {
         updateShape();
@@ -457,7 +457,7 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
         blockZEvent = false;
         return false;
     }
-    
+
     if (ev->type() == QEvent::StyleChange)
     {
         if (myFrame->style() == style() && myFrame->isVisible())
@@ -472,7 +472,7 @@ VisualFrame::eventFilter ( QObject * o, QEvent * ev )
 //         qDebug() << "reparented" << o << myWindow << myFrame->window();
 //         return false;
 //     }
-   
+
     if (o != myFrame)
     {   // now we're only interested in frame events
         return false;

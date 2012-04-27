@@ -1,3 +1,21 @@
+/*
+ *   Bespin style for Qt4
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 #include <QProgressBar>
 #include <QTimerEvent>
 #include "aprogress.h"
@@ -39,7 +57,7 @@ Progress::timerEvent(QTimerEvent * event)
     {
         if (!iter.key()) // not a progressbar - shouldn't be in items, btw...
             { mkProper = true; continue; }
-            
+
         pb = const_cast<QProgressBar*>(qobject_cast<const QProgressBar*>(iter.key()));
         if (!pb)
             continue; // not a progressbar - shouldn't be in items, btw...

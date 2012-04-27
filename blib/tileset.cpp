@@ -1,19 +1,19 @@
-/* Bespin widget style for Qt4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin library for Qt style, KWin decoration and everythng else
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Library General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
  /**
@@ -50,7 +50,7 @@ static QPixmap simple(QImage &img)
 {
     if (!img.hasAlphaChannel())
         return QPixmap::fromImage(img);
-        
+
     bool translucent = false, content = false;
     uint *data = ( uint * ) img.bits();
     int total = img.width() * img.height();
@@ -104,7 +104,7 @@ Set::Set(const QImage &img, int xOff, int yOff, int width, int height, int round
 {
     if (img.isNull())
         { _isBitmap = false; return; }
-        
+
     _isBitmap = img.depth() == 1;
     int w = qMax(1, width), h = qMax(1, height);
 
@@ -316,7 +316,7 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
                 p->drawTiledPixmap(checkRect, *tile);
             }
         }
-        
+
         checkRect.setRect(r.x(),r.y(), tlw, tlh);
         if ((pf & Left) && UNCLIPPED)
         {
@@ -333,7 +333,7 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
             p->drawPixmap(rOff, r.y(), *tile, width(TopRight)-trw, 0, trw, trh);
         }
     }
-    
+
     if (pf & Bottom)
     {
         int bOff = r.bottom()-blh+1;
@@ -383,7 +383,7 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
                 p->drawTiledPixmap(checkRect, *tile);
             }
         }
-        
+
         checkRect.setRect(r.x(), yOff, tlw, h);
         if ((pf & Left) && !pixmap[MidLeft].isNull() && UNCLIPPED)
         {
@@ -396,7 +396,7 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
                 p->drawTiledPixmap(checkRect, *tile);
             }
         }
-        
+
         checkRect.setRect(rOff, yOff, trw, h);
         if ((pf & Right) && !pixmap[MidRight].isNull() && UNCLIPPED)
         {
@@ -491,7 +491,7 @@ Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
             paths << QPainterPath();
         paths.last().moveTo(rect.bottomRight());
     }
-    
+
     if (pf & Right)
     {
         if (pf & Top)

@@ -1,19 +1,19 @@
-/* Bespin widget style for Qt4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin library for Qt style, KWin decoration and everythng else
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Library General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #include <QCache>
@@ -254,7 +254,7 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
 #define GLASS true
 #define GLOSS false
 // in addition, glosses should have the last stop at 0.9
-   
+
    // some psychovisual stuff, we search a dark & bright surrounding and
    // slightly shift hue as well (e.g. for green the dark color will slide to
    // blue and the bright one to yellow - A LITTLE! ;)
@@ -269,11 +269,11 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
     if (h < 0) h += 360;
     dv = 12 - dv; // NOTICE 12 from above...
     ltC.setHsv(h, s, qMin(v + dv,255), a);
-   
+
 //    int dc = Colors::value(c)/5; // how much darken/lighten we will
 //    QColor dkC = c.dark(100+sqrt(2*dc));
 //    QColor ltC = c.light(150-dc);
-   
+
     QPoint start, stop;
     QPixmap *dark = newPix(size, o, &start, &stop, 4*size);
     QPixmap *pix = new QPixmap(dark->size());
@@ -305,7 +305,7 @@ progressGradient(const QColor &c, int size, Qt::Orientation o)
     p.fillRect(pix->rect(), lg2);
     p.drawPixmap(0,0, alpha);
     p.end();
-   
+
     delete dark;
     return pix;
 #undef GLASS
@@ -342,24 +342,24 @@ Gradients::borderline(const QColor &c, Position pos)
     QPixmap *pix = _borderline[pos].object(c.rgba());
     if (pix)
         return *pix;
-    
+
     QColor c2 = c; c2.setAlpha(0);
-    
+
     QPoint start(0,0), stop;
     if (pos > Bottom)
     { pix = new QPixmap(32, 1); stop = QPoint(32,0); }
     else
     { pix = new QPixmap(1, 32); stop = QPoint(0,32); }
     pix->fill(Qt::transparent);
-    
+
     QLinearGradient lg(start, stop);
     if (pos % 2) // Bottom, right
     { lg.setColorAt(0, c); lg.setColorAt(1, c2); }
     else
     { lg.setColorAt(0, c2); lg.setColorAt(1, c); }
-    
+
     QPainter p(pix); p.fillRect(pix->rect(), lg); p.end();
-    
+
     if (_borderline[pos].insert(c.rgba(), pix, costs(pix)))
         return *pix;
     return nullPix;
@@ -453,7 +453,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
 
     if (type < 1 || type >= TypeAmount)
         type = Simple;
-   
+
     // very dark colors won't make nice buttons =)
     QColor iC = checkValue(c, type);
 
@@ -465,7 +465,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
     QPixmap *pix = cache->object(magicNumber);
     if (pix)
         return *pix;
-   
+
     QPoint start, stop;
     if (type == Gradients::Cloudy)
         pix = progressGradient(iC, size, o);
@@ -503,7 +503,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
             pix->fill(Qt::transparent);
         QPainter p(pix); p.fillRect(pix->rect(), grad); p.end();
     }
-   
+
     if (cache && cache->insert(magicNumber, pix, costs(pix)))
         return *pix;
     return nullPix;
@@ -515,7 +515,7 @@ const QPixmap
     QPixmap *pix = _structure[light].object(c.rgba());
     if (pix)
         return *pix;
-    
+
     pix = new QPixmap(64, 64);
     if (c.alpha() != 0xff)
         pix->fill(Qt::transparent);
@@ -727,7 +727,7 @@ const QPixmap
 {
     height = (height + 2)/3;
     height *= 3;
-    
+
     if (height <= 0)
     {
         qWarning("NULL Pixmap requested, height was %d",height);
@@ -797,7 +797,7 @@ Gradients::shadow(int height, bool bottom)
         qWarning("NULL Pixmap requested, height was %d",height);
         return nullPix;
     }
-    
+
     uint val = height + bottom*0x80000000;
     QPixmap *pix = _tabShadow.object(val);
     if (pix)
@@ -934,7 +934,7 @@ Gradients::bgSet(const QColor &c, BgMode mode, int bgIntensity)
         stops.clear();
         p.drawTiledPixmap(set->cornerTile.rect(), FX::dither());
         p.end();
-        
+
         // Left Corner, right corner
         QPixmap *mask, *pix;
         for (int cnr = 0; cnr < 2; ++cnr)
