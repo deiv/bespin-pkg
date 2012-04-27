@@ -1,19 +1,19 @@
-/* Bespin widget style for Qt4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin style for Qt4
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #include <QAbstractItemView>
@@ -157,7 +157,7 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
             const int tw = fontMetrics.size(BESPIN_MNEMONIC, groupBox->text.toUpper() + QLatin1Char(' ')).width();
             const int marg = flat ? 0 : F(3);
             Qt::Alignment align;
-        
+
             if (flat || !config.groupBoxMode)
             {
                 int left = marg;
@@ -283,11 +283,11 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
                     break;
                 }
             }
-            
+
             ret = visualRect(scrollbar->direction, RECT, ret);
         }
         break;
-      
+
     case CC_Slider:
         if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
         {
@@ -324,7 +324,7 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
             }
         }
         break;
-      
+
     case CC_ToolButton: // A tool button, like QToolButton
         if HAVE_OPTION(tb, ToolButton)
         {
@@ -347,10 +347,10 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
          const int controlHeight = tb->rect.height() - controlMargin*2;
          const int delta = controlHeight + 2*controlMargin;
          int offset = 0;
-         
+
          bool isMinimized = tb->titleBarState & Qt::WindowMinimized;
          bool isMaximized = tb->titleBarState & Qt::WindowMaximized;
-             
+
          SubControl sc = subControl;
          if (sc == SC_TitleBarNormalButton) { // check what it's good for
             if (isMinimized)
@@ -360,7 +360,7 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
             else
                break;
          }
-         
+
          switch (sc) {
          case SC_TitleBarLabel:
             if (tb->titleBarFlags &
@@ -401,7 +401,7 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
             ret.setRect(tb->rect.left() + offset, tb->rect.top() + controlMargin,
                         controlHeight, controlHeight);
             break;
-            
+
          case SC_TitleBarContextHelpButton:
             if (tb->titleBarFlags & Qt::WindowContextHelpButtonHint)
                offset += delta;
@@ -474,7 +474,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
     case SE_RadioButtonFocusRect: // Area for the focus indicator
     case SE_RadioButtonClickRect: // Clickable area, defaults to SE_RadioButtonFocusRect
         return RECT;
-   
+
 //    case SE_ComboBoxFocusRect: // Area for the focus indicator
 //    case SE_SliderFocusRect: // Area for the focus indicator
 //    case SE_Q3DockWindowHandleRect: // Area for the tear-off handle
@@ -538,7 +538,7 @@ Style::subElementRect(SubElement element, const QStyleOption *option, const QWid
             const QSize &corner = (element == SE_TabWidgetLeftCorner) ? twf->leftCornerWidgetSize : twf->rightCornerWidgetSize;
             bool vertical = false;
             QRect ret;
-            
+
             switch (twf->shape)
             {
             case QTabBar::RoundedNorth:

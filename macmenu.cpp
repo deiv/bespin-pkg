@@ -1,19 +1,19 @@
-/* Bespin mac-a-like XBar KDE4
-Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License version 2 as published by the Free Software Foundation.
-
-This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin style for Qt4
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Library General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #include <QActionEvent>
@@ -67,7 +67,7 @@ MacMenu::manage(QMenuBar *menu)
 {
     if (!menu) // ...
         return;
-    
+
     // we only accept menus that are placed on a QMainWindow - for the moment, and probably ever
     QWidget *dad = menu->parentWidget();
     if (!(dad && dad->isWindow() && dad->inherits("QMainWindow") && dad->layout() && dad->layout()->menuBar() == menu))
@@ -75,7 +75,7 @@ MacMenu::manage(QMenuBar *menu)
 
 //     if ((dad = dad->parentWidget()) && dad->inherits("QMdiSubWindow"))
 //         return;
-    
+
 
     if (!instance)
     {
@@ -95,7 +95,7 @@ MacMenu::manage(QMenuBar *menu)
 }
 
 
-bool 
+bool
 MacMenu::manages(const QMenuBar *menu)
 {
     return isActive() && instance->items.contains(const_cast<QMenuBar*>(menu));
@@ -145,7 +145,7 @@ void
 MacMenu::activate(QMenuBar *menu)
 {
     menu->removeEventFilter(this);
-    
+
     // and WOWWWW - no more per window menubars...
     menu->setFixedSize(0,0);
     //NOTICE i used to set the menu's parent->layout()->setMenuBar(0) to get rid of the free space
@@ -153,11 +153,11 @@ MacMenu::activate(QMenuBar *menu)
     // so now the stylehint for the free space below checks the menubar height and returns
     // a negative value so that final result will be 1 px heigh...
     menu->updateGeometry();
-    
+
     // we need to hold a copy of this list to handle action removes
     // (as we get the event after the action has been removed from the widget...)
     actions[menu] = menu->actions();
-    
+
     // find a nice header
     QString title = menu->window()->windowTitle();
     const QStringList appArgs = QCoreApplication::arguments();
@@ -178,7 +178,7 @@ MacMenu::activate(QMenuBar *menu)
         if (title.isEmpty())
             title = "QApplication";
     }
-    
+
     // register the menu via dbus
     QStringList entries;
     foreach (QAction* action, menu->actions())
@@ -190,7 +190,7 @@ MacMenu::activate(QMenuBar *menu)
     // TODO cause of now async call, the following should - maybe - attached to the above?!!
     if (menu->isActiveWindow())
         XBAR_SEND( MSG("requestFocus") << (qlonglong)menu );
-    
+
     // take care of several widget events!
     menu->installEventFilter(this);
     if (menu->window())
@@ -378,7 +378,7 @@ void
 MacMenu::menuClosed()
 {
     QObject * _sender = sender();
-    
+
     if (!_sender)
         return;
 

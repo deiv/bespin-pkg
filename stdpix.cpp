@@ -1,19 +1,19 @@
-/* Bespin widget style for Qt4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin style for Qt4
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #include <QStyleOptionTitleBar>
@@ -315,14 +315,14 @@ paint:
         painter.drawText(rect, Qt::AlignCenter, "?");
         break;
     }
-//    case SP_DesktopIcon: //  13   
-//    case SP_TrashIcon: //  14   
-//    case SP_ComputerIcon: //  15   
-//    case SP_DriveFDIcon: //  16   
-//    case SP_DriveHDIcon: //  17   
-//    case SP_DriveCDIcon: //  18   
-//    case SP_DriveDVDIcon: //  19   
-//    case SP_DriveNetIcon: //  20   
+//    case SP_DesktopIcon: //  13
+//    case SP_TrashIcon: //  14
+//    case SP_ComputerIcon: //  15
+//    case SP_DriveFDIcon: //  16
+//    case SP_DriveHDIcon: //  17
+//    case SP_DriveCDIcon: //  18
+//    case SP_DriveDVDIcon: //  19
+//    case SP_DriveNetIcon: //  20
 //     case SP_DirOpenIcon: //  21
 //     case SP_DirClosedIcon: //  22
 //     case SP_DirLinkIcon: //  23
@@ -357,10 +357,10 @@ paint:
         painter.drawLine(mother.center(), child.center());
         break;
     }
-//    case SP_FileIcon: //  24   
+//    case SP_FileIcon: //  24
 //    case SP_FileLinkIcon: //  25
 
-//    case SP_FileDialogStart: //  28   
+//    case SP_FileDialogStart: //  28
 //    case SP_FileDialogEnd: //  29
 
     case SP_FileDialogDetailedView: //  32
@@ -378,8 +378,8 @@ paint:
         break;
     }
 
-//    case SP_FileDialogInfoView: //  33   
-//    case SP_FileDialogContentsView: //  34   
+//    case SP_FileDialogInfoView: //  33
+//    case SP_FileDialogContentsView: //  34
     case SP_FileDialogListView: //  35
     {
         QRectF r(0,0,sz/3.0,sz/3.0);

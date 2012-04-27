@@ -1,19 +1,19 @@
-/* Bespin widget style for Qt4
-   Copyright (C) 2007-2009 Thomas Luebking <thomas.luebking@web.de>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin style for Qt4
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #include <QApplication>
@@ -47,7 +47,7 @@ Style::drawHeader(const QStyleOption *option, QPainter *painter, const QWidget *
         subopt.rect = subElementRect(SE_HeaderArrow, option, widget);
         drawHeaderArrow(&subopt, painter, widget);
     }
-       
+
 //    painter->setClipRegion(clipRegion);
 }
 
@@ -188,7 +188,7 @@ Style::drawBranch(const QStyleOption *option, QPainter *painter, const QWidget *
 
     if ( !RECT.isValid() )
         return;
-    
+
     SAVE_PEN;
     int mid_h = RECT.x() + RECT.width() / 2;
     int mid_v = RECT.y() + RECT.height() / 2;
@@ -287,7 +287,7 @@ Style::drawTree(const QStyleOptionComplex *option, QPainter *painter, const QWid
     QColor  cLine = Colors::mid( COLOR(bg), COLOR(fg), 40, 1),
             cIndi = Colors::mid( COLOR(bg), COLOR(fg), 6, 1),
             cIndiOpen = Colors::mid( COLOR(bg), COLOR(fg) );
-            
+
     if ((lv->activeSubControls & SC_All) && (lv->subControls & SC_Q3ListViewExpand))
     {
         c = 2;
@@ -439,7 +439,7 @@ Style::drawRubberBand(const QStyleOption *option, QPainter *painter, const QWidg
 
     QColor c = FCOLOR(Highlight);
     painter->setPen(c);
-    c.setAlpha(80); 
+    c.setAlpha(80);
     painter->setBrush(c);
 //     painter->setBrush(QBrush(c, Qt::Dense6Pattern));
 //     painter->setBrush(Qt::NoBrush);
@@ -484,7 +484,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
     ASSURE_OPTION(item, ViewItemV4);
 
     updateLastWidget( widget, painter );
-    
+
     if (widget && (last_flags & Crumb))
         return;
 

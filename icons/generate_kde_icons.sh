@@ -1,4 +1,21 @@
 #!/bin/bash
+
+# Bespin icontheme generator
+# Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this program; if not, write to the
+# Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 SHELL=$_
 #if [ ${SHELL##*/} != bash ]; then
 #    echo -e "\n\
@@ -126,7 +143,7 @@ while read line; do
         IP=$((Job*100/Jobs))
         FP=$((Job*1000/Jobs - 10*IP))
         echo -ne "\r$IP.$FP %  "
-        
+
         IFS=',' # set delimiter
         for dst in $dsts; do
             # split destination references

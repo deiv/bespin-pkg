@@ -1,19 +1,19 @@
-/* Bespin widget style for Qt4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin style for Qt4
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #include <QAction>
@@ -43,7 +43,7 @@ Style::drawMenuBarBg(const QStyleOption *option, QPainter *painter, const QWidge
     Tile::PosFlags pf = 0;
     if (config.UNO.sunken && !config.UNO.title)
         pf |= Tile::Top;
-    
+
 //     if (sunken)
 //         rect.setBottom(rect.bottom()-F(2));
 
@@ -138,7 +138,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         }
         // ================================================
     }
-    
+
     QRect r = RECT.adjusted(0, F(2), 0, -F(4));
     if (isEnabled && (step || hover))
     {
@@ -236,7 +236,7 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
         }
         return;
     }
-       
+
     QRect r = RECT.adjusted(0,0,-1,-1);
     bool selected = isEnabled && menuItem->state & State_Selected;
 
@@ -270,7 +270,7 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
             shadows.sunken[round_][false].render(r, painter);
         Tile::reset();
     }
-       
+
     // Text and icon, ripped from windows style
     const QStyleOptionMenuItem *menuitem = menuItem;
     int iconCol = config.menu.showIcons*menuitem->maxIconWidth;
@@ -285,7 +285,7 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
 
         painter->drawPixmap(pmr.topLeft(), pixmap);
     }
-       
+
     int x, y, w, h;
     r.getRect(&x, &y, &w, &h);
     const int tab = menuitem->tabWidth;
@@ -324,15 +324,15 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
             drawMenuCheck(&tmpOpt, painter, widget);
         xpos += cDim + F(4);
     }
-    
+
     painter->setPen ( fg );
     painter->setBrush ( Qt::NoBrush );
-    
+
     QRect textRect(xpos, y + windowsItemVMargin,
                    w - (xm + checkable*(cDim+F(4)) + subMenu*windowsRightBorder + tab + windowsItemFrame + windowsItemHMargin),
                    h - 2 * windowsItemVMargin);
     QRect vTextRect = visualRect(option->direction, r, textRect);
-    
+
     QString s = menuitem->text;
     if (!s.isEmpty())
     {   // draw text
@@ -359,7 +359,7 @@ Style::drawMenuItem(const QStyleOption *option, QPainter *painter, const QWidget
             drawItemText(painter, vTextRect, text_flags | Qt::AlignLeft, PAL, isEnabled, s);
 //       painter->drawText(vTextRect, text_flags | Qt::AlignLeft, s.left(t));
     }
-         
+
     if (subMenu)
     {   // draw sub menu arrow ================================
 

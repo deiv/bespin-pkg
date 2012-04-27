@@ -1,19 +1,19 @@
-/* Bespin mac-a-like XBar KDE4
-   Copyright (C) 2007 Thomas Luebking <thomas.luebking@web.de>
-
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+/*
+ *   Bespin Mac-a-like XBar Plasmoid
+ *   Copyright 2007-2012 by Thomas Lübking <thomas.luebking@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #include <QAbstractEventDispatcher>
@@ -158,7 +158,7 @@ XBar::init()
     dummy = new DummyWidget();
     dummy->setGeometry(5000,5000,1,1);
     dummy->show();
-    
+
 //     Plasma::Applet::init();
     //TODO : Qt's bug??
     setAspectRatioMode(Plasma::IgnoreAspectRatio);
@@ -166,7 +166,7 @@ XBar::init()
     setMaximumSize(INT_MAX, INT_MAX);
 
 //     setFlag(ItemClipsChildrenToShape); setFlag(ItemClipsToShape);
-    
+
     // TODO: use plasmoid popup and make this dynamic -> update all menubars...
     QSettings settings("Bespin", "XBar");
     settings.beginGroup("XBar");
@@ -180,11 +180,11 @@ XBar::init()
     d.extraTitle = false; //settings.value("WindowList", false).toBool();
 
     repopulateMainMenu();
-    
+
     d.currentBar = myMainMenu;
 
     updatePalette();
-    
+
     show(myMainMenu);
     QTimer::singleShot(500, this, SLOT(showMainMenu())); // force repositioning cause plasma sucks.
 
@@ -196,11 +196,11 @@ XBar::init()
     connect( KWindowSystem::self(), SIGNAL( activeWindowChanged(WId) ), this, SLOT( ggmWindowActivated(WId) ) );
     connect( KWindowSystem::self(), SIGNAL( windowAdded(WId) ), this, SLOT( ggmWindowAdded(WId) ) );
     connect( KWindowSystem::self(), SIGNAL( windowRemoved(WId) ), this, SLOT( ggmWindowRemoved(WId) ) );
-    
+
     new XBarAdaptor(this);
     QDBusConnection::sessionBus().registerService("org.kde.XBar");
     QDBusConnection::sessionBus().registerObject("/XBar", this);
-    
+
     connect (this, SIGNAL(destroyed()), this, SLOT(byeMenus()));
     connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(byeMenus()));
     connect (&d.windowList, SIGNAL(aboutToShow()), this, SLOT(updateWindowlist()));
@@ -245,9 +245,9 @@ XBar::byeMenus()
 {
     QDBusConnectionInterface *session = QDBusConnection::sessionBus().interface();
     QStringList services = session->registeredServiceNames();
-    foreach ( QString service, services ) 
+    foreach ( QString service, services )
     {
-        if ( service.startsWith("org.kde.XBar-") ) 
+        if ( service.startsWith("org.kde.XBar-") )
         {
             QDBusInterface interface( service, "/XBarClient", "org.kde.XBarClient" );
             if ( interface.isValid() )
@@ -450,10 +450,10 @@ XBar::runFromAction()
     KUriFilterData execLineData( command );
     KUriFilter::self()->filterUri( execLineData, QStringList() << "kurisearchfilter" << "kshorturifilter" );
     QString cmd = ( execLineData.uri().isLocalFile() ? execLineData.uri().path() : execLineData.uri().url() );
-    
+
     if ( cmd.isEmpty() )
         return;
-    
+
     switch( execLineData.uriType() )
     {
         case KUriFilterData::LocalFile:
@@ -493,7 +493,7 @@ XBar::callFromAction()
         qWarning("invalid dbus chain, must be: \"bus;service;path;interface;method[;arg1;arg2;...]\", bus is \"session\" or \"system\"");
         return;
     }
-    
+
     QDBusInterface *caller = 0;
     if (list.at(0) == "session")
         caller = new QDBusInterface( list.at(1), list.at(2), list.at(3), QDBusConnection::sessionBus() );
@@ -504,7 +504,7 @@ XBar::callFromAction()
         qWarning("unknown bus, must be \"session\" or \"system\"");
         return;
     }
-    
+
     QList<QVariant> args;
     if (list.count() > 5)
     {
@@ -521,7 +521,7 @@ XBar::callFromAction()
             if (ok) { args << UInt; continue; }
             double Double = list.at(i).toDouble(&ok);
             if (ok) { args << Double; continue; }
-            
+
             args << list.at(i);
         }
     }
@@ -540,7 +540,7 @@ XBar::rBuildMenu(const QDomElement &node, QObject *widget)
         if (!menubar)
             return;
     }
-    
+
     QDomNode kid = node.firstChild();
     while(!kid.isNull())
     {
@@ -604,7 +604,7 @@ XBar::buildMenu(const QString &name, QObject *widget, const QString &/*type*/)
 {
     if (!instance)
         return;
-    
+
     QDomDocument menu(name);
     QFile file(KGlobal::dirs()->locate("data", "XBar/" + name + ".xml"));
     if (!file.open(QIODevice::ReadOnly))
@@ -615,7 +615,7 @@ XBar::buildMenu(const QString &name, QObject *widget, const QString &/*type*/)
         return;
     }
     file.close();
-    
+
     QDomElement element = menu.documentElement();
     if (!element.isNull() /*&& element.tagName() == type*/)
         instance->rBuildMenu(element, widget);
@@ -649,7 +649,7 @@ XBar::repopulateMainMenu()
         connect ( action, SIGNAL(triggered()), SLOT(runFromAction()) );
         myMainMenu->addAction(action);
     }
-    
+
     if (xmlPath.isNull())
         xmlPath = KGlobal::dirs()->locate("data", "XBar");
     myMainMenuDefWatcher = new KDirWatch(this);
@@ -772,12 +772,12 @@ void
 XBar::updateWindowlist()
 {
     d.windowList.clear();
-    
+
     KWindowInfo info;
     int currentDesktop = KWindowSystem::currentDesktop();
     int n = KWindowSystem::numberOfDesktops();
     QList<WId> *windowTable = new QList<WId>[n];
-    
+
     const QList<WId>& windows = KWindowSystem::windows();
     foreach (WId id, windows)
     {
@@ -789,14 +789,14 @@ XBar::updateWindowlist()
                 windowTable[d-1].append(id);
             }
     }
-    
+
     QAction *act(0);
     int desk;
     bool needSep = false;
     for (int i = 0; i < n; ++i)
     {
         desk = i+1;
-        
+
         if (needSep)
             d.windowList.addSeparator();
         if ( desk == KWindowSystem::currentDesktop() )
@@ -824,7 +824,7 @@ XBar::updateWindowlist()
             if (i < n-1)
                 d.windowList.addSeparator();
         }
-        
+
         needSep = false;
         foreach (WId id, windowTable[i])
         {
@@ -853,7 +853,7 @@ XBar::updateWindowlist()
     d.windowList.addSeparator();
 //    d.windowList.addAction ( "Show Taskbar", this, SLOT(showTaskbar()) );
 //    d.windowList.addSeparator();
-   
+
     const QList<WId>& windows = KWindowSystem::windows();
     QAction *act = 0;
     KWindowInfo info; QString title;
@@ -929,7 +929,7 @@ XBar::wheelEvent(QGraphicsSceneWheelEvent *ev)
             }
         }
     }
-    
+
     while ( n != d.menus.end() && !n.value()->isEnabled() && ggmMenus.contains( n.key() ) )
     {   // update invalidated menus - we might have lost them as well...
         delete n.value();
@@ -1086,7 +1086,7 @@ ggmRecursive(const QDomElement &node, QObject *widget, const QString &prefix )
 {
     if ( node.isNull() )
         return;
-    
+
     MenuBar *menubar = 0;
     QMenu *menu = qobject_cast<QMenu*>(widget);
     if (!menu)
@@ -1095,7 +1095,7 @@ ggmRecursive(const QDomElement &node, QObject *widget, const QString &prefix )
         if (!menubar)
             return;
     }
-    
+
     QDomElement e = node.firstChildElement("item");
     while ( !e.isNull() )
     {
@@ -1118,9 +1118,9 @@ ggmRecursive(const QDomElement &node, QObject *widget, const QString &prefix )
                     action->setData( prefix + "/" + e.attribute("id") );
                     action->setEnabled( e.attribute("sensible") != "0" );
                     QString icon = e.attribute("icon");
-                    if ( !icon.isEmpty() ) 
+                    if ( !icon.isEmpty() )
                         icon = ggmIconMap.value( icon, QString() );
-                    if ( !icon.isEmpty() ) 
+                    if ( !icon.isEmpty() )
                         action->setIcon( KIcon( icon ) );
                     QString state = e.attribute("state");
                     int iState = 0;
@@ -1146,7 +1146,7 @@ XBar::ggmCreate( WId id )
     int nItems;
     char **list;
     XTextProperty string;
-    
+
     if ( XGetTextProperty(QX11Info::display(), id, &string, ggmContext) && XTextPropertyToStringList(&string, &list, &nItems) )
     {
         if (nItems)
@@ -1178,7 +1178,7 @@ XBar::ggmWindowActivated( WId id )
         else
             id = KWindowSystem::transientFor(id);
     }
-    
+
     if ( ggmMenus.contains( id ) )
     {
         ggmLastId = id;
@@ -1191,11 +1191,11 @@ XBar::ggmWindowActivated( WId id )
     }
 }
 
-void 
+void
 XBar::ggmUpdate( WId id )
 {
     bool added = false, wasVisible = false;
-    
+
     MenuMap::iterator it = d.menus.find( id );
     if ( it == d.menus.end() )
     {
@@ -1204,7 +1204,7 @@ XBar::ggmUpdate( WId id )
         else
             return; // there's no menu for us
     }
-    else 
+    else
     {
         wasVisible = it.value()->isVisible();
         it.value()->setEnabled(false); // invalidate
