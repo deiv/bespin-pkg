@@ -191,6 +191,16 @@ shadowData(Shadows::Type t, bool storeToRoot)
 #endif
 }
 
+bool
+Shadows::areSet(WId id)
+{
+#ifdef Q_WS_X11
+    unsigned long _12 = 12;
+    return XProperty::get<unsigned long>(id, XProperty::kwinShadow, XProperty::LONG, &_12);
+#endif
+    return false;
+}
+
 void
 Shadows::cleanUp()
 {
