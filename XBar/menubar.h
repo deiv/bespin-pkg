@@ -57,6 +57,7 @@ signals:
     void hovered(int);
     void triggered(int);
 protected:
+    void changeEvent( QEvent *event );
     inline void initStyleOption(QStyleOption *option) const
     {
         if (QStyleOptionMenuItem *mopt = qstyleoption_cast<QStyleOptionMenuItem*>(option))

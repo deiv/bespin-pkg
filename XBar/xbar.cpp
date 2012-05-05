@@ -168,15 +168,8 @@ XBar::init()
 //     setFlag(ItemClipsChildrenToShape); setFlag(ItemClipsToShape);
 
     // TODO: use plasmoid popup and make this dynamic -> update all menubars...
-    QSettings settings("Bespin", "XBar");
-    settings.beginGroup("XBar");
-    double scale = settings.value("FontScale", 1.0f).toDouble();
-    if (scale > 0.0 && scale != 1.0)
-    {
-        myFont = KGlobalSettings::menuFont();
-        myFont.setPointSize(scale*myFont.pointSize());
-        setFont(myFont);
-    }
+    updateFont();
+    connect (KGlobalSettings::self(), SIGNAL(appearanceChanged ()), SLOT(updateFont()));
     d.extraTitle = false; //settings.value("WindowList", false).toBool();
 
     repopulateMainMenu();
@@ -212,6 +205,25 @@ XBar::init()
     ggmSetLocalMenus(false);
     foreach ( WId id, KWindowSystem::windows() )
         ggmWindowAdded( id );
+}
+
+void
+XBar::updateFont()
+{
+    QSettings settings("Bespin", "XBar");
+    settings.beginGroup("XBar");
+    double scale = settings.value("FontScale", 1.0f).toDouble();
+    myFont = KGlobalSettings::menuFont();
+    if (scale > 0.0 && scale != 1.0)
+        myFont.setPointSize(scale*myFont.pointSize());
+    setFont(myFont);
+    if (sender())
+    {
+        if (myMainMenu)
+            myMainMenu->setFont(myFont);
+        foreach (MenuBar *menu, d.menus)
+            menu->setFont(myFont);
+    }
 }
 
 void
