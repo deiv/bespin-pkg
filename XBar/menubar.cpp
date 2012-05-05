@@ -211,6 +211,17 @@ MenuBar::changeAction(int idx, const QString & text)
 }
 
 void
+MenuBar::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::FontChange) {
+        for (int i = 0; i < d.actionRects.count(); ++i)
+            d.actionRects[i] = QRect();
+        updateSize();
+    }
+    QGraphicsWidget::changeEvent(event);
+}
+
+void
 MenuBar::clear()
 {
     foreach (QAction *action, d.actions)

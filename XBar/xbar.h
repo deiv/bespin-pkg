@@ -46,6 +46,7 @@ public:
     void releaseFocus(qlonglong key);
 public slots:
     void init();
+    void updateFont();
 protected:
     bool eventFilter(QObject *o, QEvent *e);
     void wheelEvent( QGraphicsSceneWheelEvent *ev );
