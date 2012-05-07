@@ -1,27 +1,6 @@
-bespin (0.r1476-3) experimental; urgency=low
+bespin (0.r1501-1) experimental; urgency=low
 
-  * Initial release. (Closes: #651091)
+  * Initial release SVN@1501 (Closes: #651091)
   * Fix debian/copyright with license details 
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Wed, 07 Mar 2012 17:57:03 +0530
-
-bespin (0.r1476-2) experimental; urgency=low
-
-  * Fix debian/copyright details
-
- -- Ritesh Raj Sarraf <rrs@debian.org>  Fri, 02 Mar 2012 00:49:33 +0530
-
-bespin (0.r1476-1) experimental; urgency=low
-
-  * Sync with SVN@1476 
-  * Initial release. (Closes: #651091)
-
- -- Ritesh Raj Sarraf <rrs@debian.org>  Wed, 29 Feb 2012 17:24:54 +0530
-
-bespin (0.r1436-1) UNRELEASED; urgency=low
-
-  * Sync with SVN@1436
-    - Added 2 new KDM themes: Aperture and Tibanna
-    - Added 2 new Ksplash themes: Aperture and Tibanna
-
- -- Ritesh Raj Sarraf <rrs@debian.org>  Mon, 19 Dec 2011 01:04:31 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Mon, 07 May 2012 09:54:57 +0530
