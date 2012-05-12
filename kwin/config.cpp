@@ -419,15 +419,17 @@ void Config::loadPresets()
 
     QListWidgetItem *item = ui.presets->item(0);
 
-    item->setData(ActiveColor, kdeglobals->value("activeBackground", Qt::black).rgba());
-    item->setData(ActiveColor2, kdeglobals->value("activeBlend", Qt::black).rgba());
-    item->setData(ActiveText, kdeglobals->value("activeForeground", Qt::black).rgba());
-    item->setData(ActiveButtons, kdeglobals->value("activeTitleBtnBg", Qt::black).rgba());
+    QColor c = QApplication::palette().color(QPalette::Active, QPalette::Window);
+    QColor ct = QApplication::palette().color(QPalette::Active, QPalette::WindowText);
+    item->setData(ActiveColor, kdeglobals->value("activeBackground", c).rgba());
+    item->setData(ActiveColor2, kdeglobals->value("activeBlend", c).rgba());
+    item->setData(ActiveText, kdeglobals->value("activeForeground", ct).rgba());
+    item->setData(ActiveButtons, kdeglobals->value("activeTitleBtnBg", ct).rgba());
 
-    item->setData(InactiveColor, kdeglobals->value("inactiveBackground", Qt::black).rgba());
-    item->setData(InactiveColor2, kdeglobals->value("inactiveBlend", Qt::black).rgba());
-    item->setData(InactiveText, kdeglobals->value("inactiveForeground", Qt::black).rgba());
-    item->setData(InactiveButtons, kdeglobals->value("inactiveTitleBtnBg", Qt::black).rgba());
+    item->setData(InactiveColor, kdeglobals->value("inactiveBackground", c).rgba());
+    item->setData(InactiveColor2, kdeglobals->value("inactiveBlend", c).rgba());
+    item->setData(InactiveText, kdeglobals->value("inactiveForeground", ct).rgba());
+    item->setData(InactiveButtons, kdeglobals->value("inactiveTitleBtnBg", ct).rgba());
 
     kdeglobals->close();
     delete kdeglobals;
