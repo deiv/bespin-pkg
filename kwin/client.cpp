@@ -867,10 +867,28 @@ Client::repaint(QPainter &p, bool paintTitle)
             // emboss?!
             int d = 0;
             const int bgv = Colors::value(bg), fgv = Colors::value(titleColor);
+//             if (bgv < fgv) // dark bg -> dark top borderline
+//                 { p.setPen(Colors::mid(bg, Qt::black, bgv, 160)); d = -1; }
+//             else // bright bg -> bright bottom borderline
+//                 { p.setPen(Colors::mid(bg, Qt::white, 16, bgv)); d = 1; }
+
             if (bgv < fgv) // dark bg -> dark top borderline
-                { p.setPen(Colors::mid(bg, Qt::black, bgv, 160)); d = -1; }
-            else // bright bg -> bright bottom borderline
-                { p.setPen(Colors::mid(bg, Qt::white, 16, bgv)); d = 1; }
+                { p.setPen(QColor(0,0,0,255-bgv)); d = -1; }
+            else  // bright bg -> bright bottom borderline
+            {
+                int s = 255 - bgv + qMin(bg.red(), qMin(bg.green(), bg.blue()));
+                // s^12/255^11 in integer compatible way ;-)
+                s = s*s/255;
+                s = s*s/255;
+                s = s*s/255;
+                s = s*s/255;
+                s = s*s/255;
+                s = s*s/255;
+                s = s - 128;
+                s = 153+ s*s*s / 20000;
+                p.setPen(QColor(255,255,255,s));
+                d = 1;
+            }
 
             QRect tr;
             QPoint off(0,0); Factory::verticalTitle() ? off.setX(-d) : off.setY(d);
