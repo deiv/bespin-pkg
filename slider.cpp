@@ -133,12 +133,15 @@ while (v <= slider->maximum) { \
         drawScrollBarGroove(&grooveOpt, painter, widget);
         config.scroll.groove = gType;
 
-#if 0
+#if 1
         // thermometer, #2
-        if (slider->minimum == 0 && slider->sliderPosition != slider->minimum)
+        if (slider->minimum > -1 && (slider->maximum - slider->minimum) > 20 &&
+            slider->sliderPosition != slider->minimum)
         {
             SAVE_PEN;
-            painter->setPen(QPen(FCOLOR(Highlight), gType ? F(3) : F(1), Qt::SolidLine, Qt::RoundCap));
+            bool hadAntiAlias = painter->testRenderHint(QPainter::Antialiasing);
+            painter->setRenderHint( QPainter::Antialiasing, gType );
+            painter->setPen(QPen(CCOLOR(scroll._, Fg), gType ? F(3) : F(1), Qt::SolidLine, Qt::RoundCap));
             if ( slider->orientation == Qt::Horizontal )
             {
                 const int y = groove.center().y() + (gType ? 1 : 0);
@@ -153,6 +156,7 @@ while (v <= slider->maximum) { \
                 const int y2 = slider->upsideDown ? groove.bottom() - F(5) : groove.top() + F(5);
                 painter->drawLine(x, handle.center().y(), x, y2);
             }
+            painter->setRenderHint( QPainter::Antialiasing, hadAntiAlias );
             RESTORE_PEN;
         }
 #endif
