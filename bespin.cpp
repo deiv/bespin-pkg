@@ -1483,7 +1483,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
 #else
             menu->move(menu->pos()-QPoint(0,F(2)));
-            shapeCorners( widget, false );
+            if (config.menu.round)
+                shapeCorners( widget, false );
 #endif
             return false;
         }
