@@ -194,14 +194,14 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
 
 // a nice round embedded chunk
 static inline void
-drawShape(QPainter *p, int s, int x = 0, int y = 0, bool outline = true)
+drawShape(QPainter *p, int s, int round, int x = 0, int y = 0, bool outline = true)
 {
     s -= 2;
     p->setPen(QPen(QColor(0,0,0,50),2));
-    p->drawEllipse(x+1,y+2,s,s);
+    p->drawRoundedRect(x+1,y+2,s,s, round, Qt::RelativeSize);
     p->setBrush(Qt::NoBrush);
     p->setPen(QPen(QColor(255,255,255, outline ? 30 : 15),1));
-    p->drawEllipse(x,y+1,s+2,s);
+    p->drawRoundedRect(x,y+1,s+2,s, round, Qt::RelativeSize);
 }
 
 static QPixmap renderPix;
@@ -296,7 +296,7 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
         p.setBrush(Gradients::brush(c, ss, Qt::Vertical, GRAD(progress) ));
     }
     p.setBrushOrigin(0,1);
-    drawShape(&p, ss);
+    drawShape(&p, ss, config.roundness*99/100);
     p.end();
 
     if (vertical) // x is in fact y!
@@ -338,7 +338,7 @@ Style::drawProgressBarGC(const QStyleOption *option, QPainter *painter, const QW
                 painter->setRenderHint(QPainter::Antialiasing);
                 painter->setBrush(Gradients::brush(c, ss, Qt::Vertical, GRAD(progress) ));
                 painter->setBrushOrigin(0, y);
-                drawShape(painter, ss, x, y, false);
+                drawShape(painter, ss, config.roundness*99/100, x, y, false);
                 painter->restore();
             }
         }
@@ -357,7 +357,7 @@ Style::drawProgressBarLabel(const QStyleOption *option, QPainter *painter, const
     painter->save();
     QRect rect = RECT;
     if (progress->orientation == Qt::Vertical)
-    {   // vertical progresses have text rotated by 90�� or 270��
+    {   // vertical progresses have text rotated by 90° or 270°
         QMatrix m;
         int h = rect.height(); rect.setHeight(rect.width()); rect.setWidth(h);
         if (progress->bottomToTop)
