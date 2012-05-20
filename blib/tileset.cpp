@@ -100,16 +100,13 @@ static QPixmap invertAlpha(const QPixmap & pix)
 }
 #endif
 
-Set::Set(const QImage &img, int xOff, int yOff, int width, int height, int round)
+Set::Set(const QImage &img, int xOff, int yOff, int width, int height)
 {
     if (img.isNull())
         { _isBitmap = false; return; }
 
     _isBitmap = img.depth() == 1;
     int w = qMax(1, width), h = qMax(1, height);
-
-    int i = xOff*2*round/100;
-    rndRect = QRect(i, i, i, i);
 
     int rOff = img.width() - xOff - w;
     int bOff = img.height() - yOff - h;
@@ -413,96 +410,6 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
     }
 
 #undef MAKE_FILL
-}
-
-void
-Set::outline(const QRect &r, QPainter *p, QColor c, int size) const
-{
-    PosFlags pf = _shape ? _shape : _defShape;
-    const int d = (size+1)/2-1;
-//    const int o = size%2;
-    QRect rect = r.adjusted(d,d,-d,-d);
-    if (rect.isNull())
-        return;
-
-    p->save();
-    p->setRenderHint(QPainter::Antialiasing, true);
-//    p->setClipRect(r);
-    QPen pen = p->pen();
-    pen.setColor(c); pen.setWidth(size);
-    p->setPen(pen); p->setBrush(Qt::NoBrush);
-
-    QList<QPainterPath> paths;
-    paths << QPainterPath();
-    QPoint end = rect.topLeft();
-    Set *that = const_cast<Set*>(this);
-
-    if (pf & Top)
-    {
-        if (pf & Right)
-        {
-            that->rndRect.moveTopRight(rect.topRight());
-            paths.last().arcMoveTo(rndRect, 0);
-            paths.last().arcTo(rndRect, 0, 90);
-        }
-        else
-            paths.last().moveTo(rect.topRight());
-        if (pf & Left)
-        {
-            that->rndRect.moveTopLeft(rect.topLeft());
-            paths.last().arcTo(rndRect, 90, 90);
-        }
-        else
-            paths.last().lineTo(rect.topLeft());
-    }
-    else
-        paths.last().moveTo(rect.topLeft());
-
-    if (pf & Left)
-    {
-        if (pf & Bottom)
-        {
-            that->rndRect.moveBottomLeft(rect.bottomLeft());
-            paths.last().arcTo(rndRect, 180, 90);
-        }
-        else
-            paths.last().lineTo(rect.bottomLeft());
-    }
-    else
-    {
-        if (!paths.last().isEmpty())
-            paths << QPainterPath();
-        paths.last().moveTo(rect.bottomLeft());
-    }
-
-    if (pf & Bottom)
-    {
-        if (pf & Right)
-        {
-            that->rndRect.moveBottomRight(rect.bottomRight());
-            paths.last().arcTo(rndRect, 270, 90);
-        }
-        else
-            paths.last().lineTo(rect.bottomRight());
-    }
-    else
-    {
-        if (!paths.last().isEmpty())
-            paths << QPainterPath();
-        paths.last().moveTo(rect.bottomRight());
-    }
-
-    if (pf & Right)
-    {
-        if (pf & Top)
-            paths.last().connectPath(paths.first());
-        else
-            paths.last().lineTo(rect.topRight());
-    }
-
-    for (int i = 0; i < paths.count(); ++i)
-        p->drawPath(paths.at(i));
-    p->restore();
 }
 
 const QPixmap &Set::corner(PosFlags pf) const
