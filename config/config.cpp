@@ -299,6 +299,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.bgMode, BG_MODE);
     handleSettings(ui.bgIntensity, BG_INTENSITY);
     handleSettings(ui.ringOverlay, BG_RING_OVERLAY);
+    handleSettings(ui.roundness, ROUNDNESS);
 #if BESPIN_ARGB_WINDOWS
     handleSettings(ui.argbOpacity, BG_OPACITY);
     setContextHelp(ui.argbSupport, "<b>Window Opacity</b><hr>\
