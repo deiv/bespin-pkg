@@ -28,6 +28,7 @@ using namespace Bespin;
 
 static QColor black = Qt::black;
 static float scale = 0.0, intensity = 0.0;
+static int roundness = 0;
 #define SET_ALPHA(_A_) black.setAlpha(_A_); p.setBrush(black)
 #define WHITE(_A_) QColor(255,255,255, _A_)
 #define BLACK(_A_) QColor(0,0,0, _A_)
@@ -38,13 +39,14 @@ void
 Style::generatePixmaps()
 {
     // interestingly every kde application creates _2_ style instances... OUCH!
-    if (config.scale == scale && intensity == config.shadowIntensity)
+    if (config.scale == scale && intensity == config.shadowIntensity && roundness == config.roundness)
         return;
 
     intensity = config.shadowIntensity;
     scale = config.scale;
 
     Elements::setShadowIntensity( config.shadowIntensity );
+    Elements::setRoundness( config.roundness );
 
     const int f9 = F(9); const int f11 = SCALE(11);
     const int f17 = SCALE(17); const int f19 = SCALE(19);
@@ -58,10 +60,10 @@ Style::generatePixmaps()
             { s = f17; r = 99; }
         else
             { s = f9; r = 70; }
-        masks.rect[i] = Tile::Set(Elements::roundedMask(s, r),s/2,s/2,1,1, r);
+        masks.rect[i] = Tile::Set(Elements::roundedMask(s, r),s/2,s/2,1,1);
         masks.rect[i].sharpenEdges();
     }
-    masks.windowShape = Tile::Set(Elements::roundedMask(9, 99),4,4,1,1, 99);
+    masks.windowShape = Tile::Set(Elements::roundedMask(9, 99),4,4,1,1);
 
     // SHADOWS ===============================
     // sunken

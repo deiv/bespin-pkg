@@ -507,6 +507,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.view.shadeRole = (QPalette::ColorRole) iSettings->value(VIEW_SHADE_ROLE).toInt();
 
     // General ===========================
+    config.roundness = readInt(ROUNDNESS);
     config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;
     config.scale = 1.0f;
     const char *scale = getenv("BESPIN_SCALE");
