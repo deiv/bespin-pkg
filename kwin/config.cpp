@@ -97,7 +97,7 @@ Config::Config(QWidget* parent) : BConfig(parent)
     setContextHelp(ui.verticalTitlebar, "<b>Vertical Titlebar</b><hr>Could be usefull...");
 
     handleSettings(ui.roundCorners, "RoundCorners", true);
-    ui.roundCorners->hide();
+//     ui.roundCorners->hide();
 
     handleSettings(ui.trimmTitle, "TrimmCaption", true);
     setContextHelp(ui.trimmTitle, "<b>Trimm Title</b><hr>\
