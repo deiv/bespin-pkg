@@ -29,7 +29,8 @@ using namespace Bespin;
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 // #define fillRect2(_R_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_R_)
 
-#define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) drawRoundedRect(QRectF(_X_, _Y_, _W_, _H_), _RX_, _RY_, Qt::RelativeSize)
+#define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) \
+    drawRoundedRect(QRectF(_X_, _Y_, _W_, _H_), ourRoundness*(_RX_)/100, ourRoundness*(_RY_)/100, Qt::RelativeSize)
 
 #define SCALE(_N_) lround(_N_*ourScale)
 
@@ -66,11 +67,13 @@ Elements::renderButtonLight(Tile::Set &set)
 #endif
 
 static float ourShadowIntensity = 1.0;
-void
-Elements::setShadowIntensity(float intensity) { ourShadowIntensity = intensity; }
+void Elements::setShadowIntensity(float intensity) { ourShadowIntensity = intensity; }
+
 static float ourScale = 1.0;
-void
-Elements::setScale(float scale) { ourScale = scale; }
+void Elements::setScale(float scale) { ourScale = scale; }
+
+static int ourRoundness = 100;
+void Elements::setRoundness(int r) { ourRoundness = qMax(qMin(r,100),0); }
 
 QImage
 Elements::glow(int size, float width)
@@ -113,7 +116,7 @@ QImage
 Elements::roundedMask(int size, int factor)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
-    p.drawRoundedRect(img.rect(), factor, factor, Qt::RelativeSize);
+    p.drawRoundedRect(img.rect(), ourRoundness*factor/100, ourRoundness*factor/100, Qt::RelativeSize);
     p.end();
     return img;
 }
