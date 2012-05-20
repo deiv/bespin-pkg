@@ -57,12 +57,13 @@ type(QFrame::Shadow shadow)
    }
 }
 
+static int s_cornerSize = 4;
 void
 VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer)
 {
 
     // first call, generate corner regions
-    if (corner[North].isEmpty())
+    if (corner[North].isEmpty() && s_cornerSize)
     {
         int f5 = 4; // TODO: make this value dynamic!
         QBitmap bm(2*f5, 2*f5);
@@ -93,6 +94,12 @@ VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect 
     extends[t][South] = outer.bottom() - 99;
     extends[t][East] = outer.right() - 99;
     extends[t][West] = -outer.x();
+}
+
+void
+VisualFrame::setRoundness(int r)
+{
+    s_cornerSize = r*4/100;
 }
 
 class StdChildAdd : public QObject

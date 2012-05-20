@@ -68,6 +68,7 @@ public:
     static void setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect &outer);
     static bool manage(QFrame *frame);
     static void release(QFrame *frame);
+    static void setRoundness(int r);
     static void setStyle(QStyle *style) { ourStyle = style; };
     inline static QStyle *style() { return ourStyle; };
 public slots:

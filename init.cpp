@@ -688,6 +688,7 @@ Style::init(const QSettings* settings)
     generatePixmaps();
     Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
                     config.bg.structure, config.bg.intensity, F(8), false, config.groupBoxMode == 2);
+    VisualFrame::setRoundness(config.scale*config.roundness);
     int f1 = F(1), f3 = F(3), f4 = F(4);
     QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
     inner.adjust(f4,f4,-f4,-f1); outer.adjust(0,0,0,F(2));
