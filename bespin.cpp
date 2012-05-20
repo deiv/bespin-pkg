@@ -420,7 +420,7 @@ static QStyle::SubElement subcontrols[N_CustomSubElements];
 enum ElementType { SH, CE, SE };
 static QMap<QString, int> styleElements; // yes. one is enough...
 // NOTICE: using QHash instead QMap is probably overhead, there won't be too many items per app
-static int counter[3] = { X_KdeBase+3 /*sic!*/, X_KdeBase, X_KdeBase };
+static uint counter[3] = { X_KdeBase+3 /*sic!*/, X_KdeBase, X_KdeBase };
 
 void
 Style::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
