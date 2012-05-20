@@ -198,10 +198,10 @@ drawShape(QPainter *p, int s, int round, int x = 0, int y = 0, bool outline = tr
 {
     s -= 2;
     p->setPen(QPen(QColor(0,0,0,50),2));
-    p->drawRoundedRect(x+1,y+2,s,s, round, Qt::RelativeSize);
+    p->drawRoundedRect(x+1,y+2,s,s, round, round,  Qt::RelativeSize);
     p->setBrush(Qt::NoBrush);
     p->setPen(QPen(QColor(255,255,255, outline ? 30 : 15),1));
-    p->drawRoundedRect(x,y+1,s+2,s, round, Qt::RelativeSize);
+    p->drawRoundedRect(x,y+1,s+2,s, round, round, Qt::RelativeSize);
 }
 
 static QPixmap renderPix;
