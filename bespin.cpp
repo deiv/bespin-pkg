@@ -689,8 +689,13 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
         inactive[Fg]    = config.kwin.inactive_role[Fg];
         active[Bg]      = config.kwin.active_role[Bg];
         active[Fg]      = config.kwin.active_role[Fg];
-        text[0]         = config.kwin.text_role[0];
-        text[1]         = config.kwin.text_role[1];
+        if (widget->isModal() && config.bg.modal.invert) {
+            // We do not know what kind of color combo we end up with here
+            text[0] = text[1] = QPalette::WindowText;
+        } else {
+            text[0]     = config.kwin.text_role[0];
+            text[1]     = config.kwin.text_role[1];
+        }
     }
 
 
