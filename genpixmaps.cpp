@@ -145,6 +145,7 @@ Style::generatePixmaps()
     for (int r = 0; r < 2; ++r)
     {
         int s = r ? f17 : f9;
+        s = qMax(int(2.*2.25*config.scale)+1, config.roundness*s/100);
         lights.glow[r] = Tile::Set(Elements::glow(s, 2.25*config.scale), s/2,s/2,1,1);
         lights.glow[r].setDefaultShape(Tile::Ring);
     }
@@ -162,7 +163,7 @@ Style::generatePixmaps()
         shadows.slider[i][true] = Elements::shadow(Dpi::target.SliderControl-F(2), i,true);
     }
     lights.slider = Elements::shadow(Dpi::target.SliderControl, true, false, 3.0);
-    masks.slider = Elements::roundMask(Dpi::target.SliderControl-F(4));
+    masks.slider = Elements::roundedMask(Dpi::target.SliderControl-F(4), 99);
     // ================================================================
 
     // RADIOUTTON =====================================
@@ -173,7 +174,7 @@ Style::generatePixmaps()
         shadows.radio[i][true] = Elements::shadow(Dpi::target.ExclusiveIndicator-F(2), i,true);
     }
     // mask
-    masks.radio = Elements::roundMask(Dpi::target.ExclusiveIndicator-F(4));
+    masks.radio = Elements::roundedMask(Dpi::target.ExclusiveIndicator-F(4), 99);
     // mask fill
 #if 0
     masks.radioIndicator = roundMask(Dpi::target.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
@@ -181,11 +182,11 @@ Style::generatePixmaps()
     int s = (Dpi::target.ExclusiveIndicator)/(5 - (config.btn.layer == Inlay));
     s *= 2; // cause of int div...
     s += F(2); // cause sunken frame "outer" part covers F(2) pixels
-    masks.radioIndicator = Elements::roundMask(Dpi::target.ExclusiveIndicator - s);
+    masks.radioIndicator = Elements::roundedMask(Dpi::target.ExclusiveIndicator - s, 99);
 #endif
     // ================================================================
     // NOTCH =====================================
-    masks.notch = Elements::roundMask(F(6));
+    masks.notch = Elements::roundedMask(F(6), 99);
     // ================================================================
 
 
