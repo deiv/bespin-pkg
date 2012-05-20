@@ -65,21 +65,20 @@ VisualFrame::setGeometry(QFrame::Shadow shadow, const QRect &inner, const QRect 
     // first call, generate corner regions
     if (corner[North].isEmpty() && s_cornerSize)
     {
-        int f5 = 4; // TODO: make this value dynamic!
-        QBitmap bm(2*f5, 2*f5);
+        QBitmap bm(2*s_cornerSize, 2*s_cornerSize);
         bm.fill(Qt::black);
         QPainter p(&bm);
         p.setPen(Qt::NoPen);
         p.setBrush(Qt::white);
-        p.drawEllipse(0,0,2*f5,2*f5);
+        p.drawEllipse(0,0,2*s_cornerSize,2*s_cornerSize);
         p.end();
         QRegion circle(bm);
-        corner[North] = circle & QRegion(0,0,f5,f5); // tl
-        corner[South] = circle & QRegion(f5,0,f5,f5); // tr
+        corner[North] = circle & QRegion(0,0,s_cornerSize,s_cornerSize); // tl
+        corner[South] = circle & QRegion(s_cornerSize,0,s_cornerSize,s_cornerSize); // tr
         corner[South].translate(-corner[South].boundingRect().left(), 0);
-        corner[West] = circle & QRegion(0,f5,f5,f5); // bl
+        corner[West] = circle & QRegion(0,s_cornerSize,s_cornerSize,s_cornerSize); // bl
         corner[West].translate(0, -corner[West].boundingRect().top());
-        corner[East] = circle & QRegion(f5,f5,f5,f5); // br
+        corner[East] = circle & QRegion(s_cornerSize,s_cornerSize,s_cornerSize,s_cornerSize); // br
         corner[East].translate(-corner[East].boundingRect().topLeft());
     }
 
