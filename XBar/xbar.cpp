@@ -409,11 +409,17 @@ XBar::registerMenu(const QString &service, qlonglong key, const QString &title, 
 
 
     // replace older versions - in case
-    delete d.menus.take( key );
+    MenuBar *oldBar = d.menus.take( key );
     d.menus.insert( key, newBar );
 
-    // add hidden
-    newBar->hide();
+    if (d.currentBar == oldBar) {
+        d.currentBar = newBar;
+        newBar->show();
+    } else {
+        // add hidden
+        newBar->hide();
+    }
+    delete oldBar;
 }
 
 void
