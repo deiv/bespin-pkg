@@ -52,6 +52,7 @@ public:
     inline qlonglong key() const { return d.key; }
     inline int openPopup() const { return d.openPopup; }
     inline void setAppTitle(const QString &title) { d.appTitle = title; }
+    static void setGlowColor(QColor bg);
     QGraphicsView *view() const;
 signals:
     void hovered(int);
