@@ -27,6 +27,21 @@
 #include "FX.h"
 #include "tileset.h"
 
+#ifdef Q_WS_X11
+#include <QX11Info>
+#include <X11/Xlib.h>
+
+#ifndef QT_NO_XRENDER
+#include <X11/extensions/Xrender.h>
+#endif
+
+#include "fixx11h.h"
+#else
+
+#define QT_NO_XRENDER #
+
+#endif
+
 #include <QtDebug>
 
 using namespace Tile;
@@ -355,13 +370,13 @@ _texPix && (!pixmap[_TILE_].hasAlphaChannel() ||\
         checkRect.setRect(xOff, bOff, w, blh);
         if (w > 0 && !pixmap[BtmMid].isNull() && UNCLIPPED)
         {   // lower line
-            if (NEED_RECT_FILL(TopMid))
+            if (NEED_RECT_FILL(BtmMid))
                 p->drawTiledPixmap(checkRect, *_texPix, QPoint(xOff, bOff) - off);
             else
             {
                 tile = &pixmap[BtmMid];
                 MAKE_FILL(QPoint(xOff, bOff));
-                p->drawTiledPixmap(checkRect, *tile);
+                p->drawTiledPixmap(checkRect, *tile, QPoint(0, height(BtmLeft)-blh));
             }
         }
     }

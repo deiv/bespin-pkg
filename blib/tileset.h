@@ -23,21 +23,6 @@
 #include <QRect>
 #include <QHash>
 
-#ifdef Q_WS_X11
-#include <QX11Info>
-#include <X11/Xlib.h>
-
-#ifndef QT_NO_XRENDER
-#include <X11/extensions/Xrender.h>
-#endif
-
-#include "fixx11h.h"
-#else
-
-#define QT_NO_XRENDER #
-
-#endif
-
 #include "gradients.h"
 
 namespace Tile
