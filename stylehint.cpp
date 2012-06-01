@@ -88,6 +88,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return 0; // no space between menus and docks (we need padding rather than margin)
 ///    case SH_FontDialog_SelectAssociatedText: // Select the text in the line edit, or when selecting an item from the listbox, or when the line edit receives focus, as done on Windows.
 ///    case SH_Menu_AllowActiveAndDisabled: // Allows disabled menu items to be active.
+    case QStyle::SH_Menu_FadeOutOnHide:
+        return false;
     case SH_Menu_SpaceActivatesItem:
         return true; // yes
     case SH_Menu_SubMenuPopupDelay:
@@ -127,6 +129,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
 ///    case SH_Workspace_FillSpaceOnMaximize: // The workspace should maximize the client area.
     case SH_TitleBar_NoBorder:
         return true; // The title bar has no border.
+    case SH_ScrollBar_RollBetweenButtons:
+        return true;
     case SH_ScrollBar_StopMouseOverSlider:
         return false; // Stops auto-repeat when the slider reaches the mouse position. (hähh?)
     case SH_BlinkCursorWhenTextSelected:
