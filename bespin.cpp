@@ -1176,7 +1176,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
 #endif
-        if ( Hacks::config.extendDolphinViews && object->inherits("DolphinViewContainer") )
+        if ( Hacks::config.extendDolphinViews &&
+             !Hacks::config.transparentDolphinView && object->inherits("DolphinViewContainer") )
         {
             QWidget *w = static_cast<QWidget*>(object);
             QPainter p(w);
@@ -1344,7 +1345,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if ( ( widget->isWindow() && config.menu.round &&
              ((widget->windowType() == Qt::ToolTip && widget->inherits("QTipLabel")) || qobject_cast<QMenu*>(widget) ||
              (isDock = qobject_cast<QDockWidget*>(widget)) ) ) ||
-             ( Hacks::config.extendDolphinViews && widget->inherits("DolphinViewContainer") ) )
+             ( Hacks::config.extendDolphinViews &&
+               !Hacks::config.transparentDolphinView && widget->inherits("DolphinViewContainer") ) )
             shapeCorners( widget, isDock );
 
         //BEGIN BLURRING REGIONS ======================================
@@ -1752,7 +1754,7 @@ inline static bool isDolphinView(const QWidget *w, QWidget **grampa)
 void
 Style::focusWidgetChanged( QWidget *old, QWidget *focusWidget )
 {
-    if ( Hacks::config.extendDolphinViews )
+    if ( Hacks::config.extendDolphinViews && !Hacks::config.transparentDolphinView )
     {
         QWidget *grampa = 0;
         if ( isDolphinView(focusWidget, &grampa) )

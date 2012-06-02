@@ -624,27 +624,37 @@ Style::polish( QWidget * widget )
                 if (QWidget *grampa = frame->parentWidget()->parentWidget())
                 {
                     frame->setFrameStyle(QFrame::NoFrame);
-                    grampa->setBackgroundRole(QPalette::Base);
-                    grampa->setForegroundRole(QPalette::Text);
+                    if (!Hacks::config.transparentDolphinView) {
+                        grampa->setBackgroundRole(QPalette::Base);
+                        grampa->setForegroundRole(QPalette::Text);
+                    }
                     QWidgetList kids = grampa->findChildren<QWidget*>();
                     foreach (QWidget *kid, kids)
                     {
-                        kid->setBackgroundRole(QPalette::Base);
-                        kid->setForegroundRole(QPalette::Text);
-                        if ( kid->inherits("KonqStatusBarMessageLabel") || kid->inherits("StatusBarMessageLabel")) // hey, why not some pointless renames...
-                        {   // hardcoded paint colors... bwuahahahaaaa :-(
-                            QPalette pal = kid->palette();
-                            pal.setColor( QPalette::WindowText, pal.color(QPalette::Text) );
-                            kid->setPalette(pal);
+                        if (Hacks::config.transparentDolphinView)
+                            kid->setAutoFillBackground(false);
+                        else {
+                            kid->setBackgroundRole(QPalette::Base);
+                            kid->setForegroundRole(QPalette::Text);
+                            if ( kid->inherits("KonqStatusBarMessageLabel") ||
+                                // hey, why not some pointless renames...
+                                kid->inherits("StatusBarMessageLabel")) {
+                                // hardcoded paint colors... bwuahahahaaaa :-(
+                                QPalette pal = kid->palette();
+                                pal.setColor( QPalette::WindowText, pal.color(QPalette::Text) );
+                                kid->setPalette(pal);
+                            }
                         }
                     }
-                    grampa->setAutoFillBackground(true);
-                    grampa->setContentsMargins(F(4),F(1),F(4),F(1));
-                    FILTER_EVENTS(grampa);
-                    int l,t,r,b;
-                    grampa = grampa->window();
-                    grampa->getContentsMargins(&l,&t,&r,&b);
-                    grampa->setContentsMargins(l,t,r,qMax(b,F(3)));
+                    if (!Hacks::config.transparentDolphinView) {
+                        grampa->setAutoFillBackground(!Hacks::config.transparentDolphinView);
+                        grampa->setContentsMargins(F(4),F(1),F(4),F(1));
+                        FILTER_EVENTS(grampa);
+                        int l,t,r,b;
+                        grampa = grampa->window();
+                        grampa->getContentsMargins(&l,&t,&r,&b);
+                        grampa->setContentsMargins(l,t,r,qMax(b,F(3)));
+                    }
                 }
             }
             if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )

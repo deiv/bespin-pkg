@@ -475,6 +475,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     The three items for a unity when eg. splitting the view, but this is not reflected visually what\
     leads to \"disalignment\"");
 
+    handleSettings(ui.hackDolphinIconViewsTransparent, HACK_DOLPHIN_ICONVIEWS_TRANSPARENT);
+    setContextHelp(ui.hackDolphinIconViewsTransparent, "<b>Transparent Dolphin Iconviews</b><hr>\
+    removes the white ground in the main dolphin icon view and paints the item directly on the background");
+
     handleSettings(ui.dolphinViews, HACK_DOLPHIN_VIEWS);
     setContextHelp(ui.dolphinViews, "<b>Dolphin sidebar</b><hr>\
     Dolphin sets some views in the sidebars to look like the window - check this to force a\
