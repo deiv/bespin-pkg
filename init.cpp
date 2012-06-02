@@ -601,24 +601,18 @@ void Style::initMetrics()
 
     Dpi::target.ScrollBarExtent = SCALE(config.scroll.sliderWidth);
     Dpi::target.ScrollBarSliderMin = SCALE(40);
-    if (config.scroll.sliderWidth < 13)
-    {
+    if (config.scroll.sliderWidth < 13) {
         Dpi::target.SliderThickness = SCALE(14);
         Dpi::target.SliderControl = SCALE(14);
-    }
-    else
-    {
+    } else {
         Dpi::target.SliderThickness = SCALE(20);
         Dpi::target.SliderControl = SCALE(20);
     }
-    if (config.btn.layer == Inlay)
-    {
+    if (config.btn.layer == Inlay) {
         Dpi::target.Indicator = SCALE(20);
         Dpi::target.ExclusiveIndicator = SCALE(19);
-    }
-    else
-    {
-        Dpi::target.Indicator = SCALE(20 - 2*config.btn.layer);
+    } else {
+        Dpi::target.Indicator = SCALE(20 - 4*bool(config.btn.layer));
         Dpi::target.ExclusiveIndicator = SCALE(17); // forced sunken
     }
 }
