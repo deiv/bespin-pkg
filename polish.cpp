@@ -1082,7 +1082,9 @@ Style::polish( QWidget * widget )
         widget->setAutoFillBackground(false);
     }
 
-    if (config.bg.blur && (widget->autoFillBackground() || widget->testAttribute(Qt::WA_OpaquePaintEvent)))
+    if (config.bg.blur && (widget->autoFillBackground() ||
+                            (widget->testAttribute(Qt::WA_OpaquePaintEvent) &&
+                            !(widget->inherits("QScrollBar") || widget->inherits("QProgressBar")))))
         FILTER_EVENTS(widget);
 
     /// KHtml css colors can easily get messed up, either because i'm unsure about what colors

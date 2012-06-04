@@ -1060,7 +1060,7 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
             continue;
         QWidget *w = static_cast<QWidget*>(o);
         if ( w->isVisible() &&
-            ((w->autoFillBackground() && w->palette().color(w->backgroundRole()).alpha() > 160) || (w->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(w))) )
+            ((w->autoFillBackground() && w->palette().color(w->backgroundRole()).alpha() > 160) || (w->testAttribute(Qt::WA_OpaquePaintEvent) && !(qobject_cast<const QScrollBar*>(w) || w->inherits("QProgressBar")))) )
         {
             QPoint offset = w->mapTo(window, QPoint(0,0));
             if (w->mask().isEmpty())
@@ -1352,7 +1352,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         //BEGIN BLURRING REGIONS ======================================
         if ( config.bg.blur &&
             (widget->isWindow() || widget->autoFillBackground() ||
-            (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
+            (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !(qobject_cast<QScrollBar*>(widget) || widget->inherits("QProgressBar")))) &&
             (appType != Plasma || qobject_cast<QMenu*>(widget))  )
         {
             QWidget *window = widget->window();
@@ -1508,7 +1508,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
 
         if ( config.bg.blur && !widget->isWindow() &&
-            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
+            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !(qobject_cast<QScrollBar*>(widget) || widget->inherits("QProgressBar")))) &&
             appType != Plasma  )
         {
             QWidget *window = widget->window();
@@ -1554,7 +1554,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         /* why to blur on hide?
          * NOTICE: because it may expose a blurrable region, you moron!*/
         if ( config.bg.blur && !widget->isWindow() &&
-            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
+            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !(qobject_cast<QScrollBar*>(widget) || widget->inherits("QProgressBar")))) &&
             appType != Plasma  )
         {
             QWidget *window = widget->window();
