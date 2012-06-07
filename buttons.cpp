@@ -602,7 +602,7 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
         if (contrast > 10)
         {
             lights.glow[true].render(RECT, painter, FCOLOR(Highlight));
-            bg = Colors::mid(bg, FCOLOR(Highlight), contrast/5, 1);
+            bg = Colors::mid(bg, FCOLOR(Highlight), contrast/4, 1);
         }
     }
     masks.rect[true].render(r, painter, config.btn.layer == Inlay ? Gradients::Sunken : GRAD(chooser), ori[1], bg);
@@ -617,10 +617,10 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
 
     if (animStep > 0)
     {   // the drop ============================
-        QColor c = Colors::mid(CCOLOR(btn.std, Bg), CCOLOR(btn.std, Fg), 12-animStep, animStep);
+        QColor c = Colors::mid(bg, CCOLOR(btn.std, Fg), 12-animStep, animStep);
         const int off = (Dpi::target.ExclusiveIndicator - (masks.radioIndicator.height() + 1))/2;
         QPoint xy = r.topLeft() + QPoint(off, off);
-        const Gradients::Type gt = isEnabled ? GRAD(btn) : Gradients::None;
+        const Gradients::Type gt = isEnabled ? GRAD(chooser) : Gradients::None;
         fillWithMask(painter, xy, Gradients::pix(c, masks.radioIndicator.height(), ori[1], gt), masks.radioIndicator);
     }
 #endif
