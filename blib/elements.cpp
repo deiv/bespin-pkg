@@ -24,6 +24,14 @@
 #include "dpi.h"
 #include "elements.h"
 
+#ifdef WIN32
+// ... ohne worte ... ok: MSVC hat wirklich kein lround
+template<typename T>
+long lround(T d){
+    return (long)(d > 0 ? d + 0.5 : ceil(d - 0.5));
+}
+#endif
+
 using namespace Bespin;
 
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)

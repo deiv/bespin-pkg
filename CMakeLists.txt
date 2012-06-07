@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 2.4)
 add_definitions( ${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} -DQT3_SUPPORT )
 
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules )
+if(WIN32)
+    set(CMAKE_DEBUG_POSTFIX "d")
+endif(WIN32)
 
 option(ENABLE_ARGB "Enable translucent windows" ON)
 option(ENABLE_KDE "Enable Bespin support for KDE4" ON)
@@ -86,7 +89,11 @@ if (X11_Xrender_FOUND)
    target_link_libraries(bespin ${X11_Xrender_LIB})
 endif (X11_Xrender_FOUND)
 
-install (TARGETS bespin LIBRARY DESTINATION ${QT_PLUGINS_DIR}/styles)
+if(WIN32)
+    install (TARGETS bespin DESTINATION ${QT_PLUGINS_DIR}/styles)
+else(WIN32)
+    install (TARGETS bespin LIBRARY DESTINATION ${QT_PLUGINS_DIR}/styles)
+endif(WIN32)
 
 add_subdirectory (config)
 

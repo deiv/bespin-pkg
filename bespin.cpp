@@ -1721,7 +1721,7 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
                               pal.color(QPalette::Inactive, QPalette::Window),
                               pal.color(QPalette::Disabled, QPalette::Window) };
 //                         Colors::mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::Base),6,1)
-#define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
+#define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase),\
                                   Colors::contrast(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase)), 10)
             pal.setColor(QPalette::Active, QPalette::AlternateBase, ALT_BASE(QPalette::Active));
             pal.setColor(QPalette::Inactive, QPalette::AlternateBase, ALT_BASE(QPalette::Inactive));

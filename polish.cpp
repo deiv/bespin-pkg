@@ -42,7 +42,11 @@
 
 #include <QtDebug>
 
+#ifdef _MSC_VER
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 #include <cmath>
 
 #include "blib/colors.h"

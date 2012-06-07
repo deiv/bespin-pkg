@@ -257,17 +257,23 @@ Shadows::set(WId id, Shadows::Type t, bool storeToRoot)
 
 void Shadows::setColor(QColor c)
 {
+#ifdef Q_WS_X11
     color = c;
+#endif
 }
 
 void Shadows::setHalo(bool h)
 {
+#ifdef Q_WS_X11
     halo = h;
+#endif
 }
 
 void
 Shadows::setSize(int small, int big)
 {
+#ifdef Q_WS_X11
     size[0] = qMin(72, qMax(8, small));
     size[1] = qMin(72, qMax(8, big));
+#endif
 }

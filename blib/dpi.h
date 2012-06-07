@@ -30,7 +30,7 @@ typedef struct BLIB_EXPORT
     int Indicator;
     int ExclusiveIndicator;
 } Target;
-extern Target target;
+extern BLIB_EXPORT Target target;
 
 }
 }

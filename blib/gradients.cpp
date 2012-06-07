@@ -636,7 +636,7 @@ const QPixmap
         QColor dc = c.dark(i);
         for (i = 1; i < 6; ++i)
         {
-            float r = i*sqrt(i)*64.0/(6*sqrt(6));
+            float r = i*sqrt((float)i)*64.0f/(6.0f*sqrt(6.0f));
             p.setPen(QPen(Colors::mid(dc, c, 6-i, i-1), 2));
             p.drawEllipse(QPointF(32,32), r, r);
             for (int x = 0; x < 65; x+=64)
