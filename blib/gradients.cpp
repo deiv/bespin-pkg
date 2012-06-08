@@ -714,6 +714,12 @@ const QPixmap
             p.drawRect(i,j*8,8,8);
         break;
     }
+    case 14: { // stone / noise
+        p.setBrush(c);
+        p.setPen(Qt::NoPen);
+        p.drawRect(pix->rect());
+        p.drawTiledPixmap(pix->rect(), QPixmap::fromImage(FX::newDitherImage(qAbs(_bgIntensity-100), 64)));
+    }
     }
     p.end();
 

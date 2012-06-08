@@ -397,12 +397,13 @@ FX::desaturate(QImage &img, const QColor &c)
 
 static QPixmap _dither;
 QImage
-FX::newDitherImage(uint intensity)
+FX::newDitherImage(uint intensity, uint size)
 {
-    QImage img(32,32, QImage::Format_ARGB32);
+    QImage img(size,size, QImage::Format_ARGB32);
+    size = size*size;
     QRgb *pixel = (QRgb*)img.bits();
     int a, v;
-    for (int i = 0; i < 1024; ++i) // 32*32...
+    for (int i = 0; i < size; ++i) // 32*32...
     {
         a = (rand() % intensity)/2;
         v = (a%2)*255;
