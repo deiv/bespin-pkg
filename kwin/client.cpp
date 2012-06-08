@@ -1482,7 +1482,7 @@ Client::tileWindow(bool more, bool vertical, bool mirrorGravity)
     {
         if (!(sz = KWindowSystem::workArea().height()))
             return;
-        state = lround((double)tiles*height()/sz);
+        state = qRound((double)tiles*height()/sz);
         change = (qAbs(height()-state*sz/tiles) < 0.05*sz);
         flags |= 1<<11;
         mode = MaximizeVertical;
@@ -1491,7 +1491,7 @@ Client::tileWindow(bool more, bool vertical, bool mirrorGravity)
     {
         if (!(sz = KWindowSystem::workArea().width()))
             return;
-        state = lround((double)tiles*width()/sz);
+        state = qRound((double)tiles*width()/sz);
         change = (qAbs(width()-state*sz/tiles) < 0.05*sz);
         flags |= 1<<10;
         mode = MaximizeHorizontal;

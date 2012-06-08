@@ -32,7 +32,7 @@ static int roundness = 0;
 #define SET_ALPHA(_A_) black.setAlpha(_A_); p.setBrush(black)
 #define WHITE(_A_) QColor(255,255,255, _A_)
 #define BLACK(_A_) QColor(0,0,0, _A_)
-#define SCALE(_N_) lround(_N_*config.scale)
+#define SCALE(_N_) qRound(_N_*config.scale)
 
 
 void

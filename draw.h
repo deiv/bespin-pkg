@@ -59,7 +59,7 @@ setBold(QPainter *p, const QString &text = QString(), int w = -1)
         if (wb > w)
         {
             int wd = qMax(w-F(4), QFontMetrics(p->font()).size(Qt::TextShowMnemonic, text).width());
-            fnt.setStretch(lround(wd*100.0/wb));
+            fnt.setStretch(qRound(wd*100.0/wb));
         }
     }
     p->setFont(fnt);
@@ -85,7 +85,7 @@ setTitleFont(QPainter *p, const QString &text = QString(), int w = -1 )
         if (wb > w)
         {
             int wd = qMax(w-F(4), QFontMetrics(p->font()).size(Qt::TextShowMnemonic, text).width());
-            fnt.setStretch(lround(wd*100.0/wb));
+            fnt.setStretch(qRound(wd*100.0/wb));
         }
     }
 

@@ -24,14 +24,6 @@
 #include "dpi.h"
 #include "elements.h"
 
-#ifdef WIN32
-// ... ohne worte ... ok: MSVC hat wirklich kein lround
-template<typename T>
-long lround(T d){
-    return (long)(d > 0 ? d + 0.5 : ceil(d - 0.5));
-}
-#endif
-
 using namespace Bespin;
 
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
@@ -40,7 +32,7 @@ using namespace Bespin;
 #define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) \
     drawRoundedRect(QRectF(_X_, _Y_, _W_, _H_), ourRoundness*(_RX_)/100, ourRoundness*(_RY_)/100, Qt::RelativeSize)
 
-#define SCALE(_N_) lround(_N_*ourScale)
+#define SCALE(_N_) qRound(_N_*ourScale)
 
 
 #define EMPTY_PIX(_W_, _H_) \
@@ -135,8 +127,8 @@ Elements::sunkenShadow(int size, bool enabled)
     EMPTY_PIX(size, size);
 
     int add = enabled*30;
-    const int add2 = lround(80./F(4));
-    const int rAdd = lround(25./F(4));
+    const int add2 = qRound(80./F(4));
+    const int rAdd = qRound(25./F(4));
 
     // draw a flat shadow
     SET_ALPHA(sqrt(ourShadowIntensity) * (55 + add));
@@ -204,7 +196,7 @@ Elements::groupShadow(int size)
     int f33 = SCALE(33);
     for (int i = 1; i < f33; ++i)
     {
-        p.setPen(BLACK(CLAMP(i*lround(255.0/F(32)),0,255)));
+        p.setPen(BLACK(CLAMP(i*qRound(255.0/F(32)),0,255)));
         p.drawLine(0, size-i, size, size-i);
     }
     p.end();

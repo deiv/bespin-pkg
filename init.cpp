@@ -585,7 +585,7 @@ Style::readSettings(const QSettings* settings, QString appName)
 #undef readRole
 #undef gradientType
 
-#define SCALE(_N_) lround((_N_)*config.scale)
+#define SCALE(_N_) qRound((_N_)*config.scale)
 
 void Style::initMetrics()
 {

@@ -16,8 +16,12 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#ifdef WIN32
 #define _USE_MATH_DEFINES
+#include <math.h>
+#else
 #include <cmath>
+#endif
 #include "animator/hovercomplex.h"
 #include "draw.h"
 
