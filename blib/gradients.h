@@ -44,7 +44,7 @@ public:
 namespace Gradients {
 
 enum Type {
-   None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, Shiny, //RadialGloss,
+   None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, Shiny, Stone, //RadialGloss,
    TypeAmount
 };
 

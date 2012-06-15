@@ -436,6 +436,7 @@ Gradients::endColor(const QColor &oc, Position p, Type type, bool cv)
     }
 }
 
+static QPixmap s_stoneDither;
 const QPixmap&
 Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type)
 {
@@ -488,6 +489,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         case Gradients::Glass:
             grad = gl_ssGradient(iC, start, stop, true); break;
         case Gradients::Simple:
+        case Gradients::Stone:
         default:
             grad = simpleGradient(iC, start, stop); break;
         case Gradients::Sunken:
@@ -501,7 +503,15 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         }
         if (c.alpha() < 255)
             pix->fill(Qt::transparent);
-        QPainter p(pix); p.fillRect(pix->rect(), grad); p.end();
+        QPainter p(pix); p.fillRect(pix->rect(), grad);
+        if (type == Gradients::Stone) {
+            if (s_stoneDither.isNull()) {
+                srand( 314159265 );
+                s_stoneDither = QPixmap::fromImage(FX::newDitherImage(32, 64));
+            }
+            p.drawTiledPixmap(pix->rect(), s_stoneDither);
+        }
+        p.end();
     }
 
     if (cache && cache->insert(magicNumber, pix, costs(pix)))

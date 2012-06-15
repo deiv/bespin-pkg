@@ -50,7 +50,7 @@
        <item row="3" column="2" colspan="2">
         <widget class="QTabWidget" name="tabWidget_2">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <property name="documentMode">
           <bool>false</bool>
@@ -112,6 +112,11 @@
              <item>
               <property name="text">
                <string>Shiny</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Stone</string>
               </property>
              </item>
              <item>
@@ -190,6 +195,11 @@
              <item>
               <property name="text">
                <string>Shiny</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Stone</string>
               </property>
              </item>
             </widget>
@@ -298,6 +308,11 @@
              </item>
              <item>
               <property name="text">
+               <string>Stone</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
                <string>Flat</string>
               </property>
              </item>
@@ -372,6 +387,11 @@
              <item>
               <property name="text">
                <string>Shiny</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Stone</string>
               </property>
              </item>
             </widget>

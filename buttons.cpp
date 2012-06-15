@@ -277,7 +277,9 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
         sunken = (sunken && !config.btn.cushion) || config.btn.layer == Sunken;
         // r == RECT at this point
         if (config.btn.layer == Inlay) {
-            const QColor sc = widget ? windowColor(widget) : FCOLOR(Window);
+            QColor sc = widget ? windowColor(widget) : FCOLOR(Window);
+//             if (Gradients::isReflective(GRAD(btn)))
+//                 sc = Colors::mid(sc, c);
             masks.rect[true].render(r, painter, Gradients::Sunken, Qt::Vertical, sc);
             const int f3 = F(3);
             if (round)

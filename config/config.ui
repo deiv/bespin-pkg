@@ -617,6 +617,12 @@
               </item>
               <item row="1" column="2">
                <widget class="QComboBox" name="structure">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="editable">
+                 <bool>false</bool>
+                </property>
                 <item>
                  <property name="text">
                   <string>Scanlines</string>
@@ -1418,8 +1424,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
-               <height>171</height>
+               <width>271</width>
+               <height>157</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1951,8 +1957,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>480</width>
-               <height>284</height>
+               <width>295</width>
+               <height>244</height>
               </rect>
              </property>
              <attribute name="label">
