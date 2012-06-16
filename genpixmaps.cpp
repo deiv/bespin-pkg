@@ -80,7 +80,7 @@ Style::generatePixmaps()
     // relief
     for (int r = 0; r < 2; ++r)
     {
-        int s = r ? f17 : f11;
+        int s = r ? f17 : f9;
         for (int i = 0; i < 2; ++i)
         {
             shadows.relief[r][i] = Tile::Set(Elements::relief(s, i), s/2,s/2,1,1);
