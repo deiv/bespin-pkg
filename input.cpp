@@ -88,7 +88,7 @@ Style::drawLineEdit(const QStyleOption *option, QPainter *painter, const QWidget
         else
             mask.render(r, painter, Gradients::Sunken, Qt::Vertical, FCOLOR(Base));
         if (hasFocus)
-            lights.glow[round].render(RECT, painter, FCOLOR(Highlight));
+            lights.glow[round].render(RECT.adjusted(-1, -1, 1, -1), painter, FCOLOR(Highlight));
     }
     if (appType == GTK)
         shadows.fallback.render(RECT,painter);
