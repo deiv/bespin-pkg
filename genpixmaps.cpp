@@ -135,13 +135,14 @@ Style::generatePixmaps()
     // ================================================================
 
     // LIGHTS ==================================
+    Elements::setShadowIntensity(1.6);
     for (int r = 0; r < 2; ++r)
     {
         int s = r ? f17 : f11;
         lights.rect[r] = Tile::Set(Elements::shadow(s, true, false, 3.0), s/2,s/2,1,1);
         lights.rect[r].setDefaultShape(Tile::Ring);
     }
-
+    Elements::setShadowIntensity(config.shadowIntensity);
     for (int r = 0; r < 2; ++r)
     {
         int s = r ? f17 : f9;
