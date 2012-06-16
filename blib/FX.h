@@ -67,7 +67,7 @@ namespace FX
     BLIB_EXPORT QPixmap fade(const QPixmap &pix, double percent);
     BLIB_EXPORT QPixmap tint(const QPixmap &mask, const QColor &color);
     BLIB_EXPORT QPixmap applyAlpha( const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect &rect = QRect(), const QRect &alphaRect = QRect());
-    BLIB_EXPORT void expblur(QImage &img, int radius);
+    BLIB_EXPORT void expblur(QImage &img, int radius, Qt::Orientations o = Qt::Horizontal|Qt::Vertical );
 //    QPixmap applyAlpha(const QPixmap &toThisPix,
 //                       const OXPicture &fromThisPict,
 //                       const QRect &rect = QRect(),
