@@ -293,6 +293,7 @@ Button::mouseReleaseEvent ( QMouseEvent *event )
     repaint();
 }
 
+// static uint fcolors[3] = {0x9C3A3A/*0xFFBF0303*/, 0xFFEB55/*0xFFF3C300*/, 0x77B753/*0xFF00892B*/};
 static uint fcolors[3] = {0xFFBF0303, 0xFFF3C300, 0xFF00892B};
 
 QColor
@@ -322,6 +323,8 @@ Button::color( bool background ) const
     return c;
 }
 
+static QPixmap s_buttonMask[2];
+
 void
 Button::paintEvent(QPaintEvent *)
 {
@@ -329,51 +332,52 @@ Button::paintEvent(QPaintEvent *)
     if (!bgPix.isNull())
         p.drawPixmap(0,0, bgPix);
 
-    if ( Factory::buttonGradient() != Gradients::None )
-    {
-        const QColor bg = color(true);
-        const float t = (height()-2)/2.0;
-        const float fs = (height()-2)/99.0;
-
-        p.end();
-        QPixmap mask(size());
-        mask.fill(Qt::transparent);
-        p.begin(&mask);
-        p.setPen(Qt::NoPen);
-        p.setBrush( Qt::white );
-        p.setRenderHint(QPainter::Antialiasing);
-        p.translate( QPoint(t,t) );
-        p.scale ( fs, fs );
-        p.drawPath(shape[myType]);
-        p.end();
-
-        p.begin(this);
-        const QColor c = color();
-        QPixmap texture(size());
-
-        texture.fill(Colors::mid(c, Qt::black, 5,4));
-        p.drawPixmap(0,0, FX::applyAlpha( texture, mask ) );
-
-        texture.fill(Colors::mid(bg, Qt::white ));
-        p.drawPixmap(0,2, FX::applyAlpha( texture, mask ) );
-
-        QRectF br = shape[myType].boundingRect();
-        br.setRect( 0, t + br.y()*fs, texture.width(), br.height() * fs );
-        texture.fill(Qt::transparent);
+    const int slick = Factory::slickButtons();
+    QRectF r(rect());
+    if (Factory::buttonnyButton()) {
+        float d = r.height() / 4.0;
+        r.adjust(d,d,-d,-d);
+        if (s_buttonMask[0].size() != size()) {
+            s_buttonMask[0] = QPixmap(size());
+            s_buttonMask[1] = QPixmap(width() - 6, height() - 6);
+            s_buttonMask[0].fill(Qt::transparent);
+            s_buttonMask[1].fill(Qt::transparent);
+            QPainter p(&s_buttonMask[0]);
+            p.setRenderHint(QPainter::Antialiasing);
+            QPoint start(0,0), stop(0,s_buttonMask[0].height());
+            QLinearGradient lg(start, stop);
+            lg.setColorAt(0, QColor(0,0,0,92));
+            lg.setColorAt(1, QColor(255,255,255,92));
+            p.setPen(Qt::NoPen);
+            p.setBrush(lg);
+            p.drawEllipse(s_buttonMask[0].rect());
+            p.end();
+            p.begin(&s_buttonMask[1]);
+            p.setRenderHint(QPainter::Antialiasing);
+            p.setPen(Qt::NoPen);
+            p.setBrush(Qt::black);
+            p.drawEllipse(s_buttonMask[1].rect());
+            p.end();
+        }
+        QPixmap texture(s_buttonMask[1].size());
         QPainter p2(&texture);
-        p2.drawTiledPixmap(br, Gradients::pix(c, br.height(), Qt::Vertical, (state & Sunken) ? Gradients::Sunken : Factory::buttonGradient()));
+        const bool rFixedColors = fixedColors;
+        fixedColors = false;
+        QColor c(color(true)); c.setAlpha(255);
+        fixedColors = rFixedColors;
+        p2.drawTiledPixmap(s_buttonMask[1].rect(), Gradients::pix(c, s_buttonMask[1].height(), Qt::Vertical,
+                                                  (state & Sunken) ? Gradients::Sunken : Factory::buttonGradient()));
         p2.end();
-        p.drawPixmap(0,1, FX::applyAlpha( texture, mask ) );
-        p.end();
 
-        return;
+        p.drawPixmap(0,0, s_buttonMask[0] );
+        p.setRenderHint(QPainter::Antialiasing);
+        p.drawPixmap(3,3, FX::applyAlpha( texture, s_buttonMask[1] ) );
     }
-    // else
 
     p.setRenderHint(QPainter::Antialiasing);
     p.setPen(Qt::NoPen);
-    p.setBrush(color());
-    const int slick = Factory::slickButtons();
+    const QColor c = color();
+    p.setBrush(c);
 
     float fx, fy;
     if (state & Sunken)
@@ -382,9 +386,11 @@ Button::paintEvent(QPaintEvent *)
     {
         if (!hoverLevel)
         {
-            const float s = width()/5.0;
-            p.drawRoundRect(s, 2*s, 3*s, s);
-            p.end(); return;
+            const float d = r.width()/5.0;
+            r.adjust(d,2*d,-d,-2*d);
+            p.drawRoundRect(r);
+            p.end();
+            return;
         }
 //             6/(b/a-1) = x
         fx = (9+hoverLevel)/15.0;
@@ -394,17 +400,20 @@ Button::paintEvent(QPaintEvent *)
     {
         if (!hoverLevel)
         {
-            const float s = height()/3.0;
-            p.drawEllipse(QRectF(s, s, s, s));
-            p.end(); return;
+            const float d = r.height()/3.0;
+            r.adjust(d,d,-d,-d);
+            p.drawEllipse(r);
+            p.end();
+            return;
         }
         fx = fy = (3+hoverLevel)/9.0;
     }
     else
         fx = fy = (18 + hoverLevel)/24.0;
-    const float fs = height()/99.0;
-    const float t = height()/2.0;
-    p.translate( QPoint(t,t) );
+    const float fs = r.height()/99.0;
+//     const float t = r.height()/2.0;
+//     p.translate( QPoint(t,t) );
+    p.translate( r.center() );
     p.scale ( fs*fx, fs*fy );
 //    p.rotate(60*hoverLevel); // too annoying, especially for fast zoom in...
     p.drawPath(shape[myType]);

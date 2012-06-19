@@ -45,7 +45,8 @@ typedef struct _Preset
 
 typedef struct
 {
-    bool forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons, verticalTitle, variableShadowSizes;
+    bool    forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons,
+            verticalTitle, variableShadowSizes, buttonnyButton;
     int slickButtons, titleAlign;
     Gradients::Type gradient[2][2], buttonGradient;
     QStringList smallTitleClasses;
@@ -64,6 +65,7 @@ public:
     bool supports( Ability ability ) const;
     inline static Gradients::Type buttonGradient() {return ourConfig.buttonGradient;}
     inline static int buttonSize(bool small) {return ourButtonSize[small];}
+    inline static bool buttonnyButton() {return ourConfig.buttonnyButton;}
     inline static int edgeSize() { return ourBorderSize[1] ? ourBorderSize[1] : !weAreComposited; }
     inline static int baseSize() { return ourBorderSize[0] ? ourBorderSize[0] : !weAreComposited; }
     inline static Qt::KeyboardModifier commandKey() { return ourCommandKey; }
