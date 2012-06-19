@@ -21,7 +21,9 @@
 #include <QMenuBar>
 #include "blib/colors.h"
 #include "bespin.h"
+#ifndef QT_NO_DBUS
 #include "macmenu.h"
+#endif
 #include "makros.h"
 
 #if  0 // QT_VERSION >= 0x040500 - no. see below!
@@ -76,6 +78,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_PrintDialog_RightAlignButtons:
         return true; // ok/cancel just belong there
     case SH_MainWindow_SpaceBelowMenuBar:
+#ifndef QT_NO_DBUS
         if (MacMenu::isActive())
         if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
         if (MacMenu::manages(menubar))
@@ -85,6 +88,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
             // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
             return -menubar->actionGeometry(menubar->actions().first()).height() + !config.UNO.title;
         }
+#endif
         return 0; // no space between menus and docks (we need padding rather than margin)
 ///    case SH_FontDialog_SelectAssociatedText: // Select the text in the line edit, or when selecting an item from the listbox, or when the line edit receives focus, as done on Windows.
 ///    case SH_Menu_AllowActiveAndDisabled: // Allows disabled menu items to be active.
@@ -132,7 +136,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_ScrollBar_RollBetweenButtons:
         return true;
     case SH_ScrollBar_StopMouseOverSlider:
-        return false; // Stops auto-repeat when the slider reaches the mouse position. (hähh?)
+        return true; // Stops auto-repeat when the slider reaches the mouse position.
     case SH_BlinkCursorWhenTextSelected:
 //         false; // that's annoying but ...
         return true; // ... great, this is now completely ignored anyway winblows ftw :-(

@@ -595,9 +595,13 @@ Style::serverSupportsShadows()
 }
 
 // X11 properties for the deco ---------------
-
+#ifndef QT_NO_DBUS
 #define MSG(_FNC_) QDBusMessage::createMethodCall( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco", _FNC_ )
 #define KWIN_SEND( _MSG_ ) QDBusConnection::sessionBus().send( _MSG_ )
+#else
+#define MSG(_FNC_) void(0)
+#define KWIN_SEND( _MSG_ ) void(0)
+#endif
 
 void
 Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])

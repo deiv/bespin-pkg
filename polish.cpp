@@ -53,8 +53,10 @@
 #include "blib/FX.h"
 #include "blib/shadows.h"
 
-#ifdef Q_WS_X11
+#ifndef QT_NO_DBUS
 #include "macmenu.h"
+#endif
+#ifdef Q_WS_X11
 #include "blib/xproperty.h"
 #endif
 
@@ -969,7 +971,7 @@ Style::polish( QWidget * widget )
             // catch resizes for gradient recalculation
             FILTER_EVENTS(mbar);
         }
-#ifdef Q_WS_X11
+#ifndef QT_NO_DBUS
         if ( appType != KDevelop ) //&& !(appType == QtDesigner && mbar->inherits("QDesignerMenuBar")) )
             MacMenu::manage(mbar);
 #endif
@@ -1159,7 +1161,7 @@ Style::unpolish( QWidget *widget )
     }
     if (QFrame *frame = qobject_cast<QFrame *>(widget))
         VisualFrame::release(frame);
-#ifdef Q_WS_X11
+#ifndef QT_NO_DBUS
     if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
         MacMenu::release(mbar);
 #endif

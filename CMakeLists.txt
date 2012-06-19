@@ -6,6 +6,7 @@ add_definitions( ${QT_DEFINITIONS} ${QT_QTDBUS_DEFINITIONS} -DQT3_SUPPORT )
 set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules )
 if(WIN32)
     set(CMAKE_DEBUG_POSTFIX "d")
+#     add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 endif(WIN32)
 
 option(ENABLE_ARGB "Enable translucent windows" ON)
@@ -65,20 +66,39 @@ add_definitions ( -DBLIB_EXPORT=Q_DECL_IMPORT )
 set (bespin_SOURCES animator/basic.cpp animator/aprogress.cpp animator/hover.cpp
 animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp
 bespin.cpp buttons.cpp docks.cpp frames.cpp genpixmaps.cpp hacks.cpp init.cpp
-input.cpp macmenu.cpp menus.cpp pixelmetric.cpp polish.cpp progress.cpp qsubcmetrics.cpp
+input.cpp menus.cpp pixelmetric.cpp polish.cpp progress.cpp qsubcmetrics.cpp
 scrollareas.cpp indicators.cpp sizefromcontents.cpp slider.cpp stdpix.cpp stylehint.cpp
 tabbing.cpp toolbars.cpp views.cpp visualframe.cpp window.cpp )
+
+set (bespin_HDRS animator/basic.h animator/aprogress.h animator/hover.h
+animator/hoverindex.h animator/tab.h config.h draw.h hacks.h splitterproxy.h visualframe.h bespin.h types.h)
+
+
+file(GLOB bespin_HDRS *.h)
+list(APPEND bespin_HDRS animator/basic.h animator/aprogress.h animator/hover.h animator/hoverindex.h animator/hovercomplex.h animator/tab.h)
 
 # if ( X11_FOUND )
 #     set (bespin_SOURCES ${bespin_SOURCES} lib/xproperty.cpp)
 # endif ( X11_FOUND )
 
 set (bespin_MOC_HDRS animator/basic.h animator/aprogress.h animator/hover.h
-animator/hoverindex.h animator/tab.h
-bespin.h visualframe.h hacks.h macmenu.h macmenu-dbus.h)
+animator/hoverindex.h animator/tab.h bespin.h visualframe.h hacks.h)
+
+if(QT_QTDBUS_FOUND)
+    message (STATUS "QtDbus available - Style will support XBar")
+    set (bespin_MOC_HDRS ${bespin_MOC_HDRS} macmenu.h macmenu-dbus.h)
+    set (bespin_HDRS ${bespin_HDRS} macmenu.h macmenu-dbus.h)
+    set (bespin_HDRS ${bespin_SOURCES} macmenu.cpp)
+else(QT_QTDBUS_FOUND)
+    message (STATUS "WARNING: *** QtDBus  not found ***\n   ---> No KWin deco and no XBar for you")
+    set (ENABLE_KWIN OFF)
+    set (ENABLE_XBAR OFF)
+    add_definitions ( -DQT_NO_DBUS )
+endif(QT_QTDBUS_FOUND)
+
 qt4_wrap_cpp(bespin_MOC_SRCS ${bespin_MOC_HDRS})
 
-add_library (bespin SHARED ${bespin_SOURCES} ${bespin_MOC_SRCS})
+add_library (bespin SHARED ${bespin_SOURCES} ${bespin_MOC_SRCS} ${bespin_HDRS})
 
 
 target_link_libraries(bespin QtBespin ${QT_QTDBUS_LIBRARY} ${QT_QT3SUPPORT_LIBRARY})

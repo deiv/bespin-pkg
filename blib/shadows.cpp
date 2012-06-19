@@ -27,11 +27,11 @@
 #include "FX.h"
 #include "shadows.h"
 #include "tileset.h"
-#include "xproperty.h"
 
 using namespace Bespin;
 
 #ifdef Q_WS_X11
+#include "xproperty.h"
 class ShadowManager : public QObject {
 public:
     ShadowManager() : QObject() {}
