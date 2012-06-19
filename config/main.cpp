@@ -21,11 +21,12 @@
 #include "dialog.h"
 #include <QDir>
 #include <QFile>
+#include <QProcess>
 #include <QSettings>
 #include <QStyleFactory>
 #include <QTimer>
 
-#define CHAR(_QSTRING_) _QSTRING_.toLatin1().data()
+#define CHAR(_QSTRING_) _QSTRING_.toLocal8Bit().data()
 #define RETURN_APP_ERROR int ret = app->exec(); delete window; delete app; return ret
 
 class BStyle : public QStyle
@@ -46,27 +47,32 @@ static int
 usage(const char* appname)
 {
    printf(
-"Usage:\n\
-==========================\n\
-%s [config]\t\t\t\t\t\tConfigure the Bespin Style\n\
-%s presets\t\t\t\t\t\tList the available Presets\n\
-%s demo [style]\t\t\t\t\tLaunch a demo, you can pass other stylenames\n\
-%s show <some_preset>\t\t\t\tOpen demo dialog with a preset\n\
-%s try <some_config.bespin>\t\t\t\tTry out an exported setting\n\
-%s sshot <some_file.png> [preset] [width]\t\tSave a screenshot\n\
-%s load <some_preset>\t\t\t\tLoad a preset to current settings\n\
-%s import <some_config.bespin>\t\t\tImport an exported setting\n\
-%s update <some_config.bespin>\t\t\tLike import, but overrides existing\n\
-%s export <some_preset> <some_config.bespin>\tExport an imported setting\n\
-%s listStyles \t\t\t\t\tList all styles on this System\n\
-%s loadPaletteFrom <style>\t\t\t\tLoad and store the default palette of a style\n",
-appname, appname, appname, appname, appname, appname, appname, appname, appname, appname, appname, appname );
+"Usage:\n"
+"==========================\n"
+"%s [config]\t\t\t\t\t\tConfigure the Bespin Style\n"
+"%s presets\t\t\t\t\t\tList the available Presets\n"
+"%s demo [style]\t\t\t\t\tLaunch a demo, you can pass other stylenames\n"
+"%s show <some_preset>\t\t\t\tOpen demo dialog with a preset\n"
+"%s try <some_config.bespin>\t\t\t\tTry out an exported setting\n"
+"%s sshot <some_file.png> [preset] [width]\t\tSave a screenshot\n"
+"%s load <some_preset>\t\t\t\tLoad a preset to current settings\n"
+"%s import <some_config.bespin>\t\t\tImport an exported setting\n"
+"%s update <some_config.bespin>\t\t\tLike import, but overrides existing\n"
+"%s export <some_preset> <some_config.bespin>\tExport an imported setting\n"
+"%s listStyles \t\t\t\t\tList all styles on this System\n"
+"%s loadPaletteFrom <style>\t\t\t\tLoad and store the default palette of a style\n"
+"%s read <style|deco> <key> [value]\t\t\tRead a config key (defaulting to optional value)\n"
+"%s write <style|deco> <key> <value>\t\t\tWrite a config key to value\n"
+"%s delete <style|deco> <key>\t\t\tRemove a config key\n"
+"%s list <style|deco> [filter]\t\t\tList config keys matching the optional filter\n",
+appname, appname, appname, appname, appname, appname, appname, appname,
+appname, appname, appname, appname, appname, appname, appname, appname );
    return 1;
 }
 
 enum Mode
 {
-    Invalid = 0, Configure, Presets, Import, Update, Export, Load, Demo, Try, Screenshot, ListStyles, Show, LoadPalette
+    Invalid = 0, Configure, Presets, Import, Update, Export, Load, Demo, Try, Screenshot, ListStyles, Show, LoadPalette, ReadSetting, WriteSetting, DeleteSetting, ListSettings
 };
 
 int
@@ -90,6 +96,10 @@ main(int argc, char *argv[])
         else if (!qstrcmp( argv[1], "load" )) mode = Load;
         else if (!qstrcmp( argv[1], "listStyles" )) mode = ListStyles;
         else if (!qstrcmp( argv[1], "loadPaletteFrom" )) mode = LoadPalette;
+        else if (!qstrcmp( argv[1], "read" )) mode = ReadSetting;
+        else if (!qstrcmp( argv[1], "write" )) mode = WriteSetting;
+        else if (!qstrcmp( argv[1], "delete" )) mode = DeleteSetting;
+        else if (!qstrcmp( argv[1], "list" )) mode = ListSettings;
     }
 
     switch (mode)
@@ -197,7 +207,7 @@ main(int argc, char *argv[])
         static_cast<BStyle*>(app->style())->init(&file);
 
         file.endGroup();
-    }
+    } // FALL THROUGH
     case Show:
     case Demo:
     {
@@ -267,6 +277,51 @@ main(int argc, char *argv[])
     {
         foreach (QString string, QStyleFactory::keys())
             printf("%s\n", CHAR(string));
+        return 0;
+    }
+    case ReadSetting:
+    case WriteSetting:
+    case DeleteSetting:
+    case ListSettings:
+    {
+        bool e = false;
+        bool deco = false;
+        if (argc < (mode == WriteSetting ? 5 : (mode == ListSettings ? 3 : 4)))
+            e = true;
+        else if (!qstrcmp( argv[2], "deco" ))
+            deco = true;
+        else if (qstrcmp( argv[2], "style" ))
+            e = true;
+        if (e)
+            return error(QString("try %1 %2 <style|deco> <key> [value]").arg(argv[0]).arg(argv[1]));
+        QSettings config("Bespin", "Style");
+        config.beginGroup(deco ? "Deco" : "Style");
+        const QString key = QString::fromLocal8Bit(argv[3]);
+        if (mode == ReadSetting)
+            printf("%s\n", CHAR(config.value(key, argc > 4 ? argv[4] : QVariant()).toString()));
+        else if (mode == DeleteSetting) {
+            if (config.contains(key))
+                config.remove(key);
+            else
+                return error(QString("there is no key \"%1\" in \"%2\"").arg(key).arg(argv[2]));
+        }
+        else if (mode == ListSettings) {
+            QStringList keys = config.childKeys();
+            if (argc > 3) {
+                keys = keys.filter(key, Qt::CaseInsensitive);
+            }
+            foreach (const QString &k, keys)
+                printf("%s : %s\n", CHAR(k), CHAR(config.value(k).toString()));
+        }
+        else
+        {
+            const bool added = !config.contains(QString::fromLocal8Bit(argv[3]));
+            config.setValue(QString::fromLocal8Bit(argv[3]), QString::fromLocal8Bit(argv[4]));
+            if (added)
+                printf("added new key \"%s\" set to \"%s\"\n", argv[3], argv[4]);
+            if (deco) // update kwin
+                QProcess::startDetached("qdbus", QStringList() << "org.kde.kwin" << "/KWin" << "reconfigure" );
+        }
         return 0;
     }
     default:
