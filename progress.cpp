@@ -114,16 +114,25 @@ Style::drawCapacityBar(const QStyleOption *option, QPainter *painter, const QWid
 }
 
 void
-Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *) const
+Style::drawSimpleProgress(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget, bool isListView) const
 {   // TODO: widget doesn't set a state - make bug report!
     OPT_ENABLED;
     if (appType == KTorrent)
         isEnabled = true; // ....
 
     const QStyleOptionProgressBarV2 *pb2 = qstyleoption_cast<const QStyleOptionProgressBarV2*>(option);
-    QPalette::ColorRole fg = QPalette::Text, bg = QPalette::Base;
-    if (option->state & State_Selected)
-        { fg = QPalette::HighlightedText; bg = QPalette::Highlight; }
+    QPalette::ColorRole fg, bg;
+    if (isListView) {
+        if (option->state & State_Selected)
+            { fg = QPalette::HighlightedText; bg = QPalette::Highlight; }
+        else
+            { fg = QPalette::Text; bg = QPalette::Base; }
+    } else {
+        if (widget)
+            { fg = widget->foregroundRole(); bg = widget->backgroundRole(); }
+        else
+            { fg = QPalette::WindowText; bg = QPalette::Window; }
+    }
 
     bool reverse = option->direction == Qt::RightToLeft;
     if (pb2 && pb2->invertedAppearance)
@@ -135,7 +144,8 @@ Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *pai
     QRect r = painter->boundingRect(RECT, Qt::AlignLeft | Qt::AlignVCenter, text);
 
     QPen oldPen = painter->pen();
-    painter->setPen(QPen(Colors::mid(COLOR(fg), COLOR(bg)), F(3)));
+    const int hght = isListView ? F(3) : RECT.height();
+    painter->setPen(QPen(Colors::mid(COLOR(fg), COLOR(bg), 1, 3), hght));
     if (vertical)
     {
         painter->drawLine(RECT.x(), RECT.top(), RECT.x(), RECT.bottom());
@@ -146,7 +156,7 @@ Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *pai
     else
     {
         painter->drawLine(RECT.left(), RECT.bottom(), RECT.right(), RECT.bottom());
-        painter->setPen(QPen(COLOR(fg), F(3)));
+        painter->setPen(QPen(COLOR(fg), hght));
         const int d = val*(RECT.width()-r.width());
         if (reverse)
         {
@@ -159,7 +169,8 @@ Style::drawListViewProgress(const QStyleOptionProgressBar *option, QPainter *pai
             painter->drawLine(RECT.left(), RECT.bottom(), RECT.left()+val*RECT.width(), RECT.bottom());
         }
     }
-    drawItemText(painter, r, Qt::AlignHCenter|Qt::AlignTop, PAL, isEnabled, text);
+    if (isListView)
+        drawItemText(painter, r, Qt::AlignHCenter|Qt::AlignTop, PAL, isEnabled, text);
     painter->setPen(oldPen);
 }
 
@@ -169,12 +180,10 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
     ASSURE_OPTION(pb, ProgressBar);
     OPT_HOVER
 
-    bool listView = !widget && (appType == KGet || appType == KTorrent);
-    if (!listView && widget && qobject_cast<const QAbstractItemView*>(widget))
-        listView = true;
-    if (listView)
+    bool listView = (!widget && (appType == KGet || appType == KTorrent)) || qobject_cast<const QAbstractItemView*>(widget);
+    if (listView || RECT.height() < F(9)) // if things get tiny, text will not work, neither will the dots be really visible
     {   // kinda inline progress in itemview (but unfortunately kget doesn't send a widget)
-        drawListViewProgress(pb, painter, widget);
+        drawSimpleProgress(pb, painter, widget, listView);
         return;
     }
 
