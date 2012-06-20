@@ -730,6 +730,7 @@ const QPixmap
         p.drawRect(pix->rect());
         QImage img = FX::newDitherImage(qAbs(_bgIntensity-100), 64);
         p.drawTiledPixmap(pix->rect(), QPixmap::fromImage(img));
+        break;
     }
     case 15: { // brushed metal
         srand( 314159265 );
