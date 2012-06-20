@@ -49,7 +49,7 @@ KdeIni::KdeIni(const QString &name)
    localFile = confPath[0] + name;
    QFile lfile(localFile);
    if (lfile.open(QIODevice::ReadOnly)) {
-      localGroup == local.end();
+      localGroup = local.end();
       QTextStream stream(&lfile);
       do {
          buffer = stream.readLine().trimmed();
@@ -63,7 +63,7 @@ KdeIni::KdeIni(const QString &name)
 
    QFile gfile(confPath[1] + name);
    if (gfile.open(QIODevice::ReadOnly)) {
-      localGroup == global.end();
+      localGroup = global.end();
       QTextStream stream(&gfile);
       do {
          buffer = stream.readLine().trimmed();
