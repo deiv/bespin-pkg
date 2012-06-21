@@ -31,6 +31,7 @@
 using namespace Bespin;
 
 QPainterPath Button::shape[NumTypes];
+static QPixmap s_buttonMask[2];
 bool Button::fixedColors = false;
 
 Button::Button(Client *parent, Type type, bool left) : QWidget(parent->widget()),
@@ -119,6 +120,7 @@ Button::init(bool leftMenu, bool fColors, int variant)
     fixedColors = fColors;
     for (int t = 0; t < NumTypes; ++t)
         shape[t] = QPainterPath();
+    s_buttonMask[0] = s_buttonMask[1] = QPixmap();
 
     Shapes::Style style = (Shapes::Style)qMin(qMax(0,variant),3);
 
@@ -323,8 +325,6 @@ Button::color( bool background ) const
     return c;
 }
 
-static QPixmap s_buttonMask[2];
-
 void
 Button::paintEvent(QPaintEvent *)
 {
@@ -342,35 +342,61 @@ Button::paintEvent(QPaintEvent *)
             s_buttonMask[1] = QPixmap(width() - 6, height() - 6);
             s_buttonMask[0].fill(Qt::transparent);
             s_buttonMask[1].fill(Qt::transparent);
+
             QPainter p(&s_buttonMask[0]);
             p.setRenderHint(QPainter::Antialiasing);
             QPoint start(0,0), stop(0,s_buttonMask[0].height());
             QLinearGradient lg(start, stop);
             lg.setColorAt(0, QColor(0,0,0,92));
             lg.setColorAt(1, QColor(255,255,255,92));
+
             p.setPen(Qt::NoPen);
             p.setBrush(lg);
-            p.drawEllipse(s_buttonMask[0].rect());
+            if (Factory::config()->roundCorners)
+                p.drawEllipse(s_buttonMask[0].rect());
+            else
+                p.drawRect(s_buttonMask[0].rect());
+            if (Factory::buttonGradient() != Gradients::Sunken) {
+                stop = QPoint(0,s_buttonMask[0].height()-4);
+                QLinearGradient lg2(start, stop);
+                lg2.setColorAt(0, QColor(255,255,255,20));
+                lg2.setColorAt(1, QColor(0,0,0,20));
+                p.setBrush(lg2);
+                if (Factory::config()->roundCorners)
+                    p.drawEllipse(s_buttonMask[0].rect().adjusted(2,2,-2,-2));
+                else
+                    p.drawRect(s_buttonMask[0].rect().adjusted(2,2,-2,-2));
+            }
             p.end();
+
             p.begin(&s_buttonMask[1]);
             p.setRenderHint(QPainter::Antialiasing);
             p.setPen(Qt::NoPen);
             p.setBrush(Qt::black);
-            p.drawEllipse(s_buttonMask[1].rect());
+            if (Factory::config()->roundCorners)
+                p.drawEllipse(s_buttonMask[1].rect());
+            else
+                p.drawRect(s_buttonMask[1].rect());
             p.end();
         }
-        QPixmap texture(s_buttonMask[1].size());
-        QPainter p2(&texture);
+
+        p.drawPixmap(0,0, s_buttonMask[0] );
+
+
         const bool rFixedColors = fixedColors;
         fixedColors = false;
         QColor c(color(true)); c.setAlpha(255);
         fixedColors = rFixedColors;
-        p2.drawTiledPixmap(s_buttonMask[1].rect(), Gradients::pix(c, s_buttonMask[1].height(), Qt::Vertical,
-                                                  (state & Sunken) ? Gradients::Sunken : Factory::buttonGradient()));
-        p2.end();
+        QPixmap texture = Gradients::pix(c, s_buttonMask[1].height(), Qt::Vertical,
+                                         (state & Sunken) ? Gradients::Sunken : Factory::buttonGradient());
+        if (s_buttonMask[1].width() > 32) { // internal shortcut hack - the cached pixmaps are 32px width
+            QPixmap gradient = texture;
+            texture = QPixmap(s_buttonMask[1].size());
+            QPainter p2(&texture);
+            p2.drawTiledPixmap(s_buttonMask[1].rect(), gradient);
+            p2.end();
+        }
 
-        p.drawPixmap(0,0, s_buttonMask[0] );
-        p.setRenderHint(QPainter::Antialiasing);
         p.drawPixmap(3,3, FX::applyAlpha( texture, s_buttonMask[1] ) );
     }
 
