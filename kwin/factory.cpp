@@ -391,7 +391,7 @@ bool Factory::readConfig()
     if (oldBool != ourConfig.buttonnyButton) ret = true;
 
     oldBool = ourConfig.invertedButtons;
-    ourConfig.invertedButtons = settings.value("InvertedButtons", true).toBool();
+    ourConfig.invertedButtons = ourConfig.buttonnyButton && settings.value("InvertedButtons", true).toBool();
     if (oldBool != ourConfig.invertedButtons) ret = true;
 
     oldBool = ourConfig.forceBorderLines;

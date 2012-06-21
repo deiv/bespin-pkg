@@ -311,7 +311,7 @@ Button::color( bool background ) const
     }
     bool active = client->isActive();
     if (Factory::config()->invertedButtons)
-        { KDecorationDefines::ColorType h = fgt; fgt = bgt; bgt = h; active = true; }
+        { KDecorationDefines::ColorType h = fgt; fgt = bgt; bgt = h; active = true || background; }
 
     if ( background )
         return client->color(bgt, active);
