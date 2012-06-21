@@ -894,7 +894,8 @@ Client::repaint(QPainter &p, bool paintTitle)
             QPoint off(0,0); Factory::verticalTitle() ? off.setX(-d) : off.setY(d);
             p.drawText ( label.translated(off), tf, myCaption, &tr );
 
-            if ( !(Factory::config()->hideInactiveButtons || Factory::verticalTitle()) )
+            if ( Factory::config()->forceBorderLines ||
+                !(Factory::config()->hideInactiveButtons || Factory::verticalTitle()) )
             {
                 if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
                     maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&

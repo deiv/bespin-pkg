@@ -56,9 +56,11 @@ bool Factory::weAreInitialized = false;
 bool Factory::weAreComposited = true; // just guessing, kwin isn't up yet ... :(
 bool Factory::weAreCompiz = false; // just guessing, isn't up yet ... :(
 Config Factory::ourConfig =
-    { false, false, false, true, true, false, true, false, 0, Qt::AlignHCenter,
-      { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
-      Gradients::None, QStringList() };
+{   false, false, false, true, true, false, true, false, false,
+    0, Qt::AlignHCenter,
+    { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
+    Gradients::None, QStringList()
+};
 Qt::KeyboardModifier Factory::ourCommandKey = Qt::AltModifier;
 int Factory::ourButtonSize[2] = {-1, -1};
 int Factory::ourBorderSize[2] = {4,4};
@@ -388,6 +390,10 @@ bool Factory::readConfig()
     ourConfig.buttonnyButton = settings.value("ButtonnyButton", false).toBool();
     if (oldBool != ourConfig.buttonnyButton) ret = true;
 
+    oldBool = ourConfig.forceBorderLines;
+    ourConfig.forceBorderLines = settings.value("BorderLines", false).toBool();
+    if (oldBool != ourConfig.forceBorderLines) ret = true;
+
     QString oldmultiorder = multiString(ourMultiButton);
     QString newmultiorder = settings.value("MultiButtonOrder", "MHFBSLE!").toString();
     if (oldmultiorder != newmultiorder)
@@ -452,7 +458,6 @@ bool Factory::readConfig()
         settings.endGroup();
     }
 
-//     const int icnVar = ourConfig.buttonGradient == Gradients::None ? settings.value("IconVariant", 1).toInt() : 1;
     Button::init( options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
                   settings.value("IAmMyLittleSister", false).toBool(), settings.value("IconVariant", 1).toInt());
 

@@ -46,7 +46,7 @@ typedef struct _Preset
 typedef struct
 {
     bool    forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons,
-            verticalTitle, variableShadowSizes, buttonnyButton;
+            verticalTitle, variableShadowSizes, buttonnyButton, forceBorderLines;
     int slickButtons, titleAlign;
     Gradients::Type gradient[2][2], buttonGradient;
     QStringList smallTitleClasses;
@@ -63,28 +63,28 @@ public:
     KDecoration *createDecoration(KDecorationBridge *b);
     bool reset(unsigned long changed);
     bool supports( Ability ability ) const;
+
+    inline static int baseSize() { return ourBorderSize[0] ? ourBorderSize[0] : !weAreComposited; }
     inline static Gradients::Type buttonGradient() {return ourConfig.buttonGradient;}
     inline static int buttonSize(bool small) {return ourButtonSize[small];}
     inline static bool buttonnyButton() {return ourConfig.buttonnyButton;}
+    inline static const Config *config() { return &ourConfig; }
     inline static int edgeSize() { return ourBorderSize[1] ? ourBorderSize[1] : !weAreComposited; }
-    inline static int baseSize() { return ourBorderSize[0] ? ourBorderSize[0] : !weAreComposited; }
     inline static Qt::KeyboardModifier commandKey() { return ourCommandKey; }
     inline static bool compositingActive() { return weAreComposited; }
-    inline static int initialized() { return weAreInitialized; }
-    inline static bool isCompiz() { return weAreCompiz; }
-//    virtual void checkRequirements( KDecorationProvides* provides );
-    inline static int titleSize(bool minimal = false) {return ourTitleSize[minimal];}
-    inline static const Config *config() { return &ourConfig; }
     static WindowData *decoInfo(qint64 pid);
     static WindowData *decoInfo(QString WMclass, NET::WindowType type, bool strict);
     static int defaultBgMode() { return ourBgMode; }
+    inline static int initialized() { return weAreInitialized; }
+    inline static bool isCompiz() { return weAreCompiz; }
     inline static const QVector<Button::Type> &multiButtons() { return ourMultiButton; }
     inline static bool roundCorners() { return ourConfig.roundCorners; }
     inline static int slickButtons() { return ourConfig.slickButtons; }
-    static inline float smallFactor() { return 0.75; }
+    inline static float smallFactor() { return 0.75; }
     static void showDesktopMenu(const QPoint &p, Client *client);
     static void showInfo(const QPoint &p, WId id);
     static void showWindowList(const QPoint &p, Client *client);
+    inline static int titleSize(bool minimal = false) {return ourTitleSize[minimal];}
     inline static bool variableShadowSizes() { return ourConfig.variableShadowSizes; }
     inline static bool verticalTitle() { return ourConfig.verticalTitle; }
 protected:
@@ -106,7 +106,7 @@ private:
     static QHash<qint64, WindowData*> ourDecoInfos;
     static QHash<qint64, BgSet*> ourBgSets;
     static QList<Preset*> ourPresets;
-    static bool weAreInitialized, weAreComposited, weAreCompiz;
+    static bool weAreInitialized, weAreComposited, weAreCompiz, weForceBorderlines;
     static int ourButtonSize[2], ourTitleSize[2], ourBgMode, ourBorderSize[2];
     static QVector<Button::Type> ourMultiButton;
     static Config ourConfig;
