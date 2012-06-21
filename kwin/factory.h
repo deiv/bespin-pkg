@@ -46,7 +46,7 @@ typedef struct _Preset
 typedef struct
 {
     bool    forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons,
-            verticalTitle, variableShadowSizes, buttonnyButton, forceBorderLines;
+            verticalTitle, variableShadowSizes, buttonnyButton, forceBorderLines, invertedButtons;
     int slickButtons, titleAlign;
     Gradients::Type gradient[2][2], buttonGradient;
     QStringList smallTitleClasses;

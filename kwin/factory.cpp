@@ -56,7 +56,7 @@ bool Factory::weAreInitialized = false;
 bool Factory::weAreComposited = true; // just guessing, kwin isn't up yet ... :(
 bool Factory::weAreCompiz = false; // just guessing, isn't up yet ... :(
 Config Factory::ourConfig =
-{   false, false, false, true, true, false, true, false, false,
+{   false, false, false, true, true, false, true, false, false, true,
     0, Qt::AlignHCenter,
     { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
     Gradients::None, QStringList()
@@ -389,6 +389,10 @@ bool Factory::readConfig()
     oldBool = ourConfig.buttonnyButton;
     ourConfig.buttonnyButton = settings.value("ButtonnyButton", false).toBool();
     if (oldBool != ourConfig.buttonnyButton) ret = true;
+
+    oldBool = ourConfig.invertedButtons;
+    ourConfig.invertedButtons = settings.value("InvertedButtons", true).toBool();
+    if (oldBool != ourConfig.invertedButtons) ret = true;
 
     oldBool = ourConfig.forceBorderLines;
     ourConfig.forceBorderLines = settings.value("BorderLines", false).toBool();

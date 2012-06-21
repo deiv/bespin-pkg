@@ -309,14 +309,18 @@ Button::color( bool background ) const
         fgt = KDecorationDefines::ColorFont;
         bgt = KDecorationDefines::ColorTitleBar;
     }
-    if ( background )
-        return client->color(bgt, client->isActive());
+    bool active = client->isActive();
+    if (Factory::config()->invertedButtons)
+        { KDecorationDefines::ColorType h = fgt; fgt = bgt; bgt = h; active = true; }
 
-    QColor c = client->color(fgt, client->isActive());
+    if ( background )
+        return client->color(bgt, active);
+
+    QColor c = client->color(fgt, active);
     if (fixedColors && myType < Multi)
         c = client->isActive() ? QColor(fcolors[myType]) :
             Colors::mid(c, QColor(fcolors[myType]), 6-hoverLevel, hoverLevel);
-    const QColor bg = client->color(bgt, client->isActive());
+    const QColor bg = client->color(bgt, active);
     if (isEnabled())
         c = Colors::mid(bg, c, 6-hoverLevel, 4);
     else
