@@ -894,19 +894,25 @@ Client::repaint(QPainter &p, bool paintTitle)
             QPoint off(0,0); Factory::verticalTitle() ? off.setX(-d) : off.setY(d);
             p.drawText ( label.translated(off), tf, myCaption, &tr );
 
-            if ( Factory::config()->forceBorderLines ||
-                !(Factory::config()->hideInactiveButtons || Factory::verticalTitle()) )
-            {
-                if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
-                    maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
-                    gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1) )
-                {   // inactive window looks like active one...
-                    int y = label.center().y();
-                    if ( !(tf & Qt::AlignLeft) )
-                        p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
-                    if ( !(tf & Qt::AlignRight) )
-                        p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
+            bool wantBorderLines = !Factory::verticalTitle() && tr.left() - 37 > label.left() && tr.right() + 37 < label.right();
+            if (wantBorderLines) { // otherwise painting looks crap
+                if (!Factory::config()->forceBorderLines) { // not forced, check whether inactive looks like active
+                    if (Factory::config()->hideInactiveButtons && !Factory::config()->buttonnyButton)
+                        wantBorderLines = false; // perfectly hinted
+                    else {
+                        wantBorderLines =   color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
+                                            gType[0] == gType[1] &&
+                                            color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1);
+                    }
                 }
+            }
+            if (wantBorderLines)
+            {   // inactive window looks like active one...
+                int y = label.center().y();
+                if ( !(tf & Qt::AlignLeft) )
+                    p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
+                if ( !(tf & Qt::AlignRight) )
+                    p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
             }
         }
 
