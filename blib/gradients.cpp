@@ -733,6 +733,11 @@ const QPixmap
         break;
     }
     case 15: { // brushed metal
+        p.end();
+        delete pix;
+        pix = new QPixmap(256,64);
+        if (c.alpha() != 0xff)
+            pix->fill(Qt::transparent);
         srand( 314159265 );
         QImage img(256,64, QImage::Format_ARGB32);
         img.fill(c);
@@ -754,9 +759,6 @@ const QPixmap
                 img.setPixel(col, row, qRgba(r, g, b, a));
             }
         }
-        p.end();
-        delete pix;
-        pix = new QPixmap(256,64);
         p.begin(pix);
         p.drawTiledPixmap(pix->rect(), QPixmap::fromImage(img));
     }
