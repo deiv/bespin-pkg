@@ -401,7 +401,7 @@ Button::paintEvent(QPaintEvent *)
             p2.end();
         }
 
-        p.drawPixmap(3,3, FX::applyAlpha( texture, s_buttonMask[1] ) );
+        p.drawPixmap(3,3, FX::applyAlpha( texture, s_buttonMask[1], s_buttonMask[1].rect() ) );
     }
 
     p.setRenderHint(QPainter::Antialiasing);
