@@ -1,3 +1,9 @@
+bespin (0.r1552-1) UNRELEASED; urgency=low
+
+  * New release SVN@1552 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 24 Jun 2012 15:40:58 +0530
+
 bespin (0.r1501-1) experimental; urgency=low
 
   * Initial release SVN@1501 (Closes: #651091)
