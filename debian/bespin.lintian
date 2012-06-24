@@ -1,0 +1,3 @@
+bespin source: native-package-with-dash-version
+kde-style-bespin binary: no-symbols-control-file usr/lib/libQtBespin.so
+kde-style-bespin binary: shlib-without-versioned-soname usr/lib/libQtBespin.so libQtBespin.so

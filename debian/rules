@@ -29,3 +29,4 @@ override_dh_auto_build:
 override_dh_auto_install:
 	test -d build || exit 1
 	cd build; $(MAKE) DESTDIR=$(install_dir) install
+	install -D -m 0644 debian/bespin.lintian $(install_dir)/usr/share/lintian/overrides/bespin
