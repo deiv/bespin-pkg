@@ -39,4 +39,9 @@ if (X11_Xrender_FOUND)
     target_link_libraries(QtBespin ${X11_Xrender_LIB})
 endif (X11_Xrender_FOUND)
 
-install (TARGETS QtBespin LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+if(WIN32)
+    install (TARGETS QtBespin DESTINATION ${QT_BINARY_DIR})
+else(WIN32)
+    install (TARGETS QtBespin LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+endif(WIN32)
+

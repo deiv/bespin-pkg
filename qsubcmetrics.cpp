@@ -334,8 +334,13 @@ Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
                 int x = ret.right() - pixelMetric(PM_MenuButtonIndicator, tb, widget);
                 if (subControl == SC_ToolButton)
                     ret.setRight(x);
-                else if (subControl == SC_ToolButtonMenu)
+                else if (subControl == SC_ToolButtonMenu) {
+                    if (config.btn.tool.connected && (config.btn.tool.frame == Raised || config.btn.tool.frame == Inlay) ) {
+                        x -= F(4);
+                        ret.setRight(ret.right() - F(4));
+                    }
                     ret.setLeft(x);
+                }
             }
             return visualRect(tb->direction, tb->rect, ret);
         }

@@ -29,9 +29,10 @@ using namespace Bespin;
 // #define fillRect(_X_,_Y_,_W_,_H_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_X_,_Y_,_W_,_H_)
 // #define fillRect2(_R_,_B_) setPen(Qt::NoPen); p.setBrush(_B_); p.drawRect(_R_)
 
-#define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) drawRoundedRect(QRectF(_X_, _Y_, _W_, _H_), _RX_, _RY_, Qt::RelativeSize)
+#define DRAW_ROUND_RECT(_X_,_Y_,_W_,_H_,_RX_,_RY_) \
+    drawRoundedRect(QRectF(_X_, _Y_, _W_, _H_), ourRoundness*(_RX_)/100, ourRoundness*(_RY_)/100, Qt::RelativeSize)
 
-#define SCALE(_N_) lround(_N_*ourScale)
+#define SCALE(_N_) qRound(_N_*ourScale)
 
 
 #define EMPTY_PIX(_W_, _H_) \
@@ -66,11 +67,13 @@ Elements::renderButtonLight(Tile::Set &set)
 #endif
 
 static float ourShadowIntensity = 1.0;
-void
-Elements::setShadowIntensity(float intensity) { ourShadowIntensity = intensity; }
+void Elements::setShadowIntensity(float intensity) { ourShadowIntensity = intensity; }
+
 static float ourScale = 1.0;
-void
-Elements::setScale(float scale) { ourScale = scale; }
+void Elements::setScale(float scale) { ourScale = scale; }
+
+static int ourRoundness = 100;
+void Elements::setRoundness(int r) { ourRoundness = qMax(qMin(r,100),0); }
 
 QImage
 Elements::glow(int size, float width)
@@ -113,7 +116,7 @@ QImage
 Elements::roundedMask(int size, int factor)
 {
     EMPTY_PIX(size, size); p.setBrush(Qt::black);
-    p.drawRoundedRect(img.rect(), factor, factor, Qt::RelativeSize);
+    p.drawRoundedRect(img.rect(), ourRoundness*factor/100, ourRoundness*factor/100, Qt::RelativeSize);
     p.end();
     return img;
 }
@@ -124,8 +127,8 @@ Elements::sunkenShadow(int size, bool enabled)
     EMPTY_PIX(size, size);
 
     int add = enabled*30;
-    const int add2 = lround(80./F(4));
-    const int rAdd = lround(25./F(4));
+    const int add2 = qRound(80./F(4));
+    const int rAdd = qRound(25./F(4));
 
     // draw a flat shadow
     SET_ALPHA(sqrt(ourShadowIntensity) * (55 + add));
@@ -161,7 +164,7 @@ Elements::relief(int size, bool enabled)
     const float f1_2 = F(1)/2.0;
     p.setPen(QPen(BLACK(int(f*70)), F(1)));
     p.DRAW_ROUND_RECT(f1_2, f1_2, size-F(1), size-F(2), 99, 99);
-    p.setPen(QPen(WHITE(int(f*35)), F(1)));
+    p.setPen(QPen(WHITE(int(f*28)), F(1)));
     p.DRAW_ROUND_RECT(f1_2, F(1)+f1_2, size-F(1), size-F(2), 99, 99);
     p.end();
     return img;
@@ -193,7 +196,7 @@ Elements::groupShadow(int size)
     int f33 = SCALE(33);
     for (int i = 1; i < f33; ++i)
     {
-        p.setPen(BLACK(CLAMP(i*lround(255.0/F(32)),0,255)));
+        p.setPen(BLACK(CLAMP(i*qRound(255.0/F(32)),0,255)));
         p.drawLine(0, size-i, size, size-i);
     }
     p.end();

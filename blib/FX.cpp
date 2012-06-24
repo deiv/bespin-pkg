@@ -186,7 +186,7 @@ static inline void blurcol( QImage & im, int col, int alpha)
 }
 
 void
-FX::expblur( QImage &img, int radius )
+FX::expblur(QImage &img, int radius, Qt::Orientations o)
 {
     if(radius<1)
         return;
@@ -196,11 +196,15 @@ FX::expblur( QImage &img, int radius )
     // Calculate the alpha such that 90% of the kernel is within the radius. (Kernel extends to infinity)
     int alpha = (int)((1<<aprec)*(1.0f-expf(-2.3f/(radius+1.f))));
 
-    for(int row=0;row<img.height();row++)
-        blurrow<aprec,zprec>(img,row,alpha);
+    if (o & Qt::Horizontal) {
+        for(int row=0;row<img.height();row++)
+            blurrow<aprec,zprec>(img,row,alpha);
+    }
 
-    for(int col=0;col<img.width();col++)
-        blurcol<aprec,zprec>(img,col,alpha);
+    if (o & Qt::Vertical) {
+        for(int col=0;col<img.width();col++)
+            blurcol<aprec,zprec>(img,col,alpha);
+    }
 }
 // ======================================================
 
@@ -397,12 +401,13 @@ FX::desaturate(QImage &img, const QColor &c)
 
 static QPixmap _dither;
 QImage
-FX::newDitherImage(uint intensity)
+FX::newDitherImage(uint intensity, uint size)
 {
-    QImage img(32,32, QImage::Format_ARGB32);
+    QImage img(size,size, QImage::Format_ARGB32);
+    size = size*size;
     QRgb *pixel = (QRgb*)img.bits();
     int a, v;
-    for (int i = 0; i < 1024; ++i) // 32*32...
+    for (uint i = 0; i < size; ++i) // 32*32...
     {
         a = (rand() % intensity)/2;
         v = (a%2)*255;

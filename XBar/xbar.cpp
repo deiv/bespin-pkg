@@ -231,6 +231,7 @@ XBar::updatePalette()
 {
     QColor fg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::TextColor);
     QColor bg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::BackgroundColor);
+    MenuBar::setGlowColor(bg);
     QPalette pal(fg, bg, Qt::white, Qt::black, Qt::gray, fg, fg, bg, bg );
     pal.setColor(QPalette::ButtonText, fg);
     setPalette(pal);
@@ -409,11 +410,17 @@ XBar::registerMenu(const QString &service, qlonglong key, const QString &title, 
 
 
     // replace older versions - in case
-    delete d.menus.take( key );
+    MenuBar *oldBar = d.menus.take( key );
     d.menus.insert( key, newBar );
 
-    // add hidden
-    newBar->hide();
+    if (d.currentBar == oldBar) {
+        d.currentBar = newBar;
+        newBar->show();
+    } else {
+        // add hidden
+        newBar->hide();
+    }
+    delete oldBar;
 }
 
 void

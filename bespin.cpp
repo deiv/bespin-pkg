@@ -48,6 +48,7 @@
 // #include "debug.h"
 
 #ifdef Q_WS_X11
+#include <QX11Info>
 #include "blib/xproperty.h"
 #endif
 #include "blib/FX.h"
@@ -420,7 +421,7 @@ static QStyle::SubElement subcontrols[N_CustomSubElements];
 enum ElementType { SH, CE, SE };
 static QMap<QString, int> styleElements; // yes. one is enough...
 // NOTICE: using QHash instead QMap is probably overhead, there won't be too many items per app
-static int counter[3] = { X_KdeBase+3 /*sic!*/, X_KdeBase, X_KdeBase };
+static uint counter[3] = { X_KdeBase+3 /*sic!*/, X_KdeBase, X_KdeBase };
 
 void
 Style::drawPrimitive ( PrimitiveElement pe, const QStyleOption * option,
@@ -594,9 +595,13 @@ Style::serverSupportsShadows()
 }
 
 // X11 properties for the deco ---------------
-
+#ifndef QT_NO_DBUS
 #define MSG(_FNC_) QDBusMessage::createMethodCall( "org.kde.kwin", "/BespinDeco", "org.kde.BespinDeco", _FNC_ )
 #define KWIN_SEND( _MSG_ ) QDBusConnection::sessionBus().send( _MSG_ )
+#else
+#define MSG(_FNC_) void(0)
+#define KWIN_SEND( _MSG_ ) void(0)
+#endif
 
 void
 Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gradients::Type (&gt)[2])
@@ -689,8 +694,13 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
         inactive[Fg]    = config.kwin.inactive_role[Fg];
         active[Bg]      = config.kwin.active_role[Bg];
         active[Fg]      = config.kwin.active_role[Fg];
-        text[0]         = config.kwin.text_role[0];
-        text[1]         = config.kwin.text_role[1];
+        if (widget->isModal() && config.bg.modal.invert) {
+            // We do not know what kind of color combo we end up with here
+            text[0] = text[1] = QPalette::WindowText;
+        } else {
+            text[0]     = config.kwin.text_role[0];
+            text[1]     = config.kwin.text_role[1];
+        }
     }
 
 
@@ -1054,7 +1064,7 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
             continue;
         QWidget *w = static_cast<QWidget*>(o);
         if ( w->isVisible() &&
-            ((w->autoFillBackground() && w->palette().color(w->backgroundRole()).alpha() > 160) || (w->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(w))) )
+            ((w->autoFillBackground() && w->palette().color(w->backgroundRole()).alpha() > 160) || (w->testAttribute(Qt::WA_OpaquePaintEvent) && !(qobject_cast<const QScrollBar*>(w) || w->inherits("QProgressBar")))) )
         {
             QPoint offset = w->mapTo(window, QPoint(0,0));
             if (w->mask().isEmpty())
@@ -1170,7 +1180,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
             return false;
         }
 #endif
-        if ( Hacks::config.extendDolphinViews && object->inherits("DolphinViewContainer") )
+        if ( Hacks::config.extendDolphinViews &&
+             !Hacks::config.transparentDolphinView && object->inherits("DolphinViewContainer") )
         {
             QWidget *w = static_cast<QWidget*>(object);
             QPainter p(w);
@@ -1338,13 +1349,14 @@ Style::eventFilter( QObject *object, QEvent *ev )
         if ( ( widget->isWindow() && config.menu.round &&
              ((widget->windowType() == Qt::ToolTip && widget->inherits("QTipLabel")) || qobject_cast<QMenu*>(widget) ||
              (isDock = qobject_cast<QDockWidget*>(widget)) ) ) ||
-             ( Hacks::config.extendDolphinViews && widget->inherits("DolphinViewContainer") ) )
+             ( Hacks::config.extendDolphinViews &&
+               !Hacks::config.transparentDolphinView && widget->inherits("DolphinViewContainer") ) )
             shapeCorners( widget, isDock );
 
         //BEGIN BLURRING REGIONS ======================================
         if ( config.bg.blur &&
             (widget->isWindow() || widget->autoFillBackground() ||
-            (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
+            (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !(qobject_cast<QScrollBar*>(widget) || widget->inherits("QProgressBar")))) &&
             (appType != Plasma || qobject_cast<QMenu*>(widget))  )
         {
             QWidget *window = widget->window();
@@ -1483,7 +1495,8 @@ Style::eventFilter( QObject *object, QEvent *ev )
             }
 #else
             menu->move(menu->pos()-QPoint(0,F(2)));
-            shapeCorners( widget, false );
+            if (config.menu.round)
+                shapeCorners( widget, false );
 #endif
             return false;
         }
@@ -1499,7 +1512,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         }
 
         if ( config.bg.blur && !widget->isWindow() &&
-            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
+            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !(qobject_cast<QScrollBar*>(widget) || widget->inherits("QProgressBar")))) &&
             appType != Plasma  )
         {
             QWidget *window = widget->window();
@@ -1545,7 +1558,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
         /* why to blur on hide?
          * NOTICE: because it may expose a blurrable region, you moron!*/
         if ( config.bg.blur && !widget->isWindow() &&
-            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) &&
+            (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !(qobject_cast<QScrollBar*>(widget) || widget->inherits("QProgressBar")))) &&
             appType != Plasma  )
         {
             QWidget *window = widget->window();
@@ -1712,7 +1725,7 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
                               pal.color(QPalette::Inactive, QPalette::Window),
                               pal.color(QPalette::Disabled, QPalette::Window) };
 //                         Colors::mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::Base),6,1)
-#define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(QPalette::_S_, QPalette::AlternateBase),\
+#define ALT_BASE(_S_) Colors::mid(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase),\
                                   Colors::contrast(pal.color(_S_, QPalette::Window), pal.color(_S_, QPalette::AlternateBase)), 10)
             pal.setColor(QPalette::Active, QPalette::AlternateBase, ALT_BASE(QPalette::Active));
             pal.setColor(QPalette::Inactive, QPalette::AlternateBase, ALT_BASE(QPalette::Inactive));
@@ -1745,7 +1758,7 @@ inline static bool isDolphinView(const QWidget *w, QWidget **grampa)
 void
 Style::focusWidgetChanged( QWidget *old, QWidget *focusWidget )
 {
-    if ( Hacks::config.extendDolphinViews )
+    if ( Hacks::config.extendDolphinViews && !Hacks::config.transparentDolphinView )
     {
         QWidget *grampa = 0;
         if ( isDolphinView(focusWidget, &grampa) )

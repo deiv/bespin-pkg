@@ -23,8 +23,9 @@
 #include <QtDebug>
 #include "draw.h"
 
-#ifdef Q_WS_X11
 #include "blib/FX.h"
+
+#ifdef Q_WS_X11
 #include "blib/xproperty.h"
 #else
 #define QT_NO_XRENDER #

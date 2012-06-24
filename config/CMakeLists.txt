@@ -18,12 +18,24 @@ qt4_wrap_cpp(bespin_config_MOC_SRCS ${bespin_config_MOC_HDRS})
 
 #--------------------------------------------------------
 
-project (bespin)
+if(WIN32)
+set(BESPIN_CONFIG bespin_cfg)
+else()
+set(BESPIN_CONFIG bespin)
+endif()
+
+project (${BESPIN_CONFIG})
+
 # add_definitions ( -DB_EXPORT=Q_DECL_IMPORT )
 qt4_wrap_ui (bespin_demo_FRM_HDRS uiDemo.ui)
-add_executable (bespin main.cpp ${bespin_config_SOURCES} ${bespin_config_MOC_SRCS}  ${bespin_config_FRM_HDRS} ${bespin_demo_FRM_HDRS})
-target_link_libraries (bespin ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
-install (TARGETS bespin DESTINATION bin)
+add_executable (${BESPIN_CONFIG} main.cpp ${bespin_config_SOURCES} ${bespin_config_MOC_SRCS}  ${bespin_config_FRM_HDRS} ${bespin_demo_FRM_HDRS})
+target_link_libraries (${BESPIN_CONFIG} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
+if(WIN32)
+    install (TARGETS ${BESPIN_CONFIG} DESTINATION ${QT_BINARY_DIR})
+else(WIN32)
+    SET_TARGET_PROPERTIES(${BESPIN_CONFIG} PROPERTIES OUTPUT_NAME "bespin")
+    install (TARGETS ${BESPIN_CONFIG} DESTINATION bin)
+endif(WIN32)
 
 #--------------------------------------------------------
 

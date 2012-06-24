@@ -28,23 +28,25 @@ using namespace Bespin;
 
 static QColor black = Qt::black;
 static float scale = 0.0, intensity = 0.0;
+static int roundness = 0;
 #define SET_ALPHA(_A_) black.setAlpha(_A_); p.setBrush(black)
 #define WHITE(_A_) QColor(255,255,255, _A_)
 #define BLACK(_A_) QColor(0,0,0, _A_)
-#define SCALE(_N_) lround(_N_*config.scale)
+#define SCALE(_N_) qRound(_N_*config.scale)
 
 
 void
 Style::generatePixmaps()
 {
     // interestingly every kde application creates _2_ style instances... OUCH!
-    if (config.scale == scale && intensity == config.shadowIntensity)
+    if (config.scale == scale && intensity == config.shadowIntensity && roundness == config.roundness)
         return;
 
     intensity = config.shadowIntensity;
     scale = config.scale;
 
     Elements::setShadowIntensity( config.shadowIntensity );
+    Elements::setRoundness( config.roundness );
 
     const int f9 = F(9); const int f11 = SCALE(11);
     const int f17 = SCALE(17); const int f19 = SCALE(19);
@@ -58,10 +60,10 @@ Style::generatePixmaps()
             { s = f17; r = 99; }
         else
             { s = f9; r = 70; }
-        masks.rect[i] = Tile::Set(Elements::roundedMask(s, r),s/2,s/2,1,1, r);
+        masks.rect[i] = Tile::Set(Elements::roundedMask(s, r),s/2,s/2,1,1);
         masks.rect[i].sharpenEdges();
     }
-    masks.windowShape = Tile::Set(Elements::roundedMask(9, 99),4,4,1,1, 99);
+    masks.windowShape = Tile::Set(Elements::roundedMask(9, 99),4,4,1,1);
 
     // SHADOWS ===============================
     // sunken
@@ -78,7 +80,7 @@ Style::generatePixmaps()
     // relief
     for (int r = 0; r < 2; ++r)
     {
-        int s = r ? f17 : f11;
+        int s = r ? f17 : f9;
         for (int i = 0; i < 2; ++i)
         {
             shadows.relief[r][i] = Tile::Set(Elements::relief(s, i), s/2,s/2,1,1);
@@ -133,16 +135,18 @@ Style::generatePixmaps()
     // ================================================================
 
     // LIGHTS ==================================
+    Elements::setShadowIntensity(1.6);
     for (int r = 0; r < 2; ++r)
     {
         int s = r ? f17 : f11;
         lights.rect[r] = Tile::Set(Elements::shadow(s, true, false, 3.0), s/2,s/2,1,1);
         lights.rect[r].setDefaultShape(Tile::Ring);
     }
-
+    Elements::setShadowIntensity(config.shadowIntensity);
     for (int r = 0; r < 2; ++r)
     {
         int s = r ? f17 : f9;
+        s = qMax(int(2.*2.25*config.scale)+1, config.roundness*s/100);
         lights.glow[r] = Tile::Set(Elements::glow(s, 2.25*config.scale), s/2,s/2,1,1);
         lights.glow[r].setDefaultShape(Tile::Ring);
     }
@@ -160,7 +164,7 @@ Style::generatePixmaps()
         shadows.slider[i][true] = Elements::shadow(Dpi::target.SliderControl-F(2), i,true);
     }
     lights.slider = Elements::shadow(Dpi::target.SliderControl, true, false, 3.0);
-    masks.slider = Elements::roundMask(Dpi::target.SliderControl-F(4));
+    masks.slider = Elements::roundedMask(Dpi::target.SliderControl-F(4), 99);
     // ================================================================
 
     // RADIOUTTON =====================================
@@ -171,7 +175,7 @@ Style::generatePixmaps()
         shadows.radio[i][true] = Elements::shadow(Dpi::target.ExclusiveIndicator-F(2), i,true);
     }
     // mask
-    masks.radio = Elements::roundMask(Dpi::target.ExclusiveIndicator-F(4));
+    masks.radio = Elements::roundedMask(Dpi::target.ExclusiveIndicator-F(4), 99);
     // mask fill
 #if 0
     masks.radioIndicator = roundMask(Dpi::target.ExclusiveIndicator - (config.btn.layer ? dpi.f10 : dpi.f12));
@@ -179,11 +183,11 @@ Style::generatePixmaps()
     int s = (Dpi::target.ExclusiveIndicator)/(5 - (config.btn.layer == Inlay));
     s *= 2; // cause of int div...
     s += F(2); // cause sunken frame "outer" part covers F(2) pixels
-    masks.radioIndicator = Elements::roundMask(Dpi::target.ExclusiveIndicator - s);
+    masks.radioIndicator = Elements::roundedMask(Dpi::target.ExclusiveIndicator - s, 99);
 #endif
     // ================================================================
     // NOTCH =====================================
-    masks.notch = Elements::roundMask(F(6));
+    masks.notch = Elements::roundedMask(F(6), 99);
     // ================================================================
 
 

@@ -436,6 +436,7 @@ Gradients::endColor(const QColor &oc, Position p, Type type, bool cv)
     }
 }
 
+static QPixmap s_stoneDither;
 const QPixmap&
 Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type)
 {
@@ -488,6 +489,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         case Gradients::Glass:
             grad = gl_ssGradient(iC, start, stop, true); break;
         case Gradients::Simple:
+        case Gradients::Stone:
         default:
             grad = simpleGradient(iC, start, stop); break;
         case Gradients::Sunken:
@@ -501,7 +503,15 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
         }
         if (c.alpha() < 255)
             pix->fill(Qt::transparent);
-        QPainter p(pix); p.fillRect(pix->rect(), grad); p.end();
+        QPainter p(pix); p.fillRect(pix->rect(), grad);
+        if (type == Gradients::Stone) {
+            if (s_stoneDither.isNull()) {
+                srand( 314159265 );
+                s_stoneDither = QPixmap::fromImage(FX::newDitherImage(32, 64));
+            }
+            p.drawTiledPixmap(pix->rect(), s_stoneDither);
+        }
+        p.end();
     }
 
     if (cache && cache->insert(magicNumber, pix, costs(pix)))
@@ -636,7 +646,7 @@ const QPixmap
         QColor dc = c.dark(i);
         for (i = 1; i < 6; ++i)
         {
-            float r = i*sqrt(i)*64.0/(6*sqrt(6));
+            float r = i*sqrt((float)i)*64.0f/(6.0f*sqrt(6.0f));
             p.setPen(QPen(Colors::mid(dc, c, 6-i, i-1), 2));
             p.drawEllipse(QPointF(32,32), r, r);
             for (int x = 0; x < 65; x+=64)
@@ -713,6 +723,44 @@ const QPixmap
         for (int i = 8*(j%2); i < 64; i+=16)
             p.drawRect(i,j*8,8,8);
         break;
+    }
+    case 14: { // stone / noise
+        p.setBrush(c);
+        p.setPen(Qt::NoPen);
+        p.drawRect(pix->rect());
+        QImage img = FX::newDitherImage(qAbs(_bgIntensity-100), 64);
+        p.drawTiledPixmap(pix->rect(), QPixmap::fromImage(img));
+        break;
+    }
+    case 15: { // brushed metal
+        p.end();
+        delete pix;
+        pix = new QPixmap(256,64);
+        if (c.alpha() != 0xff)
+            pix->fill(Qt::transparent);
+        srand( 314159265 );
+        QImage img(256,64, QImage::Format_ARGB32);
+        img.fill(c);
+        //expblur has a run-in, so the image needs to be slightly bigger
+        QImage noise = FX::newDitherImage(qMin(512, 10*qAbs(_bgIntensity-100)), 256+48).copy(0, 64, 256+48, 72);
+        FX::expblur(noise, 32, Qt::Horizontal);
+        QPainter p2(&img);
+        p2.drawImage(0,0, noise, 32, 0);
+        p2.end();
+        // now mirror blend back the right end on the left offset to create a seamless transition
+        for (int row = 0; row < 64; ++row) {
+            for (int col = 0; col < 32; ++col) {
+                QRgb p1 = img.pixel(col, row);
+                QRgb p2 = img.pixel(255-col, row);
+#define MERGE(_F_, _V_) const int _V_ = (col*_F_(p1) + (32-col)*_F_(p2)) / 32
+                MERGE(qRed, r); MERGE(qGreen, g);
+                MERGE(qBlue, b); MERGE(qAlpha, a);
+#undef MERGE
+                img.setPixel(col, row, qRgba(r, g, b, a));
+            }
+        }
+        p.begin(pix);
+        p.drawTiledPixmap(pix->rect(), QPixmap::fromImage(img));
     }
     }
     p.end();

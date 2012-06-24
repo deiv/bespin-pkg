@@ -181,7 +181,7 @@ protected:
     void drawMenuScroller(const QStyleOption*, QPainter*, const QWidget*) const;
     // progress.cpp
     void drawCapacityBar(const QStyleOption*, QPainter*, const QWidget*) const;
-    void drawListViewProgress(const QStyleOptionProgressBar*, QPainter*, const QWidget*) const;
+    void drawSimpleProgress(const QStyleOptionProgressBar*, QPainter*, const QWidget*, bool isListView) const;
     void drawProgressBar(const QStyleOption*, QPainter*, const QWidget*) const;
     void drawProgressBarGC(const QStyleOption*, QPainter*, const QWidget*, bool) const;
     inline void

@@ -62,12 +62,12 @@ namespace FX
     BLIB_EXPORT bool usesXRender();
     BLIB_EXPORT bool blend(const QPixmap &upper, QPixmap &lower, double opacity = 0.5, int x = 0, int y = 0);
     BLIB_EXPORT void desaturate(QImage &img, const QColor &c);
-    BLIB_EXPORT QImage newDitherImage(uint intensity = 6);
+    BLIB_EXPORT QImage newDitherImage(uint intensity = 6, uint size = 32);
     BLIB_EXPORT const QPixmap &dither();
     BLIB_EXPORT QPixmap fade(const QPixmap &pix, double percent);
     BLIB_EXPORT QPixmap tint(const QPixmap &mask, const QColor &color);
     BLIB_EXPORT QPixmap applyAlpha( const QPixmap &toThisPix, const QPixmap &fromThisPix, const QRect &rect = QRect(), const QRect &alphaRect = QRect());
-    BLIB_EXPORT void expblur(QImage &img, int radius);
+    BLIB_EXPORT void expblur(QImage &img, int radius, Qt::Orientations o = Qt::Horizontal|Qt::Vertical );
 //    QPixmap applyAlpha(const QPixmap &toThisPix,
 //                       const OXPicture &fromThisPict,
 //                       const QRect &rect = QRect(),

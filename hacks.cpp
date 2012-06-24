@@ -54,9 +54,6 @@
 //#include "blib/fixx11h.h"
 #include "blib/xproperty.h"
 
-
-#include <cmath>
-
 static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
 #endif
 
@@ -547,7 +544,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         }
         return false;
     }
-
+#ifdef Q_WS_X11
     if (e->type() == QEvent::WindowStateChange)
     {
         if (config.suspendFullscreenPlayers)
@@ -560,7 +557,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
                 XProperty::remove(w->winId(), XProperty::blockCompositing);
         }
     }
-
+#endif
     if (e->type() == QEvent::Show)
     {
         FILTER_EVENTS(o);

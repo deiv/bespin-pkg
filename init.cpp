@@ -174,6 +174,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.fixKMailFolderList = appType == KMail && readBool(HACK_KMAIL_FOLDERS);
         Hacks::config.extendDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_ICONVIEWS);
         Hacks::config.invertDolphinUrlBar = Hacks::config.extendDolphinViews && readBool(HACK_DOLPHIN_URLBAR);
+        Hacks::config.transparentDolphinView = Hacks::config.extendDolphinViews && readBool(HACK_DOLPHIN_ICONVIEWS_TRANSPARENT);
         Hacks::config.suspendFullscreenPlayers = readBool(HACK_SUSPEND_FULLSCREEN_PLAYERS);
         if (Hacks::config.suspendFullscreenPlayers)
             Hacks::config.suspendFullscreenPlayers = (  appName == "dragonplayer" || appName == "smplayer" ||
@@ -507,6 +508,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     config.view.shadeRole = (QPalette::ColorRole) iSettings->value(VIEW_SHADE_ROLE).toInt();
 
     // General ===========================
+    config.roundness = readInt(ROUNDNESS);
     config.shadowIntensity = iSettings->value(SHADOW_INTENSITY).toInt()/100.0;
     config.scale = 1.0f;
     const char *scale = getenv("BESPIN_SCALE");
@@ -583,7 +585,7 @@ Style::readSettings(const QSettings* settings, QString appName)
 #undef readRole
 #undef gradientType
 
-#define SCALE(_N_) lround((_N_)*config.scale)
+#define SCALE(_N_) qRound((_N_)*config.scale)
 
 void Style::initMetrics()
 {
@@ -599,24 +601,18 @@ void Style::initMetrics()
 
     Dpi::target.ScrollBarExtent = SCALE(config.scroll.sliderWidth);
     Dpi::target.ScrollBarSliderMin = SCALE(40);
-    if (config.scroll.sliderWidth < 13)
-    {
+    if (config.scroll.sliderWidth < 13) {
         Dpi::target.SliderThickness = SCALE(14);
         Dpi::target.SliderControl = SCALE(14);
-    }
-    else
-    {
+    } else {
         Dpi::target.SliderThickness = SCALE(20);
         Dpi::target.SliderControl = SCALE(20);
     }
-    if (config.btn.layer == Inlay)
-    {
+    if (config.btn.layer == Inlay) {
         Dpi::target.Indicator = SCALE(20);
         Dpi::target.ExclusiveIndicator = SCALE(19);
-    }
-    else
-    {
-        Dpi::target.Indicator = SCALE(20 - 2*config.btn.layer);
+    } else {
+        Dpi::target.Indicator = SCALE(20 - 4*bool(config.btn.layer));
         Dpi::target.ExclusiveIndicator = SCALE(17); // forced sunken
     }
 }
@@ -687,6 +683,7 @@ Style::init(const QSettings* settings)
     generatePixmaps();
     Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
                     config.bg.structure, config.bg.intensity, F(8), false, config.groupBoxMode == 2);
+    VisualFrame::setRoundness(config.scale*config.roundness);
     int f1 = F(1), f3 = F(3), f4 = F(4);
     QRect inner = QRect(0,0,100,100), outer = QRect(0,0,100,100);
     inner.adjust(f4,f4,-f4,-f1); outer.adjust(0,0,0,F(2));

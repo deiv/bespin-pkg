@@ -106,6 +106,7 @@ typedef struct Config
 
     int winBtnStyle;
 
+    int roundness;
     float scale;
 
     struct scroll

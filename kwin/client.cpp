@@ -867,27 +867,52 @@ Client::repaint(QPainter &p, bool paintTitle)
             // emboss?!
             int d = 0;
             const int bgv = Colors::value(bg), fgv = Colors::value(titleColor);
+//             if (bgv < fgv) // dark bg -> dark top borderline
+//                 { p.setPen(Colors::mid(bg, Qt::black, bgv, 160)); d = -1; }
+//             else // bright bg -> bright bottom borderline
+//                 { p.setPen(Colors::mid(bg, Qt::white, 16, bgv)); d = 1; }
+
             if (bgv < fgv) // dark bg -> dark top borderline
-                { p.setPen(Colors::mid(bg, Qt::black, bgv, 160)); d = -1; }
-            else // bright bg -> bright bottom borderline
-                { p.setPen(Colors::mid(bg, Qt::white, 16, bgv)); d = 1; }
+                { p.setPen(QColor(0,0,0,255-bgv)); d = -1; }
+            else  // bright bg -> bright bottom borderline
+            {
+                int s = 255 - bgv + qMin(bg.red(), qMin(bg.green(), bg.blue()));
+                // s^12/255^11 in integer compatible way ;-)
+                s = s*s/255;
+                s = s*s/255;
+                s = s*s/255;
+                s = s*s/255;
+                s = s*s/255;
+                s = s*s/255;
+                s = s - 128;
+                s = 153+ s*s*s / 20000;
+                p.setPen(QColor(255,255,255,s));
+                d = 1;
+            }
 
             QRect tr;
             QPoint off(0,0); Factory::verticalTitle() ? off.setX(-d) : off.setY(d);
             p.drawText ( label.translated(off), tf, myCaption, &tr );
 
-            if ( !(Factory::config()->hideInactiveButtons || Factory::verticalTitle()) )
-            {
-                if ( (tr.left() - 37 > label.left() && tr.right() + 37 < label.right() ) &&
-                    maximizeMode() != MaximizeFull && color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
-                    gType[0] == gType[1] && color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1) )
-                {   // inactive window looks like active one...
-                    int y = label.center().y();
-                    if ( !(tf & Qt::AlignLeft) )
-                        p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
-                    if ( !(tf & Qt::AlignRight) )
-                        p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
+            bool wantBorderLines = !Factory::verticalTitle() && tr.left() - 37 > label.left() && tr.right() + 37 < label.right();
+            if (wantBorderLines) { // otherwise painting looks crap
+                if (!Factory::config()->forceBorderLines) { // not forced, check whether inactive looks like active
+                    if (Factory::config()->hideInactiveButtons && !Factory::config()->buttonnyButton)
+                        wantBorderLines = false; // perfectly hinted
+                    else {
+                        wantBorderLines =   color(ColorTitleBar, 0) == color(ColorTitleBar, 1) &&
+                                            gType[0] == gType[1] &&
+                                            color(ColorTitleBlend, 0) == color(ColorTitleBlend, 1);
+                    }
                 }
+            }
+            if (wantBorderLines)
+            {   // inactive window looks like active one...
+                int y = label.center().y();
+                if ( !(tf & Qt::AlignLeft) )
+                    p.drawPixmap(tr.x() - 38, y, Gradients::borderline(titleColor, Gradients::Left));
+                if ( !(tf & Qt::AlignRight) )
+                    p.drawPixmap(tr.right() + 6, y, Gradients::borderline(titleColor, Gradients::Right));
             }
         }
 
@@ -1464,7 +1489,7 @@ Client::tileWindow(bool more, bool vertical, bool mirrorGravity)
     {
         if (!(sz = KWindowSystem::workArea().height()))
             return;
-        state = lround((double)tiles*height()/sz);
+        state = qRound((double)tiles*height()/sz);
         change = (qAbs(height()-state*sz/tiles) < 0.05*sz);
         flags |= 1<<11;
         mode = MaximizeVertical;
@@ -1473,7 +1498,7 @@ Client::tileWindow(bool more, bool vertical, bool mirrorGravity)
     {
         if (!(sz = KWindowSystem::workArea().width()))
             return;
-        state = lround((double)tiles*width()/sz);
+        state = qRound((double)tiles*width()/sz);
         change = (qAbs(width()-state*sz/tiles) < 0.05*sz);
         flags |= 1<<10;
         mode = MaximizeHorizontal;

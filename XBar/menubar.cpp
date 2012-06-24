@@ -20,6 +20,7 @@
 #include <QAction>
 #include <QBasicTimer>
 #include <QDBusInterface>
+#include <QEvent>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
@@ -29,12 +30,13 @@
 #include <QStyle>
 #include <QStyleOptionMenuItem>
 
+#include "../blib/tileset.h"
 #include <Plasma/Applet>
 
 #include "menubar.h"
 // #include "xbar.h"
 
-#include <QtDebug>
+// #include <QtDebug>
 
 
 static QBasicTimer mousePoll;
@@ -208,6 +210,16 @@ MenuBar::changeAction(int idx, const QString & text)
         act->setSeparator(true);
     d.actionRects[idx] = QRect();
     updateSize();
+}
+void
+MenuBar::changeEvent(QEvent *ce)
+{
+    if (ce->type() == QEvent::FontChange) {
+        for (int i = 0; i < d.actionRects.count(); ++i)
+            d.actionRects[i] = QRect();
+        updateSize();
+    }
+    QGraphicsWidget::changeEvent(ce);
 }
 
 void
@@ -393,6 +405,7 @@ MenuBar::mousePressEvent(QGraphicsSceneMouseEvent *ev)
     emit triggered(idx);
 }
 
+static Tile::Set *s_glow = 0;
 void
 MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
@@ -419,6 +432,7 @@ MenuBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidge
         opt.rect = adjustedActionRect;
         painter->setFont(opt.font);
         painter->setClipRect(adjustedActionRect);
+        if (s_glow) s_glow->render(adjustedActionRect, painter);
         style()->drawControl(QStyle::CE_MenuBarItem, &opt, painter, d.widget);
     }
 
@@ -474,6 +488,22 @@ MenuBar::removeAction(int idx)
     delete d.actions.takeAt(idx);
     d.actionRects.removeAt(idx);
     updateSize();
+}
+
+void
+MenuBar::setGlowColor(QColor bg)
+{
+    delete s_glow;
+    QRadialGradient rg(QPoint(17,17), 16);
+    bg.setAlpha(128); rg.setColorAt(0, bg);
+    bg.setAlpha(0); rg.setColorAt(1, bg);
+    QImage img(33,33, QImage::Format_ARGB32);
+    img.fill(Qt::transparent);
+    QPainter p(&img);
+    p.fillRect(img.rect(), rg);
+    p.end();
+    s_glow = new Tile::Set(img, 16, 16, 1,1);
+    s_glow->setDefaultShape(Tile::Full);
 }
 
 void

@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -50,7 +50,7 @@
        <item row="3" column="2" colspan="2">
         <widget class="QTabWidget" name="tabWidget_2">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <property name="documentMode">
           <bool>false</bool>
@@ -112,6 +112,11 @@
              <item>
               <property name="text">
                <string>Shiny</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Stone</string>
               </property>
              </item>
              <item>
@@ -190,6 +195,11 @@
              <item>
               <property name="text">
                <string>Shiny</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Stone</string>
               </property>
              </item>
             </widget>
@@ -298,6 +308,11 @@
              </item>
              <item>
               <property name="text">
+               <string>Stone</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
                <string>Flat</string>
               </property>
              </item>
@@ -372,6 +387,11 @@
              <item>
               <property name="text">
                <string>Shiny</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Stone</string>
               </property>
              </item>
             </widget>
@@ -554,6 +574,9 @@
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <layout class="QFormLayout" name="formLayout_2">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="label_11">
            <property name="text">
@@ -587,6 +610,58 @@
            <item>
             <property name="text">
              <string>LasseKongo (nogen)</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="buttonGradient">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <item>
+            <property name="text">
+             <string>None</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Simple</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Button</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Sunken</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Gloss</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Glass</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Metal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Cloudy</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Shiny</string>
             </property>
            </item>
           </widget>
@@ -636,59 +711,10 @@
          <item row="3" column="1">
           <widget class="QLineEdit" name="multibutton"/>
          </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="buttonGradient">
-           <item>
-            <property name="text">
-             <string>None</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Simple</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Button</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Sunken</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Gloss</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Glass</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Metal</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Cloudy</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Shiny</string>
-            </property>
-           </item>
-          </widget>
-         </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_17">
+          <widget class="QCheckBox" name="buttonnyButton">
            <property name="text">
-            <string>Gradient</string>
+            <string>More traditional button</string>
            </property>
           </widget>
          </item>
@@ -1177,12 +1203,28 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>157</x>
-     <y>49</y>
+     <x>15</x>
+     <y>34</y>
     </hint>
     <hint type="destinationlabel">
-     <x>229</x>
-     <y>50</y>
+     <x>70</x>
+     <y>34</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonnyButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>buttonGradient</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>143</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>282</x>
+     <y>82</y>
     </hint>
    </hints>
   </connection>

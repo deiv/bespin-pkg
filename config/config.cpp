@@ -55,7 +55,7 @@ extern "C"
 integers - not of interest for you*/
 namespace Gradients {
     enum Type {
-        None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, Shiny, //RadialGloss,
+        None = 0, Simple, Button, Sunken, Gloss, Glass, Metal, Cloudy, Shiny, Stone, //RadialGloss,
         TypeAmount
     };
     enum BgMode { BevelV = 2, BevelH };
@@ -299,6 +299,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.bgMode, BG_MODE);
     handleSettings(ui.bgIntensity, BG_INTENSITY);
     handleSettings(ui.ringOverlay, BG_RING_OVERLAY);
+    handleSettings(ui.roundness, ROUNDNESS);
 #if BESPIN_ARGB_WINDOWS
     handleSettings(ui.argbOpacity, BG_OPACITY);
     setContextHelp(ui.argbSupport, "<b>Window Opacity</b><hr>\
@@ -473,6 +474,10 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     setContextHelp(ui.hackDolphinIconViews, "<b>Dolphin Iconviews</b><hr>\
     The three items for a unity when eg. splitting the view, but this is not reflected visually what\
     leads to \"disalignment\"");
+
+    handleSettings(ui.hackDolphinIconViewsTransparent, HACK_DOLPHIN_ICONVIEWS_TRANSPARENT);
+    setContextHelp(ui.hackDolphinIconViewsTransparent, "<b>Transparent Dolphin Iconviews</b><hr>\
+    removes the white ground in the main dolphin icon view and paints the item directly on the background");
 
     handleSettings(ui.dolphinViews, HACK_DOLPHIN_VIEWS);
     setContextHelp(ui.dolphinViews, "<b>Dolphin sidebar</b><hr>\
@@ -1542,6 +1547,7 @@ Config::generateGradientTypes(QComboBox *box)
     box->addItem("Metal");
     box->addItem("Cloudy");
     box->addItem("Shiny");
+    box->addItem("Stone");
 }
 
 

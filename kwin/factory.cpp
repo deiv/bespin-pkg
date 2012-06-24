@@ -56,9 +56,11 @@ bool Factory::weAreInitialized = false;
 bool Factory::weAreComposited = true; // just guessing, kwin isn't up yet ... :(
 bool Factory::weAreCompiz = false; // just guessing, isn't up yet ... :(
 Config Factory::ourConfig =
-    { false, false, false, true, true, false, true, 0, Qt::AlignHCenter,
-      { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
-      Gradients::None, QStringList() };
+{   false, false, false, true, true, false, true, false, false, true,
+    0, Qt::AlignHCenter,
+    { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
+    Gradients::None, QStringList()
+};
 Qt::KeyboardModifier Factory::ourCommandKey = Qt::AltModifier;
 int Factory::ourButtonSize[2] = {-1, -1};
 int Factory::ourBorderSize[2] = {4,4};
@@ -381,8 +383,20 @@ bool Factory::readConfig()
     if (oldgradient != ourConfig.gradient[1][1]) ret = true;
 
     oldgradient = ourConfig.buttonGradient;
-    oldgradient = ourConfig.buttonGradient = (Gradients::Type)(settings.value("ButtonGradient", 0).toInt());
+    ourConfig.buttonGradient = (Gradients::Type)(settings.value("ButtonGradient", 0).toInt());
     if (oldgradient != ourConfig.buttonGradient) ret = true;
+
+    oldBool = ourConfig.buttonnyButton;
+    ourConfig.buttonnyButton = settings.value("ButtonnyButton", false).toBool();
+    if (oldBool != ourConfig.buttonnyButton) ret = true;
+
+    oldBool = ourConfig.invertedButtons;
+    ourConfig.invertedButtons = ourConfig.buttonnyButton && settings.value("InvertedButtons", true).toBool();
+    if (oldBool != ourConfig.invertedButtons) ret = true;
+
+    oldBool = ourConfig.forceBorderLines;
+    ourConfig.forceBorderLines = settings.value("BorderLines", false).toBool();
+    if (oldBool != ourConfig.forceBorderLines) ret = true;
 
     QString oldmultiorder = multiString(ourMultiButton);
     QString newmultiorder = settings.value("MultiButtonOrder", "MHFBSLE!").toString();
@@ -404,7 +418,10 @@ bool Factory::readConfig()
     int oldtitlesize = ourTitleSize[0];
     ourTitleSize[0] = fntHgt + 4 + settings.value("TitlePadding", 0).toInt();
     if (oldtitlesize != ourTitleSize[0]) ret = true;
-    ourButtonSize[0] = fntHgt - 2 + ourTitleSize[0]%2;
+    if (ourConfig.buttonnyButton)
+        ourButtonSize[0] = fntHgt + 2 + ourTitleSize[0]%2;
+    else
+        ourButtonSize[0] = fntHgt - 2 + ourTitleSize[0]%2;
 
     fntHgt *= smallFactor();
     oldtitlesize = ourTitleSize[1];
@@ -445,9 +462,8 @@ bool Factory::readConfig()
         settings.endGroup();
     }
 
-    const int icnVar = ourConfig.buttonGradient == Gradients::None ? settings.value("IconVariant", 1).toInt() : 1;
     Button::init( options()->titleButtonsLeft().contains(QRegExp("(M|S|H|F|B|L)")),
-                  settings.value("IAmMyLittleSister", false).toBool(), icnVar);
+                  settings.value("IAmMyLittleSister", false).toBool(), settings.value("IconVariant", 1).toInt());
 
     return ret;
 }

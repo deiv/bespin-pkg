@@ -23,21 +23,6 @@
 #include <QRect>
 #include <QHash>
 
-#ifdef Q_WS_X11
-#include <QX11Info>
-#include <X11/Xlib.h>
-
-#ifndef QT_NO_XRENDER
-#include <X11/extensions/Xrender.h>
-#endif
-
-#include "fixx11h.h"
-#else
-
-#define QT_NO_XRENDER #
-
-#endif
-
 #include "gradients.h"
 
 namespace Tile
@@ -61,7 +46,7 @@ inline static bool matches(PosFlags This, PosFlags That){return (This & That) ==
 class BLIB_EXPORT Set
 {
 public:
-    Set(const QImage &img, int xOff, int yOff, int width, int height, int round = 99);
+    Set(const QImage &img, int xOff, int yOff, int width, int height);
     Set()
     {
         setDefaultShape(Ring);
@@ -78,8 +63,6 @@ public:
 
     inline bool
     isQBitmap() const {return _isBitmap;}
-
-    void outline(const QRect &rect, QPainter *p, QColor c, int size = 1) const;
 
     QRect rect(const QRect &rect, PosFlags pf) const;
 
@@ -129,7 +112,6 @@ protected:
    PosFlags _defShape;
 private:
    bool _isBitmap, _hasCorners;
-   QRect rndRect;
 };
 
 BLIB_EXPORT PosFlags shape();

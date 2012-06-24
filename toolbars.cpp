@@ -252,33 +252,35 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
                                                    (pf & Tile::Right) ? X2 : 0, (pf & Tile::Bottom) ? Y2 : 0)
         if (config.btn.tool.frame)
         {
+            bool relief = false;
+            const int f1 = F(1);
             if (config.btn.tool.frame == Inlay) {
-                const QColor sc = config.UNO.toolbar ? tb->palette().color(tb->backgroundRole()) : windowColor(widget);
+                QColor sc = config.UNO.toolbar ? tb->palette().color(tb->backgroundRole()) : windowColor(widget);
+                if (config.btn.backLightHover)
+                    sc = Colors::mid(sc, c, 4, 3);
                 masks.rect[true].render(rect, painter, Gradients::Sunken, Qt::Vertical, sc);
                 const int f3 = F(3);
                 if (round)
                     rect.adjustConditionally(F(4), f3, -F(4), -f3);
                 else
                     rect.adjustConditionally(f3, f3, -f3, -f3);
-            }
-            else if (pf & Tile::Bottom)
-                rect.setBottom(rect.bottom()-F(2));
-            masks.rect[round].render(rect, painter, gt, o, c);
-
-            bool relief;
-            if (config.btn.tool.frame == Inlay) {
-                const int f1 = F(1);
-                rect.adjustConditionally(-f1, -f1, f1, f1);
                 relief = true;
             }
             else {
                 relief = (config.btn.tool.frame == Relief) && !(sunken || option->state & State_On);
-                rect = RECT;
+                if (relief)
+                    rect.adjustConditionally(f1, f1, -f1, -f1);
+                else if (pf & Tile::Bottom)
+                    rect.setBottom(rect.bottom()-F(2));
             }
-            if (relief)
+
+            masks.rect[round].render(rect, painter, gt, o, c);
+
+            if (relief) {
+                rect.adjustConditionally(-f1, -f1, f1, f1);
                 shadows.relief[round][true].render(rect, painter);
-            else
-                shadows.sunken[round][true].render(rect, painter);
+            } else
+                shadows.sunken[round][true].render(RECT, painter);
         }
         else
         {

@@ -23,6 +23,7 @@ namespace Elements {
 
     BLIB_EXPORT void setShadowIntensity(float intensity);
     BLIB_EXPORT void setScale(float scale);
+    BLIB_EXPORT void setRoundness(int roundness);
     BLIB_EXPORT QImage glow(int size, float width);
     BLIB_EXPORT QImage shadow(int size, bool opaque, bool sunken, float factor = 1.0);
     BLIB_EXPORT QImage roundMask(int size);

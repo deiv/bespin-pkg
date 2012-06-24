@@ -56,8 +56,6 @@ Config::Config(QWidget* parent) : BConfig(parent)
     connect (ui.actGrad2, SIGNAL(currentIndexChanged(int)), SLOT(watchDecoGradient()));
     connect (ui.inactGrad2, SIGNAL(currentIndexChanged(int)), SLOT(watchDecoGradient()));
 
-    connect (ui.buttonGradient, SIGNAL(currentIndexChanged(int)), SLOT(watchButtonGradient()));
-
     connect (ui.activeShadowSize, SIGNAL(valueChanged(int)), SLOT(watchShadowSize(int)));
     connect (ui.inactiveShadowSize, SIGNAL(valueChanged(int)), SLOT(watchShadowSize(int)));
 
@@ -97,7 +95,7 @@ Config::Config(QWidget* parent) : BConfig(parent)
     setContextHelp(ui.verticalTitlebar, "<b>Vertical Titlebar</b><hr>Could be usefull...");
 
     handleSettings(ui.roundCorners, "RoundCorners", true);
-    ui.roundCorners->hide();
+//     ui.roundCorners->hide();
 
     handleSettings(ui.trimmTitle, "TrimmCaption", true);
     setContextHelp(ui.trimmTitle, "<b>Trimm Title</b><hr>\
@@ -159,10 +157,12 @@ Config::Config(QWidget* parent) : BConfig(parent)
     setContextHelp(ui.slickButtons, "The appereance of unhovered buttons. Morphs to icon on hover<br>\
     Dots and bricks look slick, but may be considered less usable, as unhovered buttons look all the same");
 
+    handleSettings(ui.buttonnyButton, "ButtonnyButton", false);
+    setContextHelp(ui.buttonGradient, "More traditional button. <br>\
+    Gets you a round button frame around the actual icon.");
+
     handleSettings(ui.buttonGradient, "ButtonGradient", 0);
-    setContextHelp(ui.buttonGradient, "The button gradient. <br>\
-    \"None\" is the default and behaves a bit different from all others.<br>\
-    You cannot choose the icon variant or the unhovered look if this is a real gradient.");
+    setContextHelp(ui.buttonGradient, "Yeah, guess what.");
 
     handleSettings(ui.titlePadding, "TitlePadding", 0);
     setContextHelp(ui.titlePadding, "<b>Titlebar padding</b><hr>\
@@ -532,13 +532,6 @@ void Config::watchBgMode()
     const bool isDefault = (ui.presets->currentRow() == 0);
     ui.actGrad2->setEnabled(isDefault || idx < 0);
     ui.inactGrad2->setEnabled(isDefault || idx < 0);
-}
-
-void Config::watchButtonGradient()
-{
-    const bool enabled = ui.buttonGradient->currentIndex() == 0;
-    ui.iconVariant->setEnabled(enabled);
-    ui.slickButtons->setEnabled(enabled);
 }
 
 void Config::watchDecoGradient()

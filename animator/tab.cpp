@@ -422,7 +422,7 @@ TabInfo::updatePixmaps(Transition transition, uint ms)
         {
             QPainter p(&tabPix[2]);
             const int numStep = duration/_timeStep;
-            const int h = lround(_timeStep * (numStep-progress) / (duration-ms));
+            const int h = qRound(_timeStep * (numStep-progress) / (duration-ms));
             for (int i = (int)progress; i < tabPix[2].height(); i+=numStep)
                 p.drawPixmap(0, i, tabPix[1], 0, i, tabPix[1].width(), h);
             progress += h;

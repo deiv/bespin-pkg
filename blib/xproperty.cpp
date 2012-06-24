@@ -78,7 +78,7 @@ a 32bit integer to be set as X11 property
 Of course this is convulsive, but doesn't hurt for our purposes
 ::encode() is a bit trickier as it needs to decide whether the color values
 should be rounded up or down like
-x = qMin(lround(x/8.0),31) IS WRONG! as it would impact the hue and while
+x = qMin(qRround(x/8.0),31) IS WRONG! as it would impact the hue and while
 value manipulations are acceptable, hue values are NOT (this is a 8v stepping
 per channel and as we're gonna create gradients out of the colors, black could
 turn some kind of very dark red...)
