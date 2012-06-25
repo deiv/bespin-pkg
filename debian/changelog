@@ -1,6 +1,7 @@
-bespin (0.r1552-1) UNRELEASED; urgency=low
+bespin (0.r1552-1) unstable; urgency=low
 
   * New release SVN@1552 
+  * Upload to unstable 
 
  -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 24 Jun 2012 15:40:58 +0530
 
