@@ -275,6 +275,20 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
         *border = right = Factory::edgeSize();
         *counter = isShade() ? 14 : Factory::baseSize();
     }
+    if (Factory::config()->buttonnyButton) // need more padding to look good
+    if (!unoHeight || Factory::verticalTitle()) // is not effectively UNO
+    if (bgMode == 1 || bgMode == 0xff) // is fallback gradient
+        *title += 6;
+    Client *that = const_cast<Client*>(this);
+    that->myTitleSize = *title;
+    if (Factory::verticalTitle()) {
+        that->myTitleSpacer->changeSize( myTitleSize, 1, QSizePolicy::Fixed, QSizePolicy::Expanding);
+        that->left.setWidth(myTitleSize);
+    } else {
+        that->myTitleSpacer->changeSize( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
+        that->top.setHeight(myTitleSize);
+    }
+    that->myTitleBar->invalidate();
 }
 
 int
