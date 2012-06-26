@@ -281,8 +281,8 @@ if (!tile->isNull())\
         w -= width(TopRight);
         if (pf & (Top | Bottom) && trh + brh > r.height())
         {   // vertical edge overlap
-            trh = (trh*r.height())/(trh+brh);
-            brh = r.height() - trh;
+            tlh = trh = (trh*r.height())/(trh+brh);
+            blh = brh = r.height() - trh;
         }
     }
 
