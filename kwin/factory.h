@@ -47,7 +47,7 @@ typedef struct
 {
     bool    forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons,
             verticalTitle, variableShadowSizes, buttonnyButton, forceBorderLines, invertedButtons;
-    int slickButtons, titleAlign;
+    int slickButtons, titleAlign, buttonDepth;
     Gradients::Type gradient[2][2], buttonGradient;
     QStringList smallTitleClasses;
 } Config;

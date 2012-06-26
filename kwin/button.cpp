@@ -32,6 +32,7 @@ using namespace Bespin;
 
 QPainterPath Button::shape[NumTypes];
 static QPixmap s_buttonMask[2];
+static int s_buttonDepth = -1;
 bool Button::fixedColors = false;
 
 Button::Button(Client *parent, Type type, bool left) : QWidget(parent->widget()),
@@ -339,11 +340,11 @@ Button::paintEvent(QPaintEvent *)
     const int slick = Factory::slickButtons();
     QRectF r(rect());
     if (Factory::buttonnyButton()) {
-        float d = r.height() / 4.0;
-        r.adjust(d,d,-d,-d);
-        if (s_buttonMask[0].size() != size()) {
+        { float d = r.height() / 4.0; r.adjust(d,d,-d,-d); }
+        if (s_buttonDepth != Factory::config()->buttonDepth || s_buttonMask[0].size() != size()) {
+            const int depth = s_buttonDepth = Factory::config()->buttonDepth;
             s_buttonMask[0] = QPixmap(size());
-            s_buttonMask[1] = QPixmap(width() - 6, height() - 6);
+            s_buttonMask[1] = QPixmap(width() - (2*(depth+1)), height() - (2*(depth+1)));
             s_buttonMask[0].fill(Qt::transparent);
             s_buttonMask[1].fill(Qt::transparent);
 
@@ -361,15 +362,15 @@ Button::paintEvent(QPaintEvent *)
             else
                 p.drawRect(s_buttonMask[0].rect());
             if (Factory::buttonGradient() != Gradients::Sunken) {
-                stop = QPoint(0,s_buttonMask[0].height()-4);
+                stop = QPoint(0,s_buttonMask[0].height()-(2*depth));
                 QLinearGradient lg2(start, stop);
                 lg2.setColorAt(0, QColor(255,255,255,20));
                 lg2.setColorAt(1, QColor(0,0,0,20));
                 p.setBrush(lg2);
                 if (Factory::config()->roundCorners)
-                    p.drawEllipse(s_buttonMask[0].rect().adjusted(2,2,-2,-2));
+                    p.drawEllipse(s_buttonMask[0].rect().adjusted(depth,depth,-depth,-depth));
                 else
-                    p.drawRect(s_buttonMask[0].rect().adjusted(2,2,-2,-2));
+                    p.drawRect(s_buttonMask[0].rect().adjusted(depth,depth,-depth,-depth));
             }
             p.end();
 
@@ -401,7 +402,8 @@ Button::paintEvent(QPaintEvent *)
             p2.end();
         }
 
-        p.drawPixmap(3,3, FX::applyAlpha( texture, s_buttonMask[1], s_buttonMask[1].rect() ) );
+        const int d = Factory::config()->buttonDepth + 1;
+        p.drawPixmap(d,d, FX::applyAlpha( texture, s_buttonMask[1], s_buttonMask[1].rect() ) );
     }
 
     p.setRenderHint(QPainter::Antialiasing);
