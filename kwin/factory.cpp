@@ -423,7 +423,7 @@ bool Factory::readConfig()
     ourTitleSize[0] = fntHgt + 4 + settings.value("TitlePadding", 0).toInt();
     if (oldtitlesize != ourTitleSize[0]) ret = true;
     if (ourConfig.buttonnyButton)
-        ourButtonSize[0] = fntHgt + 2 + ourTitleSize[0]%2;
+        ourButtonSize[0] = fntHgt + qMin(2, ourConfig.buttonDepth) + ourTitleSize[0]%2;
     else
         ourButtonSize[0] = fntHgt - 2 + ourTitleSize[0]%2;
 
