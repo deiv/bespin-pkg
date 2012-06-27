@@ -184,7 +184,8 @@ XBar::init()
     ggmLastId = 0;
     ggmContext = XInternAtom( QX11Info::display(), "_NET_GLOBALMENU_MENU_CONTEXT", false );
     ggmEvent = XInternAtom( QX11Info::display(), "_NET_GLOBALMENU_MENU_EVENT", false );
-    formerX11EventFilter = QAbstractEventDispatcher::instance()->setEventFilter(globalX11EventFilter);
+    if (!formerX11EventFilter)
+        formerX11EventFilter = QAbstractEventDispatcher::instance()->setEventFilter(globalX11EventFilter);
 
     connect( KWindowSystem::self(), SIGNAL( activeWindowChanged(WId) ), this, SLOT( ggmWindowActivated(WId) ) );
     connect( KWindowSystem::self(), SIGNAL( windowAdded(WId) ), this, SLOT( ggmWindowAdded(WId) ) );
