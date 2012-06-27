@@ -740,7 +740,7 @@ const QPixmap
             pix->fill(Qt::transparent);
         srand( 314159265 );
         QImage img(256,64, QImage::Format_ARGB32);
-        img.fill(c);
+        img.fill(c.rgba());
         //expblur has a run-in, so the image needs to be slightly bigger
         QImage noise = FX::newDitherImage(qMin(512, 10*qAbs(_bgIntensity-100)), 256+48).copy(0, 64, 256+48, 72);
         FX::expblur(noise, 32, Qt::Horizontal);
