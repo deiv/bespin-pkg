@@ -230,7 +230,11 @@ XBar::updateFont()
 void
 XBar::updatePalette()
 {
-    QColor fg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::TextColor);
+    QSettings settings("Bespin", "XBar");
+    settings.beginGroup("XBar");
+    QColor fg = settings.value("Color", QColor()).value<QColor>();
+    if (!fg.isValid())
+        fg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::TextColor);
     QColor bg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::BackgroundColor);
     MenuBar::setGlowColor(bg);
     QPalette pal(fg, bg, Qt::white, Qt::black, Qt::gray, fg, fg, bg, bg );
