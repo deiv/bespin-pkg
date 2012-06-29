@@ -325,6 +325,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         QCursor::setPos(window->mapToGlobal( window->rect().topRight() ) + QPoint(2, 0) );
         QCursor::setPos(cursor);
         s_dragWidget.clear();
+        dragWidget = 0;
         s_dragCandidate.clear();
         return false;
     }
@@ -415,7 +416,8 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         }
         killTimer(autoSlideTimer);
         autoSlideTimer = 0;
-        dragCandidate = 0L;
+        s_dragCandidate.clear();
+        dragCandidate = 0;
         return false;
     }
 
@@ -424,7 +426,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         const bool wmDrag = hackMoveWindow(dragCandidate, e);
         if ( wmDrag )
         {
-            dragWidget = dragCandidate;
+            s_dragWidget = dragWidget = dragCandidate;
 
             // the release would set "dragCandidate = 0L;", therfore it cannot be done in hackMoveWindow
             // it's probably not required either
@@ -462,8 +464,10 @@ Hacks::eventFilter(QObject *o, QEvent *e)
                 }
             }
         }
-        else
+        else {
+            s_dragCandidate.clear();
             dragCandidate = 0L;
+        }
         return wmDrag;
     }
 
