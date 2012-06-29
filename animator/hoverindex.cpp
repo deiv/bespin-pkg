@@ -104,9 +104,20 @@ void
 HoverIndex::release(QObject *o)
 {
     QWidget *w = qobject_cast<QWidget*>(o);
-    if (!w) return;
-
-    items.remove(w);
+    if (!w)
+        return;
+    Items::iterator it = items.begin(), end = items.end();
+    while (it != end) {
+        if (it.key().isNull()) {
+            it = items.erase(it);
+            continue;
+        }
+        if (it.key().data() == w) {
+            items.erase(it);
+            break;
+        }
+        ++it;
+    }
     if (items.isEmpty())
         timer.stop();
 }
@@ -124,18 +135,12 @@ HoverIndex::timerEvent(QTimerEvent * event)
     QWidget *w;
     while (it != items.end())
     {
-        if (!it.key())
+        if (it.key().isNull())
         {
             it = items.erase(it);
             continue;
         }
-#if QT_VERSION >= 0x040400
-        // below does work in general, but is... ugly?!
-        // another way would be to map to a const widget first or perform a static_cast - ughh
         w = const_cast<QWidget*>(it.key().data());
-#else
-        w = const_cast<QWidget*>(&(*it.key()));
-#endif
         IndexInfo &info = it.value();
         if (info.fades[In].isEmpty() && info.fades[Out].isEmpty())
         {

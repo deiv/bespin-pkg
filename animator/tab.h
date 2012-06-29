@@ -40,9 +40,9 @@ public:
     bool proceed();
     void switchTab(QStackedWidget *sw, int index);
 protected:
-    BePointer<Curtain> curtain;
+    QWeakPointer<Curtain> curtain;
     float progress;
-    BePointer<QWidget> currentWidget;
+    QWeakPointer<QWidget> currentWidget;
     friend class Tab;
     int index;
     uint duration;
@@ -63,13 +63,13 @@ public:
     static void setDuration(uint ms);
     static void setFPS(uint fps);
     static void setTransition(Transition t);
-
+    typedef QWeakPointer<QStackedWidget> StackWidgetPtr;
 protected:
     Tab();
     virtual bool _manage(QWidget *w);
     virtual void _release(QWidget *w);
     virtual void timerEvent(QTimerEvent * event);
-    typedef QHash<const QStackedWidget*, TabInfo*> Items;
+    typedef QMap<StackWidgetPtr, TabInfo*> Items;
     Items items;
     int _activeTabs;
 protected slots:
@@ -78,5 +78,9 @@ protected slots:
 private:
     Q_DISABLE_COPY(Tab)
 };
+
+inline bool operator< (const Tab::StackWidgetPtr &ptr1, const Tab::StackWidgetPtr &ptr2) {
+    return ptr1.data() < ptr2.data();
+}
 
 } //namespace

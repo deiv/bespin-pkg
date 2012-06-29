@@ -48,7 +48,10 @@
 #include <kdemacros.h>
 
 extern "C"
-{ KDE_EXPORT KDecorationFactory* create_factory() { return new Bespin::Factory(); } }
+{
+    KDE_EXPORT KDecorationFactory* create_factory() { return new Bespin::Factory(); }
+    KDE_EXPORT int decoration_version() { return 1; }
+}
 
 using namespace Bespin;
 

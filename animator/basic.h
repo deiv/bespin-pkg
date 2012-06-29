@@ -21,7 +21,7 @@
 
 #include <QBasicTimer>
 #include <QMap>
-#include "../bepointer.h"
+#include <QWeakPointer>
 
 namespace Animator {
 
@@ -53,7 +53,7 @@ public:
     static int step(const QWidget *widget);
     virtual const Info &info(const QWidget *widget, long int index = 0) const;
     static void setFPS(uint fps);
-
+    typedef QWeakPointer<QWidget> WidgetPtr;
 protected:
     Basic();
     virtual ~Basic(){}
@@ -68,7 +68,6 @@ protected:
     QBasicTimer timer;
     uint timeStep;
     uint count;
-    typedef BePointer<QWidget> WidgetPtr;
     typedef QMap<WidgetPtr, Info> Items;
     Items items;
 protected slots:
@@ -77,6 +76,13 @@ protected slots:
 private:
     Q_DISABLE_COPY(Basic)
 };
+
+#ifndef WIDGET_PTR_LESSER
+#define WIDGET_PTR_LESSER
+inline bool operator< (const Basic::WidgetPtr &ptr1, const Basic::WidgetPtr &ptr2) {
+    return ptr1.data() < ptr2.data();
+}
+#endif
 
 } // namespace
 

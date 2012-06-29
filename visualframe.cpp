@@ -155,7 +155,7 @@ VisualFrame::release(QFrame *frame)
 
 // TODO: mange ALL frames and catch shape/shadow changes!!!
 VisualFrame::VisualFrame(QFrame *parent) : QObject(0),
-myFrame(0), myWindow(0), top(0), bottom(0), left(0), right(0), hidden(true)
+myFrame(0), myWindow(0), hidden(true)
 {
     myStyle = (QFrame::Shape)-1;
     if (notInited)
@@ -191,10 +191,13 @@ VisualFrame::updateShape()
 
     if (myStyle != QFrame::StyledPanel)
     {
-        if (top) { top->hide(); top->deleteLater(); top = 0L; }
-        if (bottom) { bottom->hide(); bottom->deleteLater(); bottom = 0L; }
-        if (left) { left->hide(); left->deleteLater(); left = 0L; }
-        if (right) { right->hide(); right->deleteLater(); right = 0L; }
+        VisualFramePart *part;
+#define WIPE(_P_) if ((part = _P_.data())) { part->hide(); part->deleteLater(); _P_.clear(); } //
+        WIPE(top)
+        WIPE(bottom)
+        WIPE(left)
+        WIPE(right)
+#undef WIPE
         myFrame->clearMask();
 
         QWidget *runner = myFrame->parentWidget();
@@ -211,14 +214,15 @@ VisualFrame::updateShape()
     // to capture e.g. dock floats etc.
     myWindow = myFrame;
     myWindow->installEventFilter(&stdChildAdd);
-    if (!top) top = new VisualFramePart(myWindow, myFrame, this, North);
-    if (!bottom) bottom = new VisualFramePart(myWindow, myFrame, this, South);
-    if (!left) left = new VisualFramePart(myWindow, myFrame, this, West);
-    if (!right) right = new VisualFramePart(myWindow, myFrame, this, East);
+    VisualFramePart *manager = top.data();
+    if (!manager) top = manager = new VisualFramePart(myWindow, myFrame, this, North);
+    if (bottom.isNull()) bottom = new VisualFramePart(myWindow, myFrame, this, South);
+    if (left.isNull()) left = new VisualFramePart(myWindow, myFrame, this, West);
+    if (right.isNull()) right = new VisualFramePart(myWindow, myFrame, this, East);
     myWindow->removeEventFilter(&stdChildAdd);
     // manage events
-    top->removeEventFilter(this);
-    top->installEventFilter(this);
+    manager->removeEventFilter(this);
+    manager->installEventFilter(this);
     if (myFrame->isVisible())
         show();
     else
@@ -282,26 +286,30 @@ VisualFrame::correctPosition()
     int offs = extends[t][West] + extends[t][East];
 
     // north element
-    top->resize(rect.width()+offs, sizes[t][North]);
-    top->move(x - extends[t][West], y - extends[t][North]);
+    VisualFramePart *part = top.data();
+    part->resize(rect.width()+offs, sizes[t][North]);
+    part->move(x - extends[t][West], y - extends[t][North]);
 
     // South element
-    bottom->resize(rect.width() + offs, sizes[t][South]);
-    bottom->move(x - extends[t][West], rect.bottom()  + extends[t][South] - sizes[t][South]);
+    part = bottom.data();
+    part->resize(rect.width() + offs, sizes[t][South]);
+    part->move(x - extends[t][West], rect.bottom()  + extends[t][South] - sizes[t][South]);
 
     offs = (sizes[t][North] + sizes[t][South]) - (extends[t][North] + extends[t][South]);
 
     // West element
-    left->resize(sizes[t][West], rect.height() - offs);
-    left->move(x - extends[t][West], y + sizes[t][North] - extends[t][North]);
+    part = left.data();
+    part->resize(sizes[t][West], rect.height() - offs);
+    part->move(x - extends[t][West], y + sizes[t][North] - extends[t][North]);
 
     // East element
-    right->resize(sizes[t][East], rect.height() - offs);
-    right->move(rect.right() + 1 - sizes[t][East] + extends[t][East], y + sizes[t][North] - extends[t][North]);
+    part = right.data();
+    part->resize(sizes[t][East], rect.height() - offs);
+    part->move(rect.right() + 1 - sizes[t][East] + extends[t][East], y + sizes[t][North] - extends[t][North]);
     //    qDebug() << myFrame->frameRect() << rect << right->geometry();
 }
 
-#define PARTS(_FUNC_) if (top) { top->_FUNC_; left->_FUNC_; right->_FUNC_; bottom->_FUNC_; } void(0)
+#define PARTS(_FUNC_) if (top.data()) { top.data()->_FUNC_; left.data()->_FUNC_; right.data()->_FUNC_; bottom.data()->_FUNC_; } void(0)
 
 void
 VisualFrame::show()
@@ -334,7 +342,7 @@ VisualFrame::show()
 
     if (window != myWindow)
     {
-        if (top->parentWidget() != myWindow)
+        if (top.data()->parentWidget() != myWindow)
         {
             myWindow->installEventFilter(&stdChildAdd);
             PARTS(setParent(myWindow));
@@ -439,7 +447,7 @@ static bool blockZEvent = false;
 bool
 VisualFrame::eventFilter ( QObject * o, QEvent * ev )
 {
-    if (o == top)
+    if (o == top.data())
     {   // "top" is the only monitored framepart!
         if (ev->type() == QEvent::ZOrderChange && !(blockZEvent || hidden))
         {

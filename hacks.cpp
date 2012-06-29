@@ -29,7 +29,6 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
-#include "bepointer.h"
 #include <QScrollBar>
 #include <QWindowStateChangeEvent>
 #include <QSlider>
@@ -41,6 +40,7 @@
 #include <QTextDocument>
 #include <QToolBar>
 #include <QToolButton>
+#include <QWeakPointer>
 
 #ifdef Q_WS_X11
 
@@ -71,8 +71,8 @@ using namespace Bespin;
 
 static Hacks *bespinHacks = 0L;
 static Hacks::HackAppType *appType = 0L;
-static BePointer<QWidget> dragCandidate = 0L;
-static BePointer<QWidget> dragWidget = 0L;
+static QWeakPointer<QWidget> s_dragCandidate;
+static QWeakPointer<QWidget> s_dragWidget;
 static bool dragWidgetHadTrack = false;
 static QMenu *lockToggleMenu = 0L;
 static QToolBar *lockToggleBar = 0L;
@@ -307,12 +307,13 @@ hackMoveWindow(QWidget* w, QEvent *e)
 // -> we need a beter image browser :(
 static int gwenview_position = 0;
 static QTextDocument html2text;
-static QPointer<QSlider> s_videoTimerSlider = 0;
-static QPointer<QSlider> s_videoVolumeSlider = 0;
+static QWeakPointer<QSlider> s_videoTimerSlider;
+static QWeakPointer<QSlider> s_videoVolumeSlider;
 static QPoint s_mousePressPos, s_lastMovePos;
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
+    QWidget *dragWidget = s_dragWidget.data();
     if (dragWidget && e->type() == QEvent::MouseMove)
     {
         qApp->removeEventFilter(this);
@@ -323,8 +324,8 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         QWidget *window = dragWidget->window();
         QCursor::setPos(window->mapToGlobal( window->rect().topRight() ) + QPoint(2, 0) );
         QCursor::setPos(cursor);
-        dragWidget = 0L;
-        dragCandidate = 0L;
+        s_dragWidget.clear();
+        s_dragCandidate.clear();
         return false;
     }
 
@@ -398,18 +399,19 @@ Hacks::eventFilter(QObject *o, QEvent *e)
                 return false;
         if (isWindowDragWidget(o, &mev->pos()))
         {
-            dragCandidate = w;
+            s_dragCandidate = w;
             s_mousePressPos = s_lastMovePos = mev->pos();
             qApp->installEventFilter(this);
         }
         return false;
     }
 
+    QWidget *dragCandidate = s_dragCandidate.data();
     if (dragCandidate && e->type() == QEvent::MouseButtonRelease)
     {   // was just a click
         qApp->removeEventFilter(this);
-        if (*appType == SMPlayer && dragCandidate->window()->isFullScreen() && s_videoTimerSlider) {
-            s_videoTimerSlider->setSliderDown(false);
+        if (*appType == SMPlayer && dragCandidate->window()->isFullScreen() && !s_videoTimerSlider.isNull()) {
+            s_videoTimerSlider.data()->setSliderDown(false);
         }
         killTimer(autoSlideTimer);
         autoSlideTimer = 0;
@@ -439,12 +441,11 @@ Hacks::eventFilter(QObject *o, QEvent *e)
             int dx = qAbs(diff.x()), dy = qAbs(diff.y());
             const int w = 64, h = 64;
             if (dx > w && dy < h) {
-                if (s_videoTimerSlider) {
-                    dx = ((mev->pos().x() - s_lastMovePos.x()) * (s_videoTimerSlider->maximum() - s_videoTimerSlider->minimum())) /
-                                                                                            (dragCandidate->window()->width());
+                if (QSlider *slider = s_videoTimerSlider.data()) {
+                    dx = ((mev->pos().x() - s_lastMovePos.x()) * (slider->maximum() - slider->minimum())) / (dragCandidate->window()->width());
                     if (dx) {
-                        s_videoTimerSlider->setSliderDown(true);
-                        s_videoTimerSlider->setSliderPosition(s_videoTimerSlider->sliderPosition() + dx);
+                        slider->setSliderDown(true);
+                        slider->setSliderPosition(slider->sliderPosition() + dx);
                         s_lastMovePos = mev->pos();
                         killTimer(autoSlideTimer);
                         autoSlideTimer = startTimer(250);
@@ -452,11 +453,10 @@ Hacks::eventFilter(QObject *o, QEvent *e)
                 }
             }
             else if (dx < w && dy > h) {
-                if (s_videoVolumeSlider) {
-                    dy = ((mev->pos().y() - s_lastMovePos.y()) * (s_videoVolumeSlider->maximum() - s_videoVolumeSlider->minimum())) /
-                                                                                            (dragCandidate->window()->height());
+                if (QSlider *slider = s_videoVolumeSlider.data()) {
+                    dy = ((mev->pos().y() - s_lastMovePos.y()) * (slider->maximum() - slider->minimum())) / (dragCandidate->window()->height());
                     if (dy) {
-                        s_videoVolumeSlider->setValue(s_videoVolumeSlider->value() - dy);
+                        slider->setValue(slider->value() - dy);
                         s_lastMovePos = mev->pos();
                     }
                 }
@@ -721,9 +721,11 @@ void
 Hacks::timerEvent(QTimerEvent *te)
 {
     if (te->timerId() == autoSlideTimer) {
-        if (*appType == SMPlayer && dragCandidate && dragCandidate->window()->isFullScreen() && s_videoTimerSlider) {
-            s_videoTimerSlider->setSliderDown(false);
-            s_videoTimerSlider->setSliderDown(true);
+        if (*appType == SMPlayer && s_dragCandidate.data() && s_dragCandidate.data()->window()->isFullScreen()) {
+            if (QSlider *slider = s_videoTimerSlider.data()) {
+                slider->setSliderDown(false);
+                slider->setSliderDown(true);
+            }
         }
         killTimer(autoSlideTimer);
         autoSlideTimer = 0;

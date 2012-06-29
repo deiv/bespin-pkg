@@ -40,6 +40,7 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeView>
+#include <QWeakPointer>
 #include <QtDBus/QDBusConnectionInterface>
 #include <QtDBus/QDBusMessage>
 
@@ -909,8 +910,8 @@ static const
 Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::SubWindow |
 Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
-static QList<BePointer<QToolBar> > pendingUnoUpdates;
-static QList<BePointer<QMainWindow> > pendingUnoWindows;
+static QList<QWeakPointer<QToolBar> > pendingUnoUpdates;
+static QList<QWeakPointer<QMainWindow> > pendingUnoWindows;
 static QTimer *unoUpdateTimer = 0;
 static bool
 updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool *gotTitle = 0)
@@ -992,14 +993,16 @@ Style::updateUno()
     }
 
     bool clear = true;
-    foreach (QToolBar *bar, pendingUnoUpdates)
+    for (QList<QWeakPointer<QToolBar> >::const_iterator it = pendingUnoUpdates.constBegin(),
+                                                       end = pendingUnoUpdates.constEnd(); it != end; ++it)
     {
-        if (bar)
+        if (QToolBar *bar = it->data())
             updateUno(bar, (clear && config.UNO.title) ? &clear : 0);
     }
-    foreach (QMainWindow *mwin, pendingUnoWindows)
+    for (QList<QWeakPointer<QMainWindow> >::const_iterator it = pendingUnoWindows.constBegin(),
+                                                          end = pendingUnoWindows.constEnd(); it != end; ++it)
     {
-        if (mwin)
+        if (QMainWindow *mwin = it->data())
         {
             if (updateUnoHeight(mwin, config.UNO.toolbar, config.UNO.title, (clear && config.UNO.title) ? &clear : 0) && config.UNO.title)
                 setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
@@ -1078,14 +1081,16 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
     }
 }
 
-static QList<BePointer<QWidget> > pendingBlurUpdates;
+static QList<QWeakPointer<QWidget> > pendingBlurUpdates;
 
 void
 Style::updateBlurRegions() const
 {
 #ifdef Q_WS_X11 // hint blur region for the kwin plugin
-    foreach (QWidget *widget, pendingBlurUpdates)
+for (QList<QWeakPointer<QWidget> >::const_iterator it = pendingBlurUpdates.constBegin(),
+                                                  end = pendingBlurUpdates.constEnd(); it != end; ++it)
     {
+        QWidget *widget = it->data();
         if (!widget)
             continue;
         if (!FX::usesXRender() && widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))

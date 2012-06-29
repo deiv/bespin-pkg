@@ -35,6 +35,10 @@ static MacMenu *instance = 0;
 #define MSG(_FNC_) QDBusMessage::createMethodCall( "org.kde.XBar", "/XBar", "org.kde.XBar", _FNC_ )
 #define XBAR_SEND( _MSG_ ) QDBusConnection::sessionBus().send( _MSG_ )
 
+inline bool operator< (const MacMenu::QMenuBar_p &ptr1, const MacMenu::QMenuBar_p &ptr2) {
+    return ptr1.data() < ptr2.data();
+}
+
 bool
 FullscreenWatcher::eventFilter(QObject *o, QEvent *ev)
 {
@@ -133,8 +137,8 @@ MacMenu::activate()
     MenuList::iterator menu = items.begin();
     while (menu != items.end())
     {
-        if (*menu)
-            { activate(*menu); ++menu; }
+        if (menu->data())
+            { activate(menu->data()); ++menu; }
         else
             { actions.remove(*menu); menu = items.erase(menu); }
     }
@@ -206,14 +210,17 @@ MacMenu::activate(QWidget *window)
     MenuList::iterator menu = items.begin();
     while (menu != items.end())
     {
-        if (*menu)
+        if (QMenuBar *mBar = menu->data())
         {
-            if ((*menu)->window() == window)
-                { activate(*menu); return; }
+            if (mBar->window() == window) {
+                activate(mBar);
+                return;
+            }
             ++menu;
+        } else {
+//             actions.remove(*menu);
+            menu = items.erase(menu);
         }
-        else
-            { actions.remove(*menu); menu = items.erase(menu); }
     }
 }
 
@@ -226,9 +233,9 @@ MacMenu::deactivate()
     QMenuBar *menu = 0;
     while (i != items.end())
     {
-        actions.remove(*i);
-        if ((menu = *i))
+        if ((menu = i->data()))
         {
+            actions.remove(i->data());
             deactivate(menu);
             ++i;
         }
@@ -257,14 +264,16 @@ MacMenu::deactivate(QWidget *window)
     MenuList::iterator menu = items.begin();
     while (menu != items.end())
     {
-        if (*menu)
+        if (QMenuBar *mBar = menu->data())
         {
-            if ((*menu)->window() == window)
-                { deactivate(*menu); return; }
+            if (mBar->window() == window) {
+                deactivate(mBar);
+                return;
+            }
             ++menu;
+        } else {
+            menu = items.erase(menu);
         }
-        else
-        { actions.remove(*menu); menu = items.erase(menu); }
     }
 }
 
@@ -275,13 +284,10 @@ MacMenu::menuBar(qlonglong key)
     QMenuBar *menu;
     while (i != items.end())
     {
-        if (!(menu = *i))
-        {
+        if (!(menu = i->data())) {
             actions.remove(menu);
             i = items.erase(i);
-        }
-        else
-        {
+        } else {
             if ((qlonglong)menu == key)
                 return menu;
             else
@@ -295,7 +301,8 @@ void
 MacMenu::popup(qlonglong key, int idx, int x, int y)
 {
     QMenuBar *menu = menuBar(key);
-    if (!menu) return;
+    if (!menu)
+        return;
 
     QMenu *pop;
     for (int i = 0; i < menu->actions().count(); ++i)
