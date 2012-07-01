@@ -238,7 +238,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>6</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -806,8 +806,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>178</width>
-               <height>63</height>
+               <width>518</width>
+               <height>265</height>
               </rect>
              </property>
              <attribute name="label">
@@ -902,8 +902,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>247</width>
-               <height>200</height>
+               <width>518</width>
+               <height>265</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1019,8 +1019,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>114</width>
-               <height>92</height>
+               <width>518</width>
+               <height>265</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1117,8 +1117,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>319</width>
-               <height>83</height>
+               <width>518</width>
+               <height>265</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1218,15 +1218,15 @@
           <item>
            <widget class="QToolBox" name="toolBox_3">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_5">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>287</width>
-               <height>192</height>
+               <width>518</width>
+               <height>232</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1429,8 +1429,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>289</width>
-               <height>172</height>
+               <width>518</width>
+               <height>175</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1962,8 +1962,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>309</width>
-               <height>263</height>
+               <width>518</width>
+               <height>303</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3017,6 +3017,13 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
         <widget class="QWidget" name="KWin">
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
+           <widget class="QCheckBox" name="kwinUseTiles">
+            <property name="text">
+             <string>Also use Tiled structure (see &quot;Windows&quot; page)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QGroupBox" name="groupBox_10">
             <property name="title">
              <string>Active Titlebar</string>
@@ -3643,8 +3650,8 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
      <y>149</y>
     </hint>
     <hint type="destinationlabel">
-     <x>597</x>
-     <y>149</y>
+     <x>620</x>
+     <y>154</y>
     </hint>
    </hints>
   </connection>
@@ -3655,12 +3662,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>267</x>
-     <y>76</y>
+     <x>255</x>
+     <y>117</y>
     </hint>
     <hint type="destinationlabel">
-     <x>275</x>
-     <y>76</y>
+     <x>620</x>
+     <y>117</y>
     </hint>
    </hints>
   </connection>
@@ -3671,12 +3678,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>399</x>
-     <y>128</y>
+     <x>394</x>
+     <y>148</y>
     </hint>
     <hint type="destinationlabel">
-     <x>424</x>
-     <y>128</y>
+     <x>628</x>
+     <y>148</y>
     </hint>
    </hints>
   </connection>
@@ -3687,12 +3694,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>191</x>
-     <y>93</y>
+     <x>302</x>
+     <y>284</y>
     </hint>
     <hint type="destinationlabel">
-     <x>205</x>
-     <y>93</y>
+     <x>598</x>
+     <y>279</y>
     </hint>
    </hints>
   </connection>
@@ -3703,12 +3710,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>213</x>
-     <y>77</y>
+     <x>196</x>
+     <y>160</y>
     </hint>
     <hint type="destinationlabel">
-     <x>232</x>
-     <y>77</y>
+     <x>619</x>
+     <y>160</y>
     </hint>
    </hints>
   </connection>
@@ -3720,11 +3727,11 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <hints>
     <hint type="sourcelabel">
      <x>378</x>
-     <y>101</y>
+     <y>296</y>
     </hint>
     <hint type="destinationlabel">
-     <x>442</x>
-     <y>103</y>
+     <x>629</x>
+     <y>297</y>
     </hint>
    </hints>
   </connection>
@@ -3736,7 +3743,7 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <hints>
     <hint type="sourcelabel">
      <x>333</x>
-     <y>79</y>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
      <x>333</x>
@@ -3755,8 +3762,8 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
      <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>202</x>
-     <y>128</y>
+     <x>187</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
@@ -3771,8 +3778,8 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
      <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>342</x>
-     <y>127</y>
+     <x>336</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
@@ -3799,12 +3806,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>246</x>
-     <y>86</y>
+     <x>226</x>
+     <y>195</y>
     </hint>
     <hint type="destinationlabel">
-     <x>246</x>
-     <y>80</y>
+     <x>226</x>
+     <y>163</y>
     </hint>
    </hints>
   </connection>
@@ -3815,12 +3822,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>246</x>
-     <y>86</y>
+     <x>226</x>
+     <y>195</y>
     </hint>
     <hint type="destinationlabel">
-     <x>160</x>
-     <y>71</y>
+     <x>141</x>
+     <y>258</y>
     </hint>
    </hints>
   </connection>
@@ -3831,12 +3838,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>228</x>
-     <y>292</y>
+     <x>355</x>
+     <y>342</y>
     </hint>
     <hint type="destinationlabel">
-     <x>407</x>
-     <y>360</y>
+     <x>546</x>
+     <y>396</y>
     </hint>
    </hints>
   </connection>
@@ -3847,12 +3854,12 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>253</x>
-     <y>297</y>
+     <x>380</x>
+     <y>342</y>
     </hint>
     <hint type="destinationlabel">
-     <x>262</x>
-     <y>318</y>
+     <x>401</x>
+     <y>369</y>
     </hint>
    </hints>
   </connection>

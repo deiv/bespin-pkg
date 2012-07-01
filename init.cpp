@@ -388,6 +388,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     readRole(kwin.active, KWIN_ACTIVE_ROLE);
     config.kwin.text_role[0] = (QPalette::ColorRole) iSettings->value(KWIN_INACTIVE_TEXT_ROLE).toInt();
     config.kwin.text_role[1] = (QPalette::ColorRole) iSettings->value(KWIN_ACTIVE_TEXT_ROLE).toInt();
+    config.kwin.useTiles = readBool(KWIN_USE_TILES);
 
     // Menus ===========================
     //--------

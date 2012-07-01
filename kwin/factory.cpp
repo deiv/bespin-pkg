@@ -16,6 +16,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <QCache>
 #include <QCoreApplication>
 #include <QDBusConnection>
 #include <QDBusMessage>
@@ -795,6 +796,22 @@ Factory::forget(qint64 pid)
         delete i.value(); i.value() = 0;
         ourDecoInfos.erase(i);
     }
+}
+
+static QPixmap nullPix;
+static QCache<qint64, QPixmap> s_structureCache(10);
+const QPixmap &
+Factory::structure(const QColor &c, int type, int intensity)
+{
+    qint64 hash = (qint64(c.rgba()) << 32) | (qint64(type) << 8) | qint64(intensity & 0xff);
+    const QPixmap *pix;
+    if ((pix = s_structureCache.object(hash)))
+        return *pix;
+    pix = &Gradients::structure(c, false, qMax(0 ,type), intensity);
+    if (s_structureCache.insert(hash, const_cast<QPixmap*>(pix), 1))
+        return *pix;
+    delete pix;
+    return nullPix;
 }
 
 void

@@ -98,7 +98,11 @@ Client::updateStylePixmaps()
             lCorner = pics->lCorner;
             rCorner = pics->rCorner;
         }
-        else
+        else if (bgMode == 1 && (btmTile = pics->btmTile)) {
+            /// NOTICE encoding the bg structure & intensity in the btmTile Pic!!
+            topTile = cornerTile = lCorner = rCorner = 0;
+        }
+        else if (bgMode > 1)
         {
             qint64 hash = 0;
             /// NOTICE style encodes the intensity in btmTile!
@@ -131,7 +135,7 @@ Client::updateStylePixmaps()
         }
         XFree(pics);
     }
-    if (topTile)
+    if (topTile || btmTile)
         widget()->update();
     else
     {
@@ -163,7 +167,7 @@ Client::activeChange(bool realActiveChange)
 {
     if (gType[0] != gType[1])
         updateTitleLayout(widget()->size());
-    if (bgMode > 1)
+    if (bgMode > 0)
         updateStylePixmaps();
     if (realActiveChange) {
         fadeButtons();
@@ -470,9 +474,9 @@ Client::init()
         myCaption =  isActive() ? "Active Window" : "Inactive Window";
     else if (!Factory::verticalTitle())
         myCaption = trimm(caption());
-    widget()->setAutoFillBackground(!isPreview());
+    widget()->setAutoFillBackground(false); // !isPreview());
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, !isPreview());
-//     widget()->setAttribute(Qt::WA_NoSystemBackground, !isPreview());
+    widget()->setAttribute(Qt::WA_NoSystemBackground, isPreview());
     widget()->setAttribute(Qt::WA_PaintOnScreen, !isPreview());
     widget()->setAttribute(Qt::WA_StyledBackground, false);
     widget()->installEventFilter(this);
@@ -602,6 +606,7 @@ inline static void shrink(QFont &fnt, float factor)
         fnt.setPixelSize(qRound(fnt.pixelSize()*factor));
 }
 
+static Gradients::Type s_previewGradient = Gradients::TypeAmount;
 void
 Client::repaint(QPainter &p, bool paintTitle)
 {
@@ -613,24 +618,23 @@ Client::repaint(QPainter &p, bool paintTitle)
     // preview widget =============================================================================
     if (isPreview())
     {
+        if (s_previewGradient == Gradients::TypeAmount)
+            s_previewGradient = Gradients::Type(rand() % Gradients::TypeAmount);
         QRect r = widget()->rect();
         bool hadAntiAliasing = p.testRenderHint(QPainter::Antialiasing);
         p.setRenderHint( QPainter::Antialiasing );
         // the shadow - this is rather expensive, but hey - who cares... ;-P
         p.setPen(Qt::NoPen);
-        p.setBrush(QColor(0,0,0,40));
-        p.drawRoundedRect(r, 8, 8);
-        r.adjust(1,0,-1,-1);
-        p.drawRoundedRect(r, 7, 7);
-        r.adjust(1,0,-1,-1);
-        p.setBrush(QColor(0,0,0,20));
-        p.drawRoundedRect(r, 6, 6);
-        r.adjust(0,0,0,-1);
-        p.drawRoundedRect(r, 6, 6);
-        r.adjust(0,0,0,-1);
+        for (int i = 0; i < 8; ++i) {
+            p.setBrush(QColor(0,0,0,4+2*i));
+            int rd = 12-i/2;
+            p.drawRoundedRect(r, rd, rd);
+            r.adjust(i%2,!(i%3),-i%2,-1);
+        }
 
         // the window
-        p.setBrush(Gradients::pix(bg, r.height(), Qt::Vertical, Gradients::Button));
+        p.setBrush(Gradients::pix(bg, r.height(), Qt::Vertical, s_previewGradient));
+        p.setBrushOrigin(QPoint(0,r.y()));
         QColor c = color(Client::ColorFont, isActive());
         c.setAlpha(80);
         p.setPen(c);
@@ -759,44 +763,69 @@ Client::repaint(QPainter &p, bool paintTitle)
         default:
         case 1: // scanlines, fallback
         {
-            const Gradients::Type gradient = (bgMode == 0xff) ? gType[isActive()] : Factory::config()->gradient[0][isActive()];
             Qt::Orientation o = Qt::Vertical;
-            QRect ttBar = top;
-            QLine borderline;
-            if (Factory::verticalTitle())
-            {
-                o = Qt::Horizontal;
-                ttBar = left;
-                p.drawRect(top);
-                borderline.setLine(myTitleSize-1, myEdgeSize, myTitleSize-1, height()-myEdgeSize);
+            p.setPen(Qt::NoPen);
+            if (topTile || btmTile) {
+                QPixmap texture;
+                if (topTile && FX::usesXRender()) {
+                    const int width = ((btmTile >> 16) & 0xffff);
+                    const int height = (btmTile & 0xffff);
+                    texture = QPixmap(width, height);
+                    if (bg.alpha() != 0xff) {
+                        texture.fill(Qt::transparent);
+                        XRenderComposite(QX11Info::display(), PictOpOver,
+                                         topTile, 0, texture.x11PictureHandle(),
+                                         0, 0, 0, 0, 0, 0, width, height);
+                    } else {
+                        texture.fill(bg);
+                        XRenderComposite(QX11Info::display(), PictOpSrc,
+                                         topTile, 0, texture.x11PictureHandle(),
+                                         0, 0, 0, 0, 0, 0, width, height);
+                    }
+                } else if (btmTile) {
+                    texture = Factory::structure(bg, (btmTile & 0xff), ((btmTile >> 8) & 0xff));
+                }
+                if (texture.isNull())
+                    p.setBrush(bg); 
+                else {
+                    p.setBrush(texture);
+                    p.setBrushOrigin(QPoint(left.width()-texture.width(), top.height()-texture.height()));
+                }
+                p.drawRect(left); p.drawRect(right); p.drawRect(top); p.drawRect(bottom);
+            } else {
+                const Gradients::Type gradient = (bgMode == 0xff) ? gType[isActive()] :
+                                                        Factory::config()->gradient[0][isActive()];
+                QRect ttBar = top;
+                QLine borderline;
+                if (Factory::verticalTitle()) {
+                    o = Qt::Horizontal;
+                    ttBar = left;
+                    p.drawRect(top);
+                    borderline.setLine(myTitleSize-1, myEdgeSize, myTitleSize-1, height()-myEdgeSize);
+                } else {
+                    p.drawRect(left);
+                    borderline.setLine(myEdgeSize, myTitleSize-1, width()-myEdgeSize, myTitleSize-1);
+                }
+                p.drawRect(right); p.drawRect(bottom);
+                if (gradient == Gradients::None)
+                    p.drawRect(ttBar);
+                else {
+                    p.fillRect(ttBar, Gradients::brush(bg, myTitleSize, o, gradient));
+                    p.setPen(Colors::mid(bg, Qt::black,6,1));
+                    p.drawLine(borderline);
+                    /* unused counter border 
+                    p.setPen(Colors::mid(bg, Qt::white,6,1));
+                    p.drawLine(0,myTitleSize-1,width(),myTitleSize-1); */
+                }
+                if ( bgMode == 0xff )  // no deco gradient in this mode
+                    break;
             }
-            else
-            {
-                p.drawRect(left);
-                borderline.setLine(myEdgeSize, myTitleSize-1, width()-myEdgeSize, myTitleSize-1);
-            }
-            p.drawRect(right); p.drawRect(bottom);
-            if (gradient == Gradients::None)
-                p.drawRect(ttBar);
-            else
-            {
-                p.fillRect(ttBar, Gradients::brush(bg, myTitleSize, o, gradient));
-                p.setPen(Colors::mid(bg, Qt::black,6,1));
-                p.drawLine(borderline);
-//                 p.setPen(Colors::mid(bg, Qt::white,6,1));
-//                 p.drawLine(0,myTitleSize-1,width(),myTitleSize-1);
-            }
-
-            if ( bgMode == 0xff )  // no deco gradient in this mode
-                break;
 
             const Gradients::Type titleGradient = gType[isActive()];
-            if (paintTitle && titleGradient && label.width())
-            {   // nice deco
+            if (paintTitle && titleGradient && label.width()) { // nice deco
                 p.setRenderHint( QPainter::Antialiasing );
                 bg = color(ColorTitleBlend, isActive());
                 const QPixmap &fill = Gradients::pix(bg, myTitleSize, o, titleGradient);
-//                 p.setPen(Qt::NoPen); p.setBrush(Gradients::structure(bg, true));
                 const QColor shadow = Colors::mid(bg, Qt::black,6,1);
                 p.setPen(QPen(shadow, 2)); p.setBrush(fill);
                 if (Factory::verticalTitle())

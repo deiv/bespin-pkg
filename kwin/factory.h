@@ -89,6 +89,7 @@ public:
     inline static bool verticalTitle() { return ourConfig.verticalTitle; }
 protected:
     static BgSet *bgSet(const QColor &c, bool vertical, int intensity, qint64 *hash = 0);
+    static const QPixmap &structure(const QColor &c, int type, int intensity);
     static void forget(qint64 pid);
     static void kickBgSet(qint64 hash);
     static void learn(qint64 pid, QByteArray data);

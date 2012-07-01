@@ -442,6 +442,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.viewShadingRole, VIEW_SHADE_ROLE);
     handleSettings(ui.viewShadeLevel, VIEW_SHADE_LEVEL);
 
+    handleSettings(ui.kwinUseTiles, KWIN_USE_TILES);
     handleSettings(ui.kwinActiveGrad, KWIN_ACTIVE_GRADIENT);
     handleSettings(ui.kwinInactiveGrad, KWIN_INACTIVE_GRADIENT);
     handleSettings(ui.kwinActiveRole, KWIN_ACTIVE_ROLE);
@@ -1395,6 +1396,7 @@ void
 Config::handleBgMode(int idx)
 {
     ui.structure->setEnabled(idx == 1);
+    ui.kwinUseTiles->setEnabled(idx == 1);
 }
 
 static const char *grooveModes[5] = {"Line", "Groove", "Inlay", "Sunken", "None"};
@@ -1412,6 +1414,7 @@ Config::handleGrooveMode(int v)
     ui.invertGroove->setDisabled(v == 4);
     ui.scrollRole->setDisabled(v == 4);
     ui.scrollActiveRole->setDisabled(v == 4);
+    ui.showOff->setDisabled(v == 4);
 }
 
 void

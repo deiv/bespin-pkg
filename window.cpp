@@ -158,7 +158,6 @@ Style::drawTitleShadow( QPainter *painter, const QWidget *widget ) const
     }
 }
 
-
 void
 Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widget) const
 {
@@ -268,9 +267,31 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     if (config.bg.mode == Scanlines)
     {
         const bool light = (widget->windowFlags() & ((Qt::Tool | Qt::Popup) & ~Qt::Window));
+        const QPixmap &structure = Gradients::structure(c, light);
+#ifndef QT_NO_XRENDER
+        if (config.kwin.useTiles) {
+            uint *decoDimP = (widget->testAttribute(Qt::WA_WState_Created) && widget->internalWinId()) ?
+                                XProperty::get<uint>(widget->winId(), XProperty::decoDim, XProperty::LONG) : 0;
+            if (decoDimP)
+            {
+                WindowPics pics;
+                pics.topTile = pics.btmTile = pics.cnrTile = pics.lCorner = pics.rCorner = 0;
+                if (FX::usesXRender()) {
+                    pics.topTile = structure.x11PictureHandle();
+                    /// NOTICE encoding the bg dims in the btmTile Pic!!
+                    pics.btmTile = ((structure.width() & 0xffff) << 16) | (structure.height() & 0xffff);
+                } else {
+                    /// NOTICE encoding the bg structure & intensity in the btmTile Pic!!
+                    pics.btmTile = ((config.bg.intensity & 0xff) << 8) | (config.bg.structure & 0xff);
+                }
+                XProperty::set<Picture>(widget->winId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
+                XFree(decoDimP);
+            }
+        }
+#endif
         painter->save();
         painter->setPen(Qt::NoPen);
-        painter->setBrush(Gradients::structure(c, light));
+        painter->setBrush(structure);
         painter->drawRect(widget->rect());
         painter->restore();
         goto CommonOperations;

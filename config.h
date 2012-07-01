@@ -83,6 +83,7 @@ typedef struct Config
     {
         Gradients::Type gradient[2];
         QPalette::ColorRole inactive_role[2], active_role[2], text_role[2];
+        bool useTiles;
     } kwin;
     Qt::LayoutDirection leftHanded;
 

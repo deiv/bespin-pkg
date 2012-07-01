@@ -99,6 +99,7 @@
 #define KWIN_ACTIVE_GRADIENT "KWin.ActiveGradient", Gradients::Button
 #define KWIN_INACTIVE_TEXT_ROLE "KWin.InactiveText", QPalette::WindowText
 #define KWIN_ACTIVE_TEXT_ROLE "KWin.ActiveText", QPalette::WindowText
+#define KWIN_USE_TILES "KWin.UseTiles", true
 
 #define MENU_DELAY "Menu.Delay", 96
 #define MENU_GLASSY "Menu.Glassy", true
