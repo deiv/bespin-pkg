@@ -401,14 +401,15 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         if (isWindowDragWidget(o, &mev->pos()))
         {
             s_dragCandidate = w;
-            s_mousePressPos = s_lastMovePos = mev->pos();
+            s_mousePressPos = mev->pos();
+            s_lastMovePos = mev->pos();
             qApp->installEventFilter(this);
         }
         return false;
     }
 
     QWidget *dragCandidate = s_dragCandidate.data();
-    if (dragCandidate && e->type() == QEvent::MouseButtonRelease)
+    if (o == dragCandidate && e->type() == QEvent::MouseButtonRelease)
     {   // was just a click
         qApp->removeEventFilter(this);
         if (*appType == SMPlayer && dragCandidate->window()->isFullScreen() && !s_videoTimerSlider.isNull()) {
@@ -421,7 +422,7 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         return false;
     }
 
-    if (dragCandidate && e->type() == QEvent::MouseMove) // gonna be draged
+    if (o == dragCandidate && e->type() == QEvent::MouseMove) // gonna be draged
     {   // we perhaps want to drag
         const bool wmDrag = hackMoveWindow(dragCandidate, e);
         if ( wmDrag )
@@ -652,7 +653,6 @@ Hacks::add(QWidget *w)
 
     if ( *appType == SMPlayer /*&& config.*/  )
     if (QSlider *slider = qobject_cast<QSlider*>(w)) {
-        qDebug() << "BESPIN" << slider << slider->parentWidget();
     if (slider->parentWidget() && slider->parentWidget()->objectName() == "controlwidget")
     {
         if (slider->inherits("TimeSlider"))
