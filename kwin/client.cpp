@@ -1287,7 +1287,9 @@ Client::reset(unsigned long changed)
             {
                 if (gType[i] == Gradients::None)
                 {
+                    int alpha = colors[i][ColorTitleBar].alpha();
                     colors[i][ColorTitleBar] = colors[i][ColorTitleBlend];
+                    colors[i][ColorTitleBar].setAlpha(alpha);
                     colors[i][ColorFont] = colors[i][ColorButtonBg];
                 }
                 else
