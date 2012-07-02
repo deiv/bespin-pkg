@@ -105,17 +105,14 @@ protected:
         case QEvent::Timer: {
             if (static_cast<QTimerEvent*>(e)->timerId() != myHoverChecker)
                 return QWidget::event(e);
-            qDebug() << "timer";
             if (mouseGrabber() == this)
                 return true;
             const int d = PADDING - 3;
-            qDebug() << "d" << d << rect().adjusted(d,d,-d,-d) << mapFromGlobal(QCursor::pos());
             if (rect().adjusted(d,d,-d,-d).contains(mapFromGlobal(QCursor::pos()))) {
                 myHoverCounter = 0;
                 return true;
             } else
                 ++myHoverCounter;
-            qDebug() << myHoverCounter;
             //  ===> FALL THROUGH IS INTENDED! We somehow lost a QEvent::Leave and gonna fix that from here!
         }
         case QEvent::HoverLeave:
