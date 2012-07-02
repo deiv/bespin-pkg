@@ -767,12 +767,54 @@ const QPixmap
 #define MERGE(_F_, _V_) const int _V_ = (col*_F_(p1) + (32-col)*_F_(p2)) / 32
                 MERGE(qRed, r); MERGE(qGreen, g);
                 MERGE(qBlue, b); MERGE(qAlpha, a);
+                img.setPixel(col, row, qRgba(r, g, b, a));
+            }
+        }
+        p.begin(structureBuffer);
+        p.drawTiledPixmap(structureBuffer->rect(), QPixmap::fromImage(img));
+        break;
+    }
+    case 16: { // concrete
+        p.end();
+        delete structureBuffer;
+        structureBuffer = new QPixmap(128,128);
+        if (c.alpha() != 0xff)
+            structureBuffer->fill(Qt::transparent);
+        srand( 314159265 );
+        QImage img(128,128, QImage::Format_ARGB32);
+        img.fill(c.rgba());
+        //expblur has a run-in, so the image needs to be slightly bigger
+        QImage noise = FX::newDitherImage(qMin(512, 10*qAbs(intensity-100)), 128+48);
+        FX::expblur(noise, 8);
+        QPainter p2(&img);
+        p2.drawImage(0,0, noise, 32, 32);
+        p2.end();
+        // now mirror blend back the right end on the left offset to create a seamless transition
+        for (int row = 0; row < 128; ++row) {
+            for (int col = 0; col < 32; ++col) {
+                QRgb p1 = img.pixel(col, row);
+                QRgb p2 = img.pixel(127-col, row);
+                MERGE(qRed, r); MERGE(qGreen, g);
+                MERGE(qBlue, b); MERGE(qAlpha, a);
+                img.setPixel(col, row, qRgba(r, g, b, a));
+            }
+        }
+        // and mirror blend back the bottom end on the top offset to create a seamless transition as well
+        for (int col = 0; col < 128; ++col) {
+            for (int row = 0; row < 32; ++row) {
+                QRgb p1 = img.pixel(col, row);
+                QRgb p2 = img.pixel(col, 127-row);
+#undef MERGE
+#define MERGE(_F_, _V_) const int _V_ = (row*_F_(p1) + (32-row)*_F_(p2)) / 32
+                MERGE(qRed, r); MERGE(qGreen, g);
+                MERGE(qBlue, b); MERGE(qAlpha, a);
 #undef MERGE
                 img.setPixel(col, row, qRgba(r, g, b, a));
             }
         }
         p.begin(structureBuffer);
         p.drawTiledPixmap(structureBuffer->rect(), QPixmap::fromImage(img));
+        break;
     }
     }
     p.end();
