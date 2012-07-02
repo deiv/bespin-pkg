@@ -706,8 +706,9 @@ const QPixmap
         p.setPen(QPen(c.dark(i)));
         p.setBrush(Qt::NoBrush);
         p.setRenderHint(QPainter::Antialiasing);
+        const double off = 64.0/63.0;
         for (i = -12; i < 66; i+=3)
-            p.drawLine(0, i+12, 64, i);
+            p.drawLine(QLineF(0, off*(i+12), 64, off*i));
         break;
     }
     case 12: // bamboo
