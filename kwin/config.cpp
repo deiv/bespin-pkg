@@ -161,8 +161,13 @@ Config::Config(QWidget* parent) : BConfig(parent)
     setContextHelp(ui.buttonGradient, "More traditional button. <br>\
     Gets you a round button frame around the actual icon.");
 
+    handleSettings(ui.invertedButtons, "InvertedButtons", true);
+
     handleSettings(ui.buttonGradient, "ButtonGradient", 0);
     setContextHelp(ui.buttonGradient, "Yeah, guess what.");
+
+    handleSettings(ui.buttonDepth, "ButtonDepth", 1);
+    setContextHelp(ui.buttonDepth, "How much it's sunken into the frame");
 
     handleSettings(ui.titlePadding, "TitlePadding", 0);
     setContextHelp(ui.titlePadding, "<b>Titlebar padding</b><hr>\
@@ -185,6 +190,8 @@ Config::Config(QWidget* parent) : BConfig(parent)
     btngrp->addButton(ui.titleCenter, Qt::AlignHCenter);
     btngrp->addButton(ui.titleRight, Qt::AlignRight);
     handleSettings(btngrp, "TitleAlign", Qt::AlignHCenter);
+
+    handleSettings(ui.borderLines, "BorderLines", false);
 
     handleSettings(ui.smallTitleClasses, "SmallTitleClasses", "");
     setContextHelp(ui.smallTitleClasses, "<b>Small Title classes</b><hr>\
