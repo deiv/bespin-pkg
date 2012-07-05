@@ -668,6 +668,8 @@ Style::init(const QSettings* settings)
             appType = Arora;
         else if ( appName == "konqueror")
             appType = Konqueror;
+        else if ( appName == "apper")
+            appType = Apper;
         else if ( appName == "Kde4ToolkitLibrary" )
         {
             appName = "opera";
