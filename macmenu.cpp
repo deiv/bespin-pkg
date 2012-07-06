@@ -32,6 +32,7 @@
 using namespace Bespin;
 
 static MacMenu *instance = 0;
+static QStringList title_seps;
 #define MSG(_FNC_) QDBusMessage::createMethodCall( "org.kde.XBar", "/XBar", "org.kde.XBar", _FNC_ )
 #define XBAR_SEND( _MSG_ ) QDBusConnection::sessionBus().send( _MSG_ )
 
@@ -56,6 +57,9 @@ static FullscreenWatcher *fullscreenWatcher = 0;
 
 MacMenu::MacMenu() : QObject()
 {
+    m_titleSeperators << " - " <<
+                        QString(" %1 ").arg(QChar(0x2013)) << // utf-8 dash
+                        QString(" %1 ").arg(QChar(0x2014)); // utf-8 em dash
     usingMacMenu = QDBusConnection::sessionBus().interface()->isServiceRegistered("org.kde.XBar");
     service = QString("org.kde.XBar-%1").arg(QCoreApplication::applicationPid());
     // register me
@@ -174,9 +178,13 @@ MacMenu::activate(QMenuBar *menu)
         if (i > -1)
             title = title.mid(i, name.length());
     }
-    title = title.section(" - ", -1);
-    if (title.isEmpty())
-    {
+    foreach (const QString &s, m_titleSeperators) {
+        if (title.contains(s)) {
+            title.section(s, -1);
+            break;
+        }
+    }
+    if (title.isEmpty()) {
         if (!menu->actions().isEmpty())
             title = menu->actions().at(0)->text();
         if (title.isEmpty())

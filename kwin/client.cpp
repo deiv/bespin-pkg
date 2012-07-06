@@ -50,6 +50,7 @@
 #include "client.h"
 
 using namespace Bespin;
+static QStringList kwin_seps;
 
 Client::Client(KDecorationBridge *b, Factory *f) :
 KDecoration(b, f), retry(0), myButtonOpacity(0), myActiveChangeTimer(0),
@@ -1669,8 +1670,10 @@ Client::trimm(const QString &string)
     if (!appName.compare("amarok", Qt::CaseInsensitive))
         return "Amarok";
 
-    const QString kwin_sep = QString(" %1 ").arg(QChar(0x2013));
-
+    if (kwin_seps.isEmpty()) {
+        kwin_seps << " - " << QString(" %1 ").arg(QChar(0x2013)) << // recently used utf-8 dash
+                    QString(" %1 ").arg(QChar(0x2014)); // trojitá uses an em dash ...
+    }
     /* Ok, *some* apps have really long and nasty window captions
     this looks clutterd, so we allow to crop them a bit and remove
     considered to be uninteresting informations ==================== */
@@ -1689,11 +1692,13 @@ Client::trimm(const QString &string)
     // in e.g. amarok, i'd like to snip "amarok" and preserve "<song> by <artist>"
     // but for e.g. k3b, i'd like to get rid of stupid
     // "the kde application to burn cds and dvds" ...
-    /*else*/ if (ret.contains(" - "))
-        ret = ret.section(" - ", 0, -2, QString::SectionSkipEmpty );
-    else if (ret.contains(kwin_sep)) // newer kwin versions use this uf8 dash (stupid idea?)
-        ret = ret.section(kwin_sep, 0, -2, QString::SectionSkipEmpty );
-
+    foreach (const QString &s, kwin_seps) {
+        if (ret.contains(s)) {
+            ret = ret.section(s, 0, -2, QString::SectionSkipEmpty );
+            break;
+        }
+    }
+    
     /* Browsers set the title to <html><title/></html> - appname
     Now the page titles can be ridiculously looooong, especially on news
     pages --------------------------------- */

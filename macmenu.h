@@ -21,6 +21,7 @@
 
 #include <QMap>
 #include <QObject>
+#include <QStringList>
 #include <QWeakPointer>
 
 class QMenuBar;
@@ -73,6 +74,7 @@ private:
     QMap< QMenuBar_p, QList<QAction*> > actions;
     bool usingMacMenu;
     QString service;
+    QStringList m_titleSeperators;
 private slots:
     void menuClosed();
     void _release(QObject *);
