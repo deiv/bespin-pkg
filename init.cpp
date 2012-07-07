@@ -135,6 +135,8 @@ void
 Style::readSettings(const QSettings* settings, QString appName)
 {
     bool delSettings = false;
+    // this is for "bespin try"
+    bool external = false;
 
     QSettings *iSettings = const_cast<QSettings*>(settings);
     if (!iSettings)
@@ -277,13 +279,16 @@ Style::readSettings(const QSettings* settings, QString appName)
             iSettings->beginGroup("Style");
         }
     }
-    else
+    else {
+        external = true;
         qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
+    }
 
     // Background ===========================
     config.bg.minValue = readInt(BG_MINVALUE);
 
     config.bg.mode = (BGMode) readInt(BG_MODE);
+
     if (appType == Opera && config.bg.mode > Scanlines)
         config.bg.mode = Plain; // it doesn't work - at least atm - and breaks kwin appereance...
     else if (config.bg.mode > BevelH)
@@ -581,6 +586,12 @@ Style::readSettings(const QSettings* settings, QString appName)
 
     if (delSettings)
         delete iSettings;
+
+    if (external) {
+        Gradients::wipe();
+        Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
+                    config.bg.structure, config.bg.intensity, F(8), true, config.groupBoxMode == 2);
+    }
 }
 
 #undef readRole
