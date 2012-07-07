@@ -219,8 +219,6 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
             if ( sameRoles ) gt = Gradients::Sunken; // sunken dark active - mac-a-like
         }
 
-        if (Colors::value(c) < 50)
-            { int h,s,v,a; c.getHsv(&h, &s, &v, &a); c.setHsv(h, s, 50, a); }
         if (step)
             c = Colors::mid(c, c2, 18-step, step);
 
