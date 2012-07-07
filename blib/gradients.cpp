@@ -368,8 +368,17 @@ Gradients::borderline(const QColor &c, Position pos)
 static QColor
 checkValue(QColor c, int type)
 {
-    if (type == Gradients::Simple || type == Gradients::Sunken || type == Gradients::Metal || type == Gradients::Shiny)
+    switch (type) {
+    case Gradients::None:
+    case Gradients::Simple:
+    case Gradients::Sunken:
+    case Gradients::Metal:
+    case Gradients::Shiny:
+    case Gradients::Stone:
         return c;
+    default: break;
+    }
+
     int v = Colors::value(c);
     const int minV = type ? ((type < Gradients::Gloss) ? 60 : 40) : 0;
     if (v < minV)
@@ -378,12 +387,12 @@ checkValue(QColor c, int type)
         c.getHsv(&h,&s,&v,&a);
         c.setHsv(h,s,minV,a);
     }
-    else if (v > 240 && type > Gradients::Sunken) // glosses etc hate high value colors
+    else if (v > 200 && type > Gradients::Sunken) // glosses etc hate high value colors
     {
         int h,s,a;
         c.getHsv(&h,&s,&v,&a);
-        s = 400*s/(400+v-240);
-        c.setHsv(h,CLAMP(s,0,255),240,a);
+        s = 400*s/(400+v-180);
+        c.setHsv(h,CLAMP(s,0,255),200,a);
     }
     return c;
 }
