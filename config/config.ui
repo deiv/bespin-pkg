@@ -238,7 +238,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -554,8 +554,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>518</width>
-               <height>265</height>
+               <width>512</width>
+               <height>269</height>
               </rect>
              </property>
              <attribute name="label">
@@ -908,7 +908,7 @@
                <x>0</x>
                <y>0</y>
                <width>247</width>
-               <height>200</height>
+               <height>196</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1230,8 +1230,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>287</width>
-               <height>192</height>
+               <width>512</width>
+               <height>230</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1434,8 +1434,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>289</width>
-               <height>174</height>
+               <width>286</width>
+               <height>166</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1806,7 +1806,22 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_9">
+           <widget class="QLabel" name="tabTransitionWarning">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <italic>false</italic>
+              <bold>true</bold>
+              <strikeout>false</strikeout>
+             </font>
+            </property>
+            <property name="text">
+             <string>Animated Tab transitions are not supported with ARGB windows</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="tabTransitionGroup">
             <property name="title">
              <string>Animated transition</string>
             </property>
@@ -1967,8 +1982,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>309</width>
-               <height>263</height>
+               <width>306</width>
+               <height>261</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2130,8 +2145,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>243</width>
-               <height>100</height>
+               <width>237</width>
+               <height>98</height>
               </rect>
              </property>
              <attribute name="label">

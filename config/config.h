@@ -64,6 +64,7 @@ private:
     void store3(const QString &, bool, const QPalette &pal = QApplication::palette() );
     void setColorsFromPalette( const QPalette &pal );
 private slots:
+    void deActivateTabTransitions();
     void filterPresets(const QString & text);
     void handleBgMode(int);
     void handleGrooveMode(int);

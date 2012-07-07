@@ -302,6 +302,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.roundness, ROUNDNESS);
 #if BESPIN_ARGB_WINDOWS
     handleSettings(ui.argbOpacity, BG_OPACITY);
+    connect(ui.argbOpacity, SIGNAL(valueChanged(int)), SLOT(deActivateTabTransitions()));
     setContextHelp(ui.argbSupport, "<b>Window Opacity</b><hr>\
     Yes, it means you can have translucent windows, BUT:<br>\
     - It's highly experimental<br>\
@@ -434,6 +435,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.crTabBar, TAB_ROLE);
     handleSettings(ui.tabTransition, TAB_TRANSITION);
     handleSettings(ui.activeTabSunken, TAB_ACTIVETABSUNKEN);
+    ui.tabTransitionWarning->hide();
 
     handleSettings(ui.headerRole, VIEW_HEADERROLE);
     handleSettings(ui.headerSortingRole, VIEW_SORTINGHEADERROLE);
@@ -777,6 +779,13 @@ Config::changeEvent(QEvent *event)
     p.drawPath(path);
     p.end();
     ui.logo->setPixmap(logo);
+}
+
+void
+Config::deActivateTabTransitions()
+{
+    ui.tabTransitionGroup->setEnabled(ui.argbOpacity->value() == 0xff);
+    ui.tabTransitionWarning->setVisible(ui.argbOpacity->value() != 0xff);
 }
 
 bool
