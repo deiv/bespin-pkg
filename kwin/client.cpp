@@ -62,6 +62,10 @@ bgMode(Factory::defaultBgMode()), corner(0), bg(0)
 
 Client::~Client()
 {
+    if (myActiveChangeTimer) {
+        killTimer(myActiveChangeTimer);
+        myActiveChangeTimer = 0;
+    }
     if (bg)
     {
         if (! --bg->set->clients)
