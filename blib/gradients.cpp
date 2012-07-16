@@ -121,7 +121,7 @@ static inline QLinearGradient
 metalGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 {
     QLinearGradient lg(start, stop);
-#if 1
+#if 0
     lg.setColorAt( 0, Colors::mid(c, Qt::white, 1, 1) );
     lg.setColorAt(0.45, Colors::mid(c, Qt::white, 2, 1) );
     lg.setColorAt(0.451, Colors::mid(c, Qt::black, 5, 1) );
@@ -131,8 +131,8 @@ metalGradient(const QColor &c, const QPoint &start, const QPoint &stop)
     int h,s,v,a;
     ic.getHsv(&h,&s,&v,&a);
     ic.setHsv(h,s,qMin(255,v+12),a); lg.setColorAt(0, ic);
-    ic.setHsv(h,s,qMin(255,v+7),a); lg.setColorAt(0.45, ic);
-    ic.setHsv(h,s,qMax(0,v-7),a); lg.setColorAt(0.451, ic);
+    ic.setHsv(h,s,qMin(255,v+7),a); lg.setColorAt(0.55, ic);
+    ic.setHsv(h,s,qMax(0,v-7),a); lg.setColorAt(0.551, ic);
     ic.setHsv(h,s,qMax(0,v-12),a); lg.setColorAt(1, ic);
 #endif
     return lg;
