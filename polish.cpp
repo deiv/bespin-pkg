@@ -668,7 +668,11 @@ Style::polish( QWidget * widget )
                 if (widget->inherits("KCompletionBox"))
                     Bespin::Shadows::manage(widget);
 
-                if (QWidget *vp = itemView->viewport())
+                if (qobject_cast<QHeaderView*>(itemView)) {
+                    itemView->setBackgroundRole(config.view.header_role[Bg]);
+                    itemView->setForegroundRole(config.view.header_role[Fg]);
+                }
+                else if (QWidget *vp = itemView->viewport())
                 {
                     if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 128)
                     {
@@ -967,7 +971,8 @@ Style::polish( QWidget * widget )
         mbar->setForegroundRole(config.UNO.__role[Fg]);
         if (config.UNO.used)
         {
-            widget->setAutoFillBackground(true);
+            QMainWindow * mwin = qobject_cast<QMainWindow*>(widget->parentWidget());
+            widget->setAutoFillBackground(mwin && mwin->menuBar() == widget);
             // catch resizes for gradient recalculation
             FILTER_EVENTS(mbar);
         }
