@@ -800,6 +800,8 @@ Style::polish( QWidget * widget )
                 }
                 widget->setBackgroundRole(bg);
                 widget->setForegroundRole(fg);
+                if (widget->inherits("BE::Button")) // I hover myself - QStyleSheetStyle breaks all animations :-(
+                    widget->setAttribute(Qt::WA_Hover);
             }
             if (!widget->testAttribute(Qt::WA_Hover))
                 Animator::Hover::manage(widget);
