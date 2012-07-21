@@ -50,6 +50,9 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
             return 1;
         if (isSpecialFrame(widget))
             return F(4);
+        // this is RIDICULOUS - if the value is "0" the View occasionally too often LOOSES ITS CONTENT ...
+        if (widget && widget->inherits("QDeclarativeView"))
+            return 1;
         return 0;
     case PM_SpinBoxFrameWidth: // Frame width of a spin box, defaults to PM_DefaultFrameWidth
         return F(1);
@@ -188,7 +191,8 @@ int Style::pixelMetric( PixelMetric pm, const QStyleOption *option, const QWidge
         return F(1);
 //    case PM_MenuScrollerHeight: // Height of the scroller area in a QMenu
 //    case PM_MenuTearoffHeight: // Height of a tear off area in a QMenu
-//    case PM_MenuDesktopFrameWidth: //
+    case PM_MenuDesktopFrameWidth: //
+        return 4;
 //    case PM_CheckListButtonSize: // Area (width/height) of the checkbox/radio button in a Q3CheckListItem
 //    case PM_CheckListControllerSize: // Area (width/height) of the controller in a Q3CheckListItem
 //       if (option) return option->rect.height()-F(4);
