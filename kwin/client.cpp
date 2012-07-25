@@ -86,6 +86,8 @@ void
 Client::updateStylePixmaps()
 {
     topTile = btmTile = cornerTile = lCorner = rCorner = 0;
+    if (Factory::config()->forceUserColors)
+        return; // "no"
     unsigned long _5 = 5;
     if (WindowPics *pics = (WindowPics*)XProperty::get<Picture>(windowId(), XProperty::bgPics, XProperty::LONG, &_5))
     {
@@ -1157,6 +1159,7 @@ Client::reset(unsigned long changed)
 
     if (changed & SettingColors)
     {   // colors =====================
+        topTile = btmTile = cornerTile = lCorner = rCorner = 0;
         for (int a = 0; a < 2; ++a)
         for (int t = 0; t < 4; ++t)
             colors[a][t] = options()->color((ColorType)t, a);
