@@ -102,7 +102,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_Menu_Scrollable:
         return true; // better scroll than fold around covering the desktop!
     case SH_Menu_SloppySubMenus:
-        return true; // don't hide submenus immediately please
+        return false; // this causes Qt to show/hide/show the menu what leads to naaasty animations with effects enabled :-(
+//         return true; // don't hide submenus immediately please
     case SH_ScrollView_FrameOnlyAroundContents: // YES - period.
         return (!(widget && widget->inherits("QComboBoxListView")));
     case SH_MenuBar_AltKeyNavigation:
