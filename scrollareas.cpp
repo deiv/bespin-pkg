@@ -270,7 +270,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
         if (config.scroll.groove == Groove::None)
             optCopy.rect.adjust(F(2),F(2),-F(2),-F(2));
         else if (grooveIsSunken)
-            optCopy.rect.adjust(-F(1),-F(1),F(1),0);
+            optCopy.rect.adjust(-F(2),-F(2),F(2),F(1));
 
         if (optCopy.rect.isValid())
         {
