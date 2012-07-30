@@ -120,8 +120,9 @@ typedef struct Config
     } scroll;
 
     float shadowIntensity;
-    bool  shadowTitlebar;
-    bool  showOff;
+    bool shadowTitlebar;
+    bool showOff;
+    bool strikeDisabled;
 
     struct tab
     {

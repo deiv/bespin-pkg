@@ -389,16 +389,25 @@ Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPale
             { savedPen = painter->pen(); penDirty = true; }
 
         QColor c = painter->pen().color();
-        c.setAlpha(c.alpha()/4 + 2);
-        painter->setPen(QPen(c, savedPen.widthF()));
-        r.translate(-1,-1);
-        painter->drawText(r, flags, text);
-        r.translate(1,2);
-        painter->drawText(r, flags, text);
-        r.translate(2,0);
-        painter->drawText(r, flags, text);
-        r.translate(-1,-2);
-        painter->drawText(r, flags, text);
+        if (config.strikeDisabled) {
+            c.setAlpha(c.alpha()/3 + 2);
+            painter->setPen(QPen(c, savedPen.widthF()));
+            QRect strike;
+            painter->drawText(r, flags, text, &strike);
+            const int y = strike.y() + strike.height()/2;
+            painter->drawLine(strike.x(), y, strike.right(), y);
+        } else {
+            c.setAlpha(c.alpha()/4 + 2);
+            painter->setPen(QPen(c, savedPen.widthF()));
+            r.translate(-1,-1);
+            painter->drawText(r, flags, text);
+            r.translate(1,2);
+            painter->drawText(r, flags, text);
+            r.translate(2,0);
+            painter->drawText(r, flags, text);
+            r.translate(-1,-2);
+            painter->drawText(r, flags, text);
+        }
     }
     else
         painter->drawText(r, flags, text, boundingRect);

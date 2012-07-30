@@ -150,6 +150,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         // flanders
         config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
         config.showOff = readBool(SHOW_OFF);
+        config.strikeDisabled = readBool(STRIKE_DISABLED);
 //         if (config.showOff)
 //             { ori[0] = Qt::Vertical; ori[1] = Qt::Horizontal; }
 //         else

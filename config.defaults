@@ -126,6 +126,7 @@
 #define SHADOW_TITLEBAR "ShadowTitlebar", false
 #define SHOW_MNEMONIC "ShowMnemonic", false
 #define SHOW_OFF "ShowOff", false
+#define STRIKE_DISABLED "StrikeDisabled", false
 
 #define PROGRESS_GRADIENT "Progress.Gradient", Gradients::Button
 #define PROGRESS_ROLE_BG "Progress.RoleBg", QPalette::WindowText
