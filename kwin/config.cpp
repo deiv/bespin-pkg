@@ -38,7 +38,7 @@ enum ConfigRole { ActiveGradient = Qt::UserRole, ActiveGradient2,
                   ActiveText, ActiveButtons, InactiveText, InactiveButtons,
                   Classes, Types };
 
-static const int Gradients_TypeAmount = 9;
+static const int Gradients_TypeAmount = 10;
 
 Config::Config(QWidget* parent) : BConfig(parent)
 {
