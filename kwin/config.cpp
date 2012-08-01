@@ -229,11 +229,12 @@ Config::Config(QWidget* parent) : BConfig(parent)
 
     /* setup the presets UI */
     QListWidgetItem *item = new QListWidgetItem("Default");
+    ui.presets->addItem(item);
     item->setData(ActiveGradient, variant(ui.actGrad));
     item->setData(ActiveGradient2, variant(ui.actGrad2));
     item->setData(InactiveGradient, variant(ui.inactGrad));
     item->setData(InactiveGradient2, variant(ui.inactGrad2));
-    ui.presets->addItem(item);
+
     connect (ui.newPreset, SIGNAL(clicked()), this, SLOT(createNewPreset()));
     connect (ui.deletePreset, SIGNAL(clicked()), this, SLOT(deleteCurrentPreset()));
     connect (ui.presets, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
@@ -268,6 +269,12 @@ Config::Config(QWidget* parent) : BConfig(parent)
     Valid entries (atm, case insensitive): \"normal\", \"dialog\" and \"utility\".");
 
     loadPresets();
+
+    ui.presets->setCurrentRow(0);
+    int ci = ui.actGrad->currentIndex();
+    ui.actGrad->setCurrentIndex(-1);
+    ui.actGrad->setCurrentIndex(ci);
+    
     /* ------------------------ */
 }
 
@@ -523,8 +530,7 @@ void Config::watchBgMode()
 {
     if (ui.presets->currentRow() < 0)
         return;
-
-    QWidget *sibling = 0;
+    QComboBox *sibling = 0;
     if (sender() == ui.actGrad)
         sibling = ui.inactGrad;
     else if (sender() == ui.inactGrad)
@@ -533,8 +539,15 @@ void Config::watchBgMode()
     if (!sibling)
         return;
 
-    int idx = variant(sender()).toInt();
-    sibling->setEnabled(idx >= 0);
+    QComboBox *trigger = static_cast<QComboBox*>(sender());
+    const int idx = variant(trigger).toInt();
+    if (idx < 0 && trigger->isEnabled()) {
+        sibling->setEnabled(!trigger->isEnabled());
+        sibling->setCurrentIndex(trigger->currentIndex());
+    } else if (!sibling->isEnabled()) {
+        sibling->setCurrentIndex(trigger->currentIndex());
+        sibling->setEnabled(true);
+    }
 
     const bool isDefault = (ui.presets->currentRow() == 0);
     ui.actGrad2->setEnabled(isDefault || idx < 0);
