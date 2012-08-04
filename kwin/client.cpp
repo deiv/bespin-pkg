@@ -830,6 +830,7 @@ Client::repaint(QPainter &p, bool paintTitle)
 
             const Gradients::Type titleGradient = gType[isActive()];
             if (paintTitle && titleGradient && label.width()) { // nice deco
+                p.setBrushOrigin(0,0);
                 p.setRenderHint( QPainter::Antialiasing );
                 bg = color(ColorTitleBlend, isActive());
                 const QPixmap &fill = Gradients::pix(bg, myTitleSize, o, titleGradient);

@@ -123,7 +123,7 @@ Button::init(bool leftMenu, bool fColors, int variant)
         shape[t] = QPainterPath();
     s_buttonMask[0] = s_buttonMask[1] = QPixmap();
 
-    Shapes::Style style = (Shapes::Style)qMin(qMax(0,variant),3);
+    Shapes::Style style = (Shapes::Style)qMin(qMax(0,variant),NumTypes-1);
 
     QRectF bound(-sz/2.0, -sz/2.0, sz, sz);
     shape[Close] = Shapes::close(bound, style);
@@ -322,10 +322,12 @@ Button::color( bool background ) const
         c = client->isActive() ? QColor(fcolors[myType]) :
             Colors::mid(c, QColor(fcolors[myType]), 6-hoverLevel, hoverLevel);
     const QColor bg = client->color(bgt, active);
-    if (isEnabled())
-        c = Colors::mid(bg, c, 6-hoverLevel, 4);
-    else
+    if (!isEnabled())
         c = Colors::mid(bg, c, 6, 1);
+    else if (Factory::buttonnyButton())
+        c = Colors::mid(bg, c, 12 - 2*hoverLevel, 4);
+    else
+        c = Colors::mid(bg, c, 6 + 4*Factory::buttonnyButton() - hoverLevel, 4);
     c.setAlpha(c.alpha()*client->buttonOpacity()/100);
     return c;
 }
@@ -412,7 +414,9 @@ Button::paintEvent(QPaintEvent *)
     p.setBrush(c);
 
     float fx, fy;
-    if (state & Sunken)
+    if (Factory::buttonnyButton())
+        fx = fy = 1.0;
+    else if (state & Sunken)
         fx = fy = .75;
     else if (slick == 2)
     {
