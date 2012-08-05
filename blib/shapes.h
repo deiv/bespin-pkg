@@ -26,7 +26,7 @@ namespace Bespin
 {
 namespace Shapes
 {
-    enum Style { Square, Round, TheRob, LasseKongo };
+    enum Style { Square, Round, TheRob, LasseKongo, Simple };
     BLIB_EXPORT QPainterPath close(const QRectF &bound, Style style = Round);
     BLIB_EXPORT QPainterPath min(const QRectF &bound, Style style = Round);
     BLIB_EXPORT QPainterPath max(const QRectF &bound, Style style = Round);
