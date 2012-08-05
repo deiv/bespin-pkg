@@ -134,7 +134,10 @@ KDecoration* Factory::createDecoration(KDecorationBridge* b)
 bool Factory::reset(unsigned long changed)
 {
     weAreInitialized = false;
+    const bool wereButtonny = buttonnyButton();
     const bool configChanged = readConfig();
+    if (wereButtonny != buttonnyButton())
+        changed |= SettingBorder;
     weAreInitialized = true;
 
     bool ret = configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder));

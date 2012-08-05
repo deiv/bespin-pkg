@@ -251,6 +251,8 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
 {
     // KWin seems to call borders() before maximizeChange() in case
     // this may be a bug but is annoying at least - TODO: kwin bug report?
+
+    // TODO: there's faar to much code copied around between here and ::reset -> make a helper function
     int *title, *border, *counter;
     if (Factory::verticalTitle())
     {
@@ -285,11 +287,11 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
         *title = Factory::titleSize(iAmSmall);
         *border = right = Factory::edgeSize();
         *counter = isShade() ? 14 : Factory::baseSize();
+        if (Factory::config()->buttonnyButton) // need more padding to look good
+        if (!unoHeight || Factory::verticalTitle()) // is not effectively UNO
+        if (bgMode == 1 || bgMode == 0xff) // is fallback gradient
+                *title += 6;
     }
-    if (Factory::config()->buttonnyButton) // need more padding to look good
-    if (!unoHeight || Factory::verticalTitle()) // is not effectively UNO
-    if (bgMode == 1 || bgMode == 0xff) // is fallback gradient
-        *title += 6;
     Client *that = const_cast<Client*>(this);
     that->myTitleSize = *title;
     if (Factory::verticalTitle()) {
@@ -1098,6 +1100,12 @@ Client::reset(unsigned long changed)
             myBaseSize = Factory::baseSize();
             myEdgeSize = Factory::edgeSize();
             myTitleSize = Factory::titleSize(iAmSmall);
+
+            if (Factory::config()->buttonnyButton) // need more padding to look good
+            if (!unoHeight || Factory::verticalTitle()) // is not effectively UNO
+            if (bgMode == 1 || bgMode == 0xff) // is fallback gradient
+                myTitleSize += 6;
+
             if (corner)
                 corner->show();
         }
