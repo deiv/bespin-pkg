@@ -414,13 +414,13 @@ Button::paintEvent(QPaintEvent *)
     p.setBrush(c);
 
     float fx, fy;
-    if (Factory::buttonnyButton())
+    if (Factory::buttonnyButton() && !slick)
         fx = fy = 1.0;
-    else if (state & Sunken)
+    else if ((state & Sunken) && !Factory::buttonnyButton())
         fx = fy = .75;
     else if (slick == 2)
     {
-        if (!hoverLevel)
+        if (!hoverLevel || Factory::buttonnyButton())
         {
             const float d = r.width()/5.0;
             r.adjust(d,2*d,-d,-2*d);
@@ -434,7 +434,7 @@ Button::paintEvent(QPaintEvent *)
         }
     else if (slick)
     {
-        if (!hoverLevel)
+        if (!hoverLevel || Factory::buttonnyButton())
         {
             const float d = r.height()/3.0;
             r.adjust(d,d,-d,-d);

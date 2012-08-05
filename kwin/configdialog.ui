@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -616,7 +616,12 @@
            </item>
            <item>
             <property name="text">
-             <string>LasseKongo (nogen)</string>
+             <string>LasseKongo (no-gen)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Traditional (pre-gen)</string>
             </property>
            </item>
           </widget>
