@@ -252,7 +252,7 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     // KWin seems to call borders() before maximizeChange() in case
     // this may be a bug but is annoying at least - TODO: kwin bug report?
 
-    // TODO: there's faar to much code copied around between here and ::reset -> make a helper function
+    // TODO: there's faar too much code copied around between here and ::reset -> make a helper function
     int *title, *border, *counter;
     if (Factory::verticalTitle())
     {
@@ -273,7 +273,6 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
 
     if (maximizeMode() == MaximizeFull)
     {
-        *title = Factory::buttonSize(iAmSmall) + 5;
         if ( options()->moveResizeMaximizedWindows() )
         {
             *border = right = qMin(4, Factory::edgeSize());
@@ -284,15 +283,11 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     }
     else
     {
-        *title = Factory::titleSize(iAmSmall);
         *border = right = Factory::edgeSize();
         *counter = isShade() ? 14 : Factory::baseSize();
-        if (Factory::config()->buttonnyButton) // need more padding to look good
-        if (!unoHeight || Factory::verticalTitle()) // is not effectively UNO
-        if (bgMode == 1 || bgMode == 0xff) // is fallback gradient
-                *title += 6;
     }
     Client *that = const_cast<Client*>(this);
+    that->updateTitleHeight(title);
     that->myTitleSize = *title;
     if (Factory::verticalTitle()) {
         that->myTitleSpacer->changeSize( myTitleSize, 1, QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -1069,68 +1064,13 @@ void
 Client::reset(unsigned long changed)
 {
     if (changed & SettingFont)
-        myTitleSize = Factory::titleSize(iAmSmall);
+        updateTitleHeight(&myTitleSize);
 
     if (changed & SettingDecoration)
     {
         gType[0] = Factory::config()->gradient[1][0];
         gType[1] = Factory::config()->gradient[1][1];
         changed |= SettingColors;
-    }
-
-    if (changed & SettingBorder)
-    {
-        if (maximizeMode() == MaximizeFull)
-        {
-            if (options()->moveResizeMaximizedWindows())
-            {
-                myBaseSize = qMin(4, Factory::baseSize());
-                myEdgeSize = qMin(4, Factory::edgeSize());
-            }
-            else
-            {
-                myBaseSize = myEdgeSize = 0;
-                if (corner)
-                    corner->hide();
-            }
-            myTitleSize = Factory::buttonSize(iAmSmall) + 5;
-        }
-        else
-        {
-            myBaseSize = Factory::baseSize();
-            myEdgeSize = Factory::edgeSize();
-            myTitleSize = Factory::titleSize(iAmSmall);
-
-            if (Factory::config()->buttonnyButton) // need more padding to look good
-            if (!unoHeight || Factory::verticalTitle()) // is not effectively UNO
-            if (bgMode == 1 || bgMode == 0xff) // is fallback gradient
-                myTitleSize += 6;
-
-            if (corner)
-                corner->show();
-        }
-
-        if (Factory::verticalTitle())
-        {
-            const int sideHeight = height() - (myTitleSize + myEdgeSize);
-            top.setRect(0, 0, width(), myEdgeSize);
-            left.setRect(0, myEdgeSize, myTitleSize, sideHeight);
-            right.setRect(0, myEdgeSize, myBaseSize, sideHeight);
-            bottom.setRect(0, height()-myEdgeSize, width(), myEdgeSize);
-        }
-        else
-        {
-            const int sideHeight = height() - (myTitleSize + myBaseSize);
-            top.setRect(0, 0, width(), myTitleSize);
-            left.setRect(0, myTitleSize, myEdgeSize, sideHeight);
-            right.setRect(width()-myEdgeSize, myTitleSize, myEdgeSize, sideHeight);
-            bottom.setRect(0, height()-myBaseSize, width(), myBaseSize);
-        }
-
-        uint decoDim = ((left.width() & 0xff) << 24) | ((top.height() & 0xff) << 16) | ((right.width() & 0xff) << 8) | (bottom.height() & 0xff);
-        XProperty::set<uint>(windowId(), XProperty::decoDim, &decoDim, XProperty::LONG);
-
-        changed |= SettingFont;
     }
 
     if (changed & SettingFont)
@@ -1335,6 +1275,55 @@ Client::reset(unsigned long changed)
         widget()->setPalette(pal);
     }
 
+    if (changed & SettingBorder)
+    {
+        if (maximizeMode() == MaximizeFull)
+        {
+            if (options()->moveResizeMaximizedWindows())
+            {
+                myBaseSize = qMin(4, Factory::baseSize());
+                myEdgeSize = qMin(4, Factory::edgeSize());
+            }
+            else
+            {
+                myBaseSize = myEdgeSize = 0;
+                if (corner)
+                    corner->hide();
+            }
+        }
+        else
+        {
+            myBaseSize = Factory::baseSize();
+            myEdgeSize = Factory::edgeSize();
+
+            if (corner)
+                corner->show();
+        }
+        updateTitleHeight(&myTitleSize);
+
+        if (Factory::verticalTitle())
+        {
+            const int sideHeight = height() - (myTitleSize + myEdgeSize);
+            top.setRect(0, 0, width(), myEdgeSize);
+            left.setRect(0, myEdgeSize, myTitleSize, sideHeight);
+            right.setRect(0, myEdgeSize, myBaseSize, sideHeight);
+            bottom.setRect(0, height()-myEdgeSize, width(), myEdgeSize);
+        }
+        else
+        {
+            const int sideHeight = height() - (myTitleSize + myBaseSize);
+            top.setRect(0, 0, width(), myTitleSize);
+            left.setRect(0, myTitleSize, myEdgeSize, sideHeight);
+            right.setRect(width()-myEdgeSize, myTitleSize, myEdgeSize, sideHeight);
+            bottom.setRect(0, height()-myBaseSize, width(), myBaseSize);
+        }
+
+        uint decoDim = ((left.width() & 0xff) << 24) | ((top.height() & 0xff) << 16) | ((right.width() & 0xff) << 8) | (bottom.height() & 0xff);
+        XProperty::set<uint>(windowId(), XProperty::decoDim, &decoDim, XProperty::LONG);
+
+        changed |= SettingFont;
+    }
+
     // WORKAROUND a bug apparently in QPaintEngine which seems to
     // fail to paint IMAGE_RGB -> QPixmap -> device while device is redirected
     dirty[0] = dirty[1] = color(ColorTitleBar, isActive()).alpha() == 0xff;
@@ -1418,6 +1407,21 @@ Client::updateTitleLayout( const QSize& )
 
     if (!label.isValid())
         label = QRect();
+}
+
+void
+Client::updateTitleHeight(int *variable)
+{
+    if (maximizeMode() == MaximizeFull) {
+        *variable = Factory::buttonSize(iAmSmall) + 5;
+    } else {
+        *variable = Factory::titleSize(iAmSmall);
+
+        if (Factory::config()->buttonnyButton) // need more padding to look good
+        if (!unoHeight || Factory::verticalTitle()) // is not effectively UNO
+        if (bgMode == 1 || bgMode == 0xff) // is fallback gradient
+            *variable += 6;
+    }
 }
 
 void

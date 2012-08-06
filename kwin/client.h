@@ -97,6 +97,7 @@ private:
     Q_DISABLE_COPY(Client)
     void fadeButtons();
     void updateTitleLayout( const QSize& s );
+    void updateTitleHeight(int *variable);
     void updateButtonCorner(bool right = false);
 private:
     QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
