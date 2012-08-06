@@ -414,13 +414,12 @@ Button::paintEvent(QPaintEvent *)
     p.setBrush(c);
 
     float fx, fy;
-    if (Factory::buttonnyButton() && !slick)
-        fx = fy = 1.0;
-    else if ((state & Sunken) && !Factory::buttonnyButton())
+    const int depth = Factory::buttonnyButton() ? Factory::config()->buttonDepth : 0;
+    if ((state & Sunken) && !Factory::buttonnyButton())
         fx = fy = .75;
     else if (slick == 2)
     {
-        if (!hoverLevel || Factory::buttonnyButton())
+        if (!hoverLevel || depth > 2)
         {
             const float d = r.width()/5.0;
             r.adjust(d,2*d,-d,-2*d);
@@ -434,7 +433,7 @@ Button::paintEvent(QPaintEvent *)
         }
     else if (slick)
     {
-        if (!hoverLevel || Factory::buttonnyButton())
+        if (!hoverLevel || depth > 2)
         {
             const float d = r.height()/3.0;
             r.adjust(d,d,-d,-d);
@@ -444,6 +443,8 @@ Button::paintEvent(QPaintEvent *)
         }
         fx = fy = (3+hoverLevel)/9.0;
     }
+    else if (Factory::buttonnyButton())
+        fx = fy = 1.0;
     else
         fx = fy = (18 + hoverLevel)/24.0;
     const float fs = r.height()/99.0;
