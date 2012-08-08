@@ -213,6 +213,25 @@ XBar::updateFont()
 {
     QSettings settings("Bespin", "XBar");
     settings.beginGroup("XBar");
+    QString weightString = settings.value("FirstElementWeight", "bold").toString();
+    int weight = QFont::Bold;
+    if (!weightString.compare("bold", Qt::CaseInsensitive))
+        weight = QFont::Bold;
+    else if (!weightString.compare("black", Qt::CaseInsensitive))
+        weight = QFont::Black;
+    else if (!weightString.compare("normal", Qt::CaseInsensitive))
+        weight = QFont::Normal;
+    else if (!weightString.compare("light", Qt::CaseInsensitive))
+        weight = QFont::Light;
+    else if (!weightString.compare("demibold", Qt::CaseInsensitive))
+        weight = QFont::DemiBold;
+    else {
+        bool ok;
+        weight = weightString.toInt(&ok);
+        weight = ok ? qMax(qMin(weight, 99), 0) : QFont::Bold;
+    }
+    MenuBar::firstElementWeight = weight;
+
     double scale = settings.value("FontScale", 1.0f).toDouble();
     myFont = KGlobalSettings::menuFont();
     if (scale > 0.0 && scale != 1.0)

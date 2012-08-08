@@ -41,6 +41,7 @@
 
 static QBasicTimer mousePoll;
 static QPointF lastMousePos;
+int MenuBar::firstElementWeight = QFont::Bold;
 
 MenuBar::MenuBar( const QString &service, qlonglong key, QGraphicsWidget *parent, QWidget *dummy) :
 QGraphicsWidget(parent)
@@ -271,7 +272,7 @@ MenuBar::initStyleOption(QStyleOptionMenuItem *option, int idx) const
     {
         option->text = d.appTitle;
         int lightX = QFontMetrics(option->font).xHeight();
-        option->font.setWeight(QFont::Black);
+        option->font.setWeight(firstElementWeight);
 //         option->font.setCapitalization ( QFont::AllUppercase );
         option->font.setPointSize((option->font.pointSize()*lightX)/QFontMetrics(option->font).xHeight());
     }
