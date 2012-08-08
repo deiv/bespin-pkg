@@ -189,7 +189,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_TitleBar_AutoRaise:
         return true; // hover titlebar buttons in MDI
     case SH_ToolButton_PopupDelay:
-        return 150; // everyone can do a click in 150ms - yesno?
+        return 222; // everyone can do a click in 150ms - but it feels wrong.
 ///    case SH_FocusFrame_Mask: // The mask of the focus frame.
     case SH_RubberBand_Mask: // The mask of the rubber band.
         return false; // we have an opaque one
