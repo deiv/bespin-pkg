@@ -194,6 +194,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     }
 //    ui.store->addItems( settings.childGroups() );
     ui.store->sortItems(0, Qt::AscendingOrder);
+    ui.store->resizeColumnToContents(0);
     ui.btnStore->setAutoDefault ( false );
     ui.btnRestore->setAutoDefault ( false );
     ui.btnImport->setAutoDefault ( false );
@@ -997,6 +998,7 @@ Config::import()
             ui.store->sortItems(0, Qt::AscendingOrder);
         }
     }
+    ui.store->resizeColumnToContents(0);
 }
 
 
@@ -1354,6 +1356,7 @@ Config::store3( const QString &string, bool addItem, const QPalette &pal )
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
         ui.store->addTopLevelItem(item);
         ui.store->sortItems(0, Qt::AscendingOrder);
+        ui.store->resizeColumnToContents(0);
     }
     setQSetting("Bespin", "Store", string);
     BConfig::save();
