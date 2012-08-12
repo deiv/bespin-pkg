@@ -598,6 +598,9 @@ XBar::rBuildMenu(const QDomElement &node, QObject *widget)
                 else
                 {
                     QMenu *newMenu = MENU_FUNC(addMenu(e.attribute("label", LABEL_ERROR)));
+                    QString icn = e.attribute("icon");
+                    if (!icn.isEmpty())
+                        newMenu->setIcon(KIcon(icn));
                     rBuildMenu(e, newMenu);
                 }
             }
