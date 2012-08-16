@@ -38,6 +38,8 @@ class Bg {
 public:
     qint64 hash;
     BgSet *set;
+    enum Mode { Plain, Gradient, VerticalGradient, HorizontalGradient, Structure, UNO };
+    enum Tile { Top, Bottom, Corner, LeftCorner, RightCorner, Left = Top, Right = Bottom  };
 };
 
 class Client : public KDecoration
@@ -46,15 +48,18 @@ class Client : public KDecoration
 public:
     Client(KDecorationBridge *b, Factory *f);
     ~Client();
+    enum DecoMode { NoDeco, CenterDeco, CornerDeco, ButtonDeco };
+    enum Area { Top, Left, Bottom, Right, Label };
     inline void activeChange() { activeChange(true); }
     void activeChange(bool realActiveChange);
     void addButtons(const QString &, int &, bool);
-    inline uint backgroundMode() {return bgMode;}
+    inline uint backgroundMode() {return myBgMode;}
     void borders( int& left, int& right, int& top, int& bottom ) const;
     int buttonBoxPos(bool active);
+    Gradients::Type buttonGradient(bool active);
     void captionChange();
     void desktopChange() {/*TODO what??*/}
-    inline Gradients::Type gradient() {return gType[isActive()];}
+    inline Gradients::Type decoGradient() const {return myGradients[isActive()];}
     inline void iconChange() {} // no icon!
     void init();
     bool isSmall() { return iAmSmall; }
@@ -74,6 +79,7 @@ public:
     void toggleOnAllDesktops();
     QString trimm(const QString &string);
     void shadeChange();
+    inline Gradients::Type unoGradient() const {return myGradients[2];}
 public slots:
     void activate();
     void throwOnDesktop();
@@ -90,32 +96,34 @@ protected:
     friend class Button;
     /// works like options()->color(.), but allows per window settings to match the window itself
     QColor color(ColorType type, bool active=true) const;
+    DecoMode decoMode() const;
     inline int buttonOpacity() const { return myButtonOpacity; }
     void repaint(QPainter &p, bool paintTitle = true);
     void tileWindow(bool more, bool vertical, bool mirrorGravity);
 private:
     Q_DISABLE_COPY(Client)
     void fadeButtons();
+    void turnGradientToStructure();
     void updateTitleLayout( const QSize& s );
     void updateTitleHeight(int *variable);
     void updateButtonCorner(bool right = false);
 private:
-    QColor colors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
-    Button *buttons[4];
+    QColor myColors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
+    Button *myButtons[4];
     int myBaseSize, myEdgeSize, myTitleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
     int myButtonOpacity;
     int myActiveChangeTimer;
-    Picture topTile, btmTile, cornerTile, lCorner, rCorner;
-    uint bgMode, unoHeight;
-    Gradients::Type gType[2];
+    Picture myTiles[5];
+    uint myBgMode, myUnoHeight;
+    Gradients::Type myGradients[3];
     bool iAmSmall;
     QBoxLayout *myTitleBar;
     QSpacerItem *myTitleSpacer;
-    QRect top, bottom, left, right, label;
+    QRect myArea[5];
     QPainterPath buttonCorner;
     QString myCaption;
-    ResizeCorner *corner;
-    Bg *bg;
+    ResizeCorner *myResizeHandle;
+    Bg *myBgSet;
     bool dirty[2];
 };
 

@@ -276,14 +276,12 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
             {
                 WindowPics pics;
                 pics.topTile = pics.btmTile = pics.cnrTile = pics.lCorner = pics.rCorner = 0;
-                if (FX::usesXRender()) {
+                if (FX::usesXRender())
                     pics.topTile = structure.x11PictureHandle();
-                    /// NOTICE encoding the bg dims in the btmTile Pic!!
-                    pics.btmTile = ((structure.width() & 0xffff) << 16) | (structure.height() & 0xffff);
-                } else {
-                    /// NOTICE encoding the bg structure & intensity in the btmTile Pic!!
-                    pics.btmTile = ((config.bg.intensity & 0xff) << 8) | (config.bg.structure & 0xff);
-                }
+                /// NOTICE encoding the bg dims in the cnrTile Pic!!
+                pics.cnrTile = ((structure.width() & 0xffff) << 16) | (structure.height() & 0xffff);
+                /// NOTICE encoding the bg structure & intensity in the btmTile Pic!!
+                pics.btmTile = ((config.bg.intensity & 0xff) << 8) | (config.bg.structure & 0xff);
                 XProperty::set<Picture>(widget->winId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
                 XFree(decoDimP);
             }

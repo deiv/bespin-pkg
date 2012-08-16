@@ -304,15 +304,17 @@ Button::color( bool background ) const
 {
     KDecorationDefines::ColorType   fgt = KDecorationDefines::ColorButtonBg,
                                     bgt = KDecorationDefines::ColorTitleBlend;
-    int bbp = left + client->buttonBoxPos(client->isActive());
-    if (bbp < 0 || bbp > 1) // 1 + -1 || 0 + 1 vs. 1 + 1 || 0 + -1
-    {
-        fgt = KDecorationDefines::ColorFont;
-        bgt = KDecorationDefines::ColorTitleBar;
+    if (!Factory::buttonnyButton()) {
+        int bbp = left + client->buttonBoxPos(client->isActive());
+        if (bbp < 0 || bbp > 1) // 1 + -1 || 0 + 1 vs. 1 + 1 || 0 + -1
+        {
+            fgt = KDecorationDefines::ColorFont;
+            bgt = KDecorationDefines::ColorTitleBar;
+        }
     }
     bool active = client->isActive();
-    if (Factory::config()->invertedButtons)
-        { KDecorationDefines::ColorType h = fgt; fgt = bgt; bgt = h; active = true || background; }
+//     if (Factory::config()->invertedButtons)
+//         { KDecorationDefines::ColorType h = fgt; fgt = bgt; bgt = h; active = true || background; }
 
     if ( background )
         return client->color(bgt, active);
@@ -395,7 +397,7 @@ Button::paintEvent(QPaintEvent *)
         QColor c(color(true)); c.setAlpha(255);
         fixedColors = rFixedColors;
         QPixmap texture = Gradients::pix(c, s_buttonMask[1].height(), Qt::Vertical,
-                                         (state & Sunken) ? Gradients::Sunken : Factory::buttonGradient());
+                                         (state & Sunken) ? Gradients::Sunken : client->buttonGradient(client->isActive()));
         if (s_buttonMask[1].width() > 32) { // internal shortcut hack - the cached pixmaps are 32px width
             QPixmap gradient = texture;
             texture = QPixmap(s_buttonMask[1].size());

@@ -664,15 +664,22 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
             uno = 0;
         else if (uno > 0xff)
             uno = 0xff;
-        data.style = ((uno & 0xff) << 24) | ((Plain & 0xff) << 16) | ((config.UNO.gradient & 0xff) << 8) | (config.UNO.gradient & 0xff);
+        data.style = ((uno & 0xff) << 24) | ((Plain & 0xff) << 16) |
+                     ((gt[0] & 0x1f) << 11) | ((gt[1] & 0x1f) << 6) | ((config.UNO.gradient & 0x1f) << 1);
     }
     else if (glassy)
     {
         bg = bg.light(115-Colors::value(bg)/20);
-        data.style = (0 << 24) | ((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff);
+        data.style = (0 << 24) | ((Plain & 0xff) << 16) |
+                     ((Gradients::None & 0x1f) << 11) | ((Gradients::None & 0x1f) << 6) | ((Gradients::None & 0x1f) << 1);
     }
-    else
-        data.style = (0 << 24) | ((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff);
+    else {
+        int mMode = mode;
+        if (mode == Scanlines && config.kwin.useTiles)
+            mMode = 128 + config.bg.structure;
+        data.style = (0 << 24) | ((mMode & 0xff) << 16) |
+                     ((gt[0] & 0x1f) << 11) | ((gt[1] & 0x1f) << 6) | ((Gradients::None & 0x1f) << 1);
+    }
 #if BESPIN_ARGB_WINDOWS
     const bool ARGB_deco = !uno && FX::compositingActive();
     if (ARGB_deco)
@@ -695,8 +702,12 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     QPalette::ColorRole inactive[2], text[2];
     if (uno || glassy)
     {
-        inactive[Bg] = active[Bg];
-        text[0] = text[1] = inactive[Fg] = active[Fg];
+//         inactive[Bg] = active[Bg];
+        inactive[Bg]    = config.kwin.inactive_role[Bg];
+        active[Bg]      = config.kwin.active_role[Bg];
+        text[0] = text[1] = active[Fg]; //  = inactive[Fg] = active[Fg];
+        inactive[Fg]    = config.kwin.inactive_role[Fg];
+        active[Fg]      = config.kwin.active_role[Fg];
     }
     else
     {
