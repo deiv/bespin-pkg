@@ -116,19 +116,37 @@ Config::Config(QWidget* parent) : BConfig(parent)
     If set to \"Flat\", \"Vertical gradient\" or \"Horizontal gradient\", the inactive variant will\
     use the same value");
 
+    setContextHelp(ui.actColor, "<b>Active titlebar color</b><hr>\
+    The color of the base gradient for ACTIVE windows.");
+
     handleSettings(ui.inactGrad, "InactiveGradient", 0);
     setContextHelp(ui.inactGrad, "<b>Inctive base gradient</b><hr>\
     The BASE gradient of INACTIVE windows.<br>\
     If set to \"Flat\", \"Vertical gradient\" or \"Horizontal gradient\", the active variant will\
     use the same value");
 
+    setContextHelp(ui.inactColor, "<b>Inactive titlebar color</b><hr>\
+    The color of the base gradient for INACTIVE windows.");
+
     handleSettings(ui.actGrad2, "ActiveGradient2", 0);
     setContextHelp(ui.actGrad2, "<b>Second active gradient</b><hr>\
-    Accessoire gradient in the titlebar center of ACTIVE windows.");
+    Accessoire gradient in the titlebar center or when using traditional Buttons, the button background of ACTIVE windows.");
+
+    setContextHelp(ui.actColor2, "<b>Active decoration color</b><hr>\
+    The color of decoration (titlebar center or traditional button background) for ACTIVE windows.");
 
     handleSettings(ui.inactGrad2, "InactiveGradient2", 0);
     setContextHelp(ui.inactGrad2, "<b>Second inactive gradient</b><hr>\
-    Accessoire gradient in the titlebar center of INACTIVE windows.");
+    Accessoire gradient in the titlebar center or when using traditional Buttons, the button background of INACTIVE windows.");
+
+    setContextHelp(ui.inactColor2, "<b>Inactive decoration color</b><hr>\
+    The color of decoration (titlebar center or traditional button background) for INACTIVE windows.");
+
+    setContextHelp(ui.actButtons, "<b>Active button icon color</b><hr>\
+    The color of the button icons in the ACTIVE window. Ie. the foreground and NOT the background of traditional buttons.");
+
+    setContextHelp(ui.inactButtons, "<b>Inactive button icon color</b><hr>\
+    The color of the button icons in the INACTIVE window. Ie. the foreground and NOT the background of traditional buttons.");
 
     handleSettings(ui.multibutton, "MultiButtonOrder", "MHFBS");
     setContextHelp(ui.multibutton, "<b>The 'Multibutton'</b><hr>\
@@ -160,8 +178,6 @@ Config::Config(QWidget* parent) : BConfig(parent)
     handleSettings(ui.buttonnyButton, "ButtonnyButton", false);
     setContextHelp(ui.buttonGradient, "More traditional button. <br>\
     Gets you a round button frame around the actual icon.");
-
-    handleSettings(ui.invertedButtons, "InvertedButtons", true);
 
     handleSettings(ui.buttonGradient, "ButtonGradient", 0);
     setContextHelp(ui.buttonGradient, "Yeah, guess what.");
