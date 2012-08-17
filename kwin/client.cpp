@@ -1224,7 +1224,7 @@ Client::reset(unsigned long changed)
                 myColors[0][ColorButtonBg].setRgba(data->inactiveButton);
                 myColors[1][ColorButtonBg].setRgba(data->activeButton);
                 myBgMode = ((data->style >> 16) & 0xff);
-                if (myBgMode > 128) {
+                if (myBgMode > 127) {
                     myBgMode = Bg::Structure;
                 }
                 myUnoHeight = ((data->style >> 24) & 0xff); // if (..)
