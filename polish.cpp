@@ -713,8 +713,9 @@ Style::polish( QWidget * widget )
                 else if (widget->inherits("QHeaderView"))
                     widget->setAttribute(Qt::WA_Hover);
             }
-            // just <strike>broadsword</strike> gladius here - the stupid viewport should use the mouse...
-            else  if (appType != Dolphin && appType != Plasma && area && area->viewport())
+            // just use <strike>broadsword</strike> <strike>gladius</strike> foil here
+            // the stupid viewport should use the mouse...
+            else  if (area && area->viewport() && !qobject_cast<QAbstractScrollArea*>(area->parent()))
                 area->viewport()->setAttribute(Qt::WA_NoMousePropagation);
 #if 0 // does not work
             else if (appType == Amarok && widget->inherits("Context::ContextView"))
