@@ -408,13 +408,17 @@ void
 Style::drawToolTip(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     painter->save();
-    painter->setRenderHint(QPainter::Antialiasing, false);
 //    painter->setBrush(Gradients::pix(FCOLOR(ToolTipBase), RECT.height(), Qt::Vertical, Gradients::Button));
     painter->setBrush(FCOLOR(ToolTipBase));
-    painter->setPen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),4,1));
-    painter->drawRect(RECT.adjusted(0,0,-1,-1));
-    if (config.menu.round && widget && widget->testAttribute(Qt::WA_TranslucentBackground) && FX::compositingActive())
+    painter->setPen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),6,1));
+    if (config.menu.round && widget && widget->testAttribute(Qt::WA_TranslucentBackground) && FX::compositingActive()) {
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->drawRoundedRect(RECT.adjusted(0,0,-1,-1),F(5),F(5));
         shapeCorners( painter, RECT, masks.windowShape );
+    } else {
+        painter->setRenderHint(QPainter::Antialiasing, false);
+        painter->drawRect(RECT.adjusted(0,0,-1,-1));
+    }
     painter->restore();
 }
 
