@@ -159,8 +159,8 @@ shadowData(Shadows::Type t, bool storeToRoot)
             p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
             p.setRenderHint(QPainter::Antialiasing);
             p.setBrush(Qt::transparent);
-            p.drawRoundedRect(shadow.rect().adjusted(globalShadowData[t-1][9], globalShadowData[t-1][8],
-                                                     -globalShadowData[t-1][11], -globalShadowData[t-1][10]), 8,8);
+            p.drawRoundedRect(shadow.rect().adjusted(globalShadowData[t-1][9]+1, globalShadowData[t-1][8]+1,
+                                                     -(1+globalShadowData[t-1][11]), -(1+globalShadowData[t-1][10])), 8,8);
 
             p.end();
 #if VARYING_SHADOWS
