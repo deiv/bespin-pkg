@@ -53,7 +53,7 @@ QGraphicsWidget(parent)
     d.service = service;
     d.key = key;
     d.widget = dummy;
-    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+    setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred));
     if (QGraphicsLinearLayout *lLayout = dynamic_cast<QGraphicsLinearLayout*>(parent->layout()))
     {
         lLayout->insertItem(0, this);

@@ -762,6 +762,7 @@ XBar::show(MenuBar *item)
     int dy = (contentsRect().height() - item->rect().height())/2;
     item->setPos(contentsRect().x(), contentsRect().y()+dy);
     item->show();
+    resize(item->sizeHint(Qt::PreferredSize, QSize()));
 }
 
 void
