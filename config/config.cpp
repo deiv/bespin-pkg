@@ -61,19 +61,15 @@ namespace Gradients {
     enum BgMode { BevelV = 2, BevelH };
 }
 
-static const char* defInfo1 =
-"<b>Bespin Style</b><hr>\
-<p>\
-&copy;&nbsp;2006-2009 by Thomas L&uuml;bking<br>\
-Includes Design Ideas by\
-<ul type=\"disc\">\
-<li>Nuno Pinheiro</li>\
-<li>David Vignoni</li>\
-<li>Kenneth Wimer</li>\
-</ul>\
-</p>\
-<hr>\
-Visit <a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>";
+static QString defInfo1(
+"<b>Bespin Style</b><hr>"
+"<p> Style Version : %style<br>"
+"Config Version: %config"
+"</p>"
+"<p>"
+"&copy;&nbsp;2006-2012<br>by Thomas&nbsp;L&uuml;bking</p>"
+"<p>Includes Design Ideas by Nuno&nbsp;Pinheiro, David&nbsp;Vignoni, Kenneth&nbsp;Wimer, TheRob and google image search</p><hr>"
+"Visit <a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>");
 
 #if 0
 static const char* defInfo2 =
@@ -126,6 +122,8 @@ public:
     }
 };
 
+extern const QString bespin_revision();
+
 /** The Constructor - your first job! */
 Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(false)
 {
@@ -136,6 +134,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     QEvent event(QEvent::PaletteChange);
     changeEvent(&event);
     ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
+    ui.info->setMinimumWidth(160);
 
     const QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
     ui.info->viewport()->setAutoFillBackground(false);
@@ -291,6 +290,17 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Can be any QTextBrowser on your UI form */
     setInfoBrowser(ui.info);
     /** 2. Define a context info that is displayed when no other context help is demanded */
+    QString sv;
+    if (qApp->style()->objectName().compare("bespin", Qt::CaseInsensitive)) {
+        if (QStyle *bespin = QStyleFactory::create("bespin")) {
+            sv = bespin->property("BespinRevision").toString();
+            delete bespin;
+        }
+    } else {
+        sv = qApp->style()->property("BespinRevision").toString();
+    }
+    defInfo1.replace("%style", sv);
+    defInfo1.replace("%config", bespin_revision());
     setDefaultContextInfo(defInfo1);
 
     /** handleSettings(.) tells BConfig to take care (save/load) of a widget
@@ -742,6 +752,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     if you want a standalone app you may want to check the main() funtion
     at the end of this file as well - but there's nothing special about it...
         =========================================== */
+    resize(1024,768);
 }
 
 void

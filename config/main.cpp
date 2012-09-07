@@ -64,16 +64,19 @@ usage(const char* appname)
 "%s read <style|deco> <key> [value]\t\t\tRead a config key (defaulting to optional value)\n"
 "%s write <style|deco> <key> <value>\t\t\tWrite a config key to value\n"
 "%s delete <style|deco> <key>\t\t\tRemove a config key\n"
-"%s list <style|deco> [filter]\t\t\tList config keys matching the optional filter\n",
+"%s list <style|deco> [filter]\t\t\tList config keys matching the optional filter\n"
+"%s revision \t\t\t\tPrint bespin version string\n",
 appname, appname, appname, appname, appname, appname, appname, appname,
-appname, appname, appname, appname, appname, appname, appname, appname );
+appname, appname, appname, appname, appname, appname, appname, appname, appname );
    return 1;
 }
 
 enum Mode
 {
-    Invalid = 0, Configure, Presets, Import, Update, Export, Load, Demo, Try, Screenshot, ListStyles, Show, LoadPalette, ReadSetting, WriteSetting, DeleteSetting, ListSettings
+    Invalid = 0, Configure, Presets, Import, Update, Export, Load, Demo, Try, Screenshot, ListStyles, Show, LoadPalette, ReadSetting, WriteSetting, DeleteSetting, ListSettings, Revision
 };
+
+extern const QString bespin_revision();
 
 int
 main(int argc, char *argv[])
@@ -84,22 +87,23 @@ main(int argc, char *argv[])
     if (argc > 1)
     {
         mode = Invalid;
-        if (!qstrcmp( argv[1], "config" )) mode = Configure;
-        else if (!qstrcmp( argv[1], "presets" )) mode = Presets;
-        else if (!qstrcmp( argv[1], "import" )) mode = Import;
-        else if (!qstrcmp( argv[1], "update" )) mode = Update;
-        else if (!qstrcmp( argv[1], "export" )) mode = Export;
-        else if (!qstrcmp( argv[1], "demo" )) mode = Demo;
-        else if (!qstrcmp( argv[1], "try" )) mode = Try;
-        else if (!qstrcmp( argv[1], "show" )) mode = Show;
-        else if (!qstrcmp( argv[1], "sshot" )) mode = Screenshot;
-        else if (!qstrcmp( argv[1], "load" )) mode = Load;
-        else if (!qstrcmp( argv[1], "listStyles" )) mode = ListStyles;
-        else if (!qstrcmp( argv[1], "loadPaletteFrom" )) mode = LoadPalette;
-        else if (!qstrcmp( argv[1], "read" )) mode = ReadSetting;
-        else if (!qstrcmp( argv[1], "write" )) mode = WriteSetting;
-        else if (!qstrcmp( argv[1], "delete" )) mode = DeleteSetting;
-        else if (!qstrcmp( argv[1], "list" )) mode = ListSettings;
+        if (!qstricmp( argv[1], "config" )) mode = Configure;
+        else if (!qstricmp( argv[1], "presets" )) mode = Presets;
+        else if (!qstricmp( argv[1], "import" )) mode = Import;
+        else if (!qstricmp( argv[1], "update" )) mode = Update;
+        else if (!qstricmp( argv[1], "export" )) mode = Export;
+        else if (!qstricmp( argv[1], "demo" )) mode = Demo;
+        else if (!qstricmp( argv[1], "try" )) mode = Try;
+        else if (!qstricmp( argv[1], "show" )) mode = Show;
+        else if (!qstricmp( argv[1], "sshot" )) mode = Screenshot;
+        else if (!qstricmp( argv[1], "load" )) mode = Load;
+        else if (!qstricmp( argv[1], "listStyles" )) mode = ListStyles;
+        else if (!qstricmp( argv[1], "loadPaletteFrom" )) mode = LoadPalette;
+        else if (!qstricmp( argv[1], "read" )) mode = ReadSetting;
+        else if (!qstricmp( argv[1], "write" )) mode = WriteSetting;
+        else if (!qstricmp( argv[1], "delete" )) mode = DeleteSetting;
+        else if (!qstricmp( argv[1], "list" )) mode = ListSettings;
+        else if (!qstricmp( argv[1], "revision" )) mode = Revision;
     }
 
     switch (mode)
@@ -288,9 +292,9 @@ main(int argc, char *argv[])
         bool deco = false;
         if (argc < (mode == WriteSetting ? 5 : (mode == ListSettings ? 3 : 4)))
             e = true;
-        else if (!qstrcmp( argv[2], "deco" ))
+        else if (!qstricmp( argv[2], "deco" ))
             deco = true;
-        else if (qstrcmp( argv[2], "style" ))
+        else if (qstricmp( argv[2], "style" ))
             e = true;
         if (e)
             return error(QString("try %1 %2 <style|deco> <key> [value]").arg(argv[0]).arg(argv[1]));
@@ -322,6 +326,21 @@ main(int argc, char *argv[])
             if (deco) // update kwin
                 QProcess::startDetached("qdbus", QStringList() << "org.kde.kwin" << "/KWin" << "reconfigure" );
         }
+        return 0;
+    }
+    case Revision: {
+        QString sv;
+        QApplication a(argc, argv);
+        if (a.style()->objectName().compare("bespin", Qt::CaseInsensitive)) {
+            if (QStyle *bespin = QStyleFactory::create("bespin")) {
+                sv = bespin->property("BespinRevision").toString();
+                delete bespin;
+            }
+        } else {
+            sv = a.style()->property("BespinRevision").toString();
+        }
+        printf("Revision (Config): %s\n"
+               "Revision (Style):  %s\n", CHAR(bespin_revision()), CHAR(sv));
         return 0;
     }
     default:

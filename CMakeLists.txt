@@ -68,7 +68,7 @@ animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp
 bespin.cpp buttons.cpp docks.cpp frames.cpp genpixmaps.cpp hacks.cpp init.cpp
 input.cpp menus.cpp pixelmetric.cpp polish.cpp progress.cpp qsubcmetrics.cpp
 scrollareas.cpp indicators.cpp sizefromcontents.cpp slider.cpp stdpix.cpp stylehint.cpp
-tabbing.cpp toolbars.cpp views.cpp visualframe.cpp window.cpp )
+tabbing.cpp toolbars.cpp views.cpp visualframe.cpp window.cpp revision.cpp)
 
 set (bespin_HDRS animator/basic.h animator/aprogress.h animator/hover.h
 animator/hoverindex.h animator/tab.h config.h draw.h hacks.h splitterproxy.h visualframe.h bespin.h types.h)

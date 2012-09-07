@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>772</width>
-    <height>594</height>
+    <width>778</width>
+    <height>589</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string>Bespin Configuration</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_14" columnstretch="5,1,5">
+  <layout class="QGridLayout" name="gridLayout_14" columnstretch="1,1,5">
    <item row="0" column="2" rowspan="2">
     <widget class="QTextBrowser" name="info">
      <property name="sizePolicy">
@@ -554,8 +554,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>512</width>
-               <height>269</height>
+               <width>363</width>
+               <height>111</height>
               </rect>
              </property>
              <attribute name="label">
@@ -812,7 +812,7 @@
                <x>0</x>
                <y>0</y>
                <width>178</width>
-               <height>63</height>
+               <height>60</height>
               </rect>
              </property>
              <attribute name="label">
@@ -907,8 +907,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>247</width>
-               <height>196</height>
+               <width>244</width>
+               <height>180</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1025,7 +1025,7 @@
                <x>0</x>
                <y>0</y>
                <width>114</width>
-               <height>92</height>
+               <height>86</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1122,8 +1122,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>319</width>
-               <height>83</height>
+               <width>316</width>
+               <height>80</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1230,8 +1230,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>512</width>
-               <height>230</height>
+               <width>277</width>
+               <height>179</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1434,8 +1434,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>286</width>
-               <height>166</height>
+               <width>282</width>
+               <height>157</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1983,7 +1983,7 @@
                <x>0</x>
                <y>0</y>
                <width>306</width>
-               <height>261</height>
+               <height>244</height>
               </rect>
              </property>
              <attribute name="label">
@@ -2145,8 +2145,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>237</width>
-               <height>98</height>
+               <width>229</width>
+               <height>90</height>
               </rect>
              </property>
              <attribute name="label">

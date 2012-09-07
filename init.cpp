@@ -632,6 +632,8 @@ void Style::initMetrics()
 
 #undef SCALE
 
+extern const QString bespin_revision();
+
 void
 Style::init(const QSettings* settings)
 {
@@ -709,5 +711,6 @@ Style::init(const QSettings* settings)
     inner.setRect(0,0,100,100); outer.setRect(0,0,100,100);
     inner.adjust(f1,f1,-f1,0); outer.adjust(-f3,-f3,f3,0);
     VisualFrame::setGeometry(QFrame::Raised, inner, outer);
+    setProperty("BespinRevision", bespin_revision());
 }
 
