@@ -1,5 +1,5 @@
 #include <QString>
-
+// comment counter 1
 const QString bespin_revision()
 {
     QString rev("$Revision$");
