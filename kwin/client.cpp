@@ -295,7 +295,7 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
         that->myArea[Left].setWidth(myTitleSize);
     } else {
         that->myTitleSpacer->changeSize( 1, myTitleSize, QSizePolicy::Expanding, QSizePolicy::Fixed);
-        that->myArea[Left].setHeight(myTitleSize);
+        that->myArea[Top].setHeight(myTitleSize);
     }
     that->myTitleBar->invalidate();
 }
