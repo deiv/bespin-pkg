@@ -238,7 +238,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>10</number>
         </property>
         <widget class="QWidget" name="Presets">
          <layout class="QGridLayout" name="gridLayout_2">
@@ -1982,8 +1982,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>306</width>
-               <height>244</height>
+               <width>501</width>
+               <height>284</height>
               </rect>
              </property>
              <attribute name="label">
@@ -3353,13 +3353,6 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
         </widget>
         <widget class="QWidget" name="Hacks">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="hackMessages">
-            <property name="text">
-             <string>Override messagebox appereances</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0">
            <widget class="QCheckBox" name="hackWindowMove">
             <property name="text">
@@ -3367,7 +3360,7 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -3380,10 +3373,24 @@ If you disable UNO for titlebar and toolbar the settings will only impact the me
             </property>
            </spacer>
           </item>
-          <item row="3" column="0">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="hackMessages">
+            <property name="text">
+             <string>Override messagebox appereances</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
            <widget class="QCheckBox" name="suspendFsVideoCompositing">
             <property name="text">
              <string>Suspend KWin compositing for SMplayer, VLC &amp; DragonPlayer in fullscreen mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="hackPanning">
+            <property name="text">
+             <string>Allow panning of some viewports</string>
             </property>
            </widget>
           </item>

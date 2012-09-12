@@ -547,6 +547,16 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     - Statusbars<br>\
     - SMPlayer/DragonPlayer Video areas<br>");
 
+    handleSettings(ui.hackPanning, HACK_PANNING);
+    setContextHelp(ui.hackPanning, "<b>Panning Viewports</b><hr>\
+    <b>WARNING</b><br>\
+    This will limit normal mouse usage on those viewports, discouraged but for touchscreens.<hr>\
+    Affected are (atm.) IconViews, TextEdits, Dolphin and QWebView<br>\
+    Pannig is skipped if a modifier (ctrl, shift or alt) is held or you tap the same element\
+    twice withing 333ms<br>\
+    Clicking items will remain operative, <b>dragging will not</b><br>\
+    Use the double tap to cause a drag, ie. tap next to and then press and hold the icon");
+
     handleSettings(ui.suspendFsVideoCompositing, HACK_SUSPEND_FULLSCREEN_PLAYERS);
     setContextHelp(ui.suspendFsVideoCompositing, "<b>Suspend Fullscreen Video Compositing</b><hr>\
     Compositing, esp. the OpenGL variant, can have a significant conversion overhead, depending\

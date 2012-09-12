@@ -173,6 +173,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.opaquePlacesViews = readBool(HACK_PLACES_VIEWS);
         Hacks::config.lockToolBars = readBool(HACK_TOOLBAR_LOCKING);
         Hacks::config.lockDocks = readBool(HACK_DOCK_LOCKING);
+        Hacks::config.panning = readBool(HACK_PANNING);
         Hacks::config.invertDolphinUrlBar = appType == Dolphin && readBool(HACK_DOLPHIN_URLBAR);
         Hacks::config.fixKMailFolderList = appType == KMail && readBool(HACK_KMAIL_FOLDERS);
         Hacks::config.extendDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_ICONVIEWS);

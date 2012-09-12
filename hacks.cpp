@@ -16,11 +16,13 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <QAbstractItemView>
 #include <QAbstractScrollArea>
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDesktopWidget>
 #include <QDockWidget>
+#include <QElapsedTimer>
 #include <QEvent>
 #include <QGroupBox>
 #include <QLabel>
@@ -62,6 +64,101 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 #include "blib/gradients.h"
 //#include "blib/xproperty.h"
 #include "hacks.h"
+
+namespace Bespin {
+class Panner;
+static Panner *s_pannerInstance = 0;
+
+class Panner : public QObject
+{
+public:
+    static void manage(QWidget *w) {
+        if (!s_pannerInstance)
+            s_pannerInstance = new Panner;
+        else
+            w->removeEventFilter(s_pannerInstance);
+        w->installEventFilter(s_pannerInstance);
+    }
+protected:
+    bool eventFilter(QObject *o, QEvent *e) {
+        switch (e->type()) {
+        case QEvent::MouseMove: {
+            if (notRelevant(e))
+                return false;
+            if (m_panning) {
+                const QPoint pos = static_cast<QMouseEvent*>(e)->pos();
+                bool noClick = !m_click;
+                if (noClick) {
+                    const int dx = pos.x() - m_lastPos.x();
+                    const int dy = pos.y() - m_lastPos.y();
+                    if (QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(o->parent())) {
+                        // dolphin stacks a graphicsview into a view inside a view ...
+                        QAbstractScrollArea *runner = area;
+                        while ((runner = qobject_cast<QAbstractScrollArea*>(runner->parent())))
+                            area = runner;
+
+                        if (dx && area->horizontalScrollBar())
+                            area->horizontalScrollBar()->setValue(area->horizontalScrollBar()->value() - dx);
+                        if (dy && area->verticalScrollBar()) {
+                            area->verticalScrollBar()->setValue(area->verticalScrollBar()->value() - dy);
+                        }
+                    } else { // mostly QWebView
+                        if (dy) {
+                            QWheelEvent wev(pos, dy, Qt::NoButton, Qt::NoModifier, Qt::Vertical);
+                            QApplication::sendEvent(o, &wev);
+                        }
+                        if (dx) {
+                            QWheelEvent weh(pos, dx, Qt::NoButton, Qt::NoModifier, Qt::Horizontal);
+                            QApplication::sendEvent(o, &weh); // "oi wehh"
+                        }
+                    }
+                }
+                m_lastPos = pos;
+                m_click = m_click && qAbs(QPoint(m_startPoint - m_lastPos).manhattanLength()) <  QApplication::startDragDistance();
+                return noClick;
+            }
+            return false;
+        }
+        case QEvent::MouseButtonPress:
+            if (notRelevant(e))
+                return false;
+            if (m_panning) // fake event from us, let it pass
+                return false;
+            if (o == m_lastTarget && m_deadTime.restart() < 333)
+                return false;
+
+            m_lastTarget = o;
+            m_startPoint = m_lastPos = static_cast<QMouseEvent*>(e)->pos();
+            m_click = m_panning = true;
+            m_deadTime.start();
+            return true;
+        case QEvent::MouseButtonRelease: {
+            if (notRelevant(e))
+                return false;
+            if (m_panning && m_click) {
+                QMouseEvent mp(QEvent::MouseButtonPress, m_startPoint, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QApplication::sendEvent(o, &mp);
+            }
+            m_deadTime.start();
+            m_panning = false;
+            return false;
+        }
+        default:
+            return false;
+        }
+    }
+private:
+    bool notRelevant(QEvent *e) {
+        QMouseEvent *me = static_cast<QMouseEvent*>(e);
+        return me->modifiers() != Qt::NoModifier || (me->button() != Qt::LeftButton && me->button() != Qt::NoButton);
+    }
+    QPoint m_startPoint, m_lastPos;
+    bool m_panning, m_click;
+    QObject *m_lastTarget;
+    QElapsedTimer m_deadTime;
+    Panner() : QObject(), m_panning(false), m_click(false), m_lastTarget(0) {}
+};
+} // namepsace
 
 using namespace Bespin;
 
@@ -698,6 +795,25 @@ Hacks::add(QWidget *w)
         frame->setFrameShadow(QFrame::Sunken);
         frame->setAutoFillBackground(true);
         FILTER_EVENTS(label);
+    }
+
+    if (config.panning) {
+        if ( QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(w) ) {
+            if (QAbstractItemView *view = qobject_cast<QAbstractItemView*>(area)) {
+            if (!view->inherits("QHeaderView")) {
+                view->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+                view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+                Panner::manage(area->viewport());
+            }
+            } else if (area->inherits("QTextEdit"))
+                Panner::manage(area->viewport());
+            else if (area->parentWidget() && area->parentWidget()->parentWidget() &&
+                QString(area->parentWidget()->parentWidget()->metaObject()->className()).startsWith("Dolphin"))
+                Panner::manage(area->viewport());
+//             else
+//                 qDebug() << area << area->parentWidget();
+        } else if (w->inherits("QWebView"))
+            Panner::manage(w);
     }
 #if 0
     ENSURE_INSTANCE;

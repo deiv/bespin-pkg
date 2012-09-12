@@ -41,7 +41,8 @@ public:
         bool messages, KHTMLView, treeViews, windowMovement, killThrobber, fixGwenview,
              opaqueDolphinViews, opaqueAmarokViews, opaquePlacesViews,
              lockToolBars, invertDolphinUrlBar, fixKMailFolderList, extendDolphinViews, lockDocks,
-             konsoleScanlines, suspendFullscreenPlayers, titleWidgets, transparentDolphinView;
+             konsoleScanlines, suspendFullscreenPlayers, titleWidgets, transparentDolphinView,
+             panning;
     } config;
 protected:
     bool eventFilter( QObject *, QEvent *);
