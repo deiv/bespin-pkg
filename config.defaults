@@ -83,6 +83,7 @@
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false
 // yes - "true" by default since a terminal w/o scanlines is no terminal at all ;-)
 #define HACK_KRUNNER "Hack.KRunner", false
+#define HACK_PANNING "Hack.Panning", false
 #define HACK_SUSPEND_FULLSCREEN_PLAYERS "Hack.SuspendFSPlayers", false
 #define HACK_THROBBER "Hack.KillThrobber", false
 // yes - "true" by default since they're dead ugly
