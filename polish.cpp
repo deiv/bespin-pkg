@@ -17,7 +17,7 @@
  */
 
 #include <QAbstractItemView>
-// #include <QAbstractScrollArea>
+#include <QAbstractScrollArea>
 #include <QAbstractSlider>
 #include <QAction>
 #include <QApplication>
@@ -33,7 +33,6 @@
 #include <QMenuBar>
 #include <QPainter>
 #include <QPushButton>
-#include <QScrollArea>
 #include <QTimer>
 #include <QToolBar>
 #include <QToolTip>
