@@ -157,11 +157,11 @@ grabWidget(QWidget * root, QPixmap &pix)
     QPixmap *saPix = 0L;
 
     QWidgetList widgets = root->findChildren<QWidget*>();
-    QList<Basic::WidgetPtr> widgets2;
+    QList<WidgetPtr> widgets2;
     foreach (QWidget *w, widgets)
-        widgets2.append(Basic::WidgetPtr(w));
+        widgets2.append(WidgetPtr(w));
 
-    for(QList<Basic::WidgetPtr>::const_iterator it = widgets2.constBegin(), end = widgets2.constEnd(); it != end; ++it)
+    for(QList<WidgetPtr>::const_iterator it = widgets2.constBegin(), end = widgets2.constEnd(); it != end; ++it)
     {
         QWidget *w = it->data();
         if (w && w->isVisibleTo(root))

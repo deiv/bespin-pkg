@@ -44,6 +44,8 @@ protected:
     void init(int s = 0, bool bwd = false);
 };
 
+typedef QWeakPointer<QWidget> WidgetPtr;
+
 class Basic : public QObject
 {
     Q_OBJECT
@@ -53,7 +55,6 @@ public:
     static int step(const QWidget *widget);
     virtual const Info &info(const QWidget *widget, long int index = 0) const;
     static void setFPS(uint fps);
-    typedef QWeakPointer<QWidget> WidgetPtr;
 protected:
     Basic();
     virtual ~Basic(){}
@@ -77,14 +78,14 @@ private:
     Q_DISABLE_COPY(Basic)
 };
 
+} // namespace
+
 #ifndef WIDGET_PTR_LESSER
 #define WIDGET_PTR_LESSER
-inline bool operator< (const Basic::WidgetPtr &ptr1, const Basic::WidgetPtr &ptr2) {
+inline bool operator< (const Animator::WidgetPtr &ptr1, const Animator::WidgetPtr &ptr2) {
     return ptr1.data() < ptr2.data();
 }
 #endif
-
-} // namespace
 
 #define INSTANCE(_CLASS_) static _CLASS_ *instance = 0;
 #define MANAGE(_CLASS_)\

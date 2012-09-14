@@ -23,6 +23,7 @@
 #include <QMap>
 #include <QWeakPointer>
 
+
 namespace Animator {
 
    enum Dir { In = 0, Out };
@@ -39,13 +40,14 @@ protected:
    long int index;
 };
 
+typedef QWeakPointer<QWidget> WidgetPtr;
+
 class HoverIndex : public QObject {
    Q_OBJECT
 public:
    static const IndexInfo *info(const QWidget *widget, long int index);
    static void setDuration(uint ms);
    static void setFPS(uint fps);
-   typedef QWeakPointer<QWidget> WidgetPtr;
 protected:
    HoverIndex();
    virtual ~HoverIndex(){}
@@ -62,14 +64,14 @@ private:
     Q_DISABLE_COPY(HoverIndex)
 };
 
+}
+
 #ifndef WIDGET_PTR_LESSER
 #define WIDGET_PTR_LESSER
-inline bool operator< (const HoverIndex::WidgetPtr &ptr1, const HoverIndex::WidgetPtr &ptr2) {
+inline bool operator< (const Animator::WidgetPtr &ptr1, const Animator::WidgetPtr &ptr2) {
     return ptr1.data() < ptr2.data();
 }
 #endif
-
-}
 
 #ifndef ANIMATOR_IMPL
 #define ANIMATOR_IMPL 0

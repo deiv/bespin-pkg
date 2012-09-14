@@ -32,6 +32,7 @@ CloseHorizontally, CrossFade
 
 class Curtain;
 class Tab;
+typedef QWeakPointer<QStackedWidget> StackWidgetPtr;
 
 class TabInfo : public QObject
 {
@@ -63,7 +64,6 @@ public:
     static void setDuration(uint ms);
     static void setFPS(uint fps);
     static void setTransition(Transition t);
-    typedef QWeakPointer<QStackedWidget> StackWidgetPtr;
 protected:
     Tab();
     virtual bool _manage(QWidget *w);
@@ -79,8 +79,11 @@ private:
     Q_DISABLE_COPY(Tab)
 };
 
-inline bool operator< (const Tab::StackWidgetPtr &ptr1, const Tab::StackWidgetPtr &ptr2) {
+} //namespace
+
+#ifndef STACK_WIDGET_PTR_LESSER
+#define STACK_WIDGET_PTR_LESSER
+inline bool operator< (const Animator::StackWidgetPtr &ptr1, const Animator::StackWidgetPtr &ptr2) {
     return ptr1.data() < ptr2.data();
 }
-
-} //namespace
+#endif
