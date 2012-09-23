@@ -622,13 +622,20 @@ Style::polish( QWidget * widget )
 #endif
             )
         {
+#define IS_DOLPHIN_VIEW \
+(QString(frame->metaObject()->className()).startsWith("Dolphin") || \
+(dv2g = (frame->parentWidget()->parentWidget() && frame->inherits("QGraphicsView") && \
+QString(frame->parentWidget()->parentWidget()->metaObject()->className()).startsWith("Dolphin"))))
             Animator::Hover::manage(frame);
-            if ( Hacks::config.extendDolphinViews && frame->parentWidget() &&
-                            QString(frame->metaObject()->className()).startsWith("Dolphin") )
+            bool dv2g = false;
+            if ( Hacks::config.extendDolphinViews && frame->parentWidget() && IS_DOLPHIN_VIEW)
             {
                 if (QWidget *grampa = frame->parentWidget()->parentWidget())
                 {
                     frame->setFrameStyle(QFrame::NoFrame);
+                    if (dv2g)
+                    if (QFrame *pFrame = qobject_cast<QFrame*>(frame->parentWidget()))
+                        pFrame->setFrameStyle(QFrame::NoFrame);
                     if (!Hacks::config.transparentDolphinView) {
                         grampa->setBackgroundRole(QPalette::Base);
                         grampa->setForegroundRole(QPalette::Text);
