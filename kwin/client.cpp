@@ -300,6 +300,13 @@ Client::borders( int& left, int& right, int& top, int& bottom ) const
     that->myTitleBar->invalidate();
 }
 
+QRegion Client::region(KDecorationDefines::Region r)
+{
+    if (r == KDecorationDefines::ExtendedBorderRegion)
+        return QRegion(widget()->rect().adjusted(-3,-3,3,3)) - widget()->rect();
+    return QRegion();
+}
+
 int
 Client::buttonBoxPos(bool active)
 {

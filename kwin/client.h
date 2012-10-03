@@ -85,6 +85,7 @@ public slots:
     void throwOnDesktop();
     void updateStylePixmaps();
     void updateUnoHeight();
+    QRegion region(KDecorationDefines::Region r);
 signals:
     void maximizeChanged(bool);
     void stickyChanged(bool);
