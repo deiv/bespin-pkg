@@ -26,6 +26,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QSettings>
+#include <QTimer>
 #include <QWidgetAction>
 #include <QStyleOptionHeader>
 #include <QTextBrowser>
@@ -105,7 +106,10 @@ Factory::Factory() : QObject(), KDecorationFactory()
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
     QDBusConnection::sessionBus().registerObject("/BespinDeco", this);
     connect (KWindowSystem::self(), SIGNAL(compositingChanged(bool)), SLOT(updateCompositingState(bool)));
-    QMetaObject::invokeMethod( this, "postInit", Qt::QueuedConnection);
+    // NOTICE DO NOT INVOKE THIS! Threaded KWin needs a little timeout (yeah for heuristical behavior!)
+    QTimer::singleShot(250, this, SLOT(postInit()));
+    // NOTICE DON'T - Hey future Thomas, this causes random crashes on startup
+    // NOTICE BAD! QMetaObject::invokeMethod( this, "postInit", Qt::QueuedConnection);
 }
 
 void Factory::postInit() {
