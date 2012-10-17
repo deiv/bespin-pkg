@@ -1,0 +1,3 @@
+ksplash/aperture/[1-9]*	usr/share/kde4/apps/ksplash/Themes/Aperture/
+ksplash/aperture/*.png	usr/share/kde4/apps/ksplash/Themes/Aperture/
+ksplash/aperture/Theme.rc	usr/share/kde4/apps/ksplash/Themes/Aperture/

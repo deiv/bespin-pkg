@@ -1,0 +1,13 @@
+bespin (0.r1552-1) UNRELEASED; urgency=low
+
+  * New release SVN@1620
+  * With Icons 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 24 Jun 2012 15:40:58 +0530
+
+bespin (0.r1501-1) experimental; urgency=low
+
+  * Initial release SVN@1501 (Closes: #651091)
+  * Fix debian/copyright with license details 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Mon, 07 May 2012 09:54:57 +0530

@@ -1,0 +1,99 @@
+Source: bespin
+Section: kde
+Priority: extra
+Maintainer: Debian KDE Extras Team <pkg-kde-extras@lists.alioth.debian.org>
+Uploaders: Ritesh Raj Sarraf <rrs@debian.org>
+Build-Depends: debhelper (>= 7.0.50~), libqt4-dev (>= 4.4), kdelibs-bin, cmake, kdelibs5-dev, kdebase-workspace-dev, libx11-dev, libxrender-dev, libxext-dev, imagemagick, inkscape, git
+Standards-Version: 3.9.3
+Homepage: http://cloudcity.sourceforge.net
+Bugs: http://sourceforge.net/tracker/?atid=976907&group_id=201276&func=browse
+Vcs-Git: git://git.debian.org/pkg-kde/kde-extras/bespin.git
+Vcs-Browser: http://git.debian.org/?p=pkg-kde/kde-extras/bespin.git
+
+Package: kde-style-bespin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: kdm-theme-bespin, ksplash-theme-bespin
+Conflicts: kde4-style-bespin, kwin4-style-bespin, plasma-widget-xbar
+Description: very glossy Qt4/KDE4 window decoration
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+
+Package: kdm-theme-bespin
+Architecture: all
+Suggests: kde-style-bespin
+Depends: ${misc:Depends}
+Description: very glossy Qt4/KDE4 kdm theme
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+ .
+ This package includes the kdm theme for Bespin
+
+Package: kdm-theme-aperture
+Architecture: all
+Suggests: kde-style-bespin
+Depends: ${misc:Depends}
+Description: very glossy Qt4/KDE4 kdm theme - aperture variant
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+ .
+ This package includes the kdm theme for Bespin - Aperture variant
+
+Package: kdm-theme-tibanna
+Architecture: all
+Suggests: kde-style-bespin
+Depends: ${misc:Depends}
+Description: very glossy Qt4/KDE4 kdm theme - tibanna variant
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+ .
+ This package includes the kdm theme for Bespin - Tibanna variant
+
+Package: ksplash-theme-bespin
+Architecture: all
+Suggests: kde-style-bespin
+Depends: ${misc:Depends}
+Description: very glossy Qt4/KDE4 ksplash theme
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+ .
+ This package includes the ksplash theme for Bespin
+
+Package: ksplash-theme-tibanna
+Architecture: all
+Suggests: kde-style-bespin
+Depends: ${misc:Depends}
+Description: very glossy Qt4/KDE4 ksplash theme - tibanna variant
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+ .
+ This package includes the ksplash theme for Bespin - Tibanna variant
+
+Package: ksplash-theme-aperture
+Architecture: all
+Suggests: kde-style-bespin
+Depends: ${misc:Depends}
+Description: very glossy Qt4/KDE4 ksplash theme - aperture variant
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+ .
+ This package includes the ksplash theme for Bespin - aperture variant
+
+Package: bespin-icon-theme
+Architecture: all
+Suggests: kde-style-bespin
+Depends: ${misc:Depends}
+Description: Icon sets for bespin
+ Bespin is a window decoration for KDE4, the name is nothing about quantum
+ mechanics, but just refers to cloud city (StarWars Episode V: The Empire
+ Strikes Back)
+ .
+ This package includes the icon theme for Bespin
+

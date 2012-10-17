@@ -1,0 +1,3 @@
+ksplash/bespin/[1-9]*	usr/share/kde4/apps/ksplash/Themes/Bespin/
+ksplash/bespin/*.png	usr/share/kde4/apps/ksplash/Themes/Bespin/
+ksplash/bespin/Theme.rc	usr/share/kde4/apps/ksplash/Themes/Bespin/
