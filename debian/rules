@@ -5,9 +5,33 @@ export DH_VERBOSE=1
 export DH_OPTIONS
 export install_dir="debian/kde-style-bespin"
 
+UNCLEANED_FILES=\
+  ksplash/aperture/1024x768/ \
+  ksplash/aperture/1280x1024/ \
+  ksplash/aperture/1366x768/ \
+  ksplash/aperture/1440x900/ \
+  ksplash/aperture/1600x1200/ \
+  ksplash/aperture/1920x1080/ \
+  ksplash/bespin/1024x768/ \
+  ksplash/bespin/1280x1024/ \
+  ksplash/bespin/1366x768/ \
+  ksplash/bespin/1440x900/ \
+  ksplash/bespin/1600x1200/ \
+  ksplash/bespin/1920x1080/ \
+  ksplash/bespin/Preview.png \
+  ksplash/tibanna/1024x768/ \
+  ksplash/tibanna/1280x1024/ \
+  ksplash/tibanna/1366x768/ \
+  ksplash/tibanna/1440x900/ \
+  ksplash/tibanna/Preview.png
+
 %:
 	dh $@ --parallel
 
+override_dh_auto_clean: override_dh_auto_configure
+	#$(RM) -R ksplash
+	cd build && make clean
+	$(RM) -R build $(UNCLEANED_FILES)
 
 override_dh_auto_configure:
 	test -d build || mkdir build
