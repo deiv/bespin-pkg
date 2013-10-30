@@ -305,6 +305,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     if (config.bg.opacity != 0xff)
     {
         QStringList blacklist = iSettings->value(ARGB_BLACKLIST).toString().split(',', QString::SkipEmptyParts);
+        blacklist << "kscreenlocker" << "kscreenlocker_greet"; // https://bugs.kde.org/show_bug.cgi?id=314663
         if (blacklist.contains(appName))
             config.bg.opacity = 0xff;
         Animator::Tab::setTransition(Animator::Jump);

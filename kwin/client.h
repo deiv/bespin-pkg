@@ -74,15 +74,16 @@ public:
     void showWindowList(const QPoint &p);
     void showWindowMenu(const QPoint &p);
     void showWindowMenu(const QRect &r);
-    inline QPoint titleOffset() const
-        { return Factory::verticalTitle() ? QPoint(myTitleSize, 0) : QPoint(0, myTitleSize); }
     void toggleOnAllDesktops();
     QString trimm(const QString &string);
     void shadeChange();
     inline Gradients::Type unoGradient() const {return myGradients[2];}
+public:
+    Q_INVOKABLE KDecorationDefines::Position titlebarPosition() { return Factory::verticalTitle() ? PositionLeft : PositionTop; }
 public slots:
     void activate();
     void throwOnDesktop();
+    void triggerMoveResize();
     void updateStylePixmaps();
     void updateUnoHeight();
     QRegion region(KDecorationDefines::Region r);
@@ -101,6 +102,7 @@ protected:
     inline int buttonOpacity() const { return myButtonOpacity; }
     void repaint(QPainter &p, bool paintTitle = true);
     void tileWindow(bool more, bool vertical, bool mirrorGravity);
+    void maximumize(Qt::MouseButtons button);
 private:
     Q_DISABLE_COPY(Client)
     void fadeButtons();
@@ -108,10 +110,11 @@ private:
     void updateTitleLayout( const QSize& s );
     void updateTitleHeight(int *variable);
     void updateButtonCorner(bool right = false);
+    int titleSize() const;
 private:
     QColor myColors[2][4]; // [inactive,active][titlebg,buttonbg/border,title,fg(bar,blend,font,btn)]
     Button *myButtons[4];
-    int myBaseSize, myEdgeSize, myTitleSize, buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
+    int buttonSpace, buttonSpaceLeft, buttonSpaceRight, retry;
     int myButtonOpacity;
     int myActiveChangeTimer;
     Picture myTiles[5];

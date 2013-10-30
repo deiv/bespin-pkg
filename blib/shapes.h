@@ -43,6 +43,7 @@ namespace Shapes
     BLIB_EXPORT QPainterPath unshade(const QRectF &bound, Style style = Round);
     BLIB_EXPORT QPainterPath exposee(const QRectF &bound, Style style = Round);
     BLIB_EXPORT QPainterPath info(const QRectF &bound, Style style = Round);
+    BLIB_EXPORT QPainterPath moveResize(const QRectF &bound, Style style = Round);
     BLIB_EXPORT QPainterPath logo(const QRectF &bound);
 }
 }

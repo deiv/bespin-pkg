@@ -343,11 +343,15 @@ TabInfo::rewind()
 void
 TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 {
+    if (!sw->window()->isVisible()) {
+        return;
+    }
     progress = 0.0;
     // update from/to indices
     //    const int oldIdx = tai->index; // just for debug out later on
     QWidget *ow = sw->widget(index);
     QWidget *cw = sw->widget(newIdx);
+
     currentWidget = cw;
     index = newIdx;
 
@@ -528,6 +532,10 @@ Tab::_manage (QWidget* w)
    if (!sw)
        return false;
 
+   // just to be sure...
+    disconnect(sw, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
+    sw->removeEventFilter(this);
+
    connect(sw, SIGNAL(destroyed(QObject*)), SLOT(release_s(QObject*)));
    connect(sw, SIGNAL(widgetRemoved(int)), SLOT(widgetRemoved(int)));
    connect(sw, SIGNAL(currentChanged(int)), SLOT(changed(int)));
@@ -542,6 +550,7 @@ Tab::_release(QWidget *w)
    if (!sw)
        return;
 
+   disconnect(sw, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
    disconnect(sw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
    disconnect(sw, SIGNAL(widgetRemoved(int)), this, SLOT(widgetRemoved(int)));
    Items::iterator it = items.begin(), end = items.end();
@@ -597,7 +606,8 @@ Tab::widgetRemoved(int index)
     Items::iterator i = items.find(sw);
     if (i == items.end())
         return;
-    if (i.value()->index == index)
+
+    if (i.value()->index == index || !sw->count())
         i.value()->index = -1;
 }
 

@@ -290,6 +290,7 @@ Style::registerRoutines()
 Style::Style() : QCommonStyle()
 {
     setObjectName(QLatin1String("Bespin"));
+    XProperty::init();
     FX::init();
 #if BESPIN_STANDARD_PALETTE_HACK
     if (usingStandardPalette)
@@ -1196,6 +1197,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 //         if (object->isWidgetType())
         if (QWidget *window = static_cast<QWidget*>(object))
         if (window->testAttribute(Qt::WA_TranslucentBackground))
+        if (window->testAttribute(Qt::WA_StyledBackground))
         if (window->isWindow())
         {
             QPainter p(window);
@@ -1701,16 +1703,17 @@ Style::eventFilter( QObject *object, QEvent *ev )
 }
 
 void
-Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bool silent)
+Style::fixViewPalette(QAbstractScrollArea *itemView, int style, bool alternate, bool silent)
 {
     QWidget *vp = itemView->viewport();
+    QAbstractItemView *realItemView = qobject_cast<QAbstractItemView*>(itemView);
 
     if (silent)
         itemView->installEventFilter(&eventKiller);
 
     if (style == 1)
     {
-        itemView->setAlternatingRowColors(false);
+        if (realItemView) realItemView->setAlternatingRowColors(false);
         itemView->setPalette(QPalette());
         QPalette pal = itemView->palette();
         if (alternate)
@@ -1742,7 +1745,7 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
         {
             if (style == 2) // force transparent
             {
-                itemView->setAlternatingRowColors(false);
+                if (realItemView) realItemView->setAlternatingRowColors(false);
                 itemView->setFrameStyle(QFrame::NoFrame);
             }
             QPalette pal = itemView->palette();

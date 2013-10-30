@@ -26,11 +26,9 @@
 #endif
 #include "makros.h"
 
-#if  0 // QT_VERSION >= 0x040500 - no. see below!
 #include <QStyleOptionTab>
 #include <QTabBar>
 #include <QTabWidget>
-#endif
 
 using namespace Bespin;
 
@@ -54,17 +52,13 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_ScrollBar_ScrollWhenPointerLeavesControl:
         return true; // UIs are no ego shooters...
     case SH_TabBar_Alignment:
-#if  0 // QT_VERSION >= 0x040500 DON'T TRY AGAIN, other thomas - it looks crap :-(
-//         qDebug() << option << widget;
-        if (const QStyleOptionTabV3 *tab = qstyleoption_cast<const QStyleOptionTabV3*>(option))
-            return (tab->documentMode ? Qt::AlignLeft : Qt::AlignCenter);
         if (const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget))
             return (tabBar->documentMode() ? Qt::AlignLeft : Qt::AlignCenter);
         if (const QTabWidget *tabWidget = qobject_cast<const QTabWidget*>(widget))
             return (tabWidget->documentMode() ? Qt::AlignLeft : Qt::AlignCenter);
-#else
+        if (const QStyleOptionTabV3 *tab = qstyleoption_cast<const QStyleOptionTabV3*>(option))
+            return (tab->documentMode ? Qt::AlignLeft : Qt::AlignCenter);
         return Qt::AlignLeft;
-#endif
     case SH_Header_ArrowAlignment:
         return Qt::AlignLeft; // we move it to text center though...
     case SH_Slider_SnapToValue:
@@ -102,7 +96,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_Menu_Scrollable:
         return true; // better scroll than fold around covering the desktop!
     case SH_Menu_SloppySubMenus:
-        return false; // this causes Qt to show/hide/show the menu what leads to naaasty animations with effects enabled :-(
+        return true; // this causes Qt to show/hide/show the menu what leads to naaasty animations with effects enabled :-(
 //         return true; // don't hide submenus immediately please
     case SH_ScrollView_FrameOnlyAroundContents: // YES - period.
         return (!(widget && widget->inherits("QComboBoxListView")));
@@ -167,7 +161,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
             return Colors::mid(FCOLOR(Base), FCOLOR(Text),6,1).rgb();
         return -1;
     case SH_UnderlineShortcut:
-        return true; // means the alt+<x> menu thing, we handle global setting throught BESPIN_MNEMONIC
+        return config.mnemonic == Qt::TextShowMnemonic;
     case SH_SpinBox_AnimateButton:
         return true; // feedback to the user, please
     case SH_SpinBox_ClickAutoRepeatRate:
@@ -175,7 +169,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_SpinBox_KeyPressAutoRepeatRate:
         return 75;
     case SH_ToolTipLabel_Opacity:
-        return 204; // ~ 80%
+        return 255; // done via ARGB painting, FileMetaDataToolTip does not work with window opacity
     case SH_DrawMenuBarSeparator:
         return false; // NO WAY!!!
     case SH_TitleBar_ModifyNotification:
@@ -221,6 +215,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return Qt::AlignRight;
     case SH_ItemView_PaintAlternatingRowColorsForEmptyArea:
         return true;
+    case SH_SpellCheckUnderlineStyle:
+        return config.macStyle ? 4 : 6; // DashDotLine / WaveUnderline
 
     case SH_KCustomStyleElement:
     {

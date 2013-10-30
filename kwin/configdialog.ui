@@ -20,7 +20,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1006,6 +1006,48 @@
          </layout>
         </widget>
        </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="borderLines">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_24">
+         <property name="text">
+          <string>Draw titlewings on active window</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_25">
+         <property name="text">
+          <string>Emboss title</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="embossTitle">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_23">
+         <property name="text">
+          <string>Trimm title</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QCheckBox" name="trimmTitle">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
        <item row="5" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
@@ -1032,43 +1074,15 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label_12">
          <property name="text">
           <string>Force small titlebar for</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="6" column="1">
         <widget class="QLineEdit" name="smallTitleClasses"/>
-       </item>
-       <item row="4" column="1">
-        <widget class="QCheckBox" name="trimmTitle">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QCheckBox" name="borderLines">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_23">
-         <property name="text">
-          <string>Trimm title</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_24">
-         <property name="text">
-          <string>Draw titlewings on active window</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -1076,7 +1090,27 @@
       <attribute name="title">
        <string>Shadows</string>
       </attribute>
-      <layout class="QFormLayout" name="formLayout_3">
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="halo">
+         <property name="text">
+          <string>Halo</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="KColorButton" name="shadowColor"/>
+         </item>
+         <item>
+          <widget class="KColorButton" name="haloColor"/>
+         </item>
+        </layout>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_18">
          <property name="text">
@@ -1165,20 +1199,6 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="KColorButton" name="shadowColor">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="halo">
-         <property name="text">
-          <string>Halo</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </widget>
@@ -1213,34 +1233,18 @@
  <resources/>
  <connections>
   <connection>
-   <sender>halo</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>shadowColor</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>15</x>
-     <y>34</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>70</x>
-     <y>34</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>buttonnyButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>buttonGradient</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>143</x>
-     <y>80</y>
+     <x>48</x>
+     <y>37</y>
     </hint>
     <hint type="destinationlabel">
-     <x>282</x>
-     <y>82</y>
+     <x>98</x>
+     <y>37</y>
     </hint>
    </hints>
   </connection>
@@ -1251,12 +1255,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>121</x>
-     <y>79</y>
+     <x>48</x>
+     <y>37</y>
     </hint>
     <hint type="destinationlabel">
-     <x>256</x>
-     <y>112</y>
+     <x>98</x>
+     <y>42</y>
     </hint>
    </hints>
   </connection>
@@ -1267,12 +1271,44 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>140</x>
-     <y>79</y>
+     <x>48</x>
+     <y>37</y>
     </hint>
     <hint type="destinationlabel">
-     <x>226</x>
-     <y>131</y>
+     <x>48</x>
+     <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>halo</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>haloColor</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>188</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>283</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>halo</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>shadowColor</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>195</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>230</x>
+     <y>41</y>
     </hint>
    </hints>
   </connection>

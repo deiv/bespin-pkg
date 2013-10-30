@@ -121,6 +121,7 @@
 #define ROUNDNESS "Roundness", 100
 
 #define SHADOW_COLOR "ShadowColor", QColor(0,0,0,255)
+#define HALO_COLOR "HaloColor", QColor(255,255,255,255)
 #define SHADOW_IS_HALO "ShadowIsHalo", false
 #define SHADOW_SIZE_INACTIVE "InactiveShadowSize", 12
 #define SHADOW_SIZE_ACTIVE "ActiveShadowSize", 48

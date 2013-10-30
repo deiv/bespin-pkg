@@ -78,6 +78,7 @@ static unsigned long*
 shadowData(Shadows::Type t, bool storeToRoot)
 {
 #ifdef Q_WS_X11
+    XProperty::init();
     unsigned long _12 = 12;
     unsigned long *data = XProperty::get<unsigned long>(QX11Info::appRootWindow(), XProperty::bespinShadow[t-1], XProperty::LONG, &_12);
     if (!data)
@@ -88,13 +89,16 @@ shadowData(Shadows::Type t, bool storeToRoot)
 #else
         int sz = size[1];
 #endif
+        float focus;
         if (halo)
         {
+            focus = 9.0f/sz;
             globalShadowData[t-1][8] = globalShadowData[t-1][9] = // yes, next line
             globalShadowData[t-1][10] = globalShadowData[t-1][11] = 3*(sz-4)/4;
         }
         else
         {
+            focus = 5.0f/sz;
             globalShadowData[t-1][8] = (sz-4)/2;
             globalShadowData[t-1][9] = 2*(sz-4)/3;
             globalShadowData[t-1][10] = sz-4;
@@ -129,30 +133,31 @@ shadowData(Shadows::Type t, bool storeToRoot)
             QPainter p(&shadow);
             p.setPen(Qt::NoPen);
 
-            if (halo)
-            {
-                rg.setColorAt(0, QColor(255,255,255,192)); rg.setColorAt(0.98, QColor(255,255,255,0));
+            int weaken = sz/2;
+            if (halo) {
+                weaken = 0;
+                rg.setColorAt(focus, QColor(255,255,255,192-sz)); rg.setColorAt(focus + (1.0f-focus)/2.0f, QColor(255,255,255,0));
                 p.setBrush(rg);
                 p.drawRect(shadowRect);
             }
 
             QColor transparent = color; transparent.setAlpha(0);
-            color.setAlpha(112-sz);
-            rg.setColorAt(0, color); rg.setColorAt(0.98, transparent);
+            color.setAlpha(96-weaken);
+            rg.setColorAt(focus, color); rg.setColorAt(0.98, transparent);
             p.setBrush(rg);
             p.drawRect(shadowRect);
 
             rg.setStops(QGradientStops());
 
-            color.setAlpha(96-sz);
-            rg.setColorAt(0, color); rg.setColorAt(0.80, transparent);
+            color.setAlpha(80-weaken);
+            rg.setColorAt(focus, color); rg.setColorAt(focus + (1.0f-focus)/1.25f, transparent);
             p.setBrush(rg);
             p.drawRect(shadowRect);
 
             rg.setStops(QGradientStops());
 
-            color.setAlpha(72-sz);
-            rg.setColorAt(0, color); rg.setColorAt(0.66, transparent);
+            color.setAlpha(64-weaken);
+            rg.setColorAt(focus, color); rg.setColorAt(focus + (1.0f-focus)/1.52f, transparent);
             p.setBrush(rg);
             p.drawRect(shadowRect);
 
@@ -195,6 +200,7 @@ bool
 Shadows::areSet(WId id)
 {
 #ifdef Q_WS_X11
+    XProperty::init();
     unsigned long _12 = 12;
     return XProperty::get<unsigned long>(id, XProperty::kwinShadow, XProperty::LONG, &_12);
 #endif
@@ -241,6 +247,7 @@ Shadows::set(WId id, Shadows::Type t, bool storeToRoot)
         qWarning("BESPIN WARNING! Setting shadow to ROOT window is NOT supported");
         return;
     }
+    XProperty::init();
     switch(t)
     {
     case Shadows::None:

@@ -585,6 +585,43 @@ Shapes::info(const QRectF &bound, Style style)
     return path;
 }
 
+QPainterPath
+Shapes::moveResize(const QRectF &bound, Style)
+{
+    _S(8)
+    QPainterPath path;
+    QRectF inner(bound);
+    QPointF c = inner.center();
+    inner.adjust(3*s8,3*s8,-3*s8,-3*s8);
+    QRectF mid(bound);
+    mid.adjust(2*s8,2*s8,-2*s8,-2*s8);
+
+    path.moveTo(mid.topLeft());
+
+    path.lineTo(inner.x(), mid.top());
+    path.lineTo(c.x(), bound.top());
+    path.lineTo(inner.right(), mid.top());
+    path.lineTo(mid.topRight());
+
+    path.lineTo(mid.right(), inner.top());
+    path.lineTo(bound.right(), c.y());
+    path.lineTo(mid.right(), inner.bottom());
+    path.lineTo(mid.bottomRight());
+
+    path.lineTo(inner.right(), mid.bottom());
+    path.lineTo(c.x(), bound.bottom());
+    path.lineTo(inner.x(), mid.bottom());
+    path.lineTo(mid.bottomLeft());
+
+    path.lineTo(mid.x(), inner.bottom());
+    path.lineTo(bound.x(), c.y());
+    path.lineTo(mid.x(), inner.top());
+
+    path.closeSubpath();
+    path.addEllipse(inner);
+    return path;
+}
+
 
 QPainterPath
 Shapes::logo(const QRectF &bound)

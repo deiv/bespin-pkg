@@ -39,6 +39,9 @@
 #include <QTreeView>
 #include <QWizard>
 
+#include <QTextBrowser>
+#include <QTextDocument>
+
 #include <QtDebug>
 
 #ifdef _MSC_VER
@@ -143,19 +146,35 @@ void Style::polish( QPalette &pal, bool onInit )
     const int vwt = Colors::value(pal.color(QPalette::Active, QPalette::Window));
     const int vt = Colors::value(pal.color(QPalette::Active, QPalette::Base));
     link.getHsv(&h,&s,&v);
+    if (s < 16 || !Colors::haveContrast(link, pal.color(QPalette::Active, QPalette::Window)) ||
+                  !Colors::haveContrast(link, pal.color(QPalette::Active, QPalette::Base))) {
+        // low saturated or little contrast color - maybe we've more luck with the foreground
+        QColor link2 = pal.color(QPalette::Active, QPalette::HighlightedText);
+        int s2;
+        link2.getHsv(&h,&s2,&v);
+        if (s2 > s || qMin(Colors::contrast(link2, pal.color(QPalette::Active, QPalette::Window)),
+                           Colors::contrast(link2, pal.color(QPalette::Active, QPalette::Base))) > 
+                      qMin(Colors::contrast(link, pal.color(QPalette::Active, QPalette::Window)),
+                           Colors::contrast(link, pal.color(QPalette::Active, QPalette::Base)))) {
+            link = link2;
+            s = s2;
+        }
+        else // re-fix attributes
+            link.getHsv(&h,&s,&v);
+    }
     s = sqrt(s/255.0)*255.0;
 
     if (vwt > 128 && vt > 128)
         v = 3*v/4;
     else if (vwt < 128 && vt < 128)
         v = qMin(255, 7*v/6);
-    link.setHsv(h, s, v);
 
+    link.setHsv(h, s, v);
     pal.setColor(QPalette::Link, link);
 
     link = Colors::mid(link, Colors::mid(pal.color(QPalette::Active, QPalette::Text),
                                          pal.color(QPalette::Active, QPalette::WindowText)), 4, 1);
-                                         pal.setColor(QPalette::LinkVisited, link);
+    pal.setColor(QPalette::LinkVisited, link);
 
     if (onInit)
     {
@@ -362,6 +381,8 @@ Style::polish( QWidget * widget )
     // apply any user selected hacks
     Hacks::add(widget);
 
+    KStyleFeatureRequest kStyleFeatureRequest = (KStyleFeatureRequest)widget->property("KStyleFeatureRequest").toUInt();
+
     //BEGIN Window handling                                                                        -
     if ( widget->isWindow() &&
 //          widget->testAttribute(Qt::WA_WState_Created) &&
@@ -375,28 +396,32 @@ Style::polish( QWidget * widget )
 //         qDebug() << widget << widget->windowType();
         if ( widget->windowType() == Qt::ToolTip)
         {
-            if (widget->inherits("QTipLabel") || widget->inherits("KToolTipWindow"))
+            if (widget->inherits("QTipLabel") || widget->inherits("KToolTipWindow") || widget->inherits("FileMetaDataToolTip"))
             {
                 if (config.menu.round && !serverSupportsShadows())
                     FILTER_EVENTS(widget)
-                if ( !widget->testAttribute(Qt::WA_TranslucentBackground) && config.menu.round && FX::compositingActive() )
+                if ( !(widget->testAttribute(Qt::WA_TranslucentBackground) || kStyleFeatureRequest & NoARGB) && FX::compositingActive() )
                     widget->setAttribute(Qt::WA_TranslucentBackground);
                 widget->setProperty("BespinWindowHints", config.menu.round?Rounded:0);
-                Bespin::Shadows::manage(widget);
+                if (!(kStyleFeatureRequest & NoShadow))
+                    Bespin::Shadows::manage(widget);
             }
         }
         else if ( widget->windowType() == Qt::Popup)
         {
-            if ( widget->inherits("QComboBoxPrivateContainer") )
+            if (!widget->testAttribute(Qt::WA_TranslucentBackground) && widget->mask().isEmpty())
+//             if ( widget->inherits("QComboBoxPrivateContainer") )
+            if (!(kStyleFeatureRequest & NoShadow))
                 Bespin::Shadows::manage(widget);
         }
         else if ( widget->testAttribute(Qt::WA_X11NetWmWindowTypeDND) && FX::compositingActive() )
         {
-            widget->setAttribute(Qt::WA_TranslucentBackground);
+            if (!(kStyleFeatureRequest & NoARGB))
+                widget->setAttribute(Qt::WA_TranslucentBackground);
             widget->clearMask();
         }
 #if BESPIN_ARGB_WINDOWS
-        else if (!(  config.bg.opacity == 0xff || // opaque
+        else if (!( (kStyleFeatureRequest & NoARGB) || config.bg.opacity == 0xff || // opaque
                 widget->windowType() == Qt::Desktop || // makes no sense + QDesktopWidget is often misused
                 widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) || // makes no sense
                 widget->testAttribute(Qt::WA_TranslucentBackground) ||
@@ -422,6 +447,7 @@ Style::polish( QWidget * widget )
 #endif
             {
                 QIcon icn = widget->windowIcon();
+                widget->setAttribute(Qt::WA_StyledBackground);
                 widget->setAttribute(Qt::WA_TranslucentBackground);
                 widget->setWindowIcon(icn);
                 // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
@@ -438,9 +464,12 @@ Style::polish( QWidget * widget )
         if ( config.bg.mode > Plain || (config.UNO.toolbar && !config.UNO.sunken) ||
              config.bg.opacity != 0xff || config.bg.ringOverlay || widget->testAttribute(Qt::WA_MacBrushedMetal) )
         {
-            if (config.bg.opacity != 0xff)
+            if (config.bg.opacity != 0xff) {
+                widget->setAttribute(Qt::WA_StyledBackground);
                 FILTER_EVENTS(widget);
-            widget->setAttribute(Qt::WA_StyledBackground);
+            }
+            if (!widget->testAttribute(Qt::WA_TranslucentBackground)) // got that either from us or don't deserve
+                widget->setAttribute(Qt::WA_StyledBackground);
         }
         if ( QMainWindow *mw = qobject_cast<QMainWindow*>(widget) )
         {
@@ -503,7 +532,7 @@ Style::polish( QWidget * widget )
                 menu->setAttribute(Qt::WA_MacBrushedMetal, false);
             // opacity
 #if BESPIN_ARGB_WINDOWS
-            if ( !menu->testAttribute(Qt::WA_TranslucentBackground) &&
+            if ( !(menu->testAttribute(Qt::WA_TranslucentBackground) || (kStyleFeatureRequest & NoARGB)) &&
                 (config.menu.opacity != 0xff || (config.menu.round && FX::compositingActive())) )
             {
                 menu->setAttribute(Qt::WA_TranslucentBackground);
@@ -523,7 +552,8 @@ Style::polish( QWidget * widget )
                 menu->setWindowFlags( menu->windowFlags()|Qt::Popup);
 
             menu->setProperty("BespinWindowHints", config.menu.round?Rounded:0);
-            Bespin::Shadows::manage(menu);
+            if (!(kStyleFeatureRequest & NoShadow))
+                Bespin::Shadows::manage(menu);
 
             // eventfiltering to reposition MDI windows, shaping, shadows, paint ARGB bg and correct distance to menubars
             FILTER_EVENTS(menu);
@@ -563,7 +593,7 @@ Style::polish( QWidget * widget )
                 FILTER_EVENTS(widget); // catch show event and palette changes for deco
             }
         }
-        if (widget->property("BespinWindowHints").toInt() & Shadowed)
+        if (kStyleFeatureRequest & Shadow)
             Bespin::Shadows::manage(widget);
     }
     //END Window handling                                                                          -
@@ -624,7 +654,7 @@ Style::polish( QWidget * widget )
         {
 #define IS_DOLPHIN_VIEW \
 (QString(frame->metaObject()->className()).startsWith("Dolphin") || \
-(dv2g = (frame->parentWidget()->parentWidget() && frame->inherits("QGraphicsView") && \
+(dv2g = (frame->parentWidget() && frame->parentWidget()->parentWidget() && frame->inherits("QGraphicsView") && \
 QString(frame->parentWidget()->parentWidget()->metaObject()->className()).startsWith("Dolphin"))))
             Animator::Hover::manage(frame);
             bool dv2g = false;
@@ -669,17 +699,15 @@ QString(frame->parentWidget()->parentWidget()->metaObject()->className()).starts
                     }
                 }
             }
-            if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) )
-            {
-                if (widget->inherits("KCompletionBox"))
+            if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(frame) ) {
+                if (widget->inherits("KCompletionBox") && !(kStyleFeatureRequest & NoShadow))
                     Bespin::Shadows::manage(widget);
 
                 if (qobject_cast<QHeaderView*>(itemView)) {
                     itemView->setBackgroundRole(config.view.header_role[Bg]);
                     itemView->setForegroundRole(config.view.header_role[Fg]);
                 }
-                else if (QWidget *vp = itemView->viewport())
-                {
+                else if (QWidget *vp = itemView->viewport()) {
                     if (!vp->autoFillBackground() || vp->palette().color(QPalette::Active, vp->backgroundRole()).alpha() < 128)
                     {
                         const bool solid = Hacks::config.opaqueAmarokViews || Hacks::config.opaqueDolphinViews ||
@@ -705,8 +733,7 @@ QString(frame->parentWidget()->parentWidget()->metaObject()->className()).starts
                         tv->viewport()->palette().color(tv->viewport()->backgroundRole()).alpha() > 200) // 255 would be perfect, though
                         tv->setAnimated(true);
 //                     KMail::MainFolderView(0xa16fd68, name = )
-                    if ( Hacks::config.fixKMailFolderList && tv->objectName() == "folderTree" )
-                    {
+                    if ( Hacks::config.fixKMailFolderList && tv->objectName() == "folderTree" ) {
                         fixViewPalette( tv, Hacks::config.opaqueDolphinViews ? 1 : 2, true );
                         tv->setHeaderHidden( true );
                         tv->setRootIsDecorated ( false );
@@ -718,6 +745,12 @@ QString(frame->parentWidget()->parentWidget()->metaObject()->className()).starts
                 }
                 else if (widget->inherits("QHeaderView"))
                     widget->setAttribute(Qt::WA_Hover);
+            }
+#define IS_DOLPHIN_PANEL \
+(frame->parentWidget() && frame->parentWidget()->parentWidget() && frame->inherits("QGraphicsView") && \
+QString(frame->parentWidget()->parentWidget()->metaObject()->className()).endsWith("Panel"))
+            else if (Hacks::config.opaqueDolphinViews && IS_DOLPHIN_PANEL) {
+                fixViewPalette(area, 1, false);
             }
             // just use <strike>broadsword</strike> <strike>gladius</strike> foil here
             // the stupid viewport should use the mouse...
@@ -923,11 +956,13 @@ QString(frame->parentWidget()->parentWidget()->metaObject()->className()).starts
             widget->setBackgroundRole(config.tab.std_role[Bg]);
             widget->setForegroundRole(config.tab.std_role[Fg]);
         }
+        QWidget *win = bar->window();
+        if (win && win->inherits("DolphinMainWindow"))
+            bar->setDocumentMode(true);
         // the eventfilter overtakes the widget painting to allow tabs ABOVE the tabbar
         FILTER_EVENTS(widget);
     }
-    else if (Hacks::config.invertDolphinUrlBar && widget->inherits("KUrlNavigator"))
-    {
+    else if (Hacks::config.invertDolphinUrlBar && widget->inherits("KUrlNavigator")) {
         widget->setContentsMargins(F(4),0,F(1), 0);
         widget->setAutoFillBackground(false);
         FILTER_EVENTS(widget);
@@ -962,7 +997,8 @@ QString(frame->parentWidget()->parentWidget()->metaObject()->className()).starts
         widget->setAttribute(Qt::WA_Hover);
         if ( config.menu.round )
             FILTER_EVENTS(dock); // shape
-        Bespin::Shadows::manage(dock);
+        if (!(kStyleFeatureRequest & NoShadow))
+            Bespin::Shadows::manage(dock);
         if ( config.bg.docks.invert && dock->features() & (QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable) )
         {
             QPalette pal = dock->palette();
@@ -976,14 +1012,16 @@ QString(frame->parentWidget()->parentWidget()->metaObject()->className()).starts
     /// Menubars and toolbar default to QPalette::Button - looks crap and leads to flicker...?!
     else if (QMenuBar *mbar = qobject_cast<QMenuBar *>(widget))
     {
-        mbar->setBackgroundRole(config.UNO.__role[Bg]);
-        mbar->setForegroundRole(config.UNO.__role[Fg]);
         if (config.UNO.used)
         {
             QMainWindow * mwin = qobject_cast<QMainWindow*>(widget->parentWidget());
-            widget->setAutoFillBackground(mwin && mwin->menuBar() == widget);
-            // catch resizes for gradient recalculation
-            FILTER_EVENTS(mbar);
+            if (mwin && mwin->menuBar() == widget) {
+                mbar->setBackgroundRole(config.UNO.__role[Bg]);
+                mbar->setForegroundRole(config.UNO.__role[Fg]);
+                widget->setAutoFillBackground(true);
+                // catch resizes for gradient recalculation
+                FILTER_EVENTS(mbar);
+            }
         }
 #ifndef QT_NO_DBUS
         if ( appType != KDevelop ) //&& !(appType == QtDesigner && mbar->inherits("QDesignerMenuBar")) )
@@ -1114,6 +1152,22 @@ QString(frame->parentWidget()->parentWidget()->metaObject()->className()).starts
         FILTER_EVENTS(widget);
         QEvent ev(QEvent::PaletteChange);
         eventFilter(widget, &ev);
+    }
+
+    /// QTextDocument will *often* come with some dark colored through the CSS and no particular background
+    /// so if we've a dark Text role, we're printing black on black
+    /// should not happen and is part of WORKAROUNDs for "lousy dark theme support everywhere"
+    if (Colors::value(widget->palette().color(QPalette::Active, QPalette::Base)) < 128) {
+        if (QTextEdit *edit = qobject_cast<QTextEdit*>(widget)) {
+            if (edit->document()) {
+                if (edit->autoFillBackground())
+                    edit->document()->setDefaultStyleSheet( QString("*{color:%1;background-color:%2;}a{color:%3;}").arg(edit->palette().color(QPalette::Active, QPalette::Text).name()).arg(edit->palette().color(QPalette::Active, QPalette::Base).name()).arg(edit->palette().color(QPalette::Active, QPalette::Link).name()) );
+                else
+                    edit->document()->setDefaultStyleSheet( QString("*{color:%1;}a{color:%2;}").arg(edit->palette().color(QPalette::Active, QPalette::WindowText).name()).arg(edit->palette().color(QPalette::Active, QPalette::Link).name()) );
+                if (QTextBrowser *browser = qobject_cast<QTextBrowser*>(edit))
+                    browser->reload();
+            }
+        }
     }
 
     if ( appType == KMail )

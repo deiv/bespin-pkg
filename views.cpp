@@ -88,7 +88,7 @@ Style::drawHeaderSection(const QStyleOption *option, QPainter *painter, const QW
 
     if (o == Qt::Vertical)
     {
-        if (!header || header->section < QStyleOptionHeader::End)
+        if (!header || header->position < QStyleOptionHeader::End)
         {
             QRect r = RECT; r.setLeft(r.right() - F(1));
             painter->drawTiledPixmap(r, Gradients::pix(CCOLOR(view.header, Bg), s, o, Gradients::Sunken));
@@ -177,7 +177,7 @@ Style::drawHeaderArrow(const QStyleOption * option, QPainter * painter, const QW
     painter->restore();
 }
 
-static const int decoration_size = 9;
+// static const int gs_decoration_size = 9;
 
 void
 Style::drawBranch(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
@@ -185,6 +185,8 @@ Style::drawBranch(const QStyleOption *option, QPainter *painter, const QWidget *
 
     if ( !RECT.isValid() )
         return;
+
+    const int gs_decoration_size = ((RECT.height()>>2) + 2) | 3;
 
     SAVE_PEN;
     int mid_h = RECT.x() + RECT.width() / 2;
@@ -195,7 +197,7 @@ Style::drawBranch(const QStyleOption *option, QPainter *painter, const QWidget *
     int aft_v = mid_v;
 
 
-    QPalette::ColorRole bg = QPalette::Text, fg = QPalette::Base;
+    QPalette::ColorRole bg = QPalette::Base, fg = QPalette::Text;
     if (widget)
         { bg = widget->backgroundRole(); fg = widget->foregroundRole(); }
 
@@ -207,26 +209,26 @@ Style::drawBranch(const QStyleOption *option, QPainter *painter, const QWidget *
     if (option->state & State_Children)
     {
         SAVE_BRUSH
-        int delta = decoration_size / 2 + 2;
+        int delta = gs_decoration_size / 2 + 2;
         bef_h -= delta;
         bef_v -= delta;
         aft_h += delta;
         aft_v += delta;
         painter->setPen(Qt::NoPen);
-        QRect rect = QRect(bef_h+2, bef_v+2, decoration_size, decoration_size);
-        if (firstCol)
-            rect.moveRight(RECT.right()-F(1));
+        QRect rect = QRect(bef_h+2, bef_v+2, gs_decoration_size, gs_decoration_size);
+//         if (firstCol)
+//             rect.moveRight(RECT.right()-F(1));
         Navi::Direction dir;
         QColor c;
         if (option->state & State_Open)
         {
             c = (option->state & State_Selected) ? FCOLOR(HighlightedText) : Colors::mid( COLOR(bg), COLOR(fg));
-            rect.translate(0,-decoration_size/6);
+            rect.translate(0,-gs_decoration_size/6);
             dir = (option->direction == Qt::RightToLeft) ? Navi::SW : Navi::SE;
         }
         else
         {
-            c = (option->state & State_Selected) ? FCOLOR(HighlightedText) : Colors::mid( COLOR(bg), COLOR(fg), 6, 1);
+            c = (option->state & State_Selected) ? FCOLOR(HighlightedText) : Colors::mid( COLOR(bg), COLOR(fg), 1, 4);
             dir = (option->direction == Qt::RightToLeft) ? Navi::W : Navi::E;
         }
         c.setAlpha(255);
@@ -242,7 +244,7 @@ Style::drawBranch(const QStyleOption *option, QPainter *painter, const QWidget *
         return;
     }
 
-    painter->setPen(Colors::mid( COLOR(bg), COLOR(fg), 40, 1));
+    painter->setPen(Colors::mid( COLOR(bg), COLOR(fg), 10, 1));
 
     if (option->state & (State_Item | State_Sibling))
         painter->drawLine(mid_h, RECT.y(), mid_h, bef_v);
@@ -524,7 +526,8 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         strongSelect = true;
         if (config.bg.modal.invert && widget && widget->window()->isModal())
             { bg = QPalette::WindowText; fg = QPalette::Window; }
-    }
+    } else
+        strongSelect = COLOR(bg) == FCOLOR(Window);
 
    // this could just lead to cluttered listviews...?!^
 //    QPalette::ColorGroup cg = item->state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
@@ -574,10 +577,16 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         else if (selected && single)
             gt =  Gradients::Button;
 
+        QColor high(FCOLOR(Highlight));
+        if (!selected) {
+            const int contrast = qMax(1, Colors::contrast(FCOLOR(Highlight), COLOR(fg)));
+            if (gt == Gradients::None)
+                high = Colors::mid(COLOR(bg), FCOLOR(Highlight), 100/contrast, 4);
+            else
+                high = Colors::mid(COLOR(bg), FCOLOR(Highlight), 100/contrast, 88);
+        }
         if (gt == Gradients::None)
         {
-            const int contrast = qMax(1, Colors::contrast(FCOLOR(Highlight), COLOR(fg)));
-            const QColor high = selected ? FCOLOR(Highlight) : Colors::mid(COLOR(bg), FCOLOR(Highlight), 100/contrast, 4);
             if (round)
                 masks.rect[RECT.height() > F(20) && RECT.width() > F(20)].render(RECT, painter, high);
             else
@@ -585,7 +594,7 @@ Style::drawItem(const QStyleOption *option, QPainter *painter, const QWidget *wi
         }
         else
         {
-            const QPixmap &fill = Gradients::pix(FCOLOR(Highlight), RECT.height(), Qt::Vertical, gt);
+            const QPixmap &fill = Gradients::pix(high, RECT.height(), Qt::Vertical, gt);
             if (round)
             {
                 const bool rounder = RECT.height() > F(20) && RECT.width() > F(20);

@@ -1,7 +1,7 @@
 accessibility:apps/preferences-desktop-accessibility
 add-file-to-archive:actions/archive-insert:list-add
 add-folder-to-archive:actions/archive-insert-directory:folder-new
-address-book-new:actions/address-book-new
+address-book-new.alt:actions/address-book-new
 akonadi:apps/akonadi
 amarok:apps/amarok
 appearance:apps/preferences-desktop-theme,categories/preferences-desktop
@@ -184,7 +184,7 @@ base:apps/base:openoffice-base
 draw:apps/draw:openoffice-draw
 math:apps/math:openoffice-math
 korganizer:apps/korganizer
-kadressbook:apps/kadressbook
+address-book:apps/kadressbook
 impress:apps/impress:openoffice-impress:kpresenter,mimetypes/application-vnd.oasis.opendocument.presentation:application-vnd.oasis.opendocument.presentation-template:application-vnd.ms-powerpoint
 calc:apps/calc:openoffice-calc,mimetypes/application-vnd.ms-excel:application-vnd.stardivision.calc:application-vnd.sun.xml.calc:application-vnd.sun.xml.calc.template
 torrent:mimetypes/application-x-bittorrent

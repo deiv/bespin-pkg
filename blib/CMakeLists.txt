@@ -17,7 +17,7 @@ add_definitions ( -DBLIB_EXPORT=Q_DECL_EXPORT )
 
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
 
-set (QtBespin_SOURCES colors.cpp dpi.cpp elements.cpp FX.cpp gradients.cpp shapes.cpp tileset.cpp shadows.cpp)
+set (QtBespin_SOURCES colors.cpp dpi.cpp elements.cpp FX.cpp gradients.cpp shapes.cpp tileset.cpp shadows.cpp WM.cpp)
 
 if ( X11_FOUND )
     set (QtBespin_SOURCES ${QtBespin_SOURCES} xproperty.cpp)
@@ -33,7 +33,7 @@ add_library (QtBespin SHARED ${QtBespin_SOURCES})
 target_link_libraries(QtBespin  ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 
 if ( X11_FOUND )
-    target_link_libraries(QtBespin ${X11_LIBRARIES})
+    target_link_libraries(QtBespin ${X11_X11_LIB})
 endif( X11_FOUND )
 if (X11_Xrender_FOUND)
     target_link_libraries(QtBespin ${X11_Xrender_LIB})

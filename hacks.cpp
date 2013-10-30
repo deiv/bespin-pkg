@@ -62,6 +62,7 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 #include <QtDebug>
 #include "blib/colors.h"
 #include "blib/gradients.h"
+#include "blib/WM.h"
 //#include "blib/xproperty.h"
 #include "hacks.h"
 
@@ -103,12 +104,31 @@ protected:
                             area->verticalScrollBar()->setValue(area->verticalScrollBar()->value() - dy);
                         }
                     } else { // mostly QWebView
+                        int factor[2] = {1, 1};
+                        if (o->inherits("QWebView")) {
+                            foreach (const QObject *o2, o->children()) {
+                                if (o2->inherits("QWebPage")) {
+                                    foreach (const QObject *o3, o2->children()) {
+                                        if (o3->inherits("QWebFrame")) {
+                                            const QSize sz = o3->property("contentsSize").toSize();
+                                            if (sz.isValid()) {
+                                                const QSize wsz = static_cast<QWidget*>(o)->size();
+                                                factor[0] = qMin(6, qRound(float(sz.width()) / wsz.width()));
+                                                factor[1] = qMin(6, qRound(float(sz.height()) / wsz.height()));
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
                         if (dy) {
-                            QWheelEvent wev(pos, dy, Qt::NoButton, Qt::NoModifier, Qt::Vertical);
+                            QWheelEvent wev(pos, dy*factor[1], Qt::NoButton, Qt::NoModifier, Qt::Vertical);
                             QApplication::sendEvent(o, &wev);
                         }
                         if (dx) {
-                            QWheelEvent weh(pos, dx, Qt::NoButton, Qt::NoModifier, Qt::Horizontal);
+                            QWheelEvent weh(pos, dx*factor[0], Qt::NoButton, Qt::NoModifier, Qt::Horizontal);
                             QApplication::sendEvent(o, &weh); // "oi wehh"
                         }
                     }
@@ -176,29 +196,6 @@ static QToolBar *lockToggleBar = 0L;
 static QAction *lockToggleAction = 0L;
 static int autoSlideTimer = 0;
 
-static void
-triggerWMMove(const QWidget *w, const QPoint &p)
-{
-#ifdef Q_WS_X11
-   // stolen... errr "adapted!" from QSizeGrip
-   QX11Info info;
-   XEvent xev;
-   xev.xclient.type = ClientMessage;
-   xev.xclient.message_type = netMoveResize;
-   xev.xclient.display = QX11Info::display();
-   xev.xclient.window = w->window()->winId();
-   xev.xclient.format = 32;
-   xev.xclient.data.l[0] = p.x();
-   xev.xclient.data.l[1] = p.y();
-   xev.xclient.data.l[2] = 8; // NET::Move
-   xev.xclient.data.l[3] = Button1;
-   xev.xclient.data.l[4] = 0;
-   XUngrabPointer(QX11Info::display(), QX11Info::appTime());
-   XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
-               SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-#endif // Q_WS_X11
-}
-
 inline static bool
 hackMessageBox(QMessageBox* box, QEvent *e)
 {
@@ -239,7 +236,7 @@ hackMessageBox(QMessageBox* box, QEvent *e)
     {
         QMouseEvent *mev = static_cast<QMouseEvent*>(e);
         if (mev->button() == Qt::LeftButton)
-            triggerWMMove(box, mev->globalPos());
+            WM::triggerMove(box->window()->winId(), mev->globalPos());
         return false;
     }
     case QEvent::Show:
@@ -335,7 +332,7 @@ isWindowDragWidget(QObject *o, const QPoint *pt = 0L)
          (qobject_cast<QToolButton*>(o) && !static_cast<QWidget*>(o)->isEnabled()) ||
          qobject_cast<QToolBar*>(o) || qobject_cast<QDockWidget*>(o) ||
 
-         qobject_cast<QStatusBar*>(o) || (o->inherits("QMainWindow") ) )
+         qobject_cast<QStatusBar*>(o) || o->inherits("QMainWindow") || o->inherits("MplayerLayer") )
         return true;
 
     if ( QLabel *label = qobject_cast<QLabel*>(o) )
@@ -359,6 +356,11 @@ hackMoveWindow(QWidget* w, QEvent *e)
         return false;
     // general validity ================================
     QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+    if (!(mev->buttons() & Qt::LeftButton)) {
+        s_dragWidget.clear();
+        s_dragCandidate.clear();
+        return false; // hanging move - we did not receive a release
+    }
 //         !w->rect().contains(w->mapFromGlobal(QCursor::pos()))) // KColorChooser etc., catched by mouseGrabber ?!
     // avoid if we click a menu action ========================================
     if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
@@ -394,7 +396,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
         (mev->pos().y() < w->fontMetrics().height()+4 && qobject_cast<QDockWidget*>(w)))
         return false;
 
-    triggerWMMove(w, mev->globalPos());
+    WM::triggerMove(w->window()->winId(), mev->globalPos());
 
     return true;
 }
@@ -491,11 +493,26 @@ Hacks::eventFilter(QObject *o, QEvent *e)
             lockToggleMenu->popup(QCursor::pos());
             return true;
         }
+        if ( *appType == Okular && config.panning  && w->isWindow() && w->objectName() == "presentationWidget") {
+            QRect r(w->rect());
+            r.setSize(r.size()/3);
+            if (r.contains(mev->pos())) {
+                QWheelEvent wev(mev->pos(), 120, Qt::NoButton, Qt::NoModifier, Qt::Vertical);
+                QApplication::sendEvent(w, &wev);
+            } else {
+                r.moveBottomRight(w->rect().bottomRight());
+                if (r.contains(mev->pos())) {
+                    QWheelEvent wev(mev->pos(), -120, Qt::NoButton, Qt::NoModifier, Qt::Vertical);
+                    QApplication::sendEvent(w, &wev);
+                }
+            }
+            return true;
+        }
         if ( !w || w->mouseGrabber() || // someone else is more interested in this
              (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
              (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
                 return false;
-        if (isWindowDragWidget(o, &mev->pos()))
+        if (!s_dragCandidate.data() && isWindowDragWidget(o, &mev->pos()))
         {
             s_dragCandidate = w;
             s_mousePressPos = mev->pos();
@@ -695,6 +712,8 @@ Hacks::add(QWidget *w)
         appType = new HackAppType((HackAppType)Unknown);
         if (qApp->inherits("GreeterApp")) // KDM segfaults on QCoreApplication::arguments()...
             *appType = KDM;
+        else if (QCoreApplication::applicationName() == "okular")
+            *appType = Okular;
         else if (QCoreApplication::applicationName() == "gwenview")
             *appType = Gwenview;
         else if (QCoreApplication::applicationName() == "smplayer" ||
@@ -707,16 +726,14 @@ Hacks::add(QWidget *w)
     if (w->isWindow())
     {
         ENSURE_INSTANCE;
-        w->removeEventFilter(bespinHacks); // just to be sure
-        w->installEventFilter(bespinHacks);
+        FILTER_EVENTS(w);
     }
 
     if (config.messages && qobject_cast<QMessageBox*>(w))
     {
         ENSURE_INSTANCE;
         w->setWindowFlags ( Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint | Qt::FramelessWindowHint);
-        w->removeEventFilter(bespinHacks); // just to be sure
-        w->installEventFilter(bespinHacks);
+        FILTER_EVENTS(w);
         return true;
     }
 
@@ -748,7 +765,7 @@ Hacks::add(QWidget *w)
         }
     }
 
-    if ( *appType == SMPlayer /*&& config.*/  )
+    if ( *appType == SMPlayer && config.panning  )
     if (QSlider *slider = qobject_cast<QSlider*>(w)) {
     if (slider->parentWidget() && slider->parentWidget()->objectName() == "controlwidget")
     {
@@ -757,6 +774,11 @@ Hacks::add(QWidget *w)
         else if (slider->inherits("MySlider"))
             s_videoVolumeSlider = slider;
     }
+    }
+
+    if ( *appType == Okular && config.panning  && w->isWindow() && w->objectName() == "presentationWidget") {
+        ENSURE_INSTANCE;
+        FILTER_EVENTS(w);
     }
 
 //     if ( w->objectName() == "qt_scrollarea_viewport" )

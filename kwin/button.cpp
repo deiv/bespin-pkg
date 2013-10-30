@@ -16,7 +16,9 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <QApplication>
 #include <QPainter>
+#include <QTimer>
 #include <QX11Info>
 #include <netwm.h>
 #include <cmath>
@@ -141,6 +143,7 @@ Button::init(bool leftMenu, bool fColors, int variant)
     shape[Unshade] = Shapes::unshade(bound, style);
     shape[Exposee] = Shapes::exposee(bound, style);
     shape[Info] = Shapes::info(bound, style);
+    shape[MoveResize] = Shapes::moveResize(bound, style);
 #if 0
     tip[Close] = i18n("Close");
     tip[Min] = i18n("Minimize");
@@ -244,16 +247,13 @@ Button::mouseReleaseEvent ( QMouseEvent *event )
     //          client->workspace()->setShowingDesktop( true );
         break;
     case Max:
-        if (client->isMaximizable ())
-        {
-            //TODO support alt/ctrl click?!
-    //          KDecorationDefines::MaximizeMode mode;
-    //          MaximizeRestore    The window is not maximized in any direction.
-    //          MaximizeVertical    The window is maximized vertically.
-    //          MaximizeHorizontal    The window is maximized horizontally.
-    //          MaximizeFull
-            client->maximize(event->button());
-//             client->setFullscreen(true);
+        if (client->isMaximizable ()) {
+            if (event->modifiers() & Qt::ShiftModifier)
+                client->setFullscreen(true);
+            else if (event->modifiers() & Qt::ControlModifier)
+                client->maximumize(event->button());
+            else
+                client->maximize(event->button());
         }
         break;
     case Restore:
@@ -288,6 +288,13 @@ Button::mouseReleaseEvent ( QMouseEvent *event )
             client->showWindowList(mapToGlobal(rect().topLeft())); break;
     case Info:
         client->showInfo(mapToGlobal(rect().topLeft())); break;
+    case MoveResize: {
+        QPoint cursor(QCursor::pos());
+        cursor.setY(mapToGlobal(rect().bottomLeft()).y() + 1);
+        QCursor::setPos(cursor);
+        QTimer::singleShot(1, client, SLOT(triggerMoveResize()));
+        break;
+    }
     default:
         return; // invalid type
     }
@@ -297,7 +304,14 @@ Button::mouseReleaseEvent ( QMouseEvent *event )
 }
 
 // static uint fcolors[3] = {0x9C3A3A/*0xFFBF0303*/, 0xFFEB55/*0xFFF3C300*/, 0x77B753/*0xFF00892B*/};
+// Font
 static uint fcolors[3] = {0xFFBF0303, 0xFFF3C300, 0xFF00892B};
+// Aqua
+// static uint fcolors[3] = { 0xFFD86F6B, 0xFFD8CA6B, 0xFF76D86B };
+
+// static uint fcolors[3] = { 0xFFFF7E71, 0xFFFBD185, 0xFFB1DE96 };
+// Aqua2
+// static uint fcolors[3] = { 0xFFBF2929, 0xFF29BF29, 0xFFBFBF29 };
 
 QColor
 Button::color( bool background ) const
@@ -316,8 +330,11 @@ Button::color( bool background ) const
 //     if (Factory::config()->invertedButtons)
 //         { KDecorationDefines::ColorType h = fgt; fgt = bgt; bgt = h; active = true || background; }
 
-    if ( background )
+    if ( background ) {
+//         if (/*fixedColors && */active && myType < Multi)
+//             return QColor(fcolors[myType]);
         return client->color(bgt, active);
+    }
 
     QColor c = client->color(fgt, active);
     if (fixedColors && myType < Multi)

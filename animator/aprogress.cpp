@@ -59,6 +59,9 @@ Progress::timerEvent(QTimerEvent * event)
         if (!w) // not a progressbar - shouldn't be in items, btw...
             { mkProper = true; continue; }
 
+        if (w->size().isEmpty())
+            continue; // https://bugs.kde.org/show_bug.cgi?id=320759
+
         pb = qobject_cast<QProgressBar*>(w);
         if (!pb)
             continue; // not a progressbar - shouldn't be in items, btw...

@@ -97,6 +97,8 @@ Config::Config(QWidget* parent) : BConfig(parent)
     handleSettings(ui.roundCorners, "RoundCorners", true);
 //     ui.roundCorners->hide();
 
+    handleSettings(ui.embossTitle, "EmbossTitle", true);
+
     handleSettings(ui.trimmTitle, "TrimmCaption", true);
     setContextHelp(ui.trimmTitle, "<b>Trimm Title</b><hr>\
     Some windows tend to have ridiculusly looong captions, e.g. Konqueror if a website title\
@@ -167,7 +169,8 @@ Config::Config(QWidget* parent) : BConfig(parent)
     <b>E</b>: Window List<br>\
     <b>X</b>: Close<br>\
     <b>I</b>: Minimize<br>\
-    <b>A</b>: Maximize<br>");
+    <b>A</b>: Maximize<br>\
+    <b>+</b>: Move/Resize window<br>");
 
     handleSettings(ui.iconVariant, "IconVariant", 1);
 
@@ -224,6 +227,8 @@ Config::Config(QWidget* parent) : BConfig(parent)
     setContextHelp(ui.halo, "<b>Use Halo instead of Shadow</b><hr>\
     Allows to set a colored halo with even paddings around windows. Good for dark setups");
     connect ( ui.shadowColor, SIGNAL( changed(const QColor&) ), SIGNAL( changed() ) );
+    connect ( ui.haloColor, SIGNAL( changed(const QColor&) ), SIGNAL( changed() ) );
+    ui.haloColor->hide(); // halo is initially untoggled
 
     /** if you call setContextHelp(.) with a combobox and pass a stringlist,
     the strings are attached to the combo entries and shown on select/hover */
@@ -242,6 +247,7 @@ Config::Config(QWidget* parent) : BConfig(parent)
     QSettings settings("Bespin", "Style");
     settings.beginGroup("Deco");
     ui.shadowColor->setColor(settings.value(SHADOW_COLOR).value<QColor>());
+    ui.haloColor->setColor(settings.value(HALO_COLOR).value<QColor>());
 
     /* setup the presets UI */
     QListWidgetItem *item = new QListWidgetItem("Default");
@@ -302,6 +308,7 @@ void Config::save(KConfigGroup&)
     QSettings settings("Bespin", "Style");
     settings.beginGroup("Deco");
     settings.setValue("ShadowColor", ui.shadowColor->color());
+    settings.setValue("HaloColor", ui.haloColor->color());
     savePresets();
 }
 

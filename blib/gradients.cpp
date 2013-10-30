@@ -30,7 +30,8 @@
 using namespace Bespin;
 
 typedef QCache<uint, QPixmap> PixmapCache;
-static QPixmap nullPix;
+static QPixmap *nullPixPtr = 0;
+#define nullPix *nullPixPtr
 
 // static Gradients::Type _progressBase = Gradients::Glass;
 
@@ -186,7 +187,8 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
     int add = (180 - v ) / 1;
     if (add < 0)
         add = -add/2;
-    add /= glass ? 48 : 96;//(glass ? 48 : 512/qMax(v,1));
+    else
+        add /= glass ? 48 : 96;//(glass ? 48 : 512/qMax(v,1));
 
     // the brightest color (top)
     int cv = v + 27 + add, ch = h, cs = s;
@@ -199,7 +201,7 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
             cs = s - (glass?6:2)*delta;
             if (cs < 0)
                 cs = 0;
-            ch = h - 3*delta/2;
+            ch = h - delta;
             while (ch < 0)
                 ch += 360;
         }
@@ -392,7 +394,7 @@ checkValue(QColor c, int type)
         int h,s,a;
         c.getHsv(&h,&s,&v,&a);
         s = 400*s/(400+v-180);
-        c.setHsv(h,CLAMP(s,0,255),200,a);
+        c.setHsv(h,CLAMP(s,0,255),220,a);
     }
     return c;
 }
@@ -445,7 +447,6 @@ Gradients::endColor(const QColor &oc, Position p, Type type, bool cv)
     }
 }
 
-static QPixmap s_stoneDither;
 const QPixmap&
 Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type)
 {
@@ -514,6 +515,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
             pix->fill(Qt::transparent);
         QPainter p(pix); p.fillRect(pix->rect(), grad);
         if (type == Gradients::Stone) {
+            static QPixmap s_stoneDither;
             if (s_stoneDither.isNull()) {
                 srand( 314159265 );
                 s_stoneDither = QPixmap::fromImage(FX::newDitherImage(32, 64));
@@ -529,7 +531,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
 }
 
 const QPixmap
-&Gradients::structure(const QColor &c, bool light, int type, int intensity)
+&Gradients::structure(QColor c, bool light, int type, int intensity)
 {
     if (type < 0) {
         if (intensity > -1) {
@@ -540,13 +542,13 @@ const QPixmap
             return *cachedBuffer;
     }
 
+    int c_alpha = c.alpha();
+    c.setAlpha(0xff);
+
     if (intensity < 0)
         intensity = _bgIntensity;
 
     QPixmap *structureBuffer = new QPixmap(64, 64);
-
-    if (c.alpha() != 0xff)
-        structureBuffer->fill(Qt::transparent);
 
     QPainter p(structureBuffer);
     int i;
@@ -722,9 +724,10 @@ const QPixmap
     }
     case 12: // bamboo
     case 13: // weave
+    case 17: // carbon fibre
     {
         i = 100 + (intensity - 100)/2;
-        QLinearGradient lg(QPoint(0,0), QPoint(0,8));
+        QLinearGradient lg(QPoint(0,0), QPoint(0,16));
         QColor dark = c.dark(i);
         QColor light = c.light(i);
         lg.setColorAt(0.0, light);
@@ -735,6 +738,12 @@ const QPixmap
         p.drawRect(rect);
         if ( iType == 12 )
             break;
+        if ( iType == 17 ) {
+            p.setBrushOrigin(0,8);
+            for (int j = 0; j < 64; j+=16)
+                p.drawRect(j,0,8,64);
+            break;
+        }
         lg = QLinearGradient(QPoint(0,0), QPoint(8,0));
         lg.setColorAt(0.0, light);
         lg.setColorAt(1.0, dark);
@@ -757,8 +766,6 @@ const QPixmap
         p.end();
         delete structureBuffer;
         structureBuffer = new QPixmap(256,64);
-        if (c.alpha() != 0xff)
-            structureBuffer->fill(Qt::transparent);
         srand( 314159265 );
         QImage img(256,64, QImage::Format_ARGB32);
         img.fill(c.rgba());
@@ -787,8 +794,6 @@ const QPixmap
         p.end();
         delete structureBuffer;
         structureBuffer = new QPixmap(128,128);
-        if (c.alpha() != 0xff)
-            structureBuffer->fill(Qt::transparent);
         srand( 314159265 );
         QImage img(128,128, QImage::Format_ARGB32);
         img.fill(c.rgba());
@@ -825,8 +830,40 @@ const QPixmap
         p.drawTiledPixmap(structureBuffer->rect(), QPixmap::fromImage(img));
         break;
     }
+    case 18: { // reptile
+        i = 100 + 3*(intensity - 100)/7;
+        QColor dark = c.dark(i);
+        QColor light = c.light(i);
+        p.setPen(Qt::NoPen);
+        p.setBrush(light);
+        p.drawRect(rect);
+        const int spacing = 8;
+        const int radius = 10;
+        for (int j = 64/spacing; j > -2; --j)
+        for (int i = j%2; i <= 64/spacing; i += 2) {
+            const int x = i*spacing;
+            const int y = j*spacing;
+            QRadialGradient rg(QPoint(x, y), radius);
+            rg.setColorAt(1.0, dark);
+            rg.setColorAt(0.0, light);
+            rg.setSpread( QGradient::PadSpread );
+            p.setBrush(rg);
+            p.drawEllipse(x-radius, y-radius, 2*radius, 2*radius);
+        }
+        break;
+    }
     }
     p.end();
+
+    if (c_alpha != 0xff) {
+        QPixmap *argb = new QPixmap(structureBuffer->size());
+        argb->fill(Qt::transparent);
+        FX::blend(*structureBuffer, *argb, c_alpha/255.0);
+        delete structureBuffer;
+        structureBuffer = argb;
+    }
+
+    c.setAlpha(c_alpha); // fix back for cache insertion
 
     if (type < 0) {
         if (_structure[light].insert(c.rgba(), structureBuffer, costs(structureBuffer)))
@@ -897,12 +934,12 @@ QPixmap &Gradients::ambient(int height)
     return nullPix;
 }
 
-static QPixmap _bevel[2];
+static QPixmap* _bevel[2] = {0,0};
 
 const QPixmap&
 Gradients::bevel(bool ltr)
 {
-   return _bevel[ltr];
+    return _bevel[ltr] ? *_bevel[ltr] : nullPix;
 }
 #if 0
 const QPixmap &
@@ -1173,6 +1210,8 @@ Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bo
     if (_initialized && !force)
         return;
     _initialized = true;
+    if (!nullPixPtr)
+        nullPixPtr = new QPixmap;
     _mode = mode;
     _struct = structure;
     _bgIntensity = bgIntesity;
@@ -1186,12 +1225,13 @@ Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bo
     QPainter p; QGradientStops stops;
     for (int i = 0; i < 2; ++i)
     {
-        _bevel[i] = i ? _bevel[0].copy() : QPixmap(btnBevelSize, 32);
-        _bevel[i].fill(Qt::transparent);
+        delete _bevel[i];
+        _bevel[i] = new QPixmap(btnBevelSize, 32);
+        _bevel[i]->fill(Qt::transparent);
         stops << QGradientStop(0, QColor(0,0,0,i?20:0)) << QGradientStop(1, QColor(0,0,0,i?0:20));
         lg.setStops(stops);
         stops.clear();
-        p.begin(&_bevel[i]); p.fillRect(_bevel[i].rect(), lg); p.end();
+        p.begin(_bevel[i]); p.fillRect(_bevel[i]->rect(), lg); p.end();
     }
 
     for (int i = 0; i < 4; ++i)
@@ -1212,6 +1252,12 @@ void Gradients::wipe() {
     _tabShadow.clear();
     _groupLight.clear();
     _structure[0].clear(); _structure[1].clear();
+//     delete nullPixPtr;
+//     nullPixPtr = 0;
+//     for (int i = 0; i < 2; ++i) {
+//         delete _bevel[i];
+//         _bevel[i] = 0;
+//     }
 
     for (int i = 0; i < 4; ++i)
         _borderline[i].clear();

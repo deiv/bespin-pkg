@@ -409,7 +409,10 @@ Style::drawToolTip(const QStyleOption *option, QPainter *painter, const QWidget 
 {
     painter->save();
 //    painter->setBrush(Gradients::pix(FCOLOR(ToolTipBase), RECT.height(), Qt::Vertical, Gradients::Button));
-    painter->setBrush(FCOLOR(ToolTipBase));
+    QColor c(FCOLOR(ToolTipBase));
+    if (widget && widget->testAttribute(Qt::WA_TranslucentBackground) && FX::compositingActive())
+        c.setAlpha(230); // ~90%
+    painter->setBrush(c);
     painter->setPen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),6,1));
     if (config.menu.round && widget && widget->testAttribute(Qt::WA_TranslucentBackground) && FX::compositingActive()) {
         painter->setRenderHint(QPainter::Antialiasing, true);

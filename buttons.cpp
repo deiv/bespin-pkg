@@ -20,6 +20,7 @@
 #include <QAbstractButton>
 #include <QAbstractItemView>
 #include <QStyleOptionButton>
+#include <QStyleOptionMenuItem>
 
 #include "draw.h"
 #include "animator/hover.h"
@@ -98,6 +99,21 @@ Style::drawPushButton(const QStyleOption *option, QPainter *painter, const QWidg
     anim.widget = 0; anim.step = 0;
 }
 
+static bool isCheckableButton(const QWidget *w, const QStyleOption *option)
+{
+    const QAbstractButton *b = qobject_cast<const QAbstractButton*>(w);
+    if (b && b->isCheckable()) {
+        if (RECT.width() < RECT.height()/3 + F(32)) {
+            // fixed size buttons as in kcron won't - there's no space for the indicator
+            if (option->state & QStyle::State_On) // we cheat and make the button focus'd if on
+                const_cast<QStyleOption*>(option)->state |= QStyle::State_HasFocus;
+            return false; // not a regular checkable button
+        }
+        return true;
+    }
+    return false;
+}
+
 void
 Style::drawPushButtonBevel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -111,6 +127,7 @@ Style::drawPushButtonBevel(const QStyleOption *option, QPainter *painter, const 
         return;
 
     OPT_SUNKEN OPT_HOVER OPT_ENABLED
+    const bool checkable = isCheckableButton(widget, option);
 
     bool resetAnim = false;
     if ( !widget || widget != anim.widget )
@@ -137,11 +154,9 @@ Style::drawPushButtonBevel(const QStyleOption *option, QPainter *painter, const 
     int animStep = anim.step;
     if ( resetAnim )
         { anim.widget = 0; anim.step = 0; }
-    // toggle indicator
-    ASSURE(widget);
-    ASSURE_WIDGET(b, QAbstractButton);
 
-    if (b->isCheckable())
+    // toggle indicator
+    if (checkable)
     {
         QRect r = RECT;
         const int h = r.height()/3;
@@ -201,6 +216,8 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
     QColor c = btnBg(PAL, isEnabled, hasFocus, anim.step, fullHover, Gradients::isTranslucent(gt));
     QColor iC = CCOLOR(btn.std, Bg);
 
+//     const bool glossy = (bgt == Gradients::Glass || bgt == Gradients::Gloss);
+
     bool drawInner = false;
     if (config.btn.cushion && sunken)
     {
@@ -236,8 +253,6 @@ Style::drawButtonFrame(const QStyleOption *option, QPainter *painter, const QWid
 
         if (hasFocus)
         {   // focus?
-            if (!config.btn.cushion && sunken)
-                r.setBottom(r.bottom() - F(1));
             const int contrast = Colors::contrast(FCOLOR(Window), FCOLOR(Highlight));
             QColor fc = ( config.btn.backLightHover && anim.step ) ? iC : FCOLOR(Window);
             fc = Colors::mid(fc, FCOLOR(Highlight), contrast/20, 1);
@@ -350,9 +365,7 @@ Style::drawPushButtonLabel(const QStyleOption *option, QPainter *painter, const 
 {
     ASSURE_OPTION(btn, Button);
     OPT_ENABLED OPT_FOCUS OPT_HOVER OPT_SUNKEN;
-    bool checkable = false;
-    if (const QAbstractButton* b = qobject_cast<const QAbstractButton*>(widget))
-        checkable = b->isCheckable();
+    const bool checkable = isCheckableButton(widget, option);
 
     QRect ir = RECT;
     if (checkable)
@@ -475,7 +488,7 @@ Style::drawCheckBox(const QStyleOption *option, QPainter *painter, const QWidget
         else
             center += QPoint(0, -F(1));
         painter->setBrush(btnFg(PAL, isEnabled, hasFocus, anim.step));
-        const int d = F(5) - (bool(config.btn.checkType) + config.btn.layer==Inlay?Raised:config.btn.layer) * F(1);
+        const int d = F(5) - (config.btn.layer==Inlay?Raised:config.btn.layer) * F(1);
         copy.rect.adjust(d, d, -d, -d);
         if (copy.rect.width() > copy.rect.height())
             copy.rect.setWidth(copy.rect.height());
@@ -630,10 +643,35 @@ Style::drawRadio(const QStyleOption *option, QPainter *painter, const QWidget *w
 
 //    case PE_FrameButtonBevel: // Panel frame for a button bevel
 
+bool
+Style::fakeMenuItem(const QStyleOptionButton *btn, QPainter *painter, const QWidget *widget, QStyleOptionMenuItem::CheckType type) const
+{
+    if (!widget)
+        return false;
+    QWidget *window = widget->window();
+    if (!(window && (window->windowFlags() & Qt::Popup) && window->inherits("QMenu")))
+        return false;
+    QStyleOptionMenuItem opt;
+    opt.QStyleOption::operator=(*btn);
+    opt.text = btn->text;
+    opt.icon = btn->icon;
+    const bool hover = (opt.state & (State_MouseOver|State_HasFocus));
+    if (hover)
+        opt.state |= State_Selected;
+    else
+        opt.state &= ~State_Selected;
+    opt.checkType = type;
+    opt.checked = !(btn->state & State_Off);
+    drawMenuItem(&opt, painter, widget);
+    return true;
+}
+
 void
 Style::drawRadioItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(btn, Button);
+    if (fakeMenuItem(btn, painter, widget, QStyleOptionMenuItem::Exclusive))
+        return;
     QStyleOptionButton subopt = *btn;
     subopt.rect = subElementRect(SE_RadioButtonIndicator, btn, widget);
     drawRadio(&subopt, painter, widget);
@@ -645,6 +683,8 @@ void
 Style::drawCheckBoxItem(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(btn, Button);
+    if (fakeMenuItem(btn, painter, widget, QStyleOptionMenuItem::NonExclusive))
+        return;
     QStyleOptionButton subopt = *btn;
     subopt.rect = subElementRect(SE_CheckBoxIndicator, btn, widget);
     drawCheckBox(&subopt, painter, widget);
@@ -653,7 +693,7 @@ Style::drawCheckBoxItem(const QStyleOption *option, QPainter *painter, const QWi
 }
 
 void
-Style::drawCheckLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
+Style::drawCheckLabel(const QStyleOption *option, QPainter *painter, const QWidget *w) const
 {
     ASSURE_OPTION(btn, Button);
     OPT_ENABLED;
@@ -671,5 +711,5 @@ Style::drawCheckLabel(const QStyleOption *option, QPainter *painter, const QWidg
             textRect.setLeft(textRect.left() + btn->iconSize.width() + F(4));
     }
     if (!btn->text.isEmpty())
-        drawItemText(painter, textRect, alignment | BESPIN_MNEMONIC, PAL, isEnabled, btn->text, QPalette::WindowText);
+        drawItemText(painter, textRect, alignment | BESPIN_MNEMONIC, PAL, isEnabled, btn->text, w ? w->foregroundRole() : QPalette::WindowText);
 }

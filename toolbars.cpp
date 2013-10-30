@@ -254,8 +254,9 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
             const int f1 = F(1);
             if (config.btn.tool.frame == Inlay) {
                 QColor sc = config.UNO.toolbar ? tb->palette().color(tb->backgroundRole()) : windowColor(widget);
-                if (config.btn.backLightHover)
-                    sc = Colors::mid(sc, c, 4, 3);
+                if (config.btn.backLightHover) {
+                    sc = Colors::mid(sc, c, 30, qMax(10,40-Colors::contrast(sc, c)));
+                }
                 masks.rect[true].render(rect, painter, Gradients::Sunken, Qt::Vertical, sc);
                 round = round && (rect.height() - 6 > 16);
                 const int f3 = F(3);

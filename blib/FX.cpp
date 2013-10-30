@@ -45,11 +45,11 @@ using namespace FX;
 #ifndef QT_NO_XRENDER
 
 static Display *dpy = QX11Info::display();
-static Window root = RootWindow (dpy, DefaultScreen (dpy));
 
 static OXPicture
 createFill(Display *dpy, const XRenderColor *c)
 {
+    static Window root = RootWindow (dpy, DefaultScreen (dpy));
     XRenderPictureAttributes pa;
     OXPixmap pixmap = XCreatePixmap (dpy, root, 1, 1, 32);
     if (!pixmap)
@@ -276,6 +276,7 @@ FX::blend(const QPixmap &upper, QPixmap &lower, double opacity, int x, int y)
         XRenderComposite (dpy, PictOpOver, upper.x11PictureHandle(), alpha,
                           lower.x11PictureHandle(), 0, 0, 0, 0, x, y,
                           upper.width(), upper.height());
+        XFlush(QX11Info::display());
     }
     else
 #endif
@@ -399,7 +400,6 @@ FX::desaturate(QImage &img, const QColor &c)
 #endif
 
 
-static QPixmap _dither;
 QImage
 FX::newDitherImage(uint intensity, uint size)
 {
@@ -419,6 +419,7 @@ FX::newDitherImage(uint intensity, uint size)
 const QPixmap &
 FX::dither()
 {
+    static QPixmap _dither;
     if (_dither.isNull())
         _dither = QPixmap::fromImage(newDitherImage());
     return _dither;

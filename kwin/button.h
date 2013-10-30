@@ -36,7 +36,7 @@ public:
     enum Type
     {
         Close = 0, Min, Max, Multi,
-        Menu, Help, Above, Below, Stick, Shade, Exposee, Info, Special,
+        Menu, Help, Above, Below, Stick, Shade, Exposee, Info, MoveResize, Special,
         // VertMax, HoriMax,
         Restore, Unstick, UnAboveBelow, Unshade, NumTypes
     };
