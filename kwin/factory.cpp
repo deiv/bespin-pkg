@@ -16,6 +16,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <QCache>
 #include <QCoreApplication>
 #include <QDBusConnection>
 #include <QDBusMessage>
@@ -25,6 +26,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QSettings>
+#include <QTimer>
 #include <QWidgetAction>
 #include <QStyleOptionHeader>
 #include <QTextBrowser>
@@ -35,6 +37,7 @@
 #include <KConfigGroup>
 #include <kwindowsystem.h>
 #include <kdeversion.h>
+#include <kmanagerselection.h>
 #include "../blib/FX.h"
 #include "../blib/shadows.h"
 #include "../config.defaults"
@@ -48,7 +51,10 @@
 #include <kdemacros.h>
 
 extern "C"
-{ KDE_EXPORT KDecorationFactory* create_factory() { return new Bespin::Factory(); } }
+{
+    KDE_EXPORT KDecorationFactory* create_factory() { return new Bespin::Factory(); }
+    KDE_EXPORT int decoration_version() { return 1; }
+}
 
 using namespace Bespin;
 
@@ -56,8 +62,8 @@ bool Factory::weAreInitialized = false;
 bool Factory::weAreComposited = true; // just guessing, kwin isn't up yet ... :(
 bool Factory::weAreCompiz = false; // just guessing, isn't up yet ... :(
 Config Factory::ourConfig =
-{   false, false, false, true, true, false, true, false, false, true,
-    0, Qt::AlignHCenter,
+{   false, false, false, true, true, false, true, false, false, true, true,
+    0, Qt::AlignHCenter, 1,
     { {Gradients::None, Gradients::Button}, {Gradients::None, Gradients::None} },
     Gradients::None, QStringList()
 };
@@ -81,6 +87,8 @@ typedef QHash<QString, QHash<NET::WindowType, WindowData*> > DoubleHash;
 
 Factory::Factory() : QObject(), KDecorationFactory()
 {
+    XProperty::init();
+    FX::init();
     weAreCompiz = !QCoreApplication::applicationName().startsWith("kwin");
     readConfig();
     //-------------
@@ -95,17 +103,27 @@ Factory::Factory() : QObject(), KDecorationFactory()
     p.end();
 
     connect (qApp, SIGNAL(aboutToQuit()), SLOT(cleanUp()));
-    connect (KWindowSystem::self(), SIGNAL(compositingChanged(bool)), SLOT(updateCompositingState(bool)));
     weAreInitialized = true;
     new BespinDecoAdaptor(this);
 //     QDBusConnection::sessionBus().registerService("org.kde.XBar");
     QDBusConnection::sessionBus().registerObject("/BespinDeco", this);
-    connect (KWindowSystem::self(), SIGNAL(compositingChanged(bool)), SLOT(updateCompositingState(bool)));
-    QMetaObject::invokeMethod( this, "postInit", Qt::QueuedConnection);
+    // NOTICE DO NOT INVOKE THIS! Threaded KWin needs a little timeout (yeah for heuristical behavior!)
+    // also the selectionOwner is now updated with delay
+    QTimer::singleShot(1000, this, SLOT(postInit()));
+    // NOTICE DON'T - Hey future Thomas, this causes random crashes on startup
+    // NOTICE BAD! QMetaObject::invokeMethod( this, "postInit", Qt::QueuedConnection);
 }
 
 void Factory::postInit() {
-    updateCompositingState(FX::compositingActive());
+    // for the time being, we just use our own selectionwatcher
+//     connect (KWindowSystem::self(), SIGNAL(compositingChanged(bool)), SLOT(updateCompositingState()));
+    Display *dpy = QX11Info::display();
+    char string[ 100 ];
+    sprintf(string, "_NET_WM_CM_S%d", DefaultScreen( dpy ));
+    KSelectionWatcher *watcher = new KSelectionWatcher(XInternAtom(dpy, string, False), -1, this);
+    connect (watcher, SIGNAL(lostOwner()), SLOT(updateCompositingState()));
+    connect (watcher, SIGNAL(newOwner(Window)), SLOT(updateCompositingState()));
+    updateCompositingState();
 }
 
 void Factory::cleanUp() {
@@ -130,7 +148,10 @@ KDecoration* Factory::createDecoration(KDecorationBridge* b)
 bool Factory::reset(unsigned long changed)
 {
     weAreInitialized = false;
+    const bool wereButtonny = buttonnyButton();
     const bool configChanged = readConfig();
+    if (wereButtonny != buttonnyButton())
+        changed |= SettingBorder;
     weAreInitialized = true;
 
     bool ret = configChanged || (changed & (SettingDecoration | SettingButtons | SettingBorder));
@@ -145,7 +166,11 @@ bool Factory::reset(unsigned long changed)
         if (wasComposited != weAreComposited)
         {
             resetDecorations(changed | SettingBorder);
+#if ! KDE_IS_VERSION(4,9,0)
+            // because of the threaded startup, this can cause real big trouble
+            // -> find a better way to switch the frame size of existing clients
             QDBusConnection::sessionBus().send( QDBusMessage::createMethodCall( "org.kde.kwin", "/KWin", "org.kde.KWin", "reconfigure" ) );
+#endif
         }
         else
             resetDecorations(changed);
@@ -173,6 +198,7 @@ multiVector(const QString & string, QVector<Button::Type> &vector)
         case 'I': type = Button::Min; break;
         case 'A': type = Button::Max; break;
         case 'X': type = Button::Close; break;
+        case '+': type = Button::MoveResize; break;
         default: continue;
         }
         vector.append(type);
@@ -300,7 +326,7 @@ bool Factory::readConfig()
 
     Shadows::setSize( settings.value(SHADOW_SIZE_INACTIVE).toInt(), settings.value(SHADOW_SIZE_ACTIVE).toInt() );
     const bool halo = settings.value(SHADOW_IS_HALO).toBool();
-    Shadows::setColor( halo ? settings.value(SHADOW_COLOR).value<QColor>() : QColor(0,0,0,255) );
+    Shadows::setColor( halo ? settings.value(HALO_COLOR).value<QColor>() : settings.value(SHADOW_COLOR).value<QColor>() );
     Shadows::setHalo( halo );
     Shadows::cleanUp();
     // get rid of old stuff (even w/o config: kwin sometimes crashes on --replace)
@@ -394,12 +420,20 @@ bool Factory::readConfig()
     ourConfig.invertedButtons = ourConfig.buttonnyButton && settings.value("InvertedButtons", true).toBool();
     if (oldBool != ourConfig.invertedButtons) ret = true;
 
+    oldInt = ourConfig.buttonDepth;
+    ourConfig.buttonDepth = qMin(qMax(0, settings.value("ButtonDepth", 1).toInt()), 4);
+    if (oldInt != ourConfig.buttonDepth) ret = true;
+
     oldBool = ourConfig.forceBorderLines;
     ourConfig.forceBorderLines = settings.value("BorderLines", false).toBool();
     if (oldBool != ourConfig.forceBorderLines) ret = true;
 
+    oldBool = ourConfig.embossTitle;
+    ourConfig.embossTitle = settings.value("EmbossTitle", true).toBool();
+    if (oldBool != ourConfig.embossTitle) ret = true;
+
     QString oldmultiorder = multiString(ourMultiButton);
-    QString newmultiorder = settings.value("MultiButtonOrder", "MHFBSLE!").toString();
+    QString newmultiorder = settings.value("MultiButtonOrder", "MHFBSLE!+").toString();
     if (oldmultiorder != newmultiorder)
     {
         ret = true;
@@ -419,7 +453,7 @@ bool Factory::readConfig()
     ourTitleSize[0] = fntHgt + 4 + settings.value("TitlePadding", 0).toInt();
     if (oldtitlesize != ourTitleSize[0]) ret = true;
     if (ourConfig.buttonnyButton)
-        ourButtonSize[0] = fntHgt + 2 + ourTitleSize[0]%2;
+        ourButtonSize[0] = fntHgt + qMin(2, ourConfig.buttonDepth) + ourTitleSize[0]%2;
     else
         ourButtonSize[0] = fntHgt - 2 + ourTitleSize[0]%2;
 
@@ -790,6 +824,22 @@ Factory::forget(qint64 pid)
     }
 }
 
+static QPixmap nullPix;
+static QCache<qint64, QPixmap> s_structureCache(10);
+const QPixmap &
+Factory::structure(const QColor &c, int type, int intensity)
+{
+    qint64 hash = (qint64(c.rgba()) << 32) | (qint64(type) << 8) | qint64(intensity & 0xff);
+    const QPixmap *pix;
+    if ((pix = s_structureCache.object(hash)))
+        return *pix;
+    pix = &Gradients::structure(c, false, qMax(0 ,type), intensity);
+    if (s_structureCache.insert(hash, const_cast<QPixmap*>(pix), 1))
+        return *pix;
+    delete pix;
+    return nullPix;
+}
+
 void
 Factory::updateDeco(WId id)
 {
@@ -803,10 +853,16 @@ Factory::updateDeco(WId id)
 }
 
 void
-Factory::updateCompositingState(bool active)
+Factory::updateCompositingState()
 {
-    weAreComposited = !active;
-    reset(0);
+    weAreComposited = FX::compositingActive();
+    // fix mask
+    QList<KDecoration*> decos = findChildren<KDecoration*>();
+    foreach (KDecoration *deco, decos)
+        deco->resize(deco->widget()->size());
+    // KWindowSystem does not work, so we don't have an "active" parameter for now
+//     weAreComposited = !active;
+    reset(SettingBorder);
 }
 
 WindowData*

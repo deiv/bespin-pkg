@@ -40,6 +40,7 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeView>
+#include <QWeakPointer>
 #include <QtDBus/QDBusConnectionInterface>
 #include <QtDBus/QDBusMessage>
 
@@ -289,6 +290,7 @@ Style::registerRoutines()
 Style::Style() : QCommonStyle()
 {
     setObjectName(QLatin1String("Bespin"));
+    XProperty::init();
     FX::init();
 #if BESPIN_STANDARD_PALETTE_HACK
     if (usingStandardPalette)
@@ -388,16 +390,25 @@ Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPale
             { savedPen = painter->pen(); penDirty = true; }
 
         QColor c = painter->pen().color();
-        c.setAlpha(c.alpha()/4 + 2);
-        painter->setPen(QPen(c, savedPen.widthF()));
-        r.translate(-1,-1);
-        painter->drawText(r, flags, text);
-        r.translate(1,2);
-        painter->drawText(r, flags, text);
-        r.translate(2,0);
-        painter->drawText(r, flags, text);
-        r.translate(-1,-2);
-        painter->drawText(r, flags, text);
+        if (config.strikeDisabled) {
+            c.setAlpha(c.alpha()/3 + 2);
+            painter->setPen(QPen(c, savedPen.widthF()));
+            QRect strike;
+            painter->drawText(r, flags, text, &strike);
+            const int y = strike.y() + strike.height()/2;
+            painter->drawLine(strike.x(), y, strike.right(), y);
+        } else {
+            c.setAlpha(c.alpha()/4 + 2);
+            painter->setPen(QPen(c, savedPen.widthF()));
+            r.translate(-1,-1);
+            painter->drawText(r, flags, text);
+            r.translate(1,2);
+            painter->drawText(r, flags, text);
+            r.translate(2,0);
+            painter->drawText(r, flags, text);
+            r.translate(-1,-2);
+            painter->drawText(r, flags, text);
+        }
     }
     else
         painter->drawText(r, flags, text, boundingRect);
@@ -654,15 +665,22 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
             uno = 0;
         else if (uno > 0xff)
             uno = 0xff;
-        data.style = ((uno & 0xff) << 24) | ((Plain & 0xff) << 16) | ((config.UNO.gradient & 0xff) << 8) | (config.UNO.gradient & 0xff);
+        data.style = ((uno & 0xff) << 24) | ((Plain & 0xff) << 16) |
+                     ((gt[0] & 0x1f) << 11) | ((gt[1] & 0x1f) << 6) | ((config.UNO.gradient & 0x1f) << 1);
     }
     else if (glassy)
     {
         bg = bg.light(115-Colors::value(bg)/20);
-        data.style = (0 << 24) | ((Plain & 0xff) << 16) | ((Gradients::None & 0xff) << 8) | (Gradients::None & 0xff);
+        data.style = (0 << 24) | ((Plain & 0xff) << 16) |
+                     ((Gradients::None & 0x1f) << 11) | ((Gradients::None & 0x1f) << 6) | ((Gradients::None & 0x1f) << 1);
     }
-    else
-        data.style = (0 << 24) | ((mode & 0xff) << 16) | ((gt[0] & 0xff) << 8) | (gt[1] & 0xff);
+    else {
+        int mMode = mode;
+        if (mode == Scanlines && config.kwin.useTiles)
+            mMode = 128 + config.bg.structure;
+        data.style = (0 << 24) | ((mMode & 0xff) << 16) |
+                     ((gt[0] & 0x1f) << 11) | ((gt[1] & 0x1f) << 6) | ((Gradients::None & 0x1f) << 1);
+    }
 #if BESPIN_ARGB_WINDOWS
     const bool ARGB_deco = !uno && FX::compositingActive();
     if (ARGB_deco)
@@ -685,8 +703,12 @@ Style::setupDecoFor(QWidget *widget, const QPalette &palette, int mode, const Gr
     QPalette::ColorRole inactive[2], text[2];
     if (uno || glassy)
     {
-        inactive[Bg] = active[Bg];
-        text[0] = text[1] = inactive[Fg] = active[Fg];
+//         inactive[Bg] = active[Bg];
+        inactive[Bg]    = config.kwin.inactive_role[Bg];
+        active[Bg]      = config.kwin.active_role[Bg];
+        text[0] = text[1] = active[Fg]; //  = inactive[Fg] = active[Fg];
+        inactive[Fg]    = config.kwin.inactive_role[Fg];
+        active[Fg]      = config.kwin.active_role[Fg];
     }
     else
     {
@@ -909,8 +931,8 @@ static const
 Qt::WindowFlags ignoreForDecoHints = ( Qt::Sheet | Qt::Drawer | Qt::Popup | Qt::SubWindow |
 Qt::ToolTip | Qt::SplashScreen | Qt::Desktop | Qt::X11BypassWindowManagerHint /*| Qt::FramelessWindowHint*/ ) & (~Qt::Dialog);
 
-static QList<BePointer<QToolBar> > pendingUnoUpdates;
-static QList<BePointer<QMainWindow> > pendingUnoWindows;
+static QList<QWeakPointer<QToolBar> > pendingUnoUpdates;
+static QList<QWeakPointer<QMainWindow> > pendingUnoWindows;
 static QTimer *unoUpdateTimer = 0;
 static bool
 updateUnoHeight(QMainWindow *mwin, bool includeToolbars, bool includeTitle, bool *gotTitle = 0)
@@ -992,14 +1014,16 @@ Style::updateUno()
     }
 
     bool clear = true;
-    foreach (QToolBar *bar, pendingUnoUpdates)
+    for (QList<QWeakPointer<QToolBar> >::const_iterator it = pendingUnoUpdates.constBegin(),
+                                                       end = pendingUnoUpdates.constEnd(); it != end; ++it)
     {
-        if (bar)
+        if (QToolBar *bar = it->data())
             updateUno(bar, (clear && config.UNO.title) ? &clear : 0);
     }
-    foreach (QMainWindow *mwin, pendingUnoWindows)
+    for (QList<QWeakPointer<QMainWindow> >::const_iterator it = pendingUnoWindows.constBegin(),
+                                                          end = pendingUnoWindows.constEnd(); it != end; ++it)
     {
-        if (mwin)
+        if (QMainWindow *mwin = it->data())
         {
             if (updateUnoHeight(mwin, config.UNO.toolbar, config.UNO.title, (clear && config.UNO.title) ? &clear : 0) && config.UNO.title)
                 setupDecoFor(mwin, mwin->palette(), config.bg.mode, GRAD(kwin));
@@ -1078,14 +1102,16 @@ static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &bl
     }
 }
 
-static QList<BePointer<QWidget> > pendingBlurUpdates;
+static QList<QWeakPointer<QWidget> > pendingBlurUpdates;
 
 void
 Style::updateBlurRegions() const
 {
 #ifdef Q_WS_X11 // hint blur region for the kwin plugin
-    foreach (QWidget *widget, pendingBlurUpdates)
+for (QList<QWeakPointer<QWidget> >::const_iterator it = pendingBlurUpdates.constBegin(),
+                                                  end = pendingBlurUpdates.constEnd(); it != end; ++it)
     {
+        QWidget *widget = it->data();
         if (!widget)
             continue;
         if (!FX::usesXRender() && widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
@@ -1171,6 +1197,7 @@ Style::eventFilter( QObject *object, QEvent *ev )
 //         if (object->isWidgetType())
         if (QWidget *window = static_cast<QWidget*>(object))
         if (window->testAttribute(Qt::WA_TranslucentBackground))
+        if (window->testAttribute(Qt::WA_StyledBackground))
         if (window->isWindow())
         {
             QPainter p(window);
@@ -1676,16 +1703,17 @@ Style::eventFilter( QObject *object, QEvent *ev )
 }
 
 void
-Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bool silent)
+Style::fixViewPalette(QAbstractScrollArea *itemView, int style, bool alternate, bool silent)
 {
     QWidget *vp = itemView->viewport();
+    QAbstractItemView *realItemView = qobject_cast<QAbstractItemView*>(itemView);
 
     if (silent)
         itemView->installEventFilter(&eventKiller);
 
     if (style == 1)
     {
-        itemView->setAlternatingRowColors(false);
+        if (realItemView) realItemView->setAlternatingRowColors(false);
         itemView->setPalette(QPalette());
         QPalette pal = itemView->palette();
         if (alternate)
@@ -1717,7 +1745,7 @@ Style::fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bo
         {
             if (style == 2) // force transparent
             {
-                itemView->setAlternatingRowColors(false);
+                if (realItemView) realItemView->setAlternatingRowColors(false);
                 itemView->setFrameStyle(QFrame::NoFrame);
             }
             QPalette pal = itemView->palette();

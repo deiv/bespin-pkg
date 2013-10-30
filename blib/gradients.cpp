@@ -30,7 +30,8 @@
 using namespace Bespin;
 
 typedef QCache<uint, QPixmap> PixmapCache;
-static QPixmap nullPix;
+static QPixmap *nullPixPtr = 0;
+#define nullPix *nullPixPtr
 
 // static Gradients::Type _progressBase = Gradients::Glass;
 
@@ -121,7 +122,7 @@ static inline QLinearGradient
 metalGradient(const QColor &c, const QPoint &start, const QPoint &stop)
 {
     QLinearGradient lg(start, stop);
-#if 1
+#if 0
     lg.setColorAt( 0, Colors::mid(c, Qt::white, 1, 1) );
     lg.setColorAt(0.45, Colors::mid(c, Qt::white, 2, 1) );
     lg.setColorAt(0.451, Colors::mid(c, Qt::black, 5, 1) );
@@ -131,8 +132,8 @@ metalGradient(const QColor &c, const QPoint &start, const QPoint &stop)
     int h,s,v,a;
     ic.getHsv(&h,&s,&v,&a);
     ic.setHsv(h,s,qMin(255,v+12),a); lg.setColorAt(0, ic);
-    ic.setHsv(h,s,qMin(255,v+7),a); lg.setColorAt(0.45, ic);
-    ic.setHsv(h,s,qMax(0,v-7),a); lg.setColorAt(0.451, ic);
+    ic.setHsv(h,s,qMin(255,v+7),a); lg.setColorAt(0.55, ic);
+    ic.setHsv(h,s,qMax(0,v-7),a); lg.setColorAt(0.551, ic);
     ic.setHsv(h,s,qMax(0,v-12),a); lg.setColorAt(1, ic);
 #endif
     return lg;
@@ -186,7 +187,8 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
     int add = (180 - v ) / 1;
     if (add < 0)
         add = -add/2;
-    add /= glass ? 48 : 96;//(glass ? 48 : 512/qMax(v,1));
+    else
+        add /= glass ? 48 : 96;//(glass ? 48 : 512/qMax(v,1));
 
     // the brightest color (top)
     int cv = v + 27 + add, ch = h, cs = s;
@@ -199,7 +201,7 @@ gl_ssColors(const QColor &c, QColor *bb, QColor *dd, bool glass = false)
             cs = s - (glass?6:2)*delta;
             if (cs < 0)
                 cs = 0;
-            ch = h - 3*delta/2;
+            ch = h - delta;
             while (ch < 0)
                 ch += 360;
         }
@@ -368,8 +370,17 @@ Gradients::borderline(const QColor &c, Position pos)
 static QColor
 checkValue(QColor c, int type)
 {
-    if (type == Gradients::Simple || type == Gradients::Sunken || type == Gradients::Metal || type == Gradients::Shiny)
+    switch (type) {
+    case Gradients::None:
+    case Gradients::Simple:
+    case Gradients::Sunken:
+    case Gradients::Metal:
+    case Gradients::Shiny:
+    case Gradients::Stone:
         return c;
+    default: break;
+    }
+
     int v = Colors::value(c);
     const int minV = type ? ((type < Gradients::Gloss) ? 60 : 40) : 0;
     if (v < minV)
@@ -378,12 +389,12 @@ checkValue(QColor c, int type)
         c.getHsv(&h,&s,&v,&a);
         c.setHsv(h,s,minV,a);
     }
-    else if (v > 240 && type > Gradients::Sunken) // glosses etc hate high value colors
+    else if (v > 200 && type > Gradients::Sunken) // glosses etc hate high value colors
     {
         int h,s,a;
         c.getHsv(&h,&s,&v,&a);
-        s = 400*s/(400+v-240);
-        c.setHsv(h,CLAMP(s,0,255),240,a);
+        s = 400*s/(400+v-180);
+        c.setHsv(h,CLAMP(s,0,255),220,a);
     }
     return c;
 }
@@ -436,7 +447,6 @@ Gradients::endColor(const QColor &oc, Position p, Type type, bool cv)
     }
 }
 
-static QPixmap s_stoneDither;
 const QPixmap&
 Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type type)
 {
@@ -505,6 +515,7 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
             pix->fill(Qt::transparent);
         QPainter p(pix); p.fillRect(pix->rect(), grad);
         if (type == Gradients::Stone) {
+            static QPixmap s_stoneDither;
             if (s_stoneDither.isNull()) {
                 srand( 314159265 );
                 s_stoneDither = QPixmap::fromImage(FX::newDitherImage(32, 64));
@@ -520,25 +531,36 @@ Gradients::pix(const QColor &c, int size, Qt::Orientation o, Gradients::Type typ
 }
 
 const QPixmap
-&Gradients::structure(const QColor &c, bool light)
+&Gradients::structure(QColor c, bool light, int type, int intensity)
 {
-    QPixmap *pix = _structure[light].object(c.rgba());
-    if (pix)
-        return *pix;
+    if (type < 0) {
+        if (intensity > -1) {
+            qWarning("Gradients::structure(): passing generic intensity for default type is not supported!");
+            intensity = _bgIntensity;
+        }
+        if (QPixmap *cachedBuffer = _structure[light].object(c.rgba()))
+            return *cachedBuffer;
+    }
 
-    pix = new QPixmap(64, 64);
-    if (c.alpha() != 0xff)
-        pix->fill(Qt::transparent);
+    int c_alpha = c.alpha();
+    c.setAlpha(0xff);
 
-    QPainter p(pix);
+    if (intensity < 0)
+        intensity = _bgIntensity;
+
+    QPixmap *structureBuffer = new QPixmap(64, 64);
+
+    QPainter p(structureBuffer);
     int i;
-    switch (_struct)
+    const int iType = type < 0 ? _struct : type;
+    const QRect &rect = structureBuffer->rect();
+    switch (iType)
     {
     default:
     case 0: // scanlines
-        p.setPen(Qt::NoPen); p.setBrush( c.light(_bgIntensity) );
-        p.drawRect(pix->rect()); p.setBrush( Qt::NoBrush );
-        i = 100 + (light?6:3)*(_bgIntensity - 100)/10;
+        p.setPen(Qt::NoPen); p.setBrush( c.light(intensity) );
+        p.drawRect(rect); p.setBrush( Qt::NoBrush );
+        i = 100 + (light?6:3)*(intensity - 100)/10;
         p.setPen(c.light(i));
         for ( i = 1; i < 64; i += 4 ) {
             p.drawLine( 0, i, 63, i );
@@ -549,10 +571,10 @@ const QPixmap
             p.drawLine( 0, i, 63, i );
         break;
     case 1: //checkboard
-        i = 100 + 2*(_bgIntensity - 100)/10;
+        i = 100 + 2*(intensity - 100)/10;
         p.setPen(Qt::NoPen);
         p.setBrush(c.light(i));
-        p.drawRect(pix->rect());
+        p.drawRect(rect);
         p.setBrush(c.dark(i));
         if (light) {
             for (int j = 0; j < 64; j+=16)
@@ -565,10 +587,10 @@ const QPixmap
         }
         break;
     case 2:  // fat scans
-        i = _bgIntensity - 100;
+        i = intensity - 100;
         p.setPen(Qt::NoPen);
         p.setBrush( c.light(100+3*i/10) );
-        p.drawRect( pix->rect() );
+        p.drawRect(rect);
         p.setPen(QPen(light ? c.light(100+i/10) : c, 2));
         p.setBrush( c.dark(100+2*i/10) );
         p.drawRect(-3,8,70,8);
@@ -577,9 +599,9 @@ const QPixmap
         p.drawRect(-3,56,70,8);
         break;
     case 3: // "blue"print
-        i = (_bgIntensity - 100);
+        i = (intensity - 100);
         p.setPen(Qt::NoPen); p.setBrush( c.dark(100+i/10) );
-        p.drawRect(pix->rect()); p.setBrush( Qt::NoBrush );
+        p.drawRect(rect); p.setBrush( Qt::NoBrush );
         p.setPen(c.light(100+(light?4:2)*i/10));
         for ( i = 0; i < 64; i += 16 )
             p.drawLine( 0, i, 63, i );
@@ -587,9 +609,9 @@ const QPixmap
             p.drawLine( i, 0, i, 63 );
         break;
     case 4: // verticals
-        i = (_bgIntensity - 100);
+        i = (intensity - 100);
         p.setPen(Qt::NoPen); p.setBrush( c.light(100+i) );
-        p.drawRect(pix->rect()); p.setBrush( Qt::NoBrush );
+        p.drawRect(rect); p.setBrush( Qt::NoBrush );
         p.setPen(c.light(100+(light?6:3)*i/10));
         for ( i = 1; i < 64; i += 4 ) {
             p.drawLine( i, 0, i, 63 );
@@ -600,9 +622,9 @@ const QPixmap
             p.drawLine( i, 0, i, 63 );
         break;
     case 5: // diagonals
-        i = 100 + (_bgIntensity - 100)/4;
+        i = 100 + (intensity - 100)/4;
         p.setPen(Qt::NoPen); p.setBrush( c.light(i) );
-        p.drawRect(pix->rect()); p.setBrush( Qt::NoBrush );
+        p.drawRect(rect); p.setBrush( Qt::NoBrush );
         p.setPen(QPen(c.dark(i), 11));
         p.setRenderHint(QPainter::Antialiasing);
         p.drawLine(-64,64,64,-64);
@@ -613,9 +635,9 @@ const QPixmap
         break;
     case 6: // slots
         p.setPen(Qt::NoPen);
-        i = 100 + 2*(_bgIntensity - 100)/10;
+        i = 100 + 2*(intensity - 100)/10;
         p.setBrush(c.light(i));
-        p.drawRect(pix->rect());
+        p.drawRect(rect);
         p.setBrush(c.dark(i));
         p.setRenderHint(QPainter::Antialiasing);
         for (int j = 0; j < 64; j+=4)
@@ -624,9 +646,9 @@ const QPixmap
         break;
     case 7: // fence
         p.setPen(Qt::NoPen);
-        i = 100 + (_bgIntensity - 100)/4;
+        i = 100 + (intensity - 100)/4;
         p.setBrush(c.light(i));
-        p.drawRect(pix->rect());
+        p.drawRect(rect);
         p.setPen(QPen(c.dark(i),2));
         p.setBrush(Qt::NoBrush);
         p.setRenderHint(QPainter::Antialiasing);
@@ -638,9 +660,9 @@ const QPixmap
     case 8: // interference
     {
         p.setPen(Qt::NoPen);
-        i = 100 + (_bgIntensity - 100)/4;
+        i = 100 + (intensity - 100)/4;
         p.setBrush(c.light(i));
-        p.drawRect(pix->rect());
+        p.drawRect(rect);
         p.setBrush(Qt::NoBrush);
         p.setRenderHint(QPainter::Antialiasing);
         QColor dc = c.dark(i);
@@ -657,9 +679,9 @@ const QPixmap
     }
     case 9: // sand
         p.setPen(Qt::NoPen);
-        i = 100 + (_bgIntensity - 100)/4;
+        i = 100 + (intensity - 100)/4;
         p.setBrush(c.light(i));
-        p.drawRect(pix->rect());
+        p.drawRect(rect);
         p.setBrush(Qt::NoBrush);
         p.setPen(QPen(c.dark(i),2));
         p.setRenderHint(QPainter::Antialiasing);
@@ -670,8 +692,8 @@ const QPixmap
         break;
     case 10: // planks
     {
-        i = 100 + (_bgIntensity - 100)/3;
-        QLinearGradient lg(pix->rect().topLeft(), pix->rect().topRight());
+        i = 100 + (intensity - 100)/3;
+        QLinearGradient lg(rect.topLeft(), rect.topRight());
         QColor shadow = c.dark(i);
         QColor light = c.light(i);
         lg.setColorAt(0.0, light);
@@ -683,27 +705,29 @@ const QPixmap
         lg.setColorAt(1.0, light);
         p.setBrush(lg);
         p.setPen(Qt::NoPen);
-        p.drawRect(pix->rect());
+        p.drawRect(rect);
         break;
     }
     case 11: // thin diagonals
     {
         p.setPen(Qt::NoPen);
-        i = 100 + (_bgIntensity - 100)/4;
+        i = 100 + (intensity - 100)/4;
         p.setBrush(c.light(i));
-        p.drawRect(pix->rect());
+        p.drawRect(rect);
         p.setPen(QPen(c.dark(i)));
         p.setBrush(Qt::NoBrush);
         p.setRenderHint(QPainter::Antialiasing);
+        const double off = 64.0/63.0;
         for (i = -12; i < 66; i+=3)
-            p.drawLine(0, i+12, 64, i);
+            p.drawLine(QLineF(0, off*(i+12), 64, off*i));
         break;
     }
     case 12: // bamboo
     case 13: // weave
+    case 17: // carbon fibre
     {
-        i = 100 + (_bgIntensity - 100)/2;
-        QLinearGradient lg(QPoint(0,0), QPoint(0,8));
+        i = 100 + (intensity - 100)/2;
+        QLinearGradient lg(QPoint(0,0), QPoint(0,16));
         QColor dark = c.dark(i);
         QColor light = c.light(i);
         lg.setColorAt(0.0, light);
@@ -711,9 +735,15 @@ const QPixmap
         lg.setSpread( QGradient::RepeatSpread );
         p.setBrush(lg);
         p.setPen(Qt::NoPen);
-        p.drawRect(pix->rect());
-        if ( _struct == 12 )
+        p.drawRect(rect);
+        if ( iType == 12 )
             break;
+        if ( iType == 17 ) {
+            p.setBrushOrigin(0,8);
+            for (int j = 0; j < 64; j+=16)
+                p.drawRect(j,0,8,64);
+            break;
+        }
         lg = QLinearGradient(QPoint(0,0), QPoint(8,0));
         lg.setColorAt(0.0, light);
         lg.setColorAt(1.0, dark);
@@ -727,22 +757,20 @@ const QPixmap
     case 14: { // stone / noise
         p.setBrush(c);
         p.setPen(Qt::NoPen);
-        p.drawRect(pix->rect());
-        QImage img = FX::newDitherImage(qAbs(_bgIntensity-100), 64);
-        p.drawTiledPixmap(pix->rect(), QPixmap::fromImage(img));
+        p.drawRect(rect);
+        QImage img = FX::newDitherImage(qAbs(intensity-100), 64);
+        p.drawTiledPixmap(rect, QPixmap::fromImage(img));
         break;
     }
     case 15: { // brushed metal
         p.end();
-        delete pix;
-        pix = new QPixmap(256,64);
-        if (c.alpha() != 0xff)
-            pix->fill(Qt::transparent);
+        delete structureBuffer;
+        structureBuffer = new QPixmap(256,64);
         srand( 314159265 );
         QImage img(256,64, QImage::Format_ARGB32);
-        img.fill(c);
+        img.fill(c.rgba());
         //expblur has a run-in, so the image needs to be slightly bigger
-        QImage noise = FX::newDitherImage(qMin(512, 10*qAbs(_bgIntensity-100)), 256+48).copy(0, 64, 256+48, 72);
+        QImage noise = FX::newDitherImage(qMin(512, 10*qAbs(intensity-100)), 256+48).copy(0, 64, 256+48, 72);
         FX::expblur(noise, 32, Qt::Horizontal);
         QPainter p2(&img);
         p2.drawImage(0,0, noise, 32, 0);
@@ -755,19 +783,96 @@ const QPixmap
 #define MERGE(_F_, _V_) const int _V_ = (col*_F_(p1) + (32-col)*_F_(p2)) / 32
                 MERGE(qRed, r); MERGE(qGreen, g);
                 MERGE(qBlue, b); MERGE(qAlpha, a);
+                img.setPixel(col, row, qRgba(r, g, b, a));
+            }
+        }
+        p.begin(structureBuffer);
+        p.drawTiledPixmap(structureBuffer->rect(), QPixmap::fromImage(img));
+        break;
+    }
+    case 16: { // concrete
+        p.end();
+        delete structureBuffer;
+        structureBuffer = new QPixmap(128,128);
+        srand( 314159265 );
+        QImage img(128,128, QImage::Format_ARGB32);
+        img.fill(c.rgba());
+        //expblur has a run-in, so the image needs to be slightly bigger
+        QImage noise = FX::newDitherImage(qMin(512, 10*qAbs(intensity-100)), 128+48);
+        FX::expblur(noise, 8);
+        QPainter p2(&img);
+        p2.drawImage(0,0, noise, 32, 32);
+        p2.end();
+        // now mirror blend back the right end on the left offset to create a seamless transition
+        for (int row = 0; row < 128; ++row) {
+            for (int col = 0; col < 32; ++col) {
+                QRgb p1 = img.pixel(col, row);
+                QRgb p2 = img.pixel(127-col, row);
+                MERGE(qRed, r); MERGE(qGreen, g);
+                MERGE(qBlue, b); MERGE(qAlpha, a);
+                img.setPixel(col, row, qRgba(r, g, b, a));
+            }
+        }
+        // and mirror blend back the bottom end on the top offset to create a seamless transition as well
+        for (int col = 0; col < 128; ++col) {
+            for (int row = 0; row < 32; ++row) {
+                QRgb p1 = img.pixel(col, row);
+                QRgb p2 = img.pixel(col, 127-row);
+#undef MERGE
+#define MERGE(_F_, _V_) const int _V_ = (row*_F_(p1) + (32-row)*_F_(p2)) / 32
+                MERGE(qRed, r); MERGE(qGreen, g);
+                MERGE(qBlue, b); MERGE(qAlpha, a);
 #undef MERGE
                 img.setPixel(col, row, qRgba(r, g, b, a));
             }
         }
-        p.begin(pix);
-        p.drawTiledPixmap(pix->rect(), QPixmap::fromImage(img));
+        p.begin(structureBuffer);
+        p.drawTiledPixmap(structureBuffer->rect(), QPixmap::fromImage(img));
+        break;
+    }
+    case 18: { // reptile
+        i = 100 + 3*(intensity - 100)/7;
+        QColor dark = c.dark(i);
+        QColor light = c.light(i);
+        p.setPen(Qt::NoPen);
+        p.setBrush(light);
+        p.drawRect(rect);
+        const int spacing = 8;
+        const int radius = 10;
+        for (int j = 64/spacing; j > -2; --j)
+        for (int i = j%2; i <= 64/spacing; i += 2) {
+            const int x = i*spacing;
+            const int y = j*spacing;
+            QRadialGradient rg(QPoint(x, y), radius);
+            rg.setColorAt(1.0, dark);
+            rg.setColorAt(0.0, light);
+            rg.setSpread( QGradient::PadSpread );
+            p.setBrush(rg);
+            p.drawEllipse(x-radius, y-radius, 2*radius, 2*radius);
+        }
+        break;
     }
     }
     p.end();
 
-    if (_structure[light].insert(c.rgba(), pix, costs(pix)))
-        return *pix;
-    return nullPix;
+    if (c_alpha != 0xff) {
+        QPixmap *argb = new QPixmap(structureBuffer->size());
+        argb->fill(Qt::transparent);
+        FX::blend(*structureBuffer, *argb, c_alpha/255.0);
+        delete structureBuffer;
+        structureBuffer = argb;
+    }
+
+    c.setAlpha(c_alpha); // fix back for cache insertion
+
+    if (type < 0) {
+        if (_structure[light].insert(c.rgba(), structureBuffer, costs(structureBuffer)))
+            return *structureBuffer;
+
+        delete structureBuffer;
+        return nullPix;
+    } else
+        return *structureBuffer;
 }
 
 const QPixmap
@@ -829,12 +934,12 @@ QPixmap &Gradients::ambient(int height)
     return nullPix;
 }
 
-static QPixmap _bevel[2];
+static QPixmap* _bevel[2] = {0,0};
 
 const QPixmap&
 Gradients::bevel(bool ltr)
 {
-   return _bevel[ltr];
+    return _bevel[ltr] ? *_bevel[ltr] : nullPix;
 }
 #if 0
 const QPixmap &
@@ -1105,6 +1210,8 @@ Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bo
     if (_initialized && !force)
         return;
     _initialized = true;
+    if (!nullPixPtr)
+        nullPixPtr = new QPixmap;
     _mode = mode;
     _struct = structure;
     _bgIntensity = bgIntesity;
@@ -1118,12 +1225,13 @@ Gradients::init(BgMode mode, int structure, int bgIntesity, int btnBevelSize, bo
     QPainter p; QGradientStops stops;
     for (int i = 0; i < 2; ++i)
     {
-        _bevel[i] = i ? _bevel[0].copy() : QPixmap(btnBevelSize, 32);
-        _bevel[i].fill(Qt::transparent);
+        delete _bevel[i];
+        _bevel[i] = new QPixmap(btnBevelSize, 32);
+        _bevel[i]->fill(Qt::transparent);
         stops << QGradientStop(0, QColor(0,0,0,i?20:0)) << QGradientStop(1, QColor(0,0,0,i?0:20));
         lg.setStops(stops);
         stops.clear();
-        p.begin(&_bevel[i]); p.fillRect(_bevel[i].rect(), lg); p.end();
+        p.begin(_bevel[i]); p.fillRect(_bevel[i]->rect(), lg); p.end();
     }
 
     for (int i = 0; i < 4; ++i)
@@ -1144,6 +1252,12 @@ void Gradients::wipe() {
     _tabShadow.clear();
     _groupLight.clear();
     _structure[0].clear(); _structure[1].clear();
+//     delete nullPixPtr;
+//     nullPixPtr = 0;
+//     for (int i = 0; i < 2; ++i) {
+//         delete _bevel[i];
+//         _bevel[i] = 0;
+//     }
 
     for (int i = 0; i < 4; ++i)
         _borderline[i].clear();

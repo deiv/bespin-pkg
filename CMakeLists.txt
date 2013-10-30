@@ -68,7 +68,7 @@ animator/hoverindex.cpp animator/hovercomplex.cpp animator/tab.cpp
 bespin.cpp buttons.cpp docks.cpp frames.cpp genpixmaps.cpp hacks.cpp init.cpp
 input.cpp menus.cpp pixelmetric.cpp polish.cpp progress.cpp qsubcmetrics.cpp
 scrollareas.cpp indicators.cpp sizefromcontents.cpp slider.cpp stdpix.cpp stylehint.cpp
-tabbing.cpp toolbars.cpp views.cpp visualframe.cpp window.cpp )
+tabbing.cpp toolbars.cpp views.cpp visualframe.cpp window.cpp revision.cpp)
 
 set (bespin_HDRS animator/basic.h animator/aprogress.h animator/hover.h
 animator/hoverindex.h animator/tab.h config.h draw.h hacks.h splitterproxy.h visualframe.h bespin.h types.h)
@@ -102,12 +102,6 @@ add_library (bespin SHARED ${bespin_SOURCES} ${bespin_MOC_SRCS} ${bespin_HDRS})
 
 
 target_link_libraries(bespin QtBespin ${QT_QTDBUS_LIBRARY} ${QT_QT3SUPPORT_LIBRARY})
-if ( X11_FOUND )
-   target_link_libraries(bespin ${X11_LIBRARIES})
-endif( X11_FOUND )
-if (X11_Xrender_FOUND)
-   target_link_libraries(bespin ${X11_Xrender_LIB})
-endif (X11_Xrender_FOUND)
 
 if(WIN32)
     install (TARGETS bespin DESTINATION ${QT_PLUGINS_DIR}/styles)
@@ -118,6 +112,7 @@ endif(WIN32)
 add_subdirectory (config)
 
 if (KDE4_FOUND)
+    add_subdirectory (be.shadowed)
     install (FILES bespin.themerc DESTINATION ${DATA_INSTALL_DIR}/kstyle/themes)
     if (X11_Xrender_FOUND)
         if(ENABLE_KWIN)

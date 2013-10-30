@@ -38,7 +38,7 @@ enum ConfigRole { ActiveGradient = Qt::UserRole, ActiveGradient2,
                   ActiveText, ActiveButtons, InactiveText, InactiveButtons,
                   Classes, Types };
 
-static const int Gradients_TypeAmount = 9;
+static const int Gradients_TypeAmount = 10;
 
 Config::Config(QWidget* parent) : BConfig(parent)
 {
@@ -97,6 +97,8 @@ Config::Config(QWidget* parent) : BConfig(parent)
     handleSettings(ui.roundCorners, "RoundCorners", true);
 //     ui.roundCorners->hide();
 
+    handleSettings(ui.embossTitle, "EmbossTitle", true);
+
     handleSettings(ui.trimmTitle, "TrimmCaption", true);
     setContextHelp(ui.trimmTitle, "<b>Trimm Title</b><hr>\
     Some windows tend to have ridiculusly looong captions, e.g. Konqueror if a website title\
@@ -116,19 +118,37 @@ Config::Config(QWidget* parent) : BConfig(parent)
     If set to \"Flat\", \"Vertical gradient\" or \"Horizontal gradient\", the inactive variant will\
     use the same value");
 
+    setContextHelp(ui.actColor, "<b>Active titlebar color</b><hr>\
+    The color of the base gradient for ACTIVE windows.");
+
     handleSettings(ui.inactGrad, "InactiveGradient", 0);
     setContextHelp(ui.inactGrad, "<b>Inctive base gradient</b><hr>\
     The BASE gradient of INACTIVE windows.<br>\
     If set to \"Flat\", \"Vertical gradient\" or \"Horizontal gradient\", the active variant will\
     use the same value");
 
+    setContextHelp(ui.inactColor, "<b>Inactive titlebar color</b><hr>\
+    The color of the base gradient for INACTIVE windows.");
+
     handleSettings(ui.actGrad2, "ActiveGradient2", 0);
     setContextHelp(ui.actGrad2, "<b>Second active gradient</b><hr>\
-    Accessoire gradient in the titlebar center of ACTIVE windows.");
+    Accessoire gradient in the titlebar center or when using traditional Buttons, the button background of ACTIVE windows.");
+
+    setContextHelp(ui.actColor2, "<b>Active decoration color</b><hr>\
+    The color of decoration (titlebar center or traditional button background) for ACTIVE windows.");
 
     handleSettings(ui.inactGrad2, "InactiveGradient2", 0);
     setContextHelp(ui.inactGrad2, "<b>Second inactive gradient</b><hr>\
-    Accessoire gradient in the titlebar center of INACTIVE windows.");
+    Accessoire gradient in the titlebar center or when using traditional Buttons, the button background of INACTIVE windows.");
+
+    setContextHelp(ui.inactColor2, "<b>Inactive decoration color</b><hr>\
+    The color of decoration (titlebar center or traditional button background) for INACTIVE windows.");
+
+    setContextHelp(ui.actButtons, "<b>Active button icon color</b><hr>\
+    The color of the button icons in the ACTIVE window. Ie. the foreground and NOT the background of traditional buttons.");
+
+    setContextHelp(ui.inactButtons, "<b>Inactive button icon color</b><hr>\
+    The color of the button icons in the INACTIVE window. Ie. the foreground and NOT the background of traditional buttons.");
 
     handleSettings(ui.multibutton, "MultiButtonOrder", "MHFBS");
     setContextHelp(ui.multibutton, "<b>The 'Multibutton'</b><hr>\
@@ -149,7 +169,8 @@ Config::Config(QWidget* parent) : BConfig(parent)
     <b>E</b>: Window List<br>\
     <b>X</b>: Close<br>\
     <b>I</b>: Minimize<br>\
-    <b>A</b>: Maximize<br>");
+    <b>A</b>: Maximize<br>\
+    <b>+</b>: Move/Resize window<br>");
 
     handleSettings(ui.iconVariant, "IconVariant", 1);
 
@@ -163,6 +184,9 @@ Config::Config(QWidget* parent) : BConfig(parent)
 
     handleSettings(ui.buttonGradient, "ButtonGradient", 0);
     setContextHelp(ui.buttonGradient, "Yeah, guess what.");
+
+    handleSettings(ui.buttonDepth, "ButtonDepth", 1);
+    setContextHelp(ui.buttonDepth, "How much it's sunken into the frame");
 
     handleSettings(ui.titlePadding, "TitlePadding", 0);
     setContextHelp(ui.titlePadding, "<b>Titlebar padding</b><hr>\
@@ -186,6 +210,8 @@ Config::Config(QWidget* parent) : BConfig(parent)
     btngrp->addButton(ui.titleRight, Qt::AlignRight);
     handleSettings(btngrp, "TitleAlign", Qt::AlignHCenter);
 
+    handleSettings(ui.borderLines, "BorderLines", false);
+
     handleSettings(ui.smallTitleClasses, "SmallTitleClasses", "");
     setContextHelp(ui.smallTitleClasses, "<b>Small Title classes</b><hr>\
     Windows with the NET_WM types \"NET::Utility\", \"NET::Menu\" and \"NET::Toolbar\" get\
@@ -201,6 +227,8 @@ Config::Config(QWidget* parent) : BConfig(parent)
     setContextHelp(ui.halo, "<b>Use Halo instead of Shadow</b><hr>\
     Allows to set a colored halo with even paddings around windows. Good for dark setups");
     connect ( ui.shadowColor, SIGNAL( changed(const QColor&) ), SIGNAL( changed() ) );
+    connect ( ui.haloColor, SIGNAL( changed(const QColor&) ), SIGNAL( changed() ) );
+    ui.haloColor->hide(); // halo is initially untoggled
 
     /** if you call setContextHelp(.) with a combobox and pass a stringlist,
     the strings are attached to the combo entries and shown on select/hover */
@@ -219,14 +247,16 @@ Config::Config(QWidget* parent) : BConfig(parent)
     QSettings settings("Bespin", "Style");
     settings.beginGroup("Deco");
     ui.shadowColor->setColor(settings.value(SHADOW_COLOR).value<QColor>());
+    ui.haloColor->setColor(settings.value(HALO_COLOR).value<QColor>());
 
     /* setup the presets UI */
     QListWidgetItem *item = new QListWidgetItem("Default");
+    ui.presets->addItem(item);
     item->setData(ActiveGradient, variant(ui.actGrad));
     item->setData(ActiveGradient2, variant(ui.actGrad2));
     item->setData(InactiveGradient, variant(ui.inactGrad));
     item->setData(InactiveGradient2, variant(ui.inactGrad2));
-    ui.presets->addItem(item);
+
     connect (ui.newPreset, SIGNAL(clicked()), this, SLOT(createNewPreset()));
     connect (ui.deletePreset, SIGNAL(clicked()), this, SLOT(deleteCurrentPreset()));
     connect (ui.presets, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
@@ -261,6 +291,12 @@ Config::Config(QWidget* parent) : BConfig(parent)
     Valid entries (atm, case insensitive): \"normal\", \"dialog\" and \"utility\".");
 
     loadPresets();
+
+    ui.presets->setCurrentRow(0);
+    int ci = ui.actGrad->currentIndex();
+    ui.actGrad->setCurrentIndex(-1);
+    ui.actGrad->setCurrentIndex(ci);
+    
     /* ------------------------ */
 }
 
@@ -272,6 +308,7 @@ void Config::save(KConfigGroup&)
     QSettings settings("Bespin", "Style");
     settings.beginGroup("Deco");
     settings.setValue("ShadowColor", ui.shadowColor->color());
+    settings.setValue("HaloColor", ui.haloColor->color());
     savePresets();
 }
 
@@ -516,8 +553,7 @@ void Config::watchBgMode()
 {
     if (ui.presets->currentRow() < 0)
         return;
-
-    QWidget *sibling = 0;
+    QComboBox *sibling = 0;
     if (sender() == ui.actGrad)
         sibling = ui.inactGrad;
     else if (sender() == ui.inactGrad)
@@ -526,8 +562,15 @@ void Config::watchBgMode()
     if (!sibling)
         return;
 
-    int idx = variant(sender()).toInt();
-    sibling->setEnabled(idx >= 0);
+    QComboBox *trigger = static_cast<QComboBox*>(sender());
+    const int idx = variant(trigger).toInt();
+    if (idx < 0 && trigger->isEnabled()) {
+        sibling->setEnabled(!trigger->isEnabled());
+        sibling->setCurrentIndex(trigger->currentIndex());
+    } else if (!sibling->isEnabled()) {
+        sibling->setCurrentIndex(trigger->currentIndex());
+        sibling->setEnabled(true);
+    }
 
     const bool isDefault = (ui.presets->currentRow() == 0);
     ui.actGrad2->setEnabled(isDefault || idx < 0);

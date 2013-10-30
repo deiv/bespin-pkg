@@ -426,7 +426,7 @@ Style::drawTabShape(const QStyleOption *option, QPainter *painter, const QWidget
 }
 
 void
-Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget*) const
+Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     ASSURE_OPTION(tab, Tab);
     OPT_SUNKEN OPT_ENABLED OPT_HOVER
@@ -459,12 +459,17 @@ Style::drawTabLabel(const QStyleOption *option, QPainter *painter, const QWidget
     if ( !tab->icon.isNull() )
     {
         QSize iconSize;
-        if (const QStyleOptionTabV2 *tabV2 = qstyleoption_cast<const QStyleOptionTabV2*>(tab))
+        if (const QStyleOptionTabV2 *tabV2 = qstyleoption_cast<const QStyleOptionTabV2*>(tab)) {
             iconSize = tabV2->iconSize;
+        }
         if ( !iconSize.isValid() )
         {
-            int iconExtent = pixelMetric(PM_SmallIconSize);
-            iconSize = QSize(iconExtent, iconExtent);
+            if (const QTabBar* tabbar = qobject_cast<const QTabBar*>(widget)) {
+                iconSize = tabbar->iconSize();
+            } else {
+                const int iconExtent = pixelMetric(PM_TabBarIconSize);
+                iconSize = QSize(iconExtent, iconExtent);
+            }
         }
         QPixmap tabIcon = tab->icon.pixmap(iconSize, (isEnabled) ? QIcon::Normal : QIcon::Disabled);
 

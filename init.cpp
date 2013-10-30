@@ -135,6 +135,8 @@ void
 Style::readSettings(const QSettings* settings, QString appName)
 {
     bool delSettings = false;
+    // this is for "bespin try"
+    bool external = false;
 
     QSettings *iSettings = const_cast<QSettings*>(settings);
     if (!iSettings)
@@ -148,6 +150,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         // flanders
         config.leftHanded = readBool(LEFTHANDED) ? Qt::RightToLeft : Qt::LeftToRight;
         config.showOff = readBool(SHOW_OFF);
+        config.strikeDisabled = readBool(STRIKE_DISABLED);
 //         if (config.showOff)
 //             { ori[0] = Qt::Vertical; ori[1] = Qt::Horizontal; }
 //         else
@@ -170,6 +173,7 @@ Style::readSettings(const QSettings* settings, QString appName)
         Hacks::config.opaquePlacesViews = readBool(HACK_PLACES_VIEWS);
         Hacks::config.lockToolBars = readBool(HACK_TOOLBAR_LOCKING);
         Hacks::config.lockDocks = readBool(HACK_DOCK_LOCKING);
+        Hacks::config.panning = readBool(HACK_PANNING);
         Hacks::config.invertDolphinUrlBar = appType == Dolphin && readBool(HACK_DOLPHIN_URLBAR);
         Hacks::config.fixKMailFolderList = appType == KMail && readBool(HACK_KMAIL_FOLDERS);
         Hacks::config.extendDolphinViews = appType == Dolphin && readBool(HACK_DOLPHIN_ICONVIEWS);
@@ -277,13 +281,16 @@ Style::readSettings(const QSettings* settings, QString appName)
             iSettings->beginGroup("Style");
         }
     }
-    else
+    else {
+        external = true;
         qWarning("Bespin: WARNING - reading EXTERNAL settings!!!");
+    }
 
     // Background ===========================
     config.bg.minValue = readInt(BG_MINVALUE);
 
     config.bg.mode = (BGMode) readInt(BG_MODE);
+
     if (appType == Opera && config.bg.mode > Scanlines)
         config.bg.mode = Plain; // it doesn't work - at least atm - and breaks kwin appereance...
     else if (config.bg.mode > BevelH)
@@ -298,6 +305,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     if (config.bg.opacity != 0xff)
     {
         QStringList blacklist = iSettings->value(ARGB_BLACKLIST).toString().split(',', QString::SkipEmptyParts);
+        blacklist << "kscreenlocker" << "kscreenlocker_greet"; // https://bugs.kde.org/show_bug.cgi?id=314663
         if (blacklist.contains(appName))
             config.bg.opacity = 0xff;
         Animator::Tab::setTransition(Animator::Jump);
@@ -388,6 +396,7 @@ Style::readSettings(const QSettings* settings, QString appName)
     readRole(kwin.active, KWIN_ACTIVE_ROLE);
     config.kwin.text_role[0] = (QPalette::ColorRole) iSettings->value(KWIN_INACTIVE_TEXT_ROLE).toInt();
     config.kwin.text_role[1] = (QPalette::ColorRole) iSettings->value(KWIN_ACTIVE_TEXT_ROLE).toInt();
+    config.kwin.useTiles = readBool(KWIN_USE_TILES);
 
     // Menus ===========================
     //--------
@@ -580,6 +589,12 @@ Style::readSettings(const QSettings* settings, QString appName)
 
     if (delSettings)
         delete iSettings;
+
+    if (external) {
+        Gradients::wipe();
+        Gradients::init(config.bg.mode > Scanlines ? (Gradients::BgMode)config.bg.mode : Gradients::BevelV,
+                    config.bg.structure, config.bg.intensity, F(8), true, config.groupBoxMode == 2);
+    }
 }
 
 #undef readRole
@@ -618,6 +633,8 @@ void Style::initMetrics()
 }
 
 #undef SCALE
+
+extern const QString bespin_revision();
 
 void
 Style::init(const QSettings* settings)
@@ -667,6 +684,8 @@ Style::init(const QSettings* settings)
             appType = Arora;
         else if ( appName == "konqueror")
             appType = Konqueror;
+        else if ( appName == "apper")
+            appType = Apper;
         else if ( appName == "Kde4ToolkitLibrary" )
         {
             appName = "opera";
@@ -694,5 +713,6 @@ Style::init(const QSettings* settings)
     inner.setRect(0,0,100,100); outer.setRect(0,0,100,100);
     inner.adjust(f1,f1,-f1,0); outer.adjust(-f3,-f3,f3,0);
     VisualFrame::setGeometry(QFrame::Raised, inner, outer);
+    setProperty("BespinRevision", bespin_revision());
 }
 

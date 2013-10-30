@@ -158,7 +158,6 @@ Style::drawTitleShadow( QPainter *painter, const QWidget *widget ) const
     }
 }
 
-
 void
 Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widget) const
 {
@@ -268,9 +267,29 @@ Style::drawWindowBg(const QStyleOption*, QPainter *painter, const QWidget *widge
     if (config.bg.mode == Scanlines)
     {
         const bool light = (widget->windowFlags() & ((Qt::Tool | Qt::Popup) & ~Qt::Window));
+        const QPixmap &structure = Gradients::structure(c, light);
+#ifndef QT_NO_XRENDER
+        if (config.kwin.useTiles) {
+            uint *decoDimP = (widget->testAttribute(Qt::WA_WState_Created) && widget->internalWinId()) ?
+                                XProperty::get<uint>(widget->winId(), XProperty::decoDim, XProperty::LONG) : 0;
+            if (decoDimP)
+            {
+                WindowPics pics;
+                pics.topTile = pics.btmTile = pics.cnrTile = pics.lCorner = pics.rCorner = 0;
+                if (FX::usesXRender())
+                    pics.topTile = structure.x11PictureHandle();
+                /// NOTICE encoding the bg dims in the cnrTile Pic!!
+                pics.cnrTile = ((structure.width() & 0xffff) << 16) | (structure.height() & 0xffff);
+                /// NOTICE encoding the bg structure & intensity in the btmTile Pic!!
+                pics.btmTile = ((config.bg.intensity & 0xff) << 8) | (config.bg.structure & 0xff);
+                XProperty::set<Picture>(widget->winId(), XProperty::bgPics, (Picture*)&pics, XProperty::LONG, 5);
+                XFree(decoDimP);
+            }
+        }
+#endif
         painter->save();
         painter->setPen(Qt::NoPen);
-        painter->setBrush(Gradients::structure(c, light));
+        painter->setBrush(structure);
         painter->drawRect(widget->rect());
         painter->restore();
         goto CommonOperations;
@@ -389,13 +408,20 @@ void
 Style::drawToolTip(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     painter->save();
-    painter->setRenderHint(QPainter::Antialiasing, false);
 //    painter->setBrush(Gradients::pix(FCOLOR(ToolTipBase), RECT.height(), Qt::Vertical, Gradients::Button));
-    painter->setBrush(FCOLOR(ToolTipBase));
-    painter->setPen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),4,1));
-    painter->drawRect(RECT.adjusted(0,0,-1,-1));
-    if (config.menu.round && widget && widget->testAttribute(Qt::WA_TranslucentBackground) && FX::compositingActive())
+    QColor c(FCOLOR(ToolTipBase));
+    if (widget && widget->testAttribute(Qt::WA_TranslucentBackground) && FX::compositingActive())
+        c.setAlpha(230); // ~90%
+    painter->setBrush(c);
+    painter->setPen(Colors::mid(FCOLOR(ToolTipBase), FCOLOR(ToolTipText),6,1));
+    if (config.menu.round && widget && widget->testAttribute(Qt::WA_TranslucentBackground) && FX::compositingActive()) {
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->drawRoundedRect(RECT.adjusted(0,0,-1,-1),F(5),F(5));
         shapeCorners( painter, RECT, masks.windowShape );
+    } else {
+        painter->setRenderHint(QPainter::Antialiasing, false);
+        painter->drawRect(RECT.adjusted(0,0,-1,-1));
+    }
     painter->restore();
 }
 

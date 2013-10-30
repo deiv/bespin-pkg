@@ -102,10 +102,11 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
 
     QPalette::ColorRole bg = config.menu.active_role[Bg];
     QPalette::ColorRole fg = config.menu.active_role[Fg];
-    if (bg == config.UNO.__role[Bg])
+    QPalette::ColorRole ibg = widget ? widget->backgroundRole() : QPalette::Window; // config.UNO.__role[Bg]
+    if (bg == ibg)
     {   // swap!
         bg = fg;
-        fg = config.UNO.__role[Bg];
+        fg = ibg;
     }
 
     bool hover = (option->state & State_Selected);
@@ -172,7 +173,7 @@ Style::drawMenuBarItem(const QStyleOption *option, QPainter *painter, const QWid
         else if (step == 6 && config.menu.itemSunken)
             shadows.sunken[round_][false].render(r, painter);
     }
-    QPalette::ColorRole fg2 = config.UNO.__role[Fg];
+    QPalette::ColorRole fg2 = widget ? widget->foregroundRole() : QPalette::WindowText; //config.UNO.__role[Fg];
     QPixmap pix = mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), isEnabled ? QIcon::Normal : QIcon::Disabled);
     const uint alignment = Qt::AlignCenter | BESPIN_MNEMONIC | Qt::TextDontClip | Qt::TextSingleLine;
     if (!pix.isNull())

@@ -184,7 +184,8 @@ XBar::init()
     ggmLastId = 0;
     ggmContext = XInternAtom( QX11Info::display(), "_NET_GLOBALMENU_MENU_CONTEXT", false );
     ggmEvent = XInternAtom( QX11Info::display(), "_NET_GLOBALMENU_MENU_EVENT", false );
-    formerX11EventFilter = QAbstractEventDispatcher::instance()->setEventFilter(globalX11EventFilter);
+    if (!formerX11EventFilter)
+        formerX11EventFilter = QAbstractEventDispatcher::instance()->setEventFilter(globalX11EventFilter);
 
     connect( KWindowSystem::self(), SIGNAL( activeWindowChanged(WId) ), this, SLOT( ggmWindowActivated(WId) ) );
     connect( KWindowSystem::self(), SIGNAL( windowAdded(WId) ), this, SLOT( ggmWindowAdded(WId) ) );
@@ -212,6 +213,25 @@ XBar::updateFont()
 {
     QSettings settings("Bespin", "XBar");
     settings.beginGroup("XBar");
+    QString weightString = settings.value("FirstElementWeight", "bold").toString();
+    int weight = QFont::Bold;
+    if (!weightString.compare("bold", Qt::CaseInsensitive))
+        weight = QFont::Bold;
+    else if (!weightString.compare("black", Qt::CaseInsensitive))
+        weight = QFont::Black;
+    else if (!weightString.compare("normal", Qt::CaseInsensitive))
+        weight = QFont::Normal;
+    else if (!weightString.compare("light", Qt::CaseInsensitive))
+        weight = QFont::Light;
+    else if (!weightString.compare("demibold", Qt::CaseInsensitive))
+        weight = QFont::DemiBold;
+    else {
+        bool ok;
+        weight = weightString.toInt(&ok);
+        weight = ok ? qMax(qMin(weight, 99), 0) : QFont::Bold;
+    }
+    MenuBar::firstElementWeight = weight;
+
     double scale = settings.value("FontScale", 1.0f).toDouble();
     myFont = KGlobalSettings::menuFont();
     if (scale > 0.0 && scale != 1.0)
@@ -229,7 +249,11 @@ XBar::updateFont()
 void
 XBar::updatePalette()
 {
-    QColor fg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::TextColor);
+    QSettings settings("Bespin", "XBar");
+    settings.beginGroup("XBar");
+    QColor fg = settings.value("Color", QColor()).value<QColor>();
+    if (!fg.isValid())
+        fg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::TextColor);
     QColor bg = Plasma::Theme::defaultTheme()->color(Plasma::Theme::BackgroundColor);
     MenuBar::setGlowColor(bg);
     QPalette pal(fg, bg, Qt::white, Qt::black, Qt::gray, fg, fg, bg, bg );
@@ -574,6 +598,9 @@ XBar::rBuildMenu(const QDomElement &node, QObject *widget)
                 else
                 {
                     QMenu *newMenu = MENU_FUNC(addMenu(e.attribute("label", LABEL_ERROR)));
+                    QString icn = e.attribute("icon");
+                    if (!icn.isEmpty())
+                        newMenu->setIcon(KIcon(icn));
                     rBuildMenu(e, newMenu);
                 }
             }
@@ -735,6 +762,7 @@ XBar::show(MenuBar *item)
     int dy = (contentsRect().height() - item->rect().height())/2;
     item->setPos(contentsRect().x(), contentsRect().y()+dy);
     item->show();
+    resize(item->sizeHint(Qt::PreferredSize, QSize()));
 }
 
 void

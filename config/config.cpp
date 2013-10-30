@@ -61,19 +61,15 @@ namespace Gradients {
     enum BgMode { BevelV = 2, BevelH };
 }
 
-static const char* defInfo1 =
-"<b>Bespin Style</b><hr>\
-<p>\
-&copy;&nbsp;2006-2009 by Thomas L&uuml;bking<br>\
-Includes Design Ideas by\
-<ul type=\"disc\">\
-<li>Nuno Pinheiro</li>\
-<li>David Vignoni</li>\
-<li>Kenneth Wimer</li>\
-</ul>\
-</p>\
-<hr>\
-Visit <a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>";
+static QString defInfo1(
+"<b>Bespin Style</b><hr>"
+"<p> Style Version : %style<br>"
+"Config Version: %config"
+"</p>"
+"<p>"
+"&copy;&nbsp;2006-2012<br>by Thomas&nbsp;L&uuml;bking</p>"
+"<p>Includes Design Ideas by Nuno&nbsp;Pinheiro, David&nbsp;Vignoni, Kenneth&nbsp;Wimer, TheRob and google image search</p><hr>"
+"Visit <a href=\"http://cloudcity.sourceforge.net\">CloudCity.SourceForge.Net</a>");
 
 #if 0
 static const char* defInfo2 =
@@ -126,6 +122,8 @@ public:
     }
 };
 
+extern const QString bespin_revision();
+
 /** The Constructor - your first job! */
 Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(false)
 {
@@ -136,6 +134,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     QEvent event(QEvent::PaletteChange);
     changeEvent(&event);
     ui.info->setOpenExternalLinks( true ); /** i've an internet link here */
+    ui.info->setMinimumWidth(160);
 
     const QPalette::ColorGroup groups[3] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
     ui.info->viewport()->setAutoFillBackground(false);
@@ -194,6 +193,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     }
 //    ui.store->addItems( settings.childGroups() );
     ui.store->sortItems(0, Qt::AscendingOrder);
+    ui.store->resizeColumnToContents(0);
     ui.btnStore->setAutoDefault ( false );
     ui.btnRestore->setAutoDefault ( false );
     ui.btnImport->setAutoDefault ( false );
@@ -290,6 +290,17 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     Can be any QTextBrowser on your UI form */
     setInfoBrowser(ui.info);
     /** 2. Define a context info that is displayed when no other context help is demanded */
+    QString sv;
+    if (qApp->style()->objectName().compare("bespin", Qt::CaseInsensitive)) {
+        if (QStyle *bespin = QStyleFactory::create("bespin")) {
+            sv = bespin->property("BespinRevision").toString();
+            delete bespin;
+        }
+    } else {
+        sv = qApp->style()->property("BespinRevision").toString();
+    }
+    defInfo1.replace("%style", sv);
+    defInfo1.replace("%config", bespin_revision());
     setDefaultContextInfo(defInfo1);
 
     /** handleSettings(.) tells BConfig to take care (save/load) of a widget
@@ -302,6 +313,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.roundness, ROUNDNESS);
 #if BESPIN_ARGB_WINDOWS
     handleSettings(ui.argbOpacity, BG_OPACITY);
+    connect(ui.argbOpacity, SIGNAL(valueChanged(int)), SLOT(deActivateTabTransitions()));
     setContextHelp(ui.argbSupport, "<b>Window Opacity</b><hr>\
     Yes, it means you can have translucent windows, BUT:<br>\
     - It's highly experimental<br>\
@@ -434,6 +446,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.crTabBar, TAB_ROLE);
     handleSettings(ui.tabTransition, TAB_TRANSITION);
     handleSettings(ui.activeTabSunken, TAB_ACTIVETABSUNKEN);
+    ui.tabTransitionWarning->hide();
 
     handleSettings(ui.headerRole, VIEW_HEADERROLE);
     handleSettings(ui.headerSortingRole, VIEW_SORTINGHEADERROLE);
@@ -442,6 +455,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     handleSettings(ui.viewShadingRole, VIEW_SHADE_ROLE);
     handleSettings(ui.viewShadeLevel, VIEW_SHADE_LEVEL);
 
+    handleSettings(ui.kwinUseTiles, KWIN_USE_TILES);
     handleSettings(ui.kwinActiveGrad, KWIN_ACTIVE_GRADIENT);
     handleSettings(ui.kwinInactiveGrad, KWIN_INACTIVE_GRADIENT);
     handleSettings(ui.kwinActiveRole, KWIN_ACTIVE_ROLE);
@@ -532,6 +546,16 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     - Mainwindows<br>\
     - Statusbars<br>\
     - SMPlayer/DragonPlayer Video areas<br>");
+
+    handleSettings(ui.hackPanning, HACK_PANNING);
+    setContextHelp(ui.hackPanning, "<b>Panning Viewports</b><hr>\
+    <b>WARNING</b><br>\
+    This will limit normal mouse usage on those viewports, discouraged but for touchscreens.<hr>\
+    Affected are (atm.) IconViews, TextEdits, Dolphin and QWebView<br>\
+    Pannig is skipped if a modifier (ctrl, shift or alt) is held or you tap the same element\
+    twice withing 333ms<br>\
+    Clicking items will remain operative, <b>dragging will not</b><br>\
+    Use the double tap to cause a drag, ie. tap next to and then press and hold the icon");
 
     handleSettings(ui.suspendFsVideoCompositing, HACK_SUSPEND_FULLSCREEN_PLAYERS);
     setContextHelp(ui.suspendFsVideoCompositing, "<b>Suspend Fullscreen Video Compositing</b><hr>\
@@ -738,6 +762,7 @@ Config::Config(QWidget *parent) : BConfig(parent), loadedPal(0), infoIsManage(fa
     if you want a standalone app you may want to check the main() funtion
     at the end of this file as well - but there's nothing special about it...
         =========================================== */
+    resize(1024,768);
 }
 
 void
@@ -776,6 +801,13 @@ Config::changeEvent(QEvent *event)
     p.drawPath(path);
     p.end();
     ui.logo->setPixmap(logo);
+}
+
+void
+Config::deActivateTabTransitions()
+{
+    ui.tabTransitionGroup->setEnabled(ui.argbOpacity->value() == 0xff);
+    ui.tabTransitionWarning->setVisible(ui.argbOpacity->value() != 0xff);
 }
 
 bool
@@ -882,7 +914,7 @@ blackListed(QString &key)
         key.startsWith("Hack.") || // don't im/export hacks
 //         key.startsWith("ARGB.") || // don't im/export ARGB stuff
         key.startsWith("App.") || // don't im/export app specific stuff
-        key == "Bg.Opacity" || // or dimmed inactive wins
+//         key == "Bg.Opacity" || 
         key == "DialogButtonLayout" || // or OS conventions
         key == "FadeInactive" || // or dimmed inactive wins
         key == "Tab.Duration" || key == "Tab.Transition" || // or tab trans settings
@@ -987,6 +1019,7 @@ Config::import()
             ui.store->sortItems(0, Qt::AscendingOrder);
         }
     }
+    ui.store->resizeColumnToContents(0);
 }
 
 
@@ -1344,6 +1377,7 @@ Config::store3( const QString &string, bool addItem, const QPalette &pal )
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
         ui.store->addTopLevelItem(item);
         ui.store->sortItems(0, Qt::AscendingOrder);
+        ui.store->resizeColumnToContents(0);
     }
     setQSetting("Bespin", "Store", string);
     BConfig::save();
@@ -1395,6 +1429,7 @@ void
 Config::handleBgMode(int idx)
 {
     ui.structure->setEnabled(idx == 1);
+    ui.kwinUseTiles->setEnabled(idx == 1);
 }
 
 static const char *grooveModes[5] = {"Line", "Groove", "Inlay", "Sunken", "None"};
@@ -1412,6 +1447,7 @@ Config::handleGrooveMode(int v)
     ui.invertGroove->setDisabled(v == 4);
     ui.scrollRole->setDisabled(v == 4);
     ui.scrollActiveRole->setDisabled(v == 4);
+    ui.showOff->setDisabled(v == 4);
 }
 
 void

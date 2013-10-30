@@ -21,7 +21,6 @@
 #include <QDropEvent>
 #include <QPainter>
 #include <QPaintEvent>
-#include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QStackedWidget>
@@ -158,11 +157,13 @@ grabWidget(QWidget * root, QPixmap &pix)
     QPixmap *saPix = 0L;
 
     QWidgetList widgets = root->findChildren<QWidget*>();
-    QList< BePointer<QWidget> > widgets2;
+    QList<WidgetPtr> widgets2;
     foreach (QWidget *w, widgets)
-        widgets2.append(BePointer<QWidget>(w));
-    foreach (QWidget *w, widgets2)
+        widgets2.append(WidgetPtr(w));
+
+    for(QList<WidgetPtr>::const_iterator it = widgets2.constBegin(), end = widgets2.constEnd(); it != end; ++it)
     {
+        QWidget *w = it->data();
         if (w && w->isVisibleTo(root))
         {
             // solids
@@ -299,7 +300,7 @@ class StdChildAdd : public QObject
 
 
 TabInfo::TabInfo(QObject* parent, QWidget *current, int idx) :
-QObject(parent), curtain(0), progress(0.0), currentWidget(current), index(idx){}
+QObject(parent), progress(0.0), currentWidget(current), index(idx){}
 
 bool
 TabInfo::proceed()
@@ -316,7 +317,8 @@ TabInfo::proceed()
 
    // normal action
    updatePixmaps(_transition, ms);
-   if (curtain) curtain->repaint();
+   if (Curtain *c = curtain.data())
+       c->repaint();
    return true;  // for counter
 }
 
@@ -324,13 +326,14 @@ void
 TabInfo::rewind()
 {
     clock = QTime(); // reset clock, this is IMPORTANT!
-    if (currentWidget)
-    	currentWidget->setUpdatesEnabled(false);
-    delete curtain; curtain = 0; // get rid of curtain, and RESHOW CONTENT!
-    if (currentWidget)
+    QWidget *cWidget = currentWidget.data();
+    if (cWidget)
+        cWidget->setUpdatesEnabled(false);
+    delete curtain.data(); curtain.clear(); // get rid of curtain, and RESHOW CONTENT!
+    if (cWidget)
     {
-        currentWidget->setUpdatesEnabled(true);
-        currentWidget->repaint();
+        cWidget->setUpdatesEnabled(true);
+        cWidget->repaint();
     }
     tabPix[0] = tabPix[1] = tabPix[2] = QPixmap(); // reset pixmaps, saves space
 }
@@ -340,11 +343,15 @@ TabInfo::rewind()
 void
 TabInfo::switchTab(QStackedWidget *sw, int newIdx)
 {
+    if (!sw->window()->isVisible()) {
+        return;
+    }
     progress = 0.0;
     // update from/to indices
     //    const int oldIdx = tai->index; // just for debug out later on
     QWidget *ow = sw->widget(index);
     QWidget *cw = sw->widget(newIdx);
+
     currentWidget = cw;
     index = newIdx;
 
@@ -386,22 +393,23 @@ TabInfo::switchTab(QStackedWidget *sw, int newIdx)
     updatePixmaps(_transition, _timeStep);
 
     // make curtain and first update ----------------
-    if (!curtain)
+    if (curtain.isNull())
     {   // prevent w from doing freaky things with the curtain
         // (e.g. QSplitter would add a new section...)
         StdChildAdd *stdChildAdd = new StdChildAdd;
         sw->installEventFilter(stdChildAdd);
 
-        curtain = new Curtain(this, sw);
-        curtain->move(contentsRect.topLeft());
-        curtain->resize(contentsRect.size());
-        curtain->show();
+        Curtain *c;
+        curtain = c = new Curtain(this, sw);
+        c->move(contentsRect.topLeft());
+        c->resize(contentsRect.size());
+        c->show();
 
         sw->removeEventFilter(stdChildAdd);
         delete stdChildAdd;
     }
     else
-        curtain->raise();
+        curtain.data()->raise();
 }
 
 void
@@ -524,6 +532,10 @@ Tab::_manage (QWidget* w)
    if (!sw)
        return false;
 
+   // just to be sure...
+    disconnect(sw, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
+    sw->removeEventFilter(this);
+
    connect(sw, SIGNAL(destroyed(QObject*)), SLOT(release_s(QObject*)));
    connect(sw, SIGNAL(widgetRemoved(int)), SLOT(widgetRemoved(int)));
    connect(sw, SIGNAL(currentChanged(int)), SLOT(changed(int)));
@@ -538,9 +550,21 @@ Tab::_release(QWidget *w)
    if (!sw)
        return;
 
+   disconnect(sw, SIGNAL(destroyed(QObject*)), this, SLOT(release_s(QObject*)));
    disconnect(sw, SIGNAL(currentChanged(int)), this, SLOT(changed(int)));
    disconnect(sw, SIGNAL(widgetRemoved(int)), this, SLOT(widgetRemoved(int)));
-   items.remove(sw);
+   Items::iterator it = items.begin(), end = items.end();
+   while (it != end) {
+       if (it.key().isNull()) {
+           it = items.erase(it);
+           continue;
+       }
+       if (it.key().data() == sw) {
+           items.erase(it);
+           break;
+       }
+       ++it;
+   }
 
    if (items.isEmpty())
        timer.stop();
@@ -582,7 +606,8 @@ Tab::widgetRemoved(int index)
     Items::iterator i = items.find(sw);
     if (i == items.end())
         return;
-    if (i.value()->index == index)
+
+    if (i.value()->index == index || !sw->count())
         i.value()->index = -1;
 }
 
@@ -598,7 +623,7 @@ Tab::timerEvent(QTimerEvent *event)
     bool mkProper = false;
     for (i = items.begin(); i != items.end(); i++)
     {
-        if (!i.key())
+        if (i.key().isNull())
         {
             mkProper = true;
             continue;

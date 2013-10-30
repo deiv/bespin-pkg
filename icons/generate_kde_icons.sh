@@ -120,17 +120,17 @@ while read line; do
             if [ -n "$halo" ]; then
                 inkscape -w $((sz-2*os)) -e ".tmp.png" "$svg" > /dev/null
                 if [ -n "$color" ]; then
-                    mogrify -fill $color -colorize 100% ".tmp.png"
+                    mogrify -fill $color -colorize 100,100,100,0 ".tmp.png"
                 fi
                 mogrify -bordercolor transparent -border ${os}x${os} ".tmp.png"
                 convert -channel RGBA -blur 0x3 ".tmp.png" ".halo.png"
-                mogrify -fill $halo -colorize 100% ".halo.png"
+                mogrify -fill $halo -colorize 100,100,100,0 ".halo.png"
                 convert ".halo.png" ".tmp.png" -gravity Center -composite "$png"
                 rm -f ".halo.png" ".tmp.png"
             else
                 inkscape -w $sz -e "$png" "$svg" > /dev/null
                 if [ -n "$color" ]; then
-                    mogrify -fill $color -colorize 100% "$png"
+                    mogrify -fill $color -colorize 100,100,100,0 "$png"
                 fi
             fi
 	    if ((alpha < 100)); then

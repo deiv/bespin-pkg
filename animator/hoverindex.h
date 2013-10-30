@@ -21,7 +21,8 @@
 
 #include <QBasicTimer>
 #include <QMap>
-#include "../bepointer.h"
+#include <QWeakPointer>
+
 
 namespace Animator {
 
@@ -39,6 +40,8 @@ protected:
    long int index;
 };
 
+typedef QWeakPointer<QWidget> WidgetPtr;
+
 class HoverIndex : public QObject {
    Q_OBJECT
 public:
@@ -53,7 +56,6 @@ protected:
    virtual void timerEvent(QTimerEvent * event);
    QBasicTimer timer;
    uint timeStep, count, maxSteps;
-   typedef QPointer<QWidget> WidgetPtr;
    typedef QMap<WidgetPtr, IndexInfo> Items;
    Items items;
 protected slots:
@@ -63,6 +65,13 @@ private:
 };
 
 }
+
+#ifndef WIDGET_PTR_LESSER
+#define WIDGET_PTR_LESSER
+inline bool operator< (const Animator::WidgetPtr &ptr1, const Animator::WidgetPtr &ptr2) {
+    return ptr1.data() < ptr2.data();
+}
+#endif
 
 #ifndef ANIMATOR_IMPL
 #define ANIMATOR_IMPL 0

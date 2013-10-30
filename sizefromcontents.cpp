@@ -20,6 +20,7 @@
 #include <QStyleOptionComboBox>
 #include <QStyleOptionMenuItem>
 #include <QTabBar>
+#include <QToolBar>
 #include "bespin.h"
 #include "makros.h"
 
@@ -207,10 +208,24 @@ Style::sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize
             h = contentsSize.height() + F(8);
         else
             h = contentsSize.height() + F(4);
-        if (config.btn.tool.connected && (config.btn.tool.frame == Raised || config.btn.tool.frame == Inlay) )
-            h += F(4);
 
-        w = qMax(contentsSize.width() + F(4), h*4/3); // 4/3 - 16/9
+        w = contentsSize.width() + F(4);
+        if (config.btn.tool.connected) {
+            if (toolbutton->icon.isNull()) {
+                if (widget)
+                if (QToolBar *bar = qobject_cast<QToolBar*>(widget->parentWidget()))
+                    h += bar->iconSize().height() - contentsSize.height();
+            }
+            if (config.btn.tool.frame == Sunken) {
+                h += F(2);
+                w += F(4);
+            } else if (config.btn.tool.frame != Relief) {
+                h += F(4);
+                w += F(8);
+            }
+        }
+
+        w = qMax(w + F(4), h*4/3); // 4/3 - 16/9
 
         if (toolbutton && hasMenuIndicator(toolbutton))
             w += pixelMetric(PM_MenuButtonIndicator, option, widget)/* + F(4)*/;

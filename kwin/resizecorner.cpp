@@ -20,6 +20,8 @@
 #include <QPolygon>
 #include <QTimer>
 
+#include "../blib/WM.h"
+
 #ifdef Q_WS_X11
 #include <QX11Info>
 #include <X11/Xlib.h>
@@ -134,8 +136,6 @@ ResizeCorner::eventFilter(QObject *obj, QEvent *e)
     return false;
 }
 
-static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
-
 void
 ResizeCorner::mouseMoveEvent ( QMouseEvent *mev )
 {
@@ -150,27 +150,7 @@ void
 ResizeCorner::mousePressEvent ( QMouseEvent *mev )
 {
     if (mev->button() == Qt::LeftButton)
-    {
-        // complex way to say: client->performWindowOperation(KDecoration::ResizeOp);
-        // stolen... errr "adapted!" from QSizeGrip
-        QX11Info info;
-        QPoint p = mev->globalPos();
-        XEvent xev;
-        xev.xclient.type = ClientMessage;
-        xev.xclient.message_type = netMoveResize;
-        xev.xclient.display = QX11Info::display();
-        xev.xclient.window = client->windowId();
-        xev.xclient.format = 32;
-        xev.xclient.data.l[0] = p.x();
-        xev.xclient.data.l[1] = p.y();
-        xev.xclient.data.l[2] = 4; // _NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHTMove
-        xev.xclient.data.l[3] = Button1;
-        xev.xclient.data.l[4] = 0;
-        XUngrabPointer(QX11Info::display(), QX11Info::appTime());
-        XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
-                    SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-    }
-
+        WM::triggerMoveResize(client->windowId(), mev->globalPos(), WM::BottomRight);
     else if (mev->button() == Qt::RightButton)
         { hide(); QTimer::singleShot(5000, this, SLOT(show())); }
     else if (mev->button() == Qt::MidButton)

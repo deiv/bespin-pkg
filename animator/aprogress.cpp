@@ -55,10 +55,14 @@ Progress::timerEvent(QTimerEvent * event)
     animationUpdate = true;
     for (iter = items.begin(); iter != items.end(); iter++)
     {
-        if (!iter.key()) // not a progressbar - shouldn't be in items, btw...
+        QWidget *w = const_cast<QWidget*>(iter.key().data());
+        if (!w) // not a progressbar - shouldn't be in items, btw...
             { mkProper = true; continue; }
 
-        pb = const_cast<QProgressBar*>(qobject_cast<const QProgressBar*>(iter.key()));
+        if (w->size().isEmpty())
+            continue; // https://bugs.kde.org/show_bug.cgi?id=320759
+
+        pb = qobject_cast<QProgressBar*>(w);
         if (!pb)
             continue; // not a progressbar - shouldn't be in items, btw...
 

@@ -102,16 +102,23 @@ protected:
 //                 setSplitter(0);
             return true;
         }
-        case QEvent::Timer:
+        case QEvent::Timer: {
             if (static_cast<QTimerEvent*>(e)->timerId() != myHoverChecker)
                 return QWidget::event(e);
             if (mouseGrabber() == this)
                 return true;
+            const int d = PADDING - 3;
+            if (rect().adjusted(d,d,-d,-d).contains(mapFromGlobal(QCursor::pos()))) {
+                myHoverCounter = 0;
+                return true;
+            } else
+                ++myHoverCounter;
             //  ===> FALL THROUGH IS INTENDED! We somehow lost a QEvent::Leave and gonna fix that from here!
+        }
         case QEvent::HoverLeave:
         case QEvent::Leave:
 //             QWidget::leaveEvent(e);
-            if (!rect().contains(mapFromGlobal(QCursor::pos())))
+            if (myHoverCounter > 4 || !rect().contains(mapFromGlobal(QCursor::pos())))
                 setSplitter(0);
             return true;
         default:
@@ -159,10 +166,12 @@ protected:
 private:
     void setSplitter(QWidget *splt)
     {
+        myHoverCounter = 0;
         if (!splt)
         {
             if (mouseGrabber() == this)
                 releaseMouse();
+            hide();
             if (QWidget *dad = parentWidget())
             {
                 dad->setUpdatesEnabled(false);
@@ -171,11 +180,11 @@ private:
             }
             if (mySplitter)
             {
+                killTimer(myHoverChecker);
+                myHoverChecker = 0;
                 QHoverEvent he(qobject_cast<QSplitterHandle*>(mySplitter) ? QEvent::HoverLeave : QEvent::HoverMove,
                                mySplitter->mapFromGlobal(QCursor::pos()), myHook);
                 QCoreApplication::sendEvent(mySplitter, &he);
-                killTimer(myHoverChecker);
-                myHoverChecker = 0;
             }
             mySplitter = splt;
             return;
@@ -203,7 +212,7 @@ private:
 private:
     QWidget *mySplitter;
     QPoint myHook;
-    int myHoverChecker;
+    int myHoverChecker, myHoverCounter;
 };
 
 #endif // SPLITTERPROXY_H

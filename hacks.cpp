@@ -16,11 +16,13 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <QAbstractItemView>
 #include <QAbstractScrollArea>
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDesktopWidget>
 #include <QDockWidget>
+#include <QElapsedTimer>
 #include <QEvent>
 #include <QGroupBox>
 #include <QLabel>
@@ -29,7 +31,6 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
-#include "bepointer.h"
 #include <QScrollBar>
 #include <QWindowStateChangeEvent>
 #include <QSlider>
@@ -41,6 +42,7 @@
 #include <QTextDocument>
 #include <QToolBar>
 #include <QToolButton>
+#include <QWeakPointer>
 
 #ifdef Q_WS_X11
 
@@ -60,8 +62,123 @@ static Atom netMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE
 #include <QtDebug>
 #include "blib/colors.h"
 #include "blib/gradients.h"
+#include "blib/WM.h"
 //#include "blib/xproperty.h"
 #include "hacks.h"
+
+namespace Bespin {
+class Panner;
+static Panner *s_pannerInstance = 0;
+
+class Panner : public QObject
+{
+public:
+    static void manage(QWidget *w) {
+        if (!s_pannerInstance)
+            s_pannerInstance = new Panner;
+        else
+            w->removeEventFilter(s_pannerInstance);
+        w->installEventFilter(s_pannerInstance);
+    }
+protected:
+    bool eventFilter(QObject *o, QEvent *e) {
+        switch (e->type()) {
+        case QEvent::MouseMove: {
+            if (notRelevant(e))
+                return false;
+            if (m_panning) {
+                const QPoint pos = static_cast<QMouseEvent*>(e)->pos();
+                bool noClick = !m_click;
+                if (noClick) {
+                    const int dx = pos.x() - m_lastPos.x();
+                    const int dy = pos.y() - m_lastPos.y();
+                    if (QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(o->parent())) {
+                        // dolphin stacks a graphicsview into a view inside a view ...
+                        QAbstractScrollArea *runner = area;
+                        while ((runner = qobject_cast<QAbstractScrollArea*>(runner->parent())))
+                            area = runner;
+
+                        if (dx && area->horizontalScrollBar())
+                            area->horizontalScrollBar()->setValue(area->horizontalScrollBar()->value() - dx);
+                        if (dy && area->verticalScrollBar()) {
+                            area->verticalScrollBar()->setValue(area->verticalScrollBar()->value() - dy);
+                        }
+                    } else { // mostly QWebView
+                        int factor[2] = {1, 1};
+                        if (o->inherits("QWebView")) {
+                            foreach (const QObject *o2, o->children()) {
+                                if (o2->inherits("QWebPage")) {
+                                    foreach (const QObject *o3, o2->children()) {
+                                        if (o3->inherits("QWebFrame")) {
+                                            const QSize sz = o3->property("contentsSize").toSize();
+                                            if (sz.isValid()) {
+                                                const QSize wsz = static_cast<QWidget*>(o)->size();
+                                                factor[0] = qMin(6, qRound(float(sz.width()) / wsz.width()));
+                                                factor[1] = qMin(6, qRound(float(sz.height()) / wsz.height()));
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        if (dy) {
+                            QWheelEvent wev(pos, dy*factor[1], Qt::NoButton, Qt::NoModifier, Qt::Vertical);
+                            QApplication::sendEvent(o, &wev);
+                        }
+                        if (dx) {
+                            QWheelEvent weh(pos, dx*factor[0], Qt::NoButton, Qt::NoModifier, Qt::Horizontal);
+                            QApplication::sendEvent(o, &weh); // "oi wehh"
+                        }
+                    }
+                }
+                m_lastPos = pos;
+                m_click = m_click && qAbs(QPoint(m_startPoint - m_lastPos).manhattanLength()) <  QApplication::startDragDistance();
+                return noClick;
+            }
+            return false;
+        }
+        case QEvent::MouseButtonPress:
+            if (notRelevant(e))
+                return false;
+            if (m_panning) // fake event from us, let it pass
+                return false;
+            if (o == m_lastTarget && m_deadTime.restart() < 333)
+                return false;
+
+            m_lastTarget = o;
+            m_startPoint = m_lastPos = static_cast<QMouseEvent*>(e)->pos();
+            m_click = m_panning = true;
+            m_deadTime.start();
+            return true;
+        case QEvent::MouseButtonRelease: {
+            if (notRelevant(e))
+                return false;
+            if (m_panning && m_click) {
+                QMouseEvent mp(QEvent::MouseButtonPress, m_startPoint, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QApplication::sendEvent(o, &mp);
+            }
+            m_deadTime.start();
+            m_panning = false;
+            return false;
+        }
+        default:
+            return false;
+        }
+    }
+private:
+    bool notRelevant(QEvent *e) {
+        QMouseEvent *me = static_cast<QMouseEvent*>(e);
+        return me->modifiers() != Qt::NoModifier || (me->button() != Qt::LeftButton && me->button() != Qt::NoButton);
+    }
+    QPoint m_startPoint, m_lastPos;
+    bool m_panning, m_click;
+    QObject *m_lastTarget;
+    QElapsedTimer m_deadTime;
+    Panner() : QObject(), m_panning(false), m_click(false), m_lastTarget(0) {}
+};
+} // namepsace
 
 using namespace Bespin;
 
@@ -71,36 +188,13 @@ using namespace Bespin;
 
 static Hacks *bespinHacks = 0L;
 static Hacks::HackAppType *appType = 0L;
-static BePointer<QWidget> dragCandidate = 0L;
-static BePointer<QWidget> dragWidget = 0L;
+static QWeakPointer<QWidget> s_dragCandidate;
+static QWeakPointer<QWidget> s_dragWidget;
 static bool dragWidgetHadTrack = false;
 static QMenu *lockToggleMenu = 0L;
 static QToolBar *lockToggleBar = 0L;
 static QAction *lockToggleAction = 0L;
 static int autoSlideTimer = 0;
-
-static void
-triggerWMMove(const QWidget *w, const QPoint &p)
-{
-#ifdef Q_WS_X11
-   // stolen... errr "adapted!" from QSizeGrip
-   QX11Info info;
-   XEvent xev;
-   xev.xclient.type = ClientMessage;
-   xev.xclient.message_type = netMoveResize;
-   xev.xclient.display = QX11Info::display();
-   xev.xclient.window = w->window()->winId();
-   xev.xclient.format = 32;
-   xev.xclient.data.l[0] = p.x();
-   xev.xclient.data.l[1] = p.y();
-   xev.xclient.data.l[2] = 8; // NET::Move
-   xev.xclient.data.l[3] = Button1;
-   xev.xclient.data.l[4] = 0;
-   XUngrabPointer(QX11Info::display(), QX11Info::appTime());
-   XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
-               SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-#endif // Q_WS_X11
-}
 
 inline static bool
 hackMessageBox(QMessageBox* box, QEvent *e)
@@ -142,7 +236,7 @@ hackMessageBox(QMessageBox* box, QEvent *e)
     {
         QMouseEvent *mev = static_cast<QMouseEvent*>(e);
         if (mev->button() == Qt::LeftButton)
-            triggerWMMove(box, mev->globalPos());
+            WM::triggerMove(box->window()->winId(), mev->globalPos());
         return false;
     }
     case QEvent::Show:
@@ -238,7 +332,7 @@ isWindowDragWidget(QObject *o, const QPoint *pt = 0L)
          (qobject_cast<QToolButton*>(o) && !static_cast<QWidget*>(o)->isEnabled()) ||
          qobject_cast<QToolBar*>(o) || qobject_cast<QDockWidget*>(o) ||
 
-         qobject_cast<QStatusBar*>(o) || (o->inherits("QMainWindow") ) )
+         qobject_cast<QStatusBar*>(o) || o->inherits("QMainWindow") || o->inherits("MplayerLayer") )
         return true;
 
     if ( QLabel *label = qobject_cast<QLabel*>(o) )
@@ -262,6 +356,11 @@ hackMoveWindow(QWidget* w, QEvent *e)
         return false;
     // general validity ================================
     QMouseEvent *mev = static_cast<QMouseEvent*>(e);
+    if (!(mev->buttons() & Qt::LeftButton)) {
+        s_dragWidget.clear();
+        s_dragCandidate.clear();
+        return false; // hanging move - we did not receive a release
+    }
 //         !w->rect().contains(w->mapFromGlobal(QCursor::pos()))) // KColorChooser etc., catched by mouseGrabber ?!
     // avoid if we click a menu action ========================================
     if (QMenuBar *bar = qobject_cast<QMenuBar*>(w))
@@ -297,7 +396,7 @@ hackMoveWindow(QWidget* w, QEvent *e)
         (mev->pos().y() < w->fontMetrics().height()+4 && qobject_cast<QDockWidget*>(w)))
         return false;
 
-    triggerWMMove(w, mev->globalPos());
+    WM::triggerMove(w->window()->winId(), mev->globalPos());
 
     return true;
 }
@@ -307,12 +406,13 @@ hackMoveWindow(QWidget* w, QEvent *e)
 // -> we need a beter image browser :(
 static int gwenview_position = 0;
 static QTextDocument html2text;
-static QPointer<QSlider> s_videoTimerSlider = 0;
-static QPointer<QSlider> s_videoVolumeSlider = 0;
+static QWeakPointer<QSlider> s_videoTimerSlider;
+static QWeakPointer<QSlider> s_videoVolumeSlider;
 static QPoint s_mousePressPos, s_lastMovePos;
 bool
 Hacks::eventFilter(QObject *o, QEvent *e)
 {
+    QWidget *dragWidget = s_dragWidget.data();
     if (dragWidget && e->type() == QEvent::MouseMove)
     {
         qApp->removeEventFilter(this);
@@ -323,8 +423,9 @@ Hacks::eventFilter(QObject *o, QEvent *e)
         QWidget *window = dragWidget->window();
         QCursor::setPos(window->mapToGlobal( window->rect().topRight() ) + QPoint(2, 0) );
         QCursor::setPos(cursor);
-        dragWidget = 0L;
-        dragCandidate = 0L;
+        s_dragWidget.clear();
+        dragWidget = 0;
+        s_dragCandidate.clear();
         return false;
     }
 
@@ -392,37 +493,55 @@ Hacks::eventFilter(QObject *o, QEvent *e)
             lockToggleMenu->popup(QCursor::pos());
             return true;
         }
+        if ( *appType == Okular && config.panning  && w->isWindow() && w->objectName() == "presentationWidget") {
+            QRect r(w->rect());
+            r.setSize(r.size()/3);
+            if (r.contains(mev->pos())) {
+                QWheelEvent wev(mev->pos(), 120, Qt::NoButton, Qt::NoModifier, Qt::Vertical);
+                QApplication::sendEvent(w, &wev);
+            } else {
+                r.moveBottomRight(w->rect().bottomRight());
+                if (r.contains(mev->pos())) {
+                    QWheelEvent wev(mev->pos(), -120, Qt::NoButton, Qt::NoModifier, Qt::Vertical);
+                    QApplication::sendEvent(w, &wev);
+                }
+            }
+            return true;
+        }
         if ( !w || w->mouseGrabber() || // someone else is more interested in this
              (mev->modifiers() != Qt::NoModifier) || // allow forcing e.g. ctrl + click
              (mev->button() != Qt::LeftButton)) // rmb shall not move, maybe resize?!
                 return false;
-        if (isWindowDragWidget(o, &mev->pos()))
+        if (!s_dragCandidate.data() && isWindowDragWidget(o, &mev->pos()))
         {
-            dragCandidate = w;
-            s_mousePressPos = s_lastMovePos = mev->pos();
+            s_dragCandidate = w;
+            s_mousePressPos = mev->pos();
+            s_lastMovePos = mev->pos();
             qApp->installEventFilter(this);
         }
         return false;
     }
 
-    if (dragCandidate && e->type() == QEvent::MouseButtonRelease)
+    QWidget *dragCandidate = s_dragCandidate.data();
+    if (o == dragCandidate && e->type() == QEvent::MouseButtonRelease)
     {   // was just a click
         qApp->removeEventFilter(this);
-        if (*appType == SMPlayer && dragCandidate->window()->isFullScreen() && s_videoTimerSlider) {
-            s_videoTimerSlider->setSliderDown(false);
+        if (*appType == SMPlayer && dragCandidate->window()->isFullScreen() && !s_videoTimerSlider.isNull()) {
+            s_videoTimerSlider.data()->setSliderDown(false);
         }
         killTimer(autoSlideTimer);
         autoSlideTimer = 0;
-        dragCandidate = 0L;
+        s_dragCandidate.clear();
+        dragCandidate = 0;
         return false;
     }
 
-    if (dragCandidate && e->type() == QEvent::MouseMove) // gonna be draged
+    if (o == dragCandidate && e->type() == QEvent::MouseMove) // gonna be draged
     {   // we perhaps want to drag
         const bool wmDrag = hackMoveWindow(dragCandidate, e);
         if ( wmDrag )
         {
-            dragWidget = dragCandidate;
+            s_dragWidget = dragWidget = dragCandidate;
 
             // the release would set "dragCandidate = 0L;", therfore it cannot be done in hackMoveWindow
             // it's probably not required either
@@ -439,12 +558,11 @@ Hacks::eventFilter(QObject *o, QEvent *e)
             int dx = qAbs(diff.x()), dy = qAbs(diff.y());
             const int w = 64, h = 64;
             if (dx > w && dy < h) {
-                if (s_videoTimerSlider) {
-                    dx = ((mev->pos().x() - s_lastMovePos.x()) * (s_videoTimerSlider->maximum() - s_videoTimerSlider->minimum())) /
-                                                                                            (dragCandidate->window()->width());
+                if (QSlider *slider = s_videoTimerSlider.data()) {
+                    dx = ((mev->pos().x() - s_lastMovePos.x()) * (slider->maximum() - slider->minimum())) / (dragCandidate->window()->width());
                     if (dx) {
-                        s_videoTimerSlider->setSliderDown(true);
-                        s_videoTimerSlider->setSliderPosition(s_videoTimerSlider->sliderPosition() + dx);
+                        slider->setSliderDown(true);
+                        slider->setSliderPosition(slider->sliderPosition() + dx);
                         s_lastMovePos = mev->pos();
                         killTimer(autoSlideTimer);
                         autoSlideTimer = startTimer(250);
@@ -452,18 +570,19 @@ Hacks::eventFilter(QObject *o, QEvent *e)
                 }
             }
             else if (dx < w && dy > h) {
-                if (s_videoVolumeSlider) {
-                    dy = ((mev->pos().y() - s_lastMovePos.y()) * (s_videoVolumeSlider->maximum() - s_videoVolumeSlider->minimum())) /
-                                                                                            (dragCandidate->window()->height());
+                if (QSlider *slider = s_videoVolumeSlider.data()) {
+                    dy = ((mev->pos().y() - s_lastMovePos.y()) * (slider->maximum() - slider->minimum())) / (dragCandidate->window()->height());
                     if (dy) {
-                        s_videoVolumeSlider->setValue(s_videoVolumeSlider->value() - dy);
+                        slider->setValue(slider->value() - dy);
                         s_lastMovePos = mev->pos();
                     }
                 }
             }
         }
-        else
+        else {
+            s_dragCandidate.clear();
             dragCandidate = 0L;
+        }
         return wmDrag;
     }
 
@@ -593,6 +712,8 @@ Hacks::add(QWidget *w)
         appType = new HackAppType((HackAppType)Unknown);
         if (qApp->inherits("GreeterApp")) // KDM segfaults on QCoreApplication::arguments()...
             *appType = KDM;
+        else if (QCoreApplication::applicationName() == "okular")
+            *appType = Okular;
         else if (QCoreApplication::applicationName() == "gwenview")
             *appType = Gwenview;
         else if (QCoreApplication::applicationName() == "smplayer" ||
@@ -605,16 +726,14 @@ Hacks::add(QWidget *w)
     if (w->isWindow())
     {
         ENSURE_INSTANCE;
-        w->removeEventFilter(bespinHacks); // just to be sure
-        w->installEventFilter(bespinHacks);
+        FILTER_EVENTS(w);
     }
 
     if (config.messages && qobject_cast<QMessageBox*>(w))
     {
         ENSURE_INSTANCE;
         w->setWindowFlags ( Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint | Qt::FramelessWindowHint);
-        w->removeEventFilter(bespinHacks); // just to be sure
-        w->installEventFilter(bespinHacks);
+        FILTER_EVENTS(w);
         return true;
     }
 
@@ -646,9 +765,8 @@ Hacks::add(QWidget *w)
         }
     }
 
-    if ( *appType == SMPlayer /*&& config.*/  )
+    if ( *appType == SMPlayer && config.panning  )
     if (QSlider *slider = qobject_cast<QSlider*>(w)) {
-        qDebug() << "BESPIN" << slider << slider->parentWidget();
     if (slider->parentWidget() && slider->parentWidget()->objectName() == "controlwidget")
     {
         if (slider->inherits("TimeSlider"))
@@ -656,6 +774,11 @@ Hacks::add(QWidget *w)
         else if (slider->inherits("MySlider"))
             s_videoVolumeSlider = slider;
     }
+    }
+
+    if ( *appType == Okular && config.panning  && w->isWindow() && w->objectName() == "presentationWidget") {
+        ENSURE_INSTANCE;
+        FILTER_EVENTS(w);
     }
 
 //     if ( w->objectName() == "qt_scrollarea_viewport" )
@@ -695,6 +818,25 @@ Hacks::add(QWidget *w)
         frame->setAutoFillBackground(true);
         FILTER_EVENTS(label);
     }
+
+    if (config.panning) {
+        if ( QAbstractScrollArea *area = qobject_cast<QAbstractScrollArea*>(w) ) {
+            if (QAbstractItemView *view = qobject_cast<QAbstractItemView*>(area)) {
+            if (!view->inherits("QHeaderView")) {
+                view->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+                view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+                Panner::manage(area->viewport());
+            }
+            } else if (area->inherits("QTextEdit"))
+                Panner::manage(area->viewport());
+            else if (area->parentWidget() && area->parentWidget()->parentWidget() &&
+                QString(area->parentWidget()->parentWidget()->metaObject()->className()).startsWith("Dolphin"))
+                Panner::manage(area->viewport());
+//             else
+//                 qDebug() << area << area->parentWidget();
+        } else if (w->inherits("QWebView"))
+            Panner::manage(w);
+    }
 #if 0
     ENSURE_INSTANCE;
     FILTER_EVENTS(w);
@@ -721,9 +863,11 @@ void
 Hacks::timerEvent(QTimerEvent *te)
 {
     if (te->timerId() == autoSlideTimer) {
-        if (*appType == SMPlayer && dragCandidate && dragCandidate->window()->isFullScreen() && s_videoTimerSlider) {
-            s_videoTimerSlider->setSliderDown(false);
-            s_videoTimerSlider->setSliderDown(true);
+        if (*appType == SMPlayer && s_dragCandidate.data() && s_dragCandidate.data()->window()->isFullScreen()) {
+            if (QSlider *slider = s_videoTimerSlider.data()) {
+                slider->setSliderDown(false);
+                slider->setSliderDown(true);
+            }
         }
         killTimer(autoSlideTimer);
         autoSlideTimer = 0;

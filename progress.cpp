@@ -180,7 +180,7 @@ Style::drawProgressBar(const QStyleOption *option, QPainter *painter, const QWid
     ASSURE_OPTION(pb, ProgressBar);
     OPT_HOVER
 
-    bool listView = (!widget && (appType == KGet || appType == KTorrent)) || qobject_cast<const QAbstractItemView*>(widget);
+    bool listView = (!widget && (appType == KGet || appType == KTorrent || appType == Apper)) || qobject_cast<const QAbstractItemView*>(widget);
     if (listView || RECT.height() < F(9)) // if things get tiny, text will not work, neither will the dots be really visible
     {   // kinda inline progress in itemview (but unfortunately kget doesn't send a widget)
         drawSimpleProgress(pb, painter, widget, listView);

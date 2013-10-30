@@ -19,13 +19,15 @@
 #ifndef BESPIN_STYLE_H
 #define BESPIN_STYLE_H
 
-class QAbstractItemView;
+class QAbstractScrollArea;
 class QSettings;
 class QStyleOptionToolButton;
 class QToolBar;
 
 #include <QCommonStyle>
 #include <QStyleOption>
+#include <QStyleOptionButton>
+#include <QStyleOptionMenuItem>
 
 #include "blib/gradients.h"
 #include "blib/tileset.h"
@@ -47,6 +49,8 @@ typedef struct _WindowData WindowData;
 #endif
 
 class EventKiller : public QObject { public: bool eventFilter( QObject *, QEvent *) { return true; } };
+
+enum KStyleFeatureRequest { Shadow = 1<<0, NoShadow = 1<<1, Blur = 1<<2, NoBlur = 1<<3, NoARGB = 1<<4, DragWidget = 1<<5, NoDragWidget = 1<<6 };
 
 class
 #ifndef Q_WS_WIN
@@ -285,7 +289,8 @@ private:
     void drawSliderHandle(const QRect &, const QStyleOption *, QPainter *, int step) const;
     int elementId(const QString &string) const;
     void erase(const QStyleOption*, QPainter*, const QWidget*, const QPoint *off = 0) const;
-    static void fixViewPalette(QAbstractItemView *itemView, int style, bool alternate, bool silent = false);
+    bool fakeMenuItem(const QStyleOptionButton*, QPainter*, const QWidget*, QStyleOptionMenuItem::CheckType type) const;
+    static void fixViewPalette(QAbstractScrollArea *itemView, int style, bool alternate, bool silent = false);
     void generatePixmaps();
     static bool hasMenuIndicator(const QStyleOptionToolButton *tb);
     void initMetrics();

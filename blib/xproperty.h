@@ -51,6 +51,7 @@ public:
     static Atom winData, bgPics, decoDim, pid, blurRegion,
                 forceShadows, kwinShadow, bespinShadow[2],
                 netSupported, blockCompositing;
+    static void init();
 
     template <typename T> inline static T *get(WId window, Atom atom, Type type, unsigned long *n = 0)
     {

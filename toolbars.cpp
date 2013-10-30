@@ -196,7 +196,7 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
     {
         QToolBar *tb = static_cast<QToolBar*>(widget->parentWidget()); // guaranteed by "connected", see above
         OPT_SUNKEN
-        const bool round = RECT.height() > 30 || config.btn.tool.frame > Relief;
+        bool round = (RECT.height() > 16) && (RECT.height() > 30 || config.btn.tool.frame > Relief);
         const bool sameRoles = config.btn.tool.std_role[Bg] == config.btn.tool.active_role[Bg];
         Gradients::Type gt = sunken ? Gradients::Sunken : GRAD(btn.tool);
 
@@ -219,8 +219,6 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
             if ( sameRoles ) gt = Gradients::Sunken; // sunken dark active - mac-a-like
         }
 
-        if (Colors::value(c) < 50)
-            { int h,s,v,a; c.getHsv(&h, &s, &v, &a); c.setHsv(h, s, 50, a); }
         if (step)
             c = Colors::mid(c, c2, 18-step, step);
 
@@ -256,9 +254,11 @@ Style::drawToolButtonShape(const QStyleOption *option, QPainter *painter, const 
             const int f1 = F(1);
             if (config.btn.tool.frame == Inlay) {
                 QColor sc = config.UNO.toolbar ? tb->palette().color(tb->backgroundRole()) : windowColor(widget);
-                if (config.btn.backLightHover)
-                    sc = Colors::mid(sc, c, 4, 3);
+                if (config.btn.backLightHover) {
+                    sc = Colors::mid(sc, c, 30, qMax(10,40-Colors::contrast(sc, c)));
+                }
                 masks.rect[true].render(rect, painter, Gradients::Sunken, Qt::Vertical, sc);
+                round = round && (rect.height() - 6 > 16);
                 const int f3 = F(3);
                 if (round)
                     rect.adjustConditionally(F(4), f3, -F(4), -f3);

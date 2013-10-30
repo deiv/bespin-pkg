@@ -22,6 +22,7 @@
 #include <QAbstractScrollArea>
 #include <QApplication>
 #include <QTimer>
+#include <QtDebug>
 #include "draw.h"
 #include "animator/hover.h"
 #include "animator/hovercomplex.h"
@@ -269,7 +270,7 @@ Style::drawScrollBar(const QStyleOptionComplex *option, QPainter *painter, const
         if (config.scroll.groove == Groove::None)
             optCopy.rect.adjust(F(2),F(2),-F(2),-F(2));
         else if (grooveIsSunken)
-            optCopy.rect.adjust(-F(1),-F(1),F(1),0);
+            optCopy.rect.adjust(-F(2),-F(2),F(2),F(1));
 
         if (optCopy.rect.isValid())
         {
@@ -472,7 +473,7 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
     const bool backLightHover = config.btn.backLightHover && config.scroll.groove != Groove::None &&
                                 config.scroll.sliderWidth > F(10) &&
                                 qAbs(fgC.red()-bgC.red()) + qAbs(fgC.green()-bgC.green())+ qAbs(fgC.blue()-bgC.blue()) > 90;
-
+#if 0
     if ( !backLightHover && widget && widget->isActiveWindow() )
     {
         if ( complexStep )
@@ -480,7 +481,14 @@ Style::drawScrollBarSlider(const QStyleOption *option, QPainter *painter, const 
         else if (!hover)
             { hover = !widgetStep; bgC = CCOLOR(scroll._, Fg); fgC = CCOLOR(scroll._, Bg); }
     }
-
+#else
+    if ( !backLightHover && widget && widget->isActiveWindow() ) {
+        if (!widgetStep)
+            widgetStep = 2;
+        else if (!(hover || scrollAreaHovered_))
+            widgetStep = qMax(2, widgetStep);
+    }
+#endif
     if (sunken) {
         c = SCROLL_COLOR(6);
         complexStep = 6;

@@ -12,7 +12,7 @@ SOURCES = animator/basic.cpp animator/aprogress.cpp animator/hover.cpp \
           pixelmetric.cpp stdpix.cpp  visualframe.cpp init.cpp genpixmaps.cpp polish.cpp \
           buttons.cpp docks.cpp frames.cpp input.cpp menus.cpp progress.cpp \
           scrollareas.cpp indicators.cpp slider.cpp tabbing.cpp toolbars.cpp \
-          views.cpp window.cpp hacks.cpp
+          views.cpp window.cpp hacks.cpp revision.cpp
           
 
 TEMPLATE = lib

@@ -50,6 +50,22 @@ Shapes::close(const QRectF &bound, Style style)
         path.addEllipse(bound);
         path.addEllipse(bound.adjusted(s8,s8,-s8,-s8));
         path.addEllipse(bound.adjusted(s4,s4,-s4,-s4));
+        break;
+    case Simple: {
+        QRectF inner(bound);
+        QPointF c = inner.center();
+        inner.adjust(3*s8,3*s8,-3*s8,-3*s8);
+        path.moveTo(bound.topLeft());
+        path.lineTo(c.x(), inner.top());
+        path.lineTo(bound.topRight());
+        path.lineTo(inner.right(), c.y());
+        path.lineTo(bound.bottomRight());
+        path.lineTo(c.x(), inner.bottom());
+        path.lineTo(bound.bottomLeft());
+        path.lineTo(inner.left(), c.y());
+        path.closeSubpath();
+        break;
+    }
     }
     return path;
 }
@@ -87,6 +103,18 @@ Shapes::min(const QRectF &bound, Style style)
         path.closeSubpath();
         path.addEllipse(bound.adjusted(s4,s4,-s4,-s4));
         break;
+    case Simple:
+    {
+        QRectF inner(bound);
+        QPointF c = inner.center();
+        inner.adjust(0,3*s8,0,-3*s8);
+        path.moveTo(bound.x(), c.y());
+        path.lineTo(c.x(), inner.top());
+        path.lineTo(bound.right(), c.y());
+        path.lineTo(c.x(), inner.bottom());
+        path.closeSubpath();
+        break;
+    }
     }
     return path;
 }
@@ -145,6 +173,21 @@ Shapes::max(const QRectF &bound, Style style)
         path.closeSubpath();
         path.addEllipse(bound.adjusted(s4,s4,-s4,-s4));
         break;
+    case Simple: {
+        QRectF inner(bound);
+        QPointF c = inner.center();
+        inner.adjust(3*s8,3*s8,-3*s8,-3*s8);
+        path.moveTo(c.x(), bound.top());
+        path.lineTo(inner.topRight());
+        path.lineTo(bound.right(), c.y());
+        path.lineTo(inner.bottomRight());
+        path.lineTo(c.x(), bound.bottom());
+        path.lineTo(inner.bottomLeft());
+        path.lineTo(bound.left(), c.y());
+        path.lineTo(inner.topLeft());
+        path.closeSubpath();
+        break;
+    }
     }
     return path;
 }
@@ -158,6 +201,7 @@ Shapes::dockControl(const QRectF &bound, bool floating, Style style)
     {
     case Square:
     case LasseKongo:
+    case Simple:
         if (floating)
             path.addRect(bound.adjusted(0, s4, 0, -s4));
         else
@@ -220,6 +264,18 @@ Shapes::restore(const QRectF &bound, Style style)
         path.closeSubpath();
         path.addEllipse(bound.adjusted(s4,s4,-s4,-s4));
         break;
+    case Simple: {
+        QRectF inner(bound);
+        QPointF c = inner.center();
+        inner.adjust(3*s8,3*s8,-3*s8,-3*s8);
+        path.moveTo(bound.right(), c.y());
+        path.lineTo(inner.bottomRight());
+        path.lineTo(c.x(), bound.bottom());
+        path.lineTo(inner.bottomLeft());
+        path.lineTo(bound.left(), c.y());
+        path.closeSubpath();
+        break;
+    }
     }
     return path;
 }
@@ -248,6 +304,7 @@ Shapes::stick(const QRectF &bound, Style style)
     default:
     case Round:
     case TheRob:
+    case Simple:
         path.addEllipse(bound.adjusted(s6, s6, -s6, -s6));
         break;
     }
@@ -268,6 +325,7 @@ Shapes::unstick(const QRectF &bound, Style style)
     default:
     case Round:
     case TheRob:
+    case Simple:
         path.addEllipse(bound.adjusted(s3, s3, -s3, -s3));
         break;
     }
@@ -283,6 +341,7 @@ Shapes::keepAbove(const QRectF &bound, Style style)
     {
     case Square:
     case LasseKongo:
+    case Simple:
         path.addRect(bound.adjusted(s4, 0, -s4, -2*s3));
         path.addRect(bound.adjusted(0, 2*s3, -2*s3, 0));
         path.addRect(bound.adjusted(2*s3, 2*s3, 0, 0));
@@ -317,6 +376,7 @@ Shapes::keepBelow(const QRectF &bound, Style style)
     {
     case Square:
     case LasseKongo:
+    case Simple:
         path.addRect(bound.adjusted(s4, 2*s3, -s4, 0));
         path.addRect(bound.adjusted(0, 0, -2*s3, -2*s3));
         path.addRect(bound.adjusted(2*s3, 0, 0, -2*s3));
@@ -349,6 +409,7 @@ Shapes::unAboveBelow(const QRectF &bound, Style style)
     {
         case Square:
         case LasseKongo:
+        case Simple:
             path.addRect(bound.adjusted(0, s4, -2*s3, -s4));
             path.addRect(bound.adjusted(2*s3, s4, 0, -s4));
             break;
@@ -376,6 +437,7 @@ Shapes::menu(const QRectF &bound, bool leftSide, Style style)
     switch (style)
     {
     case Square:
+    case Simple:
     {
         _S(4)
         path.addRect(bound);
@@ -412,6 +474,7 @@ Shapes::help(const QRectF &bound, Style style)
     {
     case Square:
     case LasseKongo:
+    case Simple:
         path.addRect(bound.adjusted(s2-s3, 0, -s4 , -s3));
         path.addRect(bound.adjusted(s2-s3, s4, -s2 , -s3));
         path.addRect(bound.adjusted(s2, 5*s6, -s4 , 0));
@@ -436,6 +499,7 @@ Shapes::shade(const QRectF &bound, Style style)
     {
     case Square:
     case LasseKongo:
+    case Simple:
         path.addRect(bound.adjusted(0, s3, 0, -s3));
         break;
     default:
@@ -456,6 +520,7 @@ Shapes::unshade(const QRectF &bound, Style style)
     {
     case Square:
     case LasseKongo:
+    case Simple:
         path.addRect(bound.adjusted(0, s3, 0, -s3));
         break;
     default:
@@ -487,6 +552,7 @@ Shapes::exposee(const QRectF &bound, Style style)
     default:
     case Round:
     case TheRob:
+    case Simple:
         path.addEllipse(rect);
         path.addEllipse(rect.translated(d,0));
         path.addEllipse(rect.translated(0,d));
@@ -511,10 +577,48 @@ Shapes::info(const QRectF &bound, Style style)
     default:
     case Round:
     case TheRob:
+    case Simple:
         path.addEllipse(bound.adjusted(s3, 0, -s3, -2*s3));
         path.addEllipse(bound.adjusted(s3, s3, -s3, 0));
         break;
     }
+    return path;
+}
+
+QPainterPath
+Shapes::moveResize(const QRectF &bound, Style)
+{
+    _S(8)
+    QPainterPath path;
+    QRectF inner(bound);
+    QPointF c = inner.center();
+    inner.adjust(3*s8,3*s8,-3*s8,-3*s8);
+    QRectF mid(bound);
+    mid.adjust(2*s8,2*s8,-2*s8,-2*s8);
+
+    path.moveTo(mid.topLeft());
+
+    path.lineTo(inner.x(), mid.top());
+    path.lineTo(c.x(), bound.top());
+    path.lineTo(inner.right(), mid.top());
+    path.lineTo(mid.topRight());
+
+    path.lineTo(mid.right(), inner.top());
+    path.lineTo(bound.right(), c.y());
+    path.lineTo(mid.right(), inner.bottom());
+    path.lineTo(mid.bottomRight());
+
+    path.lineTo(inner.right(), mid.bottom());
+    path.lineTo(c.x(), bound.bottom());
+    path.lineTo(inner.x(), mid.bottom());
+    path.lineTo(mid.bottomLeft());
+
+    path.lineTo(mid.x(), inner.bottom());
+    path.lineTo(bound.x(), c.y());
+    path.lineTo(mid.x(), inner.top());
+
+    path.closeSubpath();
+    path.addEllipse(inner);
     return path;
 }
 

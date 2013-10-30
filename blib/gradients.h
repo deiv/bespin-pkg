@@ -90,7 +90,12 @@ BLIB_EXPORT const QPixmap &bevel(bool ltr = true);
 /** a vertical N -> S light */
 BLIB_EXPORT const QPixmap &light(int height);
 
-BLIB_EXPORT const QPixmap &structure(const QColor &c, bool light = false);
+/** A background tile.
+ *NOTICE: passing a regular type will bypass caching
+  NOTICE: the Pixmap is created on the HEAP then, ie. the reference is a pointer!!!!!
+  NOTICE: you have to maintain the HEAP structure ie. delete the referece once no longer needed !!!!!
+  NOTICE: const QPixmap &pix = Gradients::structure(c, false, 0); doFancy(pix); delete &pix; !!!!!! **/
+BLIB_EXPORT const QPixmap &structure(QColor c, bool light = false, int type = -1, int intensity = -1);
 
 /** pulls a background pixmap set out of a (limited) cache - creates it if necessary */
 BLIB_EXPORT const BgSet &bgSet(const QColor &c);

@@ -92,7 +92,7 @@ HoverComplex::timerEvent(QTimerEvent * event)
     ComplexInfo *info;
     while (it != items.end())
     {
-        if (!it.key())
+        if (it.key().isNull())
         {
             it = items.erase(it);
             continue;
@@ -119,7 +119,7 @@ HoverComplex::timerEvent(QTimerEvent * event)
                 }
             }
         if (update)
-            it.key()->update();
+            it.key().data()->update();
         if (info->active == QStyle::SC_None && // needed to detect changes!
                                                 info->fades[Out] == QStyle::SC_None &&
                                                 info->fades[In] == QStyle::SC_None)

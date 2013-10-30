@@ -64,7 +64,18 @@ Basic::_release(QWidget *w)
 {
     if (w)
         w->removeEventFilter(instance);
-    items.remove(w);
+    Items::iterator it = items.begin(), end = items.end();
+    while (it != end) {
+        if (it.key().isNull()) {
+            it = items.erase(it);
+            continue;
+        }
+        if (it.key().data() == w) {
+            items.erase(it);
+            break;
+        }
+        ++it;
+    }
     if (noAnimations())
     {
         timer.stop();
@@ -129,7 +140,7 @@ Basic::timerEvent(QTimerEvent * event)
     Items::iterator it = items.begin();
     while (it != items.end())
     {
-        w = it.key();
+        w = it.key().data();
         if (!w)
         {
             it = items.erase(it);

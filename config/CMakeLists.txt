@@ -6,7 +6,7 @@
 # project (bespin-config)
 # add_definitions ( -DB_EXPORT=Q_DECL_EXPORT )
 
-set (bespin_config_SOURCES bconfig.cpp config.cpp kdeini.cpp)
+set (bespin_config_SOURCES bconfig.cpp config.cpp kdeini.cpp ../revision.cpp)
 
 qt4_add_resources (bespin_config_SOURCES)
 qt4_wrap_ui (bespin_config_FRM_HDRS config.ui)

@@ -39,8 +39,9 @@ Installation Instructions
 a) YOU HAVE CMAKE
 b) YOU DON'T HAVE CMAKE
 c) YOU WANT A .DEB PACKAGE (-> ./builddeb.sh)
-d) YOU HAVE ABSOLUTELY NO IDEA
-e) YOU STILL HAVE TROUBLE
+d) YOU WANT AN ARCH PACKAGE
+e) YOU HAVE ABSOLUTELY NO IDEA
+f) YOU STILL HAVE TROUBLE
 
 ----------------------------
 
@@ -115,11 +116,25 @@ c) YOU WANT A .DEB PACKAGE =====================================================
 
 You can directly create debian/ubuntu packages by using the builddep.sh script, which will
 create a package named kde-style-bespin that can be installed using the dpkg command.
-This requires the debhelper scripts beyound _cmake_ and _all_libs_mentioned_above_ to be installed!
+This requires the debhelper scripts *next*to* _cmake_ and _all_libs_mentioned_above_ to be installed!
 
 -----------
 
-d) YOU HAVE ABSOLUTELY NO IDEA ==============================================================
+d) YOU WANT An ARCH PACKAGE =================================================================
+
+You're using archlinux and need to look this up? LIAR! ;-)
+Ok, assuming you are a new Archlinux user and want to have bespin before anything else:
+- make sure to install all development tools - Arch should ship headers with libraries,
+so you don't need extra packages if you can run KDE at all.
+- run "makepkg" (the PKGBUILD shipped with bespin does NOT auto "svn up" so you build what you have right now)
+- install the package "sudo pacman -U bespin-1-1-i686.pkg.tar.xz"
+
+Q: the command is pacman -S ... isn't it?
+A: no, not for local packages. Cannot be S-ynced, but only U-pdated
+
+-----------
+
+e) YOU HAVE ABSOLUTELY NO IDEA ==============================================================
 
 If you don't know anything about your environment or cmake or stuff, you can call the config script
 provided with Bespin
@@ -148,7 +163,7 @@ to NOPASSWD in visudo - or you are allready root (i discourage BOTH as permanent
 
 -----------
 
-d) YOU STILL HAVE TROUBLE ====================================================================
+f) YOU STILL HAVE TROUBLE ====================================================================
 
 May be your fault, may be mine - no problem, though.
 

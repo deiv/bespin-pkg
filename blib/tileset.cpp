@@ -47,7 +47,6 @@
 using namespace Tile;
 
 // some static elements (benders)
-static QPixmap nullPix;
 static PosFlags _shape = 0;
 static const QPixmap *_texPix = 0;
 static const QColor *_texColor = 0;
@@ -281,8 +280,8 @@ if (!tile->isNull())\
         w -= width(TopRight);
         if (pf & (Top | Bottom) && trh + brh > r.height())
         {   // vertical edge overlap
-            trh = (trh*r.height())/(trh+brh);
-            brh = r.height() - trh;
+            tlh = trh = (trh*r.height())/(trh+brh);
+            blh = brh = r.height() - trh;
         }
     }
 
@@ -439,6 +438,7 @@ const QPixmap &Set::corner(PosFlags pf) const
       return pixmap[BtmLeft];
 
    qWarning("requested impossible corner %d",pf);
+   static QPixmap nullPix;
    return nullPix;
 }
 

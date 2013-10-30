@@ -46,8 +46,9 @@ typedef struct _Preset
 typedef struct
 {
     bool    forceUserColors, trimmCaption, resizeCorner, roundCorners, hideInactiveButtons,
-            verticalTitle, variableShadowSizes, buttonnyButton, forceBorderLines, invertedButtons;
-    int slickButtons, titleAlign;
+            verticalTitle, variableShadowSizes, buttonnyButton, forceBorderLines, invertedButtons,
+            embossTitle;
+    int slickButtons, titleAlign, buttonDepth;
     Gradients::Type gradient[2][2], buttonGradient;
     QStringList smallTitleClasses;
 } Config;
@@ -89,6 +90,7 @@ public:
     inline static bool verticalTitle() { return ourConfig.verticalTitle; }
 protected:
     static BgSet *bgSet(const QColor &c, bool vertical, int intensity, qint64 *hash = 0);
+    static const QPixmap &structure(const QColor &c, int type, int intensity);
     static void forget(qint64 pid);
     static void kickBgSet(qint64 hash);
     static void learn(qint64 pid, QByteArray data);
@@ -100,7 +102,7 @@ private:
 private slots:
     void cleanUp();
     void postInit();
-    void updateCompositingState(bool);
+    void updateCompositingState();
 private:
     static Qt::KeyboardModifier ourCommandKey;
     static QHash<qint64, WindowData*> ourDecoInfos;

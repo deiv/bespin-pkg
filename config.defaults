@@ -31,7 +31,7 @@
 #define ARGB_BLUR "Bg.Blur", false
 
 #define BG_INTENSITY "Bg.Intensity", 10
-#define BG_MINVALUE "Bg.MinValue", 70
+#define BG_MINVALUE "Bg.MinValue", 48
 #define BG_DOCKS_INVERT "Bg.Docks.Invert", false
 #define BG_DOCKS_SHAPE "Bg.Docks.Shape", true
 #define BG_MODE "Bg.Mode", Gradients::BevelV
@@ -83,6 +83,7 @@
 #define HACK_KHTMLVIEW "Hack.KHTMLView", false
 // yes - "true" by default since a terminal w/o scanlines is no terminal at all ;-)
 #define HACK_KRUNNER "Hack.KRunner", false
+#define HACK_PANNING "Hack.Panning", false
 #define HACK_SUSPEND_FULLSCREEN_PLAYERS "Hack.SuspendFSPlayers", false
 #define HACK_THROBBER "Hack.KillThrobber", false
 // yes - "true" by default since they're dead ugly
@@ -99,6 +100,7 @@
 #define KWIN_ACTIVE_GRADIENT "KWin.ActiveGradient", Gradients::Button
 #define KWIN_INACTIVE_TEXT_ROLE "KWin.InactiveText", QPalette::WindowText
 #define KWIN_ACTIVE_TEXT_ROLE "KWin.ActiveText", QPalette::WindowText
+#define KWIN_USE_TILES "KWin.UseTiles", true
 
 #define MENU_DELAY "Menu.Delay", 96
 #define MENU_GLASSY "Menu.Glassy", true
@@ -119,12 +121,14 @@
 #define ROUNDNESS "Roundness", 100
 
 #define SHADOW_COLOR "ShadowColor", QColor(0,0,0,255)
+#define HALO_COLOR "HaloColor", QColor(255,255,255,255)
 #define SHADOW_IS_HALO "ShadowIsHalo", false
 #define SHADOW_SIZE_INACTIVE "InactiveShadowSize", 12
 #define SHADOW_SIZE_ACTIVE "ActiveShadowSize", 48
 #define SHADOW_TITLEBAR "ShadowTitlebar", false
 #define SHOW_MNEMONIC "ShowMnemonic", false
 #define SHOW_OFF "ShowOff", false
+#define STRIKE_DISABLED "StrikeDisabled", false
 
 #define PROGRESS_GRADIENT "Progress.Gradient", Gradients::Button
 #define PROGRESS_ROLE_BG "Progress.RoleBg", QPalette::WindowText

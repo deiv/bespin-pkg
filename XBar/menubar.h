@@ -54,6 +54,7 @@ public:
     inline void setAppTitle(const QString &title) { d.appTitle = title; }
     static void setGlowColor(QColor bg);
     QGraphicsView *view() const;
+    static int firstElementWeight;
 signals:
     void hovered(int);
     void triggered(int);

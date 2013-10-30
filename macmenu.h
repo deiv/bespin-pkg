@@ -21,7 +21,8 @@
 
 #include <QMap>
 #include <QObject>
-#include "bepointer.h"
+#include <QStringList>
+#include <QWeakPointer>
 
 class QMenuBar;
 class QAction;
@@ -51,6 +52,7 @@ public:
     void hover(qlonglong key, int idx,  int x, int y);
     void popDown(qlonglong key);
     void raise(qlonglong key);
+    typedef QWeakPointer<QMenuBar> QMenuBar_p;
 public slots:
     void activate();
     void deactivate();
@@ -66,13 +68,13 @@ private:
     void activate(QMenuBar *menu);
     void changeAction(QMenuBar *menu, QActionEvent *ev);
     void deactivate(QMenuBar *menu);
-    typedef BePointer<QMenuBar> QMenuBar_p;
     typedef QList<QMenuBar_p> MenuList;
     MenuList items;
     QMenuBar *menuBar(qlonglong key);
     QMap< QMenuBar_p, QList<QAction*> > actions;
     bool usingMacMenu;
     QString service;
+    QStringList m_titleSeperators;
 private slots:
     void menuClosed();
     void _release(QObject *);

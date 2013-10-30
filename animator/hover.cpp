@@ -150,7 +150,7 @@ Hover::timerEvent(QTimerEvent * event)
     QWidget *widget = 0;
     while (it != items.end())
     {
-        widget = it.key();
+        widget = it.key().data();
         if (!widget)
         {
             it = items.erase(it);

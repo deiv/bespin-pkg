@@ -24,19 +24,38 @@ using namespace Bespin;
 #include <X11/Xatom.h>
 #include <QX11Info>
 
-BLIB_EXPORT Atom XProperty::winData = XInternAtom(QX11Info::display(), "BESPIN_WIN_DATA", False);
-BLIB_EXPORT Atom XProperty::bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", False);
-BLIB_EXPORT Atom XProperty::decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
-BLIB_EXPORT Atom XProperty::pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
-BLIB_EXPORT Atom XProperty::blurRegion = XInternAtom(QX11Info::display(), "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
-BLIB_EXPORT Atom XProperty::forceShadows = XInternAtom( QX11Info::display(), "_KDE_SHADOW_FORCE", False );
-BLIB_EXPORT Atom XProperty::kwinShadow = XInternAtom( QX11Info::display(), "_KDE_NET_WM_SHADOW", False );
+BLIB_EXPORT Atom XProperty::winData;
+BLIB_EXPORT Atom XProperty::bgPics;
+BLIB_EXPORT Atom XProperty::decoDim;
+BLIB_EXPORT Atom XProperty::pid;
+BLIB_EXPORT Atom XProperty::blurRegion;
+BLIB_EXPORT Atom XProperty::forceShadows;
+BLIB_EXPORT Atom XProperty::kwinShadow;
 //     const char* const ShadowHelper::netWMForceShadowPropertyName( "_KDE_NET_WM_FORCE_SHADOW" );
 //     const char* const ShadowHelper::netWMSkipShadowPropertyName( "_KDE_NET_WM_SKIP_SHADOW" );
-BLIB_EXPORT Atom XProperty::bespinShadow[2] = { XInternAtom( QX11Info::display(), "BESPIN_SHADOW_SMALL", False ),
-                                                XInternAtom( QX11Info::display(), "BESPIN_SHADOW_LARGE", False ) };
-BLIB_EXPORT Atom XProperty::netSupported = XInternAtom( QX11Info::display(), "_NET_SUPPORTED", False );
-BLIB_EXPORT Atom XProperty::blockCompositing = XInternAtom( QX11Info::display(), "_KDE_NET_WM_BLOCK_COMPOSITING", False );
+BLIB_EXPORT Atom XProperty::bespinShadow[2];
+BLIB_EXPORT Atom XProperty::netSupported;
+BLIB_EXPORT Atom XProperty::blockCompositing;
+
+void
+XProperty::init()
+{
+    static bool initialized = false;
+    if (initialized)
+        return;
+    winData = XInternAtom(QX11Info::display(), "BESPIN_WIN_DATA", False);
+    bgPics = XInternAtom(QX11Info::display(), "BESPIN_BG_PICS", False);
+    decoDim = XInternAtom(QX11Info::display(), "BESPIN_DECO_DIM", False);
+    pid = XInternAtom(QX11Info::display(), "_NET_WM_PID", False);
+    blurRegion = XInternAtom(QX11Info::display(), "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
+    forceShadows = XInternAtom( QX11Info::display(), "_KDE_SHADOW_FORCE", False );
+    kwinShadow = XInternAtom( QX11Info::display(), "_KDE_NET_WM_SHADOW", False );
+    bespinShadow[0] = XInternAtom( QX11Info::display(), "BESPIN_SHADOW_SMALL", False );
+    bespinShadow[1] = XInternAtom( QX11Info::display(), "BESPIN_SHADOW_LARGE", False );
+    netSupported = XInternAtom( QX11Info::display(), "_NET_SUPPORTED", False );
+    blockCompositing = XInternAtom( QX11Info::display(), "_KDE_NET_WM_BLOCK_COMPOSITING", False );
+    initialized = true;
+}
 
 void
 XProperty::setAtom(WId window, Atom atom)

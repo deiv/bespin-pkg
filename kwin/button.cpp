@@ -16,7 +16,9 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <QApplication>
 #include <QPainter>
+#include <QTimer>
 #include <QX11Info>
 #include <netwm.h>
 #include <cmath>
@@ -32,6 +34,7 @@ using namespace Bespin;
 
 QPainterPath Button::shape[NumTypes];
 static QPixmap s_buttonMask[2];
+static int s_buttonDepth = -1;
 bool Button::fixedColors = false;
 
 Button::Button(Client *parent, Type type, bool left) : QWidget(parent->widget()),
@@ -122,7 +125,7 @@ Button::init(bool leftMenu, bool fColors, int variant)
         shape[t] = QPainterPath();
     s_buttonMask[0] = s_buttonMask[1] = QPixmap();
 
-    Shapes::Style style = (Shapes::Style)qMin(qMax(0,variant),3);
+    Shapes::Style style = (Shapes::Style)qMin(qMax(0,variant),NumTypes-1);
 
     QRectF bound(-sz/2.0, -sz/2.0, sz, sz);
     shape[Close] = Shapes::close(bound, style);
@@ -140,6 +143,7 @@ Button::init(bool leftMenu, bool fColors, int variant)
     shape[Unshade] = Shapes::unshade(bound, style);
     shape[Exposee] = Shapes::exposee(bound, style);
     shape[Info] = Shapes::info(bound, style);
+    shape[MoveResize] = Shapes::moveResize(bound, style);
 #if 0
     tip[Close] = i18n("Close");
     tip[Min] = i18n("Minimize");
@@ -243,16 +247,13 @@ Button::mouseReleaseEvent ( QMouseEvent *event )
     //          client->workspace()->setShowingDesktop( true );
         break;
     case Max:
-        if (client->isMaximizable ())
-        {
-            //TODO support alt/ctrl click?!
-    //          KDecorationDefines::MaximizeMode mode;
-    //          MaximizeRestore    The window is not maximized in any direction.
-    //          MaximizeVertical    The window is maximized vertically.
-    //          MaximizeHorizontal    The window is maximized horizontally.
-    //          MaximizeFull
-            client->maximize(event->button());
-//             client->setFullscreen(true);
+        if (client->isMaximizable ()) {
+            if (event->modifiers() & Qt::ShiftModifier)
+                client->setFullscreen(true);
+            else if (event->modifiers() & Qt::ControlModifier)
+                client->maximumize(event->button());
+            else
+                client->maximize(event->button());
         }
         break;
     case Restore:
@@ -287,6 +288,13 @@ Button::mouseReleaseEvent ( QMouseEvent *event )
             client->showWindowList(mapToGlobal(rect().topLeft())); break;
     case Info:
         client->showInfo(mapToGlobal(rect().topLeft())); break;
+    case MoveResize: {
+        QPoint cursor(QCursor::pos());
+        cursor.setY(mapToGlobal(rect().bottomLeft()).y() + 1);
+        QCursor::setPos(cursor);
+        QTimer::singleShot(1, client, SLOT(triggerMoveResize()));
+        break;
+    }
     default:
         return; // invalid type
     }
@@ -296,35 +304,49 @@ Button::mouseReleaseEvent ( QMouseEvent *event )
 }
 
 // static uint fcolors[3] = {0x9C3A3A/*0xFFBF0303*/, 0xFFEB55/*0xFFF3C300*/, 0x77B753/*0xFF00892B*/};
+// Font
 static uint fcolors[3] = {0xFFBF0303, 0xFFF3C300, 0xFF00892B};
+// Aqua
+// static uint fcolors[3] = { 0xFFD86F6B, 0xFFD8CA6B, 0xFF76D86B };
+
+// static uint fcolors[3] = { 0xFFFF7E71, 0xFFFBD185, 0xFFB1DE96 };
+// Aqua2
+// static uint fcolors[3] = { 0xFFBF2929, 0xFF29BF29, 0xFFBFBF29 };
 
 QColor
 Button::color( bool background ) const
 {
     KDecorationDefines::ColorType   fgt = KDecorationDefines::ColorButtonBg,
                                     bgt = KDecorationDefines::ColorTitleBlend;
-    int bbp = left + client->buttonBoxPos(client->isActive());
-    if (bbp < 0 || bbp > 1) // 1 + -1 || 0 + 1 vs. 1 + 1 || 0 + -1
-    {
-        fgt = KDecorationDefines::ColorFont;
-        bgt = KDecorationDefines::ColorTitleBar;
+    if (!Factory::buttonnyButton()) {
+        int bbp = left + client->buttonBoxPos(client->isActive());
+        if (bbp < 0 || bbp > 1) // 1 + -1 || 0 + 1 vs. 1 + 1 || 0 + -1
+        {
+            fgt = KDecorationDefines::ColorFont;
+            bgt = KDecorationDefines::ColorTitleBar;
+        }
     }
     bool active = client->isActive();
-    if (Factory::config()->invertedButtons)
-        { KDecorationDefines::ColorType h = fgt; fgt = bgt; bgt = h; active = true || background; }
+//     if (Factory::config()->invertedButtons)
+//         { KDecorationDefines::ColorType h = fgt; fgt = bgt; bgt = h; active = true || background; }
 
-    if ( background )
+    if ( background ) {
+//         if (/*fixedColors && */active && myType < Multi)
+//             return QColor(fcolors[myType]);
         return client->color(bgt, active);
+    }
 
     QColor c = client->color(fgt, active);
     if (fixedColors && myType < Multi)
         c = client->isActive() ? QColor(fcolors[myType]) :
             Colors::mid(c, QColor(fcolors[myType]), 6-hoverLevel, hoverLevel);
     const QColor bg = client->color(bgt, active);
-    if (isEnabled())
-        c = Colors::mid(bg, c, 6-hoverLevel, 4);
-    else
+    if (!isEnabled())
         c = Colors::mid(bg, c, 6, 1);
+    else if (Factory::buttonnyButton())
+        c = Colors::mid(bg, c, 12 - 2*hoverLevel, 4);
+    else
+        c = Colors::mid(bg, c, 6 + 4*Factory::buttonnyButton() - hoverLevel, 4);
     c.setAlpha(c.alpha()*client->buttonOpacity()/100);
     return c;
 }
@@ -339,11 +361,11 @@ Button::paintEvent(QPaintEvent *)
     const int slick = Factory::slickButtons();
     QRectF r(rect());
     if (Factory::buttonnyButton()) {
-        float d = r.height() / 4.0;
-        r.adjust(d,d,-d,-d);
-        if (s_buttonMask[0].size() != size()) {
+        { float d = r.height() / 4.0; r.adjust(d,d,-d,-d); }
+        if (s_buttonDepth != Factory::config()->buttonDepth || s_buttonMask[0].size() != size()) {
+            const int depth = s_buttonDepth = Factory::config()->buttonDepth;
             s_buttonMask[0] = QPixmap(size());
-            s_buttonMask[1] = QPixmap(width() - 6, height() - 6);
+            s_buttonMask[1] = QPixmap(width() - (2*(depth+1)), height() - (2*(depth+1)));
             s_buttonMask[0].fill(Qt::transparent);
             s_buttonMask[1].fill(Qt::transparent);
 
@@ -361,15 +383,15 @@ Button::paintEvent(QPaintEvent *)
             else
                 p.drawRect(s_buttonMask[0].rect());
             if (Factory::buttonGradient() != Gradients::Sunken) {
-                stop = QPoint(0,s_buttonMask[0].height()-4);
+                stop = QPoint(0,s_buttonMask[0].height()-(2*depth));
                 QLinearGradient lg2(start, stop);
                 lg2.setColorAt(0, QColor(255,255,255,20));
                 lg2.setColorAt(1, QColor(0,0,0,20));
                 p.setBrush(lg2);
                 if (Factory::config()->roundCorners)
-                    p.drawEllipse(s_buttonMask[0].rect().adjusted(2,2,-2,-2));
+                    p.drawEllipse(s_buttonMask[0].rect().adjusted(depth,depth,-depth,-depth));
                 else
-                    p.drawRect(s_buttonMask[0].rect().adjusted(2,2,-2,-2));
+                    p.drawRect(s_buttonMask[0].rect().adjusted(depth,depth,-depth,-depth));
             }
             p.end();
 
@@ -392,7 +414,7 @@ Button::paintEvent(QPaintEvent *)
         QColor c(color(true)); c.setAlpha(255);
         fixedColors = rFixedColors;
         QPixmap texture = Gradients::pix(c, s_buttonMask[1].height(), Qt::Vertical,
-                                         (state & Sunken) ? Gradients::Sunken : Factory::buttonGradient());
+                                         (state & Sunken) ? Gradients::Sunken : client->buttonGradient(client->isActive()));
         if (s_buttonMask[1].width() > 32) { // internal shortcut hack - the cached pixmaps are 32px width
             QPixmap gradient = texture;
             texture = QPixmap(s_buttonMask[1].size());
@@ -401,7 +423,8 @@ Button::paintEvent(QPaintEvent *)
             p2.end();
         }
 
-        p.drawPixmap(3,3, FX::applyAlpha( texture, s_buttonMask[1], s_buttonMask[1].rect() ) );
+        const int d = Factory::config()->buttonDepth + 1;
+        p.drawPixmap(d,d, FX::applyAlpha( texture, s_buttonMask[1], s_buttonMask[1].rect() ) );
     }
 
     p.setRenderHint(QPainter::Antialiasing);
@@ -410,11 +433,12 @@ Button::paintEvent(QPaintEvent *)
     p.setBrush(c);
 
     float fx, fy;
-    if (state & Sunken)
+    const int depth = Factory::buttonnyButton() ? Factory::config()->buttonDepth : 0;
+    if ((state & Sunken) && !Factory::buttonnyButton())
         fx = fy = .75;
     else if (slick == 2)
     {
-        if (!hoverLevel)
+        if (!hoverLevel || depth > 2)
         {
             const float d = r.width()/5.0;
             r.adjust(d,2*d,-d,-2*d);
@@ -428,7 +452,7 @@ Button::paintEvent(QPaintEvent *)
         }
     else if (slick)
     {
-        if (!hoverLevel)
+        if (!hoverLevel || depth > 2)
         {
             const float d = r.height()/3.0;
             r.adjust(d,d,-d,-d);
@@ -438,6 +462,8 @@ Button::paintEvent(QPaintEvent *)
         }
         fx = fy = (3+hoverLevel)/9.0;
     }
+    else if (Factory::buttonnyButton())
+        fx = fy = 1.0;
     else
         fx = fy = (18 + hoverLevel)/24.0;
     const float fs = r.height()/99.0;
