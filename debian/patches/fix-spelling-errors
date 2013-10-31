@@ -1,0 +1,69 @@
+Description: Fix some spelling errors on the upstream sources
+Author: David Suárez <david.sephirot@gmail.com>
+Last-Update: 2013-10-31
+
+--- bespin-0.r1688.orig/config/config.cpp
++++ bespin-0.r1688/config/config.cpp
+@@ -468,7 +468,7 @@ Config::Config(QWidget *parent) : BConfi
+     Amarok has a \"nice\" attitude to <u>force</u> it's playlist and other views in the window background color.<br>\
+     Not only does this maybe look strange, but it's also badly implemented, breaking certain color combinations.<br>\
+     (To be fair: it's by far not the only program with this broken approach...)<br>\
+-    This setting allows to \"normalize\" the views (including a sunken frame) ...<br>\
++    This setting allows one to \"normalize\" the views (including a sunken frame) ...<br>\
+     PS: there <u>is</u> a pending merge request to at least fix the bad implementation and\
+     i've actually noted this for the first time in 2007 or 2008... ;-P");
+ 
+@@ -587,7 +587,7 @@ Config::Config(QWidget *parent) : BConfi
+ 
+     handleSettings(ui.lockDocks, HACK_DOCK_LOCKING);
+     setContextHelp(ui.lockDocks, "<b>Lock Dockwidgets</b><hr>\
+-    Qt mainwindows provide a (quite ;-) powerfull way to arrange parts of the application\
++    Qt mainwindows provide a (quite ;-) powerful way to arrange parts of the application\
+     (like the sidebars in Dolphin or K3b) but while you can lock them in eg. Amarok or K3b,\
+     they'll remain always movable in most other applications.<br>\
+     Checking this will initially lock those docks and allow you to toggle them unlocked\
+@@ -652,7 +652,7 @@ Config::Config(QWidget *parent) : BConfi
+                     It's also possible to im and export settings from external files and share\
+                     them with others.\
+                     </p><p>\
+-                    You can also call the config dialog with the paramater \"demo\"\
++                    You can also call the config dialog with the parameter \"demo\"\
+                     <p><b>\
+                     bespin demo [some style]\
+                     </b></p>\
+--- bespin-0.r1688.orig/kwin/config.cpp
++++ bespin-0.r1688/kwin/config.cpp
+@@ -86,13 +86,13 @@ Config::Config(QWidget* parent) : BConfi
+     /** setContextHelp(.) attaches a context help string to a widget on your form */
+     setContextHelp(ui.resizeCorner, "<b>Resize Corner</b><hr>\
+     Displays a small sizeGrip in the lower right corner of every window, this is especially\
+-    usefull if you select \"Tiny\" border size (i.e. no border at all)<br>\
++    useful if you select \"Tiny\" border size (i.e. no border at all)<br>\
+     If it should ever cover some important area of the window content, you can allways hide it\
+     for 5 seconds by rightclicking it.<br>\
+     <b>Notice:<b/> This is a little hackish and might not work on all systems!");
+ 
+     handleSettings(ui.verticalTitlebar, "VerticalTitlebar", false);
+-    setContextHelp(ui.verticalTitlebar, "<b>Vertical Titlebar</b><hr>Could be usefull...");
++    setContextHelp(ui.verticalTitlebar, "<b>Vertical Titlebar</b><hr>Could be useful...");
+ 
+     handleSettings(ui.roundCorners, "RoundCorners", true);
+ //     ui.roundCorners->hide();
+@@ -152,7 +152,7 @@ Config::Config(QWidget* parent) : BConfi
+ 
+     handleSettings(ui.multibutton, "MultiButtonOrder", "MHFBS");
+     setContextHelp(ui.multibutton, "<b>The 'Multibutton'</b><hr>\
+-    KWin supports a lot of different button type with more or less usefull functions.<br>\
++    KWin supports a lot of different button type with more or less useful functions.<br>\
+     Though this is really a nice feature, it will make the titlebar look cluttered and dull.<br>\
+     Thus the Bespin decoration will add only the first button beyond (NOT behind ;) Close/Min/Max\
+     and stack all extra buttons into it.<br>\
+@@ -225,7 +225,7 @@ Config::Config(QWidget* parent) : BConfi
+     handleSettings(ui.activeShadowSize, SHADOW_SIZE_ACTIVE);
+     handleSettings(ui.halo, SHADOW_IS_HALO);
+     setContextHelp(ui.halo, "<b>Use Halo instead of Shadow</b><hr>\
+-    Allows to set a colored halo with even paddings around windows. Good for dark setups");
++    Allows one to set a colored halo with even paddings around windows. Good for dark setups");
+     connect ( ui.shadowColor, SIGNAL( changed(const QColor&) ), SIGNAL( changed() ) );
+     connect ( ui.haloColor, SIGNAL( changed(const QColor&) ), SIGNAL( changed() ) );
+     ui.haloColor->hide(); // halo is initially untoggled
