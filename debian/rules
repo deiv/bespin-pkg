@@ -23,6 +23,8 @@ UNCLEANED_FILES=\
   ksplash/tibanna/1280x1024/ \
   ksplash/tibanna/1366x768/ \
   ksplash/tibanna/1440x900/ \
+  ksplash/tibanna/1600x1200/ \
+  ksplash/tibanna/1920x1080/ \
   ksplash/tibanna/Preview.png
 
 %:
