@@ -1,0 +1,6 @@
+kde-style-bespin: package-name-doesnt-match-sonames
+kde-style-bespin: shlib-without-versioned-soname usr/lib/libQtBespin.so libQtBespin.so
+# Private library, no symbols file needed
+kde-style-bespin: no-symbols-control-file usr/lib/libQtBespin.so
+# Non-user binary
+kde-style-bespin: binary-without-manpage usr/bin/be.shadowed
