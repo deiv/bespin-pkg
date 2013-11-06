@@ -1,3 +1,24 @@
+bespin (0.r1688-1) unstable; urgency=low
+
+  * New upstream release
+  * Switch to dpkg-source 3.0 (quilt) format (Closes: #724180)
+  * debian/rules: fix clean target
+  * debian/control:
+     + update debhelper version
+     + update standards version; no changes needed
+     + use canonical URL for Vcs-Git field
+     + fix long descriptions (Closes: #696566)
+  * debian/copyright: fix license file
+  * Fix some spelling errors on upstream sources
+  * Use correct debian/install-* file for extras and presets
+  * Do not install an additional copyright file
+  * Add debian/watch file
+  * Update lintian overrides
+  * Add patch to fix segfault
+  * debian/README.source: describe the new packaging policy
+
+ -- David Suárez <david.sephirot@gmail.com>  Sun, 03 Nov 2013 11:54:53 +0100
+
 bespin (0.r1552-1) unstable; urgency=low
 
   * New release SVN@1552 
