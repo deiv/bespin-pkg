@@ -30,8 +30,7 @@ UNCLEANED_FILES=\
 %:
 	dh $@ --parallel
 
-override_dh_auto_clean: override_dh_auto_configure
-	cd build && make clean
+override_dh_auto_clean:
 	$(RM) -R build $(UNCLEANED_FILES)
 
 override_dh_auto_configure:
