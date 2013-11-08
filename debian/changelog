@@ -17,7 +17,7 @@ bespin (0.r1688-1) unstable; urgency=low
   * Add patch to fix segfault
   * debian/README.source: describe the new packaging policy
 
- -- David Suárez <david.sephirot@gmail.com>  Sun, 03 Nov 2013 11:54:53 +0100
+ -- David Suárez <david.sephirot@gmail.com>  Fri, 08 Nov 2013 18:58:02 +0100
 
 bespin (0.r1552-1) unstable; urgency=low
 
